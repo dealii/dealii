@@ -281,8 +281,9 @@ namespace Utilities
           }
         AssertDimension (current_index_start, n_ghost_indices_data);
 
-        MPI_Waitall (import_requests.size(), &import_requests[0],
-                     MPI_STATUSES_IGNORE);
+        if (import_requests.size()>0)
+          MPI_Waitall (import_requests.size(), &import_requests[0],
+                       MPI_STATUSES_IGNORE);
 
         // transform import indices to local index space and compress
         // contiguous indices in form of ranges

@@ -141,6 +141,10 @@ namespace Utilities
       const unsigned int max_n_destinations
         = Utilities::MPI::max (destinations.size(), mpi_comm);
 
+      if (max_n_destinations==0)
+        // all processes have nothing to send/receive:
+        return std::vector<unsigned int>();
+
       // now that we know the number
       // of data packets every
       // processor wants to send, set

@@ -663,14 +663,15 @@ namespace TrilinosWrappers
         n_entries_per_ghost_row.push_back(1);
       }
 
-    Epetra_Map off_processor_map(-1, ghost_rows.size(), &ghost_rows[0],
+    Epetra_Map off_processor_map(-1, ghost_rows.size(),
+                                 (ghost_rows.size()>0)?(&ghost_rows[0]):NULL,
                                  0, input_row_map.Comm());
 
     std_cxx11::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
     if (input_row_map.Comm().NumProc() > 1)
       {
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
-                                          &n_entries_per_row[0],
+                                          (n_entries_per_row.size()>0)?(&n_entries_per_row[0]):NULL,
                                           exchange_data ? false : true));
         if (have_ghost_rows == true)
           nonlocal_graph.reset (new Epetra_CrsGraph (Copy, off_processor_map,
@@ -679,7 +680,8 @@ namespace TrilinosWrappers
       }
     else
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-                                        &n_entries_per_row[0], true));
+                                        (n_entries_per_row.size()>0)?(&n_entries_per_row[0]):NULL,
+                                        true));
 
     // now insert the indices, select between the right matrix
     std::vector<TrilinosWrappers::types::int_type> row_indices;
@@ -1522,7 +1524,7 @@ namespace TrilinosWrappers
         // TODO: this could lead to a dead lock when only one processor
         // calls GlobalAssemble.
         ierr = matrix->GlobalAssemble(*column_space_map,
-                                      row_partitioner(), false);
+                                      matrix->RowMap(), false);
 
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }

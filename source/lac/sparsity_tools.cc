@@ -606,9 +606,6 @@ namespace SparsityTools
                   &requests[idx]);
     }
 
-//TODO: In the following, we read individual bytes and then reinterpret them
-//    as typename DSP_t::size_type objects. this is error prone. use properly typed reads that
-//    match the write above
     {
       //receive
       std::vector<typename DSP_t::size_type> recv_buf;
@@ -619,22 +616,21 @@ namespace SparsityTools
           MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
           Assert (status.MPI_TAG==124, ExcInternalError());
 
-          MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(typename DSP_t::size_type)==0, ExcInternalError());
-
-          recv_buf.resize(len/sizeof(typename DSP_t::size_type));
-
-          MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
+          MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          recv_buf.resize(len);
+          MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
           typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
           typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
-          while (ptr+1<end)
+          while (ptr!=end)
             {
               typename DSP_t::size_type num=*(ptr++);
+              Assert(ptr!=end, ExcInternalError());
               typename DSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
+                  Assert(ptr!=end, ExcInternalError());
                   dsp.add(row, *ptr);
                   ptr++;
                 }
@@ -644,7 +640,8 @@ namespace SparsityTools
     }
 
     // complete all sends, so that we can safely destroy the buffers.
-    MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+    if (requests.size())
+      MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 
   }
 
@@ -730,9 +727,6 @@ namespace SparsityTools
                   &requests[idx]);
     }
 
-//TODO: In the following, we read individual bytes and then reinterpret them
-//    as typename DSP_t::size_type objects. this is error prone. use properly typed reads that
-//    match the write above
     {
       //receive
       std::vector<typename DSP_t::size_type> recv_buf;
@@ -743,22 +737,21 @@ namespace SparsityTools
           MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
           Assert (status.MPI_TAG==124, ExcInternalError());
 
-          MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(typename DSP_t::size_type)==0, ExcInternalError());
-
-          recv_buf.resize(len/sizeof(typename DSP_t::size_type));
-
-          MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
+          MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          recv_buf.resize(len);
+          MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
           typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
           typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
-          while (ptr+1<end)
+          while (ptr!=end)
             {
               typename DSP_t::size_type num=*(ptr++);
+              Assert(ptr!=end, ExcInternalError());
               typename DSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
+                  Assert(ptr!=end, ExcInternalError());
                   dsp.add(row, *ptr);
                   ptr++;
                 }
@@ -768,7 +761,8 @@ namespace SparsityTools
     }
 
     // complete all sends, so that we can safely destroy the buffers.
-    MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+    if (requests.size())
+      MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
   }
 
 
