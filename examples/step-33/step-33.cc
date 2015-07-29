@@ -2146,9 +2146,9 @@ namespace Step33
       // const_cast.
       case Parameters::Solver::gmres:
       {
-        Epetra_Vector x(View, system_matrix.domain_partitioner(),
+        Epetra_Vector x(View, system_matrix.trilinos_matrix().DomainMap(),
                         newton_update.begin());
-        Epetra_Vector b(View, system_matrix.range_partitioner(),
+        Epetra_Vector b(View, system_matrix.trilinos_matrix().RangeMap(),
                         right_hand_side.begin());
 
         AztecOO solver;
