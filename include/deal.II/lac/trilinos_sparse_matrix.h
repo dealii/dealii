@@ -2540,35 +2540,10 @@ namespace TrilinosWrappers
                              const MPI_Comm      &communicator,
                              const bool           exchange_data)
   {
-    Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (map, map, sparsity_pattern, exchange_data);
+    reinit (parallel_partitioning, parallel_partitioning,
+            sparsity_pattern, communicator, exchange_data);
   }
 
-
-
-  template <typename SparsityType>
-  inline
-  void SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
-                             const IndexSet      &col_parallel_partitioning,
-                             const SparsityType  &sparsity_pattern,
-                             const MPI_Comm      &communicator,
-                             const bool           exchange_data)
-  {
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map (communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (row_map, col_map, sparsity_pattern, exchange_data);
-  }
-
-
-  // declare the existence of an explicit specialization
-  template <>
-  void
-  SparseMatrix::reinit (const Epetra_Map    &input_row_map,
-                        const Epetra_Map    &input_col_map,
-                        const DynamicSparsityPattern &sparsity_pattern,
-                        const bool           exchange_data);
 
 
   template <typename number>
@@ -2581,28 +2556,8 @@ namespace TrilinosWrappers
                              const ::dealii::SparsityPattern *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (map, map, sparse_matrix, drop_tolerance, copy_values,
-            use_this_sparsity);
-  }
-
-
-
-  template <typename number>
-  inline
-  void SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
-                             const IndexSet      &col_parallel_partitioning,
-                             const ::dealii::SparseMatrix<number> &sparse_matrix,
-                             const MPI_Comm      &communicator,
-                             const double         drop_tolerance,
-                             const bool           copy_values,
-                             const ::dealii::SparsityPattern *use_this_sparsity)
-  {
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map (communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map (communicator, false);
-    reinit (row_map, col_map, sparse_matrix, drop_tolerance, copy_values,
-            use_this_sparsity);
+    reinit (parallel_partitioning, parallel_partitioning, sparse_matrix,
+            drop_tolerance, copy_values, use_this_sparsity);
   }
 
 
@@ -2626,24 +2581,6 @@ namespace TrilinosWrappers
 
 
   inline
-  const Epetra_Map &
-  SparseMatrix::domain_partitioner () const
-  {
-    return matrix->DomainMap();
-  }
-
-
-
-  inline
-  const Epetra_Map &
-  SparseMatrix::range_partitioner () const
-  {
-    return matrix->RangeMap();
-  }
-
-
-
-  inline
   IndexSet
   SparseMatrix::locally_owned_domain_indices () const
   {
@@ -2657,24 +2594,6 @@ namespace TrilinosWrappers
   SparseMatrix::locally_owned_range_indices () const
   {
     return IndexSet(matrix->RangeMap());
-  }
-
-
-
-  inline
-  const Epetra_Map &
-  SparseMatrix::row_partitioner () const
-  {
-    return matrix->RowMap();
-  }
-
-
-
-  inline
-  const Epetra_Map &
-  SparseMatrix::col_partitioner () const
-  {
-    return matrix->ColMap();
   }
 
 

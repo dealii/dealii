@@ -37,5 +37,13 @@ for (S : REAL_SCALARS)
                             const double,
                             const bool,
                             const dealii::SparsityPattern *);
+      template void
+      SparseMatrix::reinit (const IndexSet &,
+                            const IndexSet &,
+                            const dealii::SparseMatrix<S> &,
+                            const MPI_Comm &,
+                            const double,
+                            const bool,
+                            const dealii::SparsityPattern *);
     \}
   }
