@@ -1976,7 +1976,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::matrix_norm_square (const VectorBase &v) const
   {
-    Assert (matrix->RowMap().SameAs(matrix->ColMap()),
+    Assert (matrix->RowMap().SameAs(matrix->DomainMap()),
             ExcNotQuadratic());
 
     VectorBase temp_vector;
@@ -1992,7 +1992,7 @@ namespace TrilinosWrappers
   SparseMatrix::matrix_scalar_product (const VectorBase &u,
                                        const VectorBase &v) const
   {
-    Assert (matrix->RowMap().SameAs(matrix->ColMap()),
+    Assert (matrix->RowMap().SameAs(matrix->DomainMap()),
             ExcNotQuadratic());
 
     VectorBase temp_vector;
