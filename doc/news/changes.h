@@ -66,6 +66,12 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: The testsuite now runs in a mode in which we abort programs for
+  floating point exceptions due to divisions by zero or other invalid arithmetic.
+  <br>
+  (Wolfgang Bangerth, 2015/07/29)
+  </li>
+
   <li> New: MultithreadInfo::set_thread_limit() can now be called more than
   once and the environment variable DEAL_II_NUM_THREADS will be respected
   even if user code never calls it.
