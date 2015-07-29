@@ -2822,8 +2822,6 @@ namespace internal
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
                 typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
-                typename BaseClass::ExcInvalidObject());
         Assert (static_cast<unsigned int>(local_source_end-local_source_begin)
                 ==
                 accessor.get_fe().dofs_per_cell,
@@ -2856,8 +2854,6 @@ namespace internal
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
                 typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
-                typename BaseClass::ExcInvalidObject());
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcVectorDoesNotMatch());
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
@@ -2888,8 +2884,6 @@ namespace internal
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
                 typename BaseClass::ExcInvalidObject());
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcVectorDoesNotMatch());
@@ -2923,8 +2917,6 @@ namespace internal
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
                 typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
-                typename BaseClass::ExcInvalidObject());
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcVectorDoesNotMatch());
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
@@ -2954,8 +2946,6 @@ namespace internal
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
                 typename BaseClass::ExcInvalidObject());
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcMatrixDoesNotMatch());
@@ -2992,8 +2982,6 @@ namespace internal
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
                 typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
-                typename BaseClass::ExcInvalidObject());
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcMatrixDoesNotMatch());
         Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
@@ -3029,8 +3017,6 @@ namespace internal
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
                 typename BaseClass::ExcInvalidObject());
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcMatrixDoesNotMatch());
@@ -3074,8 +3060,6 @@ namespace internal
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
-        Assert (&accessor.get_fe() != 0,
                 typename BaseClass::ExcInvalidObject());
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcMatrixDoesNotMatch());
