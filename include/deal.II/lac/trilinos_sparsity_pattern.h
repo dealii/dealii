@@ -423,7 +423,7 @@ namespace TrilinosWrappers
      * performance when creating the sparsity pattern.
      */
     SparsityPattern (const Epetra_Map &parallel_partitioning,
-                     const size_type   n_entries_per_row = 0);
+                     const size_type   n_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -436,7 +436,7 @@ namespace TrilinosWrappers
      * designed to describe.
      */
     SparsityPattern (const Epetra_Map             &parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row);
+                     const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -456,7 +456,7 @@ namespace TrilinosWrappers
      */
     SparsityPattern (const Epetra_Map   &row_parallel_partitioning,
                      const Epetra_Map   &col_parallel_partitioning,
-                     const size_type     n_entries_per_row = 0);
+                     const size_type     n_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -471,7 +471,7 @@ namespace TrilinosWrappers
      */
     SparsityPattern (const Epetra_Map             &row_parallel_partitioning,
                      const Epetra_Map             &col_parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row);
+                     const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * Reinitialization function for generating a square sparsity pattern
@@ -489,7 +489,7 @@ namespace TrilinosWrappers
      */
     void
     reinit (const Epetra_Map &parallel_partitioning,
-            const size_type   n_entries_per_row = 0);
+            const size_type   n_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -503,7 +503,7 @@ namespace TrilinosWrappers
      */
     void
     reinit (const Epetra_Map             &parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row);
+            const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -524,7 +524,7 @@ namespace TrilinosWrappers
     void
     reinit (const Epetra_Map   &row_parallel_partitioning,
             const Epetra_Map   &col_parallel_partitioning,
-            const size_type     n_entries_per_row = 0);
+            const size_type     n_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -540,7 +540,7 @@ namespace TrilinosWrappers
     void
     reinit (const Epetra_Map             &row_parallel_partitioning,
             const Epetra_Map             &col_parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row);
+            const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -555,7 +555,7 @@ namespace TrilinosWrappers
     reinit (const Epetra_Map   &row_parallel_partitioning,
             const Epetra_Map   &col_parallel_partitioning,
             const SparsityType &nontrilinos_sparsity_pattern,
-            const bool          exchange_data = false);
+            const bool          exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -569,7 +569,7 @@ namespace TrilinosWrappers
     void
     reinit (const Epetra_Map   &parallel_partitioning,
             const SparsityType &nontrilinos_sparsity_pattern,
-            const bool          exchange_data = false);
+            const bool          exchange_data = false) DEAL_II_DEPRECATED;
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -932,7 +932,7 @@ namespace TrilinosWrappers
      * pattern, i.e., the partitioning of the vectors matrices based on this
      * sparsity pattern are multiplied with.
      */
-    const Epetra_Map &domain_partitioner () const;
+    const Epetra_Map &domain_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -940,14 +940,14 @@ namespace TrilinosWrappers
      * i.e., the partitioning of the vectors that are result from matrix-
      * vector products.
      */
-    const Epetra_Map &range_partitioner () const;
+    const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the sparsity pattern rows. Equal to the
      * partitioning of the range.
      */
-    const Epetra_Map &row_partitioner () const;
+    const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -955,13 +955,39 @@ namespace TrilinosWrappers
      * general not equal to the partitioner Epetra_Map for the domain because
      * of overlap in the matrix.
      */
-    const Epetra_Map &col_partitioner () const;
+    const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the communicator used for this object.
      */
-    const Epetra_Comm &trilinos_communicator () const;
+    const Epetra_Comm &trilinos_communicator () const DEAL_II_DEPRECATED;
+
+    /**
+     * Return the MPI communicator object in use with this matrix.
+     */
+    MPI_Comm get_mpi_communicator () const;
 //@}
+
+    /**
+     * @name Partitioners
+     */
+//@{
+
+    /**
+     * Return the partitioning of the domain space of this matrix, i.e., the
+     * partitioning of the vectors this matrix has to be multiplied with.
+     */
+    IndexSet locally_owned_domain_indices() const;
+
+    /**
+     * Return the partitioning of the range space of this matrix, i.e., the
+     * partitioning of the vectors that are result from matrix-vector
+     * products.
+     */
+    IndexSet locally_owned_range_indices() const;
+
+//@}
+
     /**
      * @name Iterators
      */
@@ -1440,46 +1466,19 @@ namespace TrilinosWrappers
 
 
   inline
-  const Epetra_Map &
-  SparsityPattern::domain_partitioner () const
+  IndexSet
+  SparsityPattern::locally_owned_domain_indices () const
   {
-    return static_cast<const Epetra_Map &>(graph->DomainMap());
+    return IndexSet(static_cast<const Epetra_Map &>(graph->DomainMap()));
   }
 
 
 
   inline
-  const Epetra_Map &
-  SparsityPattern::range_partitioner () const
+  IndexSet
+  SparsityPattern::locally_owned_range_indices () const
   {
-    return static_cast<const Epetra_Map &>(graph->RangeMap());
-  }
-
-
-
-  inline
-  const Epetra_Map &
-  SparsityPattern::row_partitioner () const
-  {
-    return static_cast<const Epetra_Map &>(graph->RowMap());
-  }
-
-
-
-  inline
-  const Epetra_Map &
-  SparsityPattern::col_partitioner () const
-  {
-    return static_cast<const Epetra_Map &>(graph->ColMap());
-  }
-
-
-
-  inline
-  const Epetra_Comm &
-  SparsityPattern::trilinos_communicator () const
-  {
-    return graph->RangeMap().Comm();
+    return IndexSet(static_cast<const Epetra_Map &>(graph->RangeMap()));
   }
 
 #endif // DOXYGEN
