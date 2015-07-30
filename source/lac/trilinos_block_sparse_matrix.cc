@@ -380,6 +380,38 @@ namespace TrilinosWrappers
 
 
 
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::domain_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> domain_partitioner;
+    for (size_type c = 0; c < this->n_block_cols(); ++c)
+      domain_partitioner.push_back(this->sub_objects[0][c]->domain_partitioner());
+
+    return domain_partitioner;
+  }
+
+
+
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::range_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> range_partitioner;
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      range_partitioner.push_back(this->sub_objects[r][0]->range_partitioner());
+
+    return range_partitioner;
+  }
+
+
+
+
+
 
 
   // -------------------- explicit instantiations -----------------------

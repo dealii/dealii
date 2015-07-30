@@ -29,6 +29,38 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
+#ifdef DEAL_II_WITH_TRILINOS
+IndexSet::IndexSet (const Epetra_Map &map)
+  :
+  is_compressed (true),
+  index_space_size (map.NumGlobalElements()),
+  largest_range (numbers::invalid_unsigned_int)
+{
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map.LinearMap())
+    {
+#ifndef DEAL_II_WITH_64BIT_INDICES
+      add_range(size_type(map.MinMyGID()), size_type(map.MaxMyGID()+1));
+#else
+      add_range(size_type(map.MinMyGID64()), size_type(map.MaxMyGID64()+1));
+#endif
+    }
+  else
+    {
+      const size_type n_indices = map.NumMyElements();
+#ifndef DEAL_II_WITH_64BIT_INDICES
+      unsigned int *indices = (unsigned int *)map.MyGlobalElements();
+#else
+      size_type *indices = (size_type *)map.MyGlobalElements64();
+#endif
+      add_indices(indices, indices+n_indices);
+    }
+  compress();
+}
+#endif
+
+
+
 void
 IndexSet::add_range (const size_type begin,
                      const size_type end)

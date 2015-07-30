@@ -654,7 +654,7 @@ namespace TrilinosWrappers
      * equivalent to calling the second constructor with the length of the
      * mapping vector and then entering the index values.
      */
-    BlockSparsityPattern (const std::vector<Epetra_Map> &parallel_partitioning);
+    BlockSparsityPattern (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 
     /**
      * Initialize the pattern with an array of index sets that specifies both
@@ -699,7 +699,7 @@ namespace TrilinosWrappers
      * distribution according to the specifications in the array of
      * Epetra_Maps.
      */
-    void reinit (const std::vector<Epetra_Map> &parallel_partitioning);
+    void reinit (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 
     /**
      * Resize the matrix to a square tensor product of matrices. See the
