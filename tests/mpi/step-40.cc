@@ -252,8 +252,10 @@ namespace Step40
     preconditioner(system_matrix,
                    PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
 
-    solver.solve (system_matrix, completely_distributed_solution, system_rhs,
-                  preconditioner);
+    check_solver_within_range(
+      solver.solve (system_matrix, completely_distributed_solution, system_rhs,
+                    preconditioner),
+      solver_control.last_step(), 10, 10);
 
     pcout << "   Solved in " << solver_control.last_step()
           << " iterations." << std::endl;
