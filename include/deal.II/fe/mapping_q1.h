@@ -387,17 +387,6 @@ public:
                           InternalData &data) const;
 
   /**
-   * Do the computation for the <tt>fill_*</tt> functions.
-   */
-  void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                face_no,
-                          const unsigned int                subface_no,
-                          const DataSetDescriptor           data_set,
-                          const Quadrature<dim-1>          &quadrature,
-                          const InternalData                     &internal_data,
-                          FEValuesData<dim,spacedim>                                &output_data) const;
-
-  /**
    * Compute shape values and/or derivatives.
    */
   virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,

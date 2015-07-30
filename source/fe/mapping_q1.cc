@@ -653,66 +653,66 @@ namespace internal
       const UpdateFlags update_flags(data.current_update_flags());
 
       if (update_flags & update_contravariant_transformation)
-	// if the current cell is just a
-	// translation of the previous one, no
-	// need to recompute jacobians...
-	if (cell_similarity != CellSimilarity::translation)
-	  {
-	    const unsigned int n_q_points = data.contravariant.size();
+        // if the current cell is just a
+        // translation of the previous one, no
+        // need to recompute jacobians...
+        if (cell_similarity != CellSimilarity::translation)
+          {
+            const unsigned int n_q_points = data.contravariant.size();
 
-	    std::fill(data.contravariant.begin(), data.contravariant.end(),
-		      DerivativeForm<1,dim,spacedim>());
+            std::fill(data.contravariant.begin(), data.contravariant.end(),
+                      DerivativeForm<1,dim,spacedim>());
 
-	    Assert (data.n_shape_functions > 0, ExcInternalError());
-	    const Tensor<1,spacedim> *supp_pts =
-	      &data.mapping_support_points[0];
+            Assert (data.n_shape_functions > 0, ExcInternalError());
+            const Tensor<1,spacedim> *supp_pts =
+              &data.mapping_support_points[0];
 
-	    for (unsigned int point=0; point<n_q_points; ++point)
-	      {
-		const Tensor<1,dim> *data_derv =
-		  &data.derivative(point+data_set, 0);
+            for (unsigned int point=0; point<n_q_points; ++point)
+              {
+                const Tensor<1,dim> *data_derv =
+                  &data.derivative(point+data_set, 0);
 
-		double result [spacedim][dim];
+                double result [spacedim][dim];
 
-		// peel away part of sum to avoid zeroing the
-		// entries and adding for the first time
-		for (unsigned int i=0; i<spacedim; ++i)
-		  for (unsigned int j=0; j<dim; ++j)
-		    result[i][j] = data_derv[0][j] * supp_pts[0][i];
-		for (unsigned int k=1; k<data.n_shape_functions; ++k)
-		  for (unsigned int i=0; i<spacedim; ++i)
-		    for (unsigned int j=0; j<dim; ++j)
-		      result[i][j] += data_derv[k][j] * supp_pts[k][i];
+                // peel away part of sum to avoid zeroing the
+                // entries and adding for the first time
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<dim; ++j)
+                    result[i][j] = data_derv[0][j] * supp_pts[0][i];
+                for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      result[i][j] += data_derv[k][j] * supp_pts[k][i];
 
-		// write result into contravariant data. for
-		// j=dim in the case dim<spacedim, there will
-		// never be any nonzero data that arrives in
-		// here, so it is ok anyway because it was
-		// initialized to zero at the initialization
-		for (unsigned int i=0; i<spacedim; ++i)
-		  for (unsigned int j=0; j<dim; ++j)
-		    data.contravariant[point][i][j] = result[i][j];
-	      }
-	  }
+                // write result into contravariant data. for
+                // j=dim in the case dim<spacedim, there will
+                // never be any nonzero data that arrives in
+                // here, so it is ok anyway because it was
+                // initialized to zero at the initialization
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<dim; ++j)
+                    data.contravariant[point][i][j] = result[i][j];
+              }
+          }
 
       if (update_flags & update_covariant_transformation)
-	if (cell_similarity != CellSimilarity::translation)
-	  {
-	    const unsigned int n_q_points = data.contravariant.size();
+        if (cell_similarity != CellSimilarity::translation)
+          {
+            const unsigned int n_q_points = data.contravariant.size();
             for (unsigned int point=0; point<n_q_points; ++point)
               {
                 data.covariant[point] = (data.contravariant[point]).covariant_form();
               }
-        }
+          }
 
       if (update_flags & update_volume_elements)
-	if (cell_similarity != CellSimilarity::translation)
-	  {
-	    const unsigned int n_q_points = data.contravariant.size();	  
-	    for (unsigned int point=0; point<n_q_points; ++point)
-	      data.volume_elements[point] = data.contravariant[point].determinant();
-	}
-      
+        if (cell_similarity != CellSimilarity::translation)
+          {
+            const unsigned int n_q_points = data.contravariant.size();
+            for (unsigned int point=0; point<n_q_points; ++point)
+              data.volume_elements[point] = data.contravariant[point].determinant();
+          }
+
     }
   }
 }
@@ -1024,7 +1024,6 @@ namespace internal
                       output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
                       output_data.boundary_forms[point] /=
                         (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
-
                     }
 
                   if (dim==2)
@@ -1039,13 +1038,9 @@ namespace internal
                       // and the cell normal:
                       cross_product (output_data.boundary_forms[point],
                                      data.aux[0][point], cell_normal);
-
                     }
-
                 }
             }
-
-
 
           if (update_flags & (update_normal_vectors
                               | update_JxW_values))
@@ -1077,49 +1072,39 @@ namespace internal
               output_data.inverse_jacobians[point] = data.covariant[point].transpose();
         }
     }
+
+
+    /**
+     * Do the work of MappingQ1::fill_fe_face_values() and
+     * MappingQ1::fill_fe_subface_values() in a generic way,
+     * using the 'data_set' to differentiate whether we will
+     * work on a face (and if so, which one) or subface.
+     */
+    template<int dim, int spacedim>
+    void
+    do_fill_fe_face_values (const dealii::MappingQ1<dim,spacedim>                             &mapping,
+                            const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                            const unsigned int                                                 face_no,
+                            const unsigned int                                                 subface_no,
+                            const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+                            const Quadrature<dim-1>                                           &quadrature,
+                            const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
+                            FEValuesData<dim,spacedim>                                        &output_data)
+    {
+      maybe_compute_q_points<dim,spacedim> (data_set,
+                                            data,
+                                            output_data.quadrature_points);
+      maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
+                                            data_set,
+                                            data);
+      maybe_compute_face_data (mapping,
+                               cell, face_no, subface_no, quadrature.size(),
+                               quadrature.get_weights(), data,
+                               output_data);
+    }
   }
 }
 
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ1<dim,spacedim>::
-compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                   const unsigned int                face_no,
-                   const unsigned int                subface_no,
-                   const DataSetDescriptor           data_set,
-                   const Quadrature<dim-1>           &quadrature,
-                   const InternalData                     &internal_data,
-                   FEValuesData<dim,spacedim>                                &output_data) const
-{
-  // if necessary, recompute the support points of the transformation of this cell
-  // (note that we need to first check the triangulation pointer, since otherwise
-  // the second test might trigger an exception if the triangulations are not the
-  // same)
-  if ((internal_data.mapping_support_points.size() == 0)
-      ||
-      (&cell->get_triangulation() !=
-       &internal_data.cell_of_current_support_points->get_triangulation())
-      ||
-      (cell != internal_data.cell_of_current_support_points))
-    {
-      compute_mapping_support_points(cell, internal_data.mapping_support_points);
-      internal_data.cell_of_current_support_points = cell;
-    }
-
-  internal::maybe_compute_q_points<dim,spacedim> (data_set,
-                                                  internal_data,
-                                                  output_data.quadrature_points);
-  internal::maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
-                                                  data_set,
-                                                  internal_data);
-  internal::maybe_compute_face_data (*this,
-                                     cell, face_no, subface_no, quadrature.size(),
-                                     quadrature.get_weights(), internal_data,
-                                     output_data);
-}
 
 
 template<int dim, int spacedim>
@@ -1132,19 +1117,36 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      FEValuesData<dim,spacedim>                                &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
+  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
           ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(internal_data);
+  const InternalData &data
+    = static_cast<const InternalData &>(internal_data);
 
-  compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
-                     DataSetDescriptor::face (face_no,
-                                              cell->face_orientation(face_no),
-                                              cell->face_flip(face_no),
-                                              cell->face_rotation(face_no),
-                                              quadrature.size()),
-                     quadrature,
-                     data,
-                     output_data);
+  // if necessary, recompute the support points of the transformation of this cell
+  // (note that we need to first check the triangulation pointer, since otherwise
+  // the second test might trigger an exception if the triangulations are not the
+  // same)
+  if ((data.mapping_support_points.size() == 0)
+      ||
+      (&cell->get_triangulation() !=
+       &data.cell_of_current_support_points->get_triangulation())
+      ||
+      (cell != data.cell_of_current_support_points))
+    {
+      compute_mapping_support_points(cell, data.mapping_support_points);
+      data.cell_of_current_support_points = cell;
+    }
+
+  internal::do_fill_fe_face_values (*this,
+                                    cell, face_no, numbers::invalid_unsigned_int,
+                                    DataSetDescriptor::face (face_no,
+                                                             cell->face_orientation(face_no),
+                                                             cell->face_flip(face_no),
+                                                             cell->face_rotation(face_no),
+                                                             quadrature.size()),
+                                    quadrature,
+                                    data,
+                                    output_data);
 }
 
 
@@ -1160,20 +1162,37 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         FEValuesData<dim,spacedim>                                &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
+  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
           ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(internal_data);
+  const InternalData &data
+    = static_cast<const InternalData &>(internal_data);
 
-  compute_fill_face (cell, face_no, subface_no,
-                     DataSetDescriptor::subface (face_no, subface_no,
-                                                 cell->face_orientation(face_no),
-                                                 cell->face_flip(face_no),
-                                                 cell->face_rotation(face_no),
-                                                 quadrature.size(),
-                                                 cell->subface_case(face_no)),
-                     quadrature,
-                     data,
-                     output_data);
+  // if necessary, recompute the support points of the transformation of this cell
+  // (note that we need to first check the triangulation pointer, since otherwise
+  // the second test might trigger an exception if the triangulations are not the
+  // same)
+  if ((data.mapping_support_points.size() == 0)
+      ||
+      (&cell->get_triangulation() !=
+       &data.cell_of_current_support_points->get_triangulation())
+      ||
+      (cell != data.cell_of_current_support_points))
+    {
+      compute_mapping_support_points(cell, data.mapping_support_points);
+      data.cell_of_current_support_points = cell;
+    }
+
+  internal::do_fill_fe_face_values (*this,
+                                    cell, face_no, subface_no,
+                                    DataSetDescriptor::subface (face_no, subface_no,
+                                        cell->face_orientation(face_no),
+                                        cell->face_flip(face_no),
+                                        cell->face_rotation(face_no),
+                                        quadrature.size(),
+                                        cell->subface_case(face_no)),
+                                    quadrature,
+                                    data,
+                                    output_data);
 }
 
 
