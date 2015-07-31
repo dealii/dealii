@@ -2208,7 +2208,7 @@ namespace TrilinosWrappers
                 transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID(indices[j]),
                                     GID, values[j]);
 #else
-              const size_type GID = inputleft.matrix->RowMap().GID64(i);
+              const size_type GID = inputleft.trilinos_matrix().RowMap().GID64(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
                 transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID64(indices[j]),
                                     GID, values[j]);
