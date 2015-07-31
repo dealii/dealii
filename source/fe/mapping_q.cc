@@ -199,11 +199,26 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  this->compute_data (update_flags, quadrature,
-                      quadrature.size(), *data);
+
+  // fill the data of both the Q_p and the Q_1 objects in parallel
+  Threads::TaskGroup<> tasks;
+  tasks += Threads::new_task (std_cxx11::function<void()>
+                              (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_data,
+                                               this,
+                                               update_flags,
+                                               std_cxx11::cref(quadrature),
+                                               quadrature.size(),
+                                               std_cxx11::ref(*data))));
   if (!use_mapping_q_on_all_cells)
-    this->compute_data (update_flags, quadrature,
-                        quadrature.size(), data->mapping_q1_data);
+    tasks += Threads::new_task (std_cxx11::function<void()>
+                                (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_data,
+                                                 this,
+                                                 update_flags,
+                                                 std_cxx11::cref(quadrature),
+                                                 quadrature.size(),
+                                                 std_cxx11::ref(data->mapping_q1_data))));
+  tasks.join_all ();
+
   return data;
 }
 
@@ -216,12 +231,26 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
-  this->compute_face_data (update_flags, q,
-                           quadrature.size(), *data);
+
+  // fill the data of both the Q_p and the Q_1 objects in parallel
+  Threads::TaskGroup<> tasks;
+  tasks += Threads::new_task (std_cxx11::function<void()>
+                              (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_face_data,
+                                               this,
+                                               update_flags,
+                                               std_cxx11::cref(q),
+                                               quadrature.size(),
+                                               std_cxx11::ref(*data))));
   if (!use_mapping_q_on_all_cells)
-    this->compute_face_data (update_flags, q,
-                             quadrature.size(),
-                             data->mapping_q1_data);
+    tasks += Threads::new_task (std_cxx11::function<void()>
+                                (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_face_data,
+                                                 this,
+                                                 update_flags,
+                                                 std_cxx11::cref(q),
+                                                 quadrature.size(),
+                                                 std_cxx11::ref(data->mapping_q1_data))));
+  tasks.join_all ();
+
   return data;
 }
 
@@ -234,12 +263,26 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
-  this->compute_face_data (update_flags, q,
-                           quadrature.size(), *data);
+
+  // fill the data of both the Q_p and the Q_1 objects in parallel
+  Threads::TaskGroup<> tasks;
+  tasks += Threads::new_task (std_cxx11::function<void()>
+                              (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_face_data,
+                                               this,
+                                               update_flags,
+                                               std_cxx11::cref(q),
+                                               quadrature.size(),
+                                               std_cxx11::ref(*data))));
   if (!use_mapping_q_on_all_cells)
-    this->compute_face_data (update_flags, q,
-                             quadrature.size(),
-                             data->mapping_q1_data);
+    tasks += Threads::new_task (std_cxx11::function<void()>
+                                (std_cxx11::bind(&MappingQ<dim,spacedim>::compute_face_data,
+                                                 this,
+                                                 update_flags,
+                                                 std_cxx11::cref(q),
+                                                 quadrature.size(),
+                                                 std_cxx11::ref(data->mapping_q1_data))));
+  tasks.join_all ();
+
   return data;
 }
 
