@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,7 +117,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           ,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                FEValuesData<dim,spacedim>                                &output_data) const
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between

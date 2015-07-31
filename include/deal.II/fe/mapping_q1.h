@@ -328,7 +328,7 @@ public:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  FEValuesData<dim,spacedim>                                &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Compute mapping-related information for a face of a cell.
@@ -340,7 +340,7 @@ public:
                        const unsigned int                                         face_no,
                        const Quadrature<dim-1>                                   &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       FEValuesData<dim,spacedim>                                &output_data) const;
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Compute mapping-related information for a child of a face of a cell.
@@ -353,7 +353,7 @@ public:
                           const unsigned int                                         subface_no,
                           const Quadrature<dim-1>                                   &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          FEValuesData<dim,spacedim>                                &output_data) const;
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Compute shape values and/or derivatives.

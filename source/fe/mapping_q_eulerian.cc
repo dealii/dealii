@@ -182,7 +182,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           ,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                FEValuesData<dim,spacedim>                                &output_data) const
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between

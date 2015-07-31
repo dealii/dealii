@@ -740,7 +740,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                FEValuesData<dim,spacedim>                                &output_data) const
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
@@ -951,7 +951,7 @@ namespace internal
                              const unsigned int               n_q_points,
                              const std::vector<double>        &weights,
                              const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
-                             FEValuesData<dim,spacedim>                                   &output_data)
+                             internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
     {
       const UpdateFlags update_flags(data.current_update_flags());
 
@@ -1089,7 +1089,7 @@ namespace internal
                             const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
                             const Quadrature<dim-1>                                           &quadrature,
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
-                            FEValuesData<dim,spacedim>                                        &output_data)
+                            internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
     {
       maybe_compute_q_points<dim,spacedim> (data_set,
                                             data,
@@ -1114,7 +1114,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     FEValuesData<dim,spacedim>                                &output_data) const
+                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
@@ -1159,7 +1159,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int                                         subface_no,
                         const Quadrature<dim-1>                                   &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        FEValuesData<dim,spacedim>                                &output_data) const
+                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),

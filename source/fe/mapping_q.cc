@@ -296,7 +296,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                FEValuesData<dim,spacedim>                                &output_data) const
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -349,7 +349,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     FEValuesData<dim,spacedim>                                &output_data) const
+                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -391,7 +391,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int                                         subface_no,
                         const Quadrature<dim-1>                                   &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        FEValuesData<dim,spacedim>                                &output_data) const
+                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
