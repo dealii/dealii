@@ -421,6 +421,8 @@ namespace TrilinosWrappers
      * advantageous to provide good estimates here since a good value will
      * avoid repeated allocation of memory, which considerably increases the
      * performance when creating the sparsity pattern.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparsityPattern (const Epetra_Map &parallel_partitioning,
                      const size_type   n_entries_per_row = 0) DEAL_II_DEPRECATED;
@@ -434,6 +436,8 @@ namespace TrilinosWrappers
      * since knowing the number of entries in each row is usually connected to
      * knowing the indices of nonzero entries, which the sparsity pattern is
      * designed to describe.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparsityPattern (const Epetra_Map             &parallel_partitioning,
                      const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
@@ -453,6 +457,8 @@ namespace TrilinosWrappers
      *
      * The number of columns entries per row is specified as the maximum
      * number of entries argument.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparsityPattern (const Epetra_Map   &row_parallel_partitioning,
                      const Epetra_Map   &col_parallel_partitioning,
@@ -468,6 +474,8 @@ namespace TrilinosWrappers
      * themselves &ndash; rather, all column elements of a row are stored on
      * the same processor. The vector <tt>n_entries_per_row</tt> specifies the
      * number of entries in each row of the newly generated matrix.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparsityPattern (const Epetra_Map             &row_parallel_partitioning,
                      const Epetra_Map             &col_parallel_partitioning,
@@ -486,6 +494,8 @@ namespace TrilinosWrappers
      * This function does not create any entries by itself, but provides the
      * correct data structures that can be used by the respective add()
      * function.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     void
     reinit (const Epetra_Map &parallel_partitioning,
@@ -500,6 +510,8 @@ namespace TrilinosWrappers
      * number of entries in each row is usually connected to knowing the
      * indices of nonzero entries, which the sparsity pattern is designed to
      * describe.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     void
     reinit (const Epetra_Map             &parallel_partitioning,
@@ -520,6 +532,8 @@ namespace TrilinosWrappers
      *
      * The number of columns entries per row is specified by the argument
      * <tt>n_entries_per_row</tt>.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     void
     reinit (const Epetra_Map   &row_parallel_partitioning,
@@ -536,6 +550,8 @@ namespace TrilinosWrappers
      * themselves &ndash; rather, all column elements of a row are stored on
      * the same processor. The vector <tt>n_entries_per_row</tt> specifies the
      * number of entries in each row of the newly generated matrix.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     void
     reinit (const Epetra_Map             &row_parallel_partitioning,
@@ -549,6 +565,8 @@ namespace TrilinosWrappers
      * exchange_data can be used for reinitialization with a sparsity pattern
      * that is not fully constructed. This feature is only implemented for
      * input sparsity patterns of type DynamicSparsityPattern.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template<typename SparsityType>
     void
@@ -564,6 +582,8 @@ namespace TrilinosWrappers
      * exchange_data can be used for reinitialization with a sparsity pattern
      * that is not fully constructed. This feature is only implemented for
      * input sparsity patterns of type DynamicSparsityPattern.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template<typename SparsityType>
     void
@@ -931,6 +951,8 @@ namespace TrilinosWrappers
      * sets the parallel partitioning of the domain space of this sparsity
      * pattern, i.e., the partitioning of the vectors matrices based on this
      * sparsity pattern are multiplied with.
+     *
+     * @deprecated Use locally_owned_domain_indices() instead.
      */
     const Epetra_Map &domain_partitioner () const DEAL_II_DEPRECATED;
 
@@ -939,6 +961,8 @@ namespace TrilinosWrappers
      * sets the partitioning of the range space of this sparsity pattern,
      * i.e., the partitioning of the vectors that are result from matrix-
      * vector products.
+     *
+     * @deprecated Use locally_owned_range_indices() instead.
      */
     const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
 
@@ -946,6 +970,8 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the sparsity pattern rows. Equal to the
      * partitioning of the range.
+     *
+     * @deprecated Use locally_owned_range_indices() instead.
      */
     const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
 
@@ -954,11 +980,16 @@ namespace TrilinosWrappers
      * sets the partitioning of the sparsity pattern columns. This is in
      * general not equal to the partitioner Epetra_Map for the domain because
      * of overlap in the matrix.
+     *
+     * @deprecated Usually not necessary. If desired, access via the
+     * Epetra_FECrsGraph.
      */
     const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the communicator used for this object.
+     *
+     * @deprecated Use get_mpi_communicator instead.
      */
     const Epetra_Comm &trilinos_communicator () const DEAL_II_DEPRECATED;
 
@@ -974,15 +1005,16 @@ namespace TrilinosWrappers
 //@{
 
     /**
-     * Return the partitioning of the domain space of this matrix, i.e., the
-     * partitioning of the vectors this matrix has to be multiplied with.
+     * Return the partitioning of the domain space of this pattern, i.e., the
+     * partitioning of the vectors a matrix based on this sparsity pattern has
+     * to be multiplied with.
      */
     IndexSet locally_owned_domain_indices() const;
 
     /**
-     * Return the partitioning of the range space of this matrix, i.e., the
-     * partitioning of the vectors that are result from matrix-vector
-     * products.
+     * Return the partitioning of the range space of this pattern, i.e., the
+     * partitioning of the vectors that are the result from matrix-vector
+     * products from a matrix based on this pattern.
      */
     IndexSet locally_owned_range_indices() const;
 

@@ -653,6 +653,8 @@ namespace TrilinosWrappers
      * the degrees of freedom on the individual block.  This function is
      * equivalent to calling the second constructor with the length of the
      * mapping vector and then entering the index values.
+     *
+     * @deprecated Use the respective method with IndexSet arguments instead.
      */
     BlockSparsityPattern (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 
@@ -698,6 +700,8 @@ namespace TrilinosWrappers
      * Resize the matrix to a square tensor product of matrices with parallel
      * distribution according to the specifications in the array of
      * Epetra_Maps.
+     *
+     * @deprecated Use the respective method with IndexSet arguments instead.
      */
     void reinit (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 

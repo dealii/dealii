@@ -350,6 +350,7 @@ namespace TrilinosWrappers
       Assert(col_map.IsOneToOne(),
              ExcMessage("Column map must be 1-to-1, i.e., no overlap between "
                         "the maps of different processors."));
+
       nonlocal_graph.reset();
       graph.reset ();
       column_space_map.reset (new Epetra_Map (col_map));
@@ -437,6 +438,7 @@ namespace TrilinosWrappers
                std_cxx11::shared_ptr<Epetra_FECrsGraph> &graph,
                std_cxx11::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
     {
+      nonlocal_graph.reset ();
       graph.reset ();
 
       AssertDimension (sp.n_rows(),

@@ -89,6 +89,19 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: The conversion Epetra_Map -> IndexSet is now an O(1)
+  operation for contiguous index ranges, improving over the old O(N) behavior.
+  <br>
+  (Martin Kronbichler, 2015/07/30)
+  </li>
+
+  <li> Changed: The initialization methods of TrilinosWrappers::SparseMatrix,
+  TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::SparsityPattern, and
+  TrilinosWrappers::BlockSparsityPattern with Epetra_Map arguments have been
+  marked as deprecated. Use the functions with IndexSet argument instead.
+  <br>
+  (Martin Kronbichler, Luca Heltai, 2015/07/30)
+  </li>
 
   <li> New: FESystem now does some work in parallel if your system
   has multiple processors.

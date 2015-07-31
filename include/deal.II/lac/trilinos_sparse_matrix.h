@@ -660,6 +660,8 @@ namespace TrilinosWrappers
      * However, there is no effect in the performance of matrix-vector
      * products, since Trilinos reorganizes the matrix memory prior to use (in
      * the compress() step).
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparseMatrix (const Epetra_Map  &parallel_partitioning,
                   const size_type    n_max_entries_per_row = 0) DEAL_II_DEPRECATED;
@@ -670,6 +672,8 @@ namespace TrilinosWrappers
      * case, we can already allocate the right amount of memory, which makes
      * the creation process including the insertion of nonzero elements by the
      * respective SparseMatrix::reinit call considerably faster.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparseMatrix (const Epetra_Map                &parallel_partitioning,
                   const std::vector<unsigned int> &n_entries_per_row) DEAL_II_DEPRECATED;
@@ -689,6 +693,8 @@ namespace TrilinosWrappers
      *
      * The integer input @p n_max_entries_per_row defines the number of
      * columns entries per row that will be allocated.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparseMatrix (const Epetra_Map &row_parallel_partitioning,
                   const Epetra_Map &col_parallel_partitioning,
@@ -707,6 +713,8 @@ namespace TrilinosWrappers
      * rather, all column elements of a row are stored on the same processor
      * in any case. The vector <tt>n_entries_per_row</tt> specifies the number
      * of entries in each row of the newly generated matrix.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     SparseMatrix (const Epetra_Map                &row_parallel_partitioning,
                   const Epetra_Map                &col_parallel_partitioning,
@@ -735,6 +743,8 @@ namespace TrilinosWrappers
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template<typename SparsityType>
     void reinit (const Epetra_Map    &parallel_partitioning,
@@ -752,6 +762,8 @@ namespace TrilinosWrappers
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template<typename SparsityType>
     void reinit (const Epetra_Map    &row_parallel_partitioning,
@@ -774,6 +786,8 @@ namespace TrilinosWrappers
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename number>
     void reinit (const Epetra_Map                     &parallel_partitioning,
@@ -794,6 +808,8 @@ namespace TrilinosWrappers
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
+     *
+     * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename number>
     void reinit (const Epetra_Map                      &row_parallel_partitioning,
@@ -1668,6 +1684,8 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the domain space of this matrix, i.e., the
      * partitioning of the vectors this matrix has to be multiplied with.
+     *
+     * @deprecated Use locally_owned_domain_indices() instead.
      */
     const Epetra_Map &domain_partitioner ()  const DEAL_II_DEPRECATED;
 
@@ -1676,6 +1694,8 @@ namespace TrilinosWrappers
      * sets the partitioning of the range space of this matrix, i.e., the
      * partitioning of the vectors that are result from matrix-vector
      * products.
+     *
+     * @deprecated Use locally_owned_range_indices() instead.
      */
     const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
 
@@ -1683,6 +1703,8 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the matrix rows. Equal to the partitioning of
      * the range.
+     *
+     * @deprecated Use locally_owned_range_indices() instead.
      */
     const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
 
@@ -1691,6 +1713,9 @@ namespace TrilinosWrappers
      * sets the partitioning of the matrix columns. This is in general not
      * equal to the partitioner Epetra_Map for the domain because of overlap
      * in the matrix.
+     *
+     * @deprecated Usually not necessary. If desired, access it via the
+     * Epetra_CrsMatrix.
      */
     const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
 //@}
