@@ -182,6 +182,8 @@ namespace TrilinosWrappers
      * matrix and the entries stored therein. It uses a threshold to copy only
      * elements whose modulus is larger than the threshold (so zeros in the
      * deal.II matrix can be filtered away).
+     *
+     * @deprecated Use the respective method with IndexSet arguments instead.
      */
     void reinit (const std::vector<Epetra_Map>             &input_maps,
                  const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
@@ -228,6 +230,9 @@ namespace TrilinosWrappers
      * partitioning of the domain space of this block matrix, i.e., the
      * partitioning of the individual block vectors this matrix has to be
      * multiplied with.
+     *
+     * @deprecated Use the methods of the individual matrices based on
+     * IndexSet arguments.
      */
     std::vector<Epetra_Map> domain_partitioner () const DEAL_II_DEPRECATED;
 
@@ -236,6 +241,9 @@ namespace TrilinosWrappers
      * partitioning of the range space of this block matrix, i.e., the
      * partitioning of the individual block vectors that are the result from
      * matrix-vector products.
+     *
+     * @deprecated Use the methods of the individual matrices based on
+     * IndexSet arguments.
      */
     std::vector<Epetra_Map> range_partitioner () const DEAL_II_DEPRECATED;
 
