@@ -155,6 +155,8 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree
   else if (dim == 2) piola_boundary = 2 - ((degree==0) ? 1 : 0);
   else piola_boundary = 3*(degree+1);
 
+  // std::cout<<"degree: "<<degree<<" piola_boundary: "<<piola_boundary<<" poly_space: "
+  // <<poly_space.n()<<std::endl;
   Assert(piola_boundary < poly_space.n(), 
     ExcIndexRange (piola_boundary, 0, poly_space.n()));
 
@@ -291,7 +293,6 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::get_data (
   const Mapping<dim,spacedim>    &mapping,
   const Quadrature<dim> &quadrature) const
 {
-  // Assert(false,ExcMessage("get_data begin"));
   // generate a new data object and
   // initialize some fields
   InternalData *data = new InternalData;
@@ -384,7 +385,8 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::get_data (
           }
 
       }
-  Assert(false,ExcMessage("get_data done"));
+  
+  // Assert(false, ExcMessage("get_data_done"));
   return data;
 }
 

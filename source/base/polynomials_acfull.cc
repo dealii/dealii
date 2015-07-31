@@ -128,8 +128,8 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
         monomials[i].value(unit_point(d), v(d,i));
       };
 
-  const unsigned int n_1d = degree()+1;
-
+  const unsigned int n_1d = degree();
+  // std::cout<<"n_1d: "<<n_1d <<std::endl;
 
   unsigned int k = 0;
 
@@ -137,6 +137,8 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
     for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
       {
         unsigned int ix = n_1d - 1 -iz - iy;
+        // std::cout<<"k+start: "<<k+start<<" ix: "<<ix <<
+        // " iy:"<<iy<<" iz:"<<iz<<std::endl;
         for (unsigned int d=0; d<dim; ++d)
         {
           if (update_values)
@@ -170,7 +172,7 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
 
   // -------------- supplemental curl parts --------------------//
   // same as BDM
-  Assert( k == ((dim == 2) ? (degree()+1) :  ((degree()+1)*(degree()+2)/2) || dim==1 ),
+  Assert( k == ((dim == 2) ? degree() : (degree()*(degree()+1)/2)) || (dim==1 && k==1),
          ExcMessage("polynomials space not set up correctly"));
   start += k;
 
@@ -183,12 +185,12 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
   if (dim == 2)
     {
       for (unsigned int d=0; d<dim; ++d)
-        monomials[degree()+1].value(unit_point(d), monovali[d]);
+        monomials[degree()].value(unit_point(d), monovali[d]);
       if (values.size() != 0)
         {
           values[start][0] = monovali[0][0];
           values[start][1] = -unit_point(1) * monovali[0][1];
-          if (degree()>0){
+          if (degree()>1){
           values[start+1][0] = unit_point(0) * monovali[1][1];
           values[start+1][1] = -monovali[1][0];
         }
@@ -199,7 +201,7 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
           grads[start][0][1] = 0.;
           grads[start][1][0] = -unit_point(1) * monovali[0][2];
           grads[start][1][1] = -monovali[0][1];
-          if (degree()>0){
+          if (degree()>1){
           grads[start+1][0][0] = monovali[1][1];
           grads[start+1][0][1] = unit_point(0) * monovali[1][2];
           grads[start+1][1][0] = 0.;
@@ -216,7 +218,7 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
           grad_grads[start][1][0][1] = -monovali[0][2];
           grad_grads[start][1][1][0] = -monovali[0][2];
           grad_grads[start][1][1][1] = 0.;
-          if (degree()>0){
+          if (degree()>1){
           grad_grads[start+1][0][0][0] = 0;
           grad_grads[start+1][0][0][1] = monovali[1][2];
           grad_grads[start+1][0][1][0] = monovali[1][2];
@@ -248,7 +250,7 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
               // p(t) = t^(i+1)
               monomials[i+1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree()-i].value(unit_point(d), monovalk[d]);
+              monomials[degree()-1-i].value(unit_point(d), monovalk[d]);
             }
           if (values.size() != 0)
             {
