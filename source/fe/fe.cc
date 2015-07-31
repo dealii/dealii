@@ -1220,7 +1220,7 @@ FiniteElement<1,2>::compute_2nd (
   const unsigned int,
   const Mapping<1,2>::InternalDataBase &,
   const InternalDataBase &,
-  FEValuesData<1,2> &) const
+  internal::FEValues::FiniteElementRelatedData<1,2> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1234,7 +1234,7 @@ FiniteElement<1,3>::compute_2nd (
   const unsigned int,
   const Mapping<1,3>::InternalDataBase &,
   const InternalDataBase &,
-  FEValuesData<1,3> &) const
+  internal::FEValues::FiniteElementRelatedData<1,3> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1249,7 +1249,7 @@ FiniteElement<2,3>::compute_2nd (
   const unsigned int,
   const Mapping<2,3>::InternalDataBase &,
   const InternalDataBase &,
-  FEValuesData<2,3> &) const
+  internal::FEValues::FiniteElementRelatedData<2,3> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1264,7 +1264,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
   const unsigned int offset,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
   const InternalDataBase                     &fe_internal,
-  FEValuesData<dim,spacedim>                    &data) const
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim>                    &data) const
 {
   Assert ((fe_internal.update_each | fe_internal.update_once)
           & update_hessians,

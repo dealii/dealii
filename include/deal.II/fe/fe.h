@@ -20,6 +20,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe_base.h>
 #include <deal.II/fe/fe_values_extractors.h>
+#include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/mapping.h>
@@ -1969,12 +1970,12 @@ protected:
   /**
    * Compute second derivatives by finite differences of gradients.
    */
-  void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
+  void compute_2nd (const Mapping<dim,spacedim>                                  &mapping,
                     const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
-                    const unsigned int                       offset,
-                    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                    const InternalDataBase                        &fe_internal,
-                    FEValuesData<dim,spacedim>                       &data) const;
+                    const unsigned int                                            offset,
+                    const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                    const InternalDataBase                                       &fe_internal,
+                    internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &data) const;
 
   /**
    * Given the pattern of nonzero components for each shape function, compute
