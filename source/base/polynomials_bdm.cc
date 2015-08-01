@@ -171,7 +171,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
               // p(t) = t^(i+1)
               monomials[i+1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree()-i].value(unit_point(d), monovalk[d]);
+              monomials[degree()-1-i].value(unit_point(d), monovalk[d]);
             }
           if (values.size() != 0)
             {
