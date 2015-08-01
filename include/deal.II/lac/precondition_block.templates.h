@@ -240,11 +240,6 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
   const bool permuted = (permutation.size() == M.m());
   const bool cell_permuted = (permutation.size() == this->size());
 
-//   deallog << "Permutation " << permutation.size();
-//   if (permuted) deallog << " point";
-//   if (cell_permuted) deallog << " block";
-//   deallog << std::endl;
-
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
   // cell_row, cell_column are the

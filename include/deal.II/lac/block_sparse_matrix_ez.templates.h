@@ -178,42 +178,6 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 
 
 
-//  template <typename number>
-//  unsigned int
-//  BlockSparseMatrixEZ<number>::n_nonzero_elements () const
-//  {
-//    return sparsity_pattern->n_nonzero_elements ();
-//  };
-
-
-
-//  template <typename number>
-//  unsigned int
-//  BlockSparseMatrixEZ<number>::n_actually_nonzero_elements () const
-//  {
-//    unsigned int count = 0;
-//    for (unsigned int i=0; i<rows; ++i)
-//      for (unsigned int j=0; j<columns; ++j)
-//        count += sub_objects[i][j]->n_actually_nonzero_elements ();
-//    return count;
-//  };
-
-
-
-//  template <typename number>
-//  std::size_t
-//  BlockSparseMatrixEZ<number>::memory_consumption () const
-//  {
-//    std::size_t mem = sizeof(*this);
-//    mem += MemoryConsumption::memory_consumption (sub_objects);
-//    for (unsigned int r=0; r<rows; ++r)
-//      for (unsigned int c=0; c<columns; ++c)
-//        mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
-//    return mem;
-//  };
-
-
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // ifdef block_sparse_matrix_templates_h

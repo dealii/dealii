@@ -151,12 +151,6 @@ MGTransferSelect<number>::do_copy_from_mg (
   OutVector                            &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-//  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-
-//  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-//  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-//  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
-
   typename DoFHandler<dim,spacedim>::active_cell_iterator
   level_cell = mg_dof_handler.begin_active();
   const typename DoFHandler<dim,spacedim>::active_cell_iterator

@@ -370,29 +370,6 @@ namespace MatrixCreator
                                     const Function<spacedim> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
-//                                    * Same function, but for 1d.
-//                                    */
-//
-//     void create_boundary_mass_matrix (const Mapping<1,1>       &mapping,
-//                                    const DoFHandler<1,1>    &dof,
-//                                    const Quadrature<0>    &q,
-//                                    SparseMatrix<double>   &matrix,
-//                                    const FunctionMap<1>::type &boundary_functions,
-//                                    Vector<double>         &rhs_vector,
-//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
-//                                    const Function<1> * const a = 0);
-// //codimension 1
-//
-//     void create_boundary_mass_matrix (const Mapping<1,2>       &mapping,
-//                                    const DoFHandler<1,2>    &dof,
-//                                    const Quadrature<0>    &q,
-//                                    SparseMatrix<double>   &matrix,
-//                                    const FunctionMap<2>::type &boundary_functions,
-//                                    Vector<double>         &rhs_vector,
-//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
-//                                    const Function<2> * const a = 0);
-
-
 
   /**
    * Calls the create_boundary_mass_matrix() function, see above, with
@@ -421,19 +398,6 @@ namespace MatrixCreator
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
-
-  /**
-   * Same function as above, but for hp objects.
-   */
-//
-//     void create_boundary_mass_matrix (const hp::MappingCollection<1,1>       &mapping,
-//                                    const hp::DoFHandler<1,1>    &dof,
-//                                    const hp::QCollection<0>    &q,
-//                                    SparseMatrix<double>   &matrix,
-//                                    const FunctionMap<1>::type &boundary_functions,
-//                                    Vector<double>         &rhs_vector,
-//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
-//                                    const Function<1> * const a = 0);
 
   /**
    * Same function as above, but for hp objects.
