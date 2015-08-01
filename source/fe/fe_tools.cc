@@ -739,7 +739,7 @@ namespace FETools
       // problem.
       const double result = H.least_squares (v_fine, v_coarse);
       (void)result;
-      Assert (result < 1.e-12, ExcLeastSquaresError (result));
+      Assert (result < 1.e-11, ExcLeastSquaresError (result));
 
       // Copy into the result
       // matrix. Since the matrix
@@ -1075,7 +1075,7 @@ namespace FETools
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
             (void)result;
-            Assert (result < 1.e-12, ExcLeastSquaresError(result));
+            Assert (result < 1.e-11, ExcLeastSquaresError(result));
 
             // Copy into the result
             // matrix. Since the matrix
@@ -1090,7 +1090,7 @@ namespace FETools
         // the matrix
         for (unsigned int i=0; i<this_matrix.m(); ++i)
           for (unsigned int j=0; j<this_matrix.n(); ++j)
-            if (std::fabs(this_matrix(i,j)) < 1e-12)
+            if (std::fabs(this_matrix(i,j)) < 1e-11)
               this_matrix(i,j) = 0.;
       }
   }
