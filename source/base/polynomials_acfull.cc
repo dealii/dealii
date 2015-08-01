@@ -34,7 +34,7 @@ PolynomialsACFull<dim>::PolynomialsACFull (const unsigned int k)
   p_grad_grads(polynomial_space.n())
 {
   for (unsigned int i=0; i<monomials.size(); ++i)
-    monomials[i] = Polynomials::Monomial<double> (i);
+    monomials[i] = Polynomials::Legendre (i);
 }
 
 
