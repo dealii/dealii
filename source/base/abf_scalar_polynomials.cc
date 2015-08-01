@@ -367,7 +367,7 @@ ABFScalarPolynomials<dim, POLY>::
 get_n_tensor_pols (const std::vector<POLY>  &pols)
 {
   Assert (pols.size()>=2, ExcMessage("1D Polynomial degree k<0"));
-  Assert (dim>=1, ExcMessage("Dimension has to be >=1 "));\
+  Assert (dim>=1, ExcMessage("Dimension has to be >=1 "));
 
   unsigned int y = 1;
   for (unsigned int d=0; d<dim; ++d)
