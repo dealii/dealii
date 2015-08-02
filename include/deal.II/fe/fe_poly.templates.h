@@ -247,14 +247,15 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_values
-(const Mapping<dim,spacedim>                      &mapping,
- const typename Triangulation<dim,spacedim>::cell_iterator &cell,
- const Quadrature<dim>                            &quadrature,
- const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
- FEValuesData<dim,spacedim>                       &data,
- const CellSimilarity::Similarity                  cell_similarity) const
+FE_Poly<POLY,dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const Quadrature<dim>                            &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -269,16 +270,18 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
+        mapping.transform(fe_data.shape_gradients[k],
+                          output_data.shape_gradients[k],
+                          mapping_internal, mapping_covariant);
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell, QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+                       mapping_internal, fe_data,
+                       output_data);
 }
 
 
@@ -290,9 +293,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int                    face,
                      const Quadrature<dim-1>              &quadrature,
-                     const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+                     const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
                      const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-                     FEValuesData<dim,spacedim>                    &data) const
+                     const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -318,16 +322,17 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
+                          output_data.shape_gradients[k],
+                          mapping_internal, mapping_covariant);
     }
 
   if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
+                       output_data);
 }
 
 
@@ -400,14 +405,16 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
-                                                    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                    const unsigned int                    face,
-                                                    const unsigned int                    subface,
-                                                    const Quadrature<dim-1>              &quadrature,
-                                                    const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                                                    const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-                                                    FEValuesData<dim,spacedim>                    &data) const
+FE_Poly<POLY,dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const unsigned int                    face,
+                        const unsigned int                    subface,
+                        const Quadrature<dim-1>              &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                        const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+                        const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -434,16 +441,17 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
+                          output_data.shape_gradients[k],
+                          mapping_internal, mapping_covariant);
     }
 
   if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
+                       output_data);
 }
 
 
