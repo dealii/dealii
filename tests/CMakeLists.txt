@@ -18,8 +18,6 @@
 #
 # We define toplevel targets:
 #    setup_tests    - set up testsuite subprojects
-#    regen_tests    - rerun configure stage in every testsuite subproject
-#    clean_tests    - run the 'clean' target in every testsuite subproject
 #    prune_tests    - remove all testsuite subprojects
 #
 
@@ -63,7 +61,7 @@ ELSE()
 
   IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     MESSAGE(FATAL_ERROR "The testsuite cannot be configured in-source. "
-      "Please create a separate build directory"
+      "Please create a separate build directory!"
       )
   ENDIF()
 
@@ -106,21 +104,20 @@ ADD_CUSTOM_TARGET(setup_tests)
 # Remove all tests:
 ADD_CUSTOM_TARGET(prune_tests)
 
-# Regenerate tests (run "make rebuild_cache" in subprojects):
-ADD_CUSTOM_TARGET(regen_tests)
-
-# Regenerate tests (run "make clean" in subprojects):
-ADD_CUSTOM_TARGET(clean_tests)
-
 FOREACH(_category ${_categories})
   SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
 
+  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
+
+  IF(DEAL_II_MSVC)
+    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
+  ELSE()
+    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir} > /dev/null)
+  ENDIF()
+
   ADD_CUSTOM_TARGET(setup_tests_${_category}
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
-      COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
-      ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-      > /dev/null
+    COMMAND ${_command}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
@@ -128,26 +125,11 @@ FOREACH(_category ${_categories})
   ADD_CUSTOM_TARGET(prune_tests_${_category}
     COMMAND ${CMAKE_COMMAND} -E remove_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
-
-  ADD_CUSTOM_TARGET(regen_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_CURRENT_BINARY_DIR}/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
-      > /dev/null
-    COMMENT "Processing tests/${_category}"
-    )
-  ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
-
-  ADD_CUSTOM_TARGET(clean_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_CURRENT_BINARY_DIR}/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
-    COMMENT "Processing tests/${_category}"
-    )
-  ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
   FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
     "SUBDIRS(${_category})\n"
