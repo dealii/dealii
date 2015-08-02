@@ -317,7 +317,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);
+  const double h = std::pow(measure, 1.0/dim);
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
@@ -331,7 +331,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
             if (flags & update_gradients)
               data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/(h*h);
           }
       }
 }
@@ -364,7 +364,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);  
+  const double h = std::pow(measure, 1.0/dim);
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
@@ -378,7 +378,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
             if (flags & update_gradients)
               data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/(h*h);
           }
       }
 }
@@ -412,7 +412,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
 
   const Point<dim> center(cell->center());  
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);
+  const double h = std::pow(measure, 1.0/dim);
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
@@ -426,7 +426,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
             if (flags & update_gradients)
               data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/(h*h);
           }
       }
 }

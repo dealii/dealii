@@ -151,10 +151,19 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree
   for (unsigned int comp=0; comp<this->n_components() ; ++comp)
     this->component_to_base_table[comp].first.second = comp;
 
-  if (dim == 1) piola_boundary = 0;
-  else if (dim == 2) piola_boundary = 2 - ((degree==0) ? 1 : 0);
-  else piola_boundary = 3*(degree+1);
-
+  if (dim == 1) 
+    piola_boundary = 0;
+  else 
+  {
+    if (dim == 2) 
+      {
+        piola_boundary = 2 - ((degree==0) ? 1 : 0);
+      }
+    else 
+      {
+        piola_boundary = 3*(degree+1);
+      }
+  }
   // std::cout<<"degree: "<<degree<<" piola_boundary: "<<piola_boundary<<" poly_space: "
   // <<poly_space.n()<<std::endl;
   Assert(piola_boundary < poly_space.n(), 
@@ -471,7 +480,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);
+  const double h = std::pow(measure, 1.0/dim);
 
   if(flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
@@ -628,7 +637,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);
+  const double h = std::pow(measure, 1.0/dim);
 
   if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
@@ -782,7 +791,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_subface_values (
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
-  const double h = std::sqrt(measure);
+  const double h = std::pow(measure, 1.0/dim);
 
   if(flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
