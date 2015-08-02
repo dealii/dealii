@@ -1154,6 +1154,22 @@ namespace Functions
     value (const Point<dim> &p,
            const unsigned int component = 0) const;
 
+    /**
+     * Compute the gradient of the function defined by bilinear interpolation
+     * of the given data set.
+     *
+     * @param p The point at which the function gradient is to be evaluated.
+     * @param component The vector component. Since this function is scalar,
+     * only zero is a valid argument here.
+     * @return The value of the gradient of the interpolated function at this
+     * point. If the point lies outside the set of coordinates, the function
+     * is extended by a constant and so its gradient is extended by 0.
+     */
+    virtual
+    Tensor<1, dim>
+    gradient (const Point<dim>    &p,
+              const unsigned int component = 0) const;
+
   private:
     /**
      * The set of coordinate values in each of the coordinate directions.
