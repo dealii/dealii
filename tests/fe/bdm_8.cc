@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// build a mass matrix for the RT element and try to invert it. we had trouble
+// build a mass matrix for the BDM element and try to invert it. we had trouble
 // with this at one time
 
 #include "../tests.h"
@@ -106,8 +106,11 @@ main()
   deallog.threshold_double(1.e-10);
 
   for (unsigned int i=1; i<4; ++i)
-    test<2>(i);
-
+    {
+      test<2>(i);
+      test<3>(i);
+    }
+  
   return 0;
 }
 

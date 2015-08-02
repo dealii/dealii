@@ -66,7 +66,7 @@ main()
   for (unsigned int degree=1; degree<4; ++degree)
     {
       test<2>(degree);
-//      test<3>(degree);
+      test<3>(degree);
     }
 
   return 0;

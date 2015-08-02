@@ -188,6 +188,9 @@ public:
   /**
    * Static function used in the constructor to compute the number of
    * polynomials.
+   *
+   * @warning The argument `n` is not the maximal degree, but the
+   * number of onedimensional polynomials, thus the degree plus one.
    */
   static unsigned int compute_n_pols (const unsigned int n);
 

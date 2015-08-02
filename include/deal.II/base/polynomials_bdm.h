@@ -49,21 +49,34 @@ DEAL_II_NAMESPACE_OPEN
  *
  *   More specifically, for $k=1$, this space has shape functions
  *   @f{align*}
- *     \phi_0 = \begin{array}{cc} 1 \\ 0 \end{array},
- *     \phi_1 = \begin{array}{cc} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{array},
- *     \phi_2 = \begin{array}{cc} -\sqrt{3}+2\sqrt{3}y \\ 0 \end{array},
- *     \phi_3 = \begin{array}{cc} 0 \\ 1 \end{array},
- *     \phi_4 = \begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}x \end{array},
- *     \phi_5 = \begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}y \end{array},
- *     \phi_6 = \begin{array}{cc} x^2 \\ -2xy \end{array},
- *     \phi_7 = \begin{array}{cc} 2xy \\ -y^2 \end{array},
+ *     \phi_0 = \left[\begin{array}{cc} 1 \\ 0 \end{array}\right],
+ *     \phi_1 = \left[\begin{array}{cc} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{array}\right],
+ *     \phi_2 = \left[\begin{array}{cc} -\sqrt{3}+2\sqrt{3}y \\ 0 \end{array}\right],
+ *     \phi_3 = \left[\begin{array}{cc} 0 \\ 1 \end{array}\right],
+ *     \phi_4 = \left[\begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}x \end{array}\right],
+ *     \phi_5 = \left[\begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}y \end{array}\right],
+ *     \phi_6 = \left[\begin{array}{cc} x^2 \\ -2xy \end{array}\right],
+ *     \phi_7 = \left[\begin{array}{cc} 2xy \\ -y^2 \end{array}\right],
  *   @f}
  *
+ *   Thus, the dimension of the shape function space is dimension
+ *   times the number of polynomials of degree $k$ plus two:
+ *   @f[
+ *     n = 2\frac{(k+1)(k+2)}2 + 2
+ *   @f]
+
  *   <dt>In 3D:
  *   <dd> For any <i>i=0,...,k</i> the
  * curls of <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
  * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
  * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i>
+ *
+ * The size of this function space is dimension times the number of
+ * polynomials of degree $k$ plus 3 times k+1:
+ *   @f[
+ *     n = 3\frac{(k+1)(k+2)(k+3)}6 + 3(k+1)
+ *   @f]
+ *
  * </dl>
  *
  * @todo Second derivatives in 3D are missing.

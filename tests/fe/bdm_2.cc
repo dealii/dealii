@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Show the shape functions of the Raviart-Thomas element on a grid
+// Show the shape functions of the BDM element on a grid
 // with only one cell. This cell is rotated, stretched, scaled, etc,
 // and on each of these cells each time we evaluate the shape
 // functions.
@@ -172,7 +172,10 @@ main()
   deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=1; degree<4; ++degree)
-    plot_shape_functions<2>(degree);
-
+    {
+      plot_shape_functions<2>(degree);
+      plot_shape_functions<3>(degree);
+    }
+  
   return 0;
 }

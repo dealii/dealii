@@ -73,6 +73,13 @@ void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
 				       FE_DGQ<dim> (1), 1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
+  FE_BDM<dim> *bdm1 = new FE_BDM<dim>(1);
+  fe_datas.push_back(bdm1);
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  FE_BDM<dim> *bdm2 = new FE_BDM<dim>(2);
+  fe_datas.push_back(bdm2);
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
 				   // Hcurl elements
   FE_Nedelec<dim> *ned0 = new FE_Nedelec<dim>(0);
   fe_datas.push_back(ned0);

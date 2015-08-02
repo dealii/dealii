@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// Show the shape functions of the Raviart-Thomas element on the unit cell
+// Show the shape functions of the BDM element on the unit cell
 // Plots are gnuplot compatible if lines with desired prefix are selected.
 
 #include "../tests.h"
@@ -91,9 +91,11 @@ main()
   deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=1; degree<4; ++degree)
-    plot_shape_functions<2>(degree);
-//  plot_shape_functions<3>(degree);
-
+    {
+      plot_shape_functions<2>(degree);
+      plot_shape_functions<3>(degree);
+    }
+  
   return 0;
 }
 
