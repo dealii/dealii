@@ -27,7 +27,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class FEValuesData;
 template <int dim, int spacedim> class FEValuesBase;
 template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;

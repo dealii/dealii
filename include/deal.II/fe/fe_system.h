@@ -28,6 +28,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class FEValuesData;
+
+
 /**
  * This class provides an interface to group several elements together into
  * one. To the outside world, the resulting object looks just like a usual
