@@ -53,7 +53,7 @@ template <typename number> class SparseBlockVanka;
  * Objects of this class are constructed by passing a vector of indices of the
  * degrees of freedom of the Lagrange multiplier. In the actual
  * preconditioning method, these rows are traversed in the order in which the
- * appear in the matrix. Since this is a Gau�-Seidel like procedure,
+ * appear in the matrix. Since this is a Gauß-Seidel like procedure,
  * remember to have a good ordering in advance (for transport dominated
  * problems, Cuthill-McKee algorithms are a good means for this, if points on
  * the inflow boundary are chosen as starting points for the renumbering).
