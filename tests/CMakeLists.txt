@@ -78,9 +78,9 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 # Always undefine the following variables in the setup_tests target:
 #
 FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
-  LIST(APPEND _options "-U${_var}")
+  SET(_options "${_options} -U${_var}")
   IF(NOT "${${_var}}" STREQUAL "")
-    LIST(APPEND _options "-D${_var}=${${_var}}")
+    SET(_options "${_options} -D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
 
@@ -116,35 +116,33 @@ FOREACH(_category ${_categories})
   SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
 
   ADD_CUSTOM_TARGET(setup_tests_${_category}
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
-      COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
-      ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-      > /dev/null
+    COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/manage_testsuite.sh
+      configure "${_category}" "${_category_dir}" "${CMAKE_GENERATOR}" "${_options}"
+    VERBATIM
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
   ADD_CUSTOM_TARGET(prune_tests_${_category}
-    COMMAND ${CMAKE_COMMAND} -E remove_directory
-      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/manage_testsuite.sh
+      prune "${_category}" "${_category_dir}" "${CMAKE_GENERATOR}" "${_options}"
+    VERBATIM
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
   ADD_CUSTOM_TARGET(regen_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_CURRENT_BINARY_DIR}/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
-      > /dev/null
+    COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/manage_testsuite.sh
+      regenerate "${_category}" "${_category_dir}" "${CMAKE_GENERATOR}" "${_options}"
+    VERBATIM
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
   ADD_CUSTOM_TARGET(clean_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_CURRENT_BINARY_DIR}/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
+    COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/manage_testsuite.sh
+      clean "${_category}" "${_category_dir}" "${CMAKE_GENERATOR}" "${_options}"
+    VERBATIM
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
