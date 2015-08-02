@@ -20,14 +20,6 @@
 # editing this file.
 #
 
-#TODO: this check is not working, my version is 17.0.51106.1 (2012)
-#IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "17.0.0.0" )
-##  MESSAGE(WARNING "\n"
-#    "You're using an old version of the MSVC C++ Compiler!\n"
-#    "It is strongly recommended to use at least version 2012.\n"
-#    )
-#ENDIF()
-
 
 ########################
 #                      #
