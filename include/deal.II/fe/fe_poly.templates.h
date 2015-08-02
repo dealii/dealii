@@ -206,12 +206,12 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
                                     std::vector<Tensor<1,dim> > (n_q_points));
     }
 
-  // if second derivatives through
-  // finite differencing is required,
-  // then initialize some objects for
-  // that
   if (flags & update_hessians)
-    data->initialize_2nd (this, mapping, quadrature);
+    {
+      grad_grads.resize (this->dofs_per_cell);
+      data->shape_hessians.resize (this->dofs_per_cell,
+                                   std::vector<Tensor<2,dim> > (n_q_points));
+    }
 
   // next already fill those fields
   // of which we have information by
@@ -220,7 +220,7 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
   // unit cell, and need to be
   // transformed when visiting an
   // actual cell
-  if (flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients | update_hessians))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
         poly_space.compute(quadrature.point(i),
@@ -233,6 +233,10 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
         if (flags & update_gradients)
           for (unsigned int k=0; k<this->dofs_per_cell; ++k)
             data->shape_gradients[k][i] = grads[k];
+
+        if (flags & update_hessians)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            data->shape_hessians[k][i] = grad_grads[k];
       }
   return data;
 }
@@ -274,11 +278,11 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 
@@ -324,10 +328,12 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
                           data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      if (flags & update_hessians)
+        mapping.transform(make_slice(fe_data.shape_hessians[k], offset, quadrature.size()),
+                          data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 
@@ -440,10 +446,12 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
                           data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      if (flags & update_hessians)
+        mapping.transform(make_slice(fe_data.shape_hessians[k], offset, quadrature.size()),
+                          data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 

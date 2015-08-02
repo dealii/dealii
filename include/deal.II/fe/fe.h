@@ -356,8 +356,7 @@ public:
   /**
    * A base class for internal data that derived finite element classes may
    * wish to store. This class uses the same data fields as
-   * Mapping::InternalDataBase() but adds a field for the computation of
-   * second derivatives.
+   * Mapping::InternalDataBase().
    *
    * The class is used as follows: Whenever an FEValues (or FEFaceValues or
    * FESubfaceValues) object is initialized, it requests that the finite
@@ -390,22 +389,6 @@ public:
      */
     virtual ~InternalDataBase ();
 
-    /**
-     * Initialize some pointers used in the computation of second derivatives
-     * by finite differencing of gradients.
-     */
-    void initialize_2nd (const FiniteElement<dim,spacedim> *element,
-                         const Mapping<dim,spacedim>       &mapping,
-                         const Quadrature<dim>    &quadrature);
-
-    /**
-     * Storage for FEValues objects needed to approximate second derivatives.
-     *
-     * The ordering is <i>p+hx</i>, <i>p+hy</i>, <i>p+hz</i>, <i>p-hx</i>,
-     * <i>p-hy</i>, <i>p-hz</i>, where unused entries in lower dimensions are
-     * missing.
-     */
-    std::vector<FEValues<dim,spacedim>*> differences;
   };
 
 public:
@@ -1966,15 +1949,6 @@ protected:
   TableIndices<2>
   interface_constraints_size () const;
 
-  /**
-   * Compute second derivatives by finite differences of gradients.
-   */
-  void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
-                    const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
-                    const unsigned int                       offset,
-                    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                    const InternalDataBase                        &fe_internal,
-                    FEValuesData<dim,spacedim>                       &data) const;
 
   /**
    * Given the pattern of nonzero components for each shape function, compute

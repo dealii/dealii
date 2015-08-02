@@ -274,6 +274,16 @@ protected:
      * multiplication) when visiting an actual cell.
      */
     std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+
+    /**
+     * Array with shape function hessians in quadrature points. There is one
+     * row for each shape function, containing values for each quadrature
+     * point.
+     *
+     * We store the hessians in the quadrature points on the unit cell. We
+     * then only have to apply the transformation when visiting an actual cell.
+     */
+    std::vector<std::vector<Tensor<2,dim> > > shape_hessians;
   };
 
   /**
