@@ -27,8 +27,9 @@
 #   DEAL_II_HAVE_SSE2                    *)
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_HAVE_AVX512                  *)
-#   DEAL_II_HAVE_OPENMP_SIMD             *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
+#   DEAL_II_HAVE_OPENMP_SIMD             *)
+#   DEAL_II_OPENMP_SIMD_PRAGMA
 #
 # *)
 # It is is possible to manually set the above values to their corresponding

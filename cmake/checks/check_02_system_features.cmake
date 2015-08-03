@@ -94,7 +94,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # At least on Clang 5.0.0 the template depth is set to 128, which is too low
   # to compile parts of the library. Fix this by setting a large value.
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ftemplate-depth=1024")  
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ftemplate-depth=1024")
 ENDIF()
 
 
