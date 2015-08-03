@@ -30,6 +30,34 @@ DEAL_II_NAMESPACE_OPEN
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+// the 64-bit path uses a few different names, so put that into a separate
+// implementation
+
+#ifdef DEAL_II_WITH_64BIT_INDICES
+
+IndexSet::IndexSet (const Epetra_Map &map)
+  :
+  is_compressed (true),
+  index_space_size (map.NumGlobalElements64()),
+  largest_range (numbers::invalid_unsigned_int)
+{
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map.LinearMap())
+    add_range(size_type(map.MinMyGID64()), size_type(map.MaxMyGID64()+1));
+  else
+    {
+      const size_type n_indices = map.NumMyElements();
+      size_type *indices = (size_type *)map.MyGlobalElements64();
+      add_indices(indices, indices+n_indices);
+    }
+  compress();
+}
+
+#else
+
+// this is the standard 32-bit implementation
+
 IndexSet::IndexSet (const Epetra_Map &map)
   :
   is_compressed (true),
@@ -38,26 +66,19 @@ IndexSet::IndexSet (const Epetra_Map &map)
 {
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
-    {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-      add_range(size_type(map.MinMyGID()), size_type(map.MaxMyGID()+1));
-#else
-      add_range(size_type(map.MinMyGID64()), size_type(map.MaxMyGID64()+1));
-#endif
-    }
+    add_range(size_type(map.MinMyGID()), size_type(map.MaxMyGID()+1));
   else
     {
       const size_type n_indices = map.NumMyElements();
-#ifndef DEAL_II_WITH_64BIT_INDICES
       unsigned int *indices = (unsigned int *)map.MyGlobalElements();
-#else
-      size_type *indices = (size_type *)map.MyGlobalElements64();
-#endif
       add_indices(indices, indices+n_indices);
     }
   compress();
 }
+
 #endif
+
+#endif // ifdef DEAL_II_WITH_TRILINOS
 
 
 
