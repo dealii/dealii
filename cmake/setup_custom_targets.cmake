@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -128,8 +128,6 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    test           - run a minimal set of tests
 #
 #    setup_tests    - set up testsuite subprojects
-#    regen_tests    - rerun configure stage in every testsuite subproject
-#    clean_tests    - run the 'clean' target in every testsuite subproject
 #    prune_tests    - remove all testsuite subprojects
 #
 ###\")"

@@ -49,6 +49,7 @@ run(){
   if [ $RETURN_VALUE -ne 0 ]; then
     mv output failing_output
     echo "${TEST_FULL}: BUILD successful."
+    echo "${TEST_FULL}: RUN failed. ------ Return code $RETURN_VALUE"
     echo "${TEST_FULL}: RUN failed. ------ Result: `pwd`/failing_output"
     echo "${TEST_FULL}: RUN failed. ------ Partial output:"
     cat failing_output
