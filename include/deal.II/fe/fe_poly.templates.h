@@ -150,7 +150,8 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
+    out |= update_hessians | update_gradients
+           | update_jacobian_grads | update_covariant_transformation;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
 
@@ -209,6 +210,7 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
   if (flags & update_hessians)
     {
       grad_grads.resize (this->dofs_per_cell);
+      data->modified_hessian.resize(n_q_points);
       data->shape_hessians.resize (this->dofs_per_cell,
                                    std::vector<Tensor<2,dim> > (n_q_points));
     }
@@ -280,8 +282,18 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
                           mapping_data, mapping_covariant);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
-                          mapping_data, mapping_covariant_gradient);
+        {
+          for (unsigned int q=0; q<quadrature.size(); ++q)
+            {
+              fe_data.modified_hessian[q] = fe_data.shape_hessians[k][q];
+              for (unsigned int m=0; m<dim; ++m)
+                for (unsigned int n=0; n<dim; ++n)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    fe_data.modified_hessian[q][m][n] -= data.shape_gradients[k][q][j] * data.jacobian_grads[q][m][n][j];
+            }
+          mapping.transform(fe_data.modified_hessian, data.shape_hessians[k],
+                            mapping_data, mapping_covariant_gradient);
+        }
     }
 }
 
@@ -330,9 +342,18 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                           mapping_data, mapping_covariant);
 
       if (flags & update_hessians)
-        mapping.transform(make_slice(fe_data.shape_hessians[k], offset, quadrature.size()),
-                          data.shape_hessians[k],
-                          mapping_data, mapping_covariant_gradient);
+        {
+          for (unsigned int q=0; q<quadrature.size(); ++q)
+            {
+              fe_data.modified_hessian[q] = fe_data.shape_hessians[k][q+offset];
+              for (unsigned int m=0; m<dim; ++m)
+                for (unsigned int n=0; n<dim; ++n)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    fe_data.modified_hessian[q][m][n] -= data.shape_gradients[k][q+offset][j] * data.jacobian_grads[q+offset][m][n][j];
+            }
+          mapping.transform(fe_data.modified_hessian, data.shape_hessians[k],
+                            mapping_data, mapping_covariant_gradient);
+        }
     }
 }
 
@@ -448,9 +469,18 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
                           mapping_data, mapping_covariant);
 
       if (flags & update_hessians)
-        mapping.transform(make_slice(fe_data.shape_hessians[k], offset, quadrature.size()),
-                          data.shape_hessians[k],
-                          mapping_data, mapping_covariant_gradient);
+        {
+          for (unsigned int q=0; q<quadrature.size(); ++q)
+            {
+              fe_data.modified_hessian[q] = fe_data.shape_hessians[k][q+offset];
+              for (unsigned int m=0; m<dim; ++m)
+                for (unsigned int n=0; n<dim; ++n)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    fe_data.modified_hessian[q][m][n] -= data.shape_gradients[k][q+offset][j] * data.jacobian_grads[q+offset][m][n][j];
+            }
+          mapping.transform(fe_data.modified_hessian, data.shape_hessians[k],
+                            mapping_data, mapping_covariant_gradient);
+        }
     }
 }
 

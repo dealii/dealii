@@ -857,14 +857,6 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 
       data->set_fe_data(base_no, base_fe_data);
 
-      // make sure that *we* compute
-      // second derivatives, base
-      // elements should not do it
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
-
       // The FEValuesData @p{data}
       // given to the
       // @p{fill_fe_values} function
@@ -927,11 +919,6 @@ FESystem<dim,spacedim>::get_face_data (
 
       data->set_fe_data(base_no, base_fe_data);
 
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
-
       FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
       data->set_fe_values_data(base_no, base_data);
     }
@@ -970,11 +957,6 @@ FESystem<dim,spacedim>::get_subface_data (
       Assert (base_fe_data != 0, ExcInternalError());
 
       data->set_fe_data(base_no, base_fe_data);
-
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
 
       FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
       data->set_fe_values_data(base_no, base_data);

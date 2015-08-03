@@ -284,6 +284,11 @@ protected:
      * then only have to apply the transformation when visiting an actual cell.
      */
     std::vector<std::vector<Tensor<2,dim> > > shape_hessians;
+
+    /**
+     * Scratch tensor for intermediate computations
+     */
+    mutable std::vector< Tensor<2,dim> > modified_hessian;
   };
 
   /**
