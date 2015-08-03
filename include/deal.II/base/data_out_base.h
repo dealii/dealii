@@ -886,11 +886,29 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
+     * A data type providing the different possible zlib compression levels.
+     */
+    enum ZlibCompressionLevel
+    {
+      no_compression,
+      best_speed,
+      best_compression,
+      default_compression
+    };
+
+    /**
+     * Flag determining the compression level at which zlib, if available, is
+     * run. The default is <tt>best_compression</tt>.
+     */
+    ZlibCompressionLevel compression_level;
+
+    /**
      * Constructor.
      */
     VtkFlags (const double       time   = std::numeric_limits<double>::min(),
               const unsigned int cycle  = std::numeric_limits<unsigned int>::min(),
-              const bool print_date_and_time = true);
+              const bool print_date_and_time = true,
+              const ZlibCompressionLevel compression_level = best_compression);
   };
 
 
