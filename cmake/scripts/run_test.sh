@@ -40,7 +40,7 @@ run(){
   rm -f failing_output
   rm -f output
 
-  ${RUN_COMMAND} > stdout
+  ${RUN_COMMAND} > stdout 2>&1
   RETURN_VALUE=$?
 
   [ -f output ] || cp stdout output
