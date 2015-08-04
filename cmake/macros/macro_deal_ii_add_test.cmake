@@ -16,10 +16,27 @@
 #
 # A Macro to set up tests for the testsuite
 #
-# This macro assumes that a source file "${test_name}.cc" as well as the
-# comparison file "${comparison_file}" is available in the testsuite. The
-# output of the compiled source file is compared against the file
-# comparison file.
+#
+# The testsuite distinguishes two different kinds of tests:
+#
+# - A combination of a source file "${test_name}.cc" (containing a main
+#   function) with a file "${comparison_file}" defines an executable that
+#   is compiled and linked against deal.II. Its output is compared with the
+#   comparison file. Additional libraries (like a library from a user
+#   project with code to test) the target should be linked against can be
+#   specified by
+#
+#     TEST_LIBRARIES
+#     TEST_LIBRARIES_DEBUG
+#     TEST_LIBRARIES_RELEASE
+#
+# - A combination of a parameter file "${test_name}.prm" with a file
+#   "${comparison_file}" describes the configuration of an already compiled
+#   executable that should just be run with its output being compared with
+#   the file "${comparison_file}". The executable is defined by
+#
+#     TEST_TARGET or
+#     TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
 #
 # For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES)
 # that is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is
@@ -40,13 +57,6 @@
 #   TEST_TIME_LIMIT
 #     - specifying the maximal wall clock time in seconds a test is allowed
 #       to run
-#
-# The following variables may be set:
-#
-#   TEST_LIBRARIES
-#   TEST_LIBRARIES_DEBUG
-#   TEST_LIBRARIES_RELEASE
-#     - specifying additional libraries (and targets) to link against.
 #
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
@@ -128,39 +138,66 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     ITEM_MATCHES(_match "${_build}" ${_configuration})
     IF(_match OR "${_configuration}" STREQUAL "")
 
+      STRING(TOLOWER ${_build} _build_lowercase)
+
+      #
+      # Select a suitable target:
+      #
+      IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cc")
+
+        SET(_target ${_test_name}.${_build_lowercase}) # target name
+        SET(_run_command "$<TARGET_FILE:${_target}>") # the command to issue
+
+      ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
+
+        IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+          SET(_target ${TEST_TARGET_${_build}})
+        ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
+          SET(_target ${TEST_TARGET})
+        ELSE()
+          MESSAGE(FATAL_ERROR
+            "\nFor ${_comparison_file}: \"${_test_name}.prm\" provided, but "
+            "neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
+            "\" is defined.\n\n"
+            )
+        ENDIF()
+        SET(_run_command "$<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
+
+      ELSE()
+        MESSAGE(FATAL_ERROR
+          "\nFor ${_comparison_file}: Neither \"${_test_name}.cc\", "
+          "nor \"${_test_name}.prm\" could be found!\n\n"
+          )
+      ENDIF()
+
       #
       # Set up a bunch of variables describing this particular test:
       #
-      STRING(TOLOWER ${_build} _build_lowercase)
-      SET(_target ${_test_name}.${_build_lowercase}) # target name
 
       # If _n_cpu is equal to "0", a normal, sequential test will be run,
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
 
-        SET(_diff_target ${_target}.diff) # diff target name
+        SET(_diff_target ${_test_name}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
-        SET(_run_command ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target}) # the command to issue
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
       ELSE()
 
         SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}/mpirun=${_n_cpu}) # directory to run the test in
-        # the command to issue
-        SET(_run_command "${DEAL_II_MPIEXEC} ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${DEAL_II_MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${DEAL_II_MPIEXEC_POSTFLAGS}")
-
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
+        SET(_run_command "${DEAL_II_MPIEXEC} ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${DEAL_II_MPIEXEC_PREFLAGS} ${_run_command} ${DEAL_II_MPIEXEC_POSTFLAGS}")
       ENDIF()
 
       FILE(MAKE_DIRECTORY ${_test_directory})
 
       #
-      # Add an executable for the current test and set up compile
+      # Add an executable (for the first type of tests) and set up compile
       # definitions and the full link interface. Only add the target once.
       #
-      IF(NOT TARGET ${_target})
 
+      IF(NOT TARGET ${_target})
         #
         # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
         # force a complete rerun of this test (BUILD, RUN and DIFF stage)
@@ -240,7 +277,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
           -DBINARY_DIR=${CMAKE_BINARY_DIR}
-          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/interrupt_guard.cc
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
