@@ -147,7 +147,6 @@ public:
   /**
    * Add an individual index to the set of indices.
    */
-
   void add_index (const size_type index);
 
   /**
