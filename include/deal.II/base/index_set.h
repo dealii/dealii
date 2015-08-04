@@ -138,6 +138,8 @@ public:
   /**
    * Add the half-open range $[\text{begin},\text{end})$ to the set of indices
    * represented by this class.
+   * @param[in] begin The first element of the range to be added.
+   * @param[in] end The past-the-end element of the range to be added.
    */
   void add_range (const size_type begin,
                   const size_type end);
