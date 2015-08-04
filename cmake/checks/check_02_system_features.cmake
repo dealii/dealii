@@ -105,6 +105,18 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
+#
+# Put an end to user's suffering from cygwin's defects
+#
+IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR
+    CMAKE_SYSTEM_NAME MATCHES "Windows" )
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    MESSAGE(FATAL_ERROR
+      "\nCygwin and forks such as MinGW and MinGW-64 are unsupported due to "
+      "multiple unresolved miscompilation issues.\n\n"
+      )
+  ENDIF()
+ENDIF()
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
 
