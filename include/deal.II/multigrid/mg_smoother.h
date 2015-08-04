@@ -213,16 +213,6 @@ namespace mg
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2> &matrices,
                      const MGLevelObject<DATA> &additional_data);
-    /**
-     * Initialize for matrix blocks. This function initializes the smoothing
-     * operator with the same smoother for each level.
-     *
-     * @p additional_data is an object of type @p RELAX::AdditionalData and is
-     * handed to the initialization function of the relaxation method.
-     */
-//     template <class MATRIX2>
-//     void initialize (const MGLevelObject<MatrixBlock<MATRIX2> >& matrices,
-//                   const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
     /**
      * Empty all vectors.

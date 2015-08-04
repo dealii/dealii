@@ -162,9 +162,7 @@ namespace VectorTools
 
             if (representative)
               {
-                // rep_index=dofs_of_rep_points.size()
                 dof_to_rep_index_table[fe_index].push_back(dofs_of_rep_points[fe_index].size());
-                // dofs_of_rep_points[rep_index]=i
                 dofs_of_rep_points[fe_index].push_back(i);
                 ++n_rep_points[fe_index];
               }

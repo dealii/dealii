@@ -85,38 +85,6 @@ TriaRawIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
 }
 
 
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaRawIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
-
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
-
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaActiveIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
 
 template <typename Accessor>
 inline

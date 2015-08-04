@@ -283,26 +283,21 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   bool T = transpose;
   if (symmetric && (steps2 % 2 == 0))
     T = false;
-//  cerr << 'S' << level;
-//  cerr << '(' << matrices[level]->m() << ',' << matrices[level]->n() << ')';
 
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
         {
-//        cerr << 'T';
           matrices[level].vmult(*r,u);
           r->sadd(-1.,1.,rhs);
           smoothers[level].Tvmult(*d, *r);
         }
       else
         {
-//        cerr << 'N';
           matrices[level].vmult(*r,u);
           r->sadd(-1.,1.,rhs);
           smoothers[level].vmult(*d, *r);
         }
-//      cerr << '{' << r->l2_norm() << '}';
       u += *d;
       if (symmetric)
         T = !T;

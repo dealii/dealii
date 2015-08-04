@@ -376,16 +376,6 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 
 
 
-/*  template <typename number> */
-/*  template <typename number2> */
-/*  void FullMatrix<number>::fill (const number2* entries) */
-/*  { */
-/*      if (n_cols()*n_rows() != 0) */
-/*        std::copy (entries, entries+n_rows()*n_cols(), &this->values[0]); */
-/*  } */
-
-
-
 template <typename number>
 void FullMatrix<number>::add_row (const size_type i,
                                   const number s,
