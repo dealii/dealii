@@ -298,7 +298,7 @@ namespace Step20
     :
     degree (degree),
     fe (FE_RaviartThomas<dim>(degree), 1,
-        FE_DGQ<dim>(degree), 1),
+       FE_DGQ<dim>(degree), 1),
     dof_handler (triangulation)
   {}
 

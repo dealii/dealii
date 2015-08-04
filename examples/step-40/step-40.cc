@@ -194,18 +194,18 @@ namespace Step40
     :
     mpi_communicator (MPI_COMM_WORLD),
     triangulation (mpi_communicator,
-                   typename Triangulation<dim>::MeshSmoothing
-                   (Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
+                  typename Triangulation<dim>::MeshSmoothing
+                  (Triangulation<dim>::smoothing_on_refinement |
+                   Triangulation<dim>::smoothing_on_coarsening)),
     dof_handler (triangulation),
     fe (2),
     pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(mpi_communicator)
-            == 0)),
+          (Utilities::MPI::this_mpi_process(mpi_communicator)
+           == 0)),
     computing_timer (mpi_communicator,
-                     pcout,
-                     TimerOutput::summary,
-                     TimerOutput::wall_times)
+                    pcout,
+                    TimerOutput::summary,
+                    TimerOutput::wall_times)
   {}
 
 

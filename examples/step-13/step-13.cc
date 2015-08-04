@@ -937,8 +937,8 @@ namespace Step13
                          const Quadrature<dim>    &quadrature)
       :
       fe_values (fe,
-                 quadrature,
-                 update_gradients | update_JxW_values)
+                quadrature,
+                update_gradients | update_JxW_values)
     {}
 
 
@@ -947,8 +947,8 @@ namespace Step13
     AssemblyScratchData (const AssemblyScratchData &scratch_data)
       :
       fe_values (scratch_data.fe_values.get_fe(),
-                 scratch_data.fe_values.get_quadrature(),
-                 update_gradients | update_JxW_values)
+                scratch_data.fe_values.get_quadrature(),
+                update_gradients | update_JxW_values)
     {}
 
 
@@ -1125,7 +1125,7 @@ namespace Step13
       :
       Base<dim> (triangulation),
       Solver<dim> (triangulation, fe,
-                   quadrature, boundary_values),
+                  quadrature, boundary_values),
       rhs_function (&rhs_function)
     {}
 
@@ -1217,7 +1217,7 @@ namespace Step13
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, fe, quadrature,
-                         rhs_function, boundary_values)
+                        rhs_function, boundary_values)
     {}
 
 
@@ -1266,7 +1266,7 @@ namespace Step13
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, fe, quadrature,
-                         rhs_function, boundary_values)
+                        rhs_function, boundary_values)
     {}
 
 

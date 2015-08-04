@@ -560,7 +560,7 @@ namespace Step31
 
     stokes_degree (1),
     stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
-               FE_Q<dim>(stokes_degree), 1),
+              FE_Q<dim>(stokes_degree), 1),
     stokes_dof_handler (triangulation),
 
     temperature_degree (2),

@@ -627,7 +627,7 @@ namespace Step43
     degree (degree),
     darcy_degree (degree),
     darcy_fe (FE_Q<dim>(darcy_degree+1), dim,
-              FE_Q<dim>(darcy_degree), 1),
+             FE_Q<dim>(darcy_degree), 1),
     darcy_dof_handler (triangulation),
 
     saturation_degree (degree+1),

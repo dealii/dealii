@@ -610,8 +610,8 @@ namespace Step14
                          const Quadrature<dim>    &quadrature)
       :
       fe_values (fe,
-                 quadrature,
-                 update_gradients | update_JxW_values)
+                quadrature,
+                update_gradients | update_JxW_values)
     {}
 
 
@@ -620,8 +620,8 @@ namespace Step14
     AssemblyScratchData (const AssemblyScratchData &scratch_data)
       :
       fe_values (scratch_data.fe_values.get_fe(),
-                 scratch_data.fe_values.get_quadrature(),
-                 update_gradients | update_JxW_values)
+                scratch_data.fe_values.get_quadrature(),
+                update_gradients | update_JxW_values)
     {}
 
 
@@ -829,8 +829,8 @@ namespace Step14
       :
       Base<dim> (triangulation),
       Solver<dim> (triangulation, fe,
-                   quadrature, face_quadrature,
-                   boundary_values),
+                  quadrature, face_quadrature,
+                  boundary_values),
       rhs_function (&rhs_function)
     {}
 
@@ -954,8 +954,8 @@ namespace Step14
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, fe, quadrature,
-                         face_quadrature, rhs_function,
-                         boundary_values)
+                        face_quadrature, rhs_function,
+                        boundary_values)
     {}
 
 
@@ -996,8 +996,8 @@ namespace Step14
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, fe, quadrature,
-                         face_quadrature,
-                         rhs_function, boundary_values)
+                        face_quadrature,
+                        rhs_function, boundary_values)
     {}
 
 
@@ -1064,8 +1064,8 @@ namespace Step14
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, fe, quadrature,
-                         face_quadrature,
-                         rhs_function, boundary_values),
+                        face_quadrature,
+                        rhs_function, boundary_values),
       weighting_function (&weighting_function)
     {}
 
@@ -1852,8 +1852,8 @@ namespace Step14
       :
       Base<dim> (triangulation),
       Solver<dim> (triangulation, fe,
-                   quadrature, face_quadrature,
-                   boundary_values),
+                  quadrature, face_quadrature,
+                  boundary_values),
       dual_functional (&dual_functional)
     {}
 
@@ -2109,10 +2109,10 @@ namespace Step14
               const Function<dim>      &right_hand_side)
       :
       fe_values (fe, quadrature,
-                 update_values   |
-                 update_hessians |
-                 update_quadrature_points |
-                 update_JxW_values),
+                update_values   |
+                update_hessians |
+                update_quadrature_points |
+                update_JxW_values),
       right_hand_side (&right_hand_side),
       cell_residual (quadrature.size()),
       rhs_values (quadrature.size()),
@@ -2127,11 +2127,11 @@ namespace Step14
     CellData (const CellData &cell_data)
       :
       fe_values (cell_data.fe_values.get_fe(),
-                 cell_data.fe_values.get_quadrature(),
-                 update_values   |
-                 update_hessians |
-                 update_quadrature_points |
-                 update_JxW_values),
+                cell_data.fe_values.get_quadrature(),
+                update_values   |
+                update_hessians |
+                update_quadrature_points |
+                update_JxW_values),
       right_hand_side (cell_data.right_hand_side),
       cell_residual (cell_data.cell_residual),
       rhs_values (cell_data.rhs_values),
@@ -2147,17 +2147,17 @@ namespace Step14
               const Quadrature<dim-1>  &face_quadrature)
       :
       fe_face_values_cell (fe, face_quadrature,
-                           update_values        |
-                           update_gradients     |
-                           update_JxW_values    |
-                           update_normal_vectors),
+                          update_values        |
+                          update_gradients     |
+                          update_JxW_values    |
+                          update_normal_vectors),
       fe_face_values_neighbor (fe, face_quadrature,
-                               update_values     |
-                               update_gradients  |
-                               update_JxW_values |
-                               update_normal_vectors),
+                              update_values     |
+                              update_gradients  |
+                              update_JxW_values |
+                              update_normal_vectors),
       fe_subface_values_cell (fe, face_quadrature,
-                              update_gradients)
+                             update_gradients)
     {
       const unsigned int n_face_q_points
         = face_quadrature.size();
@@ -2175,20 +2175,20 @@ namespace Step14
     FaceData (const FaceData &face_data)
       :
       fe_face_values_cell (face_data.fe_face_values_cell.get_fe(),
-                           face_data.fe_face_values_cell.get_quadrature(),
-                           update_values        |
-                           update_gradients     |
-                           update_JxW_values    |
-                           update_normal_vectors),
+                          face_data.fe_face_values_cell.get_quadrature(),
+                          update_values        |
+                          update_gradients     |
+                          update_JxW_values    |
+                          update_normal_vectors),
       fe_face_values_neighbor (face_data.fe_face_values_neighbor.get_fe(),
-                               face_data.fe_face_values_neighbor.get_quadrature(),
-                               update_values     |
-                               update_gradients  |
-                               update_JxW_values |
-                               update_normal_vectors),
+                              face_data.fe_face_values_neighbor.get_quadrature(),
+                              update_values     |
+                              update_gradients  |
+                              update_JxW_values |
+                              update_normal_vectors),
       fe_subface_values_cell (face_data.fe_subface_values_cell.get_fe(),
-                              face_data.fe_subface_values_cell.get_quadrature(),
-                              update_gradients),
+                             face_data.fe_subface_values_cell.get_quadrature(),
+                             update_gradients),
       jump_residual (face_data.jump_residual),
       dual_weights (face_data.dual_weights),
       cell_grads (face_data.cell_grads),
@@ -2205,10 +2205,10 @@ namespace Step14
                                  const Vector<double>    &dual_weights)
       :
       cell_data (*dual_solver.fe,
-                 *dual_solver.quadrature,
-                 *primal_solver.rhs_function),
+                *dual_solver.quadrature,
+                *primal_solver.rhs_function),
       face_data (*dual_solver.fe,
-                 *dual_solver.face_quadrature),
+                *dual_solver.face_quadrature),
       primal_solution(primal_solution),
       dual_weights(dual_weights)
     {}
@@ -2238,11 +2238,11 @@ namespace Step14
       :
       Base<dim> (coarse_grid),
       PrimalSolver<dim> (coarse_grid, primal_fe,
-                         quadrature, face_quadrature,
-                         rhs_function, bv),
+                        quadrature, face_quadrature,
+                        rhs_function, bv),
       DualSolver<dim> (coarse_grid, dual_fe,
-                       quadrature, face_quadrature,
-                       dual_functional)
+                      quadrature, face_quadrature,
+                      dual_functional)
     {}
 
 

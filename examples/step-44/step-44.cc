@@ -1095,8 +1095,8 @@ namespace Step44
     triangulation(Triangulation<dim>::maximum_smoothing),
     time(parameters.end_time, parameters.delta_t),
     timer(std::cout,
-          TimerOutput::summary,
-          TimerOutput::wall_times),
+         TimerOutput::summary,
+         TimerOutput::wall_times),
     degree(parameters.poly_degree),
     // The Finite Element System is composed of dim continuous displacement
     // DOFs, and discontinuous pressure and dilatation DOFs. In an attempt to
@@ -1107,8 +1107,8 @@ namespace Step44
     // not. However, it has been shown that the latter demonstrate good
     // convergence characteristics nonetheless.
     fe(FE_Q<dim>(parameters.poly_degree), dim, // displacement
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1, // pressure
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1), // dilatation
+      FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1, // pressure
+      FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1), // dilatation
     dof_handler_ref(triangulation),
     dofs_per_cell (fe.dofs_per_cell),
     u_fe(first_u_component),
@@ -1254,19 +1254,19 @@ namespace Step44
       :
       fe_values_ref(fe_cell, qf_cell, uf_cell),
       Nx(qf_cell.size(),
-         std::vector<double>(fe_cell.dofs_per_cell)),
+        std::vector<double>(fe_cell.dofs_per_cell)),
       grad_Nx(qf_cell.size(),
-              std::vector<Tensor<2, dim> >(fe_cell.dofs_per_cell)),
+             std::vector<Tensor<2, dim> >(fe_cell.dofs_per_cell)),
       symm_grad_Nx(qf_cell.size(),
-                   std::vector<SymmetricTensor<2, dim> >
-                   (fe_cell.dofs_per_cell))
+                  std::vector<SymmetricTensor<2, dim> >
+                  (fe_cell.dofs_per_cell))
     {}
 
     ScratchData_K(const ScratchData_K &rhs)
       :
       fe_values_ref(rhs.fe_values_ref.get_fe(),
-                    rhs.fe_values_ref.get_quadrature(),
-                    rhs.fe_values_ref.get_update_flags()),
+                   rhs.fe_values_ref.get_quadrature(),
+                   rhs.fe_values_ref.get_update_flags()),
       Nx(rhs.Nx),
       grad_Nx(rhs.grad_Nx),
       symm_grad_Nx(rhs.symm_grad_Nx)
@@ -1332,20 +1332,20 @@ namespace Step44
       fe_values_ref(fe_cell, qf_cell, uf_cell),
       fe_face_values_ref(fe_cell, qf_face, uf_face),
       Nx(qf_cell.size(),
-         std::vector<double>(fe_cell.dofs_per_cell)),
+        std::vector<double>(fe_cell.dofs_per_cell)),
       symm_grad_Nx(qf_cell.size(),
-                   std::vector<SymmetricTensor<2, dim> >
-                   (fe_cell.dofs_per_cell))
+                  std::vector<SymmetricTensor<2, dim> >
+                  (fe_cell.dofs_per_cell))
     {}
 
     ScratchData_RHS(const ScratchData_RHS &rhs)
       :
       fe_values_ref(rhs.fe_values_ref.get_fe(),
-                    rhs.fe_values_ref.get_quadrature(),
-                    rhs.fe_values_ref.get_update_flags()),
+                   rhs.fe_values_ref.get_quadrature(),
+                   rhs.fe_values_ref.get_update_flags()),
       fe_face_values_ref(rhs.fe_face_values_ref.get_fe(),
-                         rhs.fe_face_values_ref.get_quadrature(),
-                         rhs.fe_face_values_ref.get_update_flags()),
+                        rhs.fe_face_values_ref.get_quadrature(),
+                        rhs.fe_face_values_ref.get_update_flags()),
       Nx(rhs.Nx),
       symm_grad_Nx(rhs.symm_grad_Nx)
     {}
@@ -1487,8 +1487,8 @@ namespace Step44
       solution_values_p_total(rhs.solution_values_p_total),
       solution_values_J_total(rhs.solution_values_J_total),
       fe_values_ref(rhs.fe_values_ref.get_fe(),
-                    rhs.fe_values_ref.get_quadrature(),
-                    rhs.fe_values_ref.get_update_flags())
+                   rhs.fe_values_ref.get_quadrature(),
+                   rhs.fe_values_ref.get_update_flags())
     {}
 
     void reset()

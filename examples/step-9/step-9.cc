@@ -626,13 +626,13 @@ namespace Step9
   AssemblyScratchData (const FiniteElement<dim> &fe)
     :
     fe_values (fe,
-               QGauss<dim>(2),
-               update_values   | update_gradients |
-               update_quadrature_points | update_JxW_values),
+              QGauss<dim>(2),
+              update_values   | update_gradients |
+              update_quadrature_points | update_JxW_values),
     fe_face_values (fe,
-                    QGauss<dim-1>(2),
-                    update_values     | update_quadrature_points   |
-                    update_JxW_values | update_normal_vectors)
+                   QGauss<dim-1>(2),
+                   update_values     | update_quadrature_points   |
+                   update_JxW_values | update_normal_vectors)
   {}
 
 
@@ -642,13 +642,13 @@ namespace Step9
   AssemblyScratchData (const AssemblyScratchData &scratch_data)
     :
     fe_values (scratch_data.fe_values.get_fe(),
-               scratch_data.fe_values.get_quadrature(),
-               update_values   | update_gradients |
-               update_quadrature_points | update_JxW_values),
+              scratch_data.fe_values.get_quadrature(),
+              update_values   | update_gradients |
+              update_quadrature_points | update_JxW_values),
     fe_face_values (scratch_data.fe_face_values.get_fe(),
-                    scratch_data.fe_face_values.get_quadrature(),
-                    update_values     | update_quadrature_points   |
-                    update_JxW_values | update_normal_vectors)
+                   scratch_data.fe_face_values.get_quadrature(),
+                   update_values     | update_quadrature_points   |
+                   update_JxW_values | update_normal_vectors)
   {}
 
 
@@ -974,8 +974,8 @@ namespace Step9
                        const Vector<double>     &solution)
     :
     fe_midpoint_value(fe,
-                      QMidpoint<dim> (),
-                      update_values | update_quadrature_points),
+                     QMidpoint<dim> (),
+                     update_values | update_quadrature_points),
     solution(solution)
   {}
 
@@ -985,8 +985,8 @@ namespace Step9
   EstimateScratchData(const EstimateScratchData &scratch_data)
     :
     fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
-                      scratch_data.fe_midpoint_value.get_quadrature(),
-                      update_values | update_quadrature_points),
+                     scratch_data.fe_midpoint_value.get_quadrature(),
+                     update_values | update_quadrature_points),
     solution(scratch_data.solution)
   {}
 

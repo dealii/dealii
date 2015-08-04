@@ -560,11 +560,11 @@ namespace Step35
         :
         nqp (data.nqp),
         fe_val_vel (data.fe_val_vel.get_fe(),
-                    data.fe_val_vel.get_quadrature(),
-                    data.fe_val_vel.get_update_flags()),
+                   data.fe_val_vel.get_quadrature(),
+                   data.fe_val_vel.get_update_flags()),
         fe_val_pres (data.fe_val_pres.get_fe(),
-                     data.fe_val_pres.get_quadrature(),
-                     data.fe_val_pres.get_update_flags())
+                    data.fe_val_pres.get_quadrature(),
+                    data.fe_val_pres.get_update_flags())
       {}
     };
 
@@ -617,8 +617,8 @@ namespace Step35
         grad_u_star (nqp),
         u_star_tmp (nqp),
         fe_val (data.fe_val.get_fe(),
-                data.fe_val.get_quadrature(),
-                data.fe_val.get_update_flags())
+               data.fe_val.get_quadrature(),
+               data.fe_val.get_update_flags())
       {}
     };
 

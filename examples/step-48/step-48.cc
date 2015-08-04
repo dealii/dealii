@@ -328,7 +328,7 @@ namespace Step48
   SineGordonProblem<dim>::SineGordonProblem ()
     :
     pcout (std::cout,
-           Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0),
+          Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0),
 #ifdef DEAL_II_WITH_P4EST
     triangulation (MPI_COMM_WORLD),
 #endif

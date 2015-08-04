@@ -109,9 +109,9 @@ namespace Step53
   AfricaTopography::AfricaTopography ()
     :
     topography_data (get_endpoints(),
-                     n_intervals(),
-                     Table<2,double> (380, 220,
-                                      get_data().begin()))
+                    n_intervals(),
+                    Table<2,double> (380, 220,
+                                     get_data().begin()))
   {}
 
 

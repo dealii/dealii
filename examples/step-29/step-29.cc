@@ -326,7 +326,7 @@ namespace Step29
   ComputeIntensity<dim>::ComputeIntensity ()
     :
     DataPostprocessorScalar<dim> ("Intensity",
-                                  update_values)
+                                 update_values)
   {}
 
 

@@ -366,7 +366,7 @@ namespace Step32
                             const UpdateFlags         update_flags)
         :
         stokes_fe_values (mapping, stokes_fe, stokes_quadrature,
-                          update_flags),
+                         update_flags),
         grad_phi_u (stokes_fe.dofs_per_cell),
         phi_p (stokes_fe.dofs_per_cell)
       {}
@@ -378,9 +378,9 @@ namespace Step32
       StokesPreconditioner (const StokesPreconditioner &scratch)
         :
         stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
-                          scratch.stokes_fe_values.get_fe(),
-                          scratch.stokes_fe_values.get_quadrature(),
-                          scratch.stokes_fe_values.get_update_flags()),
+                         scratch.stokes_fe_values.get_fe(),
+                         scratch.stokes_fe_values.get_quadrature(),
+                         scratch.stokes_fe_values.get_update_flags()),
         grad_phi_u (scratch.grad_phi_u),
         phi_p (scratch.phi_p)
       {}
@@ -430,10 +430,10 @@ namespace Step32
                     const UpdateFlags         temperature_update_flags)
         :
         StokesPreconditioner<dim> (stokes_fe, stokes_quadrature,
-                                   mapping,
-                                   stokes_update_flags),
+                                  mapping,
+                                  stokes_update_flags),
         temperature_fe_values (mapping, temperature_fe, stokes_quadrature,
-                               temperature_update_flags),
+                              temperature_update_flags),
         phi_u (stokes_fe.dofs_per_cell),
         grads_phi_u (stokes_fe.dofs_per_cell),
         div_phi_u (stokes_fe.dofs_per_cell),
@@ -447,9 +447,9 @@ namespace Step32
         :
         StokesPreconditioner<dim> (scratch),
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
-                               scratch.temperature_fe_values.get_quadrature(),
-                               scratch.temperature_fe_values.get_update_flags()),
+                              scratch.temperature_fe_values.get_fe(),
+                              scratch.temperature_fe_values.get_quadrature(),
+                              scratch.temperature_fe_values.get_update_flags()),
         phi_u (scratch.phi_u),
         grads_phi_u (scratch.grads_phi_u),
         div_phi_u (scratch.div_phi_u),
@@ -484,9 +484,9 @@ namespace Step32
                          const Quadrature<dim>    &temperature_quadrature)
         :
         temperature_fe_values (mapping,
-                               temperature_fe, temperature_quadrature,
-                               update_values    | update_gradients |
-                               update_JxW_values),
+                              temperature_fe, temperature_quadrature,
+                              update_values    | update_gradients |
+                              update_JxW_values),
         phi_T (temperature_fe.dofs_per_cell),
         grad_phi_T (temperature_fe.dofs_per_cell)
       {}
@@ -497,9 +497,9 @@ namespace Step32
       TemperatureMatrix (const TemperatureMatrix &scratch)
         :
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
-                               scratch.temperature_fe_values.get_quadrature(),
-                               scratch.temperature_fe_values.get_update_flags()),
+                              scratch.temperature_fe_values.get_fe(),
+                              scratch.temperature_fe_values.get_quadrature(),
+                              scratch.temperature_fe_values.get_update_flags()),
         phi_T (scratch.phi_T),
         grad_phi_T (scratch.grad_phi_T)
       {}
@@ -555,15 +555,15 @@ namespace Step32
                       const Quadrature<dim>    &quadrature)
         :
         temperature_fe_values (mapping,
-                               temperature_fe, quadrature,
-                               update_values    |
-                               update_gradients |
-                               update_hessians  |
-                               update_quadrature_points |
-                               update_JxW_values),
+                              temperature_fe, quadrature,
+                              update_values    |
+                              update_gradients |
+                              update_hessians  |
+                              update_quadrature_points |
+                              update_JxW_values),
         stokes_fe_values (mapping,
-                          stokes_fe, quadrature,
-                          update_values | update_gradients),
+                         stokes_fe, quadrature,
+                         update_values | update_gradients),
         phi_T (temperature_fe.dofs_per_cell),
         grad_phi_T (temperature_fe.dofs_per_cell),
 
@@ -586,13 +586,13 @@ namespace Step32
       TemperatureRHS (const TemperatureRHS &scratch)
         :
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
-                               scratch.temperature_fe_values.get_quadrature(),
-                               scratch.temperature_fe_values.get_update_flags()),
+                              scratch.temperature_fe_values.get_fe(),
+                              scratch.temperature_fe_values.get_quadrature(),
+                              scratch.temperature_fe_values.get_update_flags()),
         stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
-                          scratch.stokes_fe_values.get_fe(),
-                          scratch.stokes_fe_values.get_quadrature(),
-                          scratch.stokes_fe_values.get_update_flags()),
+                         scratch.stokes_fe_values.get_fe(),
+                         scratch.stokes_fe_values.get_quadrature(),
+                         scratch.stokes_fe_values.get_update_flags()),
         phi_T (scratch.phi_T),
         grad_phi_T (scratch.grad_phi_T),
 
@@ -637,7 +637,7 @@ namespace Step32
       StokesPreconditioner (const FiniteElement<dim> &stokes_fe)
         :
         local_matrix (stokes_fe.dofs_per_cell,
-                      stokes_fe.dofs_per_cell),
+                     stokes_fe.dofs_per_cell),
         local_dof_indices (stokes_fe.dofs_per_cell)
       {}
 
@@ -694,9 +694,9 @@ namespace Step32
       TemperatureMatrix (const FiniteElement<dim> &temperature_fe)
         :
         local_mass_matrix (temperature_fe.dofs_per_cell,
-                           temperature_fe.dofs_per_cell),
+                          temperature_fe.dofs_per_cell),
         local_stiffness_matrix (temperature_fe.dofs_per_cell,
-                                temperature_fe.dofs_per_cell),
+                               temperature_fe.dofs_per_cell),
         local_dof_indices (temperature_fe.dofs_per_cell)
       {}
 
@@ -729,7 +729,7 @@ namespace Step32
         local_rhs (temperature_fe.dofs_per_cell),
         local_dof_indices (temperature_fe.dofs_per_cell),
         matrix_for_bc (temperature_fe.dofs_per_cell,
-                       temperature_fe.dofs_per_cell)
+                      temperature_fe.dofs_per_cell)
       {}
 
       template <int dim>
@@ -1208,26 +1208,26 @@ namespace Step32
     :
     parameters (parameters_),
     pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            == 0)),
+          (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
+           == 0)),
 
     triangulation (MPI_COMM_WORLD,
-                   typename Triangulation<dim>::MeshSmoothing
-                   (Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
+                  typename Triangulation<dim>::MeshSmoothing
+                  (Triangulation<dim>::smoothing_on_refinement |
+                   Triangulation<dim>::smoothing_on_coarsening)),
 
     mapping (4),
 
     stokes_fe (FE_Q<dim>(parameters.stokes_velocity_degree),
-               dim,
-               (parameters.use_locally_conservative_discretization
-                ?
-                static_cast<const FiniteElement<dim> &>
-                (FE_DGP<dim>(parameters.stokes_velocity_degree-1))
-                :
-                static_cast<const FiniteElement<dim> &>
-                (FE_Q<dim>(parameters.stokes_velocity_degree-1))),
-               1),
+              dim,
+              (parameters.use_locally_conservative_discretization
+               ?
+               static_cast<const FiniteElement<dim> &>
+               (FE_DGP<dim>(parameters.stokes_velocity_degree-1))
+               :
+               static_cast<const FiniteElement<dim> &>
+               (FE_Q<dim>(parameters.stokes_velocity_degree-1))),
+              1),
 
     stokes_dof_handler (triangulation),
 
@@ -1243,9 +1243,9 @@ namespace Step32
     rebuild_temperature_preconditioner (true),
 
     computing_timer (MPI_COMM_WORLD,
-                     pcout,
-                     TimerOutput::summary,
-                     TimerOutput::wall_times)
+                    pcout,
+                    TimerOutput::summary,
+                    TimerOutput::wall_times)
   {}
 
 

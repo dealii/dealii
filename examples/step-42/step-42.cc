@@ -157,12 +157,12 @@ namespace Step42
     sigma_0(sigma_0),
     gamma(gamma),
     stress_strain_tensor_kappa (kappa
-                                * outer_product(unit_symmetric_tensor<dim>(),
-                                                unit_symmetric_tensor<dim>())),
+                               * outer_product(unit_symmetric_tensor<dim>(),
+                                               unit_symmetric_tensor<dim>())),
     stress_strain_tensor_mu (2 * mu
-                             * (identity_tensor<dim>()
-                                - outer_product(unit_symmetric_tensor<dim>(),
-                                                unit_symmetric_tensor<dim>()) / 3.0))
+                            * (identity_tensor<dim>()
+                               - outer_product(unit_symmetric_tensor<dim>(),
+                                               unit_symmetric_tensor<dim>()) / 3.0))
   {}
 
 
@@ -826,9 +826,9 @@ namespace Step42
     :
     mpi_communicator(MPI_COMM_WORLD),
     pcout(std::cout,
-          (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+         (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never,
-                    TimerOutput::wall_times),
+                   TimerOutput::wall_times),
 
     n_initial_global_refinements (prm.get_integer("number of initial refinements")),
     triangulation(mpi_communicator),
@@ -841,18 +841,18 @@ namespace Step42
     gamma (0.01),
     sigma_0(400.0),
     constitutive_law (e_modulus,
-                      nu,
-                      sigma_0,
-                      gamma),
+                     nu,
+                     sigma_0,
+                     gamma),
 
     base_mesh (prm.get("base mesh")),
     obstacle (prm.get("obstacle") == "read from file"
-              ?
-              static_cast<const Function<dim>*>
-              (new EquationData::ChineseObstacle<dim>("obstacle.pbm", (base_mesh == "box" ? 1.0 : 0.5)))
-              :
-              static_cast<const Function<dim>*>
-              (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
+             ?
+             static_cast<const Function<dim>*>
+             (new EquationData::ChineseObstacle<dim>("obstacle.pbm", (base_mesh == "box" ? 1.0 : 0.5)))
+             :
+             static_cast<const Function<dim>*>
+             (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
 
     transfer_solution (prm.get_bool("transfer solution")),
     n_refinement_cycles (prm.get_integer("number of cycles"))

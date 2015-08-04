@@ -591,8 +591,8 @@ namespace Step21
     :
     degree (degree),
     fe (FE_RaviartThomas<dim>(degree), 1,
-        FE_DGQ<dim>(degree), 1,
-        FE_DGQ<dim>(degree), 1),
+       FE_DGQ<dim>(degree), 1,
+       FE_DGQ<dim>(degree), 1),
     dof_handler (triangulation),
     n_refinement_steps (5),
     time_step (0),
