@@ -268,9 +268,6 @@ namespace mg
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
  *
- * @note If '--enable-mgcompatibility' was used on configuring deal.II, this
- * class behaves like MGSmootherPrecondition.
- *
  * @author Guido Kanschat, 2003
  */
 template<class MATRIX, class RELAX, class VECTOR>
