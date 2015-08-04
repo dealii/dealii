@@ -131,29 +131,6 @@
 
 #cmakedefine DEAL_II_MSVC
 
-/*
- * Disable a bunch of warnings for Microsoft Visual C++.
- */
-#ifdef _MSC_VER
-#  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
-#  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
-#  pragma warning( disable : 4996 ) /* unsafe functions, such as strcat and sprintf */
-#  pragma warning( disable : 4355 ) /* 'this' : used in base member initializer list */
-#  pragma warning( disable : 4661 ) /* no suitable definition provided for explicit template instantiation request */
-#  pragma warning( disable : 4800 ) /* forcing value to bool 'true' or 'false' (performance warning) */
-#  pragma warning( disable : 4146 ) /* unary minus operator applied to unsigned type, result still unsigned */
-#  pragma warning( disable : 4667 ) /* no function template defined that matches forced instantiation */
-#  pragma warning( disable : 4520 ) /* multiple default constructors specified */
-#  pragma warning( disable : 4700 ) /* uninitialized local variable */
-#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
-#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
-/*
- * Also make sure we don't let MS Windows headers define min/max as
- * macros, see http://support.microsoft.com/kb/143208
- */
-#  define NOMINMAX
-#endif /*_MSC_VER*/
-
 
 /***********************************************************************
  * Thread support

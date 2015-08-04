@@ -20,14 +20,6 @@
 # editing this file.
 #
 
-#TODO: this check is not working, my version is 17.0.51106.1 (2012)
-#IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "17.0.0.0" )
-##  MESSAGE(WARNING "\n"
-#    "You're using an old version of the MSVC C++ Compiler!\n"
-#    "It is strongly recommended to use at least version 2012.\n"
-#    )
-#ENDIF()
-
 
 ########################
 #                      #
@@ -38,14 +30,44 @@
 # enable exception handling:
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/EHsc")
 
-#enable warnings:
-ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
 
 # Globally disable some legacy min and max macros that cause problems:
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/NOMINMAX")
+LIST(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
+LIST(APPEND DEAL_II_USER_DEFINITIONS "NOMINMAX")
 
-# Disable warning about unknown pragmas
+ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
+
+#
+# Selectively disable a bunch of warnings:
+#
+# 4068 - unknown pragmas
+# 4244 - implied downcasting from double to float
+# 4267 - implied downcasting from size_t to unsigned int
+# 4996 - unsafe functions, such as strcat and sprintf
+# 4355 - 'this' : used in base member initializer list
+# 4661 - no suitable definition provided for explicit template instantiation request
+# 4800 - forcing value to bool 'true' or 'false' (performance warning)
+# 4146 - unary minus operator applied to unsigned type, result still unsigned
+# 4667 - no function template defined that matches forced instantiation
+# 4520 - multiple default constructors specified
+# 4700 - uninitialized local variable
+# 4789 - destination of memory copy is too small
+# 4808 - case 'value' is not a valid value for switch condition of type 'bool
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4068")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4244")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4267")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4996")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4355")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4661")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4800")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4146")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4667")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4520")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4700")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4789")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4808")
+
 
 #############################
 #                           #
