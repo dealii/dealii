@@ -28,11 +28,11 @@ template <int dim, int spacedim>
 FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
   :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-    FiniteElementData<dim>(this->get_dpo_vector(degree),
-                           1, degree,
-                           FiniteElementData<dim>::H1),
-    std::vector<bool> (1, false))
+   TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+   FiniteElementData<dim>(this->get_dpo_vector(degree),
+                          1, degree,
+                          FiniteElementData<dim>::H1),
+   std::vector<bool> (1, false))
 {
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "
@@ -52,11 +52,11 @@ template <int dim, int spacedim>
 FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
   :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
-    FiniteElementData<dim>(this->get_dpo_vector(points.size()-1),
-                           1, points.size()-1,
-                           FiniteElementData<dim>::H1),
-    std::vector<bool> (1, false))
+   TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
+   FiniteElementData<dim>(this->get_dpo_vector(points.size()-1),
+                          1, points.size()-1,
+                          FiniteElementData<dim>::H1),
+   std::vector<bool> (1, false))
 {
   const unsigned int degree = points.size()-1;
   (void)degree;

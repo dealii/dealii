@@ -63,8 +63,8 @@ public:
    * Constructor.
    */
   FE_PolyFace_NP (const POLY &poly_space,
-               const FiniteElementData<dim> &fe_data,
-               const std::vector<bool> &restriction_is_additive_flags);
+                  const FiniteElementData<dim> &fe_data,
+                  const std::vector<bool> &restriction_is_additive_flags);
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value

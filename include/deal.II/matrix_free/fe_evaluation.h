@@ -1734,21 +1734,21 @@ FEEvaluationBase<dim,n_components_,Number>
   quad_no            (quad_no_in),
   n_fe_components    (data_in.get_dof_info(fe_no_in).n_components),
   active_fe_index    (data_in.get_dof_info(fe_no_in).fe_index_from_degree
-                      (fe_degree)),
+                     (fe_degree)),
   active_quad_index  (data_in.get_mapping_info().
-                      mapping_data_gen[quad_no_in].
-                      quad_index_from_n_q_points(n_q_points)),
+                     mapping_data_gen[quad_no_in].
+                     quad_index_from_n_q_points(n_q_points)),
   matrix_info        (&data_in),
   dof_info           (&data_in.get_dof_info(fe_no_in)),
   mapping_info       (&data_in.get_mapping_info()),
   data               (&data_in.get_shape_info
-                      (fe_no_in, quad_no_in, active_fe_index,
-                       active_quad_index)),
+                     (fe_no_in, quad_no_in, active_fe_index,
+                      active_quad_index)),
   cartesian_data     (0),
   jacobian           (0),
   J_value            (0),
   quadrature_weights (mapping_info->mapping_data_gen[quad_no].
-                      quadrature_weights[active_quad_index].begin()),
+                     quadrature_weights[active_quad_index].begin()),
   quadrature_points  (0),
   jacobian_grad      (0),
   jacobian_grad_upper(0),
@@ -3708,7 +3708,7 @@ FEEvaluationAccess<dim,n_components_,Number>
                       const FEEvaluationBase<dim,n_components_other,Number> *other)
   :
   FEEvaluationBase <dim,n_components_,Number>(mapping, fe, quadrature, update_flags,
-                                              first_selected_component, other)
+                                             first_selected_component, other)
 {}
 
 
@@ -3754,7 +3754,7 @@ FEEvaluationAccess<dim,1,Number>
                       const FEEvaluationBase<dim,n_components_other,Number> *other)
   :
   FEEvaluationBase <dim,1,Number> (mapping, fe, quadrature, update_flags,
-                                   first_selected_component, other)
+                                  first_selected_component, other)
 {}
 
 
@@ -3993,7 +3993,7 @@ FEEvaluationAccess<dim,dim,Number>
                       const FEEvaluationBase<dim,n_components_other,Number> *other)
   :
   FEEvaluationBase <dim,dim,Number> (mapping, fe, quadrature, update_flags,
-                                     first_selected_component, other)
+                                    first_selected_component, other)
 {}
 
 
@@ -4353,7 +4353,7 @@ FEEvaluationAccess<1,1,Number>
                       const FEEvaluationBase<1,n_components_other,Number> *other)
   :
   FEEvaluationBase <1,1,Number> (mapping, fe, quadrature, update_flags,
-                                 first_selected_component, other)
+                                first_selected_component, other)
 {}
 
 
@@ -6085,7 +6085,7 @@ namespace internal
   // operation is identity, which allows us to write shorter code.
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   struct FEEvaluationImpl<MatrixFreeFunctions::tensor_gausslobatto, dim,
-    fe_degree, n_q_points_1d, n_components, Number>
+           fe_degree, n_q_points_1d, n_components, Number>
   {
     static
     void evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
@@ -6359,8 +6359,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 const unsigned int        first_selected_component)
   :
   BaseClass (mapping, fe, quadrature, update_flags,
-             first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
+            first_selected_component,
+            static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
   dofs_per_cell (this->data->dofs_per_cell)
 {
   check_template_arguments(numbers::invalid_unsigned_int);
@@ -6379,8 +6379,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 const unsigned int        first_selected_component)
   :
   BaseClass (StaticMappingQ1<dim>::mapping, fe, quadrature, update_flags,
-             first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
+            first_selected_component,
+            static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
   dofs_per_cell (this->data->dofs_per_cell)
 {
   check_template_arguments(numbers::invalid_unsigned_int);
@@ -6399,9 +6399,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 const unsigned int        first_selected_component)
   :
   BaseClass (other.mapped_geometry->get_fe_values().get_mapping(),
-             fe, other.mapped_geometry->get_quadrature(),
-             other.mapped_geometry->get_fe_values().get_update_flags(),
-             first_selected_component, &other),
+            fe, other.mapped_geometry->get_quadrature(),
+            other.mapped_geometry->get_fe_values().get_update_flags(),
+            first_selected_component, &other),
   dofs_per_cell (this->data->dofs_per_cell)
 {
   check_template_arguments(numbers::invalid_unsigned_int);

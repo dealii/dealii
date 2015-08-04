@@ -338,7 +338,7 @@ namespace TrilinosWrappers
     :
     SolverBase (cn),
     additional_data (data.output_solver_details,
-                     data.restart_parameter)
+                    data.restart_parameter)
   {
     solver_name = gmres;
   }

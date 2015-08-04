@@ -221,38 +221,38 @@ namespace internal
       finite_element (fe),
       face_quadratures (face_quadratures),
       fe_face_values_cell (mapping,
-                           finite_element,
-                           face_quadratures,
-                           update_gradients      |
-                           update_JxW_values     |
-                           (need_quadrature_points  ?
-                            update_quadrature_points :
-                            UpdateFlags()) |
-                           update_normal_vectors),
+                          finite_element,
+                          face_quadratures,
+                          update_gradients      |
+                          update_JxW_values     |
+                          (need_quadrature_points  ?
+                           update_quadrature_points :
+                           UpdateFlags()) |
+                          update_normal_vectors),
       fe_face_values_neighbor (mapping,
-                               finite_element,
-                               face_quadratures,
-                               update_gradients),
+                              finite_element,
+                              face_quadratures,
+                              update_gradients),
       fe_subface_values (mapping,
-                         finite_element,
-                         face_quadratures,
-                         update_gradients),
+                        finite_element,
+                        face_quadratures,
+                        update_gradients),
       phi (n_solution_vectors,
-           std::vector<std::vector<double> >
-           (face_quadratures.max_n_quadrature_points(),
-            std::vector<double> (fe.n_components()))),
+          std::vector<std::vector<double> >
+          (face_quadratures.max_n_quadrature_points(),
+           std::vector<double> (fe.n_components()))),
       psi (n_solution_vectors,
-           std::vector<std::vector<Tensor<1,spacedim> > >
-           (face_quadratures.max_n_quadrature_points(),
-            std::vector<Tensor<1,spacedim> > (fe.n_components()))),
+          std::vector<std::vector<Tensor<1,spacedim> > >
+          (face_quadratures.max_n_quadrature_points(),
+           std::vector<Tensor<1,spacedim> > (fe.n_components()))),
       neighbor_psi (n_solution_vectors,
-                    std::vector<std::vector<Tensor<1,spacedim> > >
-                    (face_quadratures.max_n_quadrature_points(),
-                     std::vector<Tensor<1,spacedim> > (fe.n_components()))),
+                   std::vector<std::vector<Tensor<1,spacedim> > >
+                   (face_quadratures.max_n_quadrature_points(),
+                    std::vector<Tensor<1,spacedim> > (fe.n_components()))),
       normal_vectors (face_quadratures.max_n_quadrature_points()),
       coefficient_values1 (face_quadratures.max_n_quadrature_points()),
       coefficient_values (face_quadratures.max_n_quadrature_points(),
-                          dealii::Vector<double> (fe.n_components())),
+                         dealii::Vector<double> (fe.n_components())),
       JxW_values (face_quadratures.max_n_quadrature_points()),
       subdomain_id (subdomain_id),
       material_id (material_id),

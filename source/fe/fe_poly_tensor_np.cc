@@ -131,13 +131,13 @@ namespace
 
 template <class POLY, int dim, int spacedim>
 FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree,
-                                                 const FiniteElementData<dim> &fe_data,
-                                                 const std::vector<bool> &restriction_is_additive_flags,
-                                                 const std::vector<ComponentMask> &nonzero_components)
+                                                       const FiniteElementData<dim> &fe_data,
+                                                       const std::vector<bool> &restriction_is_additive_flags,
+                                                       const std::vector<ComponentMask> &nonzero_components)
   :
   FiniteElement<dim,spacedim> (fe_data,
-                               restriction_is_additive_flags,
-                               nonzero_components),
+                              restriction_is_additive_flags,
+                              nonzero_components),
   poly_space(POLY(degree))
 {
   cached_point(0) = -1;
@@ -151,23 +151,23 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree
   for (unsigned int comp=0; comp<this->n_components() ; ++comp)
     this->component_to_base_table[comp].first.second = comp;
 
-  if (dim == 1) 
+  if (dim == 1)
     piola_boundary = 0;
-  else 
-  {
-    if (dim == 2) 
-      {
-        piola_boundary = 2 - ((degree==0) ? 1 : 0);
-      }
-    else 
-      {
-        piola_boundary = 3*(degree+1);
-      }
-  }
+  else
+    {
+      if (dim == 2)
+        {
+          piola_boundary = 2 - ((degree==0) ? 1 : 0);
+        }
+      else
+        {
+          piola_boundary = 3*(degree+1);
+        }
+    }
   // std::cout<<"degree: "<<degree<<" piola_boundary: "<<piola_boundary<<" poly_space: "
   // <<poly_space.n()<<std::endl;
-  Assert(piola_boundary < poly_space.n(), 
-    ExcIndexRange (piola_boundary, 0, poly_space.n()));
+  Assert(piola_boundary < poly_space.n(),
+         ExcIndexRange (piola_boundary, 0, poly_space.n()));
 
 }
 
@@ -188,8 +188,8 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::shape_value (const unsigned int, const Poin
 template <class POLY, int dim, int spacedim>
 double
 FE_PolyTensor_NP<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
-                                                         const Point<dim> &p,
-                                                         const unsigned int component) const
+                                                            const Point<dim> &p,
+                                                            const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
@@ -215,7 +215,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::shape_value_component (const unsigned int i
 template <class POLY, int dim, int spacedim>
 Tensor<1,dim>
 FE_PolyTensor_NP<POLY,dim,spacedim>::shape_grad (const unsigned int,
-                                              const Point<dim> &) const
+                                                 const Point<dim> &) const
 {
   typedef    FiniteElement<dim,spacedim> FEE;
   Assert(false, typename FEE::ExcFENotPrimitive());
@@ -227,8 +227,8 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::shape_grad (const unsigned int,
 template <class POLY, int dim, int spacedim>
 Tensor<1,dim>
 FE_PolyTensor_NP<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
-                                                        const Point<dim> &p,
-                                                        const unsigned int component) const
+                                                           const Point<dim> &p,
+                                                           const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
@@ -394,7 +394,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::get_data (
           }
 
       }
-  
+
   // Assert(false, ExcMessage("get_data_done"));
   return data;
 }
@@ -424,7 +424,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
 // {
 //        std::cout << data.quadrature_points[k] << "   JxW: "
 //       << data.JxW_values[k]
-//       <<std::endl; 
+//       <<std::endl;
 // }
 
   // convert data object to internal
@@ -472,40 +472,40 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
   std::vector<Tensor<2,dim> > grads(0);
   std::vector<Tensor<3,dim> > grad_grads(0);
 
-   if (flags & update_values)
-      values.resize (this->dofs_per_cell);
+  if (flags & update_values)
+    values.resize (this->dofs_per_cell);
 
   if (flags & update_gradients)
-      grads.resize (this->dofs_per_cell);
+    grads.resize (this->dofs_per_cell);
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
   const double h = std::pow(measure, 1.0/dim);
 
-  if(flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
-    {
-
-      poly_space.compute(Point<dim>(data.quadrature_points[k] - center)/h,
-        values, grads, grad_grads);
-
-      for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
       {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
-        if (flags & update_values) 
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            data.shape_values(first+d,k) = sign_change[i] * values[i][d];
-        }
 
-        if (flags & update_gradients)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
-        }
+        poly_space.compute(Point<dim>(data.quadrature_points[k] - center)/h,
+                           values, grads, grad_grads);
+
+        for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
+          {
+            const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+                                                                        this->get_nonzero_components(i).first_selected_component()];
+            if (flags & update_values)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_values(first+d,k) = sign_change[i] * values[i][d];
+              }
+
+            if (flags & update_gradients)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
+              }
+          }
       }
-    }
   // ===================== piola-mapping degree of freedoms =====================
 
   for (unsigned int i=this->dofs_per_cell-piola_boundary; i<this->dofs_per_cell; ++i)
@@ -514,26 +514,26 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
                                                                   this->get_nonzero_components(i).first_selected_component()];
 
       if (flags & update_values && cell_similarity != CellSimilarity::translation)
-      {
-        switch (mapping_type)
-          {
+        {
+          switch (mapping_type)
+            {
 
-          case mapping_raviart_thomas:
-          case mapping_piola:
-          {
-            std::vector<Tensor<1,dim> > shape_values (n_q_points);
-            mapping.transform(fe_data.shape_values[i], shape_values,
-                              mapping_data, mapping_piola);
-            for (unsigned int k=0; k<n_q_points; ++k)
-              for (unsigned int d=0; d<dim; ++d)
-                data.shape_values(first+d,k)
-                  = sign_change[i] * shape_values[k][d];
-            break;
-          }
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform(fe_data.shape_values[i], shape_values,
+                                mapping_data, mapping_piola);
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_values(first+d,k)
+                    = sign_change[i] * shape_values[k][d];
+              break;
+            }
 
-          default:
-            Assert(false, ExcNotImplemented());
-          }
+            default:
+              Assert(false, ExcNotImplemented());
+            }
         }
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
@@ -597,7 +597,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
   Assert (flags & update_quadrature_points, ExcInternalError());
-  const unsigned int n_q_points = data.quadrature_points.size();   
+  const unsigned int n_q_points = data.quadrature_points.size();
 
   // offset determines which data set
   // to take (all data sets for all
@@ -622,7 +622,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
   if (mapping_type == mapping_raviart_thomas)
     get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
 
- // ===================== non-mapping degree of freedoms =====================
+// ===================== non-mapping degree of freedoms =====================
 
   // some scratch arrays
   std::vector<Tensor<1,dim> > values(0);
@@ -630,10 +630,10 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
   std::vector<Tensor<3,dim> > grad_grads(0);
 
   if (flags & update_values)
-      values.resize (this->dofs_per_cell);
+    values.resize (this->dofs_per_cell);
 
   if (flags & update_gradients)
-      grads.resize (this->dofs_per_cell);
+    grads.resize (this->dofs_per_cell);
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
@@ -641,29 +641,29 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
 
   if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
-    {
-      poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
-        values, grads, grad_grads);
-
-      for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
       {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
-        if (flags & update_values)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            data.shape_values(first+d,k) = sign_change[i] * values[i][d];
-        }
+        poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
+                           values, grads, grad_grads);
 
-        if (flags & update_gradients)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-              data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
-        }
+        for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
+          {
+            const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+                                                                        this->get_nonzero_components(i).first_selected_component()];
+            if (flags & update_values)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_values(first+d,k) = sign_change[i] * values[i][d];
+              }
+
+            if (flags & update_gradients)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
+              }
+          }
       }
-    }
 
- // ===================== piola-mapping degree of freedoms =====================
+// ===================== piola-mapping degree of freedoms =====================
 
   for (unsigned int i=this->dofs_per_cell-piola_boundary; i<this->dofs_per_cell; ++i)
     {
@@ -783,39 +783,39 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_subface_values (
   std::vector<Tensor<2,dim> > grads(0);
   std::vector<Tensor<3,dim> > grad_grads(0);
 
-   if (flags & update_values)
-      values.resize (this->dofs_per_cell);
+  if (flags & update_values)
+    values.resize (this->dofs_per_cell);
 
   if (flags & update_gradients)
-      grads.resize (this->dofs_per_cell);
+    grads.resize (this->dofs_per_cell);
 
   const Point<dim> center(cell->center());
   const double measure = cell->measure();
   const double h = std::pow(measure, 1.0/dim);
 
-  if(flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
-    {
-      poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
-        values, grads, grad_grads);
-
-      for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
       {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
-        if (flags & update_values) 
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            data.shape_values(first+d,k) = sign_change[i] * values[i][d];
-        }
+        poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
+                           values, grads, grad_grads);
 
-        if (flags & update_gradients)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
-        }
+        for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
+          {
+            const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+                                                                        this->get_nonzero_components(i).first_selected_component()];
+            if (flags & update_values)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_values(first+d,k) = sign_change[i] * values[i][d];
+              }
+
+            if (flags & update_gradients)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
+              }
+          }
       }
-    }
 
 
 
@@ -917,7 +917,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
       if (flags & update_gradients)
         // out |= update_gradients | update_piola | update_covariant_transformation;
         out |= update_gradients | update_piola |
-                update_covariant_transformation | update_jacobian_grads;
+               update_covariant_transformation | update_jacobian_grads;
 
       if (flags & update_hessians)
         out |= update_hessians | update_piola | update_covariant_transformation;
@@ -934,7 +934,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
       if (flags & update_gradients)
         // out |= update_gradients | update_piola | update_covariant_transformation;
         out |= update_gradients | update_piola |
-                update_covariant_transformation | update_jacobian_grads;
+               update_covariant_transformation | update_jacobian_grads;
 
 
       if (flags & update_hessians)
@@ -949,7 +949,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
     }
     }
 
-      out |= update_quadrature_points;
+  out |= update_quadrature_points;
 
   return out;
 }

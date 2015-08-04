@@ -377,7 +377,7 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
   SparseVanka<number> (M, selected, conserve_memory, n_threads),
   n_blocks (n_blocks),
   dof_masks (n_blocks,
-             std::vector<bool>(M.m(), false))
+            std::vector<bool>(M.m(), false))
 {
   compute_dof_masks (M, selected, blocking_strategy);
 }

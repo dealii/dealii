@@ -135,13 +135,13 @@ template <int dim, int spacedim>
 FE_DGABF_Scalar<dim, spacedim>::FE_DGABF_Scalar (const unsigned int degree)
   :
   FE_Poly<ABFScalarPolynomials<dim>, dim, spacedim> (
-    ABFScalarPolynomials<dim>(Polynomials::Legendre::generate_complete_basis(degree+1)),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+   ABFScalarPolynomials<dim>(Polynomials::Legendre::generate_complete_basis(degree+1)),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
+   std::vector<ComponentMask>(FiniteElementData<dim>(
+                                get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  
+
   // do not initialize embedding and restriction here. these matrices are
   // initialized on demand in get_restriction_matrix and
   // get_prolongation_matrix
@@ -193,7 +193,7 @@ FE_DGABF_Scalar<dim, spacedim>::get_dpo_vector (const unsigned int deg)
     dpo[dim] *= deg+1;
 
   unsigned int x = 1;
-  for(unsigned int i=0; i<dim-1; ++i)
+  for (unsigned int i=0; i<dim-1; ++i)
     x *= deg+1;
 
   dpo[dim] += dim*x;
@@ -206,7 +206,7 @@ FE_DGABF_Scalar<dim, spacedim>::get_dpo_vector (const unsigned int deg)
 template <int dim, int spacedim>
 void
 FE_DGABF_Scalar<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
-                                       const char                 direction) const
+                                                const char                 direction) const
 {
   Assert (false, ExcNotImplemented ());
 }
@@ -553,7 +553,7 @@ FE_DGABF_Scalar<dim, spacedim>::compare_for_face_domination (const FiniteElement
 template <int dim, int spacedim>
 bool
 FE_DGABF_Scalar<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
-                                            const unsigned int face_index) const
+                                                     const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
           ExcIndexRange (shape_index, 0, this->dofs_per_cell));

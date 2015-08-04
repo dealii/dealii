@@ -1018,22 +1018,22 @@ template <int dim>
 QTelles<dim>::QTelles (
   const Quadrature<1> &base_quad, const Point<dim> &singularity)
   :
-/**
-* We need the explicit implementation if dim == 1. If dim > 1 we use the
-* former implementation and apply a tensorial product to obtain the higher
-* dimensions.
-**/
+  /**
+  * We need the explicit implementation if dim == 1. If dim > 1 we use the
+  * former implementation and apply a tensorial product to obtain the higher
+  * dimensions.
+  **/
   Quadrature<dim>(
-    dim == 2 ?
-    QAnisotropic<dim>(
-      QTelles<1>(base_quad, Point<1>(singularity[0])),
-      QTelles<1>(base_quad, Point<1>(singularity[1]))) :
-    dim == 3 ?
-    QAnisotropic<dim>(
-      QTelles<1>(base_quad, Point<1>(singularity[0])),
-      QTelles<1>(base_quad, Point<1>(singularity[1])),
-      QTelles<1>(base_quad, Point<1>(singularity[2]))) :
-    Quadrature<dim>())
+   dim == 2 ?
+   QAnisotropic<dim>(
+     QTelles<1>(base_quad, Point<1>(singularity[0])),
+     QTelles<1>(base_quad, Point<1>(singularity[1]))) :
+   dim == 3 ?
+   QAnisotropic<dim>(
+     QTelles<1>(base_quad, Point<1>(singularity[0])),
+     QTelles<1>(base_quad, Point<1>(singularity[1])),
+     QTelles<1>(base_quad, Point<1>(singularity[2]))) :
+   Quadrature<dim>())
 {
 }
 
@@ -1041,10 +1041,10 @@ template <int dim>
 QTelles<dim>::QTelles (
   const unsigned int n, const Point<dim> &singularity)
   :
-/**
-* In this case we map the standard Gauss Legendre formula using the given
-* singularity point coordinates.
-**/
+  /**
+  * In this case we map the standard Gauss Legendre formula using the given
+  * singularity point coordinates.
+  **/
   Quadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
 {}
 
@@ -1054,9 +1054,9 @@ template <>
 QTelles<1>::QTelles (
   const Quadrature<1> &base_quad, const Point<1> &singularity)
   :
-/**
-* We explicitly implement the Telles' variable change if dim == 1.
-**/
+  /**
+  * We explicitly implement the Telles' variable change if dim == 1.
+  **/
   Quadrature<1>(base_quad)
 {
   /**

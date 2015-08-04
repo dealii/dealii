@@ -353,7 +353,7 @@ BlockSparsityPattern::BlockSparsityPattern (const size_type n_rows,
                                             const size_type n_columns)
   :
   BlockSparsityPatternBase<SparsityPattern>(n_rows,
-                                            n_columns)
+                                           n_columns)
 {}
 
 
@@ -449,7 +449,7 @@ BlockDynamicSparsityPattern (const size_type n_rows,
                              const size_type n_columns)
   :
   BlockSparsityPatternBase<DynamicSparsityPattern>(n_rows,
-                                                   n_columns)
+                                                  n_columns)
 {}
 
 
@@ -459,7 +459,7 @@ BlockDynamicSparsityPattern (const std::vector<size_type> &row_indices,
                              const std::vector<size_type> &col_indices)
   :
   BlockSparsityPatternBase<DynamicSparsityPattern>(row_indices.size(),
-                                                   col_indices.size())
+                                                  col_indices.size())
 {
   for (size_type i=0; i<row_indices.size(); ++i)
     for (size_type j=0; j<col_indices.size(); ++j)
@@ -472,7 +472,7 @@ BlockDynamicSparsityPattern::
 BlockDynamicSparsityPattern (const std::vector<IndexSet> &partitioning)
   :
   BlockSparsityPatternBase<DynamicSparsityPattern>(partitioning.size(),
-                                                   partitioning.size())
+                                                  partitioning.size())
 {
   for (size_type i=0; i<partitioning.size(); ++i)
     for (size_type j=0; j<partitioning.size(); ++j)
@@ -547,7 +547,7 @@ namespace TrilinosWrappers
                         const size_type n_columns)
     :
     dealii::BlockSparsityPatternBase<SparsityPattern>(n_rows,
-                                                      n_columns)
+                                                     n_columns)
   {}
 
 
@@ -557,7 +557,7 @@ namespace TrilinosWrappers
                         const std::vector<size_type> &col_indices)
     :
     BlockSparsityPatternBase<SparsityPattern>(row_indices.size(),
-                                              col_indices.size())
+                                             col_indices.size())
   {
     for (size_type i=0; i<row_indices.size(); ++i)
       for (size_type j=0; j<col_indices.size(); ++j)
@@ -572,7 +572,7 @@ namespace TrilinosWrappers
     :
     BlockSparsityPatternBase<SparsityPattern>
     (parallel_partitioning.size(),
-     parallel_partitioning.size())
+    parallel_partitioning.size())
   {
     for (size_type i=0; i<parallel_partitioning.size(); ++i)
       for (size_type j=0; j<parallel_partitioning.size(); ++j)
@@ -589,7 +589,7 @@ namespace TrilinosWrappers
     :
     BlockSparsityPatternBase<SparsityPattern>
     (parallel_partitioning.size(),
-     parallel_partitioning.size())
+    parallel_partitioning.size())
   {
     for (size_type i=0; i<parallel_partitioning.size(); ++i)
       for (size_type j=0; j<parallel_partitioning.size(); ++j)
@@ -609,7 +609,7 @@ namespace TrilinosWrappers
     :
     BlockSparsityPatternBase<SparsityPattern>
     (row_parallel_partitioning.size(),
-     col_parallel_partitioning.size())
+    col_parallel_partitioning.size())
   {
     for (size_type i=0; i<row_parallel_partitioning.size(); ++i)
       for (size_type j=0; j<col_parallel_partitioning.size(); ++j)

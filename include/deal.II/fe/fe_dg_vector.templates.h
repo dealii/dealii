@@ -28,12 +28,12 @@ FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
   const unsigned int deg, MappingType map)
   :
   FE_PolyTensor<POLY, dim, spacedim>(
-    deg,
-    FiniteElementData<dim>(
-      get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
-    std::vector<bool>(POLY::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(POLY::compute_n_pols(deg),
-                               ComponentMask(dim,true)))
+   deg,
+   FiniteElementData<dim>(
+     get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
+   std::vector<bool>(POLY::compute_n_pols(deg), true),
+   std::vector<ComponentMask>(POLY::compute_n_pols(deg),
+                              ComponentMask(dim,true)))
 {
   this->mapping_type = map;
   const unsigned int polynomial_degree = this->tensor_degree();

@@ -1646,8 +1646,8 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
                          const unsigned int   n_copies)
   :
   Quadrature<1> (uses_both_endpoints(base_quadrature) ?
-                 (base_quadrature.size()-1) * n_copies + 1 :
-                 base_quadrature.size() * n_copies)
+                (base_quadrature.size()-1) * n_copies + 1 :
+                base_quadrature.size() * n_copies)
 {
 //  fill(*this, base_quadrature, n_copies);
   Assert (base_quadrature.size() > 0, ExcNotInitialized());
@@ -1759,7 +1759,7 @@ QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
                            const unsigned int   N)
   :
   Quadrature<dim> (QIterated<dim-1>(base_quadrature, N),
-                   QIterated<1>(base_quadrature, N))
+                  QIterated<1>(base_quadrature, N))
 {}
 
 

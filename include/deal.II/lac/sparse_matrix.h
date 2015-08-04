@@ -1923,7 +1923,7 @@ namespace SparseMatrixIterators
             const std::size_t   index_within_matrix)
     :
     SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        index_within_matrix),
+                                       index_within_matrix),
     matrix (matrix)
   {}
 
@@ -2059,7 +2059,7 @@ namespace SparseMatrixIterators
             const std::size_t   index)
     :
     SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        index),
+                                       index),
     matrix (matrix)
   {}
 

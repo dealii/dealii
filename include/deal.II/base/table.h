@@ -2137,8 +2137,8 @@ Table<1,T>::Table (const unsigned int size,
                    const bool C_style_indexing)
   :
   TableBase<1,T> (TableIndices<1> (size),
-                  entries,
-                  C_style_indexing)
+                 entries,
+                 C_style_indexing)
 {}
 
 
@@ -2238,8 +2238,8 @@ Table<2,T>::Table (const unsigned int size1,
                    const bool C_style_indexing)
   :
   TableBase<2,T> (TableIndices<2> (size1, size2),
-                  entries,
-                  C_style_indexing)
+                 entries,
+                 C_style_indexing)
 {}
 
 
@@ -2508,8 +2508,8 @@ Table<3,T>::Table (const unsigned int size1,
                    const bool C_style_indexing)
   :
   TableBase<3,T> (TableIndices<3> (size1, size2, size3),
-                  entries,
-                  C_style_indexing)
+                 entries,
+                 C_style_indexing)
 {}
 
 

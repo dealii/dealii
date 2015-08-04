@@ -42,9 +42,9 @@ PolynomialsACFull<dim>::PolynomialsACFull (const unsigned int k)
 template <int dim>
 void
 PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
-                              std::vector<Tensor<1,dim> > &values,
-                              std::vector<Tensor<2,dim> > &grads,
-                              std::vector<Tensor<3,dim> > &grad_grads) const
+                                 std::vector<Tensor<1,dim> > &values,
+                                 std::vector<Tensor<2,dim> > &grads,
+                                 std::vector<Tensor<3,dim> > &grad_grads) const
 {
   Assert(values.size()==n_pols || values.size()==0,
          ExcDimensionMismatch(values.size(), n_pols));
@@ -140,40 +140,40 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
         // std::cout<<"k+start: "<<k+start<<" ix: "<<ix <<
         // " iy:"<<iy<<" iz:"<<iz<<std::endl;
         for (unsigned int d=0; d<dim; ++d)
-        {
-          if (update_values)
-          values[start+k][d] =
-            unit_point(d)
-            * v[0][ix][0]
-            * ((dim>1) ? v[1][iy][0] : 1.)
-            * ((dim>2) ? v[2][iz][0] : 1.);
+          {
+            if (update_values)
+              values[start+k][d] =
+                unit_point(d)
+                * v[0][ix][0]
+                * ((dim>1) ? v[1][iy][0] : 1.)
+                * ((dim>2) ? v[2][iz][0] : 1.);
 
-          if (update_grads)
-            for (unsigned int d2=0; d2<dim; ++d2)
-            {
-              grads[start+k][d][d2] = 
-              ((d==d2)? ( v[0][ix][0]
-                        * ((dim>1) ? v[1][iy][0] : 1.)
-                        * ((dim>2) ? v[2][iz][0] : 1.)) : 0. )
-              +  unit_point(d) 
-               * v[0][ix][(d2==0) ? 1 : 0]
-               * ((dim>1) ? v[1][iy][(d2==1) ? 1 : 0] : 1.)
-               * ((dim>2) ? v[2][iz][(d2==2) ? 1 : 0] : 1.);
-            }
+            if (update_grads)
+              for (unsigned int d2=0; d2<dim; ++d2)
+                {
+                  grads[start+k][d][d2] =
+                    ((d==d2)? ( v[0][ix][0]
+                                * ((dim>1) ? v[1][iy][0] : 1.)
+                                * ((dim>2) ? v[2][iz][0] : 1.)) : 0. )
+                    +  unit_point(d)
+                    * v[0][ix][(d2==0) ? 1 : 0]
+                    * ((dim>1) ? v[1][iy][(d2==1) ? 1 : 0] : 1.)
+                    * ((dim>2) ? v[2][iz][(d2==2) ? 1 : 0] : 1.);
+                }
 
-          if (update_grad_grads)
-            Assert(false,ExcNotImplemented());
-        }
+            if (update_grad_grads)
+              Assert(false,ExcNotImplemented());
+          }
 
         k++;
-    }
-    
+      }
+
 
 
   // -------------- supplemental curl parts --------------------//
   // same as BDM
   Assert( k == ((dim == 2) ? degree() : (degree()*(degree()+1)/2)) || (dim==1 && k==1),
-         ExcMessage("polynomials space not set up correctly"));
+          ExcMessage("polynomials space not set up correctly"));
   start += k;
 
   // Store values of auxiliary
@@ -190,10 +190,11 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
         {
           values[start][0] = monovali[0][0];
           values[start][1] = -unit_point(1) * monovali[0][1];
-          if (degree()>1){
-          values[start+1][0] = unit_point(0) * monovali[1][1];
-          values[start+1][1] = -monovali[1][0];
-        }
+          if (degree()>1)
+            {
+              values[start+1][0] = unit_point(0) * monovali[1][1];
+              values[start+1][1] = -monovali[1][0];
+            }
         }
       if (grads.size() != 0)
         {
@@ -201,12 +202,13 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
           grads[start][0][1] = 0.;
           grads[start][1][0] = -unit_point(1) * monovali[0][2];
           grads[start][1][1] = -monovali[0][1];
-          if (degree()>1){
-          grads[start+1][0][0] = monovali[1][1];
-          grads[start+1][0][1] = unit_point(0) * monovali[1][2];
-          grads[start+1][1][0] = 0.;
-          grads[start+1][1][1] = -monovali[1][1];
-        }
+          if (degree()>1)
+            {
+              grads[start+1][0][0] = monovali[1][1];
+              grads[start+1][0][1] = unit_point(0) * monovali[1][2];
+              grads[start+1][1][0] = 0.;
+              grads[start+1][1][1] = -monovali[1][1];
+            }
         }
       if (grad_grads.size() != 0)
         {
@@ -218,16 +220,17 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
           grad_grads[start][1][0][1] = -monovali[0][2];
           grad_grads[start][1][1][0] = -monovali[0][2];
           grad_grads[start][1][1][1] = 0.;
-          if (degree()>1){
-          grad_grads[start+1][0][0][0] = 0;
-          grad_grads[start+1][0][0][1] = monovali[1][2];
-          grad_grads[start+1][0][1][0] = monovali[1][2];
-          grad_grads[start+1][0][1][1] = unit_point(0) * monovali[1][3];
-          grad_grads[start+1][1][0][0] = 0.;
-          grad_grads[start+1][1][0][1] = 0.;
-          grad_grads[start+1][1][1][0] = 0.;
-          grad_grads[start+1][1][1][1] = -monovali[1][2];
-        }
+          if (degree()>1)
+            {
+              grad_grads[start+1][0][0][0] = 0;
+              grad_grads[start+1][0][0][1] = monovali[1][2];
+              grad_grads[start+1][0][1][0] = monovali[1][2];
+              grad_grads[start+1][0][1][1] = unit_point(0) * monovali[1][3];
+              grad_grads[start+1][1][0][0] = 0.;
+              grad_grads[start+1][1][0][1] = 0.;
+              grad_grads[start+1][1][1][0] = 0.;
+              grad_grads[start+1][1][1][1] = -monovali[1][2];
+            }
         }
     }
   else // dim == 3

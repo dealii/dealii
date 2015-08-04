@@ -80,10 +80,10 @@ namespace TrilinosWrappers
     has_ghosts  (false),
 #ifdef DEAL_II_WITH_MPI
     vector(new Epetra_FEVector(
-             Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
+            Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
 #else
     vector(new Epetra_FEVector(
-             Epetra_Map(0,0,Epetra_SerialComm())))
+            Epetra_Map(0,0,Epetra_SerialComm())))
 #endif
   {}
 

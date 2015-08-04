@@ -319,8 +319,8 @@ FESystem<dim,spacedim>::FESystem (
   const std::vector<unsigned int>                  &multiplicities)
   :
   FiniteElement<dim,spacedim> (multiply_dof_numbers(fes, multiplicities),
-                               compute_restriction_is_additive_flags (fes, multiplicities),
-                               compute_nonzero_components(fes, multiplicities)),
+                              compute_restriction_is_additive_flags (fes, multiplicities),
+                              compute_nonzero_components(fes, multiplicities)),
   base_elements(count_nonzeros(multiplicities))
 {
   initialize(fes, multiplicities);
@@ -1186,11 +1186,11 @@ FESystem<dim,spacedim>::compute_fill (
           // Piola transformation, which is applied to correctly map the RT
           // space from the reference element to the global coordinate system.
           if (cell_similarity != CellSimilarity::translation)
-          {
-            base_data.JxW_values = data.JxW_values;
-            // added by Zhen Tao
-            base_data.quadrature_points = data.quadrature_points;
-          }
+            {
+              base_data.JxW_values = data.JxW_values;
+              // added by Zhen Tao
+              base_data.quadrature_points = data.quadrature_points;
+            }
 
 
           // Make sure that in the case of fill_fe_values the data is only

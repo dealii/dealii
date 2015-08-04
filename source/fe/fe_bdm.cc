@@ -37,12 +37,12 @@ template <int dim>
 FE_BDM<dim>::FE_BDM (const unsigned int deg)
   :
   FE_PolyTensor<PolynomialsBDM<dim>, dim> (
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
-    get_ria_vector (deg),
-    std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
-                               std::vector<bool>(dim,true)))
+   deg,
+   FiniteElementData<dim>(get_dpo_vector(deg),
+                          dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
+   get_ria_vector (deg),
+   std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
+                              std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   Assert (dim<3, ExcNotImplemented());

@@ -31,12 +31,12 @@ template <int dim, int spacedim>
 FE_Bernstein<dim,spacedim>::FE_Bernstein (const unsigned int degree)
   :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim> (
-    //TensorProductPolynomials<dim>(dealii::generate_complete_bernstein_basis<double>(degree)),
-    this->renumber_bases(degree),
-    FiniteElementData<dim>(this->get_dpo_vector(degree),
-                           1, degree,
-                           FiniteElementData<dim>::H1),
-    std::vector<bool> (1, false))
+   //TensorProductPolynomials<dim>(dealii::generate_complete_bernstein_basis<double>(degree)),
+   this->renumber_bases(degree),
+   FiniteElementData<dim>(this->get_dpo_vector(degree),
+                          1, degree,
+                          FiniteElementData<dim>::H1),
+   std::vector<bool> (1, false))
 {}
 
 

@@ -1621,7 +1621,7 @@ namespace ChunkSparseMatrixIterators
             const unsigned int  row)
     :
     ChunkSparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                             row),
+                                            row),
     matrix (matrix)
   {}
 
@@ -1785,7 +1785,7 @@ namespace ChunkSparseMatrixIterators
             const unsigned int  row)
     :
     ChunkSparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                             row),
+                                            row),
     matrix (matrix)
   {}
 

@@ -36,11 +36,11 @@ namespace internal
       mapping_collection (&mapping_collection),
       q_collection (q_collection),
       fe_values_table (fe_collection.size(),
-                       mapping_collection.size(),
-                       q_collection.size()),
+                      mapping_collection.size(),
+                      q_collection.size()),
       present_fe_values_index (numbers::invalid_unsigned_int,
-                               numbers::invalid_unsigned_int,
-                               numbers::invalid_unsigned_int),
+                              numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int),
       update_flags (update_flags)
     {}
 
@@ -53,14 +53,14 @@ namespace internal
       :
       fe_collection (&fe_collection),
       mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValues::space_dimension>::
-                          mapping_collection),
+                         mapping_collection),
       q_collection (q_collection),
       fe_values_table (fe_collection.size(),
-                       1,
-                       q_collection.size()),
+                      1,
+                      q_collection.size()),
       present_fe_values_index (numbers::invalid_unsigned_int,
-                               numbers::invalid_unsigned_int,
-                               numbers::invalid_unsigned_int),
+                              numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int),
       update_flags (update_flags)
     {}
 
@@ -121,9 +121,9 @@ namespace hp
                                     const UpdateFlags                 update_flags)
     :
     internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+       fe_collection,
+       q_collection,
+       update_flags)
   {}
 
 
@@ -133,8 +133,8 @@ namespace hp
                                     const UpdateFlags            update_flags)
     :
     internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (fe_collection,
-        q_collection,
-        update_flags)
+       q_collection,
+       update_flags)
   {}
 
 
@@ -238,9 +238,9 @@ namespace hp
                                             const UpdateFlags         update_flags)
     :
     internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+       fe_collection,
+       q_collection,
+       update_flags)
   {}
 
 
@@ -250,8 +250,8 @@ namespace hp
                                             const UpdateFlags         update_flags)
     :
     internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (fe_collection,
-        q_collection,
-        update_flags)
+       q_collection,
+       update_flags)
   {}
 
 
@@ -357,9 +357,9 @@ namespace hp
                                                   const UpdateFlags         update_flags)
     :
     internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+       fe_collection,
+       q_collection,
+       update_flags)
   {}
 
 
@@ -369,8 +369,8 @@ namespace hp
                                                   const UpdateFlags         update_flags)
     :
     internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (fe_collection,
-        q_collection,
-        update_flags)
+       q_collection,
+       update_flags)
   {}
 
 

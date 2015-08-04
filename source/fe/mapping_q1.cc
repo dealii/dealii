@@ -483,10 +483,10 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
     data.volume_elements.resize(n_original_q_points);
 
   if (flags & update_jacobian_grads)
-  {
-    data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
-    data.contravariant_derivatives.resize(n_original_q_points);
-  }
+    {
+      data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
+      data.contravariant_derivatives.resize(n_original_q_points);
+    }
 
   compute_shapes (q.get_points(), data);
 }
@@ -716,47 +716,47 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 
   // Zhen Tao
   if (update_flags & update_jacobian_grads)
-  {
-    AssertDimension (data.contravariant_derivatives.size(), n_q_points);
-
-    if (cell_similarity != CellSimilarity::translation)
     {
-      std::fill(data.contravariant_derivatives.begin(),
-                data.contravariant_derivatives.end(),
-                DerivativeForm<2,dim,spacedim>());
+      AssertDimension (data.contravariant_derivatives.size(), n_q_points);
 
-      Assert (data.n_shape_functions > 0, ExcInternalError());
-
-      const Tensor<1,spacedim> *supp_pts =
-                  &data.mapping_support_points[0];
-
-      for (unsigned int point=0; point<n_q_points; ++point)
+      if (cell_similarity != CellSimilarity::translation)
         {
-          const Tensor<2,dim> *second =
-            &data.second_derivative(point+data_set, 0);
-          double result [spacedim][dim][dim];
-          for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int l=0; l<dim; ++l)
-                result[i][j][l] = (second[0][j][l] * supp_pts[0][i]);
-          for (unsigned int k=1; k<data.n_shape_functions; ++k)
-            for (unsigned int i=0; i<spacedim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                for (unsigned int l=0; l<dim; ++l)
-                  result[i][j][l]
-                  += (second[k][j][l]
-                      *
-                      supp_pts[k][i]);
+          std::fill(data.contravariant_derivatives.begin(),
+                    data.contravariant_derivatives.end(),
+                    DerivativeForm<2,dim,spacedim>());
 
-          // never touch any data for j=dim in case dim<spacedim, so it
-          // will always be zero as it was initialized
-          for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int l=0; l<dim; ++l)
-                data.contravariant_derivatives[point][i][j][l] = result[i][j][l];
+          Assert (data.n_shape_functions > 0, ExcInternalError());
+
+          const Tensor<1,spacedim> *supp_pts =
+            &data.mapping_support_points[0];
+
+          for (unsigned int point=0; point<n_q_points; ++point)
+            {
+              const Tensor<2,dim> *second =
+                &data.second_derivative(point+data_set, 0);
+              double result [spacedim][dim][dim];
+              for (unsigned int i=0; i<spacedim; ++i)
+                for (unsigned int j=0; j<dim; ++j)
+                  for (unsigned int l=0; l<dim; ++l)
+                    result[i][j][l] = (second[0][j][l] * supp_pts[0][i]);
+              for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<dim; ++j)
+                    for (unsigned int l=0; l<dim; ++l)
+                      result[i][j][l]
+                      += (second[k][j][l]
+                          *
+                          supp_pts[k][i]);
+
+              // never touch any data for j=dim in case dim<spacedim, so it
+              // will always be zero as it was initialized
+              for (unsigned int i=0; i<spacedim; ++i)
+                for (unsigned int j=0; j<dim; ++j)
+                  for (unsigned int l=0; l<dim; ++l)
+                    data.contravariant_derivatives[point][i][j][l] = result[i][j][l];
+            }
         }
     }
-  }
 
 }
 
@@ -1285,14 +1285,14 @@ MappingQ1<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
   switch (mapping_type)
-  {
+    {
     case mapping_piola_gradient:
       transform_gradients(input_grads, input_values,
-        output, mapping_data, mapping_type);
+                          output, mapping_data, mapping_type);
       return;
     default:
       Assert(false, ExcNotImplemented());
-  }
+    }
 }
 
 
@@ -1463,7 +1463,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   switch (mapping_type)
-  {
+    {
     case mapping_piola_gradient:
     {
       Assert (data.update_flags & update_covariant_transformation,
@@ -1487,7 +1487,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
 
           DerivativeForm<1,dim,spacedim> G =
             apply_transformation(data.contravariant_derivatives[i],
-                                input_values[i] );
+                                 input_values[i] );
           Tensor<2,spacedim> T2 =
             apply_transformation(data.covariant[i] ,G );
 
@@ -1498,7 +1498,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
 
           Tensor<1,dim> v2 =
             trace_apply_transformation(data.contravariant_derivatives[i],
-                                 data.covariant[i] );
+                                       data.covariant[i] );
 
           Tensor<1,spacedim> v3 =
             apply_transformation(data.covariant[i], v2 );
@@ -1517,7 +1517,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
 
     default:
       Assert(false, ExcNotImplemented());
-  }
+    }
 
 }
 

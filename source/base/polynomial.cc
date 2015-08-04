@@ -712,8 +712,8 @@ namespace Polynomials
                                             const unsigned int support_point)
     :
     Polynomial<double> (internal::LagrangeEquidistant::
-                        generate_equidistant_unit_points (n),
-                        support_point)
+                       generate_equidistant_unit_points (n),
+                       support_point)
   {
     Assert (coefficients.size() == 0, ExcInternalError());
 

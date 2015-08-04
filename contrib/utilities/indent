@@ -32,7 +32,7 @@ echo "--- Indenting all deal.II header and source files"
 for dir in include/deal.II/* source/* examples ; do
   files=`find $dir | egrep '\.(cc|h)$'` ;
   if test -n "$files" ; then
-    (astyle --options=contrib/utilities/astyle.rc $files ) &
+    (/Users/zhentao/Documents/astyle/build/gcc/bin/astyle --options=contrib/utilities/astyle.rc $files ) &
   fi
 done
 

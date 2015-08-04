@@ -73,7 +73,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const DH      &euler_dof
   local_dofs(fe->dofs_per_cell),
   dof_indices(fe->dofs_per_cell),
   fe_mask(mask.size() ? mask :
-          ComponentMask(fe->get_nonzero_components(0).size(), true)),
+         ComponentMask(fe->get_nonzero_components(0).size(), true)),
   fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
 {
   unsigned int size = 0;
@@ -680,9 +680,9 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
   VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
-  {
-    Assert(false, ExcNotImplemented());
-  }
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 template<int dim, int spacedim, class VECTOR, class DH>

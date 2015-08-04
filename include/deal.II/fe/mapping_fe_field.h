@@ -171,13 +171,13 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
-   virtual
-   void
-   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
-      const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
-      VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-      const MappingType type) const;
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
+             const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the

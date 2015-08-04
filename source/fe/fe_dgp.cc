@@ -25,11 +25,11 @@ template <int dim, int spacedim>
 FE_DGP<dim,spacedim>::FE_DGP (const unsigned int degree)
   :
   FE_Poly<PolynomialSpace<dim>, dim, spacedim> (
-    PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+   PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+   std::vector<ComponentMask>(FiniteElementData<dim>(
+                                get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   // Reinit the vectors of restriction and prolongation matrices to the right
   // sizes

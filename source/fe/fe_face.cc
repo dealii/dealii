@@ -41,9 +41,9 @@ template <int dim, int spacedim>
 FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
   :
   FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
-    TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(1,true))
+   TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(1,true))
 {
   // initialize unit face support points
   const unsigned int codim = dim-1;
@@ -308,8 +308,8 @@ template <int spacedim>
 FE_FaceQ<1,spacedim>::FE_FaceQ (const unsigned int degree)
   :
   FiniteElement<1,spacedim> (FiniteElementData<1>(get_dpo_vector(degree), 1, degree, FiniteElementData<1>::L2),
-                             std::vector<bool>(1,true),
-                             std::vector<ComponentMask> (1, ComponentMask(1,true)))
+                            std::vector<bool>(1,true),
+                            std::vector<ComponentMask> (1, ComponentMask(1,true)))
 {
   this->unit_face_support_points.resize(1);
 
@@ -578,8 +578,8 @@ FE_FaceP<dim,spacedim>::FE_FaceP (const unsigned int degree)
   :
   FE_PolyFace<PolynomialSpace<dim-1>, dim, spacedim>
   (PolynomialSpace<dim-1>(Polynomials::Legendre::generate_complete_basis(degree)),
-   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-   std::vector<bool>(1,true))
+  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+  std::vector<bool>(1,true))
 {}
 
 

@@ -36,12 +36,12 @@ template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   :
   FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim> (
-    deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
-    get_ria_vector (deg),
-    std::vector<ComponentMask>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
-                               std::vector<bool>(dim,true)))
+   deg,
+   FiniteElementData<dim>(get_dpo_vector(deg),
+                          dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
+   get_ria_vector (deg),
+   std::vector<ComponentMask>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
+                              std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;

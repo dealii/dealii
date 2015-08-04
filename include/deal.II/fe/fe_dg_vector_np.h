@@ -163,7 +163,7 @@ template <int dim, int spacedim=dim>
 class FE_ACRed : public FE_DGVector_NP<PolynomialsBDM<dim>, dim, spacedim>
 {
 public:
-  
+
   FE_ACRed (const unsigned int p);
 
   virtual std::string get_name () const;
@@ -173,7 +173,7 @@ template <int dim, int spacedim=dim>
 class FE_ACFull : public FE_DGVector_NP<PolynomialsACFull<dim>, dim, spacedim>
 {
 public:
-  
+
   FE_ACFull (const unsigned int p);
 
   virtual std::string get_name () const;

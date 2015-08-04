@@ -121,9 +121,9 @@ public:
    * fe_data.degree.
    */
   FE_PolyTensor_NP (const unsigned int degree,
-                 const FiniteElementData<dim> &fe_data,
-                 const std::vector<bool> &restriction_is_additive_flags,
-                 const std::vector<ComponentMask> &nonzero_components);
+                    const FiniteElementData<dim> &fe_data,
+                    const std::vector<bool> &restriction_is_additive_flags,
+                    const std::vector<ComponentMask> &nonzero_components);
 
   /**
    * Since these elements are vector valued, an exception is thrown.

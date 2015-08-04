@@ -44,8 +44,8 @@ MappingQEulerian (const unsigned int degree,
   euler_dof_handler(&euler_dof_handler),
   support_quadrature(degree),
   fe_values(euler_dof_handler.get_fe(),
-            support_quadrature,
-            update_values | update_q_points)
+           support_quadrature,
+           update_values | update_q_points)
 { }
 
 

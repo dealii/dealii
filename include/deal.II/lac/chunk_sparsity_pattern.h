@@ -823,11 +823,11 @@ namespace ChunkSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     reduced_accessor(row==sparsity_pattern->n_rows() ?
-                     *sparsity_pattern->sparsity_pattern.end() :
-                     *sparsity_pattern->sparsity_pattern.
-                     begin(row/sparsity_pattern->get_chunk_size())),
+                    *sparsity_pattern->sparsity_pattern.end() :
+                    *sparsity_pattern->sparsity_pattern.
+                    begin(row/sparsity_pattern->get_chunk_size())),
     chunk_row (row==sparsity_pattern->n_rows() ? 0 :
-               row%sparsity_pattern->get_chunk_size()),
+              row%sparsity_pattern->get_chunk_size()),
     chunk_col (0)
   {}
 

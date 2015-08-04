@@ -138,8 +138,8 @@ FE_PolyTensor<POLY,dim,spacedim>::FE_PolyTensor (const unsigned int degree,
                                                  const std::vector<ComponentMask> &nonzero_components)
   :
   FiniteElement<dim,spacedim> (fe_data,
-                               restriction_is_additive_flags,
-                               nonzero_components),
+                              restriction_is_additive_flags,
+                              nonzero_components),
   poly_space(POLY(degree))
 {
   cached_point(0) = -1;
@@ -1037,7 +1037,7 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
       if (flags & update_gradients)
         // out |= update_gradients | update_piola | update_covariant_transformation;
         out |= update_gradients | update_piola |
-                update_covariant_transformation | update_jacobian_grads;
+               update_covariant_transformation | update_jacobian_grads;
 
       if (flags & update_hessians)
         out |= update_hessians | update_piola | update_covariant_transformation;
@@ -1054,7 +1054,7 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
       if (flags & update_gradients)
         // out |= update_gradients | update_piola | update_covariant_transformation;
         out |= update_gradients | update_piola |
-                update_covariant_transformation | update_jacobian_grads;
+               update_covariant_transformation | update_jacobian_grads;
 
 
       if (flags & update_hessians)

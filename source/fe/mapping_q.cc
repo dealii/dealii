@@ -80,17 +80,17 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
   degree(p),
   n_inner(Utilities::fixed_power<dim>(degree-1)),
   n_outer((dim==1) ? 2 :
-          ((dim==2) ?
-           4+4*(degree-1) :
-           8+12*(degree-1)+6*(degree-1)*(degree-1))),
+         ((dim==2) ?
+          4+4*(degree-1) :
+          8+12*(degree-1)+6*(degree-1)*(degree-1))),
   tensor_pols(0),
   n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
   renumber(FETools::
-           lexicographic_to_hierarchic_numbering (
-             FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
-                                     degree))),
+          lexicographic_to_hierarchic_numbering (
+            FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
+                                    degree))),
   use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
-                              || (dim != spacedim)),
+                             || (dim != spacedim)),
   feq(degree),
   line_support_points(degree+1)
 {
@@ -1032,9 +1032,9 @@ void MappingQ<dim,spacedim>::transform (
   VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
-  {
-    Assert(false, ExcNotImplemented());
-  }
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 template<int dim, int spacedim>

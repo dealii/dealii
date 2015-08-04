@@ -190,7 +190,7 @@ namespace internal
                                                           const UpdateFlags update_flags)
       :
       fe_values(mapping, fe_dummy, Quadrature<dim>(quadrature),
-                internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
+               internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
       quadrature_1d(quadrature),
       inverse_jacobians(fe_values.get_quadrature().size()),
       jxw_values(fe_values.get_quadrature().size()),
@@ -209,7 +209,7 @@ namespace internal
                                                           const UpdateFlags update_flags)
       :
       fe_values(fe_dummy, Quadrature<dim>(quadrature),
-                internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
+               internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
       quadrature_1d(quadrature),
       inverse_jacobians(fe_values.get_quadrature().size()),
       jxw_values(fe_values.get_quadrature().size()),

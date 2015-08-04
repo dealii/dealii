@@ -53,29 +53,29 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
   dofs_per_quad(dim>1? dofs_per_object[2]:0),
   dofs_per_hex(dim>2? dofs_per_object[3]:0),
   first_line_index(GeometryInfo<dim>::vertices_per_cell
-                   * dofs_per_vertex),
+                  * dofs_per_vertex),
   first_quad_index(first_line_index+
-                   GeometryInfo<dim>::lines_per_cell
-                   * dofs_per_line),
+                  GeometryInfo<dim>::lines_per_cell
+                  * dofs_per_line),
   first_hex_index(first_quad_index+
-                  GeometryInfo<dim>::quads_per_cell
-                  * dofs_per_quad),
+                 GeometryInfo<dim>::quads_per_cell
+                 * dofs_per_quad),
   first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
-                        * dofs_per_vertex),
+                       * dofs_per_vertex),
   first_face_quad_index((dim==3 ?
-                         GeometryInfo<dim-1>::vertices_per_cell
-                         * dofs_per_vertex :
-                         GeometryInfo<dim>::vertices_per_cell
-                         * dofs_per_vertex) +
-                        GeometryInfo<dim-1>::lines_per_cell
-                        * dofs_per_line),
+                        GeometryInfo<dim-1>::vertices_per_cell
+                        * dofs_per_vertex :
+                        GeometryInfo<dim>::vertices_per_cell
+                        * dofs_per_vertex) +
+                       GeometryInfo<dim-1>::lines_per_cell
+                       * dofs_per_line),
   dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex +
-                GeometryInfo<dim>::lines_per_face * dofs_per_line +
-                GeometryInfo<dim>::quads_per_face *dofs_per_quad),
+               GeometryInfo<dim>::lines_per_face * dofs_per_line +
+               GeometryInfo<dim>::quads_per_face *dofs_per_quad),
   dofs_per_cell (GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex +
-                 GeometryInfo<dim>::lines_per_cell * dofs_per_line +
-                 GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
-                 GeometryInfo<dim>::hexes_per_cell *dofs_per_hex),
+                GeometryInfo<dim>::lines_per_cell * dofs_per_line +
+                GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
+                GeometryInfo<dim>::hexes_per_cell *dofs_per_hex),
   components(n_components),
   degree(degree),
   conforming_space(conformity),

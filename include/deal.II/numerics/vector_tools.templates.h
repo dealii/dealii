@@ -6060,9 +6060,9 @@ namespace VectorTools
     IDScratchData<dim,spacedim>::IDScratchData (const IDScratchData &data)
       :
       x_fe_values(data.x_fe_values.get_mapping_collection(),
-                  data.x_fe_values.get_fe_collection(),
-                  data.x_fe_values.get_quadrature_collection(),
-                  data.x_fe_values.get_update_flags())
+                 data.x_fe_values.get_fe_collection(),
+                 data.x_fe_values.get_quadrature_collection(),
+                 data.x_fe_values.get_update_flags())
     {}
 
     template <int dim, int spacedim>
@@ -6281,20 +6281,20 @@ namespace VectorTools
 
         case Hdiv_seminorm:
           Assert (n_components >= dim,
-            ExcMessage ("You can only ask for the Hdiv norm for a finite element "
-                        "with at least 'dim' components. In that case, this function "
-                        "will take the divergence of the first 'dim' components."));
+                  ExcMessage ("You can only ask for the Hdiv norm for a finite element "
+                              "with at least 'dim' components. In that case, this function "
+                              "will take the divergence of the first 'dim' components."));
           for (unsigned int q=0; q<n_q_points; ++q)
             {
               double sum = 0;
               for (unsigned int k=0; k<dim; k++)
                 sum += (data.psi_grads[q][k][k] )
-                        * data.weight_vectors[q][k];
+                       * data.weight_vectors[q][k];
               sum = sum * sum;
               diff += sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
-        break;
+          break;
 
         case W1infty_seminorm:
         case W1infty_norm:

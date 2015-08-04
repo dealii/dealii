@@ -405,7 +405,7 @@ FE_Q_Base<POLY,dim,spacedim>::FE_Q_Base (const POLY &poly_space,
                                          const std::vector<bool> &restriction_is_additive_flags)
   :
   FE_Poly<POLY,dim,spacedim>(poly_space, fe_data, restriction_is_additive_flags,
-                             std::vector<ComponentMask>(1, std::vector<bool>(1,true)))
+                            std::vector<ComponentMask>(1, std::vector<bool>(1,true)))
 {}
 
 

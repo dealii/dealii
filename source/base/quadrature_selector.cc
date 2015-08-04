@@ -56,7 +56,7 @@ QuadratureSelector<dim>::QuadratureSelector (const std::string &s,
                                              const unsigned int order)
   :
   Quadrature<dim> (create_quadrature(s, order).get_points(),
-                   create_quadrature(s, order).get_weights())
+                  create_quadrature(s, order).get_weights())
 {
 }
 

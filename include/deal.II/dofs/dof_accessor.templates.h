@@ -56,8 +56,8 @@ DoFAccessor<structdim,DH,level_dof_access>::DoFAccessor (
   :
   dealii::internal::DoFAccessor::Inheritance<structdim,DH::dimension,
   DH::space_dimension>::BaseClass (tria,
-                                   level,
-                                   index),
+                                  level,
+                                  index),
   dof_handler(const_cast<DH *>(dof_handler))
 {}
 
@@ -2176,8 +2176,8 @@ DoFAccessor (const Triangulation<1,spacedim> *tria,
              const DH<1,spacedim> *dof_handler)
   :
   BaseClass (tria,
-             vertex_kind,
-             vertex_index),
+            vertex_kind,
+            vertex_index),
   dof_handler(const_cast<DH<1,spacedim>*>(dof_handler))
 {}
 

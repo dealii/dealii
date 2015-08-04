@@ -54,19 +54,24 @@ namespace internal
                               const unsigned int ,
                               unsigned int       (&indices)[2])
     {
-      if(n < n_pols_0*n_pols_0)
-      {
-        indices[0] = n % n_pols_0;
-        indices[1] = n / n_pols_0;
-      }else{
-        if(n < n_pols_0*n_pols_0+n_pols_0){
-          indices[0] = n_pols_0;
-          indices[1] = n % n_pols_0;
-        }else{
+      if (n < n_pols_0*n_pols_0)
+        {
           indices[0] = n % n_pols_0;
-          indices[1] = n_pols_0;
+          indices[1] = n / n_pols_0;
         }
-      }
+      else
+        {
+          if (n < n_pols_0*n_pols_0+n_pols_0)
+            {
+              indices[0] = n_pols_0;
+              indices[1] = n % n_pols_0;
+            }
+          else
+            {
+              indices[0] = n % n_pols_0;
+              indices[1] = n_pols_0;
+            }
+        }
     }
 
     inline
@@ -75,31 +80,37 @@ namespace internal
                               const unsigned int n_pols_1,
                               unsigned int       (&indices)[3])
     {
-      if(n < n_pols_0 * n_pols_0 *n_pols_0)
-      {
-        indices[0] = n % n_pols_0;
-        indices[1] = (n/n_pols_0) % n_pols_1;
-        indices[2] = n / (n_pols_0*n_pols_1);
-      }else{
-        if(n < n_pols_0 * n_pols_0 *n_pols_0 + n_pols_0 * n_pols_0)
+      if (n < n_pols_0 * n_pols_0 *n_pols_0)
         {
-          indices[0] = n_pols_0;
-          indices[1] = n % n_pols_0;
-          indices[2] = (n/n_pols_0) % n_pols_1;
-        }else{
-          if(n < n_pols_0 * n_pols_0 *n_pols_0 + 2*(n_pols_0 * n_pols_0))
-          {
-            indices[0] = n % n_pols_0;
-            indices[1] = n_pols_0;
-            indices[2] = (n/n_pols_0) % n_pols_1;
-          }else{
-            indices[0] = n % n_pols_0;
-            indices[1] = (n/n_pols_0) % n_pols_1;
-            indices[2] = n_pols_0;
-          }
+          indices[0] = n % n_pols_0;
+          indices[1] = (n/n_pols_0) % n_pols_1;
+          indices[2] = n / (n_pols_0*n_pols_1);
         }
-      }
-      
+      else
+        {
+          if (n < n_pols_0 * n_pols_0 *n_pols_0 + n_pols_0 * n_pols_0)
+            {
+              indices[0] = n_pols_0;
+              indices[1] = n % n_pols_0;
+              indices[2] = (n/n_pols_0) % n_pols_1;
+            }
+          else
+            {
+              if (n < n_pols_0 * n_pols_0 *n_pols_0 + 2*(n_pols_0 * n_pols_0))
+                {
+                  indices[0] = n % n_pols_0;
+                  indices[1] = n_pols_0;
+                  indices[2] = (n/n_pols_0) % n_pols_1;
+                }
+              else
+                {
+                  indices[0] = n % n_pols_0;
+                  indices[1] = (n/n_pols_0) % n_pols_1;
+                  indices[2] = n_pols_0;
+                }
+            }
+        }
+
     }
   }
 }
@@ -167,7 +178,7 @@ ABFScalarPolynomials<0,Polynomials::Polynomial<double> >
 template <int dim, typename POLY>
 double
 ABFScalarPolynomials<dim,POLY>::compute_value (const unsigned int i,
-                                                   const Point<dim> &p) const
+                                               const Point<dim> &p) const
 {
   Assert(dim>0, ExcNotImplemented());
 
@@ -186,7 +197,7 @@ ABFScalarPolynomials<dim,POLY>::compute_value (const unsigned int i,
 template <int dim, typename POLY>
 Tensor<1,dim>
 ABFScalarPolynomials<dim,POLY>::compute_grad (const unsigned int i,
-                                                  const Point<dim> &p) const
+                                              const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -222,7 +233,7 @@ ABFScalarPolynomials<dim,POLY>::compute_grad (const unsigned int i,
 template <int dim, typename POLY>
 Tensor<2,dim>
 ABFScalarPolynomials<dim,POLY>::compute_grad_grad (const unsigned int i,
-                                                       const Point<dim> &p) const
+                                                   const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);

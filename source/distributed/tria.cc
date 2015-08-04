@@ -2031,9 +2031,9 @@ namespace parallel
       // do not check for distorted cells
       dealii::Triangulation<dim,spacedim>
       (smooth_grid,
-       false),
+      false),
       mpi_communicator (Utilities::MPI::
-                        duplicate_communicator(mpi_communicator)),
+                       duplicate_communicator(mpi_communicator)),
       settings(settings_),
       my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
       triangulation_has_content (false),

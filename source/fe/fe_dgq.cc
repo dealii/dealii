@@ -135,11 +135,11 @@ template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
   :
   FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+   TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
+   std::vector<ComponentMask>(FiniteElementData<dim>(
+                                get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   // fill in support points
   if (degree == 0)
@@ -190,11 +190,11 @@ template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1> &points)
   :
   FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
-    FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
+   TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
+   FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
+   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
+   std::vector<ComponentMask>(FiniteElementData<dim>(
+                                get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
   // Compute support points, which
   // are the tensor product of the

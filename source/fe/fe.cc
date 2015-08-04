@@ -115,14 +115,14 @@ FiniteElement<dim,spacedim>::FiniteElement (
   :
   FiniteElementData<dim> (fe_data),
   adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
-                                                    this->dofs_per_quad : 0 ,
-                                                    dim==3 ? 8 : 0),
+                                                   this->dofs_per_quad : 0 ,
+                                                   dim==3 ? 8 : 0),
   adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
-                                                    this->dofs_per_line : 0),
+                                                   this->dofs_per_line : 0),
   system_to_base_table(this->dofs_per_cell),
   face_system_to_base_table(this->dofs_per_face),
   component_to_base_table (this->components,
-                           std::make_pair(std::make_pair(0U, 0U), 0U)),
+                          std::make_pair(std::make_pair(0U, 0U), 0U)),
   restriction_is_additive_flags(r_i_a_f),
   nonzero_components (nonzero_c)
 {

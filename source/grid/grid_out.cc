@@ -205,8 +205,8 @@ namespace GridOutFlags
                const unsigned int n_boundary_face_points)
     :
     EpsFlagsBase(size_type, size, line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points)
+                color_lines_on_user_flag,
+                n_boundary_face_points)
   {}
 
 
@@ -233,9 +233,9 @@ namespace GridOutFlags
               )
     :
     EpsFlagsBase(size_type, size, line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points,
-                 color_lines_level),
+                color_lines_on_user_flag,
+                n_boundary_face_points,
+                color_lines_level),
     write_cell_numbers (write_cell_numbers),
     write_cell_number_level (write_cell_number_level),
     write_vertex_numbers (write_vertex_numbers)
@@ -274,8 +274,8 @@ namespace GridOutFlags
                const double        turn_angle)
     :
     EpsFlagsBase(size_type, size, line_width,
-                 color_lines_on_user_flag,
-                 n_boundary_face_points),
+                color_lines_on_user_flag,
+                n_boundary_face_points),
     azimut_angle (azimut_angle),
     turn_angle (turn_angle)
   {}

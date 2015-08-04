@@ -408,36 +408,36 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
  * @relates DerivativeForm
  * @author Zhen Tao, 2014
  */
- template <int spacedim, int dim>
- inline
- DerivativeForm<1, dim, spacedim>
- apply_transformation (const DerivativeForm<2,dim,spacedim> &DF,
-                       const Tensor<1,dim>               &T)
- {
+template <int spacedim, int dim>
+inline
+DerivativeForm<1, dim, spacedim>
+apply_transformation (const DerivativeForm<2,dim,spacedim> &DF,
+                      const Tensor<1,dim>               &T)
+{
   //  Assert (spacedim==dim, ExcMessage("Tensor not square"));
-   DerivativeForm<1, dim, spacedim> dest;
-   for (unsigned int i=0; i<spacedim; ++i)
-      for (unsigned int j=0; j<dim; ++j)
-        dest[i][j] = DF[i][j] * T;
-   return dest;
- }
+  DerivativeForm<1, dim, spacedim> dest;
+  for (unsigned int i=0; i<spacedim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      dest[i][j] = DF[i][j] * T;
+  return dest;
+}
 
- template <int spacedim, int dim>
- inline
- Tensor<1, dim>
- trace_apply_transformation (const DerivativeForm<2,dim,spacedim> &DF2,
-                             const DerivativeForm<1,dim,spacedim> &DF1)
- {
+template <int spacedim, int dim>
+inline
+Tensor<1, dim>
+trace_apply_transformation (const DerivativeForm<2,dim,spacedim> &DF2,
+                            const DerivativeForm<1,dim,spacedim> &DF1)
+{
   //  Assert (spacedim==dim, ExcMessage("Tensor not square"));
-   Tensor<1,dim> dest;
-   for(unsigned int k=0; k<dim; ++k)
-     for(unsigned int i=0; i<spacedim; ++i)
-       for(unsigned int j=0; j<dim; ++j)
-       {
-         dest[k] += DF2[i][j][k] * DF1[i][j];
-       }
-   return dest;
- }
+  Tensor<1,dim> dest;
+  for (unsigned int k=0; k<dim; ++k)
+    for (unsigned int i=0; i<spacedim; ++i)
+      for (unsigned int j=0; j<dim; ++j)
+        {
+          dest[k] += DF2[i][j][k] * DF1[i][j];
+        }
+  return dest;
+}
 
 
 /**

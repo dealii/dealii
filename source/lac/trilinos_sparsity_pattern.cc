@@ -233,12 +233,12 @@ namespace TrilinosWrappers
     :
     Subscriptor(),
     column_space_map (new Epetra_Map(TrilinosWrappers::types::int_type(0),
-                                     TrilinosWrappers::types::int_type(0),
-                                     Utilities::Trilinos::comm_self())),
+                                    TrilinosWrappers::types::int_type(0),
+                                    Utilities::Trilinos::comm_self())),
     graph (new Epetra_FECrsGraph(View,
-                                 *column_space_map,
-                                 *column_space_map,
-                                 0))
+                                *column_space_map,
+                                *column_space_map,
+                                0))
   {
     (void)input_sparsity;
     Assert (input_sparsity.n_rows() == 0,

@@ -28,12 +28,12 @@ FE_DGVector_NP<POLY,dim,spacedim>::FE_DGVector_NP (
   const unsigned int deg, MappingType map)
   :
   FE_PolyTensor_NP<POLY, dim, spacedim>(
-    deg,
-    FiniteElementData<dim>(
-      get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
-    std::vector<bool>(POLY::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(POLY::compute_n_pols(deg),
-                               ComponentMask(dim,true)))
+   deg,
+   FiniteElementData<dim>(
+     get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
+   std::vector<bool>(POLY::compute_n_pols(deg), true),
+   std::vector<ComponentMask>(POLY::compute_n_pols(deg),
+                              ComponentMask(dim,true)))
 {
   this->mapping_type = map;
   const unsigned int polynomial_degree = this->tensor_degree();
@@ -80,7 +80,7 @@ FE_DGVector_NP<POLY,dim,spacedim>::get_dpo_vector (const unsigned int deg)
 template <class POLY, int dim, int spacedim>
 bool
 FE_DGVector_NP<POLY,dim,spacedim>::has_support_on_face (const unsigned int,
-                                                     const unsigned int) const
+                                                        const unsigned int) const
 {
   return true;
 }
