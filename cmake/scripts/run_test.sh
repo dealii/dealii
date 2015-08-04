@@ -39,12 +39,12 @@ COMPARISON_FILE="$6"
 run(){
   rm -f failing_output
   rm -f output
+  rm -f stdout
 
   ${RUN_COMMAND} > stdout 2>&1
   RETURN_VALUE=$?
 
-  [ -f output ] || cp stdout output
-  rm -f stdout
+  [ -f output ] || mv stdout output
 
   if [ $RETURN_VALUE -ne 0 ]; then
     mv output failing_output
@@ -53,6 +53,12 @@ run(){
     echo "${TEST_FULL}: RUN failed. ------ Result: `pwd`/failing_output"
     echo "${TEST_FULL}: RUN failed. ------ Partial output:"
     cat failing_output
+    if [ -f stdout ]; then
+      echo ""
+      echo "${TEST_FULL}: RUN failed. ------ Additional output on stdout/stderr:"
+      echo ""
+      cat stdout
+    fi
     exit 1
   fi
 }
