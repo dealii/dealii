@@ -716,6 +716,8 @@ public:
    * index at the same time. This needs to be made sure from the caller's
    * site. There is no locking mechanism inside this method to prevent data
    * races.
+   * @param[in] local_vector, local_dof_indices, local_matrix are  input parameters.
+   * @return[out] global_vector  is an output parameter.
    */
   template <typename VectorType, typename LocalType>
   void
