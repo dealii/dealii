@@ -149,7 +149,13 @@ public:
 
   /**
    * Add a whole set of indices described by dereferencing every element of
-   * the the iterator range <code>[begin,end)</code>.
+   * the iterator range <code>[begin,end)</code>.
+   *
+   * @param[in] begin Iterator to the first element of range of indices
+   *   to be added
+   * @param[in] end The past-the-end iterator for the range of elements
+   *   to be added.
+   * @pre The condition <code>begin@<=end</code> needs to be satisfied.
    */
   template <typename ForwardIterator>
   void add_indices (const ForwardIterator &begin,
