@@ -233,6 +233,14 @@ protected:
      * point.
      */
     std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
+
+    /**
+     * Array with shape function second derivatives in quadrature points.
+     * There is one row for each shape function, containing values for each
+     * quadrature point.
+     */
+    std::vector< std::vector< Tensor<3, spacedim> > > shape_grad_grads;
+
   };
 
   /**

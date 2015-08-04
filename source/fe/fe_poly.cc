@@ -56,11 +56,11 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 
@@ -93,11 +93,11 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 
@@ -131,11 +131,11 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 
@@ -165,11 +165,11 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
                           mapping_data, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        mapping.transform(fe_data.shape_hessians[k], data.shape_hessians[k],
+                          mapping_data, mapping_covariant_gradient);
+    }
 }
 
 

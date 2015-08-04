@@ -324,23 +324,23 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
         data->shape_grads[i].resize (n_q_points);
     }
 
-  // if second derivatives through
-  // finite differencing is required,
-  // then initialize some objects for
-  // that
   if (flags & update_hessians)
     {
-//      grad_grads.resize (this->dofs_per_cell);
-      data->initialize_2nd (this, mapping, quadrature);
+      grad_grads.resize (this->dofs_per_cell);
+      data->shape_grad_grads.resize (this->dofs_per_cell);
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+        data->shape_grad_grads[i].resize (n_q_points);
     }
 
+
+
   // Compute shape function values
-  // and derivatives on the reference
-  // cell. Make sure, that for the
-  // node values N_i holds
+  // and first and second derivatives
+  // on the reference cell. Make sure,
+  // that for the node values N_i holds
   // N_i(v_j)=\delta_ij for all basis
   // functions v_j
-  if (flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients | update_hessians))
     for (unsigned int k=0; k<n_q_points; ++k)
       {
         poly_space.compute(quadrature.point(k),
@@ -373,6 +373,21 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
                   for (unsigned int j=0; j<this->dofs_per_cell; ++j)
                     add_grads += inverse_node_matrix(j,i) * grads[j];
                   data->shape_grads[i][k] = add_grads;
+                }
+          }
+
+        if (flags & update_hessians)
+          {
+            if (inverse_node_matrix.n_cols() == 0)
+              for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+                data->shape_grad_grads[i][k] = grad_grads[i];
+            else
+              for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+                {
+                  Tensor<3,dim> add_grad_grads;
+                  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+                    add_grad_grads += inverse_node_matrix(j,i) * grad_grads[j];
+                  data->shape_grad_grads[i][k] = add_grad_grads;
                 }
           }
 
@@ -426,162 +441,68 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   else if (mapping_type == mapping_nedelec)
     get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
 
+  // we only need to update element data if the current cell is not a
+  // translation of the previous one; or, even if it is a translation, if we
+  // use mappings other than the standard mappings that require us to recompute
+  // values and derivatives because of possible sign changes
+  const bool update_is_necessary = (cell_similarity != CellSimilarity::translation)
+                                   || ((mapping_type == mapping_piola)
+                                       || (mapping_type == mapping_raviart_thomas)
+                                       || (mapping_type == mapping_nedelec));
 
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    {
-      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                  this->get_nonzero_components(i).first_selected_component()];
+  if (update_is_necessary)
+    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+      {
+        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+                                                                    this->get_nonzero_components(i).first_selected_component()];
 
-      // update the shape function values as necessary
-      //
-      // we only need to do this if the current cell is not a translation of
-      // the previous one; or, even if it is a translation, if we use mappings
-      // other than the standard mappings that require us to recompute values
-      // and derivatives because of possible sign changes
-      if (flags & update_values &&
-          ((cell_similarity != CellSimilarity::translation)
-           ||
-           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-            || (mapping_type == mapping_nedelec))))
-        switch (mapping_type)
-          {
-          case mapping_none:
-          {
-            for (unsigned int k=0; k<n_q_points; ++k)
-              for (unsigned int d=0; d<dim; ++d)
-                data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
-            break;
-          }
-
-          case mapping_covariant:
-          case mapping_contravariant:
-          {
-            std::vector<Tensor<1,dim> > shape_values (n_q_points);
-            mapping.transform(fe_data.shape_values[i],
-                              shape_values, mapping_data, mapping_type);
-
-            for (unsigned int k=0; k<n_q_points; ++k)
-              for (unsigned int d=0; d<dim; ++d)
-                data.shape_values(first+d,k) = shape_values[k][d];
-
-            break;
-          }
-
-          case mapping_raviart_thomas:
-          case mapping_piola:
-          {
-            std::vector<Tensor<1,dim> > shape_values (n_q_points);
-            mapping.transform(fe_data.shape_values[i], shape_values,
-                              mapping_data, mapping_piola);
-            for (unsigned int k=0; k<n_q_points; ++k)
-              for (unsigned int d=0; d<dim; ++d)
-                data.shape_values(first+d,k)
-                  = sign_change[i] * shape_values[k][d];
-            break;
-          }
-
-          case mapping_nedelec:
-          {
-            std::vector<Tensor<1,dim> > shape_values (n_q_points);
-            mapping.transform (fe_data.shape_values[i], shape_values,
-                               mapping_data, mapping_covariant);
-
-            for (unsigned int k = 0; k < n_q_points; ++k)
-              for (unsigned int d = 0; d < dim; ++d)
-                data.shape_values(first+d,k) = sign_change[i] * shape_values[k][d];
-
-            break;
-          }
-
-          default:
-            Assert(false, ExcNotImplemented());
-          }
-
-      // update gradients. apply the same logic as above
-      if (flags & update_gradients
-          &&
-          ((cell_similarity != CellSimilarity::translation)
-           ||
-           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-            || (mapping_type == mapping_nedelec))))
-
-        {
-          std::vector<Tensor<2, spacedim > > shape_grads1 (n_q_points);
-          //std::vector<DerivativeForm<1,dim,spacedim> > shape_grads2 (n_q_points);
-
+        if (flags & update_values)
           switch (mapping_type)
             {
             case mapping_none:
             {
-              mapping.transform(fe_data.shape_grads[i], shape_grads1,
-                                mapping_data, mapping_covariant);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
-                  data.shape_gradients[first+d][k] = shape_grads1[k][d];
+                  data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
               break;
             }
+
             case mapping_covariant:
-            {
-              mapping.transform(fe_data.shape_grads[i], shape_grads1,
-                                mapping_data, mapping_covariant_gradient);
-
-              for (unsigned int k=0; k<n_q_points; ++k)
-                for (unsigned int d=0; d<dim; ++d)
-                  data.shape_gradients[first+d][k] = shape_grads1[k][d];
-
-              break;
-            }
             case mapping_contravariant:
             {
-              mapping.transform(fe_data.shape_grads[i], shape_grads1,
-                                mapping_data, mapping_contravariant_gradient);
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform(fe_data.shape_values[i],
+                                shape_values, mapping_data, mapping_type);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
-                  data.shape_gradients[first+d][k] = shape_grads1[k][d];
+                  data.shape_values(first+d,k) = shape_values[k][d];
 
               break;
             }
+
             case mapping_raviart_thomas:
-            case mapping_piola_gradient:
+            case mapping_piola:
             {
-
-
-              std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
-              for (unsigned int k=0; k<input.size(); ++k)
-                input[k] = fe_data.shape_grads[i][k];
-
-              mapping.transform(input, shape_grads1,
-                                mapping_data, mapping_piola_gradient);
-
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform(fe_data.shape_values[i], shape_values,
+                                mapping_data, mapping_piola);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
-                  data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
-
+                  data.shape_values(first+d,k)
+                    = sign_change[i] * shape_values[k][d];
               break;
             }
 
             case mapping_nedelec:
             {
-              // treat the gradients of
-              // this particular shape
-              // function at all
-              // q-points. if Dv is the
-              // gradient of the shape
-              // function on the unit
-              // cell, then
-              // (J^-T)Dv(J^-1) is the
-              // value we want to have on
-              // the real cell.
-              std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
-              for (unsigned int k=0; k<input.size(); ++k)
-                input[k] = fe_data.shape_grads[i][k];
-              mapping.transform (input,shape_grads1,
-                                 mapping_data, mapping_covariant_gradient);
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform (fe_data.shape_values[i], shape_values,
+                                 mapping_data, mapping_covariant);
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
+                  data.shape_values(first+d,k) = sign_change[i] * shape_values[k][d];
 
               break;
             }
@@ -589,20 +510,265 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
             default:
               Assert(false, ExcNotImplemented());
             }
-        }
-    }
 
-  // finally update second derivatives. again apply the same logic
-  // as above regarding when this has to happen
-  if (flags & update_hessians
-      &&
-      ((cell_similarity != CellSimilarity::translation)
-       ||
-       ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-        || (mapping_type == mapping_nedelec))))
-    this->compute_2nd (mapping, cell,
-                       typename QProjector<dim>::DataSetDescriptor().cell(),
-                       mapping_data, fe_data, data);
+        // update gradients
+        if (flags & update_gradients )
+
+          {
+            std::vector<Tensor<2, spacedim > > shape_grads1 (n_q_points);
+            //std::vector<DerivativeForm<1,dim,spacedim> > shape_grads2 (n_q_points);
+
+            switch (mapping_type)
+              {
+              case mapping_none:
+              {
+                mapping.transform(fe_data.shape_grads[i], shape_grads1,
+                                  mapping_data, mapping_covariant);
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  for (unsigned int d=0; d<dim; ++d)
+                    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+                break;
+              }
+              case mapping_covariant:
+              {
+                mapping.transform(fe_data.shape_grads[i], shape_grads1,
+                                  mapping_data, mapping_covariant_gradient);
+
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  for (unsigned int d=0; d<dim; ++d)
+                    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+
+                break;
+              }
+              case mapping_contravariant:
+              {
+                mapping.transform(fe_data.shape_grads[i], shape_grads1,
+                                  mapping_data, mapping_contravariant_gradient);
+
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  for (unsigned int d=0; d<dim; ++d)
+                    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+
+                break;
+              }
+              case mapping_raviart_thomas:
+              case mapping_piola_gradient:
+              {
+
+                /* TODO : Is this variable here really necessary?
+                 *        Why not use shape_grads[i] directly?
+                 */
+                std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+                for (unsigned int k=0; k<input.size(); ++k)
+                  input[k] = fe_data.shape_grads[i][k];
+
+                mapping.transform(input, shape_grads1,
+                                  mapping_data, mapping_piola_gradient);
+
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  for (unsigned int d=0; d<dim; ++d)
+                    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
+
+                break;
+              }
+
+              case mapping_nedelec:
+              {
+                // treat the gradients of
+                // this particular shape
+                // function at all
+                // q-points. if Dv is the
+                // gradient of the shape
+                // function on the unit
+                // cell, then
+                // (J^-T)Dv(J^-1) is the
+                // value we want to have on
+                // the real cell.
+                std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+                for (unsigned int k=0; k<input.size(); ++k)
+                  input[k] = fe_data.shape_grads[i][k];
+                mapping.transform (input,shape_grads1,
+                                   mapping_data, mapping_covariant_gradient);
+
+                for (unsigned int k = 0; k < n_q_points; ++k)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
+
+                break;
+              }
+
+              default:
+                Assert(false, ExcNotImplemented());
+              }
+          }
+
+        // update hessians
+        if (flags & update_hessians )
+
+          {
+            std::vector<Tensor<3, spacedim > > shape_grad_grads1 (n_q_points);
+            std::vector<Tensor<1, dim > > shape_hessians_for_fixed_indices (n_q_points);
+            std::vector<Tensor<1, dim > > transformed_shape_hessians_for_fixed_indices (n_q_points);
+
+            /*
+             * One way to view the tranasformed Hessian is as a weighted sum of outer products of
+             * the rows of the mapping support_point_inverse_gradient. We take this view and do the
+             * computation one outer product term at a time. First we initialize by the outer product
+             * of the 0th row with itself, then we increment by the other combinations.
+             */
+            // first, we compute the weight of the outer product
+            for (unsigned int k=0; k<n_q_points; ++k)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k][d][0][0];
+                  }
+              }
+            switch (mapping_type)
+              {
+              case mapping_none:
+              {
+                transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+              }
+
+              case mapping_covariant:
+              case mapping_contravariant:
+              {
+                std::vector<Tensor<1,dim> > shape_values (n_q_points);
+                mapping.transform(shape_hessians_for_fixed_indices,
+                                  transformed_shape_hessians_for_fixed_indices,
+                                  mapping_data, mapping_type);
+
+                break;
+              }
+
+              case mapping_raviart_thomas:
+              case mapping_piola:
+              {
+                mapping.transform(shape_hessians_for_fixed_indices,
+                                  transformed_shape_hessians_for_fixed_indices,
+                                  mapping_data, mapping_piola);
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+                break;
+              }
+
+              case mapping_nedelec:
+              {
+                mapping.transform (shape_hessians_for_fixed_indices,
+                                   transformed_shape_hessians_for_fixed_indices,
+                                   mapping_data, mapping_covariant);
+
+
+                for (unsigned int k=0; k<n_q_points; ++k)
+                  transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+                break;
+              }
+
+              default:
+                Assert(false, ExcNotImplemented());
+              }
+
+            // then we perform the outer product
+            for (unsigned int k=0; k<n_q_points; ++k)
+              {
+                const Tensor<2,spacedim> &mapping_inverse_grad =
+                  mapping.support_point_inverse_gradient (k, mapping_data);
+                for (unsigned int d1=0; d1<spacedim; ++d1)
+                  {
+                    for (unsigned int d2=0; d2<spacedim; ++d2)
+                      {
+                        for (unsigned int d=0; d<dim; ++d)
+                          data.shape_hessians[first+d][k][d1][d2] =
+                            transformed_shape_hessians_for_fixed_indices[k][d]
+                            * mapping_inverse_grad[0][d1]
+                            * mapping_inverse_grad[0][d2];
+                      }
+                  }
+              }
+            for (unsigned int D1=0; D1<spacedim; ++D1)
+              {
+                const unsigned int D2_start = (D1==0)? 1 : 0 ; // Combination (0,0) already computed
+                for (unsigned int D2=D2_start; D2<spacedim; ++D2)
+                  {
+                    // first, we compute the weight of the outer product
+                    for (unsigned int k=0; k<n_q_points; ++k)
+                      {
+                        for (unsigned int d=0; d<dim; ++d)
+                          {
+                            shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k][d][D1][D2];
+                          }
+                      }
+                    switch (mapping_type)
+                      {
+                      case mapping_none:
+                      {
+                        transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+                      }
+
+                      case mapping_covariant:
+                      case mapping_contravariant:
+                      {
+                        std::vector<Tensor<1,dim> > shape_values (n_q_points);
+                        mapping.transform(shape_hessians_for_fixed_indices,
+                                          transformed_shape_hessians_for_fixed_indices, mapping_data,
+                                          mapping_type);
+
+                        break;
+                      }
+
+                      case mapping_raviart_thomas:
+                      case mapping_piola:
+                      {
+                        mapping.transform(shape_hessians_for_fixed_indices,
+                                          transformed_shape_hessians_for_fixed_indices,
+                                          mapping_data, mapping_piola);
+                        for (unsigned int k=0; k<n_q_points; ++k)
+                          transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+                        break;
+                      }
+
+                      case mapping_nedelec:
+                      {
+                        mapping.transform (shape_hessians_for_fixed_indices,
+                                           transformed_shape_hessians_for_fixed_indices,
+                                           mapping_data, mapping_covariant);
+
+
+                        for (unsigned int k=0; k<n_q_points; ++k)
+                          transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+                        break;
+                      }
+
+                      default:
+                        Assert(false, ExcNotImplemented());
+                      }
+
+                    // then we perform the outer product
+                    for (unsigned int k=0; k<n_q_points; ++k)
+                      {
+                        const Tensor<2,spacedim> &mapping_inverse_grad =
+                          mapping.support_point_inverse_gradient (k, mapping_data);
+                        for (unsigned int d1=0; d1<spacedim; ++d1)
+                          {
+                            for (unsigned int d2=0; d2<spacedim; ++d2)
+                              {
+                                for (unsigned int d=0; d<dim; ++d)
+                                  data.shape_hessians[first+d][k][d1][d2] +=
+                                    transformed_shape_hessians_for_fixed_indices[k][d]
+                                    * mapping_inverse_grad[D1][d1]
+                                    * mapping_inverse_grad[D2][d2];
+                              }
+                          }
+                      }
+                  }
+              }
+
+          }
+
+      }
 }
 
 
@@ -803,10 +969,174 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
               Assert(false, ExcNotImplemented());
             }
         }
-    }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+
+      // update hessians
+      if (flags & update_hessians )
+
+        {
+          std::vector<Tensor<3, spacedim > > shape_grad_grads1 (n_q_points);
+          std::vector<Tensor<1, dim > > shape_hessians_for_fixed_indices (n_q_points);
+          std::vector<Tensor<1, dim > > transformed_shape_hessians_for_fixed_indices (n_q_points);
+
+          /*
+           * One way to view the tranasformed Hessian is as a weighted sum of outer products of
+           * the rows of the mapping support_point_inverse_gradient. We take this view and do the
+           * computation one outer product term at a time. First we initialize by the outer product
+           * of the 0th row with itself, then we increment by the other combinations.
+           */
+          // first, we compute the weight of the outer product
+          for (unsigned int k=0; k<n_q_points; ++k)
+            {
+              for (unsigned int d=0; d<dim; ++d)
+                {
+                  shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k+offset][d][0][0];
+                }
+            }
+          switch (mapping_type)
+            {
+            case mapping_none:
+            {
+              transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+            }
+
+            case mapping_covariant:
+            case mapping_contravariant:
+            {
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform(shape_hessians_for_fixed_indices,
+                                transformed_shape_hessians_for_fixed_indices,
+                                mapping_data, mapping_type);
+
+              break;
+            }
+
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+              mapping.transform(shape_hessians_for_fixed_indices,
+                                transformed_shape_hessians_for_fixed_indices,
+                                mapping_data, mapping_piola);
+              for (unsigned int k=0; k<n_q_points; ++k)
+                transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+              break;
+            }
+
+            case mapping_nedelec:
+            {
+              mapping.transform (shape_hessians_for_fixed_indices,
+                                 transformed_shape_hessians_for_fixed_indices,
+                                 mapping_data, mapping_covariant);
+
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+              break;
+            }
+
+            default:
+              Assert(false, ExcNotImplemented());
+            }
+
+          // then we perform the outer product
+          for (unsigned int k=0; k<n_q_points; ++k)
+            {
+              const Tensor<2,spacedim> &mapping_inverse_grad =
+                mapping.support_point_inverse_gradient (k, mapping_data);
+              for (unsigned int d1=0; d1<spacedim; ++d1)
+                {
+                  for (unsigned int d2=0; d2<spacedim; ++d2)
+                    {
+                      for (unsigned int d=0; d<dim; ++d)
+                        data.shape_hessians[first+d][k][d1][d2] =
+                          transformed_shape_hessians_for_fixed_indices[k][d]
+                          * mapping_inverse_grad[0][d1]
+                          * mapping_inverse_grad[0][d2];
+                    }
+                }
+            }
+          for (unsigned int D1=0; D1<spacedim; ++D1)
+            {
+              const unsigned int D2_start = (D1==0)? 1 : 0 ; // Combination (0,0) already computed
+              for (unsigned int D2=D2_start; D2<spacedim; ++D2)
+                {
+                  // first, we compute the weight of the outer product
+                  for (unsigned int k=0; k<n_q_points; ++k)
+                    {
+                      for (unsigned int d=0; d<dim; ++d)
+                        {
+                          shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k+offset][d][D1][D2];
+                        }
+                    }
+                  switch (mapping_type)
+                    {
+                    case mapping_none:
+                    {
+                      transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+                    }
+
+                    case mapping_covariant:
+                    case mapping_contravariant:
+                    {
+                      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+                      mapping.transform(shape_hessians_for_fixed_indices,
+                                        transformed_shape_hessians_for_fixed_indices, mapping_data,
+                                        mapping_type);
+
+                      break;
+                    }
+
+                    case mapping_raviart_thomas:
+                    case mapping_piola:
+                    {
+                      mapping.transform(shape_hessians_for_fixed_indices,
+                                        transformed_shape_hessians_for_fixed_indices,
+                                        mapping_data, mapping_piola);
+                      for (unsigned int k=0; k<n_q_points; ++k)
+                        transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+                      break;
+                    }
+
+                    case mapping_nedelec:
+                    {
+                      mapping.transform (shape_hessians_for_fixed_indices,
+                                         transformed_shape_hessians_for_fixed_indices,
+                                         mapping_data, mapping_covariant);
+
+
+                      for (unsigned int k=0; k<n_q_points; ++k)
+                        transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+                      break;
+                    }
+
+                    default:
+                      Assert(false, ExcNotImplemented());
+                    }
+
+                  // then we perform the outer product
+                  for (unsigned int k=0; k<n_q_points; ++k)
+                    {
+                      const Tensor<2,spacedim> &mapping_inverse_grad =
+                        mapping.support_point_inverse_gradient (k, mapping_data);
+                      for (unsigned int d1=0; d1<spacedim; ++d1)
+                        {
+                          for (unsigned int d2=0; d2<spacedim; ++d2)
+                            {
+                              for (unsigned int d=0; d<dim; ++d)
+                                data.shape_hessians[first+d][k][d1][d2] +=
+                                  transformed_shape_hessians_for_fixed_indices[k][d]
+                                  * mapping_inverse_grad[D1][d1]
+                                  * mapping_inverse_grad[D2][d2];
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
 }
 
 
@@ -1013,10 +1343,173 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
               Assert(false, ExcNotImplemented());
             }
         }
+      // update hessians
+      if (flags & update_hessians )
+
+        {
+          std::vector<Tensor<3, spacedim > > shape_grad_grads1 (n_q_points);
+          std::vector<Tensor<1, dim > > shape_hessians_for_fixed_indices (n_q_points);
+          std::vector<Tensor<1, dim > > transformed_shape_hessians_for_fixed_indices (n_q_points);
+
+          /*
+           * One way to view the tranasformed Hessian is as a weighted sum of outer products of
+           * the rows of the mapping support_point_inverse_gradient. We take this view and do the
+           * computation one outer product term at a time. First we initialize by the outer product
+           * of the 0th row with itself, then we increment by the other combinations.
+           */
+          // first, we compute the weight of the outer product
+          for (unsigned int k=0; k<n_q_points; ++k)
+            {
+              for (unsigned int d=0; d<dim; ++d)
+                {
+                  shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k+offset][d][0][0];
+                }
+            }
+          switch (mapping_type)
+            {
+            case mapping_none:
+            {
+              transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+            }
+
+            case mapping_covariant:
+            case mapping_contravariant:
+            {
+              std::vector<Tensor<1,dim> > shape_values (n_q_points);
+              mapping.transform(shape_hessians_for_fixed_indices,
+                                transformed_shape_hessians_for_fixed_indices,
+                                mapping_data, mapping_type);
+
+              break;
+            }
+
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+              mapping.transform(shape_hessians_for_fixed_indices,
+                                transformed_shape_hessians_for_fixed_indices,
+                                mapping_data, mapping_piola);
+              for (unsigned int k=0; k<n_q_points; ++k)
+                transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+              break;
+            }
+
+            case mapping_nedelec:
+            {
+              mapping.transform (shape_hessians_for_fixed_indices,
+                                 transformed_shape_hessians_for_fixed_indices,
+                                 mapping_data, mapping_covariant);
+
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+              break;
+            }
+
+            default:
+              Assert(false, ExcNotImplemented());
+            }
+
+          // then we perform the outer product
+          for (unsigned int k=0; k<n_q_points; ++k)
+            {
+              const Tensor<2,spacedim> &mapping_inverse_grad =
+                mapping.support_point_inverse_gradient (k, mapping_data);
+              for (unsigned int d1=0; d1<spacedim; ++d1)
+                {
+                  for (unsigned int d2=0; d2<spacedim; ++d2)
+                    {
+                      for (unsigned int d=0; d<dim; ++d)
+                        data.shape_hessians[first+d][k][d1][d2] =
+                          transformed_shape_hessians_for_fixed_indices[k][d]
+                          * mapping_inverse_grad[0][d1]
+                          * mapping_inverse_grad[0][d2];
+                    }
+                }
+            }
+          for (unsigned int D1=0; D1<spacedim; ++D1)
+            {
+              const unsigned int D2_start = (D1==0)? 1 : 0 ; // Combination (0,0) already computed
+              for (unsigned int D2=D2_start; D2<spacedim; ++D2)
+                {
+                  // first, we compute the weight of the outer product
+                  for (unsigned int k=0; k<n_q_points; ++k)
+                    {
+                      for (unsigned int d=0; d<dim; ++d)
+                        {
+                          shape_hessians_for_fixed_indices[k][d] = fe_data.shape_grad_grads[i][k+offset][d][D1][D2];
+                        }
+                    }
+                  switch (mapping_type)
+                    {
+                    case mapping_none:
+                    {
+                      transformed_shape_hessians_for_fixed_indices = shape_hessians_for_fixed_indices;
+                    }
+
+                    case mapping_covariant:
+                    case mapping_contravariant:
+                    {
+                      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+                      mapping.transform(shape_hessians_for_fixed_indices,
+                                        transformed_shape_hessians_for_fixed_indices, mapping_data,
+                                        mapping_type);
+
+                      break;
+                    }
+
+                    case mapping_raviart_thomas:
+                    case mapping_piola:
+                    {
+                      mapping.transform(shape_hessians_for_fixed_indices,
+                                        transformed_shape_hessians_for_fixed_indices,
+                                        mapping_data, mapping_piola);
+                      for (unsigned int k=0; k<n_q_points; ++k)
+                        transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+                      break;
+                    }
+
+                    case mapping_nedelec:
+                    {
+                      mapping.transform (shape_hessians_for_fixed_indices,
+                                         transformed_shape_hessians_for_fixed_indices,
+                                         mapping_data, mapping_covariant);
+
+
+                      for (unsigned int k=0; k<n_q_points; ++k)
+                        transformed_shape_hessians_for_fixed_indices[k] *= sign_change[i];
+
+                      break;
+                    }
+
+                    default:
+                      Assert(false, ExcNotImplemented());
+                    }
+
+                  // then we perform the outer product
+                  for (unsigned int k=0; k<n_q_points; ++k)
+                    {
+                      const Tensor<2,spacedim> &mapping_inverse_grad =
+                        mapping.support_point_inverse_gradient (k, mapping_data);
+                      for (unsigned int d1=0; d1<spacedim; ++d1)
+                        {
+                          for (unsigned int d2=0; d2<spacedim; ++d2)
+                            {
+                              for (unsigned int d=0; d<dim; ++d)
+                                data.shape_hessians[first+d][k][d1][d2] +=
+                                  transformed_shape_hessians_for_fixed_indices[k][d]
+                                  * mapping_inverse_grad[D1][d1]
+                                  * mapping_inverse_grad[D2][d2];
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 

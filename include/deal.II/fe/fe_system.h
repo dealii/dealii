@@ -1069,19 +1069,13 @@ private:
      * the @p base_fe_datas vector to @p n_base_elements and initializes the
      * compute_hessians field.
      */
-    InternalData (const unsigned int n_base_elements,
-                  const bool         compute_hessians);
+    InternalData (const unsigned int n_base_elements);
 
     /**
      * Destructor. Deletes all @p InternalDatas whose pointers are stored by
      * the @p base_fe_datas vector.
      */
     ~InternalData();
-
-    /**
-     * Flag indicating whether second derivatives shall be computed.
-     */
-    const bool compute_hessians;
 
     /**
      * Gives write-access to the pointer to a @p InternalData of the @p
