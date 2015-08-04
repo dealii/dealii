@@ -1183,7 +1183,7 @@ namespace GridTools
    * (For more details see DoFTools::make_periodicity_constraints(), the
    * glossary
    * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
-   * and @ref step_45 "step-45"). Second, @p matrix will be stored in the
+   * and step-45). Second, @p matrix will be stored in the
    * PeriodicFacePair collection @p matched_pairs for further use.
    *
    * @tparam Container A type that satisfies the requirements of a mesh

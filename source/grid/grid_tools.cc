@@ -2926,7 +2926,7 @@ next_cell:
    * An orthogonal equality test for points:
    *
    * point1 and point2 are considered equal, if
-   *   matrix.(point1 + offset) - point2
+   *   matrix.point1 + offset - point2
    * is parallel to the unit vector in <direction>
    */
   template<int spacedim>

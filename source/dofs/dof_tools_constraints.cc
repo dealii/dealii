@@ -1946,8 +1946,8 @@ namespace DoFTools
                   unsigned int inverse_constraint_target = numbers::invalid_unsigned_int;
                   if (is_inverse_constrained)
                     for (unsigned int jj=0; jj<dofs_per_face; ++jj)
-                      if (((std::abs(transformation(i,jj)) < eps)) ||
-                          (std::abs(transformation(i,jj)+1) < eps) == false)
+                      if (((std::abs(transformation(i,jj)) < eps) ||
+                           (std::abs(transformation(i,jj)+1) < eps)) == false)
                         {
                           is_inverse_constrained = false;
                           break;
