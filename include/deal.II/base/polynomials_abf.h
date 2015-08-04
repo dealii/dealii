@@ -53,17 +53,17 @@ class PolynomialsABF
 {
 public:
   /**
-   * Constructor. Creates all basis functions for Raviart-Thomas polynomials
+   * Constructor. Creates all basis functions for Arnold-Boffi-Falk polynomials
    * of given degree.
    *
-   * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
+   * @arg k: the degree of the ABF-space, which is the degree of
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
    * contained.
    */
   PolynomialsABF (const unsigned int k);
   /**
-   * Computes the value and the first and second derivatives of each Raviart-
-   * Thomas polynomial at @p unit_point.
+   * Computes the value and the first and second derivatives of each Arnold-Boffi-Falk
+   * polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.
