@@ -28,11 +28,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Quadrature;
-template <int dim, int spacedim> class FEValuesData;
+template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEValuesBase;
 template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
+
 
 /**
  * The transformation type used for the Mapping::transform() functions.
@@ -779,7 +780,7 @@ private:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const InternalDataBase                                    &internal_data,
-                  FEValuesData<dim,spacedim>                                &output_data) const = 0;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const = 0;
 
   /**
    * This function is the equivalent to Mapping::fill_fe_values(),
@@ -812,7 +813,7 @@ private:
                        const unsigned int                                         face_no,
                        const Quadrature<dim-1>                                   &quadrature,
                        const InternalDataBase                                    &internal_data,
-                       FEValuesData<dim,spacedim>                                &output_data) const = 0;
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const = 0;
 
   /**
    * This function is the equivalent to Mapping::fill_fe_values(),
@@ -849,7 +850,7 @@ private:
                           const unsigned int                                         subface_no,
                           const Quadrature<dim-1>                                   &quadrature,
                           const InternalDataBase                                    &internal_data,
-                          FEValuesData<dim,spacedim>                                &output_data) const = 0;
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const = 0;
 
   /**
    * Give class @p FEValues access to the private <tt>get_...data</tt> and

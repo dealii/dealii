@@ -206,7 +206,7 @@ protected:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  FEValuesData<dim,spacedim>                                &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Compute mapping-related information for a face of a cell.
@@ -218,7 +218,7 @@ protected:
                        const unsigned int                                         face_no,
                        const Quadrature<dim-1>                                   &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       FEValuesData<dim,spacedim>                                &output_data) const;
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Compute mapping-related information for a child of a face of a cell.
@@ -231,7 +231,7 @@ protected:
                           const unsigned int                                         subface_no,
                           const Quadrature<dim-1>                                   &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          FEValuesData<dim,spacedim>                                &output_data) const;
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape functions

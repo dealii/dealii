@@ -328,7 +328,7 @@ namespace internal
                              const unsigned int  my_q,
                              CellType (&cell_t_prev)[n_vector_elements],
                              CellType (&cell_t)[n_vector_elements],
-                             FEValues<dim,dim> &fe_values,
+                             dealii::FEValues<dim,dim> &fe_values,
                              CellData          &cell_data) const;
     };
 

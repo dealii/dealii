@@ -2073,67 +2073,93 @@ get_interpolated_dof_values (const IndexSet &,
 /* --------------------- FEValuesData ----------------- */
 
 
+namespace internal
+{
+  namespace FEValues
+  {
+    template <int dim, int spacedim>
+    void
+    MappingRelatedData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
+                                                  const UpdateFlags         flags)
+    {
+      if (flags & update_quadrature_points)
+        this->quadrature_points.resize(n_quadrature_points);
+
+      if (flags & update_JxW_values)
+        this->JxW_values.resize(n_quadrature_points);
+
+      if (flags & update_jacobians)
+        this->jacobians.resize(n_quadrature_points);
+
+      if (flags & update_jacobian_grads)
+        this->jacobian_grads.resize(n_quadrature_points);
+
+      if (flags & update_inverse_jacobians)
+        this->inverse_jacobians.resize(n_quadrature_points);
+
+      if (flags & update_boundary_forms)
+        this->boundary_forms.resize(n_quadrature_points);
+
+      if (flags & update_normal_vectors)
+        this->normal_vectors.resize(n_quadrature_points);
+    }
+
+
+    template <int dim, int spacedim>
+    void
+    FiniteElementRelatedData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
+                                                        const FiniteElement<dim,spacedim> &fe,
+                                                        const UpdateFlags         flags)
+    {
+
+      // initialize the table mapping
+      // from shape function number to
+      // the rows in the tables storing
+      // the data by shape function and
+      // nonzero component
+      this->shape_function_to_row_table
+        = make_shape_function_to_row_table (fe);
+
+      // count the total number of non-zero
+      // components accumulated over all shape
+      // functions
+      unsigned int n_nonzero_shape_components = 0;
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        n_nonzero_shape_components += fe.n_nonzero_components (i);
+      Assert (n_nonzero_shape_components >= fe.dofs_per_cell,
+              ExcInternalError());
+
+      // with the number of rows now
+      // known, initialize those fields
+      // that we will need to their
+      // correct size
+      if (flags & update_values)
+        this->shape_values.reinit(n_nonzero_shape_components,
+                                  n_quadrature_points);
+
+      if (flags & update_gradients)
+        this->shape_gradients.resize (n_nonzero_shape_components,
+                                      std::vector<Tensor<1,spacedim> > (n_quadrature_points));
+
+      if (flags & update_hessians)
+        this->shape_hessians.resize (n_nonzero_shape_components,
+                                     std::vector<Tensor<2,spacedim> > (n_quadrature_points));
+    }
+  }
+}
+
+
 template <int dim, int spacedim>
 void
 FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
                                         const FiniteElement<dim,spacedim> &fe,
                                         const UpdateFlags         flags)
 {
+  // initialize the base classes
+  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(n_quadrature_points, flags);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(n_quadrature_points, fe, flags);
+
   this->update_flags = flags;
-
-  // initialize the table mapping
-  // from shape function number to
-  // the rows in the tables storing
-  // the data by shape function and
-  // nonzero component
-  this->shape_function_to_row_table
-    = make_shape_function_to_row_table (fe);
-
-  // count the total number of non-zero
-  // components accumulated over all shape
-  // functions
-  unsigned int n_nonzero_shape_components = 0;
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    n_nonzero_shape_components += fe.n_nonzero_components (i);
-  Assert (n_nonzero_shape_components >= fe.dofs_per_cell,
-          ExcInternalError());
-
-  // with the number of rows now
-  // known, initialize those fields
-  // that we will need to their
-  // correct size
-  if (flags & update_values)
-    this->shape_values.reinit(n_nonzero_shape_components,
-                              n_quadrature_points);
-
-  if (flags & update_gradients)
-    this->shape_gradients.resize (n_nonzero_shape_components,
-                                  std::vector<Tensor<1,spacedim> > (n_quadrature_points));
-
-  if (flags & update_hessians)
-    this->shape_hessians.resize (n_nonzero_shape_components,
-                                 std::vector<Tensor<2,spacedim> > (n_quadrature_points));
-
-  if (flags & update_quadrature_points)
-    this->quadrature_points.resize(n_quadrature_points);
-
-  if (flags & update_JxW_values)
-    this->JxW_values.resize(n_quadrature_points);
-
-  if (flags & update_jacobians)
-    this->jacobians.resize(n_quadrature_points);
-
-  if (flags & update_jacobian_grads)
-    this->jacobian_grads.resize(n_quadrature_points);
-
-  if (flags & update_inverse_jacobians)
-    this->inverse_jacobians.resize(n_quadrature_points);
-
-  if (flags & update_boundary_forms)
-    this->boundary_forms.resize(n_quadrature_points);
-
-  if (flags & update_normal_vectors)
-    this->normal_vectors.resize(n_quadrature_points);
 }
 
 
@@ -3533,6 +3559,7 @@ void FEValues<dim,spacedim>::do_reinit ()
                                 *this->mapping_data,
                                 *this->fe_data,
                                 *this,
+                                *this,
                                 this->cell_similarity);
 
   this->fe_data->clear_first_cell ();
@@ -3728,6 +3755,7 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                      this->quadrature,
                                      *this->mapping_data,
                                      *this->fe_data,
+                                     *this,
                                      *this);
 
   this->fe_data->clear_first_cell ();
@@ -3961,6 +3989,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                         this->quadrature,
                                         *this->mapping_data,
                                         *this->fe_data,
+                                        *this,
                                         *this);
 
   this->fe_data->clear_first_cell ();

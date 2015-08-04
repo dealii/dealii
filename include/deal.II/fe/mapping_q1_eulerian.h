@@ -135,7 +135,7 @@ protected:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  FEValuesData<dim,spacedim>                                &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Reference to the vector of shifts.
