@@ -931,7 +931,7 @@ namespace GridTools
     /**
      * The relative orientation of the first face with respect to the second
      * face as described in orthogonal_equality() and
-     * make_periodicity_constraints() (and stored as a bitset).
+     * DoFTools::make_periodicity_constraints() (and stored as a bitset).
      */
     std::bitset<3> orientation;
 
@@ -945,7 +945,9 @@ namespace GridTools
      * first_vector_components of the FESystem. Alternatively, if @p
      * first_vector_components is empty the matrix is interpreted as an
      * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
-     * For more details see DoFTools::make_periodicity_constraints().
+     * For more details see DoFTools::make_periodicity_constraints() and
+     * the glossary
+     * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
   };
@@ -1060,14 +1062,14 @@ namespace GridTools
    * details.
    *
    * The @p direction refers to the space direction in which periodicity is
-   * enforced.
+   * enforced. When maching periodic faces this vector component is ignored.
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
    * them to the corresponding vertices of the 'second' boundary. This can
    * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
-   * Optionally a @p matrix can be specified that describes how vector
+   * Optionally, a @p matrix can be specified that describes how vector
    * valued DoFs of the first face should be modified prior to constraining
    * to the DoFs of the second face. If the matrix has size
    * $n\_face\_dofs\times n\_face\_dofs$, the periodicity constraints are
@@ -1075,8 +1077,9 @@ namespace GridTools
    * $dim\times dim$, the matrix is interpreted as a rotation matrix for
    * vector valued components.
    * For more details see DoFTools::make_periodicity_constraints(), the
-   * glossary @ref GlossPeriodicConstraints "glossary entry on periodic
-   * conditions" and @ref step_45 "step-45".
+   * glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
+   * and @ref step_45 "step-45".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1124,9 +1127,11 @@ namespace GridTools
    * first_vector_components can be specified that describes how vector valued
    * DoFs of the first face should be modified prior to constraining to the
    * DoFs of the second face. If @p first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all vector
-   * valued blocks listed in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary
+   * matrix is interpreted as a rotation matrix that is applied to all
+   * vector valued blocks listed in @p first_vector_components of the
+   * FESystem. For more details see
+   * DoFTools::make_periodicity_constraints() and the glossary
+   *
    * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh

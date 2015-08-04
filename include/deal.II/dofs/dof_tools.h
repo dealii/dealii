@@ -933,8 +933,7 @@ namespace DoFTools
    * This is the main high level interface for above low level variant of
    * make_periodicity_constraints(). It takes an std::vector @p periodic_faces
    * as argument and applies above make_periodicity_constraints on each entry.
-   * The std::vector @p periodic_faces can be created by
-   * GridTools::collect_periodic_faces.
+   * @p periodic_faces can be created by GridTools::collect_periodic_faces.
    *
    * @note For DoFHandler objects that are built on a
    * parallel::distributed::Triangulation object
