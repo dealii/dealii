@@ -298,8 +298,8 @@ namespace PETScWrappers
 
 
   /**
-   * An implementation of the solver interface using the PETSc Chebychev
-   * solver.
+   * An implementation of the solver interface using the PETSc Chebyshev (or,
+   * prior version 3.3, Chebychev) solver.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, 2004

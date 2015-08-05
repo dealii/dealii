@@ -1263,9 +1263,6 @@ namespace DataOutBase
 
   /**
    * Write the given list of patches to the output stream in OpenDX format.
-   *
-   * Since OpenDX uses some kind of visual data flow oriented programming
-   * language, some of these programs are provided in <tt>contrib/dx</tt>.
    */
   template <int dim, int spacedim>
   void write_dx (const std::vector<Patch<dim,spacedim> > &patches,

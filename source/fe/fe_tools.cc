@@ -1099,33 +1099,6 @@ namespace FETools
   }
 
 
-  /*
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<1,2>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<1,3>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<2,3>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  */
-
 
   template <int dim, typename number, int spacedim>
   void

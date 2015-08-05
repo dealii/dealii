@@ -1646,8 +1646,6 @@ namespace DoFTools
    * are possible, in particular changing <tt>boundary_dofs</tt> for non-
    * essential boundary conditions.
    *
-   * Since the patches are defined through refinement, th
-   *
    * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
    * be stored.
    *
