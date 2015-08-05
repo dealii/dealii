@@ -954,7 +954,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -978,7 +978,7 @@ estimate (const DH                &dof_handler,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
   estimate(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
@@ -1001,7 +1001,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -1025,7 +1025,7 @@ estimate (const DH                &dof_handler,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
           const types::material_id       material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
@@ -1050,7 +1050,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const unsigned int                   ,
           const types::subdomain_id          subdomain_id_,
           const types::material_id                   material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
@@ -1214,7 +1214,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const unsigned int                   n_threads,
           const types::subdomain_id          subdomain_id,
           const types::material_id                   material_id,
-          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+          const Strategy strategy)
 {
   // forward to the function with the QCollection
   estimate (mapping, dof_handler,
@@ -1237,7 +1237,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                                    const unsigned int                   n_threads,
                                                    const types::subdomain_id subdomain_id,
                                                    const types::material_id       material_id,
-                                                   const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+                                                   const Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,
@@ -1258,7 +1258,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                                    const unsigned int                   n_threads,
                                                    const types::subdomain_id subdomain_id,
                                                    const types::material_id       material_id,
-                                                   const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
+                                                   const Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,

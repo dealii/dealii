@@ -571,7 +571,7 @@ public:
   enum EndPoint { left,right };
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussRadauChebyshev(const unsigned int n,
-                       QGaussRadauChebyshev::EndPoint ep=QGaussRadauChebyshev::left);
+                       EndPoint ep=QGaussRadauChebyshev::left);
 
 private:
   const EndPoint ep;

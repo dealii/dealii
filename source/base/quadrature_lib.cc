@@ -1201,7 +1201,7 @@ QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
 template <>
 std::vector<double>
 QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
-                                               QGaussRadauChebyshev::EndPoint ep)
+                                               EndPoint ep)
 {
 
   std::vector<double> points(n);
@@ -1225,7 +1225,7 @@ QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
 template <>
 std::vector<double>
 QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
-                                                QGaussRadauChebyshev::EndPoint ep)
+                                                EndPoint ep)
 {
 
   std::vector<double> weights(n);
@@ -1267,7 +1267,7 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
 
 template <>
 QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
-                                               QGaussRadauChebyshev::EndPoint ep)
+                                               EndPoint ep)
   :
   Quadrature<2> (QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)),
                  QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
@@ -1277,7 +1277,7 @@ QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
 
 template <int dim>
 QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
-                                                 QGaussRadauChebyshev::EndPoint ep)
+                                                 EndPoint ep)
   :
   Quadrature<dim> (QGaussRadauChebyshev<dim-1>(n,static_cast<typename QGaussRadauChebyshev<dim-1>::EndPoint>(ep)),
                    QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
