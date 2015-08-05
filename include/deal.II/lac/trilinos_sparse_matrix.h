@@ -1112,15 +1112,21 @@ namespace TrilinosWrappers
      *
      * This function is able to insert new elements into the matrix as long as
      * compress() has not been called, so the sparsity pattern will be
-     * extended. When compress() is called for the first time, then this is no
-     * longer possible and an insertion of elements at positions which have
-     * not been initialized will throw an exception. Note that in case
-     * elements need to be inserted, it is mandatory that elements are
-     * inserted only once. Otherwise, the elements will actually be added in
-     * the end (since it is not possible to efficiently find values to the
-     * same entry before compress() has been called). In the case that an
-     * element is set more than once, initialize the matrix with a sparsity
-     * pattern first.
+     * extended. When compress() is called for the first time (or in case the
+     * matrix is initialized from a sparsity pattern), no new elements can be
+     * added and an insertion of elements at positions which have not been
+     * initialized will throw an exception.
+     *
+     * For the case that the matrix is constructed without a sparsity pattern
+     * and new matrix entries are added on demand, please note the following
+     * behavior imposed by the underlying Epetra_FECrsMatrix data
+     * structure: If the same matrix entry is inserted more than once, the
+     * matrix entries will be added upon calling compress() (since Epetra does
+     * not track values to the same entry before the final compress() is
+     * called), even if VectorOperation::insert is specified as argument to
+     * compress(). In the case you cannot make sure that matrix entries are
+     * only set once, initialize the matrix with a sparsity pattern to fix the
+     * matrix structure before inserting elements.
      */
     void set (const size_type i,
               const size_type j,
@@ -1137,14 +1143,26 @@ namespace TrilinosWrappers
      *
      * This function is able to insert new elements into the matrix as long as
      * compress() has not been called, so the sparsity pattern will be
-     * extended. When compress() is called for the first time, then this is no
-     * longer possible and an insertion of elements at positions which have
-     * not been initialized will throw an exception.
+     * extended. After compress() has been called for the first time or the
+     * matrix has been initialized from a sparsity pattern, extending the
+     * sparsity pattern is no longer possible and an insertion of elements at
+     * positions which have not been initialized will throw an exception.
      *
      * The optional parameter <tt>elide_zero_values</tt> can be used to
      * specify whether zero values should be inserted anyway or they should be
      * filtered away. The default value is <tt>false</tt>, i.e., even zero
      * values are inserted/replaced.
+     *
+     * For the case that the matrix is constructed without a sparsity pattern
+     * and new matrix entries are added on demand, please note the following
+     * behavior imposed by the underlying Epetra_FECrsMatrix data
+     * structure: If the same matrix entry is inserted more than once, the
+     * matrix entries will be added upon calling compress() (since Epetra does
+     * not track values to the same entry before the final compress() is
+     * called), even if VectorOperation::insert is specified as argument to
+     * compress(). In the case you cannot make sure that matrix entries are
+     * only set once, initialize the matrix with a sparsity pattern to fix the
+     * matrix structure before inserting elements.
      */
     void set (const std::vector<size_type>     &indices,
               const FullMatrix<TrilinosScalar> &full_matrix,
@@ -1166,14 +1184,26 @@ namespace TrilinosWrappers
      *
      * This function is able to insert new elements into the matrix as long as
      * compress() has not been called, so the sparsity pattern will be
-     * extended. When compress() is called for the first time, then this is no
-     * longer possible and an insertion of elements at positions which have
-     * not been initialized will throw an exception.
+     * extended. After compress() has been called for the first time or the
+     * matrix has been initialized from a sparsity pattern, extending the
+     * sparsity pattern is no longer possible and an insertion of elements at
+     * positions which have not been initialized will throw an exception.
      *
      * The optional parameter <tt>elide_zero_values</tt> can be used to
      * specify whether zero values should be inserted anyway or they should be
      * filtered away. The default value is <tt>false</tt>, i.e., even zero
      * values are inserted/replaced.
+     *
+     * For the case that the matrix is constructed without a sparsity pattern
+     * and new matrix entries are added on demand, please note the following
+     * behavior imposed by the underlying Epetra_FECrsMatrix data
+     * structure: If the same matrix entry is inserted more than once, the
+     * matrix entries will be added upon calling compress() (since Epetra does
+     * not track values to the same entry before the final compress() is
+     * called), even if VectorOperation::insert is specified as argument to
+     * compress(). In the case you cannot make sure that matrix entries are
+     * only set once, initialize the matrix with a sparsity pattern to fix the
+     * matrix structure before inserting elements.
      */
     void set (const size_type                    row,
               const std::vector<size_type>      &col_indices,
@@ -1186,14 +1216,26 @@ namespace TrilinosWrappers
      *
      * This function is able to insert new elements into the matrix as long as
      * compress() has not been called, so the sparsity pattern will be
-     * extended. When compress() is called for the first time, then this is no
-     * longer possible and an insertion of elements at positions which have
-     * not been initialized will throw an exception.
+     * extended. After compress() has been called for the first time or the
+     * matrix has been initialized from a sparsity pattern, extending the
+     * sparsity pattern is no longer possible and an insertion of elements at
+     * positions which have not been initialized will throw an exception.
      *
      * The optional parameter <tt>elide_zero_values</tt> can be used to
      * specify whether zero values should be inserted anyway or they should be
      * filtered away. The default value is <tt>false</tt>, i.e., even zero
      * values are inserted/replaced.
+     *
+     * For the case that the matrix is constructed without a sparsity pattern
+     * and new matrix entries are added on demand, please note the following
+     * behavior imposed by the underlying Epetra_FECrsMatrix data
+     * structure: If the same matrix entry is inserted more than once, the
+     * matrix entries will be added upon calling compress() (since Epetra does
+     * not track values to the same entry before the final compress() is
+     * called), even if VectorOperation::insert is specified as argument to
+     * compress(). In the case you cannot make sure that matrix entries are
+     * only set once, initialize the matrix with a sparsity pattern to fix the
+     * matrix structure before inserting elements.
      */
     void set (const size_type       row,
               const size_type       n_cols,
@@ -2509,10 +2551,14 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n () const
   {
+    // If the matrix structure has not been fixed (i.e., we did not have a
+    // sparsity pattern), it does not know about the number of columns so we
+    // must always take this from the additional column space map
+    Assert(column_space_map.get() != 0, ExcInternalError());
 #ifndef DEAL_II_WITH_64BIT_INDICES
-    return matrix->NumGlobalCols();
+    return column_space_map->NumGlobalElements();
 #else
-    return matrix->NumGlobalCols64();
+    return column_space_map->NumGlobalElements64();
 #endif
   }
 
