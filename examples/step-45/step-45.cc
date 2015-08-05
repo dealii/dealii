@@ -171,7 +171,7 @@ namespace Step45
 
     // We also incorporate the homogeneous Dirichlet boundary conditions on
     // the upper and lower parts of the boundary (i.e. the ones with boundary
-    // indicator 1) and close the <code>ConstraintMatrix</code> object:
+    // indicator 1) and close the ConstraintMatrix object:
     VectorTools::interpolate_boundary_values (dof_handler, 1,
                                               ZeroFunction<2> (),
                                               constraints);

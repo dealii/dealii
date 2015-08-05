@@ -2335,7 +2335,7 @@ namespace Step14
     // solutions only to see them qualitatively, we contend ourselves with
     // interpolating the dual solution to the (smaller) primal space. For the
     // interpolation, there is a library function, that takes a
-    // <code>ConstraintMatrix</code> object including the hanging node
+    // ConstraintMatrix object including the hanging node
     // constraints. The rest is standard.
     //
     // There is, however, one work-around worth mentioning: in this function,
