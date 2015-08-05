@@ -50,7 +50,7 @@ FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_ele
   :
   compute_hessians (compute_hessians),
   base_fe_datas(n_base_elements),
-  base_fe_values_datas(n_base_elements)
+  base_fe_output_objects(n_base_elements)
 {}
 
 
@@ -64,14 +64,7 @@ FESystem<dim,spacedim>::InternalData::~InternalData()
       {
         delete base_fe_datas[i];
         base_fe_datas[i] = 0;
-      };
-
-  for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
-    if (base_fe_values_datas[i])
-      {
-        delete base_fe_values_datas[i];
-        base_fe_values_datas[i] = 0;
-      };
+      }
 }
 
 
@@ -102,41 +95,13 @@ InternalData::set_fe_data (const unsigned int base_no,
 
 
 template <int dim, int spacedim>
-FEValuesData<dim,spacedim> &
+internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
 FESystem<dim,spacedim>::
-InternalData::get_fe_values_data (const unsigned int base_no) const
+InternalData::get_fe_output_object (const unsigned int base_no) const
 {
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  return *base_fe_values_datas[base_no];
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-InternalData::set_fe_values_data (const unsigned int base_no,
-                                  FEValuesData<dim,spacedim> *ptr)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  base_fe_values_datas[base_no]=ptr;
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-InternalData::delete_fe_values_data (const unsigned int base_no)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  delete base_fe_values_datas[base_no];
-  base_fe_values_datas[base_no]=0;
+  Assert(base_no<base_fe_output_objects.size(),
+         ExcIndexRange(base_no,0,base_fe_output_objects.size()));
+  return base_fe_output_objects[base_no];
 }
 
 
@@ -893,34 +858,6 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
               ExcInternalError());
       Assert (!(base_fe_data->update_once & update_hessians),
               ExcInternalError());
-
-      // The FEValuesData @p{data}
-      // given to the
-      // @p{fill_fe_values} function
-      // includes the FEValuesDatas
-      // of the FESystem. Here the
-      // FEValuesDatas @p{*base_data}
-      // needs to be created that
-      // later will be given to the
-      // @p{fill_fe_values} functions
-      // of the base
-      // elements. @p{base_data->initialize}
-      // cannot be called earlier as
-      // in the @p{fill_fe_values}
-      // function called for the
-      // first cell. This is because
-      // the initialize function
-      // needs the update flags as
-      // argument.
-      //
-      // The pointers @p{base_data}
-      // are stored into the
-      // FESystem::InternalData
-      // @p{data}, similar to the
-      // storing of the
-      // @p{base_fe_data}s.
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -968,9 +905,6 @@ FESystem<dim,spacedim>::get_face_data (
               ExcInternalError());
       Assert (!(base_fe_data->update_once & update_hessians),
               ExcInternalError());
-
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -1020,9 +954,6 @@ FESystem<dim,spacedim>::get_subface_data (
               ExcInternalError());
       Assert (!(base_fe_data->update_once & update_hessians),
               ExcInternalError());
-
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -1115,8 +1046,8 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
   base_fe      = base_element(base_no);
   typename FiniteElement<dim,spacedim>::InternalDataBase &
   base_fe_data = fe_data.get_fe_data(base_no);
-  FEValuesData<dim,spacedim> &
-  base_data    = fe_data.get_fe_values_data(base_no);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+  base_data    = fe_data.get_fe_output_object(base_no);
 
   // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
   // dim_1==dim-1 and dim_1=dim. Hence the following workaround
@@ -1147,18 +1078,6 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
     }
 
 
-  // Copy all of the things that the mapping set in the FEValuesData
-  // that we store here into the corresponding objects we pass down
-  // to the various base elements. some of these arrays may be empty,
-  // in which case copying is cheap
-  base_data.JxW_values        = mapping_data.JxW_values;
-  base_data.jacobians         = mapping_data.jacobians;
-  base_data.jacobian_grads    = mapping_data.jacobian_grads;
-  base_data.inverse_jacobians = mapping_data.inverse_jacobians;
-  base_data.quadrature_points = mapping_data.quadrature_points;
-  base_data.normal_vectors    = mapping_data.normal_vectors;
-  base_data.boundary_forms    = mapping_data.boundary_forms;
-
   // Make sure that in the case of fill_fe_values the data is only
   // copied from base_data to data if base_data is changed. therefore
   // use fe_fe_data.current_update_flags()
@@ -1168,13 +1087,13 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
   // base_fe_data.update_flags.
   if (face_sub_no.first==invalid_face_number)
     base_fe.fill_fe_values(mapping, cell, *cell_quadrature, *mapping_and_fe_internal.first,
-                           base_fe_data, base_data, base_data, cell_similarity);
+                           base_fe_data, mapping_data, base_data, cell_similarity);
   else if (face_sub_no.second==invalid_face_number)
     base_fe.fill_fe_face_values(mapping, cell, face_sub_no.first,
-                                *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, base_data, base_data);
+                                *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, mapping_data, base_data);
   else
     base_fe.fill_fe_subface_values(mapping, cell, face_sub_no.first, face_sub_no.second,
-                                   *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, base_data, base_data);
+                                   *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, mapping_data, base_data);
 
   // now data has been generated, so copy it. we used to work by
   // looping over all base elements (i.e. this outer loop), then over
@@ -1280,11 +1199,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
     {
       if (fe_data.is_first_cell())
         {
-          // Initialize the FEValuesDatas for the base elements.  Originally
-          // this was the task of FEValues::FEValues() but the latter
-          // initializes the FEValuesDatas only of the FESystem, not of the
-          // FEValuesDatas needed by the base elements (and: how should it
-          // know of their existence, after all).
+          // Initialize the internal FE objects for the base elements
           for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
             {
               // Pointer needed to get the update flags of the base element
@@ -1295,8 +1210,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const UpdateFlags base_update_flags
                 = mapping_internal.update_flags | base_fe_data.update_flags;
 
-              // Initialize the FEValuesDatas for the base elements.
-              FEValuesData<dim,spacedim> &base_data=fe_data.get_fe_values_data(base_no);
+              // Initialize the output objects for the base elements.
+              internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_data=fe_data.get_fe_output_object(base_no);
               const FiniteElement<dim,spacedim> &base_fe=base_element(base_no);
               base_data.initialize (n_q_points, base_fe, base_update_flags);
             }

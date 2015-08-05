@@ -28,8 +28,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class FEValuesData;
-
 
 /**
  * This class provides an interface to group several elements together into
@@ -1088,29 +1086,13 @@ private:
     typename FiniteElement<dim,spacedim>::InternalDataBase &
     get_fe_data (const unsigned int base_no) const;
 
-
     /**
-     * Gives write-access to the pointer to a @p FEValuesData for the @p
-     * base_noth base element.
+     * Gives read-access to the pointer to an object to which into which the
+     * <code>base_no</code>th base element will write its output when calling
+     * FiniteElement::fill_fe_values() and similar functions.
      */
-    void set_fe_values_data (const unsigned int base_no,
-                             FEValuesData<dim,spacedim> *);
-
-    /**
-     * Gives read-access to the pointer to a @p FEValuesData for the @p
-     * base_noth base element.
-     */
-    FEValuesData<dim,spacedim> &get_fe_values_data (const unsigned int base_no) const;
-
-    /**
-     * Deletes the @p FEValuesData the <tt>fe_datas[base_no]</tt> pointer is
-     * pointing to. Sets <tt>fe_datas[base_no]</tt> to zero.
-     *
-     * This function is used to delete @p FEValuesData that are needed only on
-     * the first cell but not any more afterwards.  This is the case for e.g.
-     * Lagrangian elements (see e.g. @p FE_Q classes).
-     */
-    void delete_fe_values_data (const unsigned int base_no);
+    internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+    get_fe_output_object (const unsigned int base_no) const;
 
     /**
      * Set the @p first_cell flag to @p false. Used by the @p FEValues class
@@ -1136,14 +1118,14 @@ private:
     typename std::vector<typename FiniteElement<dim,spacedim>::InternalDataBase *> base_fe_datas;
 
     /**
-     * Pointers to the @p FEValuesData objects that are given to the @p
-     * fill_fe_values function of the base elements. They are accessed to by
-     * the @p set_ and @p get_fe_values_data functions.
+     * A collection of objects to which the base elements will write their output
+     * when we call
+     * FiniteElement::fill_fe_values() and related functions on them.
      *
      * The size of this vector is set to @p n_base_elements by the
      * InternalData constructor.
      */
-    std::vector<FEValuesData<dim,spacedim> *> base_fe_values_datas;
+    mutable std::vector<internal::FEValues::FiniteElementRelatedData<dim,spacedim> > base_fe_output_objects;
   };
 
   /*
