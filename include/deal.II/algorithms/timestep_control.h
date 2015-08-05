@@ -139,8 +139,11 @@ namespace Algorithms
     /**
      * Set size of the first step. This may be overwritten by the time
      * stepping strategy.
+     *
+     * @param[in] step The size of the first step, which may be overwritten by
+     *   the time stepping strategy.
      */
-    void start_step (double);
+    void start_step (const double step);
 
     /**
      * Set size of the maximum step size.
@@ -249,7 +252,7 @@ namespace Algorithms
 
 
   inline void
-  TimestepControl::start_step (double t)
+  TimestepControl::start_step (const double t)
   {
     start_step_val = t;
   }
