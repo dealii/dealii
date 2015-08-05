@@ -204,8 +204,9 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcNoComponentSelected, "The number of selected
-                    components in a mask must be greater than zero.");
+  DeclExceptionMsg (ExcNoComponentSelected,
+                    "The number of selected components in a mask "
+                    "must be greater than zero.");
 
 private:
   /**
