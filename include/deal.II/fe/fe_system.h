@@ -1036,12 +1036,12 @@ private:
   template <int dim_1>
   void
   compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
-                         const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                         const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+                         CellSimilarity::Similarity>       cell_and_similarity,
                          const std::pair<unsigned int,unsigned int>        face_sub_no,
                          const Quadrature<dim_1>                          &quadrature,
-                         const CellSimilarity::Similarity                  cell_similarity,
                          const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
-                         const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_internal,
+                         const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
                          const unsigned int                                base_element,
                          const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                          internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;

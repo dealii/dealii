@@ -1095,17 +1095,20 @@ template <int dim_1>
 void
 FESystem<dim,spacedim>::
 compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
-                       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                       const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+                       CellSimilarity::Similarity>       cell_and_similarity,
                        const std::pair<unsigned int, unsigned int>       face_sub_no,
                        const Quadrature<dim_1>                          &quadrature,
-                       const CellSimilarity::Similarity                  cell_similarity,
                        const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
-                       const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
                        const unsigned int                                base_no,
                        const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
-  const InternalData &fe_data = static_cast<const InternalData &> (*mapping_internal.second);
+  const typename Triangulation<dim,spacedim>::cell_iterator cell            = cell_and_similarity.first;
+  const CellSimilarity::Similarity                          cell_similarity = cell_and_similarity.second;
+
+  const InternalData &fe_data = static_cast<const InternalData &> (*mapping_and_fe_internal.second);
   const unsigned int n_q_points = quadrature.size();
 
   const FiniteElement<dim,spacedim> &
@@ -1164,14 +1167,14 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
   // copied from base_data to data on each face, therefore use
   // base_fe_data.update_flags.
   if (face_sub_no.first==invalid_face_number)
-    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, *mapping_internal.first,
+    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, *mapping_and_fe_internal.first,
                            base_fe_data, base_data, base_data, cell_similarity);
   else if (face_sub_no.second==invalid_face_number)
     base_fe.fill_fe_face_values(mapping, cell, face_sub_no.first,
-                                *face_quadrature, *mapping_internal.first, base_fe_data, base_data, base_data);
+                                *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, base_data, base_data);
   else
     base_fe.fill_fe_subface_values(mapping, cell, face_sub_no.first, face_sub_no.second,
-                                   *face_quadrature, *mapping_internal.first, base_fe_data, base_data, base_data);
+                                   *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, base_data, base_data);
 
   // now data has been generated, so copy it. we used to work by
   // looping over all base elements (i.e. this outer loop), then over
@@ -1306,10 +1309,9 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         += Threads::new_task (std_cxx11::function<void ()>(std_cxx11::bind (&FESystem<dim,spacedim>::template compute_fill_one_base<dim_1>,
                                                            this,
                                                            std_cxx11::cref(mapping),
-                                                           std_cxx11::cref(cell),
+                                                           std::make_pair(cell, CellSimilarity::none),
                                                            std::make_pair(face_no, sub_no),
                                                            std_cxx11::cref(quadrature),
-                                                           CellSimilarity::none,
                                                            std::make_pair(&mapping_internal,
                                                                &fedata),
                                                            base_no,
