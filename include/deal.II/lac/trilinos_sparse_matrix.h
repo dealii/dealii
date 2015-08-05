@@ -2551,6 +2551,9 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n () const
   {
+    // If the matrix structure has not been fixed (i.e., we did not have a
+    // sparsity pattern), it does not know about the number of columns so we
+    // must always take this from the additional column space map
     Assert(column_space_map.get() != 0, ExcInternalError());
 #ifndef DEAL_II_WITH_64BIT_INDICES
     return column_space_map->NumGlobalElements();
