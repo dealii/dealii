@@ -82,19 +82,14 @@ DEAL_II_NAMESPACE_OPEN
  * @skip main
  * @until C.fill
  *
- * The BlockMatrixArray needs a VectorMemory&lt;Vector&lt;number&gt; &gt;
- * object to allocate auxiliary vectors. <tt>number</tt> must equal the second
- * template argument of BlockMatrixArray and also the number type of the
- * BlockVector used later. We use the GrowingVectorMemory type, since it
- * remembers the vector and avoids reallocating.
- *
- * @line Growing
- *
  * Now, we are ready to build a <i>2x2</i> BlockMatrixArray.
- * @line Block First, we enter the matrix <tt>A</tt> multiplied by 2 in the
+ * @line Block
+ * First, we enter the matrix <tt>A</tt> multiplied by 2 in the
  * upper left block
- * @line enter Now -1 times <tt>B1</tt> in the upper right block.
- * @line enter We add the transpose of <tt>B2</tt> to the upper right block
+ * @line enter
+ * Now -1 times <tt>B1</tt> in the upper right block.
+ * @line enter
+ * We add the transpose of <tt>B2</tt> to the upper right block
  * and continue in a similar fashion. In the end, the block matrix structure
  * is printed into an LaTeX table.
  * @until latex
