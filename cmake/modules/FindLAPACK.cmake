@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,6 +37,8 @@ SET_IF_EMPTY(BLAS_DIR "$ENV{BLAS_DIR}")
 SET_IF_EMPTY(LAPACK_DIR "$ENV{LAPACK_DIR}")
 
 SET(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
+
+# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 SET(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
