@@ -1,0 +1,9 @@
+
+DEAL::Matrix norm set local once: 9.04157
+DEAL::Matrix norm set local twice: 27.1247
+DEAL::Matrix norm set non-local once: 9.04157
+DEAL::Matrix norm set non-local twice: 13.4815
+DEAL::Matrix norm set non-local twice: 14.7817
+DEAL::Matrix norm set twice, 2nd attempt: 13.4815
+DEAL::Matrix norm set twice-twice: 13.4815
+DEAL::OK
