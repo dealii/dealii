@@ -79,11 +79,11 @@ index), then the constraint can also be represented by
   u_{i_0} = \sum_{i\in\partial\Omega_h\backslash i_0} -u_i.
 @f]
 This, luckily, is exactly the form of constraints for which the
-<code>ConstraintMatrix</code> class was designed. Note that we have used this
+ConstraintMatrix class was designed. Note that we have used this
 class in several previous examples for the representation of hanging nodes
 constraints, which also have this form: there, the middle vertex shall have
 the mean of the values of the adjacent vertices. In general, the
-<code>ConstraintMatrix</code> class is designed to handle homogeneous constraints
+ConstraintMatrix class is designed to handle homogeneous constraints
 of the form
 @f[
   CU = 0
@@ -93,7 +93,7 @@ where $C$ denotes a matrix, and $U$ the vector of nodal values.
 In this example, the mean value along the boundary allows just such a
 representation, with $C$ being a matrix with just one row (i.e. there is only
 one constraint). In the implementation, we will create a
-<code>ConstraintMatrix</code> object, add one constraint (i.e. add another row to
+ConstraintMatrix object, add one constraint (i.e. add another row to
 the matrix) referring to the first boundary node $i_0$, and insert the weights
 with which all the other nodes contribute, which in this example happens to be
 just $-1$.

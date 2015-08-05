@@ -389,7 +389,7 @@ namespace Step51
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
     // element method.  We can enforce the boundary conditions in an analogous
-    // manner through the use of <code>ConstraintMatrix</code> constructs. In
+    // manner through the use of ConstraintMatrix constructs. In
     // addition, hanging nodes are handled in the same way as for
     // continuous finite elements: For the face elements which
     // only define degrees of freedom on the face, this process sets the
