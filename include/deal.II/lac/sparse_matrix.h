@@ -1517,7 +1517,11 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcDifferentSparsityPatterns);
+  DeclExceptionMsg (ExcDifferentSparsityPatterns,
+                    "When copying one sparse matrix into another, "
+                    "or when adding one sparse matrix to another, "
+                    "both matrices need to refer to the same "
+                    "sparsity pattern.");
   /**
    * Exception
    */
