@@ -474,8 +474,8 @@ namespace FETools
    * correspond to the number of columns of @p projection_matrix.  The size of
    * @p vector_of_tensors_at_nodes must correspond to the number of rows of @p
    * vector_of_tensors_at_nodes .  The projection matrix @p projection_matrix
-   * desribes the projection of scalar data from the quadrature points and can
-   * be obtained from the
+   * describes the projection of scalar data from the quadrature points and
+   * can be obtained from the
    * FETools::compute_projection_from_quadrature_points_matrix function.
    */
   template <int dim>
@@ -535,7 +535,7 @@ namespace FETools
    * The same is true if @p fe1 is a continuous and @p fe2 is a discontinuous
    * finite element. For the case that @p fe1 is a discontinuous and @p fe2 is
    * a continuous finite element there is no point interpolation defined at
-   * the discontinuities.  Therefore the meanvalue is taken at the DoF values
+   * the discontinuities.  Therefore the mean value is taken at the DoF values
    * on the discontinuities.
    *
    * Note that for continuous elements on grids with hanging nodes (i.e.

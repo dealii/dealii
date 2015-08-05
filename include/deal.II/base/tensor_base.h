@@ -582,7 +582,7 @@ public:
 private:
   /**
    * Store the values in a simple array.  For <tt>dim==0</tt> store one
-   * element, because otherways the compiler would choke.  We catch this case
+   * element, because otherwise the compiler would choke.  We catch this case
    * in the constructor to disallow the creation of such an object.
    */
   Number values[(dim!=0) ? (dim) : (dim+1)];

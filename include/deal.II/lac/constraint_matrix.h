@@ -309,7 +309,7 @@ public:
                     const std::vector<std::pair<size_type,double> > &col_val_pairs);
 
   /**
-   * Set an imhomogeneity to the constraint line <i>i</i>, according to the
+   * Set an inhomogeneity to the constraint line <i>i</i>, according to the
    * discussion in the general class description.
    *
    * @note the line needs to be added with one of the add_line() calls first.
@@ -320,7 +320,7 @@ public:
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
    * are usually filled in an arbitrary order and since we do not want to use
-   * associative constainers to store the lines, we need to sort the lines and
+   * associative constrainers to store the lines, we need to sort the lines and
    * within the lines the columns before usage of the matrix. This is done
    * through this function.
    *
@@ -442,7 +442,7 @@ public:
 
   /**
    * Returns <tt>true</tt> in case the dof is constrained and there is a non-
-   * trivial inhomogeneous valeus set to the dof.
+   * trivial inhomogeneous values set to the dof.
    */
   bool is_inhomogeneously_constrained (const size_type index) const;
 
@@ -1175,7 +1175,7 @@ private:
    * entries takes place when calling the <tt>close()</tt> function.
    *
    * We could, instead of using a vector, use an associative array, like a map
-   * to store the lines. This, however, would mean a much more fractioned heap
+   * to store the lines. This, however, would mean a much more fragmented heap
    * since it allocates many small objects, and would additionally make usage
    * of this matrix much slower.
    */

@@ -595,7 +595,7 @@ namespace Patterns
     Assert (separator.size() > 0,
             ExcMessage ("The separator must have a non-zero length."));
     Assert (separator != ":",
-            ExcMessage ("The separator can not be a colon ':' sicne that "
+            ExcMessage ("The separator can not be a colon ':' since that "
                         "is the separator between the two elements of <key:value> pairs"));
   }
 

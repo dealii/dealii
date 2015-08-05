@@ -239,7 +239,7 @@ namespace Step54
     // The mesh imported has a single, two-dimensional cell located in
     // three-dimensional space. We now want to ensure that it is refined
     // according to the CAD geometry imported above. This this end, we get an
-    // iterator to that cell and assgin to it the manifold_id 1 (see
+    // iterator to that cell and assign to it the manifold_id 1 (see
     // @ref GlossManifoldIndicator "this glossary entry").
     // We also get an iterator to its four faces, and assign each of them
     // the manifold_id 2:

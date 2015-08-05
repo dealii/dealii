@@ -625,7 +625,7 @@ private:
  * here, the given function object is still a scalar function (i.e. it has a
  * single value at each space point) but that the Function object generated is
  * vector valued. The number of vector components is specified in the
- * constructor, where one also selectes a single one of these vector
+ * constructor, where one also selects a single one of these vector
  * components that should be filled by the passed object. The result is a
  * vector Function object that returns zero in each component except the
  * single selected one where it returns the value returned by the given as the

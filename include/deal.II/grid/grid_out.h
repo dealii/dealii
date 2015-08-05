@@ -237,7 +237,7 @@ namespace GridOutFlags
 
     /**
      * Based on the vertices of the face and #n_boundary_face_points
-     * additional points a tensor product mesh (tranformed to the real space)
+     * additional points a tensor product mesh (transformed to the real space)
      * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
      * each boundary face.
      */
@@ -318,7 +318,7 @@ namespace GridOutFlags
     bool color_lines_on_user_flag;
 
     /**
-     * This is the number of points on a boundary face, that are ploted
+     * This is the number of points on a boundary face, that are plotted
      * additionally to the vertices of the face.
      *
      * This is used if the mapping used is not the standard @p MappingQ1
@@ -1173,7 +1173,7 @@ public:
   static std::string default_suffix (const OutputFormat output_format);
 
   /**
-   * Default suffix for the default output format selected throuw
+   * Default suffix for the default output format selected through
    * ParameterHandler.
    */
   std::string default_suffix () const;

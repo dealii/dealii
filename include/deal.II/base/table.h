@@ -301,7 +301,7 @@ namespace internal
       iterator begin () const;
 
       /**
-       * Return an interator to the element past the end of this row.
+       * Return an iterator to the element past the end of this row.
        */
       iterator end () const;
 

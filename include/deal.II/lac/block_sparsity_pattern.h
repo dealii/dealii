@@ -128,9 +128,9 @@ public:
 
   /**
    * Resize the matrix, by setting the number of block rows and columns. This
-   * deletes all blocks and replaces them by unitialized ones, i.e. ones for
-   * which also the sizes are not yet set. You have to do that by calling the
-   * reinit() functions of the blocks themselves. Do not forget to call
+   * deletes all blocks and replaces them with uninitialized ones, i.e. ones
+   * for which also the sizes are not yet set. You have to do that by calling
+   * the reinit() functions of the blocks themselves. Do not forget to call
    * collect_sizes() after that on this object.
    *
    * The reason that you have to set sizes of the blocks yourself is that the

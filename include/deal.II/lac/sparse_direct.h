@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This matrix class implements the usual interface of preconditioners, that
  * is a function initialize(const SparseMatrix<double>&matrix,const
- * AdditionalData) for initalizing and the whole set of vmult() functions
+ * AdditionalData) for initializing and the whole set of vmult() functions
  * common to all matrices. Implemented here are only vmult() and vmult_add(),
  * which perform multiplication with the inverse matrix. Furthermore, this
  * class provides an older interface, consisting of the functions factorize()
@@ -85,7 +85,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Dummy class needed for the usual initalization interface of
+   * Dummy class needed for the usual initialization interface of
    * preconditioners.
    */
   class AdditionalData

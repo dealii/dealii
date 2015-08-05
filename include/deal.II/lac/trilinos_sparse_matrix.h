@@ -441,7 +441,7 @@ namespace TrilinosWrappers
    *
    * The interface of this class is modeled after the existing SparseMatrix
    * class in deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since Trilinos only supports a single scalar type
+   * exchangeable. However, since Trilinos only supports a single scalar type
    * (double), it is not templated, and only works with doubles.
    *
    * Note that Trilinos only guarantees that operations do what you expect if
@@ -576,7 +576,7 @@ namespace TrilinosWrappers
      * meant for use in serial programs, where there is no need to specify how
      * the matrix is going to be distributed among different processors. This
      * function works in %parallel, too, but it is recommended to manually
-     * specify the %parallel partioning of the matrix using an Epetra_Map.
+     * specify the %parallel partitioning of the matrix using an Epetra_Map.
      * When run in %parallel, it is currently necessary that each processor
      * holds the sparsity_pattern structure because each processor sets its
      * rows.
@@ -727,7 +727,7 @@ namespace TrilinosWrappers
      * programs following the style of the tutorial programs, this function
      * (and the respective call for a rectangular matrix) are the natural way
      * to initialize the matrix size, its distribution among the MPI processes
-     * (if run in %parallel) as well as the locatoin of non-zero elements.
+     * (if run in %parallel) as well as the location of non-zero elements.
      * Trilinos stores the sparsity pattern internally, so it won't be needed
      * any more after this call, in contrast to the deal.II own object. The
      * optional argument @p exchange_data can be used for reinitialization
@@ -896,7 +896,7 @@ namespace TrilinosWrappers
      * programs, this function (and the respective call for a rectangular
      * matrix) are the natural way to initialize the matrix size, its
      * distribution among the MPI processes (if run in %parallel) as well as
-     * the locatoin of non-zero elements. Trilinos stores the sparsity pattern
+     * the location of non-zero elements. Trilinos stores the sparsity pattern
      * internally, so it won't be needed any more after this call, in contrast
      * to the deal.II own object. The optional argument @p exchange_data can
      * be used for reinitialization with a sparsity pattern that is not fully
@@ -2463,7 +2463,7 @@ namespace TrilinosWrappers
 
     if (value == 0)
       {
-        // we have to do checkings on Insert/Add in any case to be consistent
+        // we have to check after Insert/Add in any case to be consistent
         // with the MPI communication model (see the comments in the
         // documentation of TrilinosWrappers::Vector), but we can save some
         // work if the addend is zero. However, these actions are done in case

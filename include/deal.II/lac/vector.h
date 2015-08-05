@@ -836,7 +836,7 @@ public:
    * Output of vector in user-defined format. For complex-valued vectors, the
    * format should include specifiers for both the real and imaginary parts.
    *
-   * This funcion is deprecated.
+   * This function is deprecated.
    */
   void print (const char *format = 0) const DEAL_II_DEPRECATED;
 

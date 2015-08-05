@@ -247,7 +247,7 @@ FE_RaviartThomas<1>::initialize_restriction()
 
 // This function is the same Raviart-Thomas interpolation performed by
 // interpolate. Still, we cannot use interpolate, since it was written
-// for smooth functions. Thefunctions interpolated here are not
+// for smooth functions. The functions interpolated here are not
 // smooth, maybe even not continuous. Therefore, we must double the
 // number of quadrature points in each direction in order to integrate
 // only smooth functions.
@@ -285,7 +285,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 
       for (unsigned int sub=0; sub<GeometryInfo<dim>::max_children_per_face; ++sub)
         {
-          // The weight fuctions for
+          // The weight functions for
           // the coarse face are
           // evaluated on the subface
           // only.

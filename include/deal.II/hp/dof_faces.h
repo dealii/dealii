@@ -216,7 +216,7 @@ namespace internal
      * cells, as this information is independent of the hierarchical structure
      * of cells, which are organized in levels. In 2D we store information on
      * degrees of freedom located on lines whereas in 3D we store information
-     * on drefrees of freedom located on quads and lines. In 1D we do nothing,
+     * on degrees of freedom located on quads and lines. In 1D we do nothing,
      * as the faces of lines are vertices which are treated separately.
      *
      * Apart from the internal::hp::DoFObjects object containing the data to

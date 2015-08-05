@@ -792,7 +792,7 @@ namespace parallel
       Vector<Number> &operator -= (const Vector<Number> &V);
 
       /**
-       * A collective add operation: This funnction adds a whole set of values
+       * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
       template <typename OtherNumber>

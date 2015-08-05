@@ -189,7 +189,7 @@ public:
   void vmult (VECTOR &w, const VECTOR &v) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   void Tvmult (VECTOR &w, const VECTOR &v) const;
 
@@ -365,7 +365,7 @@ public:
               const BlockVector<number> &src) const;
 
   /**
-   * Add a soruce to dest, where the mean value in the selected component is
+   * Add a source to dest, where the mean value in the selected component is
    * subtracted.
    */
   template <typename number>

@@ -628,7 +628,7 @@ public:
    */
   TorusBoundary (const double R, const double r);
 
-//Boundary Refinenment  Functions
+//Boundary Refinement Functions
   /**
    * Construct a new point on a line.
    */

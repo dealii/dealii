@@ -112,7 +112,7 @@ namespace Functions
      * Parse parameters needed by this class.  If the number of components
      * which is parsed does not match the number of components of this object,
      * an assertion is thrown and the program is aborted.  In order for the
-     * class to function properly, we follow the same convenctions declared in
+     * class to function properly, we follow the same conventions declared in
      * the FunctionParser class (look there for a detailed description of the
      * syntax for function declarations).
      *

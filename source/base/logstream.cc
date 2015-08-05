@@ -405,7 +405,7 @@ LogStream::get_prefixes() const
         = prefixes.get_implementation();
 
       // The thread that created this LogStream object should be the first
-      // in tbb's enumerable_thread_specific containter.
+      // in tbb's enumerable_thread_specific container.
       const tbb::enumerable_thread_specific<std::stack<std::string> >::const_iterator first_elem
         = impl.begin();
 

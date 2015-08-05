@@ -508,7 +508,7 @@ SparseMatrixEZ<number>::print_formatted ( std::ostream          &out,
         width = precision+2;
     }
 
-  // TODO: Skip nonexisting entries
+  // TODO: Skip nonexistant entries
   for (size_type i=0; i<m(); ++i)
     {
       for (size_type j=0; j<n(); ++j)

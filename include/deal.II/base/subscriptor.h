@@ -166,7 +166,7 @@ private:
   map_iterator;
 
   /**
-   * Store the number of objects which subscribed to this object. Initialally,
+   * Store the number of objects which subscribed to this object. Initially,
    * this number is zero, and upon destruction it shall be zero again (i.e.
    * all objects which subscribed should have unsubscribed again).
    *

@@ -109,7 +109,7 @@ public:
      * stored. It is then used for all other blocks.
      *
      * \note Avoid setting this true if your blocks are not equal, in
-     * particularr if their sizes differ.
+     * particular if their sizes differ.
      */
     bool same_diagonal;
     /**
@@ -220,7 +220,7 @@ protected:
    * Pointer to the matrix. Make sure that the matrix exists as long as this
    * class needs it, i.e. until calling @p invert_diagblocks, or (if the
    * inverse matrices should not be stored) until the last call of the
-   * preconditoining @p vmult function of the derived classes.
+   * preconditioning @p vmult function of the derived classes.
    */
   SmartPointer<const MATRIX,RelaxationBlock<MATRIX,inverse_type> > A;
 

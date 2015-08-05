@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Furthermore note, that an object of this class does <b>not</b> represent
  * the derivative of a function, like FunctionDerivative, that gives a
- * directional derivate by calling the value() function. In fact, this class
+ * directional derivative by calling the value() function. In fact, this class
  * (the AutoDerivativeFunction class) can substitute the Function class as
  * base class for user defined classes. This class implements the gradient()
  * functions for automatic computation of numerical difference quotients and

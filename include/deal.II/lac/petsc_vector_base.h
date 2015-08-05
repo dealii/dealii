@@ -222,7 +222,7 @@ namespace PETScWrappers
    *
    * The interface of this class is modeled after the existing Vector class in
    * deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since PETSc only supports a single scalar type
+   * exchangeable. However, since PETSc only supports a single scalar type
    * (either double, float, or a complex data type), it is not templated, and
    * only works with whatever your PETSc installation has defined the data
    * type @p PetscScalar to.
@@ -547,7 +547,7 @@ namespace PETScWrappers
 
     /**
      * A collective piecewise multiply operation on <code>this</code> vector
-     * with itself. TODO: The model for this function should be similer to add
+     * with itself. TODO: The model for this function should be similar to add
      * ().
      *
      * This function is deprecated.
@@ -764,7 +764,7 @@ namespace PETScWrappers
 
     /**
      * Denotes if this vector has ghost indices associated with it. This means
-     * that at least one of the processes in a parallel programm has at least
+     * that at least one of the processes in a parallel program has at least
      * one ghost index.
      */
     bool ghosted;

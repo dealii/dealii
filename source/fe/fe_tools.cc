@@ -111,7 +111,7 @@ namespace
   // The following three functions serve to fill the maps from element
   // names to elements fe_name_map below. The first one exists because
   // we have finite elements which are not implemented for nonzero
-  // codimension. These should be transfered to the second function
+  // codimension. These should be transferred to the second function
   // eventually.
 
   template <int dim>

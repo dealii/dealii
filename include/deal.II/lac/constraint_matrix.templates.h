@@ -481,7 +481,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 }
 
 
-//TODO: I'm sure the followng could be made more elegant by using a bit of
+//TODO: I'm sure the following could be made more elegant by using a bit of
 //introspection using static member variables of the various vector
 //classes to dispatch between the different functions, rather than using
 //knowledge of the individual types
@@ -2252,7 +2252,7 @@ ConstraintMatrix::distribute_local_to_global (
 
       // now to the vectors. besides doing the same job as we did above (i.e.,
       // distribute the content of the local vector into the global one), need
-      // to account for inhomogeneities here: thie corresponds to eliminating
+      // to account for inhomogeneities here: this corresponds to eliminating
       // the respective column in the local matrix with value on the right
       // hand side.
       if (use_vectors == true)

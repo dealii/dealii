@@ -128,7 +128,7 @@ public:
 
   /**
    * Return whether this block mask represents a mask with exactly
-   * <code>n</code> blocks. This is true if either it was initilized with a
+   * <code>n</code> blocks. This is true if either it was initialized with a
    * vector with exactly <code>n</code> entries of type <code>bool</code> (in
    * this case, @p n must equal the result of size()) or if it was initialized
    * with an empty vector (or using the default constructor) in which case it

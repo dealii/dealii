@@ -171,7 +171,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::update_each (const UpdateFlags in) const
   // quantities are necessary to
   // compute what we need. note that
   // some flags appear in both
-  // conditions and in subsequents
+  // conditions and in subsequent
   // set operations. this leads to
   // some circular logic. the only
   // way to treat this is to
@@ -283,7 +283,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_face_data (const UpdateFlags upd
                                         std::vector<Tensor<1,dim> > (n_original_q_points));
           if (dim==2)
             {
-              // ensure a counterclock wise
+              // ensure a counterclockwise
               // orientation of tangentials
               static const int tangential_orientation[4]= {-1,1,1,-1};
               for (unsigned int i=0; i<nfaces; ++i)
@@ -370,7 +370,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::get_subface_data (const UpdateFlags upda
 }
 
 
-// Note that the CellSimilarity flag is modifyable, since MappingFEField can need to
+// Note that the CellSimilarity flag is modifiable, since MappingFEField can need to
 // recalculate data even when cells are similar.
 template<int dim, int spacedim, class VECTOR, class DH>
 CellSimilarity::Similarity

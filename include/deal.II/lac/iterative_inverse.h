@@ -106,7 +106,7 @@ public:
 
   /**
    * The solver, which allows selection of the actual solver as well as
-   * adjuxtment of parameters.
+   * adjustment of parameters.
    */
   SolverSelector<VECTOR> solver;
 

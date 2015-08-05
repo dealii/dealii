@@ -85,7 +85,7 @@ namespace MeshWorker
     IntegrationInfo();
 
     /**
-     * Copy constructor, creating a clone to be used by WorksTream::run().
+     * Copy constructor, creating a clone to be used by WorkStream::run().
      */
     IntegrationInfo(const IntegrationInfo<dim, spacedim> &other);
 
@@ -142,7 +142,7 @@ namespace MeshWorker
 
     /// Access to finite elements
     /**
-     * This access function must be used if the initalize() for a group of
+     * This access function must be used if the initialize() for a group of
      * elements was used (with a valid BlockInfo object).
      */
     const FEValuesBase<dim, spacedim> &fe_values (const unsigned int i) const;

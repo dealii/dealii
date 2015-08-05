@@ -180,7 +180,7 @@ public:
 
 private:
   /**
-   * Pointer to the object we want to subscribt to. Since it is often
+   * Pointer to the object we want to subscribe to. Since it is often
    * necessary to follow this pointer when debugging, we have deliberately
    * chosen a short name.
    */

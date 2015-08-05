@@ -201,7 +201,7 @@ namespace TrilinosWrappers
    *
    * The interface of this class is modeled after the existing Vector class in
    * deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since Trilinos only supports a single scalar type
+   * exchangeable. However, since Trilinos only supports a single scalar type
    * (double), it is not templated, and only works with that type.
    *
    * Note that Trilinos only guarantees that operations do what you expect if

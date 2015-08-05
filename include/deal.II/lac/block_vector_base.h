@@ -612,7 +612,7 @@ public:
   /**
    * Update internal structures after resizing vectors. Whenever you reinited
    * a block of a block vector, the internal data structures are corrupted.
-   * Therefore, you should call this function after al blocks got their new
+   * Therefore, you should call this function after all blocks got their new
    * size.
    */
   void collect_sizes ();
@@ -864,7 +864,7 @@ public:
 
 
   /**
-   * A collective add operation: This funnction adds a whole set of values
+   * A collective add operation: This function adds a whole set of values
    * stored in @p values to the vector components specified by @p indices.
    */
   template <typename Number>

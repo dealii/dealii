@@ -90,7 +90,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -102,7 +102,7 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product, adding to <tt>dst</tt>.
+   * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const;

@@ -203,7 +203,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
   base_to_block_indices.reinit(1,1);
 
   // initialize the restriction and prolongation matrices. the default
-  // contructur of FullMatrix<dim> initializes them with size zero
+  // constructor of FullMatrix<dim> initializes them with size zero
   prolongation.resize(RefinementCase<dim>::isotropic_refinement);
   restriction.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref=RefinementCase<dim>::cut_x;
@@ -1342,7 +1342,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
                   // component index
                   // of the n-th
                   // nonzero
-                  // compoment
+                  // component
                   unsigned int component=0;
                   for (unsigned int nonzero_comp=0; component<this->n_components();
                        ++component)

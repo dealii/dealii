@@ -449,7 +449,7 @@ protected:
 
   /**
    * Used to store the index of the element presently pointed to on the level
-   * presentl used.
+   * presently used.
    */
   int present_index;
 
@@ -761,7 +761,7 @@ public:
    * direction. @p true indicates, that the line is oriented from vertex 0 to
    * vertex 1, whereas it is the other way around otherwise. In 1d and 2d,
    * this is always @p true, but in 3d it may be different, see the respective
-   * discussion in the documentation of the GeometryInfo classe.
+   * discussion in the documentation of the GeometryInfo class.
    *
    * This function is really only for internal use in the library unless you
    * absolutely know what this is all about.
@@ -797,7 +797,7 @@ public:
    * If the present cell is not refined, one is returned.
    *
    * If one considers a triangulation as a forest where the root of each tree
-   * are the coarse mesh cells and nodes have descendents (the children of a
+   * are the coarse mesh cells and nodes have descendants (the children of a
    * cell), then this function returns the number of terminal nodes in the
    * sub-tree originating from the current object; consequently, if the
    * current object is not further refined, the answer is one.
@@ -1123,7 +1123,7 @@ public:
   /**
    * Access the value of the user pointer. It is in the responsibility of the
    * user to make sure that the pointer points to something useful. You should
-   * use the new style cast operator to maintain a minimum of typesafety, e.g.
+   * use the new style cast operator to maintain a minimum of type safety, e.g.
    *
    * @note User pointers and user indices are mutually exclusive. Therefore,
    * you can only use one of them, unless you call
@@ -1281,8 +1281,8 @@ public:
    * Center of the object. The center of an object is defined to be the
    * average of the locations of the vertices. If required, the user may ask
    * this function to return the average of the point according to the
-   * underlyinging Manifold object, by setting to true the optional parameter
-   * @p respect_manifold.
+   * underlying Manifold object, by setting to true the optional parameter @p
+   * respect_manifold.
    *
    * When the geometry of a TriaAccessor is not flat, or when part of the
    * bounding objects of this TriaAccessor are not flat, the result given by
@@ -1377,7 +1377,7 @@ private:
    *
    * This function is only for internal use in the library. Setting this flag
    * to any other value than the one that the triangulation has already set is
-   * bound to bring you desaster.
+   * bound to bring you disaster.
    */
   void set_face_orientation (const unsigned int face,
                              const bool         orientation) const;
@@ -1662,7 +1662,7 @@ public:
   Point<spacedim> &vertex (const unsigned int i = 0) const;
 
   /**
-   * Return the center of this object, which of course co-incides with the
+   * Return the center of this object, which of course coincides with the
    * location of the vertex this object refers to.
    */
   Point<spacedim> center () const;
@@ -1887,7 +1887,7 @@ public:
   /**
    * Set the boundary indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
-   * vertex, there are no lower-dimensional obejct and this function is
+   * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_boundary_id() with the same argument.
    *
    * @ingroup boundary
@@ -1909,7 +1909,7 @@ public:
   /**
    * Set the manifold indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
-   * vertex, there are no lower-dimensional obejct and this function is
+   * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_manifold_id() with the same argument.
    *
    * @ingroup manifold
@@ -2624,7 +2624,7 @@ public:
    * works for parallel triangulations. See the documentation of the CellId
    * class for more information.
    *
-   * @note This operation takes O(level) time to compute. In most practicaly
+   * @note This operation takes O(level) time to compute. In most practical
    * cases, the number of levels of a triangulation will depend
    * logarithmically on the number of cells in the triangulation.
    */
@@ -2662,7 +2662,7 @@ protected:
    * neighbor_of_coarser_neighbor() function should be call. If you'd like to
    * know only the <code>face_no</code> which is required to get back from the
    * neighbor to the present cell then simply use the neighbor_face_no()
-   * function which can be used for coarser as well as noncoarser neighbors.
+   * function which can be used for coarser as well as non-coarser neighbors.
    */
   unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
 

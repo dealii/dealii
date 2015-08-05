@@ -518,7 +518,7 @@ namespace Step39
     mg_matrix_dg_down.clear();
     // It is important to update the sparsity patterns after <tt>clear()</tt>
     // was called for the level matrices, since the matrices lock the sparsity
-    // pattern through the Smartpointer and Subscriptor mechanism.
+    // pattern through the SmartPointer and Subscriptor mechanism.
     mg_sparsity.resize(0, n_levels-1);
     mg_sparsity_dg_interface.resize(0, n_levels-1);
 

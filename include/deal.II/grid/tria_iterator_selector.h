@@ -144,7 +144,7 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 3D case only. See the
+     * These are the declarations for the 3D case only. See the
      * @ref Iterators
      * module for more information.
      *

@@ -3078,7 +3078,7 @@ namespace internal
 
 //TODO[WB/MK]: This function could me made more efficient because it
 //allocates memory, which could be avoided by passing in another
-//argument as a scratch array. Comment(GK) Do not bother and leva this
+//argument as a scratch array. Comment(GK) Do not bother and leave this
 //to ConstraintMatrix or MeshWorker::Assembler
 
         // get indices of dofs

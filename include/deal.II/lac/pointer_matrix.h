@@ -394,7 +394,7 @@ public:
    * Transposed matrix-vector product, actually the multiplication of the
    * vector representing this matrix with <tt>src(0)</tt>.
    *
-   * The dimension of <tt>drc</tt> is 1, while that of <tt>dst</tt> is the
+   * The dimension of <tt>src</tt> is 1, while that of <tt>dst</tt> is the
    * size of the vector representing this matrix.
    */
   virtual void Tvmult (Vector<number> &dst,

@@ -1763,7 +1763,7 @@ FullMatrix<number>::gauss_jordan ()
 #endif
 
   // otherwise do it by hand. use the
-  // Gauss-Jordan-Algorithmus from
+  // Gauss-Jordan-Algorithm from
   // Stoer & Bulirsch I (4th Edition)
   // p. 153
   const size_type N = n();

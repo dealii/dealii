@@ -402,7 +402,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
   // quantities are necessary to
   // compute what we need. note that
   // some flags appear in both
-  // conditions and in subsequents
+  // conditions and in subsequent
   // set operations. this leads to
   // some circular logic. the only
   // way to treat this is to
@@ -525,7 +525,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
                                         std::vector<Tensor<1,dim> > (n_original_q_points));
           if (dim==2)
             {
-              // ensure a counterclock wise
+              // ensure a counterclockwise
               // orientation of tangentials
               static const int tangential_orientation[4]= {-1,1,1,-1};
               for (unsigned int i=0; i<nfaces; ++i)

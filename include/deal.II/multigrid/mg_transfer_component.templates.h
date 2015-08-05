@@ -160,8 +160,7 @@ MGTransferSelect<number>::do_copy_from_mg (
   // data appropriately to the output
   // vector
 
-  // Note that the level is
-  // monotonuosly increasing
+  // Note that the level is increasing monotonically
   dst = 0;
   for (; level_cell != endc; ++level_cell)
     {
@@ -197,8 +196,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   // data appropriately to the output
   // vector
 
-  // Note that the level is
-  // monotonuosly increasing
+  // Note that the level is increasing monotonically
   dst = 0;
   for (; level_cell != endc; ++level_cell)
     {

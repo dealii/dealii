@@ -602,7 +602,7 @@ namespace hp
      * object.
      *
      * This function is made virtual, since a dof handler object might be
-     * accessed through a pointers to thisr base class, although the actual
+     * accessed through a pointers to this base class, although the actual
      * object might be a derived class.
      */
     virtual std::size_t memory_consumption () const;

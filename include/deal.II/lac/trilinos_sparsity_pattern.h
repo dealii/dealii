@@ -283,7 +283,7 @@ namespace TrilinosWrappers
     typedef SparsityPatternIterators::Iterator const_iterator;
 
     /**
-     * @name Basic constructors and initalization.
+     * @name Basic constructors and initialization.
      */
 //@{
     /**
@@ -527,7 +527,7 @@ namespace TrilinosWrappers
      * &ndash; the processor that owns a certain row always owns all the
      * column elements, no matter how far they might be spread out. The second
      * Epetra_Map is only used to specify the number of columns and for
-     * internal arragements when doing matrix-vector products with vectors
+     * internal arrangements when doing matrix-vector products with vectors
      * based on that column map.
      *
      * The number of columns entries per row is specified by the argument
@@ -633,7 +633,7 @@ namespace TrilinosWrappers
      * columns &ndash; the processor that owns a certain row always owns all
      * the column elements, no matter how far they might be spread out. The
      * second Epetra_Map is only used to specify the number of columns and for
-     * internal arragements when doing matrix-vector products with vectors
+     * internal arrangements when doing matrix-vector products with vectors
      * based on that column map.
      *
      * The number of columns entries per row is specified as the maximum
@@ -677,7 +677,7 @@ namespace TrilinosWrappers
      * DoFTools::extract_locally_relevant_dofs). The other constructors
      * methods use general Trilinos facilities that allow to add elements to
      * arbitrary rows (as done by all the other reinit functions). However,
-     * this flexbility come at a cost, the most prominent being that adding
+     * this flexibility come at a cost, the most prominent being that adding
      * elements into the same matrix from multiple threads in shared memory is
      * not safe whenever MPI is used. For these settings, the current method
      * is the one to choose: It will store the off-processor data as an
@@ -737,7 +737,7 @@ namespace TrilinosWrappers
      * &ndash; the processor that owns a certain row always owns all the
      * column elements, no matter how far they might be spread out. The second
      * IndexSet is only used to specify the number of columns and for internal
-     * arragements when doing matrix-vector products with vectors based on an
+     * arrangements when doing matrix-vector products with vectors based on an
      * EpetraMap based on that IndexSet.
      *
      * The number of columns entries per row is specified by the argument
@@ -765,12 +765,12 @@ namespace TrilinosWrappers
      * DoFTools::extract_locally_relevant_dofs). Trilinos matrices allow to
      * add elements to arbitrary rows (as done by all the other reinit
      * functions) and this is what all the other reinit methods do, too.
-     * However, this flexbility come at a cost, the most prominent being that
+     * However, this flexibility come at a cost, the most prominent being that
      * adding elements into the same matrix from multiple threads in shared
      * memory is not safe whenever MPI is used. For these settings, the
      * current method is the one to choose: It will store the off-processor
      * data as an additional sparsity pattern (that is then passed to the
-     * Trilinos matrix via the reinit mehtod) which can be organized in such a
+     * Trilinos matrix via the reinit method) which can be organized in such a
      * way that thread-safety can be ensured (as long as the user makes sure
      * to never write into the same matrix row simultaneously, of course).
      */
@@ -1451,7 +1451,7 @@ namespace TrilinosWrappers
 
     // verify that the size of the data type Trilinos expects matches that the
     // iterator points to. we allow for some slippage between signed and
-    // unsigned and only compare that they are both eiter 32 or 64 bit. to
+    // unsigned and only compare that they are both either 32 or 64 bit. to
     // write this test properly, not that we cannot compare the size of
     // '*begin' because 'begin' may be an iterator and '*begin' may be an
     // accessor class. consequently, we need to somehow get an actual value

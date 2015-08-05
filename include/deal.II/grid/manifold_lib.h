@@ -164,7 +164,7 @@ protected:
 
 private:
   /**
-   * Helper FlatManifold to compute temptative midpoints.
+   * Helper FlatManifold to compute tentative midpoints.
    */
   FlatManifold<dim,spacedim> flat_manifold;
 
@@ -180,11 +180,11 @@ private:
  * Function<spacedim> and Function<chartdim> objects describing the
  * push_forward() and pull_back() functions.
  *
- * You can use this Manifold object to describe any arbitray shape domain, as
+ * You can use this Manifold object to describe any arbitrary shape domain, as
  * long as you can express it in terms of an invertible map, for which you
  * provide both the forward expression, and the inverse expression.
  *
- * In debug mode, a check is performed to verify that the tranformations are
+ * In debug mode, a check is performed to verify that the transformations are
  * actually one the inverse of the other.
  *
  * @ingroup manifold

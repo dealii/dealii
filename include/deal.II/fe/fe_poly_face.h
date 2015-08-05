@@ -194,7 +194,7 @@ protected:
    * Determine the values that need to be computed on the unit cell to be able
    * to compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this function, refer to the documentation in
+   * For the purpose of this function, refer to the documentation in
    * FiniteElement.
    *
    * This class assumes that shape functions of this FiniteElement do
@@ -210,7 +210,7 @@ protected:
    * Determine the values that need to be computed on every cell to be able to
    * compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this function, refer to the documentation in
+   * For the purpose of this function, refer to the documentation in
    * FiniteElement.
    *
    * This class assumes that shape functions of this FiniteElement do

@@ -127,7 +127,7 @@ namespace GridTools
                  const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
-   * Return the diamater of the smallest active cell of a triangulation. See
+   * Return the diameter of the smallest active cell of a triangulation. See
    * step-24 for an example of use of this function.
    */
   template <int dim, int spacedim>
@@ -135,7 +135,7 @@ namespace GridTools
   minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Return the diamater of the largest active cell of a triangulation.
+   * Return the diameter of the largest active cell of a triangulation.
    */
   template <int dim, int spacedim>
   double
@@ -1128,7 +1128,7 @@ namespace GridTools
    * DoFs of the first face should be modified prior to constraining to the
    * DoFs of the second face. If @p first_vector_components is non empty the
    * matrix is interpreted as a rotation matrix that is applied to all vector
-   * valued blocks listet in @p first_vector_components of the FESystem. For
+   * valued blocks listed in @p first_vector_components of the FESystem. For
    * more details see make_periodicity_constraints() and the glossary
    * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
    *
@@ -1169,7 +1169,7 @@ namespace GridTools
    * over. This is a function you'd typically call when there is only one
    * active level on your Triangulation.
    *
-   * The optional parameter @p reset_boundary_ids, indicates wether this
+   * The optional parameter @p reset_boundary_ids, indicates whether this
    * function should reset the boundary_ids of the Triangulation to its
    * default value 0 after copying its value to the manifold_id. By default,
    * boundary_ids are left untouched.
@@ -1190,7 +1190,7 @@ namespace GridTools
    * underlying manifold.
    *
    * When reading a Triangulation from a supported input format, typical
-   * informations that can be stored in a file are boundary conditions for
+   * information that can be stored in a file are boundary conditions for
    * boundary faces (which we store in the boundary_id of the faces), material
    * types for cells (which we store in the material_id of the cells) and in
    * some cases subdomain ids for cells (which we store in the subdomain_id of
@@ -1203,7 +1203,7 @@ namespace GridTools
    * Manifold objects for new points. This function iterates over active cells
    * and copies the material_ids to the manifold_ids.
    *
-   * The optional parameter @p compute_face_ids, indicates wether this
+   * The optional parameter @p compute_face_ids, indicates whether this
    * function should also set the manifold_ids of the faces (both for internal
    * faces and for faces on the boundary). If set to true, then each face will
    * get a manifold_id equal to the minimum of the surrounding manifold_ids,

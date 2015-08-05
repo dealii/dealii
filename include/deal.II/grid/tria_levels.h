@@ -102,8 +102,8 @@ namespace internal
        * In one dimension, a neighbor may have any level less or equal the
        * level of this cell. If it has the same level, it may be refined an
        * arbitrary number of times, but the neighbor pointer still points to
-       * the cell on the same level, while the neighbors of the childs of the
-       * neighbor may point to this cell or its children.
+       * the cell on the same level, while the neighbors of the children of
+       * the neighbor may point to this cell or its children.
        *
        * In two and more dimensions, the neighbor is either on the same level
        * and refined (in which case its children have neighbor pointers to
@@ -169,8 +169,8 @@ namespace internal
 
       /**
        * Check the memory consistency of the different containers. Should only
-       * be called with the prepro flag @p DEBUG set. The function should be
-       * called from the functions of the higher TriaLevel classes.
+       * be called with the preprocessor flag @p DEBUG set. The function
+       * should be called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 

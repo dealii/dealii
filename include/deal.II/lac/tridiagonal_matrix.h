@@ -57,7 +57,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * @name Constructors and initalization.
+   * @name Constructors and initialization.
    */
   /**
    * Constructor generating an empty matrix of dimension <tt>n</tt>.

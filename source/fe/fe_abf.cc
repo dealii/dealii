@@ -337,7 +337,7 @@ FE_ABF<dim>::initialize_restriction()
 
       for (unsigned int sub=0; sub<GeometryInfo<dim>::max_children_per_face; ++sub)
         {
-          // The weight fuctions for
+          // The weight functions for
           // the coarse face are
           // evaluated on the subface
           // only.
@@ -357,7 +357,7 @@ FE_ABF<dim>::initialize_restriction()
           // when building the shape
           // functions, these weights
           // are equal to the
-          // corresponding shpe
+          // corresponding shape
           // functions.
           for (unsigned int k=0; k<n_face_points; ++k)
             for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)

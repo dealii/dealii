@@ -366,7 +366,7 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  * undefined behavior.
  *
  * The argument @p add_into selects where the entries should only be written
- * into the output arrays or the result should be added into the exisiting
+ * into the output arrays or the result should be added into the existing
  * entries in the output. For <code>add_into == false</code>, the following
  * code is assumed:
  *

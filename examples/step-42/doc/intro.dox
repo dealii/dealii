@@ -306,7 +306,7 @@ method for the contact. It works as follows:
  \f}
  with ${\hat R}\left({\mathbf u}\right)=\left(P_{Pi}(C\varepsilon(u)),\varepsilon(\varphi^{i}_p\right)$ with
  the exceptions of (i) elements $p\in\mathcal{A}_i$ where we set ${\hat R}\left({\mathbf u}\right)=0$,
- and (ii) elements that correpond to hanging nodes, which we eliminate in the usual manner.
+ and (ii) elements that correspond to hanging nodes, which we eliminate in the usual manner.
 
  <li> Define the new active and inactive sets by
  @f{gather*}\mathcal{A}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
@@ -409,7 +409,7 @@ Compared to step-41, the programs has a few new classes:
 Other than that, let us comment only on the following aspects:
 <ul>
 <li> The program allows you to select from two different coarse meshes
-  through the parameter file. These are eiter a cube $[0,1]^3$ or
+  through the parameter file. These are either a cube $[0,1]^3$ or
   a half sphere with the open side facing the positive $z$ direction.
   
 <li>In either case, we will assume the convention that the part of the

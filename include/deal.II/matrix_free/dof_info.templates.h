@@ -97,7 +97,7 @@ namespace internal
       // implementation computed a hash value based on the truncated array (to
       // given accuracy around 1e-13) in order to easily detect different
       // arrays and then made a fine-grained check when the hash values were
-      // equal. this was quite lenghty and now we use a std::map with a
+      // equal. this was quite lengthy and now we use a std::map with a
       // user-defined comparator to compare floating point arrays to a
       // tolerance 1e-13.
       std::pair<typename std::map<std::vector<double>, types::global_dof_index,

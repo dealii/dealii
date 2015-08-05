@@ -466,7 +466,7 @@ protected:
    * i-th column of Y is real_vertex[i].  If we split X=[A|b], the least
    * square approx is A x_hat+b  Classically  X = Y * (M^t (M M^t)^{-1})  Let
    * K = M^t * (M M^t)^{-1} = [KA Kb] this can be precomputed, and that is
-   * exactely what we do.  Finally A = Y*KA  and  b = Y*Kb.
+   * exactly what we do.  Finally A = Y*KA  and  b = Y*Kb.
    */
   Point<dim>
   transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
