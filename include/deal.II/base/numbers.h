@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/types.h>
+
+#include <cmath>
 #include <complex>
 
 DEAL_II_NAMESPACE_OPEN
@@ -318,7 +320,7 @@ namespace numbers
   typename NumberTraits<number>::real_type
   NumberTraits<number>::abs (const number &x)
   {
-    return std::fabs(x);
+    return std::abs(x);
   }
 
 

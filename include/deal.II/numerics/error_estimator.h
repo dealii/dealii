@@ -337,7 +337,7 @@ public:
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Calls the @p estimate function, see above, with
@@ -354,7 +354,7 @@ public:
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Same function as above, but accepts more than one solution vector and
@@ -381,7 +381,7 @@ public:
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Calls the @p estimate function, see above, with
@@ -398,7 +398,7 @@ public:
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id          material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -417,7 +417,7 @@ public:
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -435,7 +435,7 @@ public:
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -454,7 +454,7 @@ public:
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -472,7 +472,7 @@ public:
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id,
-                        const KellyErrorEstimator<dim,spacedim>::Strategy strategy = cell_diameter_over_24);
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Exception
