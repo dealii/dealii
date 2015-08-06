@@ -1466,6 +1466,11 @@ public:
    * The same holds for the arguments of this function as for the
    * shape_value() function.
    *
+   * @param function_no Number of the shape function to be evaluated.
+   *
+   * @param quadrature_point Number of the quadrature point at which function is to be
+   * evaluated.
+   *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
   const Tensor<1,spacedim> &
