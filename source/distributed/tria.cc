@@ -2612,26 +2612,27 @@ namespace parallel
     bool
     Triangulation<dim,spacedim>::has_hanging_nodes () const
     {
+      if (n_global_levels()<=1)
+        return false; // can not have hanging nodes without refined cells
+
       // if there are any active cells with level less than n_global_levels()-1, then
       // there is obviously also one with level n_global_levels()-1, and
       // consequently there must be a hanging node somewhere.
       //
-      // the problem is that we cannot just ask for the first active cell, but
-      // instead need to filter over locally owned cells
-      bool res_local = false;
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active();
-           (cell != this->end()) && (cell->level() < (int)(n_global_levels()-1));
-           cell++)
+      // The problem is that we cannot just ask for the first active cell, but
+      // instead need to filter over locally owned cells.
+      bool have_coarser_cell = false;
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active(n_global_levels()-2);
+           cell != this->end(n_global_levels()-2);
+           ++cell)
         if (cell->is_locally_owned())
           {
-            res_local = true;
+            have_coarser_cell = true;
             break;
           }
 
-      // reduce over MPI
-      bool res;
-      MPI_Allreduce(&res_local, &res, 1, MPI::BOOL, MPI_LOR, mpi_communicator);
-      return res;
+      // return true if at least one process has a coarser cell
+      return 0<Utilities::MPI::max(have_coarser_cell?1:0, mpi_communicator);
     }
 
 
