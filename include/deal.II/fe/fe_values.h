@@ -1274,18 +1274,6 @@ template <int dim, int spacedim=dim>
 class FEValuesData : public internal::FEValues::MappingRelatedData<dim,spacedim>,
   public internal::FEValues::FiniteElementRelatedData<dim,spacedim>
 {
-public:
-  /**
-   * Initialize all vectors to correct size.
-   */
-  void initialize (const unsigned int        n_quadrature_points,
-                   const FiniteElement<dim,spacedim> &fe,
-                   const UpdateFlags         flags);
-
-  /**
-   * Original update flags handed to the constructor of FEValues.
-   */
-  UpdateFlags          update_flags;
 };
 
 
@@ -2372,7 +2360,6 @@ protected:
    */
   const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
 
-
   /**
    * Internal data of mapping.
    */
@@ -2382,6 +2369,11 @@ protected:
    * Internal data of finite element.
    */
   SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
+
+  /**
+   * Original update flags handed to the constructor of FEValues.
+   */
+  UpdateFlags          update_flags;
 
   /**
    * Initialize some update flags. Called from the @p initialize functions of
