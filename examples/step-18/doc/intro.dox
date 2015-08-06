@@ -341,7 +341,7 @@ generate graphical output for that subset of cells that it owns, write them
 into separate files and have a way to display all files for a certain timestep
 at the same time. This way the code produces one .vtu file per processor per
 time step. The two common VTK file viewers ParaView and VisIt both support
-opening more than one .vtu file at once. To simplifiy the process of picking
+opening more than one .vtu file at once. To simplify the process of picking
 the correct files and allow moving around in time, both support record files
 that reference all files for a given timestep. Sadly, the record files have a
 different format between VisIt and Paraview, so we write out both formats.
