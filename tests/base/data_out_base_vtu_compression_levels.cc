@@ -56,16 +56,16 @@ void check_all(std::ostream &log)
       switch (i)
         {
         case (0):
-          flags.compression_level = DataOutBase::VtkFlags::ZlibCompressionLevel::no_compression;
+          flags.compression_level = DataOutBase::VtkFlags::no_compression;
           break;
         case (1):
-          flags.compression_level = DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+          flags.compression_level = DataOutBase::VtkFlags::best_speed;
           break;
         case (2):
-          flags.compression_level = DataOutBase::VtkFlags::ZlibCompressionLevel::best_compression;
+          flags.compression_level = DataOutBase::VtkFlags::best_compression;
           break;
         case (3):
-          flags.compression_level = DataOutBase::VtkFlags::ZlibCompressionLevel::default_compression;
+          flags.compression_level = DataOutBase::VtkFlags::default_compression;
           break;
         default:
           Assert(false, ExcInternalError());
