@@ -1906,6 +1906,11 @@ namespace Step42
       {
         TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         solution_transfer.interpolate(distributed_solution);
+
+        // enforce constraints to make the interpolated solution conforming on
+        // the new mesh:
+        constraints_hanging_nodes.distribute(distributed_solution);
+
         solution = distributed_solution;
         compute_nonlinear_residual(solution);
       }

@@ -1106,9 +1106,14 @@ namespace Step28
 
     triangulation.execute_coarsening_and_refinement ();
     dof_handler.distribute_dofs (fe);
+    this->setup_linear_system ();
 
     solution.reinit (dof_handler.n_dofs());
     soltrans.interpolate(solution_old, solution);
+
+    // enforce constraints to make the interpolated solution conforming on
+    // the new mesh:
+    hanging_node_constraints.distribute(solution);
 
     solution_old.reinit (dof_handler.n_dofs());
     solution_old = solution;
@@ -1644,7 +1649,12 @@ namespace Step28
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
-          initialize_problem();
+          {
+            initialize_problem();
+            for (unsigned int group=0; group<parameters.n_groups; ++group)
+              energy_groups[group]->setup_linear_system ();
+          }
+
         else
           {
             refine_grid ();
@@ -1652,8 +1662,6 @@ namespace Step28
               energy_groups[group]->solution *= k_eff;
           }
 
-        for (unsigned int group=0; group<parameters.n_groups; ++group)
-          energy_groups[group]->setup_linear_system ();
 
         std::cout << "   Numbers of active cells:       ";
         for (unsigned int group=0; group<parameters.n_groups; ++group)

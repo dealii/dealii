@@ -3538,6 +3538,11 @@ namespace Step32
       tmp[1] = &(distributed_temp2);
       temperature_trans.interpolate(tmp);
 
+      // enforce constraints to make the interpolated solution conforming on
+      // the new mesh:
+      temperature_constraints.distribute(distributed_temp1);
+      temperature_constraints.distribute(distributed_temp2);
+
       temperature_solution     = distributed_temp1;
       old_temperature_solution = distributed_temp2;
     }
@@ -3551,6 +3556,12 @@ namespace Step32
       stokes_tmp[1] = &(old_distributed_stokes);
 
       stokes_trans.interpolate (stokes_tmp);
+
+      // enforce constraints to make the interpolated solution conforming on
+      // the new mesh:
+      stokes_constraints.distribute(distributed_stokes);
+      stokes_constraints.distribute(old_distributed_stokes);
+
       stokes_solution     = distributed_stokes;
       old_stokes_solution = old_distributed_stokes;
     }
