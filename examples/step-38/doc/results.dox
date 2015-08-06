@@ -125,7 +125,7 @@ void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
     std::set<unsigned char> boundary_ids;
     boundary_ids.insert (0);
 
-    GridTools::extract_boundary_mesh (volume_mesh, triangulation,
+    GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
 				      boundary_ids);
     triangulation.set_boundary (1);                            /* ** */
     triangulation.set_boundary (0);                            /* ** */
