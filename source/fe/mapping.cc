@@ -50,7 +50,7 @@ transform_real_to_unit_projected_to_face (
   //The function doesn't make physical sense for dim=1
   Assert(dim>1, ExcNotImplemented());
   //Not implemented for higher dimensions
-  Assert(3<=dim, ExcNotImplemented());
+  Assert(dim<=3, ExcNotImplemented());
 
   Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
 
