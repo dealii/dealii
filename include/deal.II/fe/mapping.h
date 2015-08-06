@@ -275,14 +275,17 @@ public:
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const Point<spacedim>                            &p) const = 0;
 
-/**
- * Transforms the point @p p on the real @p cell to the corresponding point
- * on the unit cell, and then projects it to a dim-1  point on the face with
- * the given face number @p face_no. Ideally the point @p p is near the face
- * @ face_no, but any point in the cell can technically be projected.
- */
-virtual Point<dim-1>
-transform_real_to_unit_projected_to_face (
+  /**
+   * Transforms the point @p p on the real @p cell to the corresponding point
+   * on the unit cell, and then projects it to a dim-1  point on the face with
+   * the given face number @p face_no. Ideally the point @p p is near the face
+   * @ face_no, but any point in the cell can technically be projected.
+   *
+   * This function does not make physical sense when dim=1,
+   * so it throws an exception in this case.
+   */
+  virtual Point<dim-1>
+  transform_real_to_unit_projected_to_face (
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const unsigned int &face_no,
     const Point<spacedim> &p) const;
