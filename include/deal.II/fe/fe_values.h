@@ -1352,8 +1352,8 @@ namespace internal
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim, int spacedim>
-class FEValuesBase : protected internal::FEValues::MappingRelatedData<dim,spacedim>,
-  protected internal::FEValues::FiniteElementRelatedData<dim,spacedim>,
+class FEValuesBase : protected dealii::internal::FEValues::MappingRelatedData<dim, spacedim>,
+  protected dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim>,
   public Subscriptor
 {
 public:
