@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/fe/fe_update_flags.h>
@@ -230,6 +231,16 @@ public:
    * Virtual destructor.
    */
   virtual ~Mapping ();
+
+  /**
+   * Return the mapped vertices of a cell. These values are not equal to the
+   * vertex coordinates stored by the triangulation for MappingQEulerian and
+   * MappingQ1Eulerian.
+   */
+  virtual
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices (
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the

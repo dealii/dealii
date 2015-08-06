@@ -17,6 +17,7 @@
 #define dealii__mapping_q1_eulerian_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -100,6 +101,14 @@ public:
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**
+   * Return the mapped vertices of the cell.
+   */
+  virtual
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices
+  (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+  /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */
@@ -146,17 +155,6 @@ protected:
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
   SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
-
-
-private:
-  /**
-   * Computes the support points of the mapping. For @p MappingQ1Eulerian
-   * these are the vertices.
-   */
-  virtual void compute_mapping_support_points(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
-
 };
 
 /*@}*/

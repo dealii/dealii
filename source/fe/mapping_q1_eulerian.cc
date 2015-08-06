@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -36,67 +37,50 @@ MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 
 
 template <int dim, class EulerVectorType, int spacedim>
-void
+std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               std::vector<Point<spacedim> > &a) const
+get_vertices
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  // The assertions can not be in the constructor, since this would
+  // require to call dof_handler.distribute_dofs(fe) *before* the mapping
+  // object is constructed, which is not necessarily what we want.
 
-  // The assertions can not be in the
-  // constructor, since this would
-  // require to call
-  // dof_handler.distribute_dofs(fe)
-  // *before* the mapping object is
-  // constructed, which is not
-  // necessarily what we want.
-
-//TODO: Only one of these two assertions should be relevant
+  //TODO: Only one of these two assertions should be relevant
   AssertDimension (spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
-  AssertDimension(shiftmap_dof_handler->get_fe().n_components(), spacedim);
+  AssertDimension (shiftmap_dof_handler->get_fe().n_components(), spacedim);
 
   AssertDimension (shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
-  // cast the
-  // Triangulation<dim>::cell_iterator
-  // into a
-  // DoFHandler<dim>::cell_iterator
-  // which is necessary for access to
+  // cast the Triangulation<dim>::cell_iterator into a
+  // DoFHandler<dim>::cell_iterator which is necessary for access to
   // DoFCellAccessor::get_dof_values()
   typename DoFHandler<dim,spacedim>::cell_iterator dof_cell (*cell, shiftmap_dof_handler);
 
-  // We require the cell to be active
-  // since we can only then get nodal
+  // We require the cell to be active since we can only then get nodal
   // values for the shifts
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
-  // for Q1 elements, the number of
-  // support points should equal the
-  // number of vertices
-  a.resize(GeometryInfo<dim>::vertices_per_cell);
-
-  // now get the values of the shift
-  // vectors at the vertices
+  // now get the values of the shift vectors at the vertices
   Vector<double> mapping_values (shiftmap_dof_handler->get_fe().dofs_per_cell);
   dof_cell->get_dof_values (*euler_transform_vectors, mapping_values);
-
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     {
       Point<spacedim> shift_vector;
 
-      // pick out the value of the
-      // shift vector at the present
-      // vertex. since vertex dofs
-      // are always numbered first,
-      // we can access them easily
+      // pick out the value of the shift vector at the present
+      // vertex. since vertex dofs are always numbered first, we can
+      // access them easily
       for (unsigned int j=0; j<spacedim; ++j)
         shift_vector[j] = mapping_values(i*spacedim+j);
 
-      // compute new support point by
-      // old (reference) value and
-      // added shift
-      a[i] = cell->vertex(i) + shift_vector;
+      // compute new support point by old (reference) value and added
+      // shift
+      vertices[i] = cell->vertex(i) + shift_vector;
     }
+  return vertices;
 }
 
 
