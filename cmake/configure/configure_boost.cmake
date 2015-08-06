@@ -35,6 +35,16 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
   ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
 
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+
+  IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    #
+    # Bundled boost tries to (dl)open itself as a dynamic library on
+    # Windows. Disable this undesired behavior by exporting
+    # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
+    #
+    LIST(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
+    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
+  ENDIF()
 ENDMACRO()
 
 
