@@ -1242,53 +1242,6 @@ namespace internal
 
 
 
-//TODO: Add access to mapping values to FEValuesBase
-
-/**
- * A class that contains all data vectors for FEValues, FEFaceValues, and
- * FESubfaceValues.
- *
- * This class has been extracted from FEValuesBase to encapsulate in one
- * place all of the data, independent of the functions that later
- * access this data in the public interfaces of the FEValues and related
- * classes. Consequently, this base class is protected in FEValuesBase.
- *
- * The second reason is because in FEValuesBase::reinit, we first need to
- * call Mapping::fill_fe_values() to compute mapping related data, and later
- * call FiniteElement::fill_fe_values() to compute shape function related
- * data. In the first step, Mapping::fill_fe_values() gets a pointer to
- * its own internal data structure and a pointer to the FEValuesData base
- * object of FEValuesBase, and the mapping then places the computed data
- * into the data fields that pertain to the mapping below. In the second
- * step, the finite element receives a pointer to its own internal object,
- * and to the current object, and from both of these computes the shape
- * function related information and, again, places it into the current
- * FEValuesData object.
- *
- * More information can be found on the page on
- * @ref UpdateFlagsEssay.
- *
- * @ingroup feaccess
- */
-template <int dim, int spacedim=dim>
-class FEValuesData : public internal::FEValues::MappingRelatedData<dim,spacedim>,
-  public internal::FEValues::FiniteElementRelatedData<dim,spacedim>
-{
-public:
-  /**
-   * Initialize all vectors to correct size.
-   */
-  void initialize (const unsigned int        n_quadrature_points,
-                   const FiniteElement<dim,spacedim> &fe,
-                   const UpdateFlags         flags);
-
-  /**
-   * Original update flags handed to the constructor of FEValues.
-   */
-  UpdateFlags          update_flags;
-};
-
-
 /**
  * FEValues, FEFaceValues and FESubfaceValues objects are interfaces to finite
  * element and mapping classes on the one hand side, to cells and quadrature
@@ -1399,7 +1352,8 @@ public:
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim, int spacedim>
-class FEValuesBase : protected FEValuesData<dim,spacedim>,
+class FEValuesBase : protected internal::FEValues::MappingRelatedData<dim,spacedim>,
+  protected internal::FEValues::FiniteElementRelatedData<dim,spacedim>,
   public Subscriptor
 {
 public:
@@ -2372,7 +2326,6 @@ protected:
    */
   const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
 
-
   /**
    * Internal data of mapping.
    */
@@ -2382,6 +2335,11 @@ protected:
    * Internal data of finite element.
    */
   SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
+
+  /**
+   * Original update flags handed to the constructor of FEValues.
+   */
+  UpdateFlags          update_flags;
 
   /**
    * Initialize some update flags. Called from the @p initialize functions of

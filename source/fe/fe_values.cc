@@ -104,7 +104,7 @@ namespace FEValuesViews
             ExcIndexRange(component, 0, fe_values.fe->n_components()));
 
 //TODO: we'd like to use the fields with the same name as these
-// variables from FEValuesData, but they aren't initialized yet
+// variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table (*fe_values.fe);
@@ -165,7 +165,7 @@ namespace FEValuesViews
                           fe_values.fe->n_components()));
 
 //TODO: we'd like to use the fields with the same name as these
-// variables from FEValuesData, but they aren't initialized yet
+// variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table (*fe_values.fe);
@@ -263,7 +263,7 @@ namespace FEValuesViews
                          0,
                          fe_values.fe->n_components()));
 //TODO: we'd like to use the fields with the same name as these
-// variables from FEValuesData, but they aren't initialized yet
+// variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table (*fe_values.fe);
@@ -362,7 +362,7 @@ namespace FEValuesViews
                          0,
                          fe_values.fe->n_components()));
 //TODO: we'd like to use the fields with the same name as these
-// variables from FEValuesData, but they aren't initialized yet
+// variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table (*fe_values.fe);
@@ -2070,9 +2070,6 @@ get_interpolated_dof_values (const IndexSet &,
 
 
 
-/* --------------------- FEValuesData ----------------- */
-
-
 namespace internal
 {
   namespace FEValues
@@ -2146,20 +2143,6 @@ namespace internal
                                      std::vector<Tensor<2,spacedim> > (n_quadrature_points));
     }
   }
-}
-
-
-template <int dim, int spacedim>
-void
-FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
-                                        const FiniteElement<dim,spacedim> &fe,
-                                        const UpdateFlags         flags)
-{
-  // initialize the base classes
-  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(n_quadrature_points, flags);
-  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(n_quadrature_points, fe, flags);
-
-  this->update_flags = flags;
 }
 
 
@@ -3447,8 +3430,11 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->mapping_data = this->mapping->get_data(flags, quadrature);
   this->fe_data      = this->fe->get_data(flags, *this->mapping, quadrature);
 
-  // set up objects within this class
-  FEValuesData<dim,spacedim>::initialize (this->n_quadrature_points, *this->fe, flags);
+  // initialize the base classes
+  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+
+  this->update_flags = flags;
 }
 
 
@@ -3674,8 +3660,11 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->mapping_data = this->mapping->get_face_data(flags, this->quadrature);
   this->fe_data      = this->fe->get_face_data(flags, *this->mapping, this->quadrature);
 
-  // set up objects within this class
-  FEValuesData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+  // initialize the base classes
+  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+
+  this->update_flags = flags;
 }
 
 
@@ -3822,8 +3811,11 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                                   *this->mapping,
                                                   this->quadrature);
 
-  // set up objects within this class
-  FEValuesData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+  // initialize the base classes
+  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+
+  this->update_flags = flags;
 }
 
 

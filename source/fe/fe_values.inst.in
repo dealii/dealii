@@ -23,7 +23,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension <= deal_II_space_dimension
 #if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
 
-    template class FEValuesData<deal_II_dimension,deal_II_space_dimension>;
     template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>;
     template class FEValues<deal_II_dimension,deal_II_space_dimension>;
     template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>::

@@ -44,9 +44,10 @@ inconvenience this causes.
   functions has been changed, in an effort to clarify which of these contain
   input information and which contain output information for these functions.
   The same has been done for the corresponding functions in the Mapping
-  class hierarchy.
+  class hierarchy. As part of a general overhaul, the FEValuesData class
+  has also been removed.
   <br>
-  (Wolfgang Bangerth, 2015/07/20)
+  (Wolfgang Bangerth, 2015/07/20-2015/08/06)
   </li>
 
   <li> Changed: The function DoFRenumbering::random() now produces different
