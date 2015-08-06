@@ -808,18 +808,20 @@ DEAL::FE_FaceP<2>(1)
 DEAL::FE_FaceP<2>(3)
 DEAL::FE_DGRaviartThomas<2>(0)
 DEAL::FE_DGRaviartThomas<2>(1)
+DEAL::FE_DGBDM<2>(1)
+DEAL::FE_DGBDM<2>(2)
 DEAL::FE_DGNedelec<2>(0)
 DEAL::FE_DGNedelec<2>(1)
 DEAL::FE_RaviartThomas<2>(0)
 DEAL::FE_RaviartThomas<2>(1)
 DEAL::FE_RaviartThomas<2>(2)
 DEAL::FESystem<2>[FE_RaviartThomas<2>(1)-FE_DGQ<2>(1)]
+DEAL::FE_BDM<2>(1)
+DEAL::FE_BDM<2>(2)
 DEAL::FE_Nedelec<2>(0)
 DEAL::FE_Nedelec<2>(1)
 DEAL::FE_DGBDM<2>(1)
 DEAL::FE_DGBDM<2>(2)
-DEAL::FE_BDM<2>(1)
-DEAL::FE_BDM<2>(2)
 DEAL::FE_RaviartThomasNodal<2>(0)
 DEAL::FE_RaviartThomasNodal<2>(1)
 DEAL::FESystem<2>[FE_RaviartThomasNodal<2>(1)-FE_DGQ<2>(1)]
@@ -1545,255 +1547,7 @@ DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::
-DEAL::fe_data[23]:FE_DGNedelec<2>(0)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=0
-DEAL::dofs_per_quad=4
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=0
-DEAL::first_hex_index=4
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=0
-DEAL::dofs_per_face=0
-DEAL::dofs_per_cell=4
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[4]->4
-DEAL::degree=1
-DEAL::conformity= L2
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=4
-DEAL::generalized_face_support_points=0
-DEAL::face_to_equivalent_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::support on face 0:	0	1	2	3
-DEAL::support on face 1:	0	1	2	3
-DEAL::support on face 2:	0	1	2	3
-DEAL::support on face 3:	0	1	2	3
-DEAL::
-DEAL::fe_data[24]:FE_DGNedelec<2>(1)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=0
-DEAL::dofs_per_quad=12
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=0
-DEAL::first_hex_index=12
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=0
-DEAL::dofs_per_face=0
-DEAL::dofs_per_cell=12
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[12]->12
-DEAL::degree=2
-DEAL::conformity= L2
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=9
-DEAL::generalized_face_support_points=0
-DEAL::face_to_equivalent_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::face_to_cell_index:
-DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::
-DEAL::fe_data[25]:FE_RaviartThomas<2>(0)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=1
-DEAL::dofs_per_quad=0
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=4
-DEAL::first_hex_index=4
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=1
-DEAL::dofs_per_face=1
-DEAL::dofs_per_cell=4
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[4]->4
-DEAL::degree=1
-DEAL::conformity= Hdiv
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=4
-DEAL::generalized_face_support_points=1
-DEAL::face_to_equivalent_cell_index: 0
-DEAL::face_to_cell_index: 0
-DEAL::face_to_cell_index: 1
-DEAL::face_to_cell_index: 2
-DEAL::face_to_cell_index: 3
-DEAL::support on face 0:	0	2	3
-DEAL::support on face 1:	1	2	3
-DEAL::support on face 2:	0	1	2
-DEAL::support on face 3:	0	1	3
-DEAL::
-DEAL::fe_data[26]:FE_RaviartThomas<2>(1)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=2
-DEAL::dofs_per_quad=4
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=8
-DEAL::first_hex_index=12
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=2
-DEAL::dofs_per_face=2
-DEAL::dofs_per_cell=12
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[12]->12
-DEAL::degree=2
-DEAL::conformity= Hdiv
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=12
-DEAL::generalized_face_support_points=2
-DEAL::face_to_equivalent_cell_index: 0 1
-DEAL::face_to_cell_index: 0 1
-DEAL::face_to_cell_index: 2 3
-DEAL::face_to_cell_index: 4 5
-DEAL::face_to_cell_index: 6 7
-DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
-DEAL::
-DEAL::fe_data[27]:FE_RaviartThomas<2>(2)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=3
-DEAL::dofs_per_quad=12
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=12
-DEAL::first_hex_index=24
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=3
-DEAL::dofs_per_face=3
-DEAL::dofs_per_cell=24
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[24]->24
-DEAL::degree=3
-DEAL::conformity= Hdiv
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=21
-DEAL::generalized_face_support_points=3
-DEAL::face_to_equivalent_cell_index: 0 1 2
-DEAL::face_to_cell_index: 0 1 2
-DEAL::face_to_cell_index: 3 4 5
-DEAL::face_to_cell_index: 6 7 8
-DEAL::face_to_cell_index: 9 10 11
-DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
-DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
-DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
-DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
-DEAL::
-DEAL::fe_data[28]:FESystem<2>[FE_RaviartThomas<2>(1)-FE_DGQ<2>(1)]
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=2
-DEAL::dofs_per_quad=8
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=8
-DEAL::first_hex_index=16
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=2
-DEAL::dofs_per_face=2
-DEAL::dofs_per_cell=16
-DEAL::primitive=no
-DEAL::components=3
-DEAL::blocks=2:[12 4]->16
-DEAL::degree=2
-DEAL::conformity=
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=0
-DEAL::generalized_face_support_points=0
-DEAL::face_to_equivalent_cell_index: 0 1
-DEAL::face_to_cell_index: 0 1
-DEAL::face_to_cell_index: 2 3
-DEAL::face_to_cell_index: 4 5
-DEAL::face_to_cell_index: 6 7
-DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	14
-DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	13	15
-DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
-DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	14	15
-DEAL::
-DEAL::fe_data[29]:FE_Nedelec<2>(0)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=1
-DEAL::dofs_per_quad=0
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=4
-DEAL::first_hex_index=4
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=1
-DEAL::dofs_per_face=1
-DEAL::dofs_per_cell=4
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[4]->4
-DEAL::degree=1
-DEAL::conformity= Hcurl
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=4
-DEAL::generalized_face_support_points=1
-DEAL::face_to_equivalent_cell_index: 0
-DEAL::face_to_cell_index: 0
-DEAL::face_to_cell_index: 1
-DEAL::face_to_cell_index: 2
-DEAL::face_to_cell_index: 3
-DEAL::support on face 0:	0	2	3
-DEAL::support on face 1:	1	2	3
-DEAL::support on face 2:	0	1	2
-DEAL::support on face 3:	0	1	3
-DEAL::
-DEAL::fe_data[30]:FE_Nedelec<2>(1)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=2
-DEAL::dofs_per_quad=4
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=8
-DEAL::first_hex_index=12
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=2
-DEAL::dofs_per_face=2
-DEAL::dofs_per_cell=12
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[12]->12
-DEAL::degree=2
-DEAL::conformity= Hcurl
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=12
-DEAL::generalized_face_support_points=2
-DEAL::face_to_equivalent_cell_index: 0 1
-DEAL::face_to_cell_index: 0 1
-DEAL::face_to_cell_index: 2 3
-DEAL::face_to_cell_index: 4 5
-DEAL::face_to_cell_index: 6 7
-DEAL::support on face 0:	0	1	4	5	6	7	8	9	10	11
-DEAL::support on face 1:	2	3	4	5	6	7
-DEAL::support on face 2:	0	1	2	3	4	5
-DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11
-DEAL::
-DEAL::fe_data[31]:FE_DGBDM<2>(1)
+DEAL::fe_data[23]:FE_DGBDM<2>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=8
@@ -1824,7 +1578,7 @@ DEAL::support on face 1:	0	1	2	3	4	5	6	7
 DEAL::support on face 2:	0	1	2	3	4	5	6	7
 DEAL::support on face 3:	0	1	2	3	4	5	6	7
 DEAL::
-DEAL::fe_data[32]:FE_DGBDM<2>(2)
+DEAL::fe_data[24]:FE_DGBDM<2>(2)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=14
@@ -1855,69 +1609,69 @@ DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
 DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
 DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
 DEAL::
-DEAL::fe_data[33]:FE_BDM<2>(1)
+DEAL::fe_data[25]:FE_DGNedelec<2>(0)
 DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=2
-DEAL::dofs_per_quad=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=4
 DEAL::dofs_per_hex=0
 DEAL::first_line_index=0
-DEAL::first_quad_index=8
-DEAL::first_hex_index=8
+DEAL::first_quad_index=0
+DEAL::first_hex_index=4
 DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=2
-DEAL::dofs_per_face=2
-DEAL::dofs_per_cell=8
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=4
 DEAL::primitive=no
 DEAL::components=2
-DEAL::blocks=1:[8]->8
+DEAL::blocks=1:[4]->4
+DEAL::degree=1
+DEAL::conformity= L2
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=4
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3
+DEAL::support on face 1:	0	1	2	3
+DEAL::support on face 2:	0	1	2	3
+DEAL::support on face 3:	0	1	2	3
+DEAL::
+DEAL::fe_data[26]:FE_DGNedelec<2>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=12
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=12
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=12
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[12]->12
 DEAL::degree=2
-DEAL::conformity= Hdiv
+DEAL::conformity= L2
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
 DEAL::generalized_support_points=9
-DEAL::generalized_face_support_points=2
-DEAL::face_to_equivalent_cell_index: 0 1
-DEAL::face_to_cell_index: 0 1
-DEAL::face_to_cell_index: 2 3
-DEAL::face_to_cell_index: 4 5
-DEAL::face_to_cell_index: 6 7
-DEAL::support on face 0:	0	1	2	3	4	5	6	7
-DEAL::support on face 1:	0	1	2	3	4	5	6	7
-DEAL::support on face 2:	0	1	2	3	4	5	6	7
-DEAL::support on face 3:	0	1	2	3	4	5	6	7
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::
-DEAL::fe_data[34]:FE_BDM<2>(2)
-DEAL::dofs_per_vertex=0
-DEAL::dofs_per_line=3
-DEAL::dofs_per_quad=2
-DEAL::dofs_per_hex=0
-DEAL::first_line_index=0
-DEAL::first_quad_index=12
-DEAL::first_hex_index=14
-DEAL::first_face_line_index=0
-DEAL::first_face_quad_index=3
-DEAL::dofs_per_face=3
-DEAL::dofs_per_cell=14
-DEAL::primitive=no
-DEAL::components=2
-DEAL::blocks=1:[14]->14
-DEAL::degree=3
-DEAL::conformity= Hdiv
-DEAL::unit_support_points=0
-DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=16
-DEAL::generalized_face_support_points=3
-DEAL::face_to_equivalent_cell_index: 0 1 2
-DEAL::face_to_cell_index: 0 1 2
-DEAL::face_to_cell_index: 3 4 5
-DEAL::face_to_cell_index: 6 7 8
-DEAL::face_to_cell_index: 9 10 11
-DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
-DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
-DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
-DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
-DEAL::
-DEAL::fe_data[35]:FE_RaviartThomasNodal<2>(0)
+DEAL::fe_data[27]:FE_RaviartThomas<2>(0)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=1
 DEAL::dofs_per_quad=0
@@ -1948,7 +1702,317 @@ DEAL::support on face 1:	1	2	3
 DEAL::support on face 2:	0	1	2
 DEAL::support on face 3:	0	1	3
 DEAL::
-DEAL::fe_data[36]:FE_RaviartThomasNodal<2>(1)
+DEAL::fe_data[28]:FE_RaviartThomas<2>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=2
+DEAL::dofs_per_quad=4
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=8
+DEAL::first_hex_index=12
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=2
+DEAL::dofs_per_face=2
+DEAL::dofs_per_cell=12
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[12]->12
+DEAL::degree=2
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=12
+DEAL::generalized_face_support_points=2
+DEAL::face_to_equivalent_cell_index: 0 1
+DEAL::face_to_cell_index: 0 1
+DEAL::face_to_cell_index: 2 3
+DEAL::face_to_cell_index: 4 5
+DEAL::face_to_cell_index: 6 7
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
+DEAL::
+DEAL::fe_data[29]:FE_RaviartThomas<2>(2)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=3
+DEAL::dofs_per_quad=12
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=12
+DEAL::first_hex_index=24
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=3
+DEAL::dofs_per_face=3
+DEAL::dofs_per_cell=24
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[24]->24
+DEAL::degree=3
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=21
+DEAL::generalized_face_support_points=3
+DEAL::face_to_equivalent_cell_index: 0 1 2
+DEAL::face_to_cell_index: 0 1 2
+DEAL::face_to_cell_index: 3 4 5
+DEAL::face_to_cell_index: 6 7 8
+DEAL::face_to_cell_index: 9 10 11
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23
+DEAL::
+DEAL::fe_data[30]:FESystem<2>[FE_RaviartThomas<2>(1)-FE_DGQ<2>(1)]
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=2
+DEAL::dofs_per_quad=8
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=8
+DEAL::first_hex_index=16
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=2
+DEAL::dofs_per_face=2
+DEAL::dofs_per_cell=16
+DEAL::primitive=no
+DEAL::components=3
+DEAL::blocks=2:[12 4]->16
+DEAL::degree=2
+DEAL::conformity=
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=0
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index: 0 1
+DEAL::face_to_cell_index: 0 1
+DEAL::face_to_cell_index: 2 3
+DEAL::face_to_cell_index: 4 5
+DEAL::face_to_cell_index: 6 7
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	14
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	13	15
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	14	15
+DEAL::
+DEAL::fe_data[31]:FE_BDM<2>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=2
+DEAL::dofs_per_quad=0
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=8
+DEAL::first_hex_index=8
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=2
+DEAL::dofs_per_face=2
+DEAL::dofs_per_cell=8
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[8]->8
+DEAL::degree=2
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=8
+DEAL::generalized_face_support_points=2
+DEAL::face_to_equivalent_cell_index: 0 1
+DEAL::face_to_cell_index: 0 1
+DEAL::face_to_cell_index: 2 3
+DEAL::face_to_cell_index: 4 5
+DEAL::face_to_cell_index: 6 7
+DEAL::support on face 0:	0	1	2	3	4	5	6	7
+DEAL::support on face 1:	0	1	2	3	4	5	6	7
+DEAL::support on face 2:	0	1	2	3	4	5	6	7
+DEAL::support on face 3:	0	1	2	3	4	5	6	7
+DEAL::
+DEAL::fe_data[32]:FE_BDM<2>(2)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=3
+DEAL::dofs_per_quad=2
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=12
+DEAL::first_hex_index=14
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=3
+DEAL::dofs_per_face=3
+DEAL::dofs_per_cell=14
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[14]->14
+DEAL::degree=3
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=13
+DEAL::generalized_face_support_points=3
+DEAL::face_to_equivalent_cell_index: 0 1 2
+DEAL::face_to_cell_index: 0 1 2
+DEAL::face_to_cell_index: 3 4 5
+DEAL::face_to_cell_index: 6 7 8
+DEAL::face_to_cell_index: 9 10 11
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::
+DEAL::fe_data[33]:FE_Nedelec<2>(0)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=1
+DEAL::dofs_per_quad=0
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=4
+DEAL::first_hex_index=4
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=1
+DEAL::dofs_per_face=1
+DEAL::dofs_per_cell=4
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[4]->4
+DEAL::degree=1
+DEAL::conformity= Hcurl
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=4
+DEAL::generalized_face_support_points=1
+DEAL::face_to_equivalent_cell_index: 0
+DEAL::face_to_cell_index: 0
+DEAL::face_to_cell_index: 1
+DEAL::face_to_cell_index: 2
+DEAL::face_to_cell_index: 3
+DEAL::support on face 0:	0	2	3
+DEAL::support on face 1:	1	2	3
+DEAL::support on face 2:	0	1	2
+DEAL::support on face 3:	0	1	3
+DEAL::
+DEAL::fe_data[34]:FE_Nedelec<2>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=2
+DEAL::dofs_per_quad=4
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=8
+DEAL::first_hex_index=12
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=2
+DEAL::dofs_per_face=2
+DEAL::dofs_per_cell=12
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[12]->12
+DEAL::degree=2
+DEAL::conformity= Hcurl
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=12
+DEAL::generalized_face_support_points=2
+DEAL::face_to_equivalent_cell_index: 0 1
+DEAL::face_to_cell_index: 0 1
+DEAL::face_to_cell_index: 2 3
+DEAL::face_to_cell_index: 4 5
+DEAL::face_to_cell_index: 6 7
+DEAL::support on face 0:	0	1	4	5	6	7	8	9	10	11
+DEAL::support on face 1:	2	3	4	5	6	7
+DEAL::support on face 2:	0	1	2	3	4	5
+DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11
+DEAL::
+DEAL::fe_data[35]:FE_DGBDM<2>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=8
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=8
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=8
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[8]->8
+DEAL::degree=2
+DEAL::conformity= L2
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=9
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3	4	5	6	7
+DEAL::support on face 1:	0	1	2	3	4	5	6	7
+DEAL::support on face 2:	0	1	2	3	4	5	6	7
+DEAL::support on face 3:	0	1	2	3	4	5	6	7
+DEAL::
+DEAL::fe_data[36]:FE_DGBDM<2>(2)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=14
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=14
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=14
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[14]->14
+DEAL::degree=3
+DEAL::conformity= L2
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=16
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13
+DEAL::
+DEAL::fe_data[37]:FE_RaviartThomasNodal<2>(0)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=1
+DEAL::dofs_per_quad=0
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=4
+DEAL::first_hex_index=4
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=1
+DEAL::dofs_per_face=1
+DEAL::dofs_per_cell=4
+DEAL::primitive=no
+DEAL::components=2
+DEAL::blocks=1:[4]->4
+DEAL::degree=1
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=4
+DEAL::generalized_face_support_points=1
+DEAL::face_to_equivalent_cell_index: 0
+DEAL::face_to_cell_index: 0
+DEAL::face_to_cell_index: 1
+DEAL::face_to_cell_index: 2
+DEAL::face_to_cell_index: 3
+DEAL::support on face 0:	0	2	3
+DEAL::support on face 1:	1	2	3
+DEAL::support on face 2:	0	1	2
+DEAL::support on face 3:	0	1	3
+DEAL::
+DEAL::fe_data[38]:FE_RaviartThomasNodal<2>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=2
 DEAL::dofs_per_quad=4
@@ -1979,7 +2043,7 @@ DEAL::support on face 1:	2	3	4	5	6	7	8	9	10	11
 DEAL::support on face 2:	0	1	2	3	4	5	8	9	10	11
 DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11
 DEAL::
-DEAL::fe_data[37]:FESystem<2>[FE_RaviartThomasNodal<2>(1)-FE_DGQ<2>(1)]
+DEAL::fe_data[39]:FESystem<2>[FE_RaviartThomasNodal<2>(1)-FE_DGQ<2>(1)]
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=2
 DEAL::dofs_per_quad=8
@@ -2010,7 +2074,7 @@ DEAL::support on face 1:	2	3	4	5	6	7	8	9	10	11	13	15
 DEAL::support on face 2:	0	1	2	3	4	5	8	9	10	11	12	13
 DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11	14	15
 DEAL::
-DEAL::fe_data[38]:FESystem<2>[FE_Q<2>(3)^2]
+DEAL::fe_data[40]:FESystem<2>[FE_Q<2>(3)^2]
 DEAL::dofs_per_vertex=2
 DEAL::dofs_per_line=4
 DEAL::dofs_per_quad=8
@@ -2041,7 +2105,7 @@ DEAL::support on face 1:	2	3	6	7	12	13	14	15
 DEAL::support on face 2:	0	1	2	3	16	17	18	19
 DEAL::support on face 3:	4	5	6	7	20	21	22	23
 DEAL::
-DEAL::fe_data[39]:FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(3)]
+DEAL::fe_data[41]:FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(3)]
 DEAL::dofs_per_vertex=3
 DEAL::dofs_per_line=2
 DEAL::dofs_per_quad=4
@@ -2072,7 +2136,7 @@ DEAL::support on face 1:	3	4	5	9	10	11	14	15
 DEAL::support on face 2:	0	1	2	3	4	5	16	17
 DEAL::support on face 3:	6	7	8	9	10	11	18	19
 DEAL::
-DEAL::fe_data[40]:FESystem<2>[FE_Q<2>(4)^2]
+DEAL::fe_data[42]:FESystem<2>[FE_Q<2>(4)^2]
 DEAL::dofs_per_vertex=2
 DEAL::dofs_per_line=6
 DEAL::dofs_per_quad=18
@@ -2103,7 +2167,7 @@ DEAL::support on face 1:	2	3	6	7	14	15	16	17	18	19
 DEAL::support on face 2:	0	1	2	3	20	21	22	23	24	25
 DEAL::support on face 3:	4	5	6	7	26	27	28	29	30	31
 DEAL::
-DEAL::fe_data[41]:FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]^2]
+DEAL::fe_data[43]:FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]^2]
 DEAL::dofs_per_vertex=4
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
@@ -2134,7 +2198,7 @@ DEAL::support on face 1:	4	5	6	7	12	13	14	15
 DEAL::support on face 2:	0	1	2	3	4	5	6	7
 DEAL::support on face 3:	8	9	10	11	12	13	14	15
 DEAL::
-DEAL::fe_data[42]:FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FESystem<2>[FE_DGQ<2>(1)^2]]
+DEAL::fe_data[44]:FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FESystem<2>[FE_DGQ<2>(1)^2]]
 DEAL::dofs_per_vertex=2
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=8
@@ -2165,7 +2229,7 @@ DEAL::support on face 1:	2	3	6	7	9	11	13	15
 DEAL::support on face 2:	0	1	2	3	8	9	12	13
 DEAL::support on face 3:	4	5	6	7	10	11	14	15
 DEAL::
-DEAL::fe_data[43]:FESystem<2>[FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)]-FESystem<2>[FE_Q<2>(2)^2]-FESystem<2>[FE_DGQ<2>(2)^2]]
+DEAL::fe_data[45]:FESystem<2>[FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)]-FESystem<2>[FE_Q<2>(2)^2]-FESystem<2>[FE_DGQ<2>(2)^2]]
 DEAL::dofs_per_vertex=4
 DEAL::dofs_per_line=3
 DEAL::dofs_per_quad=21
@@ -2196,7 +2260,7 @@ DEAL::support on face 1:	4	5	6	7	12	13	14	15	19	20	21	33	36	39	42	45	48
 DEAL::support on face 2:	0	1	2	3	4	5	6	7	22	23	24	31	32	33	40	41	42
 DEAL::support on face 3:	8	9	10	11	12	13	14	15	25	26	27	37	38	39	46	47	48
 DEAL::
-DEAL::fe_data[44]:FESystem<2>[FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]^2]^2-FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FESystem<2>[FE_DGQ<2>(1)^2]]-FESystem<2>[FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)]-FESystem<2>[FE_Q<2>(2)^2]-FESystem<2>[FE_DGQ<2>(2)^2]]^2]
+DEAL::fe_data[46]:FESystem<2>[FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]^2]^2-FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FESystem<2>[FE_DGQ<2>(1)^2]]-FESystem<2>[FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)]-FESystem<2>[FE_Q<2>(2)^2]-FESystem<2>[FE_DGQ<2>(2)^2]]^2]
 DEAL::dofs_per_vertex=18
 DEAL::dofs_per_line=6
 DEAL::dofs_per_quad=50
@@ -2250,12 +2314,16 @@ DEAL::FE_FaceP<3>(1)
 DEAL::FE_FaceP<3>(3)
 DEAL::FE_DGRaviartThomas<3>(0)
 DEAL::FE_DGRaviartThomas<3>(1)
+DEAL::FE_DGBDM<3>(1)
+DEAL::FE_DGBDM<3>(2)
 DEAL::FE_DGNedelec<3>(0)
 DEAL::FE_DGNedelec<3>(1)
 DEAL::FE_RaviartThomas<3>(0)
 DEAL::FE_RaviartThomas<3>(1)
 DEAL::FE_RaviartThomas<3>(2)
 DEAL::FESystem<3>[FE_RaviartThomas<3>(1)-FE_DGQ<3>(1)]
+DEAL::FE_BDM<3>(1)
+DEAL::FE_BDM<3>(2)
 DEAL::FE_Nedelec<3>(0)
 DEAL::FE_Nedelec<3>(1)
 DEAL::FE_RaviartThomasNodal<3>(0)
@@ -3072,7 +3140,77 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::
-DEAL::fe_data[23]:FE_DGNedelec<3>(0)
+DEAL::fe_data[23]:FE_DGBDM<3>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=0
+DEAL::dofs_per_hex=18
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=0
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=18
+DEAL::primitive=no
+DEAL::components=3
+DEAL::blocks=1:[18]->18
+DEAL::degree=2
+DEAL::conformity= L2
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=27
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::
+DEAL::fe_data[24]:FE_DGBDM<3>(2)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=0
+DEAL::dofs_per_hex=39
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=0
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=0
+DEAL::dofs_per_cell=39
+DEAL::primitive=no
+DEAL::components=3
+DEAL::blocks=1:[39]->39
+DEAL::degree=3
+DEAL::conformity= L2
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=64
+DEAL::generalized_face_support_points=0
+DEAL::face_to_equivalent_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::face_to_cell_index:
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::
+DEAL::fe_data[25]:FE_DGNedelec<3>(0)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
@@ -3107,7 +3245,7 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11
 DEAL::
-DEAL::fe_data[24]:FE_DGNedelec<3>(1)
+DEAL::fe_data[26]:FE_DGNedelec<3>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
@@ -3142,7 +3280,7 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53
 DEAL::
-DEAL::fe_data[25]:FE_RaviartThomas<3>(0)
+DEAL::fe_data[27]:FE_RaviartThomas<3>(0)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=1
@@ -3177,7 +3315,7 @@ DEAL::support on face 3:	0	1	2	3	4	5
 DEAL::support on face 4:	0	1	2	3	4	5
 DEAL::support on face 5:	0	1	2	3	4	5
 DEAL::
-DEAL::fe_data[26]:FE_RaviartThomas<3>(1)
+DEAL::fe_data[28]:FE_RaviartThomas<3>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=4
@@ -3212,7 +3350,7 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::
-DEAL::fe_data[27]:FE_RaviartThomas<3>(2)
+DEAL::fe_data[29]:FE_RaviartThomas<3>(2)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=9
@@ -3247,7 +3385,7 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75	76	77	78	79	80	81	82	83	84	85	86	87	88	89	90	91	92	93	94	95	96	97	98	99	100	101	102	103	104	105	106	107
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75	76	77	78	79	80	81	82	83	84	85	86	87	88	89	90	91	92	93	94	95	96	97	98	99	100	101	102	103	104	105	106	107
 DEAL::
-DEAL::fe_data[28]:FESystem<3>[FE_RaviartThomas<3>(1)-FE_DGQ<3>(1)]
+DEAL::fe_data[30]:FESystem<3>[FE_RaviartThomas<3>(1)-FE_DGQ<3>(1)]
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=4
@@ -3282,7 +3420,77 @@ DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	40	41	42	43
 DEAL::
-DEAL::fe_data[29]:FE_Nedelec<3>(0)
+DEAL::fe_data[31]:FE_BDM<3>(1)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=3
+DEAL::dofs_per_hex=0
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=18
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=3
+DEAL::dofs_per_cell=18
+DEAL::primitive=no
+DEAL::components=3
+DEAL::blocks=1:[18]->18
+DEAL::degree=2
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=24
+DEAL::generalized_face_support_points=4
+DEAL::face_to_equivalent_cell_index: 0 1 2
+DEAL::face_to_cell_index: 0 1 2
+DEAL::face_to_cell_index: 3 4 5
+DEAL::face_to_cell_index: 6 7 8
+DEAL::face_to_cell_index: 9 10 11
+DEAL::face_to_cell_index: 12 13 14
+DEAL::face_to_cell_index: 15 16 17
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17
+DEAL::
+DEAL::fe_data[32]:FE_BDM<3>(2)
+DEAL::dofs_per_vertex=0
+DEAL::dofs_per_line=0
+DEAL::dofs_per_quad=6
+DEAL::dofs_per_hex=3
+DEAL::first_line_index=0
+DEAL::first_quad_index=0
+DEAL::first_hex_index=36
+DEAL::first_face_line_index=0
+DEAL::first_face_quad_index=0
+DEAL::dofs_per_face=6
+DEAL::dofs_per_cell=39
+DEAL::primitive=no
+DEAL::components=3
+DEAL::blocks=1:[39]->39
+DEAL::degree=3
+DEAL::conformity= Hdiv
+DEAL::unit_support_points=0
+DEAL::unit_face_support_points=0
+DEAL::generalized_support_points=55
+DEAL::generalized_face_support_points=9
+DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5
+DEAL::face_to_cell_index: 0 1 2 3 4 5
+DEAL::face_to_cell_index: 6 7 8 9 10 11
+DEAL::face_to_cell_index: 12 13 14 15 16 17
+DEAL::face_to_cell_index: 18 19 20 21 22 23
+DEAL::face_to_cell_index: 24 25 26 27 28 29
+DEAL::face_to_cell_index: 30 31 32 33 34 35
+DEAL::support on face 0:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 1:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 2:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 3:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::support on face 5:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38
+DEAL::
+DEAL::fe_data[33]:FE_Nedelec<3>(0)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=1
 DEAL::dofs_per_quad=0
@@ -3317,7 +3525,7 @@ DEAL::support on face 3:	0	1	3	4	5	7	10	11
 DEAL::support on face 4:	0	1	2	3	8	9	10	11
 DEAL::support on face 5:	4	5	6	7	8	9	10	11
 DEAL::
-DEAL::fe_data[30]:FE_Nedelec<3>(1)
+DEAL::fe_data[34]:FE_Nedelec<3>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=2
 DEAL::dofs_per_quad=4
@@ -3352,7 +3560,7 @@ DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11	14	15	20	21	22	23	26	27	30	31	36	
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	16	17	18	19	20	21	22	23	24	25	28	29	34	35	38	39	40	41	42	43
 DEAL::support on face 5:	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	28	29	34	35	38	39	44	45	46	47
 DEAL::
-DEAL::fe_data[31]:FE_RaviartThomasNodal<3>(0)
+DEAL::fe_data[35]:FE_RaviartThomasNodal<3>(0)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=1
@@ -3387,7 +3595,7 @@ DEAL::support on face 3:	0	1	3	4	5
 DEAL::support on face 4:	0	1	2	3	4
 DEAL::support on face 5:	0	1	2	3	5
 DEAL::
-DEAL::fe_data[32]:FE_RaviartThomasNodal<3>(1)
+DEAL::fe_data[36]:FE_RaviartThomasNodal<3>(1)
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=4
@@ -3422,7 +3630,7 @@ DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35
 DEAL::
-DEAL::fe_data[33]:FESystem<3>[FE_RaviartThomasNodal<3>(1)-FE_DGQ<3>(1)]
+DEAL::fe_data[37]:FESystem<3>[FE_RaviartThomasNodal<3>(1)-FE_DGQ<3>(1)]
 DEAL::dofs_per_vertex=0
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=4
@@ -3457,7 +3665,7 @@ DEAL::support on face 3:	0	1	2	3	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	36	37	38	39
 DEAL::support on face 5:	0	1	2	3	4	5	6	7	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	33	34	35	40	41	42	43
 DEAL::
-DEAL::fe_data[34]:FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]^2]
+DEAL::fe_data[38]:FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]^2]
 DEAL::dofs_per_vertex=4
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
@@ -3492,7 +3700,7 @@ DEAL::support on face 3:	8	9	10	11	12	13	14	15	24	25	26	27	28	29	30	31
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15
 DEAL::support on face 5:	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31
 DEAL::
-DEAL::fe_data[35]:FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]-FESystem<3>[FE_DGQ<3>(1)^2]]
+DEAL::fe_data[39]:FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]-FESystem<3>[FE_DGQ<3>(1)^2]]
 DEAL::dofs_per_vertex=2
 DEAL::dofs_per_line=0
 DEAL::dofs_per_quad=0
@@ -3527,7 +3735,7 @@ DEAL::support on face 3:	4	5	6	7	12	13	14	15	18	19	22	23	26	27	30	31
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	16	17	18	19	24	25	26	27
 DEAL::support on face 5:	8	9	10	11	12	13	14	15	20	21	22	23	28	29	30	31
 DEAL::
-DEAL::fe_data[36]:FESystem<3>[FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)]-FESystem<3>[FE_Q<3>(2)^2]-FESystem<3>[FE_DGQ<3>(2)^2]]
+DEAL::fe_data[40]:FESystem<3>[FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)]-FESystem<3>[FE_Q<3>(2)^2]-FESystem<3>[FE_DGQ<3>(2)^2]]
 DEAL::dofs_per_vertex=4
 DEAL::dofs_per_line=3
 DEAL::dofs_per_quad=3
@@ -3562,7 +3770,7 @@ DEAL::support on face 3:	8	9	10	11	12	13	14	15	24	25	26	27	28	29	30	31	41	42	43	
 DEAL::support on face 4:	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	32	33	34	35	36	37	38	39	40	41	42	43	80	81	82	89	90	91	92	93	94	95	96	97	116	117	118	119	120	121	122	123	124
 DEAL::support on face 5:	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	44	45	46	47	48	49	50	51	52	53	54	55	83	84	85	107	108	109	110	111	112	113	114	115	134	135	136	137	138	139	140	141	142
 DEAL::
-DEAL::fe_data[37]:FESystem<3>[FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]^2]^2-FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]-FESystem<3>[FE_DGQ<3>(1)^2]]-FESystem<3>[FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)]-FESystem<3>[FE_Q<3>(2)^2]-FESystem<3>[FE_DGQ<3>(2)^2]]^2]
+DEAL::fe_data[41]:FESystem<3>[FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]^2]^2-FESystem<3>[FESystem<3>[FE_Q<3>(1)^2]-FESystem<3>[FE_DGQ<3>(1)^2]]-FESystem<3>[FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)]-FESystem<3>[FE_Q<3>(2)^2]-FESystem<3>[FE_DGQ<3>(2)^2]]^2]
 DEAL::dofs_per_vertex=18
 DEAL::dofs_per_line=6
 DEAL::dofs_per_quad=6

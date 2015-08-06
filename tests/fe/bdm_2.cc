@@ -174,7 +174,6 @@ main()
   for (unsigned int degree=1; degree<4; ++degree)
     {
       plot_shape_functions<2>(degree);
-      plot_shape_functions<3>(degree);
     }
   
   return 0;
