@@ -324,11 +324,11 @@ public:
    */
   virtual
   CellSimilarity::Similarity
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const CellSimilarity::Similarity                           cell_similarity,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
+                  const CellSimilarity::Similarity                               cell_similarity,
+                  const Quadrature<dim>                                         &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
+                  dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Compute mapping-related information for a face of a cell.
@@ -336,11 +336,11 @@ public:
    * a discussion of purpose and arguments of this function.
    */
   virtual void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
+                       const unsigned int                                             face_no,
+                       const Quadrature<dim-1>                                       &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
+                       dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Compute mapping-related information for a child of a face of a cell.
@@ -348,12 +348,12 @@ public:
    * a discussion of purpose and arguments of this function.
    */
   virtual void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         subface_no,
-                          const Quadrature<dim-1>                                   &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
+                          const unsigned int                                             face_no,
+                          const unsigned int                                             subface_no,
+                          const Quadrature<dim-1>                                       &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
+                          dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Compute shape values and/or derivatives.
