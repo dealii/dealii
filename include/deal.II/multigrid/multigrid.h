@@ -185,11 +185,11 @@ public:
   void set_maxlevel (const unsigned int);
 
   /**
-   * Set the coarse level for which the multilevel method is performed. By
+   * Set the coarsest level for which the multilevel method is performed. By
    * default, this is zero. Accepted are non-negative values not larger than
-   * than the current #maxlevel.
+   * the current #maxlevel.
    *
-   * If <tt>relative</tt> ist <tt>true</tt>, then this function determins the
+   * If <tt>relative</tt> is <tt>true</tt>, then this function determines the
    * number of levels used, that is, it sets #minlevel to
    * #maxlevel-<tt>level</tt>.
    *
