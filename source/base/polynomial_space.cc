@@ -36,7 +36,7 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 
 template <>
 unsigned int
-PolynomialSpace<0>::compute_n_pols (const unsigned int n)
+PolynomialSpace<0>::compute_n_pols (const unsigned int)
 {
   return 0;
 }
