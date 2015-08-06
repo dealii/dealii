@@ -229,13 +229,13 @@ namespace
   {
     switch (level)
       {
-      case (DataOutBase::VtkFlags::ZlibCompressionLevel::no_compression):
+      case (DataOutBase::VtkFlags::no_compression):
         return Z_NO_COMPRESSION;
-      case (DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed):
+      case (DataOutBase::VtkFlags::best_speed):
         return Z_BEST_SPEED;
-      case (DataOutBase::VtkFlags::ZlibCompressionLevel::best_compression):
+      case (DataOutBase::VtkFlags::best_compression):
         return Z_BEST_COMPRESSION;
-      case (DataOutBase::VtkFlags::ZlibCompressionLevel::default_compression):
+      case (DataOutBase::VtkFlags::default_compression):
         return Z_DEFAULT_COMPRESSION;
       default:
         Assert(false, ExcNotImplemented());
