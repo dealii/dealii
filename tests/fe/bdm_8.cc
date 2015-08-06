@@ -79,7 +79,7 @@ test (const unsigned int degree)
         mass_matrix(i,j) = 0;
   mass_matrix.print_formatted (logfile, 3, false, 0, " ", 1);
 
-  SolverControl           solver_control (dofs_per_cell,
+  SolverControl           solver_control (2*dofs_per_cell,
                                           1e-8);
   PrimitiveVectorMemory<> vector_memory;
   SolverCG<>              cg (solver_control, vector_memory);

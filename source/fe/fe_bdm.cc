@@ -332,7 +332,7 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
   // cell. First on the faces, we have to test polynomials of degree
   // up to deg, which means we need dg+1 points in each direction. The
   // fact that we do not have tensor product polynomials will be
-  // considered later.
+  // considered later. In 2D, we can use point values.
   QGauss<dim-1> face_points (deg+1);
 
   // Copy the quadrature formula to the face points.
@@ -341,9 +341,10 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
     this->generalized_face_support_points[k] = face_points.point(k);
 
   // In the interior, we only test with polynomials of degree up to
-  // deg-2, thus we use deg-1 points. Note that deg>=1 and the lowest
-  // order element has no points in the cell.
-  QGauss<dim> cell_points(deg-1);
+  // deg-2, thus we use deg points. Note that deg>=1 and the lowest
+  // order element has no points in the cell, such that we have to
+  // distinguish this case.
+  QGauss<dim> cell_points(deg==1 ? 0 : deg);
 
   // Compute the size of the whole support point set
   const unsigned int npoints
