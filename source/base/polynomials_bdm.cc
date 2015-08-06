@@ -14,7 +14,9 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <iostream>
 #include <iomanip>
@@ -171,7 +173,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
               // p(t) = t^(i+1)
               monomials[i+1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree()-i].value(unit_point(d), monovalk[d]);
+              monomials[degree()-i-1].value(unit_point(d), monovalk[d]);
             }
           if (values.size() != 0)
             {

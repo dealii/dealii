@@ -296,11 +296,15 @@ namespace FETools
    *
    * @param isotropic_only Set to <code>true</code> if you only want to
    * compute matrices for isotropic refinement.
+   *
+   * @param threshold is the gap allowed in the least squares
+   * algorithm computing the embedding.
    */
   template <int dim, typename number, int spacedim>
   void compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   std::vector<std::vector<FullMatrix<number> > > &matrices,
-                                  const bool isotropic_only = false);
+                                  const bool isotropic_only = false,
+                                  const double threshold = 1.e-12);
 
   /**
    * Compute the embedding matrices on faces needed for constraint matrices.
@@ -317,6 +321,9 @@ namespace FETools
    * @param face_fine The number of the face on the refined side of the face
    * for which this is computed.
    *
+   * @param threshold is the gap allowed in the least squares
+   * algorithm computing the embedding.
+   *
    * @warning This function will be used in computing constraint matrices. It
    * is not sufficiently tested yet.
    */
@@ -325,7 +332,8 @@ namespace FETools
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
                                   const unsigned int face_coarse,
-                                  const unsigned int face_fine);
+                                  const unsigned int face_fine,
+                                  const double threshold = 1.e-12);
 
   /**
    * For all possible (isotropic and anisotropic) refinement cases compute the

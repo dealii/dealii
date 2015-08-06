@@ -34,6 +34,8 @@
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_abf.h>
+#include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
@@ -123,7 +125,9 @@ namespace
     result["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
     result["FE_ABF"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_ABF<dim> >);
+    result["FE_BDM"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_BDM<dim> >);
     result["FE_RaviartThomas"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     result["FE_RaviartThomasNodal"]
@@ -708,7 +712,8 @@ namespace FETools
       const FiniteElement<dim, spacedim> &fe,
       const FEValues<dim, spacedim> &coarse,
       const Householder<double> &H,
-      FullMatrix<number> &this_matrix)
+      FullMatrix<number> &this_matrix,
+      const double threshold)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nd = fe.n_components ();
@@ -741,8 +746,10 @@ namespace FETools
       // solve the least squares
       // problem.
       const double result = H.least_squares (v_fine, v_coarse);
+      Assert (result <= threshold, ExcLeastSquaresError (result));
+      // Avoid warnings in release mode
       (void)result;
-      Assert (result < 1.e-12, ExcLeastSquaresError (result));
+      (void)threshold;
 
       // Copy into the result
       // matrix. Since the matrix
@@ -760,7 +767,8 @@ namespace FETools
     compute_embedding_matrices_for_refinement_case (
       const FiniteElement<dim, spacedim> &fe,
       std::vector<FullMatrix<number> > &matrices,
-      const unsigned int ref_case)
+      const unsigned int ref_case,
+      const double threshold)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
@@ -851,7 +859,7 @@ namespace FETools
                 {
                   task_group +=
                     Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
-                                       i, fe, coarse, H, this_matrix);
+                                       i, fe, coarse, H, this_matrix, threshold);
                 }
               task_group.join_all();
             }
@@ -860,7 +868,7 @@ namespace FETools
               for (unsigned int i = 0; i < n; ++i)
                 {
                   compute_embedding_for_shape_function<dim, number, spacedim>
-                  (i, fe, coarse, H, this_matrix);
+                  (i, fe, coarse, H, this_matrix, threshold);
                 }
             }
 
@@ -882,7 +890,8 @@ namespace FETools
   void
   compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                              std::vector<std::vector<FullMatrix<number> > > &matrices,
-                             const bool isotropic_only)
+                             const bool isotropic_only,
+                             const double threshold)
   {
     Threads::TaskGroup<void> task_group;
 
@@ -893,7 +902,7 @@ namespace FETools
 
     for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
       task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
-                                       fe, matrices[ref_case-1], ref_case);
+                                       fe, matrices[ref_case-1], ref_case, threshold);
 
     task_group.join_all ();
   }
@@ -905,7 +914,8 @@ namespace FETools
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
                                   const unsigned int face_coarse,
-                                  const unsigned int face_fine)
+                                  const unsigned int face_fine,
+                                  const double threshold)
   {
     Assert(face_coarse==0, ExcNotImplemented());
     Assert(face_fine==0, ExcNotImplemented());
@@ -1077,8 +1087,10 @@ namespace FETools
             // solve the least squares
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
+            Assert (result <= threshold, ExcLeastSquaresError(result));
+            // Avoid compiler warnings in Release mode
             (void)result;
-            Assert (result < 1.e-12, ExcLeastSquaresError(result));
+            (void)threshold;
 
             // Copy into the result
             // matrix. Since the matrix

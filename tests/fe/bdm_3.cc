@@ -15,7 +15,7 @@
 
 
 
-// Just output the constraint matrices of the RT element
+// Just output the constraint matrices of the BDM element
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -60,8 +60,11 @@ main()
   deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=1; degree<4; ++degree)
-    test<2>(degree);
-
+    {
+      test<2>(degree);
+      test<3>(degree);
+    }
+  
   return 0;
 }
 

@@ -32,7 +32,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template
       void compute_embedding_matrices<deal_II_dimension, double, deal_II_space_dimension>
       (const FiniteElement<deal_II_dimension,deal_II_space_dimension> &,
-       std::vector<std::vector<FullMatrix<double> > > &,bool);
+       std::vector<std::vector<FullMatrix<double> > > &, const bool, const double);
 #endif
       \}
   }
@@ -111,7 +111,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template
       void compute_face_embedding_matrices<deal_II_dimension,double>
       (const FiniteElement<deal_II_dimension> &, FullMatrix<double> ( &)[GeometryInfo<deal_II_dimension>::max_children_per_face],
-       unsigned int, unsigned int);
+       unsigned int, unsigned int, const double);
 
       template
       void

@@ -35,6 +35,14 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 
 
 template <>
+unsigned int
+PolynomialSpace<0>::compute_n_pols (const unsigned int n)
+{
+  return 0;
+}
+
+
+template <>
 void
 PolynomialSpace<1>::
 compute_index (const unsigned int i,
