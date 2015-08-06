@@ -89,6 +89,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: VtkFlags now stores a parameter describing the compression level
+  zlib uses when writing compressed output. For small problems, the flag
+  ZlibCompressionLevel::best_speed can make the call to write_vtu many times
+  faster.
+  <br>
+  (David Wells, 2015/08/03)
+  </li>
+
   <li> Improved: The conversion Epetra_Map -> IndexSet is now an O(1)
   operation for contiguous index ranges, improving over the old O(N) behavior.
   <br>
