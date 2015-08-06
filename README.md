@@ -9,15 +9,21 @@ to the complex data structures and algorithms required.
 For the impatient:
 ------------------
 
-Let's say you've unpacked the .tar.gz file, or cloned the git repository into
-a directory /path/to/dealii/sources. Then configure, compile, and install the
-deal.II library with:
+Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources. 
+Then configure, compile, and install the deal.II library with:
 
     $ mkdir build
     $ cd build
     $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/dealii/should/be/intalled/to /path/to/dealii/sources
     $ make install    (alternatively $ make -j<N> install)
     $ make test
+
+To build from the repository, excute the following commands first.
+
+    $ git clone https://github.com/dealii/dealii
+    $ cd dealii
+
+Then continue as before.
 
 A detailed *ReadME* can be found at ./doc/readme.html and
 ./doc/users/cmake.html or at http://www.dealii.org/.
