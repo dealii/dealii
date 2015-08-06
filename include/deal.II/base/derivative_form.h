@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
  * spacedim-dimensional space. For such objects, the first derivative of the
  * function is a linear map from ${\mathbb R}^{\text{dim}}$ to ${\mathbb
  * R}^{\text{spacedim}}$, i.e., it can be represented as a matrix
- * in ${\mathbb R}^{\text{spacedim}\times \text{dim}}. This makes sense
+ * in ${\mathbb R}^{\text{spacedim}\times \text{dim}}$. This makes sense
  * since one would represent the first derivative, $\nabla f(\mathbf x)$
  * with $\mathbf x\in {\mathbb R}^{\text{dim}}$, in such a way that the
  * directional derivative in direction $\mathbf d\in {\mathbb R}^{\text{dim}}$
@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * @f}
  * i.e., one needs to be able to multiply the matrix $\nabla f(\mathbf x)$ by
  * a vector in ${\mathbb R}^{\text{dim}}$, and the result is a difference
- * of function values, which are in ${\mathbb R}^{\text{spacedim}}. Consequently,
+ * of function values, which are in ${\mathbb R}^{\text{spacedim}}$. Consequently,
  * the matrix must be of size $\text{spacedim}\times\text{dim}$.
  *
  * Similarly, the second derivative is a bilinear map from  ${\mathbb
