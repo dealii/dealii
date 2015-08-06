@@ -39,6 +39,35 @@ Mapping<dim, spacedim>::get_vertices (
 }
 
 
+template<int dim, int spacedim>
+Point<dim-1>
+Mapping<dim,spacedim>::
+transform_real_to_unit_projected_to_face (
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+    const unsigned int &face_no,
+    const Point<spacedim> &p) const
+{
+  Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
+
+  Point<dim-1> unit_face_pt;
+
+  if (dim==2) {
+    if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
+      unit_face_pt = Point<dim-1>(unit_cell_pt(1));
+    else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
+      unit_face_pt = Point<dim-1>(unit_cell_pt(0));
+  }
+  else if (dim==3) {
+    if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
+      unit_face_pt = Point<dim-1>(unit_cell_pt(1), unit_cell_pt(2));
+    else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
+      unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(2));
+    else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 2)
+      unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(1));
+  }
+
+  return unit_face_pt;
+}
 
 /*------------------------------ InternalDataBase ------------------------------*/
 
@@ -65,6 +94,8 @@ Mapping<dim, spacedim>::InternalDataBase::memory_consumption () const
 {
   return sizeof(*this);
 }
+
+
 
 
 /*------------------------------ InternalData ------------------------------*/
