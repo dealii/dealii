@@ -32,52 +32,65 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
- * Brezzi-Douglas-Marini polynomials as described in the book by Brezzi and
- * Fortin.
+ * Brezzi-Douglas-Marini (<i> BDM </i>) polynomials described in Brezzi and
+ * Fortin's <i>Mixed and Hybrid Finite Element Methods</i> (refer to pages
+ * 119 - 124).
  *
- * These polynomial spaces are based on the space <i>P<sub>k</sub></i>,
- * realized by a PolynomialSpace constructed with Legendre polynomials. Since
- * these shape functions are not sufficient, additional functions are added.
- * These are the following vector valued polynomials:
- *
- * <dl>
+ * The <i> BDM </i> polynomial space contain the entire  $(P_{k})^{n}$
+ * space (constructed with PolynomialSpace Legendre polynomials) as well as
+ * part of $(P_{k+1})^{n}$
+ * (ie. $(P_{k})^{n} \subset BDM_{k} \subset (P_{k+1})^{n}$).  Furthermore,
+ * $BDM_{k}$ elements are designed so that
+ * $\nabla \cdot q \in P_{k-1} (K)$ and $q \cdot n |_{e_{i}} \in P_{k}(e_{i})$.
+ * More details
+ * of two and three dimensional $BDM_{k}$ elements are given below.
+ *<dl>
  *   <dt> In 2D:
- *   <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
- *   and <i>xy<sup>k+1</sup></i>.
- *   Note the curl of a scalar function is given by $\text{curl}(f(x,y)) =
+ *   <dd> $ BDM_{k} = \{\mathbf{q} | \mathbf{q} = p_{k} (x,y) +
+ *      r \; \text{curl} (x^{k+1}y) + s \;
+ *      \text{curl} (xy^{k+1}), p_{k} \in (P_{k})^{2} \}$.
+ *
+ *   Note: the curl of a scalar function is given by $\text{curl}(f(x,y)) =
  *   \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
  *
- *   More specifically, for $k=1$, this space has shape functions
+ *   <dd> The shape functions for $k=1$ are
  *   @f{align*}
- *     \phi_0 = \left[\begin{array}{cc} 1 \\ 0 \end{array}\right],
- *     \phi_1 = \left[\begin{array}{cc} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{array}\right],
- *     \phi_2 = \left[\begin{array}{cc} -\sqrt{3}+2\sqrt{3}y \\ 0 \end{array}\right],
- *     \phi_3 = \left[\begin{array}{cc} 0 \\ 1 \end{array}\right],
- *     \phi_4 = \left[\begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}x \end{array}\right],
- *     \phi_5 = \left[\begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}y \end{array}\right],
- *     \phi_6 = \left[\begin{array}{cc} x^2 \\ -2xy \end{array}\right],
- *     \phi_7 = \left[\begin{array}{cc} 2xy \\ -y^2 \end{array}\right],
+ *     \phi_0 = \begin{pmatrix} 1 \\ 0 \end{pmatrix},
+ *     \phi_1 = \begin{pmatrix} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{pmatrix},
+ *     \phi_2 = \begin{pmatrix} -\sqrt{3}+2\sqrt{3}y \\ 0 \end{pmatrix},
+ *     \phi_3 = \begin{pmatrix} 0 \\ 1 \end{pmatrix},
+ *     \phi_4 = \begin{pmatrix} 0 \\ -\sqrt{3}+2\sqrt{3}x \end{pmatrix},
+ *     \phi_5 = \begin{pmatrix} 0 \\ -\sqrt{3}+2\sqrt{3}y \end{pmatrix},
+ *     \phi_6 = \begin{pmatrix} x^2 \\ -2xy \end{pmatrix},
+ *     \phi_7 = \begin{pmatrix} 2xy \\ -y^2 \end{pmatrix}.
  *   @f}
  *
- *   Thus, the dimension of the shape function space is dimension
- *   times the number of polynomials of degree $k$ plus two:
- *   @f[
- *     n = 2\frac{(k+1)(k+2)}2 + 2
- *   @f]
-
- *   <dt>In 3D:
- *   <dd> For any <i>i=0,...,k</i> the
- * curls of <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
- * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
- * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i>
+ *   <dd> The dimension of the $BDM_{k}$ space is
+ * $(k+1)(k+2)+2$, with $k+1$ unknowns per
+ * edge and $k(k-1)$ interior unknowns.
  *
- * The size of this function space is dimension times the number of
- * polynomials of degree $k$ plus 3 times k+1:
- *   @f[
- *     n = 3\frac{(k+1)(k+2)(k+3)}6 + 3(k+1)
- *   @f]
+ *   <dt> In 3D:
+ *   <dd> $ BDM_{k} =
+ *        \{\mathbf{q} | \mathbf{q} = p_{k} (x,y,z)
+ *        + \sum_{i=0}^{k} (
+ *        r_{i} \; \text{curl}
+ *        \begin{pmatrix} 0\\0\\xy^{i+1}z^{k-i} \end{pmatrix}
+ *        + s_{i} \; \text{curl}
+ *        \begin{pmatrix} yz^{i+1}x^{k-i}\\0\\0 \end{pmatrix}
+ *        + t_{i} \; \text{curl}
+ *        \begin{pmatrix}0\\zx^{i+1}y^{k-i}\\0\end{pmatrix})
+ *        , p_{k} \in (P_{k})^{3} \}$.
  *
- * </dl>
+ *   <dd> Note: the 3D description of $BDM_{k}$ is not unique.
+ *        See <i>Mixed and Hybrid Finite Element Methods</i> page 122
+ *        for an alternative definition.
+ *
+ *   <dd> The dimension of the $BDM_{k}$ space is
+ *        $\dfrac{(k+1)(k+2)(k+3)}{2} + 3(k+1)$, with $\dfrac{(k+1)(k+2)}{2}$
+ *        unknowns per face and $\dfrac{(k-1)k(k+1)}{2}$ interior unknowns.
+ *
+ *</dl>
+ *
  *
  * @todo Second derivatives in 3D are missing.
  *
