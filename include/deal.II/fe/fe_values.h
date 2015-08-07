@@ -2339,7 +2339,7 @@ protected:
   /**
    * Internal data of finite element.
    */
-  SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
+  SmartPointer<typename FiniteElement<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
 
   /**
    * Original update flags handed to the constructor of FEValues.

@@ -99,7 +99,7 @@ FE_Nothing<dim,spacedim>::shape_value (const unsigned int /*i*/,
 
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Nothing<dim,spacedim>::get_data (const UpdateFlags  /*flags*/,
                                     const Mapping<dim,spacedim> & /*mapping*/,
                                     const Quadrature<dim> & /*quadrature*/) const
@@ -107,7 +107,7 @@ FE_Nothing<dim,spacedim>::get_data (const UpdateFlags  /*flags*/,
   // Create a default data object.  Normally we would then
   // need to resize things to hold the appropriate numbers
   // of dofs, but in this case all data fields are empty.
-  typename Mapping<dim,spacedim>::InternalDataBase *data
+  typename FiniteElement<dim,spacedim>::InternalDataBase *data
     = new typename FiniteElement<dim,spacedim>::InternalDataBase();
   return data;
 }
@@ -121,7 +121,7 @@ fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
                 const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                 const Quadrature<dim> & /*quadrature*/,
                 const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
                 const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
                 internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/,
                 const CellSimilarity::Similarity  /*cell_similarity*/) const
@@ -139,7 +139,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> & /*mapping*/,
                      const unsigned int /*face*/,
                      const Quadrature<dim-1> & /*quadrature*/,
                      const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                     const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
                      const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
                      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/) const
 {
@@ -155,7 +155,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim> & /*mapping*/,
                         const unsigned int /*subface*/,
                         const Quadrature<dim-1> & /*quadrature*/,
                         const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                        const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
                         const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/) const
 {

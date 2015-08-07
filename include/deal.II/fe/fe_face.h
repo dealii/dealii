@@ -228,17 +228,17 @@ public:
 
 protected:
   virtual
-  typename Mapping<1,spacedim>::InternalDataBase *
+  typename FiniteElement<1,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Mapping<1,spacedim> &mapping,
             const Quadrature<1> &quadrature) const;
 
-  typename Mapping<1,spacedim>::InternalDataBase *
+  typename FiniteElement<1,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags,
                  const Mapping<1,spacedim> &mapping,
                  const Quadrature<0> &quadrature) const;
 
-  typename Mapping<1,spacedim>::InternalDataBase *
+  typename FiniteElement<1,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags,
                     const Mapping<1,spacedim> &mapping,
                     const Quadrature<0> &quadrature) const;
@@ -249,7 +249,7 @@ protected:
                   const typename Triangulation<1,spacedim>::cell_iterator &cell,
                   const Quadrature<1>                                     &quadrature,
                   const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename Mapping<1,spacedim>::InternalDataBase    &fe_internal,
+                  const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
                   const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
                   internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data,
                   const CellSimilarity::Similarity                          cell_similarity) const;
@@ -261,7 +261,7 @@ protected:
                        const unsigned int                                         face_no,
                        const Quadrature<0>                                   &quadrature,
                        const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename Mapping<1,spacedim>::InternalDataBase    &fe_internal,
+                       const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
                        const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
                        internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
 
@@ -273,7 +273,7 @@ protected:
                           const unsigned int                                         sub_no,
                           const Quadrature<0>                                   &quadrature,
                           const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename Mapping<1,spacedim>::InternalDataBase    &fe_internal,
+                          const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
                           const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
                           internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
 

@@ -2023,7 +2023,7 @@ protected:
    * then has to assume ownership (which includes destruction when it is no
    * more needed).
    */
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual InternalDataBase *
   get_data (const UpdateFlags      flags,
             const Mapping<dim,spacedim>    &mapping,
             const Quadrature<dim> &quadrature) const = 0;
@@ -2034,7 +2034,7 @@ protected:
    * the caller of this function then has to assume ownership (which includes
    * destruction when it is no more needed).
    */
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual InternalDataBase *
   get_face_data (const UpdateFlags        flags,
                  const Mapping<dim,spacedim>      &mapping,
                  const Quadrature<dim-1> &quadrature) const;
@@ -2045,7 +2045,7 @@ protected:
    * object of which the caller of this function then has to assume ownership
    * (which includes destruction when it is no more needed).
    */
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual InternalDataBase *
   get_subface_data (const UpdateFlags        flags,
                     const Mapping<dim,spacedim>      &mapping,
                     const Quadrature<dim-1> &quadrature) const;
@@ -2056,7 +2056,7 @@ protected:
                   const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                   const Quadrature<dim>                                               &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const typename Mapping<dim,spacedim>::InternalDataBase              &fe_internal,
+                  const InternalDataBase                                              &fe_internal,
                   const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
                   dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data,
                   const CellSimilarity::Similarity                                     cell_similarity) const = 0;
@@ -2068,7 +2068,7 @@ protected:
                        const unsigned int                                                   face_no,
                        const Quadrature<dim-1>                                             &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const typename Mapping<dim,spacedim>::InternalDataBase              &fe_internal,
+                       const InternalDataBase                                              &fe_internal,
                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
@@ -2080,7 +2080,7 @@ protected:
                           const unsigned int                                                   sub_no,
                           const Quadrature<dim-1>                                             &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const typename Mapping<dim,spacedim>::InternalDataBase              &fe_internal,
+                          const InternalDataBase                                              &fe_internal,
                           const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
                           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 

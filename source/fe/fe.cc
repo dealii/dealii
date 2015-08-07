@@ -1418,7 +1418,7 @@ FiniteElement<dim,spacedim>::compute_n_nonzero_components (
 /*------------------------------- FiniteElement ----------------------*/
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
                                             const Mapping<dim,spacedim>      &mapping,
                                             const Quadrature<dim-1> &quadrature) const
@@ -1430,7 +1430,7 @@ FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
 
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
                                                const Mapping<dim,spacedim>      &mapping,
                                                const Quadrature<dim-1> &quadrature) const

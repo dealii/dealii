@@ -176,7 +176,7 @@ protected:
   MappingType mapping_type;
 
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Mapping<dim,spacedim> &mapping,
             const Quadrature<dim> &quadrature) const;
@@ -187,7 +187,7 @@ protected:
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &fe_internal,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
                   const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                   internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
                   const CellSimilarity::Similarity                           cell_similarity) const;
@@ -199,7 +199,7 @@ protected:
                        const unsigned int                                         face_no,
                        const Quadrature<dim-1>                                   &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &fe_internal,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
                        const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
@@ -211,7 +211,7 @@ protected:
                           const unsigned int                                         sub_no,
                           const Quadrature<dim-1>                                   &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &fe_internal,
+                          const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
                           const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                           internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
