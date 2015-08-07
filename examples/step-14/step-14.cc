@@ -579,10 +579,7 @@ namespace Step14
                                       std_cxx11::ref(linear_system)),
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
-
-      rhs_task.join ();
-
-      linear_system.hanging_node_constraints.condense (linear_system.rhs);
+      linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
       std::map<types::global_dof_index,double> boundary_value_map;
       VectorTools::interpolate_boundary_values (dof_handler,
@@ -590,7 +587,8 @@ namespace Step14
                                                 *boundary_values,
                                                 boundary_value_map);
 
-      linear_system.hanging_node_constraints.condense (linear_system.matrix);
+      rhs_task.join ();
+      linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
       MatrixTools::apply_boundary_values (boundary_value_map,
                                           linear_system.matrix,
@@ -770,9 +768,8 @@ namespace Step14
       virtual
       void output_solution () const;
 
-      const SmartPointer<const Function<dim> > rhs_function;
-
     protected:
+      const SmartPointer<const Function<dim> > rhs_function;
       virtual void assemble_rhs (Vector<double> &rhs) const;
     };
 
@@ -1013,12 +1010,12 @@ namespace Step14
       // First compute some residual based error indicators for all cells by a
       // method already implemented in the library. What exactly is computed
       // can be read in the documentation of that class.
-      Vector<float> estimated_error (this->triangulation->n_active_cells());
+      Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
       KellyErrorEstimator<dim>::estimate (this->dof_handler,
                                           *this->face_quadrature,
                                           typename FunctionMap<dim>::type(),
                                           this->solution,
-                                          estimated_error);
+                                          estimated_error_per_cell);
 
       // Now we are going to weight these indicators by the value of the
       // function given to the constructor:
@@ -1026,11 +1023,11 @@ namespace Step14
       cell = this->dof_handler.begin_active(),
       endc = this->dof_handler.end();
       for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
-        estimated_error(cell_index)
+        estimated_error_per_cell(cell_index)
         *= weighting_function->value (cell->center());
 
       GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
-                                                       estimated_error,
+                                                       estimated_error_per_cell,
                                                        0.3, 0.03);
       this->triangulation->execute_coarsening_and_refinement ();
     }
