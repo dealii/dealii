@@ -1845,7 +1845,7 @@ DEAL::degree=3
 DEAL::conformity= Hdiv
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=13
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=3
 DEAL::face_to_equivalent_cell_index: 0 1 2
 DEAL::face_to_cell_index: 0 1 2
@@ -3474,7 +3474,7 @@ DEAL::degree=3
 DEAL::conformity= Hdiv
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=55
+DEAL::generalized_support_points=62
 DEAL::generalized_face_support_points=9
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5
 DEAL::face_to_cell_index: 0 1 2 3 4 5
