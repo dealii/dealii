@@ -348,11 +348,11 @@ public:
    * modification despite the fact that the surrounding object is
    * marked as <code>const</code>.
    */
-  class InternalDataBase: public Subscriptor
+  class InternalDataBase : public Subscriptor
   {
   private:
     /**
-     * Copy constructor forbidden.
+     * Copy construction is forbidden.
      */
     InternalDataBase (const InternalDataBase &);
 
