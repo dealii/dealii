@@ -42,7 +42,7 @@ Mapping<dim, spacedim>::get_vertices (
 template<int dim, int spacedim>
 Point<dim-1>
 Mapping<dim,spacedim>::
-transform_real_to_unit_projected_to_face (
+project_real_point_to_unit_point_on_face (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int &face_no,
   const Point<spacedim> &p) const
