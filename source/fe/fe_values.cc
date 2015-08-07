@@ -2184,7 +2184,7 @@ FEValuesBase<dim,spacedim>::~FEValuesBase ()
   // have assumed ownership
   if (fe_data != 0)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *tmp1=fe_data;
+      typename FiniteElement<dim,spacedim>::InternalDataBase *tmp1=fe_data;
       fe_data=0;
       delete tmp1;
     }

@@ -164,7 +164,7 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 //---------------------------------------------------------------------------
 
 template <class POLY, int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
                                       const Mapping<dim,spacedim>    &mapping,
                                       const Quadrature<dim> &quadrature) const
@@ -252,7 +252,7 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
                 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim>                            &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
                 const internal::FEValues::MappingRelatedData<dim,spacedim> &,
                 internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
                 const CellSimilarity::Similarity                  cell_similarity) const
@@ -294,7 +294,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      const unsigned int                    face,
                      const Quadrature<dim-1>              &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                     const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase       &fedata,
                      const internal::FEValues::MappingRelatedData<dim,spacedim> &,
                      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -346,7 +346,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
                         const unsigned int                    subface,
                         const Quadrature<dim-1>              &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                        const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase       &fedata,
                         const internal::FEValues::MappingRelatedData<dim,spacedim> &,
                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {

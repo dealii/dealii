@@ -247,7 +247,7 @@ FE_DGPNonparametric<dim,spacedim>::update_each (const UpdateFlags flags) const
 //---------------------------------------------------------------------------
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_DGPNonparametric<dim,spacedim>::get_data (
   const UpdateFlags      update_flags,
   const Mapping<dim,spacedim> &,
@@ -282,7 +282,7 @@ fill_fe_values (const Mapping<dim,spacedim> &,
                 const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const Quadrature<dim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,
-                const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
                 const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                 internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
                 const CellSimilarity::Similarity /*cell_similarity*/) const
@@ -323,7 +323,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
                      const unsigned int,
                      const Quadrature<dim-1>&,
                      const typename Mapping<dim,spacedim>::InternalDataBase &,
-                     const typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase       &fe_data,
                      const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -364,7 +364,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
                         const unsigned int,
                         const Quadrature<dim-1>&,
                         const typename Mapping<dim,spacedim>::InternalDataBase &,
-                        const typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase       &fe_data,
                         const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {

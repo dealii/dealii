@@ -810,7 +810,7 @@ FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
 
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
                                   const Mapping<dim,spacedim>    &mapping,
                                   const Quadrature<dim> &quadrature) const
@@ -841,13 +841,8 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
   // the base elements and store them
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
       data->set_fe_data(base_no, base_fe_data);
 
@@ -868,7 +863,7 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 // that get_face_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_face_data (
   const UpdateFlags      flags_,
   const Mapping<dim,spacedim>    &mapping,
@@ -891,13 +886,8 @@ FESystem<dim,spacedim>::get_face_data (
 
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_face_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        base_element(base_no).get_face_data(sub_flags, mapping, quadrature);
 
       data->set_fe_data(base_no, base_fe_data);
 
@@ -917,7 +907,7 @@ FESystem<dim,spacedim>::get_face_data (
 // that get_subface_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_subface_data (
   const UpdateFlags      flags_,
   const Mapping<dim,spacedim>    &mapping,
@@ -940,13 +930,8 @@ FESystem<dim,spacedim>::get_subface_data (
 
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_subface_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        base_element(base_no).get_subface_data(sub_flags, mapping, quadrature);
 
       data->set_fe_data(base_no, base_fe_data);
 
@@ -969,7 +954,7 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
                 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim>                            &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
                 const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                 internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
                 const CellSimilarity::Similarity                  cell_similarity) const
@@ -989,7 +974,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      const unsigned int                    face_no,
                      const Quadrature<dim-1>              &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
                      const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -1010,7 +995,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                      &mappin
                         const unsigned int                                sub_no,
                         const Quadrature<dim-1>                          &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                        const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
                         const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -1031,7 +1016,7 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
                        const std::pair<unsigned int, unsigned int>       face_sub_no,
                        const Quadrature<dim_1>                          &quadrature,
                        const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
-                       const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
                        const unsigned int                                base_no,
                        const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
@@ -1173,7 +1158,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const Quadrature<dim_1>                          &quadrature,
               const CellSimilarity::Similarity                   cell_similarity,
               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-              const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+              const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
               const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
               internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -1203,7 +1188,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
           for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
             {
               // Pointer needed to get the update flags of the base element
-              typename Mapping<dim,spacedim>::InternalDataBase &
+              typename FiniteElement<dim,spacedim>::InternalDataBase &
               base_fe_data = fe_data.get_fe_data(base_no);
 
               // compute update flags ...
