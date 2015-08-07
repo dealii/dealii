@@ -34,7 +34,7 @@
 
 void check (Triangulation<2> &tria)
 {
-  Point<2> p (1./3., 1./2.);
+  Point<2> p (1./3., 1./2.-1e-10); // avoid ambiguity for hypercube mesh
 
   Triangulation<2>::active_cell_iterator cell
     = GridTools::find_active_cell_around_point (tria, p);
@@ -72,6 +72,3 @@ int main ()
     check (coarse_grid);
   }
 }
-
-
-
