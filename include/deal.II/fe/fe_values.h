@@ -2334,12 +2334,12 @@ protected:
   /**
    * Internal data of mapping.
    */
-  SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > mapping_data;
+  std_cxx11::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
 
   /**
    * Internal data of finite element.
    */
-  SmartPointer<typename FiniteElement<dim,spacedim>::InternalDataBase,FEValuesBase<dim,spacedim> > fe_data;
+  std_cxx11::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fe_data;
 
   /**
    * Original update flags handed to the constructor of FEValues.
