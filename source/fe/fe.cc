@@ -39,6 +39,42 @@ const double FiniteElement<dim,spacedim>::fd_step_length = 1.0e-6;
 
 
 template <int dim, int spacedim>
+FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
+  update_flags(update_default),
+  update_once(update_default),
+  update_each(update_default),
+  first_cell(true)
+{}
+
+
+
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
+{
+  for (unsigned int i=0; i<differences.size (); ++i)
+    if (differences[i] != 0)
+      {
+        // delete pointer and set it
+        // to zero to avoid
+        // inadvertent use
+        delete differences[i];
+        differences[i] = 0;
+      }
+}
+
+
+
+template <int dim, int spacedim>
+std::size_t
+FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption () const
+{
+  return sizeof(*this);
+}
+
+
+
+
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
@@ -89,19 +125,39 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
 
 
 
+template <int dim, int spacedim>
+inline
+UpdateFlags
+FiniteElement<dim,spacedim>::InternalDataBase::current_update_flags () const
+{
+  if (first_cell)
+    {
+      Assert (update_flags==(update_once|update_each),
+              ExcInternalError());
+      return update_flags;
+    }
+  else
+    return update_each;
+}
+
+
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
+inline
+bool
+FiniteElement<dim,spacedim>::InternalDataBase::is_first_cell () const
 {
-  for (unsigned int i=0; i<differences.size (); ++i)
-    if (differences[i] != 0)
-      {
-        // delete pointer and set it
-        // to zero to avoid
-        // inadvertent use
-        delete differences[i];
-        differences[i] = 0;
-      };
+  return first_cell;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+void
+FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ()
+{
+  first_cell = false;
 }
 
 

@@ -382,9 +382,21 @@ public:
    *
    * @author Guido Kanschat, 2001; Wolfgang Bangerth, 2015.
    */
-  class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
+  class InternalDataBase : public Subscriptor
   {
+  private:
+    /**
+     * Copy construction is forbidden.
+     */
+    InternalDataBase (const InternalDataBase &);
+
   public:
+    /**
+     * Constructor. Sets update_flags to @p update_default and @p first_cell
+     * to @p true.
+     */
+    InternalDataBase ();
+
     /**
      * Destructor. Made virtual to allow polymorphism.
      */
@@ -399,6 +411,51 @@ public:
                          const Quadrature<dim>    &quadrature);
 
     /**
+     * Values updated by the constructor or by reinit.
+     */
+    UpdateFlags          update_flags;
+
+    /**
+     * Values computed by constructor.
+     */
+    UpdateFlags          update_once;
+
+    /**
+     * Values updated on each cell by reinit.
+     */
+    UpdateFlags          update_each;
+
+    /**
+     * If <tt>first_cell==true</tt> this function returns @p update_flags,
+     * i.e. <tt>update_once|update_each</tt>. If <tt>first_cell==false</tt> it
+     * returns @p update_each.
+     */
+    UpdateFlags  current_update_flags() const;
+
+    /**
+     * Return whether we are presently initializing data for the first cell.
+     * The value of the field this function is returning is set to @p true in
+     * the constructor, and cleared by the @p FEValues class after the first
+     * cell has been initialized.
+     *
+     * This function is used to determine whether we need to use the @p
+     * update_once flags for computing data, or whether we can use the @p
+     * update_each flags.
+     */
+    bool is_first_cell () const;
+
+    /**
+     * Set the @p first_cell flag to @p false. Used by the @p FEValues class
+     * to indicate that we have already done the work on the first cell.
+     */
+    virtual void clear_first_cell ();
+
+    /**
+     * Return an estimate (in bytes) or the memory consumption of this object.
+     */
+    virtual std::size_t memory_consumption () const;
+
+    /**
      * Storage for FEValues objects needed to approximate second derivatives.
      *
      * The ordering is <i>p+hx</i>, <i>p+hy</i>, <i>p+hz</i>, <i>p-hx</i>,
@@ -406,6 +463,12 @@ public:
      * missing.
      */
     std::vector<FEValues<dim,spacedim>*> differences;
+
+  private:
+    /**
+     * The value returned by @p is_first_cell.
+     */
+    bool first_cell;
   };
 
 public:
