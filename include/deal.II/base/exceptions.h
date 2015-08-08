@@ -286,6 +286,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
+ * @note Active in DEBUG mode only
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
@@ -314,6 +315,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
+ * @note Active in DEBUG mode only
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
@@ -340,6 +342,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
+ * @note Active in both DEBUG and RELEASE modes
  * @ref ExceptionBase
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
