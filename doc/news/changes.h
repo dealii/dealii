@@ -90,6 +90,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a function MemoryConsumption::memory_consumption()
+  for std_cxx11::unique_ptr arguments.
+  <br>
+  (Wolfgang Bangerth, 2015/08/07)
+  </li>
+
   <li> New: VtkFlags now stores a parameter describing the compression level
   zlib uses when writing compressed output. For small problems, the flag
   ZlibCompressionLevel::best_speed can make the call to write_vtu many times
