@@ -355,9 +355,7 @@ public:
 
   /**
    * A base class for internal data that derived finite element classes may
-   * wish to store. This class uses the same data fields as
-   * Mapping::InternalDataBase() but adds a field for the computation of
-   * second derivatives.
+   * wish to store.
    *
    * The class is used as follows: Whenever an FEValues (or FEFaceValues or
    * FESubfaceValues) object is initialized, it requests that the finite
