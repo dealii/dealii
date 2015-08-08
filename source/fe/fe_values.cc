@@ -2161,8 +2161,6 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
   dofs_per_cell (dofs_per_cell),
   mapping(&mapping, typeid(*this).name()),
   fe(&fe, typeid(*this).name()),
-  mapping_data(0, typeid(*this).name()),
-  fe_data(0, typeid(*this).name()),
   fe_values_views_cache (*this)
 {
   Assert (n_q_points > 0,
@@ -2177,25 +2175,6 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::~FEValuesBase ()
 {
-  // delete those fields that were
-  // created by the mapping and
-  // finite element objects,
-  // respectively, but of which we
-  // have assumed ownership
-  if (fe_data != 0)
-    {
-      typename FiniteElement<dim,spacedim>::InternalDataBase *tmp1=fe_data;
-      fe_data=0;
-      delete tmp1;
-    }
-
-  if (mapping_data != 0)
-    {
-      typename Mapping<dim,spacedim>::InternalDataBase *tmp1=mapping_data;
-      mapping_data=0;
-      delete tmp1;
-    }
-
   tria_listener.disconnect ();
 }
 
@@ -3427,8 +3406,8 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // FE and the Mapping can store
   // intermediate data used across
   // calls to reinit
-  this->mapping_data = this->mapping->get_data(flags, quadrature);
-  this->fe_data      = this->fe->get_data(flags, *this->mapping, quadrature);
+  this->mapping_data.reset (this->mapping->get_data(flags, quadrature));
+  this->fe_data.reset (this->fe->get_data(flags, *this->mapping, quadrature));
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
@@ -3657,8 +3636,8 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // FE and the Mapping can store
   // intermediate data used across
   // calls to reinit
-  this->mapping_data = this->mapping->get_face_data(flags, this->quadrature);
-  this->fe_data      = this->fe->get_face_data(flags, *this->mapping, this->quadrature);
+  this->mapping_data.reset (this->mapping->get_face_data(flags, this->quadrature));
+  this->fe_data.reset (this->fe->get_face_data(flags, *this->mapping, this->quadrature));
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
@@ -3806,10 +3785,10 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // FE and the Mapping can store
   // intermediate data used across
   // calls to reinit
-  this->mapping_data = this->mapping->get_subface_data(flags, this->quadrature);
-  this->fe_data      = this->fe->get_subface_data(flags,
+  this->mapping_data.reset (this->mapping->get_subface_data(flags, this->quadrature));
+  this->fe_data.reset (this->fe->get_subface_data(flags,
                                                   *this->mapping,
-                                                  this->quadrature);
+                                                  this->quadrature));
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
