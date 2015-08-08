@@ -363,30 +363,63 @@ void ZeroFunction<dim, Number>::vector_gradient_list (
 
 //---------------------------------------------------------------------------
 
-
 template <int dim, typename Number>
 ConstantFunction<dim, Number>::ConstantFunction (const Number value,
                                                  const unsigned int n_components)
   :
   ZeroFunction<dim, Number> (n_components),
-  function_value    (value)
+  function_value_vector (n_components, value)
 {}
+
+template <int dim, typename Number>
+ConstantFunction<dim, Number>::
+ConstantFunction (const std::vector<Number> &values)
+  :
+  ZeroFunction<dim, Number> (values.size()),
+  function_value_vector (values)
+{}
+
+
+template <int dim, typename Number>
+ConstantFunction<dim, Number>::
+ConstantFunction (const Vector<Number> &values)
+  :
+  ZeroFunction<dim, Number> (values.size()),
+  function_value_vector (values.size())
+{
+  Assert (values.size() == function_value_vector.size(),
+          ExcDimensionMismatch (values.size(), function_value_vector.size()));
+  std::copy (values.begin(),values.end(),function_value_vector.begin());
+}
+
+
+template <int dim, typename Number>
+ConstantFunction<dim, Number>::
+ConstantFunction (const Number *begin_ptr, const unsigned int n_components)
+  :
+  ZeroFunction<dim, Number> (n_components),
+  function_value_vector (n_components)
+{
+  Assert (begin_ptr != 0, ExcMessage ("Null pointer encountered!"));
+  std::copy (begin_ptr, begin_ptr+n_components, function_value_vector.begin());
+}
 
 
 
 template <int dim, typename Number>
-ConstantFunction<dim, Number>::~ConstantFunction () {}
-
+ConstantFunction<dim, Number>::~ConstantFunction ()
+{
+  function_value_vector.clear();
+}
 
 
 template <int dim, typename Number>
 Number ConstantFunction<dim, Number>::value (const Point<dim> &,
                                              const unsigned int component) const
 {
-  (void)component;
   Assert (component < this->n_components,
           ExcIndexRange (component, 0, this->n_components));
-  return function_value;
+  return function_value_vector[component];
 }
 
 
@@ -398,7 +431,8 @@ void ConstantFunction<dim, Number>::vector_value (const Point<dim> &,
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
 
-  std::fill (return_value.begin(), return_value.end(), function_value);
+  std::copy (function_value_vector.begin(),function_value_vector.end(),
+             return_value.begin());
 }
 
 
@@ -406,17 +440,17 @@ void ConstantFunction<dim, Number>::vector_value (const Point<dim> &,
 template <int dim, typename Number>
 void ConstantFunction<dim, Number>::value_list (
   const std::vector<Point<dim> > &points,
-  std::vector<Number>            &values,
+  std::vector<Number>            &return_values,
   const unsigned int              component) const
 {
+  // To avoid warning of unused parameter
   (void)points;
-  (void)component;
   Assert (component < this->n_components,
           ExcIndexRange (component, 0, this->n_components));
-  Assert (values.size() == points.size(),
-          ExcDimensionMismatch(values.size(), points.size()));
+  Assert (return_values.size() == points.size(),
+          ExcDimensionMismatch(return_values.size(), points.size()))
 
-  std::fill (values.begin(), values.end(), function_value);
+  std::fill (return_values.begin(), return_values.end(), function_value_vector[component]);
 }
 
 
@@ -424,16 +458,17 @@ void ConstantFunction<dim, Number>::value_list (
 template <int dim, typename Number>
 void ConstantFunction<dim, Number>::vector_value_list (
   const std::vector<Point<dim> > &points,
-  std::vector<Vector<Number> >   &values) const
+  std::vector<Vector<Number> >   &return_values) const
 {
-  Assert (values.size() == points.size(),
-          ExcDimensionMismatch(values.size(), points.size()));
+  Assert (return_values.size() == points.size(),
+          ExcDimensionMismatch(return_values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      Assert (values[i].size() == this->n_components,
-              ExcDimensionMismatch(values[i].size(), this->n_components));
-      std::fill (values[i].begin(), values[i].end(), function_value);
+      Assert (return_values[i].size() == this->n_components,
+              ExcDimensionMismatch(return_values[i].size(), this->n_components));
+      std::copy (function_value_vector.begin(),function_value_vector.end(),
+                 return_values[i].begin());
     };
 }
 
@@ -443,8 +478,8 @@ template <int dim, typename Number>
 std::size_t
 ConstantFunction<dim, Number>::memory_consumption () const
 {
-  // only simple data elements, so use sizeof operator
-  return sizeof (*this);
+  // Here we assume Number is a simple type.
+  return (sizeof(*this) + this->n_components*sizeof(Number));
 }
 
 //---------------------------------------------------------------------------
@@ -493,6 +528,20 @@ ComponentSelectFunction (const std::pair<unsigned int,unsigned int> &selected,
 
 
 
+
+template <int dim, typename Number>
+void
+ComponentSelectFunction<dim, Number>::
+substitute_function_value_with (const ConstantFunction<dim, Number> &f)
+{
+  Point<dim> p;
+  for (unsigned int i=0; i<this->function_value_vector.size(); ++i)
+    this->function_value_vector[i] = f.value(p,i);
+}
+
+
+
+
 template <int dim, typename Number>
 void ComponentSelectFunction<dim, Number>::vector_value (
   const Point<dim> &,
@@ -502,9 +551,9 @@ void ComponentSelectFunction<dim, Number>::vector_value (
           ExcDimensionMismatch (return_value.size(), this->n_components));
 
   return_value = 0;
-  std::fill (return_value.begin()+selected_components.first,
-             return_value.begin()+selected_components.second,
-             this->function_value);
+  std::copy (this->function_value_vector.begin()+selected_components.first,
+             this->function_value_vector.begin()+selected_components.second,
+             return_value.begin()+selected_components.first);
 }
 
 
@@ -528,10 +577,14 @@ template <int dim, typename Number>
 std::size_t
 ComponentSelectFunction<dim, Number>::memory_consumption () const
 {
-  // only simple data elements, so use sizeof operator
-  return sizeof (*this);
+  // No new complex data structure is introduced here, just evaluate how much
+  // more memory is used *inside* the class via sizeof() and add that value to
+  // parent class's memory_consumption()
+  return (sizeof(*this) - sizeof(ConstantFunction<dim, Number>)
+          + ConstantFunction<dim, Number>::memory_consumption());
 }
 
++//---------------------------------------------------------------------------
 
 template <int dim, typename Number>
 ScalarFunctionFromFunctionObject<dim, Number>::

@@ -376,7 +376,7 @@ public:
 
 
 /**
- * Provide a function which always returns the constant value handed to the
+ * Provide a function which always returns the constant values handed to the
  * constructor.
  *
  * Obviously, the derivates of this function are zero, which is why we derive
@@ -389,25 +389,37 @@ public:
  * <tt>ZeroFunction</tt> is known at compile time and need not be looked up
  * somewhere in memory.
  *
- * You can pass to the constructor an integer denoting the number of
- * components this function shall have. It defaults to one. If it is greater
- * than one, then the function will return the constant value in all its
- * components, which might not be overly useful a feature in most cases,
- * however.
- *
  * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
  */
 template <int dim, typename Number=double>
 class ConstantFunction : public ZeroFunction<dim, Number>
 {
 public:
   /**
-   * Constructor; takes the constant function value as an argument. The number
-   * of components is preset to one.
+   * Constructor; set values of all components to the provided one. The default number
+   * of components is one.
    */
   ConstantFunction (const Number       value,
                     const unsigned int n_components = 1);
+
+  /**
+   * Constructor; takes an <tt>std::vector<Number></tt> object as an argument. The number
+   * of components is determined by <tt>values.size()</tt>.
+   */
+  ConstantFunction (const std::vector<Number> &values);
+
+  /**
+   * Constructor; takes an <tt>Vector<Number></tt> object as an argument. The number
+   * of components is determined by <tt>values.size()</tt>.
+   */
+  ConstantFunction (const Vector<Number> &values);
+
+  /**
+   * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
+   * to initialize a new object.
+   */
+  ConstantFunction (const Number *begin_ptr, const unsigned int n_components);
 
   /**
    * Virtual destructor; absolutely necessary in this case.
@@ -417,25 +429,24 @@ public:
   virtual Number value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  virtual void   vector_value (const Point<dim> &p,
-                               Vector<Number>   &return_value) const;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<Number>   &return_value) const;
 
   virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Number>            &values,
+                           std::vector<Number>            &return_values,
                            const unsigned int              component = 0) const;
 
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<Number> >   &values) const;
+                                  std::vector<Vector<Number> >   &return_values) const;
 
   std::size_t memory_consumption () const;
 
 protected:
   /**
-   * Store the constant function value.
+   * Store the constant function value vector.
    */
-  const Number function_value;
+  std::vector<Number> function_value_vector;
 };
-
 
 
 /**
@@ -482,11 +493,25 @@ public:
   ComponentSelectFunction (const std::pair<unsigned int, unsigned int> &selected,
                            const unsigned int n_components);
 
+
+  /**
+   * Substitute function value with value of a <tt>ConstantFunction<dim, Number> <\tt>
+   * object and keep the current selection pattern.
+   *
+   * This is useful if you want to have different values in different components since the
+   * provided constructors of <tt>ComponentSelectFunction<dim, Number> <\tt>
+   * class can only have same value for all components.
+   *
+   * @note: we copy the underlaying component value data from @para f from its beginning.
+   * So the number of components of @para f cannot be less than the calling object.
+   */
+  virtual void substitute_function_value_with (const ConstantFunction<dim, Number> &f);
+
   /**
    * Return the value of the function at the given point for all components.
    */
-  virtual void   vector_value (const Point<dim> &p,
-                               Vector<Number>   &return_value) const;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<Number>   &return_value) const;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
