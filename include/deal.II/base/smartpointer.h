@@ -70,14 +70,14 @@ public:
   SmartPointer ();
 
   /**
-   * Copy constructor for SmartPointer. We do now copy the object subscribed
+   * Copy constructor for SmartPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
   template <class Q>
   SmartPointer (const SmartPointer<T,Q> &tt);
 
   /**
-   * Copy constructor for SmartPointer. We do now copy the object subscribed
+   * Copy constructor for SmartPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
   SmartPointer (const SmartPointer<T,P> &tt);
