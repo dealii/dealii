@@ -382,7 +382,7 @@ public:
    *
    * @author Guido Kanschat, 2001; Wolfgang Bangerth, 2015.
    */
-  class InternalDataBase : public Subscriptor
+  class InternalDataBase
   {
   private:
     /**

@@ -348,7 +348,7 @@ public:
    * modification despite the fact that the surrounding object is
    * marked as <code>const</code>.
    */
-  class InternalDataBase : public Subscriptor
+  class InternalDataBase
   {
   private:
     /**
