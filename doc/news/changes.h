@@ -90,6 +90,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: FEFaceValues and FESubfaceValues can now also compute
+  gradients of the Jacobian of the transformation from unit to real cell,
+  controlled by update_jacobian_grads.
+  <br>
+  (Martin Kronbichler, 2015/08/08)
+  </li>
+
   <li> New: There is now a function MemoryConsumption::memory_consumption()
   for std_cxx11::unique_ptr arguments.
   <br>

@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Show the Jacobians and inverse Jacobians on hyperball with one quadrature
-// point
+// Show the Jacobians, inverse Jacobians, and Jacobian gradients on hyperball
+// with one quadrature point
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -44,7 +44,8 @@ void test()
     quad_p(d) = 0.42 + 0.11 * d;
   Quadrature<dim> quad(quad_p);
   FEValues<dim> fe_val (mapping, dummy, quad,
-                        update_jacobians | update_inverse_jacobians);
+                        update_jacobians | update_inverse_jacobians |
+                        update_jacobian_grads);
   deallog << dim << "d Jacobians:" << std::endl;
   typename Triangulation<dim>::active_cell_iterator
   cell = tria.begin_active(), endc = tria.end();
@@ -72,6 +73,21 @@ void test()
       deallog << std::endl;
     }
   deallog << std::endl;
+
+  deallog << dim << "d Jacobian gradients:" << std::endl;
+  cell = tria.begin_active();
+  endc = tria.end();
+  for ( ; cell != endc; ++cell)
+    {
+      fe_val.reinit (cell);
+
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          for (unsigned int f=0; f<dim; ++f)
+            deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
+      deallog << std::endl;
+    }
+  deallog << std::endl;
 }
 
 
@@ -79,7 +95,7 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(4) << std::fixed;
+  deallog << std::setprecision(8) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -89,6 +105,3 @@ main()
 
   return 0;
 }
-
-
-

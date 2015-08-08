@@ -3709,9 +3709,6 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;
   this->present_face_index=cell->face_index(face_no);
 
-  Assert(!(this->update_flags & update_jacobian_grads),
-         ExcNotImplemented());
-
   this->get_mapping().fill_fe_face_values(*this->present_cell,
                                           face_no,
                                           this->quadrature,
@@ -3942,9 +3939,6 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
              ExcInternalError());
       this->present_face_index=subface_index;
     }
-
-  Assert(!(this->update_flags & update_jacobian_grads),
-         ExcNotImplemented());
 
   // now ask the mapping and the finite element to do the actual work
   this->get_mapping().fill_fe_subface_values(*this->present_cell,

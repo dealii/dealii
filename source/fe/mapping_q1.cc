@@ -835,6 +835,54 @@ namespace internal
           }
 
     }
+
+    /**
+     * Update the Hessian of the transformation from unit to real cell, the
+     * Jacobian gradients.
+     *
+     * Skip the computation if possible as indicated by the first argument.
+     */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_grads (const CellSimilarity::Similarity                                   cell_similarity,
+                                 const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+                                 const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
+                                 std::vector<DerivativeForm<2,dim,spacedim> >                      &jacobian_grads)
+    {
+      const UpdateFlags update_flags(data.current_update_flags());
+      if (update_flags & update_jacobian_grads)
+        {
+          const unsigned int n_q_points = jacobian_grads.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<2,dim> *second =
+                    &data.second_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        result[i][j][l] = (second[0][j][l] *
+                                           data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          result[i][j][l]
+                          += (second[k][j][l]
+                              *
+                              data.mapping_support_points[k][i]);
+
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        jacobian_grads[point][i][j][l] = result[i][j][l];
+                }
+            }
+        }
+    }
   }
 }
 
@@ -991,50 +1039,6 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           output_data.jacobians[point] = data.contravariant[point];
     }
 
-  // calculate values of the derivatives of the Jacobians. do it here, since
-  // we only do it for cells, not faces.
-  if (update_flags & update_jacobian_grads)
-    {
-      AssertDimension (output_data.jacobian_grads.size(), n_q_points);
-
-      if (cell_similarity != CellSimilarity::translation)
-        {
-
-          std::fill(output_data.jacobian_grads.begin(),
-                    output_data.jacobian_grads.end(),
-                    DerivativeForm<2,dim,spacedim>());
-
-
-          const unsigned int data_set = DataSetDescriptor::cell();
-
-          for (unsigned int point=0; point<n_q_points; ++point)
-            {
-              const Tensor<2,dim> *second =
-                &data.second_derivative(point+data_set, 0);
-              double result [spacedim][dim][dim];
-              for (unsigned int i=0; i<spacedim; ++i)
-                for (unsigned int j=0; j<dim; ++j)
-                  for (unsigned int l=0; l<dim; ++l)
-                    result[i][j][l] = (second[0][j][l] *
-                                       data.mapping_support_points[0][i]);
-              for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    for (unsigned int l=0; l<dim; ++l)
-                      result[i][j][l]
-                      += (second[k][j][l]
-                          *
-                          data.mapping_support_points[k][i]);
-
-              // never touch any data for j=dim in case dim<spacedim, so it
-              // will always be zero as it was initialized
-              for (unsigned int i=0; i<spacedim; ++i)
-                for (unsigned int j=0; j<dim; ++j)
-                  for (unsigned int l=0; l<dim; ++l)
-                    output_data.jacobian_grads[point][i][j][l] = result[i][j][l];
-            }
-        }
-    }
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
@@ -1043,6 +1047,11 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
         for (unsigned int point=0; point<n_q_points; ++point)
           output_data.inverse_jacobians[point] = data.covariant[point].transpose();
     }
+
+  internal::maybe_update_jacobian_grads<dim,spacedim> (cell_similarity,
+                                                       DataSetDescriptor::cell (),
+                                                       data,
+                                                       output_data.jacobian_grads);
 
   return cell_similarity;
 }
@@ -1220,6 +1229,10 @@ namespace internal
       maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
                                             data_set,
                                             data);
+      maybe_update_jacobian_grads<dim,spacedim> (CellSimilarity::none,
+                                                 data_set,
+                                                 data,
+                                                 output_data.jacobian_grads);
       maybe_compute_face_data (mapping,
                                cell, face_no, subface_no, quadrature.size(),
                                quadrature.get_weights(), data,
