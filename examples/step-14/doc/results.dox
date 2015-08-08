@@ -217,28 +217,28 @@ Refinement cycle: 3
    Point x-derivative=-0.053033
    Estimated error=-0.00136114
 Refinement cycle: 4
-   Number of degrees of freedom=541
-   Point x-derivative=-0.0526461
-   Estimated error=-0.000555479
+   Number of degrees of freedom=532
+   Point x-derivative=-0.0526429
+   Estimated error=-0.000558868
 Refinement cycle: 5
-   Number of degrees of freedom=1286
-   Point x-derivative=-0.0526896
-   Estimated error=-0.0002261
+   Number of degrees of freedom=1267
+   Point x-derivative=-0.0526955
+   Estimated error=-0.000220116
 Refinement cycle: 6
-   Number of degrees of freedom=2924
-   Point x-derivative=-0.0527503
-   Estimated error=-9.38035e-05
+   Number of degrees of freedom=2864
+   Point x-derivative=-0.0527495
+   Estimated error=-9.46731e-05
 Refinement cycle: 7
-   Number of degrees of freedom=6578
-   Point x-derivative=-0.0527877
-   Estimated error=-3.94139e-05
+   Number of degrees of freedom=6409
+   Point x-derivative=-0.052785
+   Estimated error=-4.21543e-05
 Refinement cycle: 8
-   Number of degrees of freedom=14780
-   Point x-derivative=-0.0528047
-   Estimated error=-1.85456e-05
+   Number of degrees of freedom=14183
+   Point x-derivative=-0.0528028
+   Estimated error=-2.04241e-05
 Refinement cycle: 9
-   Number of degrees of freedom=31438
-   Point x-derivative=-0.0528145
+   Number of degrees of freedom=29902
+   Point x-derivative=-0.052814
 @endcode
 
 
