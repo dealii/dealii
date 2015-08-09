@@ -808,14 +808,25 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
-  // get data objects from each of
-  // the base elements and store them
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_data,
+                                                 base_element(base_no),
+                                                 flags,
+                                                 mapping,
+                                                 quadrature);
+
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      // create internal objects for base elements and initialize their
-      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_data(flags, mapping, quadrature);
+        get_data_tasks[base_no].return_value();
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
@@ -847,12 +858,25 @@ FESystem<dim,spacedim>::get_face_data (
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_face_data,
+                                                 base_element(base_no),
+                                                 flags,
+                                                 mapping,
+                                                 quadrature);
+
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      // create internal objects for base elements and initialize their
-      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_face_data(flags, mapping, quadrature);
+        get_data_tasks[base_no].return_value();
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
@@ -886,12 +910,25 @@ FESystem<dim,spacedim>::get_subface_data (
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_subface_data,
+                                                 base_element(base_no),
+                                                 flags,
+                                                 mapping,
+                                                 quadrature);
+
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      // create internal objects for base elements and initialize their
-      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_subface_data(flags, mapping, quadrature);
+        get_data_tasks[base_no].return_value();
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
