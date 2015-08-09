@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Show the Jacobians and inverse Jacobians of FEFaceValues and
-// FESubfaceValues on a Cartesian mesh with MappingCartesian with one
-// quadrature point
+// Show the Jacobians, inverse Jacobians, and Jacobian gradients of
+// FEFaceValues and FESubfaceValues on a Cartesian mesh with MappingCartesian
+// with one quadrature point
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -44,9 +44,11 @@ void test()
     quad_p(d) = 0.42 + 0.11 * d;
   Quadrature<dim-1> quad(quad_p);
   FEFaceValues<dim> fe_val (mapping, dummy, quad,
-                            update_jacobians | update_inverse_jacobians);
+                            update_jacobians | update_inverse_jacobians |
+                            update_jacobian_grads);
   FESubfaceValues<dim> fe_sub_val (mapping, dummy, quad,
-                                   update_jacobians | update_inverse_jacobians);
+                                   update_jacobians | update_inverse_jacobians |
+                                   update_jacobian_grads);
   deallog << dim << "d Jacobians:" << std::endl;
   typename Triangulation<dim>::active_cell_iterator
   cell = tria.begin_active(), endc = tria.end();
@@ -103,6 +105,36 @@ void test()
 
     }
   deallog << std::endl;
+
+  deallog << dim << "d Jacobian gradients:" << std::endl;
+  cell = tria.begin_active();
+  endc = tria.end();
+  for ( ; cell != endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+        fe_val.reinit (cell, f);
+
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
+        deallog << std::endl;
+
+        // Also check the Jacobian with FESubfaceValues
+        if (cell->at_boundary(f) == false &&
+            cell->neighbor(f)->level() < cell->level())
+          {
+            fe_sub_val.reinit(cell->neighbor(f), cell->neighbor_face_no(f),
+                              cell->neighbor_of_coarser_neighbor(f).second);
+
+            for (unsigned int d=0; d<dim; ++d)
+              for (unsigned int e=0; e<dim; ++e)
+                for (unsigned int f=0; f<dim; ++f)
+                  deallog << fe_sub_val.jacobian_grad(0)[d][e][f] << " ";
+            deallog << std::endl;
+          }
+      }
+  deallog << std::endl;
 }
 
 
@@ -110,7 +142,7 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(4) << std::fixed;
+  deallog << std::setprecision(8) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
