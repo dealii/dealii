@@ -841,9 +841,17 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
   // the base elements and store them
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
+      // create internal objects for base elements and initialize their
+      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
         base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
 
       // make sure that *we* compute
@@ -886,9 +894,17 @@ FESystem<dim,spacedim>::get_face_data (
 
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
+      // create internal objects for base elements and initialize their
+      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
         base_element(base_no).get_face_data(sub_flags, mapping, quadrature);
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
 
       Assert (!(base_fe_data->update_each & update_hessians),
@@ -930,9 +946,17 @@ FESystem<dim,spacedim>::get_subface_data (
 
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
+      // create internal objects for base elements and initialize their
+      // respective output objects
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
         base_element(base_no).get_subface_data(sub_flags, mapping, quadrature);
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
 
       Assert (!(base_fe_data->update_each & update_hessians),
@@ -1182,26 +1206,6 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 
   if (flags & (update_values | update_gradients))
     {
-      if (fe_data.is_first_cell())
-        {
-          // Initialize the internal FE objects for the base elements
-          for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-            {
-              // Pointer needed to get the update flags of the base element
-              typename FiniteElement<dim,spacedim>::InternalDataBase &
-              base_fe_data = fe_data.get_fe_data(base_no);
-
-              // compute update flags ...
-              const UpdateFlags base_update_flags
-                = mapping_internal.update_flags | base_fe_data.update_flags;
-
-              // Initialize the output objects for the base elements.
-              internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_data=fe_data.get_fe_output_object(base_no);
-              const FiniteElement<dim,spacedim> &base_fe=base_element(base_no);
-              base_data.initialize (n_q_points, base_fe, base_update_flags);
-            }
-        }
-
       // let base elements update the necessary data
       Threads::TaskGroup<> task_group;
       for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
