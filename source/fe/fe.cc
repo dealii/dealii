@@ -126,7 +126,6 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
 
 
 template <int dim, int spacedim>
-inline
 UpdateFlags
 FiniteElement<dim,spacedim>::InternalDataBase::current_update_flags () const
 {
@@ -143,17 +142,6 @@ FiniteElement<dim,spacedim>::InternalDataBase::current_update_flags () const
 
 
 template <int dim, int spacedim>
-inline
-bool
-FiniteElement<dim,spacedim>::InternalDataBase::is_first_cell () const
-{
-  return first_cell;
-}
-
-
-
-template <int dim, int spacedim>
-inline
 void
 FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ()
 {

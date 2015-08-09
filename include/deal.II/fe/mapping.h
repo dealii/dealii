@@ -391,18 +391,6 @@ public:
     UpdateFlags  current_update_flags() const;
 
     /**
-     * Return whether we are presently initializing data for the first cell.
-     * The value of the field this function is returning is set to @p true in
-     * the constructor, and cleared by the @p FEValues class after the first
-     * cell has been initialized.
-     *
-     * This function is used to determine whether we need to use the @p
-     * update_once flags for computing data, or whether we can use the @p
-     * update_each flags.
-     */
-    bool is_first_cell () const;
-
-    /**
      * Set the @p first_cell flag to @p false. Used by the @p FEValues class
      * to indicate that we have already done the work on the first cell.
      */
@@ -437,7 +425,8 @@ public:
 
   private:
     /**
-     * The value returned by @p is_first_cell.
+     * Initially set to true, but reset to false when clear_first_cell()
+     * is called.
      */
     bool first_cell;
   };
@@ -891,16 +880,6 @@ Mapping<dim,spacedim>::InternalDataBase::current_update_flags () const
     }
   else
     return update_each;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-bool
-Mapping<dim,spacedim>::InternalDataBase::is_first_cell () const
-{
-  return first_cell;
 }
 
 
