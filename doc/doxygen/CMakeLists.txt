@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -101,10 +101,10 @@ LIST(APPEND _doxygen_input
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/
   )
 
+# Add other directories in which to find images
 SET(_doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
-  ${CMAKE_CURRENT_BINARY_DIR}/images
   )
 
 file(GLOB _doxygen_depend

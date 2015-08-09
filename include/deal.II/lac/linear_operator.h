@@ -578,7 +578,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
  * @relates LinearOperator
  *
  * Returns the transpose linear operations of
- * @ref op.
+ * @p op.
  *
  * @ingroup LAOperators
  */
@@ -682,7 +682,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
  * Returns a LinearOperator that is the identity of the vector space @p Range.
  *
  * The function takes an <code>std::function</code> object
- * @ref reinit_vector
+ * @p reinit_vector
  * as an argument to initialize the <code>reinit_range_vector</code> and
  * <code>reinit_domain_vector</code> objects of the LinearOperator object.
  *
