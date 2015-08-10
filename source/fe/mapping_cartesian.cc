@@ -667,6 +667,21 @@ MappingCartesian<dim,spacedim>::transform (
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
             output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+                                / data.volume_element;
+      return;
+    }
+
+    case mapping_piola_gradient:
+    {
+      Assert (data.update_flags & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+      Assert (data.update_flags & update_volume_elements,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
                                 / data.length[d1] / data.volume_element;
       return;
     }
@@ -695,6 +710,68 @@ MappingCartesian<dim,spacedim>::transform (
 
   switch (mapping_type)
     {
+    case mapping_covariant:
+    {
+      Assert (data.update_flags & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] / data.length[d2];
+      return;
+    }
+
+    case mapping_contravariant:
+    {
+      Assert (data.update_flags & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] * data.length[d2];
+      return;
+    }
+
+    case mapping_covariant_gradient:
+    {
+      Assert (data.update_flags & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] / data.length[d2] / data.length[d1];
+      return;
+    }
+
+    case mapping_contravariant_gradient:
+    {
+      Assert (data.update_flags & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] * data.length[d2] / data.length[d1];
+      return;
+    }
+
+    case mapping_piola:
+    {
+      Assert (data.update_flags & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+      Assert (data.update_flags & update_volume_elements,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        for (unsigned int d1=0; d1<dim; ++d1)
+          for (unsigned int d2=0; d2<dim; ++d2)
+            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+                                / data.volume_element;
+      return;
+    }
     case mapping_piola_gradient:
     {
       Assert (data.update_flags & update_contravariant_transformation,
