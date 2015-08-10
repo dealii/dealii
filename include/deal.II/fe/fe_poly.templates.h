@@ -150,7 +150,8 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
+    out |= update_hessians | update_covariant_transformation
+           | update_gradients | update_jacobian_grads;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
 
@@ -166,7 +167,7 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 template <class POLY, int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
-                                      const Mapping<dim,spacedim>    &mapping,
+                                      const Mapping<dim,spacedim> &,
                                       const Quadrature<dim> &quadrature) const
 {
   // generate a new data object and
@@ -211,7 +212,12 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
   // then initialize some objects for
   // that
   if (flags & update_hessians)
-    data->initialize_2nd (this, mapping, quadrature);
+    {
+      grad_grads.resize (this->dofs_per_cell);
+      data->shape_hessians.resize (this->dofs_per_cell,
+                                   std::vector<Tensor<2,dim> > (n_q_points));
+      data->untransformed_shape_hessians.resize (n_q_points);
+    }
 
   // next already fill those fields
   // of which we have information by
@@ -220,7 +226,7 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
   // unit cell, and need to be
   // transformed when visiting an
   // actual cell
-  if (flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients | update_hessians))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
         poly_space.compute(quadrature.point(i),
@@ -233,6 +239,10 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
         if (flags & update_gradients)
           for (unsigned int k=0; k<this->dofs_per_cell; ++k)
             data->shape_gradients[k][i] = grads[k];
+
+        if (flags & update_hessians)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            data->shape_hessians[k][i] = grad_grads[k];
       }
   return data;
 }
@@ -248,14 +258,14 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
-                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const Quadrature<dim>                            &quadrature,
-                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+fill_fe_values (const Mapping<dim,spacedim>                                  &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const Quadrature<dim>                                        &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+                const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data,
+                const CellSimilarity::Similarity                              cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -276,12 +286,23 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
         mapping.transform(fe_data.shape_gradients[k],
                           output_data.shape_gradients[k],
                           mapping_internal, mapping_covariant);
-    }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_internal, fe_data,
-                       output_data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            {
+              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
+            }
+
+          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
+                                          mapping_data, output_data, quadrature.size(), k);
+
+          mapping.transform(fe_data.untransformed_shape_hessians,
+                            output_data.shape_hessians[k],
+                            mapping_internal, mapping_covariant_gradient);
+        }
+    }
 }
 
 
@@ -289,14 +310,14 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                    face,
-                     const Quadrature<dim-1>              &quadrature,
+fill_fe_face_values (const Mapping<dim,spacedim>                                  &mapping,
+                     const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
+                     const unsigned int                                            face,
+                     const Quadrature<dim-1>                                      &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase       &fedata,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                     const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -328,27 +349,37 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
                           output_data.shape_gradients[k],
                           mapping_internal, mapping_covariant);
+
+      if (flags & update_hessians)
+        {
+          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            {
+              fe_data.untransformed_shape_hessians[i+offset] = fe_data.shape_hessians[k][i+offset];
+            }
+
+          correct_untransformed_hessians(VectorSlice< std::vector<Tensor<2,dim> > >
+                                         ( fe_data.untransformed_shape_hessians, offset , quadrature.size()),
+                                         mapping_data, output_data, quadrature.size(), k);
+
+          mapping.transform(make_slice(fe_data.untransformed_shape_hessians, offset, quadrature.size()),
+                            output_data.shape_hessians[k], mapping_internal, mapping_covariant_gradient);
+        }
     }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
-                       output_data);
 }
-
-
 
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
-                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const unsigned int                    face,
-                        const unsigned int                    subface,
-                        const Quadrature<dim-1>              &quadrature,
+fill_fe_subface_values (const Mapping<dim,spacedim>                                  &mapping,
+                        const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
+                        const unsigned int                                            face,
+                        const unsigned int                                            subface,
+                        const Quadrature<dim-1>                                      &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                        const typename FiniteElement<dim,spacedim>::InternalDataBase       &fedata,
-                        const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                        const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                        internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -381,14 +412,42 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
         mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
                           output_data.shape_gradients[k],
                           mapping_internal, mapping_covariant);
-    }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
-                       output_data);
+      if (flags & update_hessians)
+        {
+          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            {
+              fe_data.untransformed_shape_hessians[i+offset] = fe_data.shape_hessians[k][i+offset];
+            }
+
+          correct_untransformed_hessians(VectorSlice< std::vector<Tensor<2,dim> > >
+                                         ( fe_data.untransformed_shape_hessians, offset , quadrature.size()),
+                                         mapping_data, output_data, quadrature.size(), k);
+
+          mapping.transform(make_slice(fe_data.untransformed_shape_hessians, offset, quadrature.size()),
+                            output_data.shape_hessians[k], mapping_internal, mapping_covariant_gradient);
+        }
+    }
 }
 
 
+template <class POLY, int dim, int spacedim>
+void
+FE_Poly<POLY,dim,spacedim>::
+correct_untransformed_hessians (VectorSlice< std::vector<Tensor<2, dim> > >                       uncorrected_shape_hessians,
+                                const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+                                const internal::FEValues::FiniteElementRelatedData<dim,spacedim> &fevalues_data,
+                                const unsigned int                                                n_q_points,
+                                const unsigned int                                                dof) const
+{
+  for (unsigned int i=0; i<n_q_points; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int l=0; l<dim; ++l)
+        for (unsigned int n=0; n<spacedim; ++n)
+          uncorrected_shape_hessians[i][j][l] -= fevalues_data.shape_gradients[dof][i][n]
+                                                 * mapping_data.jacobian_grads[i][n][l][j];
+}
 
 namespace internal
 {
