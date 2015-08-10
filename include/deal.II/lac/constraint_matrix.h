@@ -667,6 +667,12 @@ public:
    * index at the same time. This needs to be made sure from the caller's
    * site. There is no locking mechanism inside this method to prevent data
    * races.
+   *
+   * @param[in] local_vector Vector of local contributions.
+   * @param[in] local_dof_indices Local degrees of freedom indices
+   *   corresponding to the vector of local contributions.
+   * @param[out]  global_vector The global vector to which all local
+   *   contributions will be added.
    */
   template <class InVector, class OutVector>
   void
@@ -716,9 +722,6 @@ public:
    * index at the same time. This needs to be made sure from the caller's
    * site. There is no locking mechanism inside this method to prevent data
    * races.
-   * @param local_vector : vector of local contributions.
-   * @param local_dof_indices : local degrees of freedom indices correspinding to the vector of local contributions.
-   * @param  global_vector : vector of local contributions is distributed to this global_vector.
    */
   template <typename VectorType, typename LocalType>
   void
