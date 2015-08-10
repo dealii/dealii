@@ -2467,7 +2467,12 @@ public:
    * and
    * @ref GlossArtificialCell).
    * This function counts over all of them, including ghost and artificial
-   * active cells.
+   * active cells. This implies that the index returned by this function
+   * uniquely identifies a cell within the triangulation on a single processor,
+   * but does not uniquely identify the cell among the (parts of the)
+   * triangulation that is shared among processors. If you would like to identify
+   * active cells across processors, you need to consider the CellId of a cell
+   * returned by CellAccessor::id().
    */
   unsigned int active_cell_index () const;
 
