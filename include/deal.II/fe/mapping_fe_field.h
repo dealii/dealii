@@ -396,35 +396,6 @@ public:
                                         InternalData &mdata) const;
 
   /**
-   * Do the computation for the <tt>fill_*</tt> functions.
-   */
-  void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int      npts,
-                     const typename QProjector<dim>::DataSetDescriptor data_set,
-                     const CellSimilarity::Similarity cell_similarity,
-                     const InternalData           &data,
-                     std::vector<Point<spacedim> > &quadrature_points) const;
-
-
-  /**
-   * Do the computation for the <tt>fill_*</tt> functions.
-   */
-  void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int      face_no,
-                          const unsigned int      subface_no,
-                          const unsigned int      npts,
-                          const typename QProjector<dim>::DataSetDescriptor data_set,
-                          const std::vector<double>   &weights,
-                          const InternalData           &mapping_data,
-                          std::vector<Point<spacedim> >    &quadrature_points,
-                          std::vector<double>         &JxW_values,
-                          std::vector<Tensor<1,spacedim> > &boundary_form,
-                          std::vector<Point<spacedim> > &normal_vectors,
-                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
-
-
-  /**
    * Always returns @p false.
    */
   virtual
