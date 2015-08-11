@@ -140,7 +140,7 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
                                                std::vector<Point<dim> > &quadrature_points,
                                                std::vector<Point<dim> > &normal_vectors) const
 {
-  const UpdateFlags update_flags(data.current_update_flags());
+  const UpdateFlags update_flags = data.update_each;
 
   // some more sanity checks
   if (face_no != invalid_face_number)
@@ -342,20 +342,20 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   // equal and are the product of the
   // local lengths in each coordinate
   // direction
-  if (data.current_update_flags() & (update_JxW_values | update_volume_elements))
+  if (data.update_each & (update_JxW_values | update_volume_elements))
     if (cell_similarity != CellSimilarity::translation)
       {
         double J = data.length[0];
         for (unsigned int d=1; d<dim; ++d)
           J *= data.length[d];
         data.volume_element = J;
-        if (data.current_update_flags() & update_JxW_values)
+        if (data.update_each & update_JxW_values)
           for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
             output_data.JxW_values[i] = J * quadrature.weight(i);
       }
   // "compute" Jacobian at the quadrature
   // points, which are all the same
-  if (data.current_update_flags() & update_jacobians)
+  if (data.update_each & update_jacobians)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
         {
@@ -366,7 +366,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   // "compute" the derivative of the Jacobian
   // at the quadrature points, which are all
   // zero of course
-  if (data.current_update_flags() & update_jacobian_grads)
+  if (data.update_each & update_jacobian_grads)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
         output_data.jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
@@ -374,7 +374,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   // "compute" inverse Jacobian at the
   // quadrature points, which are all
   // the same
-  if (data.current_update_flags() & update_inverse_jacobians)
+  if (data.update_each & update_inverse_jacobians)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
         {
@@ -420,15 +420,15 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.length[d];
 
-  if (data.current_update_flags() & update_JxW_values)
+  if (data.update_each & update_JxW_values)
     for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
       output_data.JxW_values[i] = J * quadrature.weight(i);
 
-  if (data.current_update_flags() & update_boundary_forms)
+  if (data.update_each & update_boundary_forms)
     for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.current_update_flags() & update_volume_elements)
+  if (data.update_each & update_volume_elements)
     {
       J = data.length[0];
       for (unsigned int d=1; d<dim; ++d)
@@ -436,7 +436,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       data.volume_element = J;
     }
 
-  if (data.current_update_flags() & update_jacobians)
+  if (data.update_each & update_jacobians)
     for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
       {
         output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
@@ -444,7 +444,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
           output_data.jacobians[i][d][d] = data.length[d];
       }
 
-  if (data.current_update_flags() & update_inverse_jacobians)
+  if (data.update_each & update_inverse_jacobians)
     for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
         output_data.inverse_jacobians[i] = DerivativeForm<1,dim,spacedim>();
@@ -486,7 +486,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.length[d];
 
-  if (data.current_update_flags() & update_JxW_values)
+  if (data.update_each & update_JxW_values)
     {
       // Here,
       // cell->face(face_no)->n_children()
@@ -506,11 +506,11 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
         output_data.JxW_values[i] = J * quadrature.weight(i) / n_subfaces;
     }
 
-  if (data.current_update_flags() & update_boundary_forms)
+  if (data.update_each & update_boundary_forms)
     for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.current_update_flags() & update_volume_elements)
+  if (data.update_each & update_volume_elements)
     {
       J = data.length[0];
       for (unsigned int d=1; d<dim; ++d)
@@ -518,7 +518,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       data.volume_element = J;
     }
 
-  if (data.current_update_flags() & update_jacobians)
+  if (data.update_each & update_jacobians)
     for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
       {
         output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
@@ -526,7 +526,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
           output_data.jacobians[i][d][d] = data.length[d];
       }
 
-  if (data.current_update_flags() & update_inverse_jacobians)
+  if (data.update_each & update_inverse_jacobians)
     for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
         output_data.inverse_jacobians[i] = DerivativeForm<1,spacedim,dim>();
