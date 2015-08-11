@@ -239,6 +239,14 @@ protected:
      * point.
      */
     std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
+
+    /**
+     * Scratch arrays for intermediate computations
+     */
+    mutable std::vector<double> sign_change;
+    mutable std::vector<Tensor<1, spacedim> > transformed_shape_values;
+    mutable std::vector<Tensor<2, spacedim > > transformed_shape_grads;
+    mutable std::vector<Tensor<2, dim > > untransformed_shape_grads;
   };
 
   /**
