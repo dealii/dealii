@@ -21,8 +21,8 @@ DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:GMRES::Starting value 9.98895
-DEAL:GMRES::Convergence step 21 value 1.04294e-13
+DEAL:GMRES::Starting value 10.0041
+DEAL:GMRES::Convergence step 21 value 1.79028e-13
 DEAL::energy-error: 0.332582
 DEAL::L2-error:     0.00548996
 DEAL::Estimate 0.838060
@@ -35,8 +35,8 @@ DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:GMRES::Starting value 10.7902
-DEAL:GMRES::Convergence step 28 value 4.34099e-13
+DEAL:GMRES::Starting value 10.8018
+DEAL:GMRES::Convergence step 28 value 2.71140e-13
 DEAL::energy-error: 0.237705
 DEAL::L2-error:     0.00250869
 DEAL::Estimate 0.611449
@@ -49,8 +49,8 @@ DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:GMRES::Starting value 12.1830
-DEAL:GMRES::Convergence step 33 value 5.33786e-13
+DEAL:GMRES::Starting value 12.2055
+DEAL:GMRES::Convergence step 33 value 8.68786e-13
 DEAL::energy-error: 0.170860
 DEAL::L2-error:     0.00120805
 DEAL::Estimate 0.452418
@@ -63,8 +63,8 @@ DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:GMRES::Starting value 15.5674
-DEAL:GMRES::Convergence step 34 value 3.96471e-13
+DEAL:GMRES::Starting value 15.5679
+DEAL:GMRES::Convergence step 34 value 7.55616e-13
 DEAL::energy-error: 0.122755
 DEAL::L2-error:     0.000602816
 DEAL::Estimate 0.332525
@@ -77,8 +77,8 @@ DEAL::Assemble matrix
 DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
-DEAL:GMRES::Starting value 18.7536
-DEAL:GMRES::Convergence step 33 value 6.84534e-13
+DEAL:GMRES::Starting value 18.7682
+DEAL:GMRES::Convergence step 33 value 8.65709e-13
 DEAL::energy-error: 0.0869445
 DEAL::L2-error:     0.000292783
 DEAL::Estimate 0.236647

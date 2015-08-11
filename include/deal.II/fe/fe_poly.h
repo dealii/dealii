@@ -248,7 +248,6 @@ protected:
    */
   virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
-
   /**
    * Fields of cell-independent data.
    *
@@ -279,7 +278,41 @@ protected:
      * multiplication) when visiting an actual cell.
      */
     std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+
+    /**
+     * Array with shape function hessians in quadrature points. There is one
+     * row for each shape function, containing values for each quadrature
+     * point.
+     *
+     * We store the hessians in the quadrature points on the unit cell. We
+     * then only have to apply the transformation when visiting an actual cell.
+     */
+    std::vector<std::vector<Tensor<2,dim> > > shape_hessians;
+
+    /**
+     * Scratch array to store temporary values during hessian calculations in
+     * actual cells.
+     */
+    mutable std::vector<Tensor<2,dim> > untransformed_shape_hessians;
   };
+
+  /**
+   * Correct the hessian in the reference cell by subtracting the term corresponding
+   * to the Jacobian gradient for one degree of freedom. The result being given by:
+   *
+   * \frac{\partial^2 \phi_i}{\partial\hat{x}_J\partial\hat{x}_K}
+   * - \frac{\partial \phi_i}{\partial {x}_l}
+   * \left( \frac{\partial^2{x}_l}{\partial\hat{x}_J\partial\hat{x}_K} \right)
+   *
+   * After this correction, the shape hessians are simply a mapping_covariant_gradient
+   * transformation.
+   */
+  void
+  correct_untransformed_hessians (VectorSlice< std::vector<Tensor<2, dim> > >                       uncorrected_shape_hessians,
+                                  const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+                                  const internal::FEValues::FiniteElementRelatedData<dim,spacedim> &fevalues_data,
+                                  const unsigned int                                                n_q_points,
+                                  const unsigned int                                                dof) const;
 
   /**
    * The polynomial space. Its type is given by the template parameter POLY.
