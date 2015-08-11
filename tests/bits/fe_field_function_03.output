@@ -2,7 +2,7 @@
 DEAL::Ndofs :1025
 DEAL::V norm: 22.6385
 DEAL::Value of the laplacian in 0:
-DEAL::correct value: -2.46740, approximation: -2.46743
+DEAL::correct value: -2.46740, approximation: -2.46740
 DEAL::Value of the laplacian in 0.5*e1 and 0.25 * e1:
 DEAL:: correct values: -1.74472 -2.27958, approximations: -1.74739 -2.28103
 DEAL::Ndofs :1089
