@@ -871,11 +871,6 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException0 (ExcGhostsPresent);
-
-    /**
-     * Exception
-     */
     DeclException0 (ExcDifferentParallelPartitioning);
 
     /**

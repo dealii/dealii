@@ -1000,6 +1000,10 @@ namespace StandardExceptions
                     "You are trying an operation on a vector that is only "
                     "allowed if the vector has no ghost elements, but the "
                     "vector you are operating on does have ghost elements. "
+                    "Specifically, vectors with ghost elements are read-only "
+                    "and cannot appear in operations that write into these "
+                    "vectors."
+                    "\n\n"
                     "See the glossary entry on 'Ghosted vectors' for more "
                     "information.");
 
