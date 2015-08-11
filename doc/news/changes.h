@@ -90,6 +90,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a function Mapping::project_real_point_to_unit_point_on_face()
+  that calls Mapping::transform_real_to_unit_cell() and then projects the
+  result to a provided face.
+  <br>
+  (Jason Sheldon, 2015/08/11)
+  </li>
+
   <li> New: FEFaceValues and FESubfaceValues can now also compute
   gradients of the Jacobian of the transformation from unit to real cell,
   controlled by update_jacobian_grads.
