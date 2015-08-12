@@ -66,6 +66,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q 
+  enriched by bubble functions.
+  <br>
+  (Daniel Arndt, 2015/08/12)
+  </li>
 
   <li> New: MultithreadInfo::set_thread_limit() can now be called more than
   once and the environment variable DEAL_II_NUM_THREADS will be respected

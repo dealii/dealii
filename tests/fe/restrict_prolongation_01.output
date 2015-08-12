@@ -1,0 +1,199 @@
+
+DEAL::FE_Q<2>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q<3>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_DG0<2>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_DG0<3>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_Bubbles<2>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_Bubbles<3>(1)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q<2>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q<3>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_DG0<2>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_DG0<3>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_Bubbles<2>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_Bubbles<3>(2)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q<2>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q<3>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_DG0<2>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_DG0<3>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK
+DEAL::FE_Q_Bubbles<2>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::FE_Q_Bubbles<3>(3)
+DEAL::RefinementCase 1
+DEAL::OK
+DEAL::RefinementCase 2
+DEAL::OK
+DEAL::RefinementCase 3
+DEAL::OK
+DEAL::RefinementCase 4
+DEAL::OK
+DEAL::RefinementCase 5
+DEAL::OK
+DEAL::RefinementCase 6
+DEAL::OK
+DEAL::RefinementCase 7
+DEAL::OK

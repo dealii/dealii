@@ -35,6 +35,7 @@ SET(_src
   fe_poly_tensor.cc
   fe_q_base.cc
   fe_q.cc
+  fe_q_bubbles.cc
   fe_q_dg0.cc
   fe_q_hierarchical.cc
   fe_q_iso_q1.cc
@@ -72,6 +73,7 @@ SET(_inst
   fe_poly.inst.in
   fe_poly_tensor.inst.in
   fe_q_base.inst.in
+  fe_q_bubbles.inst.in
   fe_q_dg0.inst.in
   fe_q_hierarchical.inst.in
   fe_q.inst.in
