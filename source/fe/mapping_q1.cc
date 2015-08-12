@@ -522,16 +522,16 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
   // add flags if the respective
   // quantities are necessary to
   // compute what we need. note that
-  // some flags appear in both
+  // some flags appear in both the
   // conditions and in subsequent
   // set operations. this leads to
   // some circular logic. the only
   // way to treat this is to
-  // iterate. since there are 4
+  // iterate. since there are 5
   // if-clauses in the loop, it will
-  // take at most 3 iterations to
+  // take at most 5 iterations to
   // converge. do them:
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i=0; i<5; ++i)
     {
       // The following is a little incorrect:
       // If not applied on a face,
