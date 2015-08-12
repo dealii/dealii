@@ -299,11 +299,11 @@ protected:
   /**
    * Correct the hessian in the reference cell by subtracting the term corresponding
    * to the Jacobian gradient for one degree of freedom. The result being given by:
-   *
+   * @f[
    * \frac{\partial^2 \phi_i}{\partial\hat{x}_J\partial\hat{x}_K}
    * - \frac{\partial \phi_i}{\partial {x}_l}
-   * \left( \frac{\partial^2{x}_l}{\partial\hat{x}_J\partial\hat{x}_K} \right)
-   *
+   * \left( \frac{\partial^2{x}_l}{\partial\hat{x}_J\partial\hat{x}_K} \right).
+   * @f]
    * After this correction, the shape hessians are simply a mapping_covariant_gradient
    * transformation.
    */
