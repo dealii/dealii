@@ -547,7 +547,6 @@ namespace internal
                              const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                              const unsigned int               face_no,
                              const unsigned int               subface_no,
-                             const unsigned int               n_q_points,
                              const std::vector<double>        &weights,
                              const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
                              internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
@@ -707,7 +706,7 @@ namespace internal
                                                  fe, fe_mask, fe_to_real,
                                                  output_data.jacobian_grads);
       maybe_compute_face_data (mapping,
-                               cell, face_no, subface_no, quadrature.size(),
+                               cell, face_no, subface_no,
                                quadrature.get_weights(), data,
                                output_data);
     }
