@@ -15,26 +15,26 @@
 
 
 // Show the Jacobians, inverse Jacobians, and Jacobian gradients on hyperball
-// with one quadrature point
+// with one quadrature point for MappingQ and MappingFEField
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/numerics/vector_tools.h>
 
-template<int dim>
-void test()
+
+template <int dim>
+void do_test(const Triangulation<dim> &tria,
+             const Mapping<dim>       &mapping)
 {
-  Triangulation<dim> tria;
-  GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
-
-  MappingQ<dim> mapping(3);
   FE_Nothing<dim> dummy;
   // choose a point that is not right in the
   // middle of the cell so that the Jacobian
@@ -88,6 +88,36 @@ void test()
       deallog << std::endl;
     }
   deallog << std::endl;
+}
+
+
+
+template<int dim>
+void test()
+{
+  Triangulation<dim> tria;
+  GridGenerator::hyper_ball (tria);
+  static const HyperBallBoundary<dim> boundary;
+  tria.set_boundary (0, boundary);
+
+  {
+    deallog << "========== MappingQ ==========" << std::endl;
+    MappingQ<dim> mapping(3);
+    do_test(tria, mapping);
+  }
+
+  {
+    deallog << "========== MappingFEField ==========" << std::endl;
+    FESystem<dim>   fe_euler(FE_Q<dim> (QGaussLobatto<1>(4)), dim);
+    DoFHandler<dim> map_dh(tria);
+    map_dh.distribute_dofs (fe_euler);
+
+    Vector<double> euler_vec(map_dh.n_dofs());
+    VectorTools::get_position_vector(map_dh, euler_vec);
+
+    MappingFEField<dim> mapping(map_dh, euler_vec);
+    do_test(tria, mapping);
+  }
 }
 
 
