@@ -1057,7 +1057,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   // the right size and transformation shape values already computed at point
   // p.
   const Quadrature<dim> point_quadrature(p);
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_transformation_values,
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points,
                                                       point_quadrature));
 
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells ||
@@ -1139,7 +1139,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
       const Quadrature<dim> point_quadrature(initial_p_unit);
 
-      UpdateFlags update_flags = update_transformation_values|update_transformation_gradients;
+      UpdateFlags update_flags = update_quadrature_points | update_jacobians;
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
       std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
