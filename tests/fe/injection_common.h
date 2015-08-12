@@ -31,6 +31,7 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
