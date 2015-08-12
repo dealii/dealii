@@ -3528,7 +3528,6 @@ void FEValues<dim,spacedim>::do_reinit ()
                                 this->cell_similarity);
 
   this->fe_data->clear_first_cell ();
-  this->mapping_data->clear_first_cell ();
 }
 
 
@@ -3724,7 +3723,6 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                      *this);
 
   this->fe_data->clear_first_cell ();
-  this->mapping_data->clear_first_cell ();
 }
 
 
@@ -3958,7 +3956,6 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                         *this);
 
   this->fe_data->clear_first_cell ();
-  this->mapping_data->clear_first_cell ();
 }
 
 

@@ -231,13 +231,10 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_data (const UpdateFlags      upd
                                                       const unsigned int     n_original_q_points,
                                                       InternalData           &data) const
 {
-  const unsigned int n_q_points = q.size();
-
-  data.update_once = update_once(update_flags);
   data.update_each = update_each(update_flags);
-  data.update_flags = data.update_once | data.update_each;
 
-  const UpdateFlags flags(data.update_flags);
+  const unsigned int n_q_points = q.size();
+  const UpdateFlags flags = update_once(update_flags) | update_each(update_flags);
 
   if (flags & update_transformation_values)
     data.shape_values.resize(data.n_shape_functions * n_q_points);
@@ -272,7 +269,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_face_data (const UpdateFlags upd
 
   if (dim > 1)
     {
-      if (data.update_flags & update_boundary_forms)
+      if (update_flags & update_boundary_forms)
         {
           data.aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
 
@@ -991,7 +988,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform_fields(
     {
     case mapping_contravariant:
     {
-      Assert (data.update_flags & update_contravariant_transformation,
+      Assert (data.update_each & update_contravariant_transformation,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1002,9 +999,9 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform_fields(
 
     case mapping_piola:
     {
-      Assert (data.update_flags & update_contravariant_transformation,
+      Assert (data.update_each & update_contravariant_transformation,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-      Assert (data.update_flags & update_volume_elements,
+      Assert (data.update_each & update_volume_elements,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
       Assert (rank==1, ExcMessage("Only for rank 1"));
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1021,7 +1018,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform_fields(
     //rather than DerivativeForm
     case mapping_covariant:
     {
-      Assert (data.update_flags & update_contravariant_transformation,
+      Assert (data.update_each & update_contravariant_transformation,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1054,7 +1051,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform_differential_forms(
     {
     case mapping_covariant:
     {
-      Assert (data.update_flags & update_contravariant_transformation,
+      Assert (data.update_each & update_contravariant_transformation,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
