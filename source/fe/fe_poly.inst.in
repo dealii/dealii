@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension <= deal_II_space_dimension
     template class FE_Poly<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
     template class FE_Poly<TensorProductPolynomialsConst<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
+    template class FE_Poly<TensorProductPolynomialsBubbles<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
     template class FE_Poly<TensorProductPolynomials<deal_II_dimension,Polynomials::PiecewisePolynomial<double> >, deal_II_dimension, deal_II_space_dimension>;
     template class FE_Poly<PolynomialSpace<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
     template class FE_Poly<PolynomialsP<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;

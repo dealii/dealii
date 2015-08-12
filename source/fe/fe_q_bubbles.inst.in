@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
+// $Id$
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2013 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +18,7 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension 	
-    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomialsConst<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomialsBubbles<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension,Polynomials::PiecewisePolynomial<double> >, deal_II_dimension, deal_II_space_dimension>;
+#if deal_II_dimension <= deal_II_space_dimension
+    template class FE_Q_Bubbles<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }
-
-
