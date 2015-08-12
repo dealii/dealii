@@ -90,6 +90,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: Some finite elements compute hessians analytically rather than
+  by finite differencing. Namely, these are finite elements that are subclasses
+  of FEPoly as well as FESystem with those as base elements.
+  <br>
+  (Maien Hamed, 2015/08/01-2015/08/09)
+  </li>
+
   <li> New: There is now a function Mapping::project_real_point_to_unit_point_on_face()
   that calls Mapping::transform_real_to_unit_cell() and then projects the
   result to a provided face.
