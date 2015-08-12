@@ -231,17 +231,47 @@ protected:
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Mapping<1,spacedim> &mapping,
-            const Quadrature<1> &quadrature) const;
+            const Quadrature<1> &quadrature) const
+  {
+    return new typename FiniteElement<1, spacedim>::InternalDataBase;
+  }
 
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags,
-                 const Mapping<1,spacedim> &mapping,
-                 const Quadrature<0> &quadrature) const;
+  get_face_data(const UpdateFlags update_flags,
+                const Mapping<1,spacedim> &mapping,
+                const Quadrature<0> &quadrature) const
+  {
+    // generate a new data object and initialize some fields
+    typename FiniteElement<1, spacedim>::InternalDataBase *data =
+      new typename FiniteElement<1, spacedim>::InternalDataBase;
+
+    // check what needs to be initialized only once and what on every
+    // cell/face/subface we visit
+    data->update_once = update_once(update_flags);
+    data->update_each = update_each(update_flags);
+    data->update_flags = data->update_once | data->update_each;
+
+    const UpdateFlags flags(data->update_flags);
+    const unsigned int n_q_points = quadrature.size();
+    AssertDimension(n_q_points, 1);
+    (void)n_q_points;
+
+    // No derivatives of this element are implemented.
+    if (flags & update_gradients || flags & update_hessians)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return data;
+  }
 
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags,
-                    const Mapping<1,spacedim> &mapping,
-                    const Quadrature<0> &quadrature) const;
+  get_subface_data(const UpdateFlags update_flags,
+                   const Mapping<1,spacedim> &mapping,
+                   const Quadrature<0> &quadrature) const
+  {
+    return get_face_data(update_flags, mapping, quadrature);
+  }
 
   virtual
   void

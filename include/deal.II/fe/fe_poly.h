@@ -18,6 +18,7 @@
 
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/base/quadrature.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -63,6 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Ralf Hartmann 2004, Guido Kanschat, 2009
  */
+
 template <class POLY, int dim=POLY::dimension, int spacedim=dim>
 class FE_Poly : public FiniteElement<dim,spacedim>
 {
@@ -164,9 +166,77 @@ protected:
 
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Mapping<dim,spacedim> &mapping,
-            const Quadrature<dim> &quadrature) const;
+  get_data(const UpdateFlags update_flags,
+           const Mapping<dim,spacedim> &mapping,
+           const Quadrature<dim> &quadrature) const
+  {
+    // generate a new data object and
+    // initialize some fields
+    InternalData *data = new InternalData;
+
+    // check what needs to be
+    // initialized only once and what
+    // on every cell/face/subface we
+    // visit
+    data->update_once = update_once(update_flags);
+    data->update_each = update_each(update_flags);
+    data->update_flags = data->update_once | data->update_each;
+
+    const UpdateFlags flags(data->update_flags);
+    const unsigned int n_q_points = quadrature.size();
+
+    // some scratch arrays
+    std::vector<double> values(0);
+    std::vector<Tensor<1, dim> > grads(0);
+    std::vector<Tensor<2, dim> > grad_grads(0);
+
+    // initialize fields only if really
+    // necessary. otherwise, don't
+    // allocate memory
+    if (flags & update_values)
+      {
+        values.resize(this->dofs_per_cell);
+        data->shape_values.resize(this->dofs_per_cell,
+                                  std::vector<double>(n_q_points));
+      }
+
+    if (flags & update_gradients)
+      {
+        grads.resize(this->dofs_per_cell);
+        data->shape_gradients.resize(this->dofs_per_cell,
+                                     std::vector<Tensor<1, dim> >(n_q_points));
+      }
+
+    // if second derivatives through
+    // finite differencing is required,
+    // then initialize some objects for
+    // that
+    if (flags & update_hessians)
+      data->initialize_2nd(this, mapping, quadrature);
+
+    // next already fill those fields
+    // of which we have information by
+    // now. note that the shape
+    // gradients are only those on the
+    // unit cell, and need to be
+    // transformed when visiting an
+    // actual cell
+    if (flags & (update_values | update_gradients))
+      for (unsigned int i = 0; i<n_q_points; ++i)
+        {
+          poly_space.compute(quadrature.point(i),
+                             values, grads, grad_grads);
+
+          if (flags & update_values)
+            for (unsigned int k = 0; k<this->dofs_per_cell; ++k)
+              data->shape_values[k][i] = values[k];
+
+          if (flags & update_gradients)
+            for (unsigned int k = 0; k<this->dofs_per_cell; ++k)
+              data->shape_gradients[k][i] = grads[k];
+        }
+    return data;
+  }
 
   virtual
   void
