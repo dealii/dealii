@@ -477,27 +477,10 @@ compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 
 template<int dim, int spacedim>
 UpdateFlags
-MappingQ1<dim,spacedim>::update_once (const UpdateFlags in) const
+MappingQ1<dim,spacedim>::update_once (const UpdateFlags) const
 {
-  UpdateFlags out = UpdateFlags(in & (update_transformation_values
-                                      | update_transformation_gradients));
-
-  // Shape function values
-  if (in & update_quadrature_points)
-    out |= update_transformation_values;
-
-  // Shape function gradients
-  if (in & (update_covariant_transformation
-            | update_contravariant_transformation
-            | update_JxW_values
-            | update_boundary_forms
-            | update_normal_vectors
-            | update_jacobians
-            | update_jacobian_grads
-            | update_inverse_jacobians))
-    out |= update_transformation_gradients;
-
-  return out;
+  // nothing here
+  return update_default;
 }
 
 
@@ -589,10 +572,19 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
 
   const UpdateFlags flags(data.update_flags);
 
-  if (flags & update_transformation_values)
+  // see if we need the (transformation) shape function values
+  // and/or gradients and resize the necessary arrays
+  if (flags & update_quadrature_points)
     data.shape_values.resize(data.n_shape_functions * n_q_points);
 
-  if (flags & update_transformation_gradients)
+  if (flags & (update_covariant_transformation
+               | update_contravariant_transformation
+               | update_JxW_values
+               | update_boundary_forms
+               | update_normal_vectors
+               | update_jacobians
+               | update_jacobian_grads
+               | update_inverse_jacobians))
     data.shape_derivatives.resize(data.n_shape_functions * n_q_points);
 
   if (flags & update_covariant_transformation)
@@ -740,7 +732,7 @@ namespace internal
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
                             std::vector<Point<spacedim> >                                     &quadrature_points)
     {
-      const UpdateFlags update_flags(data.current_update_flags());
+      const UpdateFlags update_flags = data.update_each;
 
       if (update_flags & update_quadrature_points)
         {
@@ -771,7 +763,7 @@ namespace internal
                             const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data)
     {
-      const UpdateFlags update_flags(data.current_update_flags());
+      const UpdateFlags update_flags = data.update_each;
 
       if (update_flags & update_contravariant_transformation)
         // if the current cell is just a
@@ -849,7 +841,7 @@ namespace internal
                                  const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
                                  std::vector<DerivativeForm<2,dim,spacedim> >                      &jacobian_grads)
     {
-      const UpdateFlags update_flags(data.current_update_flags());
+      const UpdateFlags update_flags = data.update_each;
       if (update_flags & update_jacobian_grads)
         {
           const unsigned int n_q_points = jacobian_grads.size();
@@ -942,7 +934,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                                   DataSetDescriptor::cell (),
                                                   data);
 
-  const UpdateFlags update_flags(data.current_update_flags());
+  const UpdateFlags update_flags = data.update_each;
   const std::vector<double> &weights=quadrature.get_weights();
 
   // Multiply quadrature weights by absolute value of Jacobian determinants or
@@ -1085,7 +1077,7 @@ namespace internal
                              const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
                              internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
     {
-      const UpdateFlags update_flags(data.current_update_flags());
+      const UpdateFlags update_flags = data.update_each;
 
       if (update_flags & update_boundary_forms)
         {
@@ -1592,7 +1584,7 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   // computed at point p.
   const Quadrature<dim> point_quadrature(p);
 
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_transformation_values,
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points | update_jacobians,
                                                       point_quadrature));
 
   // compute the mapping support
@@ -1857,7 +1849,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       // point initial_p_unit.
       const Quadrature<dim> point_quadrature(initial_p_unit);
 
-      UpdateFlags update_flags = update_transformation_values| update_transformation_gradients;
+      UpdateFlags update_flags = update_quadrature_points | update_jacobians;
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
