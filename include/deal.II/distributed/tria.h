@@ -26,6 +26,8 @@
 #include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/std_cxx11/tuple.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <set>
 #include <vector>
 #include <list>
@@ -324,7 +326,7 @@ namespace parallel
      * @ingroup distributed
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
     public:
       /**
@@ -618,49 +620,6 @@ namespace parallel
       void
       communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
 
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
-
-      /**
-       * Return the number of active cells in the triangulation that are
-       * locally owned, i.e. that have a subdomain_id equal to
-       * locally_owned_subdomain(). Note that there may be more active cells
-       * in the triangulation stored on the present processor, such as for
-       * example ghost cells, or cells further away from the locally owned
-       * block of cells but that are needed to ensure that the triangulation
-       * that stores this processor's set of active cells still remains
-       * balanced with respect to the 2:1 size ratio of adjacent cells.
-       *
-       * As a consequence of the remark above, the result of this function is
-       * always smaller or equal to the result of the function with the same
-       * name in the ::Triangulation base class, which includes the active
-       * ghost and artificial cells (see also
-       * @ref GlossArtificialCell
-       * and
-       * @ref GlossGhostCell).
-       */
-      unsigned int n_locally_owned_active_cells () const;
-
-      /**
-       * Return the sum over all processors of the number of active cells
-       * owned by each processor. This equals the overall number of active
-       * cells in the distributed triangulation.
-       */
-      virtual types::global_dof_index n_global_active_cells () const;
-
-      /**
-       * Returns the global maximum level. This may be bigger than the number
-       * dealii::Triangulation::n_levels() (a function in this class's base
-       * class) returns if the current processor only stores cells in parts of
-       * the domain that are not very refined, but if other processors store
-       * cells in more deeply refined parts of the domain.
-       */
-      virtual unsigned int n_global_levels () const;
 
       /**
        * Returns true if the triangulation has hanging nodes.
@@ -679,20 +638,6 @@ namespace parallel
        */
       virtual
       bool has_hanging_nodes() const;
-
-      /**
-       * Return the number of active cells owned by each of the MPI processes
-       * that contribute to this triangulation. The element of this vector
-       * indexed by locally_owned_subdomain() equals the result of
-       * n_locally_owned_active_cells().
-       */
-      const std::vector<unsigned int> &
-      n_locally_owned_active_cells_per_processor () const;
-
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-      MPI_Comm get_communicator () const;
 
       /**
        * Return the local memory consumption in bytes.
@@ -876,12 +821,6 @@ namespace parallel
 
 
     private:
-      /**
-       * MPI communicator to be used for the triangulation. We create a unique
-       * communicator for this class, which is a duplicate of the one passed
-       * to the constructor.
-       */
-      MPI_Comm mpi_communicator;
 
       /**
        * store the Settings.
@@ -889,29 +828,9 @@ namespace parallel
       Settings settings;
 
       /**
-       * The subdomain id to be used for the current processor.
-       */
-      types::subdomain_id my_subdomain;
-
-      /**
        * A flag that indicates whether the triangulation has actual content.
        */
       bool triangulation_has_content;
-
-      /**
-       * A structure that contains some numbers about the distributed
-       * triangulation.
-       */
-      struct NumberCache
-      {
-        std::vector<unsigned int> n_locally_owned_active_cells;
-        types::global_dof_index   n_global_active_cells;
-        unsigned int              n_global_levels;
-
-        NumberCache();
-      };
-
-      NumberCache number_cache;
 
       /**
        * A data structure that holds the connectivity between trees. Since
@@ -1019,12 +938,6 @@ namespace parallel
        */
       void copy_local_forest_to_triangulation ();
 
-
-      /**
-       * Update the number_cache variable after mesh creation or refinement.
-       */
-      void update_number_cache ();
-
       /**
        * Internal function notifying all registered classes to attach their
        * data before repartitioning occurs. Called from
@@ -1052,7 +965,7 @@ namespace parallel
      * all this class does is throw an exception.
      */
     template <int spacedim>
-    class Triangulation<1,spacedim> : public dealii::Triangulation<1,spacedim>
+    class Triangulation<1,spacedim> : public dealii::parallel::Triangulation<1,spacedim>
     {
     public:
       /**
@@ -1065,19 +978,6 @@ namespace parallel
        * Destructor.
        */
       virtual ~Triangulation ();
-
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-      MPI_Comm get_communicator () const;
-
-      /**
-       * Return the sum over all processors of the number of active cells
-       * owned by each processor. This equals the overall number of active
-       * cells in the distributed triangulation.
-       */
-      types::global_dof_index n_global_active_cells () const;
-      virtual unsigned int n_global_levels () const;
 
       /**
        * Returns a permutation vector for the order the coarse cells are
@@ -1123,14 +1023,6 @@ namespace parallel
        */
       void
       communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
-
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see
@@ -1210,12 +1102,6 @@ namespace parallel
        */
       types::subdomain_id locally_owned_subdomain () const;
 
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-#ifdef DEAL_II_WITH_MPI
-      MPI_Comm get_communicator () const;
-#endif
     };
   }
 }

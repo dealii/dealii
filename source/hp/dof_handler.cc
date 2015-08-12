@@ -2743,15 +2743,26 @@ namespace hp
     number_cache.n_global_dofs        = next_free_dof;
     number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
 
-    number_cache.locally_owned_dofs
-      = IndexSet (number_cache.n_global_dofs);
-    number_cache.locally_owned_dofs.add_range (0,
-                                               number_cache.n_global_dofs);
-    Assert (number_cache.n_global_dofs < std::numeric_limits<unsigned int>::max (),
-            ExcMessage ("Global number of degrees of freedom is too large."));
-    number_cache.n_locally_owned_dofs_per_processor
-      = std::vector<types::global_dof_index> (1,
-                                              (types::global_dof_index) number_cache.n_global_dofs);
+    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
+        (&this->get_tria())
+        == 0)
+      {
+        number_cache.locally_owned_dofs
+          = IndexSet (number_cache.n_global_dofs);
+        number_cache.locally_owned_dofs.add_range (0,
+                                                   number_cache.n_global_dofs);
+        Assert (number_cache.n_global_dofs < std::numeric_limits<unsigned int>::max (),
+                ExcMessage ("Global number of degrees of freedom is too large."));
+        number_cache.n_locally_owned_dofs_per_processor
+          = std::vector<types::global_dof_index> (1,
+                                                  (types::global_dof_index) number_cache.n_global_dofs);
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented() );
+        //number_cache.locally_owned_dofs = dealii::DoFTools::locally_owned_dofs_with_subdomain(this,tria->locally_owned_subdomain() );
+        //TODO: update n_locally_owned_dofs_per_processor as well
+      }
 
     number_cache.locally_owned_dofs_per_processor
       = std::vector<IndexSet> (1,

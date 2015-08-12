@@ -86,7 +86,7 @@ SET(_categories
   a-framework algorithms all-headers aniso arpack base bits build_tests
   codim_one deal.II distributed_grids fe gla grid hp integrators lac lapack
   manifold matrix_free metis mpi multigrid opencascade petsc serialization
-  slepc trilinos umfpack
+  slepc trilinos umfpack sharedtria
   )
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   # Only set up mesh_converter tests if the testsuite is set up as a

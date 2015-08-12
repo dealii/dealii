@@ -24,17 +24,20 @@ namespace internal
     \{
       template class PolicyBase<deal_II_dimension,deal_II_dimension>;
       template class Sequential<deal_II_dimension,deal_II_dimension>;
+      template class ParallelShared<deal_II_dimension,deal_II_dimension>;
       template class ParallelDistributed<deal_II_dimension,deal_II_dimension>;
 
 #if deal_II_dimension==1 || deal_II_dimension==2
       template class PolicyBase<deal_II_dimension,deal_II_dimension+1>;
       template class Sequential<deal_II_dimension,deal_II_dimension+1>;
+      template class ParallelShared<deal_II_dimension,deal_II_dimension+1>;
       template class ParallelDistributed<deal_II_dimension,deal_II_dimension+1>;
 #endif
 
 #if deal_II_dimension==3
       template class PolicyBase<1,3>;
       template class Sequential<1,3>;
+      template class ParallelShared<1,3>;
       template class ParallelDistributed<1,3>;
 #endif
     \}

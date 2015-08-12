@@ -1073,7 +1073,54 @@ namespace DoFTools
       active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
   }
 
+  template <class DH>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_subdomain (const DH  &dof_handler)
+  {
+    //the following is a random process (flip of a coin), thus should be called once only.
+    std::vector< dealii::types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
+    dealii::DoFTools::get_subdomain_association (dof_handler, subdomain_association);
 
+    const unsigned int n_subdomains = 1 + (*std::max_element (subdomain_association.begin (),
+                                                              subdomain_association.end ()   ));
+
+    std::vector<dealii::IndexSet> index_sets (n_subdomains,dealii::IndexSet(dof_handler.n_dofs()));
+
+    // loop over subdomain_association and populate IndexSet when a
+    // change in subdomain ID is found
+    dealii::types::global_dof_index i_min          = 0;
+    dealii::types::global_dof_index this_subdomain = subdomain_association[0];
+
+    for (dealii::types::global_dof_index index = 1;
+         index < subdomain_association.size (); ++index)
+      {
+        //found index different from the current one
+        if (subdomain_association[index] != this_subdomain)
+          {
+            index_sets[this_subdomain].add_range (i_min, index);
+            i_min = index;
+            this_subdomain = subdomain_association[index];
+          }
+      }
+
+    // the very last element is of different index
+    if (i_min == subdomain_association.size () - 1)
+      {
+        index_sets[this_subdomain].add_index (i_min);
+      }
+
+    // otherwise there are at least two different indices
+    else
+      {
+        index_sets[this_subdomain].add_range (
+          i_min, subdomain_association.size ());
+      }
+
+    for (unsigned int i = 0; i < n_subdomains; i++)
+      index_sets[i].compress ();
+
+    return index_sets;
+  }
 
   template <class DH>
   void
@@ -1093,6 +1140,9 @@ namespace DoFTools
            ExcDimensionMismatch(subdomain_association.size(),
                                 dof_handler.n_dofs()));
 
+    Assert(dof_handler.n_dofs() > 0,
+           ExcMessage("Number of DoF is not positive. "
+                      "This could happen when the function is called before NumberCache is written."));
     // preset all values by an invalid value
     std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
                  numbers::invalid_subdomain_id);
