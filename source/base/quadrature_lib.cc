@@ -29,15 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
 
-namespace
-{
-  template <typename number>
-  number abs (const number a)
-  {
-    return ((a>0) ? a : -a);
-  }
-}
-
 
 
 template <>
@@ -158,7 +149,7 @@ QGauss<1>::QGauss (const unsigned int n)
           pp = n*(z*p1-p2)/(z*z-1);
           z = z-p1/pp;
         }
-      while (abs(p1/pp) > tolerance);
+      while (std::abs(p1/pp) > tolerance);
 
       double x = .5*z;
       this->quadrature_points[i-1] = Point<1>(.5-x);
