@@ -233,27 +233,52 @@ public:
   virtual ~Mapping ();
 
   /**
+   * Return a pointer to a copy of the present object. The caller of this copy
+   * then assumes ownership of it.
+   *
+   * The function is declared abstract virtual in this base class, and derived
+   * classes will have to implement it.
+   *
+   * This function is mainly used by the hp::MappingCollection class.
+   */
+  virtual
+  Mapping<dim,spacedim> *clone () const = 0;
+
+  /**
    * Return the mapped vertices of a cell. These values are not equal to the
    * vertex coordinates stored by the triangulation for MappingQEulerian and
    * MappingQ1Eulerian.
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
 
   /**
-   * Transforms the point @p p on the unit cell to the point @p p_real on the
-   * real cell @p cell and returns @p p_real.
+   * @name Mapping points between reference and real cells
+   * @{
    */
-  virtual Point<spacedim>
-  transform_unit_to_real_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<dim>                                 &p) const = 0;
 
   /**
-   * Transforms the point @p p on the real @p cell to the corresponding point
-   * on the unit cell, and return its coordinates.
+   * Maps the point @p p on the unit cell to the corresponding point on the
+   * real cell @p cell.
+   *
+   * @param cell Iterator to the cell that will be used to define the mapping.
+   * @param p Location of a point on the reference cell.
+   * @return The location of the reference point mapped to real space using
+   *   the mapping defined by the class derived from the current one that
+   *   implements the mapping, and the coordinates of the cell identified by
+   *   the first argument.
+   */
+  virtual
+  Point<spacedim>
+  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<dim>                                          &p) const = 0;
+
+  /**
+   * Maps the point @p p on the real @p cell to the corresponding point
+   * on the unit cell, and return its coordinates. This function provides
+   * the inverse of the mapping provided by transform_unit_to_real_cell().
    *
    * In the codimension one case, this function returns the normal projection
    * of the real point @p p on the curve or surface identified by the @p cell.
@@ -269,11 +294,19 @@ public:
    * checking whether the return reference coordinates lie inside of outside
    * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell) or
    * whether the exception mentioned above has been thrown.
+   *
+   * @param cell Iterator to the cell that will be used to define the mapping.
+   * @param p Location of a point on the given cell.
+   * @return The reference cell location of the point that when mapped to real
+   *   space equals the coordinates given by the second argument. This mapping
+   *   uses the mapping defined by the class derived from the current one that
+   *   implements the mapping, and the coordinates of the cell identified by
+   *   the first argument.
    */
-  virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const = 0;
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                                     &p) const = 0;
 
   /**
    * Transforms the point @p p on the real @p cell to the corresponding point
@@ -290,6 +323,64 @@ public:
     const unsigned int &face_no,
     const Point<spacedim> &p) const;
 
+  /**
+   * @}
+   */
+
+
+  /**
+   * Returns whether the mapping preserves vertex locations, i.e., whether the
+   * mapped location of the reference cell vertices (given by
+   * GeometryInfo::unit_cell_vertex()) equals the result of
+   * <code>cell-@>vertex()</code>.
+   *
+   * For example, implementations in derived classes return @p true for
+   * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
+   * MappingQ1Eulerian.
+   */
+  virtual
+  bool preserves_vertex_locations () const = 0;
+
+  /**
+   * Exception
+   */
+  DeclException0 (ExcInvalidData);
+
+
+  /**
+   * Computing the mapping between a real space point and a point in reference
+   * space failed, typically because the given point lies outside the cell
+   * where the inverse mapping is not unique.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg (ExcTransformationFailed,
+                    "Computing the mapping between a real space point and a point in reference "
+                    "space failed, typically because the given point lies outside the cell "
+                    "where the inverse mapping is not unique.");
+
+  /**
+   * deal.II assumes the Jacobian determinant to be positive. When the cell
+   * geometry is distorted under the image of the mapping, the mapping becomes
+   * invalid and this exception is thrown.
+   *
+   * @ingroup Exceptions
+   */
+  DeclException3 (ExcDistortedMappedCell,
+                  Point<spacedim>, double, int,
+                  << "The image of the mapping applied to cell with center ["
+                  << arg1 << "] is distorted. The cell geometry or the "
+                  << "mapping are invalid, giving a non-positive volume "
+                  << "fraction of " << arg2 << " in quadrature point "
+                  << arg3 << ".");
+
+
+  /**
+   * @name Interface with FEValues
+   * @{
+   */
+
+public:
   /**
    * Base class for internal data of mapping objects. The
    * internal mechanism is that upon construction of a FEValues object, it
@@ -425,198 +516,7 @@ public:
   };
 
 
-  /**
-   * Transform a field of vectors or 1-differential forms according to the
-   * selected MappingType.
-   *
-   * @note Normally, this function is called by a finite element, filling
-   * FEValues objects. For this finite element, there should be an alias
-   * MappingType like @p mapping_bdm, @p mapping_nedelec, etc. This alias
-   * should be preferred to using the types below.
-   *
-   * The mapping types currently implemented by derived classes are:
-   * <ul>
-   * <li> @p mapping_contravariant: maps a vector field on the reference cell
-   * is to the physical cell through the Jacobian:
-   * @f[
-   * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
-   * @f]
-   * In physics, this is usually referred to as the contravariant
-   * transformation. Mathematically, it is the push forward of a vector field.
-   *
-   * <li> @p mapping_covariant: maps a field of one-forms on the reference
-   * cell to a field of one-forms on the physical cell. (theoretically this
-   * would refer to a DerivativeForm<1, dim, 1> but it canonically identified
-   * with a Tensor<1,dim>). Mathematically, it is the pull back of the
-   * differential form
-   * @f[
-   * \mathbf u(\mathbf x) = J(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
-   * u}(\mathbf{\hat x}).
-   * @f]
-   * In the case when dim=spacedim the previous formula reduces to
-   * @f[
-   * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
-   * u}(\mathbf{\hat x}).
-   * @f]
-   * Gradients of scalar differentiable functions are transformed this way.
-   *
-   * <li> @p mapping_piola: A field of <i>n-1</i>-forms on the reference cell
-   * is also represented by a vector field, but again transforms differently,
-   * namely by the Piola transform
-   * @f[
-   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
-   * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
-   * @f]
-   * </ul>
-   *
-   * @todo What is n in mapping_piola description?
-   */
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-             VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-             const InternalDataBase &internal,
-             const MappingType type) const = 0;
-
-
-
-  /**
-   * Transform a field of differential forms from the reference cell to the
-   * physical cell.  It is useful to think of $\mathbf{T} = D \mathbf u$ and
-   * $\mathbf{\hat T} = \hat D \mathbf{\hat u}$, with $\mathbf u$ a vector
-   * field.  The mapping types currently implemented by derived classes are:
-   * <ul>
-   * <li> @p mapping_covariant: maps a field of forms on the reference cell to
-   * a field of forms on the physical cell. Mathematically, it is the pull
-   * back of the differential form
-   * @f[
-   * \mathbf T(\mathbf x) = \mathbf{\hat T}(\mathbf{\hat x})
-   *                        J*(J^{T} J)^{-1}(\mathbf{\hat x}).
-   * @f]
-   * n the case when dim=spacedim the previous formula reduces to
-   * @f[
-   * \mathbf T(\mathbf x) = \mathbf{\hat u}(\mathbf{\hat x})
-   *                        J^{-1}(\mathbf{\hat x}).
-   * @f]
-   * Jacobians of spacedim-vector valued differentiable functions are
-   * transformed this way.
-   * </ul>
-   * @note It would have been more reasonable to make this transform a
-   * template function with the rank in <code>DerivativeForm@<1, dim,
-   * rank@></code>. Unfortunately C++ does not allow templatized virtual
-   * functions. This is why we identify <code>DerivativeForm@<1, dim,
-   * 1@></code> with a <code>Tensor@<1,dim@></code> when using
-   * mapping_covariant() in the function transform above this one.
-   */
-  virtual
-  void
-  transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const InternalDataBase &internal,
-             const MappingType type) const = 0;
-
-
-
-  /**
-   * Transform a tensor field from the reference cell to the physical cell.
-   * This tensors are most of times the jacobians in the reference cell of
-   * vector fields that have been pulled back from the physical cell.  The
-   * mapping types currently implemented by derived classes are:
-   * <ul>
-   * <li> @p mapping_contravariant_gradient, it assumes $\mathbf u(\mathbf x)
-   * = J \mathbf{\hat u}$ so that
-   * @f[
-   * \mathbf T(\mathbf x) =
-   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
-   * @f]
-   * <li> @p mapping_covariant_gradient, it assumes $\mathbf u(\mathbf x) =
-   * J^{-T} \mathbf{\hat u}$ so that
-   * @f[
-   * \mathbf T(\mathbf x) =
-   * J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
-   * @f]
-   * <li> @p mapping_piola_gradient, it assumes $\mathbf u(\mathbf x) =
-   * \frac{1}{\text{det}J(\mathbf x)} J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
-   * so that
-   * @f[
-   * \mathbf T(\mathbf x) =
-   * \frac{1}{\text{det}J(\mathbf x)}
-   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
-   * @f]
-   * </ul>
-   * @todo The formulas for mapping_covariant_gradient(),
-   * mapping_contravariant_gradient() and mapping_piola_gradient() are only
-   * true as stated for linear mappings. If, for example, the mapping is
-   * bilinear then there is a missing term associated with the derivative of
-   * J.
-   */
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const InternalDataBase &internal,
-             const MappingType type) const = 0;
-
-  /**
-   * Return a pointer to a copy of the present object. The caller of this copy
-   * then assumes ownership of it.
-   *
-   * Since one can't create objects of class Mapping, this function of course
-   * has to be implemented by derived classes.
-   *
-   * This function is mainly used by the hp::MappingCollection class.
-   */
-  virtual
-  Mapping<dim,spacedim> *clone () const = 0;
-
-  /**
-   * Returns whether the mapping preserves vertex locations, i.e. whether the
-   * mapped location of the reference cell vertices (given by
-   * GeometryInfo::unit_cell_vertex()) equals the result of
-   * <code>cell-@>vertex()</code>.
-   *
-   * For example, implementations in derived classes return @p true for
-   * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
-   * MappingQ1Eulerian.
-   */
-  virtual
-  bool preserves_vertex_locations () const = 0;
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidData);
-
-
-  /**
-   * Computing the mapping between a real space point and a point in reference
-   * space failed, typically because the given point lies outside the cell
-   * where the inverse mapping is not unique.
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0(ExcTransformationFailed);
-
-  /**
-   * deal.II assumes the Jacobian determinant to be positive. When the cell
-   * geometry is distorted under the image of the mapping, the mapping becomes
-   * invalid and this exception is thrown.
-   *
-   * @ingroup Exceptions
-   */
-  DeclException3 (ExcDistortedMappedCell,
-                  Point<spacedim>, double, int,
-                  << "The image of the mapping applied to cell with center ["
-                  << arg1 << "] is distorted. The cell geometry or the "
-                  << "mapping are invalid, giving a non-positive volume "
-                  << "fraction of " << arg2 << " in quadrature point "
-                  << arg3 << ".");
-
-private:
-
+protected:
   /**
    * Indicate fields to be updated in the constructor of FEValues. Especially,
    * fields not asked for by FEValues, but computed for efficiency reasons
@@ -641,7 +541,8 @@ private:
    * cell. See the documentation of Mapping::InternalDataBase for more
    * information on the purpose of this function.
    */
-  virtual InternalDataBase *
+  virtual
+  InternalDataBase *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const = 0;
 
@@ -651,7 +552,8 @@ private:
    * Mapping::InternalDataBase for more
    * information on the purpose of this function.
    */
-  virtual InternalDataBase *
+  virtual
+  InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const = 0;
 
@@ -661,7 +563,8 @@ private:
    * of Mapping::InternalDataBase for more
    * information on the purpose of this function.
    */
-  virtual InternalDataBase *
+  virtual
+  InternalDataBase *
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const = 0;
 
@@ -821,6 +724,154 @@ private:
                           const Quadrature<dim-1>                                       &quadrature,
                           const InternalDataBase                                        &internal_data,
                           dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const = 0;
+
+  /**
+   * @}
+   */
+
+public:
+
+  /**
+   * @name Functions usable by finite element fields to map points and tensors
+   * @{
+   */
+
+  /**
+   * Transform a field of vectors or 1-differential forms according to the
+   * selected MappingType.
+   *
+   * @note Normally, this function is called by a finite element, filling
+   * FEValues objects. For this finite element, there should be an alias
+   * MappingType like @p mapping_bdm, @p mapping_nedelec, etc. This alias
+   * should be preferred to using the types below.
+   *
+   * The mapping types currently implemented by derived classes are:
+   * <ul>
+   * <li> @p mapping_contravariant: maps a vector field on the reference cell
+   * is to the physical cell through the Jacobian:
+   * @f[
+   * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
+   * @f]
+   * In physics, this is usually referred to as the contravariant
+   * transformation. Mathematically, it is the push forward of a vector field.
+   *
+   * <li> @p mapping_covariant: maps a field of one-forms on the reference
+   * cell to a field of one-forms on the physical cell. (theoretically this
+   * would refer to a DerivativeForm<1, dim, 1> but it canonically identified
+   * with a Tensor<1,dim>). Mathematically, it is the pull back of the
+   * differential form
+   * @f[
+   * \mathbf u(\mathbf x) = J(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
+   * u}(\mathbf{\hat x}).
+   * @f]
+   * In the case when dim=spacedim the previous formula reduces to
+   * @f[
+   * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
+   * u}(\mathbf{\hat x}).
+   * @f]
+   * Gradients of scalar differentiable functions are transformed this way.
+   *
+   * <li> @p mapping_piola: A field of <i>dim-1</i>-forms on the reference cell
+   * is also represented by a vector field, but again transforms differently,
+   * namely by the Piola transform
+   * @f[
+   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
+   * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
+   * @f]
+   * </ul>
+   */
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+             VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
+             const InternalDataBase &internal,
+             const MappingType type) const = 0;
+
+
+
+  /**
+   * Transform a field of differential forms from the reference cell to the
+   * physical cell.  It is useful to think of $\mathbf{T} = D \mathbf u$ and
+   * $\mathbf{\hat T} = \hat D \mathbf{\hat u}$, with $\mathbf u$ a vector
+   * field.  The mapping types currently implemented by derived classes are:
+   * <ul>
+   * <li> @p mapping_covariant: maps a field of forms on the reference cell to
+   * a field of forms on the physical cell. Mathematically, it is the pull
+   * back of the differential form
+   * @f[
+   * \mathbf T(\mathbf x) = \mathbf{\hat T}(\mathbf{\hat x})
+   *                        J*(J^{T} J)^{-1}(\mathbf{\hat x}).
+   * @f]
+   * n the case when dim=spacedim the previous formula reduces to
+   * @f[
+   * \mathbf T(\mathbf x) = \mathbf{\hat u}(\mathbf{\hat x})
+   *                        J^{-1}(\mathbf{\hat x}).
+   * @f]
+   * Jacobians of spacedim-vector valued differentiable functions are
+   * transformed this way.
+   * </ul>
+   * @note It would have been more reasonable to make this transform a
+   * template function with the rank in <code>DerivativeForm@<1, dim,
+   * rank@></code>. Unfortunately C++ does not allow templatized virtual
+   * functions. This is why we identify <code>DerivativeForm@<1, dim,
+   * 1@></code> with a <code>Tensor@<1,dim@></code> when using
+   * mapping_covariant() in the function transform above this one.
+   */
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+             const InternalDataBase &internal,
+             const MappingType type) const = 0;
+
+
+  /**
+   * Transform a tensor field from the reference cell to the physical cell.
+   * This tensors are usually the Jacobians in the reference cell of
+   * vector fields that have been pulled back from the physical cell.  The
+   * mapping types currently implemented by derived classes are:
+   * <ul>
+   * <li> @p mapping_contravariant_gradient, it assumes $\mathbf u(\mathbf x)
+   * = J \mathbf{\hat u}$ so that
+   * @f[
+   * \mathbf T(\mathbf x) =
+   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   * J^{-1}(\mathbf{\hat x}).
+   * @f]
+   * <li> @p mapping_covariant_gradient, it assumes $\mathbf u(\mathbf x) =
+   * J^{-T} \mathbf{\hat u}$ so that
+   * @f[
+   * \mathbf T(\mathbf x) =
+   * J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   * J^{-1}(\mathbf{\hat x}).
+   * @f]
+   * <li> @p mapping_piola_gradient, it assumes $\mathbf u(\mathbf x) =
+   * \frac{1}{\text{det}J(\mathbf x)} J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
+   * so that
+   * @f[
+   * \mathbf T(\mathbf x) =
+   * \frac{1}{\text{det}J(\mathbf x)}
+   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   * J^{-1}(\mathbf{\hat x}).
+   * @f]
+   * </ul>
+   * @todo The formulas for mapping_covariant_gradient(),
+   * mapping_contravariant_gradient() and mapping_piola_gradient() are only
+   * true as stated for linear mappings. If, for example, the mapping is
+   * bilinear then there is a missing term associated with the derivative of
+   * J.
+   */
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+             const InternalDataBase &internal,
+             const MappingType type) const = 0;
+
+  /**
+   * @}
+   */
+
 
   /**
    * Give class @p FEValues access to the private <tt>get_...data</tt> and
