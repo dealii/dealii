@@ -869,13 +869,15 @@ public:
   void symmetrize ();
 
   /**
-   * Copy the given matrix to this one.  The operation triggers an assertion
-   * if the sparsity patterns of the two involved matrices do not point to the
-   * same object, since in this case the copy operation is cheaper. Since this
-   * operation is nonetheless not for free, we do not make it available
-   * through <tt>operator =</tt>, since this may lead to unwanted usage,
-   * e.g. in copy arguments to functions, which should really be arguments by
-   * reference.
+   * Copy the matrix given as argument into the current object.
+   *
+   * Copying matrices is an expensive operation that we do not want to happen
+   * by accident through compiler generated code for <code>operator=</code>.
+   * (This would happen, for example, if one accidentally declared a function
+   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
+   * The functionality of copying matrices is implemented in this member function
+   * instead. All copy operations of objects of this type therefore require an
+   * explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
