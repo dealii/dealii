@@ -66,6 +66,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The online documentation of all functions now includes
+  links to the file and line where that function is implemented. Both
+  are clickable to provide immediate access to the source code of a
+  function.
+  <br>
+  (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
+  </li>
+
   <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q 
   enriched by bubble functions.
   <br>
