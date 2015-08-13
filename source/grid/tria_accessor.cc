@@ -2281,4 +2281,3 @@ neighbor_child_on_subface (const unsigned int face,
 #include "tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

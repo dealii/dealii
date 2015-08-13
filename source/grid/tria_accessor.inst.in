@@ -62,7 +62,7 @@ for (deal_II_dimension : DIMENSIONS)
 
     template class TriaAccessor<1,deal_II_dimension,2>;
     template class TriaAccessor<1,deal_II_dimension,3>;
-    
+
 
 #endif
 #if deal_II_dimension == 2
@@ -91,5 +91,3 @@ for (deal_II_dimension : DIMENSIONS)
 
 #endif
   }
-
-    
