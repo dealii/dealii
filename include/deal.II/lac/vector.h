@@ -660,7 +660,7 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Number s);
+  void add (const Number s) DEAL_II_DEPRECATED;
 
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
@@ -811,7 +811,7 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   void ratio (const Vector<Number> &a,
-              const Vector<Number> &b);
+              const Vector<Number> &b) DEAL_II_DEPRECATED;
 
   /**
    * This function does nothing but is there for compatibility with the @p
