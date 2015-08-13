@@ -73,22 +73,80 @@ public:
   unsigned int get_degree () const;
 
 protected:
-
+  /**
+  NOTE: The following functions have their definitions inlined into the class declaration
+    * because we otherwise run into a compiler error with MS Visual Studio.
+     */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Mapping<dim,spacedim> &mapping,
-            const Quadrature<dim> &quadrature) const;
+            const Quadrature<dim> &quadrature) const
+  {
+    InternalData *data = new InternalData;
+    return data;
+  }
 
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags,
-                 const Mapping<dim,spacedim> &mapping,
-                 const Quadrature<dim-1>& quadrature) const;
+  get_face_data(const UpdateFlags update_flags,
+                const Mapping<dim,spacedim> &mapping,
+                const Quadrature<dim-1>& quadrature) const
+  {
+    // generate a new data object and
+    // initialize some fields
+    InternalData *data = new InternalData;
+
+    // check what needs to be
+    // initialized only once and what
+    // on every cell/face/subface we
+    // visit
+    data->update_once = update_once(update_flags);
+    data->update_each = update_each(update_flags);
+    data->update_flags = data->update_once | data->update_each;
+
+    const UpdateFlags flags(data->update_flags);
+    const unsigned int n_q_points = quadrature.size();
+
+    // some scratch arrays
+    std::vector<double> values(0);
+    std::vector<Tensor<1, dim - 1> > grads(0);
+    std::vector<Tensor<2, dim - 1> > grad_grads(0);
+
+    // initialize fields only if really
+    // necessary. otherwise, don't
+    // allocate memory
+    if (flags & update_values)
+      {
+        values.resize(poly_space.n());
+        data->shape_values.resize(poly_space.n(),
+                                  std::vector<double>(n_q_points));
+        for (unsigned int i = 0; i<n_q_points; ++i)
+          {
+            poly_space.compute(quadrature.point(i),
+                               values, grads, grad_grads);
+
+            for (unsigned int k = 0; k<poly_space.n(); ++k)
+              data->shape_values[k][i] = values[k];
+          }
+      }
+    // No derivatives of this element
+    // are implemented.
+    if (flags & update_gradients || flags & update_hessians)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return data;
+  }
 
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags,
-                    const Mapping<dim,spacedim> &mapping,
-                    const Quadrature<dim-1>& quadrature) const;
+  get_subface_data(const UpdateFlags update_flags,
+                   const Mapping<dim,spacedim> &mapping,
+                   const Quadrature<dim-1>& quadrature) const
+  {
+    return get_face_data(update_flags, mapping,
+                         QProjector<dim - 1>::project_to_all_children(quadrature));
+  }
 
   virtual
   void
