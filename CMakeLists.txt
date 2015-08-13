@@ -63,6 +63,7 @@ FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
 
+include(../CMake.vars REQUIRED)
 #
 # Check for the existence of various optional folders:
 #
@@ -78,12 +79,14 @@ IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt)
   SET(DEAL_II_HAVE_TESTS_DIRECTORY TRUE)
 ENDIF()
 
+include(../CMake.vars REQUIRED)
 #
 # We have to initialize some cached variables before PROJECT is called, so
 # do it at this point:
 #
 VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 
+include(../CMake.vars REQUIRED)
 #
 # Now, set the project and set up the rest:
 #
