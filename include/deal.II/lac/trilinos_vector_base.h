@@ -690,7 +690,7 @@ namespace TrilinosWrappers
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void add (const TrilinosScalar s);
+    void add (const TrilinosScalar s) DEAL_II_DEPRECATED;
 
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
@@ -794,7 +794,7 @@ namespace TrilinosWrappers
      * attempt is made to catch such situations.
      */
     void ratio (const VectorBase &a,
-                const VectorBase &b);
+                const VectorBase &b) DEAL_II_DEPRECATED;
     //@}
 
 

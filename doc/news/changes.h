@@ -95,6 +95,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: The function Vector::add() that adds a scalar number to all
+  elements of a vector has been deprecated. The same is true for the
+  Vector::ratio() function, and for the corresponding functions in other
+  vector classes.
+  <br>
+  (Wolfgang Bangerth, Bruno Turcksin, 2015/08/13)
+  </li>
+
   <li> Improved: Some finite elements compute hessians analytically rather than
   by finite differencing. Namely, these are finite elements that are subclasses
   of FEPoly as well as FESystem with those as base elements.
