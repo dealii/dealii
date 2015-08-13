@@ -815,11 +815,12 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
   std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
   get_data_tasks (this->n_base_elements());
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_data,
-                                                 base_element(base_no),
-                                                 flags,
-                                                 mapping,
-                                                 quadrature);
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
   // then wait for each of these calls to finish in turn and initialize
   // these objects
@@ -865,11 +866,12 @@ FESystem<dim,spacedim>::get_face_data (
   std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
   get_data_tasks (this->n_base_elements());
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_face_data,
-                                                 base_element(base_no),
-                                                 flags,
-                                                 mapping,
-                                                 quadrature);
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_face_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
   // then wait for each of these calls to finish in turn and initialize
   // these objects
@@ -917,11 +919,12 @@ FESystem<dim,spacedim>::get_subface_data (
   std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
   get_data_tasks (this->n_base_elements());
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (&FiniteElement<dim,spacedim>::get_subface_data,
-                                                 base_element(base_no),
-                                                 flags,
-                                                 mapping,
-                                                 quadrature);
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_subface_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
   // then wait for each of these calls to finish in turn and initialize
   // these objects
