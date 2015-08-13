@@ -227,6 +227,10 @@ public:
   get_constant_modes () const;
 
 protected:
+  /**
+  NOTE: The following functions have their definitions inlined into the class declaration
+    * because we otherwise run into a compiler error with MS Visual Studio.
+     */
   virtual
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,

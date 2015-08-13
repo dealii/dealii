@@ -174,7 +174,10 @@ protected:
    * cell to the mesh cell.
    */
   MappingType mapping_type;
-
+  /**
+  NOTE: The following function has its definition inlined into the class declaration
+    * because we otherwise run into a compiler error with MS Visual Studio.
+    */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data(const UpdateFlags update_flags,

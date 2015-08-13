@@ -73,7 +73,10 @@ public:
   unsigned int get_degree () const;
 
 protected:
-
+  /**
+  NOTE: The following functions have their definitions inlined into the class declaration
+    * because we otherwise run into a compiler error with MS Visual Studio.
+     */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
