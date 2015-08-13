@@ -1,0 +1,95 @@
+The initial matrix:
+0	0	1
+1	0	2
+1	1	3
+2	0	7
+2	1	6.18
+2	2	3.14
+3	2	2.718
+Ignore a zero entry insertion:
+0	0	1
+1	0	2
+1	1	3
+2	0	7
+2	1	6.18
+2	2	3.14
+3	2	2.718
+Set existing entry (1,0) to zero:
+0	0	1
+1	0	0
+1	1	3
+2	0	7
+2	1	6.18
+2	2	3.14
+3	2	2.718
+Insert new zero to (1,2):
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	6.18
+2	2	3.14
+3	2	2.718
+Insert new zero to (2,4), out of range of default row length:
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	6.18
+2	2	3.14
+2	4	0
+3	2	2.718
+Set existing entry (2,1) to zero with elide_zero_values=false:
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	0
+2	2	3.14
+2	4	0
+3	2	2.718
+Insert a non-zero entry at (3,0) with elide_zero_values=false:
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	0
+2	2	3.14
+2	4	0
+3	0	1.414
+3	2	2.718
+Insert new zero entry to an empty row with elide_zero_values=false:
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	0
+2	2	3.14
+2	4	0
+3	0	1.414
+3	2	2.718
+4	4	0
+Copy the matrix and drop all zeros:
+0	0	1
+1	1	3
+2	0	7
+2	2	3.14
+3	0	1.414
+3	2	2.718
+Copy the matrix and keep all zeros:
+0	0	1
+1	0	0
+1	1	3
+1	2	0
+2	0	7
+2	1	0
+2	2	3.14
+2	4	0
+3	0	1.414
+3	2	2.718
+4	4	0
