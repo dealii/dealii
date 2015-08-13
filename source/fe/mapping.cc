@@ -81,10 +81,7 @@ project_real_point_to_unit_point_on_face (
 
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
-  update_flags(update_default),
-  update_once(update_default),
-  update_each(update_default),
-  first_cell(true)
+  update_each(update_default)
 {}
 
 
