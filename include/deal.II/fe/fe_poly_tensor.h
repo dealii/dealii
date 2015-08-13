@@ -182,7 +182,7 @@ protected:
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data(const UpdateFlags update_flags,
-           const Mapping<dim,spacedim> &mapping,
+           const Mapping<dim,spacedim> &,
            const Quadrature<dim> &quadrature) const
   {
     // generate a new data object and
@@ -207,7 +207,8 @@ protected:
     std::vector<Tensor<4,dim> > third_derivatives(0);
     std::vector<Tensor<5,dim> > fourth_derivatives(0);
 
-    data->sign_change.resize (this->dofs_per_cell);
+    if (flags & (update_values | update_gradients | update_hessians) )
+      data->sign_change.resize (this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -229,30 +230,32 @@ protected:
         for (unsigned int i=0; i<this->dofs_per_cell; ++i)
           data->shape_grads[i].resize (n_q_points);
         data->transformed_shape_grads.resize (n_q_points);
+
         if ( (mapping_type == mapping_raviart_thomas)
              ||
              (mapping_type == mapping_piola)
              ||
-             (mapping_type == mapping_nedelec))
+             (mapping_type == mapping_nedelec)
+             ||
+             (mapping_type == mapping_contravariant))
           data->untransformed_shape_grads.resize(n_q_points);
-
-        if ( mapping_type != mapping_none )
-          data->transformed_jacobian_grads.resize (n_q_points);
       }
 
-    // if second derivatives through
-    // finite differencing is required,
-    // then initialize some objects for
-    // that
     if (flags & update_hessians)
       {
-//      grad_grads.resize (this->dofs_per_cell);
-        data->initialize_2nd (this, mapping, quadrature);
+        grad_grads.resize (this->dofs_per_cell);
+        data->shape_grad_grads.resize (this->dofs_per_cell);
+        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+          data->shape_grad_grads[i].resize (n_q_points);
+        data->transformed_shape_hessians.resize (n_q_points);
+        if ( mapping_type != mapping_none )
+          data->untransformed_shape_hessian_tensors.resize(n_q_points);
       }
 
     // Compute shape function values
-    // and derivatives on the reference
-    // cell. Make sure, that for the
+    // and derivatives and hessians on
+    // the reference cell.
+    // Make sure, that for the
     // node values N_i holds
     // N_i(v_j)=\delta_ij for all basis
     // functions v_j
@@ -291,6 +294,21 @@ protected:
                     for (unsigned int j=0; j<this->dofs_per_cell; ++j)
                       add_grads += inverse_node_matrix(j,i) * grads[j];
                     data->shape_grads[i][k] = add_grads;
+                  }
+            }
+
+          if (flags & update_hessians)
+            {
+              if (inverse_node_matrix.n_cols() == 0)
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+                  data->shape_grad_grads[i][k] = grad_grads[i];
+              else
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+                  {
+                    Tensor<3,dim> add_grad_grads;
+                    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+                      add_grad_grads += inverse_node_matrix(j,i) * grad_grads[j];
+                    data->shape_grad_grads[i][k] = add_grad_grads;
                   }
             }
 
@@ -358,15 +376,26 @@ protected:
     std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
 
     /**
+        * Array with shape function hessians in quadrature points. There is one
+        * row for each shape function, containing values for each quadrature
+        * point.
+        */
+    std::vector< std::vector< DerivativeForm<2, dim, spacedim> > > shape_grad_grads;
+
+    /**
      * Scratch arrays for intermediate computations
      */
     mutable std::vector<double> sign_change;
     mutable std::vector<Tensor<1, spacedim> > transformed_shape_values;
+    // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim > > transformed_shape_grads;
     mutable std::vector<Tensor<2, dim > > untransformed_shape_grads;
-    // pushed forward jacobian gradients
-    mutable std::vector<Tensor<3, spacedim > > transformed_jacobian_grads;
+    //for shape_hessian computations
+    mutable std::vector<Tensor<3, spacedim > > transformed_shape_hessians;
+    mutable std::vector<Tensor<3, dim > > untransformed_shape_hessian_tensors;
   };
+
+
 
   /**
    * The polynomial space. Its type is given by the template parameter POLY.
