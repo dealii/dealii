@@ -17,7 +17,9 @@
 #define dealii__fe_poly_face_h
 
 
+#include <deal.II/base/qprojector.h>
 #include <deal.II/fe/fe.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -73,15 +75,17 @@ public:
   unsigned int get_degree () const;
 
 protected:
-  /**
-  NOTE: The following functions have their definitions inlined into the class declaration
-    * because we otherwise run into a compiler error with MS Visual Studio.
-     */
+  /*
+   * NOTE: The following functions have their definitions inlined into the class declaration
+   * because we otherwise run into a compiler error with MS Visual Studio.
+   */
+
+
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Mapping<dim,spacedim> &mapping,
-            const Quadrature<dim> &quadrature) const
+  get_data (const UpdateFlags /*update_flags*/,
+            const Mapping<dim,spacedim> &/*mapping*/,
+            const Quadrature<dim> &/*quadrature*/) const
   {
     InternalData *data = new InternalData;
     return data;
@@ -89,7 +93,7 @@ protected:
 
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_face_data(const UpdateFlags update_flags,
-                const Mapping<dim,spacedim> &mapping,
+                const Mapping<dim,spacedim> &/*mapping*/,
                 const Quadrature<dim-1>& quadrature) const
   {
     // generate a new data object and

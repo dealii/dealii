@@ -227,22 +227,24 @@ public:
   get_constant_modes () const;
 
 protected:
-  /**
-  NOTE: The following functions have their definitions inlined into the class declaration
-    * because we otherwise run into a compiler error with MS Visual Studio.
-     */
+  /*
+   * NOTE: The following functions have their definitions inlined into the class declaration
+   * because we otherwise run into a compiler error with MS Visual Studio.
+   */
+
+
   virtual
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
-            const Mapping<1,spacedim> &mapping,
-            const Quadrature<1> &quadrature) const
+            const Mapping<1,spacedim> &/*mapping*/,
+            const Quadrature<1> &/*quadrature*/) const
   {
     return new typename FiniteElement<1, spacedim>::InternalDataBase;
   }
 
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_face_data(const UpdateFlags update_flags,
-                const Mapping<1,spacedim> &mapping,
+                const Mapping<1,spacedim> &/*mapping*/,
                 const Quadrature<0> &quadrature) const
   {
     // generate a new data object and initialize some fields
