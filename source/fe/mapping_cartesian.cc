@@ -779,6 +779,7 @@ MappingCartesian<dim,spacedim>::transform (
                                 / data.volume_element;
       return;
     }
+
     case mapping_piola_gradient:
     {
       Assert (data.update_each & update_contravariant_transformation,
@@ -798,6 +799,128 @@ MappingCartesian<dim,spacedim>::transform (
       Assert(false, ExcNotImplemented());
     }
 
+}
+
+
+template<int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::transform (
+  const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+    {
+    case mapping_covariant_gradient:
+    {
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+
+                output[q][i][j][k] = input[q][i][j][k] / data.length[j] / data.length[k];
+
+              }
+    }
+    default:
+      Assert(false, ExcNotImplemented());
+    }
+
+}
+
+template<int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::transform (
+  const VectorSlice<const std::vector< Tensor<3,dim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+    {
+    case mapping_contravariant_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    input[q][i][j][k]
+                                        * data.length[i]
+                                        / data.length[j]
+                                        / data.length[k];
+              }
+      return;
+    }
+
+    case mapping_covariant_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    input[q][i][j][k]
+                                        / data.length[i]
+                                        / data.length[j]
+                                        / data.length[k];
+              }
+
+      return;
+    }
+
+    case mapping_piola_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+      Assert (data.update_each & update_volume_elements,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    input[q][i][j][k]
+                                        * data.length[i]
+                                        / data.volume_element
+                                        / data.length[j]
+                                        / data.length[k];
+              }
+
+      return;
+    }
+
+    default:
+      Assert(false, ExcNotImplemented());
+    }
 }
 
 

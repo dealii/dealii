@@ -911,13 +911,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::transform (
 {
   AssertDimension (input.size(), output.size());
 
-  std::vector<DerivativeForm<1, spacedim,spacedim> > aux_output1(output.size());
-  VectorSlice< std::vector<DerivativeForm<1, spacedim,spacedim> > >  aux_output( aux_output1);
+  transform_differential_forms(input, output, mapping_data, mapping_type);
 
-  transform_differential_forms(input, aux_output, mapping_data, mapping_type);
-
-  for (unsigned int i=0; i<output.size(); i++)
-    output[i] = aux_output[i];
 }
 
 
@@ -934,6 +929,70 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform
   AssertDimension (input.size(), output.size());
 
   AssertThrow(false, ExcNotImplemented());
+}
+
+
+
+template<int dim, int spacedim, class VECTOR, class DH>
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
+  const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+    {
+    case mapping_covariant_gradient:
+    {
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] = data.covariant[q][j][0]
+                                     * data.covariant[q][k][0]
+                                     * input[q][i][0][0];
+                for (unsigned int J=0; J<dim; ++J)
+                  {
+                    const unsigned int K0 = (0==J)? 1 : 0;
+                    for (unsigned int K=K0; K<dim; ++K)
+                      output[q][i][j][k] += data.covariant[q][j][J]
+                                            * data.covariant[q][k][K]
+                                            * input[q][i][J][K];
+                  }
+
+              }
+    }
+    default:
+      Assert(false, ExcNotImplemented());
+    }
+
+}
+
+template<int dim, int spacedim, class VECTOR, class DH>
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
+  const VectorSlice<const std::vector< Tensor<3,dim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType /*mapping_type*/) const
+{
+
+  (void)input;
+  (void)output;
+  (void)mapping_data;
+  AssertDimension (input.size(), output.size());
+
+  AssertThrow(false, ExcNotImplemented());
+
 }
 
 
@@ -1003,7 +1062,7 @@ template<int dim, int spacedim, class VECTOR, class DH>
 template < int rank >
 void MappingFEField<dim,spacedim,VECTOR,DH>::transform_differential_forms(
   const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-  VectorSlice<std::vector<DerivativeForm<rank, spacedim,spacedim> > > output,
+  VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
