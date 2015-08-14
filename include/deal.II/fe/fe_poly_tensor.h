@@ -20,6 +20,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/quadrature.h>
 
 DEAL_II_NAMESPACE_OPEN
 
