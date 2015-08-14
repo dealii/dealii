@@ -317,7 +317,7 @@ public:
    * This function does not make physical sense when dim=1,
    * so it throws an exception in this case.
    */
-  virtual Point<dim-1>
+  Point<dim-1>
   project_real_point_to_unit_point_on_face (
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const unsigned int &face_no,
