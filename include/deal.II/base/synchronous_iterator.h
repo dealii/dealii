@@ -38,6 +38,10 @@ DEAL_II_NAMESPACE_OPEN
  * The template argument of the current class shall be of type
  * <code>std_cxx11::tuple</code> with arguments equal to the iterator types.
  *
+ * The individual iterators can be accessed using
+ * <code>std_cxx11::get<X>(synchronous_iterator.iterators)</code> where X is the
+ * number corresponding to the desired iterator.
+ *
  * This type, and the helper functions associated with it, are used as the
  * Value concept for the blocked_range type of the Threading Building Blocks.
  *
@@ -88,6 +92,8 @@ SynchronousIterators (const SynchronousIterators &i)
  * first element of the second argument. Since the objects compared march
  * forward all elements at the same time, comparing the first element is
  * sufficient.
+ *
+ * @relates SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -104,6 +110,8 @@ operator< (const SynchronousIterators<Iterators> &a,
  * Return the distance between the first and the second argument. Since the
  * objects compared march forward all elements at the same time, differencing
  * the first element is sufficient.
+ *
+ * @relates SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -121,6 +129,8 @@ operator- (const SynchronousIterators<Iterators> &a,
 
 /**
  * Advance a tuple of iterators by $n$.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2>
 inline
@@ -133,6 +143,8 @@ void advance (std_cxx11::tuple<I1,I2> &t,
 
 /**
  * Advance a tuple of iterators by $n$.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
 inline
@@ -146,6 +158,8 @@ void advance (std_cxx11::tuple<I1,I2,I3> &t,
 
 /**
  * Advance a tuple of iterators by $n$.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2,
           typename I3, typename I4>
@@ -163,6 +177,8 @@ void advance (std_cxx11::tuple<I1,I2,I3, I4> &t,
 
 /**
  * Advance a tuple of iterators by 1.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2>
 inline
@@ -174,6 +190,8 @@ void advance_by_one (std_cxx11::tuple<I1,I2> &t)
 
 /**
  * Advance a tuple of iterators by 1.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
 inline
@@ -186,6 +204,8 @@ void advance_by_one (std_cxx11::tuple<I1,I2,I3> &t)
 
 /**
  * Advance a tuple of iterators by 1.
+ *
+ * @relates SynchronousIterators
  */
 template <typename I1, typename I2,
           typename I3, typename I4>
@@ -202,6 +222,8 @@ void advance_by_one (std_cxx11::tuple<I1,I2,I3,I4> &t)
 
 /**
  * Advance the elements of this iterator by $n$.
+ *
+ * @relates SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -216,6 +238,8 @@ operator + (const SynchronousIterators<Iterators> &a,
 
 /**
  * Advance the elements of this iterator by 1.
+ *
+ * @relates SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -230,6 +254,8 @@ operator ++ (SynchronousIterators<Iterators> &a)
 /**
  * Compare synch iterators for inequality. Since they march in synch,
  * comparing only the first element is sufficient.
+ *
+ * @relates SynchronousIterators
  */
 template <typename Iterators>
 inline
