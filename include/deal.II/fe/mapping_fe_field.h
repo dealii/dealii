@@ -506,18 +506,12 @@ private:
                           typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
+   * Implementation of the corresponding function in the base class,
+   * Mapping::requires_update_flags(). See there for more information.
    */
-  virtual UpdateFlags
-  update_once (const UpdateFlags in) const;
-
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
-  virtual UpdateFlags
-  update_each (const UpdateFlags in) const;
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
    * Reimplemented from Mapping. See the documentation of the base class for

@@ -211,8 +211,13 @@ protected:
                      std::vector<Point<dim> > &normal_vectors) const;
 
 private:
-  virtual UpdateFlags update_once (const UpdateFlags) const;
-  virtual UpdateFlags update_each (const UpdateFlags) const;
+  /**
+   * Implementation of the corresponding function in the base class,
+   * Mapping::requires_update_flags(). See there for more information.
+   */
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
    * Value to indicate that a given face or subface number is invalid.

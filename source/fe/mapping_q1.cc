@@ -477,43 +477,15 @@ compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 
 template<int dim, int spacedim>
 UpdateFlags
-MappingQ1<dim,spacedim>::update_once (const UpdateFlags) const
+MappingQ1<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {
-  // nothing here
-  return update_default;
-}
-
-
-
-template<int dim, int spacedim>
-UpdateFlags
-MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
-{
-  // Select flags of concern for the
-  // transformation.
-  UpdateFlags out = UpdateFlags(in & (update_quadrature_points
-                                      | update_covariant_transformation
-                                      | update_contravariant_transformation
-                                      | update_JxW_values
-                                      | update_boundary_forms
-                                      | update_normal_vectors
-                                      | update_volume_elements
-                                      | update_jacobians
-                                      | update_jacobian_grads
-                                      | update_inverse_jacobians));
-
-  // add flags if the respective
-  // quantities are necessary to
-  // compute what we need. note that
-  // some flags appear in both the
-  // conditions and in subsequent
-  // set operations. this leads to
-  // some circular logic. the only
-  // way to treat this is to
-  // iterate. since there are 5
-  // if-clauses in the loop, it will
-  // take at most 5 iterations to
+  // add flags if the respective quantities are necessary to compute
+  // what we need. note that some flags appear in both the conditions
+  // and in subsequent set operations. this leads to some circular
+  // logic. the only way to treat this is to iterate. since there are
+  // 5 if-clauses in the loop, it will take at most 5 iterations to
   // converge. do them:
+  UpdateFlags out = in;
   for (unsigned int i=0; i<5; ++i)
     {
       // The following is a little incorrect:
@@ -564,36 +536,38 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
                                        const unsigned int     n_original_q_points,
                                        InternalData          &data) const
 {
-  data.update_each = update_each(update_flags);
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values(). use the transitive hull of the required
+  // flags
+  data.update_each = requires_update_flags(update_flags);
 
   const unsigned int n_q_points = q.size();
-  const UpdateFlags flags = update_once(update_flags) | update_each(update_flags);
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
-  if (flags & update_quadrature_points)
+  if (data.update_each & update_quadrature_points)
     data.shape_values.resize(data.n_shape_functions * n_q_points);
 
-  if (flags & (update_covariant_transformation
-               | update_contravariant_transformation
-               | update_JxW_values
-               | update_boundary_forms
-               | update_normal_vectors
-               | update_jacobians
-               | update_jacobian_grads
-               | update_inverse_jacobians))
+  if (data.update_each & (update_covariant_transformation
+                          | update_contravariant_transformation
+                          | update_JxW_values
+                          | update_boundary_forms
+                          | update_normal_vectors
+                          | update_jacobians
+                          | update_jacobian_grads
+                          | update_inverse_jacobians))
     data.shape_derivatives.resize(data.n_shape_functions * n_q_points);
 
-  if (flags & update_covariant_transformation)
+  if (data.update_each & update_covariant_transformation)
     data.covariant.resize(n_original_q_points);
 
-  if (flags & update_contravariant_transformation)
+  if (data.update_each & update_contravariant_transformation)
     data.contravariant.resize(n_original_q_points);
 
-  if (flags & update_volume_elements)
+  if (data.update_each & update_volume_elements)
     data.volume_elements.resize(n_original_q_points);
 
-  if (flags & update_jacobian_grads)
+  if (data.update_each & update_jacobian_grads)
     data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
 
   compute_shapes (q.get_points(), data);
@@ -624,7 +598,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 
   if (dim > 1)
     {
-      if (update_flags & update_boundary_forms)
+      if (data.update_each & update_boundary_forms)
         {
           data.aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
 

@@ -116,15 +116,6 @@ enum MappingType
  * The interface for filling the tables of FEValues is provided. Everything
  * else has to happen in derived classes.
  *
- * The following paragraph applies to the implementation of FEValues. Usage of
- * the class is as follows: first, call the functions @p update_once and @p
- * update_each with the update flags you need. This includes the flags needed
- * by the FiniteElement. Then call <tt>get_*_data</tt> and with the or'd
- * results.  This will initialize and return some internal data structures. On
- * the first cell, call <tt>fill_fe_*_values</tt> with the result of @p
- * update_once. Finally, on each cell, use <tt>fill_fe_*_values</tt> with the
- * result of @p update_each to compute values for a special cell.
- *
  * <h3>Mathematics of the mapping</h3>
  *
  * The mapping is a transformation $\mathbf x = \Phi(\mathbf{\hat x})$ which
@@ -195,13 +186,6 @@ enum MappingType
  * performed through the functions transform(). See the documentation there
  * for possible choices.
  *
- * <h3>Technical notes</h3>
- *
- * A hint to implementors: no function except the two functions @p
- * update_once and @p update_each may add any flags.
- *
- * For more information about the <tt>spacedim</tt> template parameter check
- * the documentation of FiniteElement or the one of Triangulation.
  *
  * <h3>References</h3>
  *
@@ -475,7 +459,20 @@ public:
     virtual ~InternalDataBase ();
 
     /**
-     * Values updated on each cell by Mapping::fill_fe_values() and friends.
+     * A set of update flags specifying the kind of information that
+     * an implementation of the Mapping interface needs to compute on
+     * each cell or face, i.e., in Mapping::fill_fe_values() and
+     * friends.
+     *
+     * This set of flags is stored here by implementations of
+     * Mapping::get_data(), Mapping::get_face_data(), or
+     * Mapping::get_subface_data(), and is that subset of the update
+     * flags passed to those functions that require re-computation on
+     * every cell. (The subset of the flags corresponding to
+     * information that can be computed once and for all already at
+     * the time of the call to Mapping::get_data() -- or an
+     * implementation of that interface -- need not be stored here
+     * because it has already been taken care of.)
      */
     UpdateFlags          update_each;
 
@@ -488,23 +485,28 @@ public:
 
 protected:
   /**
-   * Indicate fields to be updated in the constructor of FEValues. Especially,
-   * fields not asked for by FEValues, but computed for efficiency reasons
-   * will be notified here.
+   * Given a set of update flags, compute which other quantities <i>also</i>
+   * need to be computed in order to satisfy the request by the given flags.
+   * Then return the combination of the original set of flags and those
+   * just computed.
+   *
+   * As an example, if @p update_flags contains update_JxW_values
+   * (i.e., the product of the determinant of the Jacobian and the
+   * weights provided by the quadrature formula), a mapping may
+   * require the computation of the full Jacobian matrix in order to
+   * compute its determinant. They would then return not just
+   * update_JxW_values, but also update_jacobians. (This is not how it
+   * is actually done internally in the derived classes that compute
+   * the JxW values -- they set update_contravariant_transformation
+   * instead, from which the determinant can also be computed -- but
+   * this does not take away from the instructiveness of the example.)
    *
    * See
    * @ref UpdateFlagsEssay.
    */
-  virtual UpdateFlags update_once (const UpdateFlags) const = 0;
-
-  /**
-   * The same as update_once(), but for the flags to be updated for each grid
-   * cell.
-   *
-   * See
-   * @ref UpdateFlagsEssay.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags) const = 0;
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const = 0;
 
   /**
    * Prepare internal data structures and fill in values independent of the
@@ -513,7 +515,7 @@ protected:
    */
   virtual
   InternalDataBase *
-  get_data (const UpdateFlags,
+  get_data (const UpdateFlags      update_flags,
             const Quadrature<dim> &quadrature) const = 0;
 
   /**
@@ -524,8 +526,8 @@ protected:
    */
   virtual
   InternalDataBase *
-  get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const = 0;
+  get_face_data (const UpdateFlags        update_flags,
+                 const Quadrature<dim-1> &quadrature) const = 0;
 
   /**
    * Prepare internal data structure for transformation of children of faces
@@ -535,8 +537,8 @@ protected:
    */
   virtual
   InternalDataBase *
-  get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const = 0;
+  get_subface_data (const UpdateFlags        update_flags,
+                    const Quadrature<dim-1> &quadrature) const = 0;
 
   /**
    * Compute information about the mapping from the reference cell
