@@ -50,7 +50,7 @@ namespace parallel
     n_subdomains(Utilities::MPI::n_mpi_processes(mpi_communicator))
   {
     number_cache.n_locally_owned_active_cells.resize (n_subdomains);
-  };
+  }
 
   template <int dim, int spacedim>
   void
