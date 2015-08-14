@@ -248,8 +248,8 @@ protected:
                 const Quadrature<0> &quadrature) const
   {
     // generate a new data object and initialize some fields
-    typename FiniteElement<1, spacedim>::InternalDataBase *data =
-      new typename FiniteElement<1, spacedim>::InternalDataBase;
+    typename FiniteElement<1,spacedim>::InternalDataBase *data =
+      new typename FiniteElement<1,spacedim>::InternalDataBase;
 
     // check what needs to be initialized only once and what on every
     // cell/face/subface we visit

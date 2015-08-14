@@ -113,23 +113,23 @@ protected:
 
     // some scratch arrays
     std::vector<double> values(0);
-    std::vector<Tensor<1, dim - 1> > grads(0);
-    std::vector<Tensor<2, dim - 1> > grad_grads(0);
+    std::vector<Tensor<1,dim-1> > grads(0);
+    std::vector<Tensor<2,dim-1> > grad_grads(0);
 
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
     if (flags & update_values)
       {
-        values.resize(poly_space.n());
-        data->shape_values.resize(poly_space.n(),
-                                  std::vector<double>(n_q_points));
-        for (unsigned int i = 0; i<n_q_points; ++i)
+        values.resize (poly_space.n());
+        data->shape_values.resize (poly_space.n(),
+                                   std::vector<double> (n_q_points));
+        for (unsigned int i=0; i<n_q_points; ++i)
           {
             poly_space.compute(quadrature.point(i),
                                values, grads, grad_grads);
 
-            for (unsigned int k = 0; k<poly_space.n(); ++k)
+            for (unsigned int k=0; k<poly_space.n(); ++k)
               data->shape_values[k][i] = values[k];
           }
       }

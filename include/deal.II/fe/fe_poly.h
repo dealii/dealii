@@ -163,14 +163,16 @@ public:
                                                    const unsigned int component) const;
 
 protected:
-  /**
-  NOTE: The following function has its definition inlined into the class declaration
-    * because we otherwise run into a compiler error with MS Visual Studio.
-    */
+  /*
+   * NOTE: The following function has its definition inlined into the class declaration
+   * because we otherwise run into a compiler error with MS Visual Studio.
+   */
+
+
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data(const UpdateFlags update_flags,
-           const Mapping<dim,spacedim> &mapping,
+           const Mapping<dim,spacedim> &/*mapping*/,
            const Quadrature<dim> &quadrature) const
   {
     // generate a new data object and
@@ -190,24 +192,24 @@ protected:
 
     // some scratch arrays
     std::vector<double> values(0);
-    std::vector<Tensor<1, dim> > grads(0);
-    std::vector<Tensor<2, dim> > grad_grads(0);
+    std::vector<Tensor<1,dim> > grads(0);
+    std::vector<Tensor<2,dim> > grad_grads(0);
 
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
     if (flags & update_values)
       {
-        values.resize(this->dofs_per_cell);
-        data->shape_values.resize(this->dofs_per_cell,
-                                  std::vector<double>(n_q_points));
+        values.resize (this->dofs_per_cell);
+        data->shape_values.resize (this->dofs_per_cell,
+                                   std::vector<double> (n_q_points));
       }
 
     if (flags & update_gradients)
       {
-        grads.resize(this->dofs_per_cell);
-        data->shape_gradients.resize(this->dofs_per_cell,
-                                     std::vector<Tensor<1, dim> >(n_q_points));
+        grads.resize (this->dofs_per_cell);
+        data->shape_gradients.resize (this->dofs_per_cell,
+                                      std::vector<Tensor<1,dim> > (n_q_points));
       }
 
     // if second derivatives through
@@ -215,7 +217,12 @@ protected:
     // then initialize some objects for
     // that
     if (flags & update_hessians)
-      data->initialize_2nd(this, mapping, quadrature);
+      {
+        grad_grads.resize (this->dofs_per_cell);
+        data->shape_hessians.resize (this->dofs_per_cell,
+                                     std::vector<Tensor<2,dim> > (n_q_points));
+        data->untransformed_shape_hessians.resize (n_q_points);
+      }
 
     // next already fill those fields
     // of which we have information by
@@ -224,19 +231,23 @@ protected:
     // unit cell, and need to be
     // transformed when visiting an
     // actual cell
-    if (flags & (update_values | update_gradients))
-      for (unsigned int i = 0; i<n_q_points; ++i)
+    if (flags & (update_values | update_gradients | update_hessians))
+      for (unsigned int i=0; i<n_q_points; ++i)
         {
           poly_space.compute(quadrature.point(i),
                              values, grads, grad_grads);
 
           if (flags & update_values)
-            for (unsigned int k = 0; k<this->dofs_per_cell; ++k)
+            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_values[k][i] = values[k];
 
           if (flags & update_gradients)
-            for (unsigned int k = 0; k<this->dofs_per_cell; ++k)
+            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_gradients[k][i] = grads[k];
+
+          if (flags & update_hessians)
+            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+              data->shape_hessians[k][i] = grad_grads[k];
         }
     return data;
   }
