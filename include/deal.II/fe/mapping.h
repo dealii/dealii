@@ -111,79 +111,88 @@ enum MappingType
 
 
 /**
- * Abstract base class for mapping classes.
+ * @short Abstract base class for mapping classes.
  *
- * The interface for filling the tables of FEValues is provided. Everything
- * else has to happen in derived classes.
+ * This class declares the interface for the functionality to describe mappings
+ * from the reference (unit) cell to a cell in real space, as well as for filling
+ * the information necessary to use the FEValues, FEFaceValues, and FESubfaceValues
+ * classes. Concrete implementations of these interfaces are provided in
+ * derived classes.
  *
  * <h3>Mathematics of the mapping</h3>
  *
- * The mapping is a transformation $\mathbf x = \Phi(\mathbf{\hat x})$ which
- * maps the reference cell [0,1]<sup>dim</sup> to the actual grid cell in
- * R<sup>spacedim</sup>. In order to describe the application of the mapping
- * to different objects, we introduce the notation for the Jacobian
- * $J(\mathbf{\hat x}) = \nabla\Phi(\mathbf{\hat x})$. For instance, if
+ * The mapping is a transformation $\mathbf x = \mathbf F_K(\hat{\mathbf  x})$ which
+ * maps points $\hat{\mathbf x}$ in the reference cell $[0,1]^\text{dim}$ to points
+ * $\mathbf x$ in the actual grid cell
+ * $K\subset{\mathbb R}^\text{spacedim}$. Many of the applications of such mappings
+ * require the Jacobian of this mapping,
+ * $J(\hat{\mathbf x}) = \hat\nabla {\mathbf F}_K(\hat{\mathbf  x})$. For instance, if
  * dim=spacedim=2, we have
  * @f[
- * J(\mathbf{\hat x}) = \left(\begin{matrix}
+ * J(\hat{\mathbf  x}) = \left(\begin{matrix}
  * \frac{\partial x}{\partial \hat x} & \frac{\partial x}{\partial \hat y}
  * \\
  * \frac{\partial y}{\partial \hat x} & \frac{\partial y}{\partial \hat y}
  * \end{matrix}\right)
  * @f]
  *
- * <h4>Mapping of functions</h4>
+ * <h4>%Mapping of scalar functions</h4>
  *
- * Functions are simply mapped such that
+ * The shape functions of scalar finite elements are typically defined on a reference
+ * cell and are then simply mapped according to the rule
  * @f[
- * u(\mathbf x) = u\bigl(\Phi(\mathbf{\hat x})\bigr)
- * = \hat u(\mathbf{\hat x}).
- * @f]
- * Since finite element shape functions are usually defined on the reference
- * cell, nothing needs to be done for them. For a function defined on the
- * computational domain, the quadrature points need to be mapped, which is
- * done in fill_fe_values() if @p update_quadrature_points is set in the
- * update flags. The mapped quadrature points are then accessed through
- * FEValuesBase::quadrature_point().
- *
- * @todo Add a function <tt>transform_quadrature_points</tt> for this.
- *
- * <h4>Mapping of integrals</h4>
- *
- * The volume form $d\hat x$ is mapped such that for a grid cell <i>Z</i>
- * @f[
- *  \int_Z u(\mathbf x)\,d\mathbf x = \int_{\hat Z} \hat
- * u(\mathbf{\hat x}) \left|\text{det}J(\mathbf{\hat x})\right|
- * \,d\mathbf{\hat x}.
+ * \varphi(\mathbf x) = \varphi\bigl(\mathbf F_K(\hat{\mathbf  x})\bigr)
+ * = \hat \varphi(\hat{\mathbf  x}).
  * @f]
  *
- * The transformed quadrature weights $\left|\text{det}J(\mathbf{\hat
- * x})\right|$ are accessed through FEValuesBase::JxW() and computed in
- * fill_fe_values(), if @p update_JxW_values is set in the update flags.
  *
- * @todo Add a function <tt>transform_quadrature_weights</tt> for this.
+ * <h4>%Mapping of integrals</h4>
  *
- * @todo Add documentation on the codimension-one case
+ * Using simply a change of variables, integrals of scalar functions over a cell
+ * $K$ can be expressed as an integral over the reference cell $\hat K$.
+ * Specifically, The volume form $d\hat x$ is transformed so that
+ * @f[
+ *  \int_K u(\mathbf x)\,dx = \int_{\hat K} \hat
+ * u(\hat{\mathbf  x}) \left|\text{det}J(\hat{\mathbf  x})\right|
+ * \,d\hat x.
+ * @f]
  *
- * <h4>Mapping of vector fields, differential forms and gradients of vector
+ * In expressions where such integrals are approximated by quadrature,
+ * this then leads to terms of the form
+ * @f[
+ *  \int_K u(\mathbf x)\,dx
+ *  \approx
+ *  \sum_{q}
+ *  \hat u(\hat{\mathbf  x}_q)
+ *  \underbrace{\left|\text{det}J(\hat{\mathbf  x}_q)\right| w_q}_{=: \text{JxW}_q}.
+ * @f]
+ * Here, the weights $\text{JxW}_q$ of each quadrature point (where <i>JxW</i>
+ * mnemonically stands for <i>Jacobian times Quadrature Weights</i>) take the
+ * role of the $dx$ in the original integral. Consequently, they appear in all
+ * code that computes integrals approximated by quadrature, and are accessed
+ * by FEValues::JxW().
+ *
+ * @todo Document what happens in the codimension-1 case.
+ *
+ *
+ * <h4>%Mapping of vector fields, differential forms and gradients of vector
  * fields</h4>
  *
- * The transformation of vector fields, differential forms
- * (gradients/jacobians) and gradients of vector fields between the reference
- * cell and the actual grid cell follows the general form
+ * The transformation of vector fields or differential forms
+ * (gradients of scalar functions) $\mathbf v$, and gradients of vector fields $\mathbf T$
+ * follows the general form
  *
  * @f[
- * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
- * \mathbf{\hat v}(\mathbf{\hat x}),
+ * \mathbf v(\mathbf x) = \mathbf A(\hat{\mathbf  x})
+ * \hat{\mathbf  v}(\hat{\mathbf  x}),
  * \qquad
- * \mathbf T(\mathbf x) = \mathbf A(\mathbf{\hat x})
- * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}),
+ * \mathbf T(\mathbf x) = \mathbf A(\hat{\mathbf  x})
+ * \hat{\mathbf  T}(\hat{\mathbf  x}) \mathbf B(\hat{\mathbf  x}).
  * @f]
- *
- * where <b>v</b> is a vector field or a differential form and and <b>T</b> a
- * tensor field of gradients. The differential forms <b>A</b> and <b>B</b> are
- * determined by the MappingType enumerator. These transformations are
- * performed through the functions transform(). See the documentation there
+ * The differential forms <b>A</b> and <b>B</b> are
+ * determined by the kind of object being transformed. These transformations are
+ * performed through the transform() functions, and the type of object being
+ * transformed is specified by their MappingType argument. See the documentation there
  * for possible choices.
  *
  *
@@ -237,6 +246,18 @@ public:
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
+  /**
+   * Returns whether the mapping preserves vertex locations, i.e., whether the
+   * mapped location of the reference cell vertices (given by
+   * GeometryInfo::unit_cell_vertex()) equals the result of
+   * <code>cell-@>vertex()</code>.
+   *
+   * For example, implementations in derived classes return @p true for
+   * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
+   * MappingQ1Eulerian, and MappingFEField.
+   */
+  virtual
+  bool preserves_vertex_locations () const = 0;
 
   /**
    * @name Mapping points between reference and real cells
@@ -296,16 +317,15 @@ public:
    * Transforms the point @p p on the real @p cell to the corresponding point
    * on the unit cell, and then projects it to a dim-1  point on the face with
    * the given face number @p face_no. Ideally the point @p p is near the face
-   * @ face_no, but any point in the cell can technically be projected.
+   * @p face_no, but any point in the cell can technically be projected.
    *
    * This function does not make physical sense when dim=1,
    * so it throws an exception in this case.
    */
   Point<dim-1>
-  project_real_point_to_unit_point_on_face (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const unsigned int &face_no,
-    const Point<spacedim> &p) const;
+  project_real_point_to_unit_point_on_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                            const unsigned int &face_no,
+                                            const Point<spacedim> &p) const;
 
   /**
    * @}
@@ -313,17 +333,9 @@ public:
 
 
   /**
-   * Returns whether the mapping preserves vertex locations, i.e., whether the
-   * mapped location of the reference cell vertices (given by
-   * GeometryInfo::unit_cell_vertex()) equals the result of
-   * <code>cell-@>vertex()</code>.
-   *
-   * For example, implementations in derived classes return @p true for
-   * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
-   * MappingQ1Eulerian.
+   * @name Exceptions
+   * @{
    */
-  virtual
-  bool preserves_vertex_locations () const = 0;
 
   /**
    * Exception
@@ -358,6 +370,9 @@ public:
                   << "fraction of " << arg2 << " in quadrature point "
                   << arg3 << ".");
 
+  /**
+   * @}
+   */
 
   /**
    * @name Interface with FEValues
@@ -722,33 +737,36 @@ public:
    * <li> @p mapping_contravariant: maps a vector field on the reference cell
    * is to the physical cell through the Jacobian:
    * @f[
-   * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
+   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})\hat{\mathbf  u}(\hat{\mathbf  x}).
    * @f]
    * In physics, this is usually referred to as the contravariant
    * transformation. Mathematically, it is the push forward of a vector field.
    *
    * <li> @p mapping_covariant: maps a field of one-forms on the reference
-   * cell to a field of one-forms on the physical cell. (theoretically this
-   * would refer to a DerivativeForm<1, dim, 1> but it canonically identified
-   * with a Tensor<1,dim>). Mathematically, it is the pull back of the
+   * cell to a field of one-forms on the physical cell. (Theoretically this
+   * would refer to a DerivativeForm<1,dim,1> but we canonically identify
+   * this type with a Tensor<1,dim>). Mathematically, it is the pull back of the
    * differential form
    * @f[
-   * \mathbf u(\mathbf x) = J(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
-   * u}(\mathbf{\hat x}).
-   * @f]
-   * In the case when dim=spacedim the previous formula reduces to
-   * @f[
-   * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
-   * u}(\mathbf{\hat x}).
+   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}\hat{\mathbf
+   * u}(\hat{\mathbf  x}).
    * @f]
    * Gradients of scalar differentiable functions are transformed this way.
+   *
+   * In the case when dim=spacedim the previous formula reduces to
+   * @f[
+   * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})^{-T}\hat{\mathbf
+   * u}(\hat{\mathbf  x})
+   * @f]
+   * because we assume that the mapping $\mathbf F_K$ is always invertible,
+   * and consequently its Jacobian $J$ is an invertible matrix.
    *
    * <li> @p mapping_piola: A field of <i>dim-1</i>-forms on the reference cell
    * is also represented by a vector field, but again transforms differently,
    * namely by the Piola transform
    * @f[
-   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
-   * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
+   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}\;J(\mathbf x)}
+   * J(\mathbf x) \hat{\mathbf  u}(\mathbf x).
    * @f]
    * </ul>
    */
@@ -763,31 +781,32 @@ public:
 
   /**
    * Transform a field of differential forms from the reference cell to the
-   * physical cell.  It is useful to think of $\mathbf{T} = D \mathbf u$ and
-   * $\mathbf{\hat T} = \hat D \mathbf{\hat u}$, with $\mathbf u$ a vector
+   * physical cell.  It is useful to think of $\mathbf{T} = \nabla \mathbf u$ and
+   * $\hat{\mathbf  T} = \hat \nabla \hat{\mathbf  u}$, with $\mathbf u$ a vector
    * field.  The mapping types currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_covariant: maps a field of forms on the reference cell to
    * a field of forms on the physical cell. Mathematically, it is the pull
    * back of the differential form
    * @f[
-   * \mathbf T(\mathbf x) = \mathbf{\hat T}(\mathbf{\hat x})
-   *                        J*(J^{T} J)^{-1}(\mathbf{\hat x}).
-   * @f]
-   * n the case when dim=spacedim the previous formula reduces to
-   * @f[
-   * \mathbf T(\mathbf x) = \mathbf{\hat u}(\mathbf{\hat x})
-   *                        J^{-1}(\mathbf{\hat x}).
+   * \mathbf T(\mathbf x) = \hat{\mathbf  T}(\hat{\mathbf  x})
+   *                        J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
    * @f]
    * Jacobians of spacedim-vector valued differentiable functions are
    * transformed this way.
+   *
+   * In the case when dim=spacedim the previous formula reduces to
+   * @f[
+   * \mathbf T(\mathbf x) = \hat{\mathbf  u}(\hat{\mathbf  x})
+   *                        J(\hat{\mathbf  x})^{-1}.
+   * @f]
    * </ul>
    * @note It would have been more reasonable to make this transform a
    * template function with the rank in <code>DerivativeForm@<1, dim,
    * rank@></code>. Unfortunately C++ does not allow templatized virtual
    * functions. This is why we identify <code>DerivativeForm@<1, dim,
    * 1@></code> with a <code>Tensor@<1,dim@></code> when using
-   * mapping_covariant() in the function transform above this one.
+   * mapping_covariant() in the function transform() above this one.
    */
   virtual
   void
@@ -799,39 +818,39 @@ public:
 
   /**
    * Transform a tensor field from the reference cell to the physical cell.
-   * This tensors are usually the Jacobians in the reference cell of
+   * These tensors are usually the Jacobians in the reference cell of
    * vector fields that have been pulled back from the physical cell.  The
    * mapping types currently implemented by derived classes are:
    * <ul>
-   * <li> @p mapping_contravariant_gradient, it assumes $\mathbf u(\mathbf x)
-   * = J \mathbf{\hat u}$ so that
+   * <li> @p mapping_contravariant_gradient: it assumes $\mathbf u(\mathbf x)
+   * = J \hat{\mathbf  u}$ so that
    * @f[
    * \mathbf T(\mathbf x) =
-   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
+   * J(\hat{\mathbf  x}) \hat{\mathbf  T}(\hat{\mathbf  x})
+   * J(\hat{\mathbf  x})^{-1}.
    * @f]
-   * <li> @p mapping_covariant_gradient, it assumes $\mathbf u(\mathbf x) =
-   * J^{-T} \mathbf{\hat u}$ so that
+   * <li> @p mapping_covariant_gradient: it assumes $\mathbf u(\mathbf x) =
+   * J^{-T} \hat{\mathbf  u}$ so that
    * @f[
    * \mathbf T(\mathbf x) =
-   * J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
+   * J(\hat{\mathbf  x})^{-T} \hat{\mathbf  T}(\hat{\mathbf  x})
+   * J(\hat{\mathbf  x})^{-1}.
    * @f]
-   * <li> @p mapping_piola_gradient, it assumes $\mathbf u(\mathbf x) =
-   * \frac{1}{\text{det}J(\mathbf x)} J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
+   * <li> @p mapping_piola_gradient: it assumes $\mathbf u(\mathbf x) =
+   * \frac{1}{\text{det}\;J(\mathbf x)} J(\mathbf x) \hat{\mathbf  u}(\mathbf x)$
    * so that
    * @f[
    * \mathbf T(\mathbf x) =
-   * \frac{1}{\text{det}J(\mathbf x)}
-   * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
-   * J^{-1}(\mathbf{\hat x}).
+   * \frac{1}{\text{det}\;J(\mathbf x)}
+   * J(\hat{\mathbf  x}) \hat{\mathbf  T}(\hat{\mathbf  x})
+   * J(\hat{\mathbf  x})^{-1}.
    * @f]
    * </ul>
-   * @todo The formulas for mapping_covariant_gradient(),
-   * mapping_contravariant_gradient() and mapping_piola_gradient() are only
+   * @todo The formulas for mapping_covariant_gradient,
+   * mapping_contravariant_gradient and mapping_piola_gradient are only
    * true as stated for linear mappings. If, for example, the mapping is
-   * bilinear then there is a missing term associated with the derivative of
-   * J.
+   * bilinear (or has a higher order polynomial degree) then there is a
+   * missing term associated with the derivative of $J$.
    */
   virtual
   void
