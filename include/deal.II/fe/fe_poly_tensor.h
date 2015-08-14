@@ -200,27 +200,38 @@ protected:
     const unsigned int n_q_points = quadrature.size();
 
     // some scratch arrays
-    std::vector<Tensor<1, dim> > values(0);
-    std::vector<Tensor<2, dim> > grads(0);
-    std::vector<Tensor<3, dim> > grad_grads(0);
+    std::vector<Tensor<1,dim> > values(0);
+    std::vector<Tensor<2,dim> > grads(0);
+    std::vector<Tensor<3,dim> > grad_grads(0);
+
+    data->sign_change.resize (this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
     if (flags & update_values)
       {
-        values.resize(this->dofs_per_cell);
-        data->shape_values.resize(this->dofs_per_cell);
-        for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
-          data->shape_values[i].resize(n_q_points);
+        values.resize (this->dofs_per_cell);
+        data->shape_values.resize (this->dofs_per_cell);
+        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+          data->shape_values[i].resize (n_q_points);
+        if (mapping_type != mapping_none)
+          data->transformed_shape_values.resize (n_q_points);
       }
 
     if (flags & update_gradients)
       {
-        grads.resize(this->dofs_per_cell);
-        data->shape_grads.resize(this->dofs_per_cell);
-        for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
-          data->shape_grads[i].resize(n_q_points);
+        grads.resize (this->dofs_per_cell);
+        data->shape_grads.resize (this->dofs_per_cell);
+        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+          data->shape_grads[i].resize (n_q_points);
+        data->transformed_shape_grads.resize (n_q_points);
+        if ( (mapping_type == mapping_raviart_thomas)
+             ||
+             (mapping_type == mapping_piola)
+             ||
+             (mapping_type == mapping_nedelec))
+          data->untransformed_shape_grads.resize(n_q_points);
       }
 
     // if second derivatives through
@@ -229,8 +240,8 @@ protected:
     // that
     if (flags & update_hessians)
       {
-        //      grad_grads.resize (this->dofs_per_cell);
-        data->initialize_2nd(this, mapping, quadrature);
+//      grad_grads.resize (this->dofs_per_cell);
+        data->initialize_2nd (this, mapping, quadrature);
       }
 
     // Compute shape function values
@@ -240,7 +251,7 @@ protected:
     // N_i(v_j)=\delta_ij for all basis
     // functions v_j
     if (flags & (update_values | update_gradients))
-      for (unsigned int k = 0; k<n_q_points; ++k)
+      for (unsigned int k=0; k<n_q_points; ++k)
         {
           poly_space.compute(quadrature.point(k),
                              values, grads, grad_grads);
@@ -248,14 +259,14 @@ protected:
           if (flags & update_values)
             {
               if (inverse_node_matrix.n_cols() == 0)
-                for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
                   data->shape_values[i][k] = values[i];
               else
-                for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
                   {
-                    Tensor<1, dim> add_values;
-                    for (unsigned int j = 0; j<this->dofs_per_cell; ++j)
-                      add_values += inverse_node_matrix(j, i) * values[j];
+                    Tensor<1,dim> add_values;
+                    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+                      add_values += inverse_node_matrix(j,i) * values[j];
                     data->shape_values[i][k] = add_values;
                   }
             }
@@ -263,14 +274,14 @@ protected:
           if (flags & update_gradients)
             {
               if (inverse_node_matrix.n_cols() == 0)
-                for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
                   data->shape_grads[i][k] = grads[i];
               else
-                for (unsigned int i = 0; i<this->dofs_per_cell; ++i)
+                for (unsigned int i=0; i<this->dofs_per_cell; ++i)
                   {
-                    Tensor<2, dim> add_grads;
-                    for (unsigned int j = 0; j<this->dofs_per_cell; ++j)
-                      add_grads += inverse_node_matrix(j, i) * grads[j];
+                    Tensor<2,dim> add_grads;
+                    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+                      add_grads += inverse_node_matrix(j,i) * grads[j];
                     data->shape_grads[i][k] = add_grads;
                   }
             }
