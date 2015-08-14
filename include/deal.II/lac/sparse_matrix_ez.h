@@ -81,7 +81,7 @@ template<typename number> class FullMatrix;
  * default_increment.
  *
  * Letting @p default_increment zero causes an exception whenever a row
- * overflows.
+ * overflows, in and only in DEBUG mode.
  *
  * If the rows are expected to be filled more or less from first to last,
  * using a @p default_row_length of zero may not be such a bad idea.
@@ -431,7 +431,8 @@ public:
   /**
    * Set the element <tt>(i,j)</tt> to @p value.
    *
-   * If <tt>value</tt> is not a finite number an exception is thrown.
+   * If <tt>value</tt> is not a finite number an exception is thrown in and only
+   * in DEBUG mode.
    *
    * The optional parameter <tt>elide_zero_values</tt> can be used to specify
    * whether zero values should be added anyway or these should be filtered
@@ -450,7 +451,7 @@ public:
   /**
    * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
    * does not exist. Filters out zeroes automatically. If <tt>value</tt> is
-   * not a finite number an exception is thrown.
+   * not a finite number an exception is thrown in and only in DEBUG mode.
    */
   void add (const size_type i,
             const size_type j,
@@ -558,17 +559,6 @@ public:
    * @name Entry Access
    */
 //@{
-  /**
-   * Return the value of the entry (i,j).  This may be an expensive operation
-   * and you should always take care where to call this function.  In order to
-   * avoid abuse, this function throws an exception if the required element
-   * does not exist in the matrix.
-   *
-   * In case you want a function that returns zero instead (for entries that
-   * are not in the sparsity pattern of the matrix), use the @p el function.
-   */
-  number operator () (const size_type i,
-                      const size_type j) const;
 
   /**
    * Return the value of the entry (i,j). Returns zero for all non-existing
@@ -576,6 +566,14 @@ public:
    */
   number el (const size_type i,
              const size_type j) const;
+
+  /**
+   * Do the same thing as function @p el() does, but throws an exception if the
+   * required element does not exist in the matrix in and only in DEBUG mode.
+   */
+  number operator () (const size_type i,
+                      const size_type j) const;
+
 //@}
   /**
    * @name Multiplications
