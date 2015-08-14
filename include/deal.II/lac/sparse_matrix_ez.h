@@ -699,6 +699,14 @@ public:
   const_iterator begin (const size_type r) const;
 
   /**
+   * Iterator on diagonal entry of row @p r. This function throws an exception
+   * if the row @p r has no diagonal element in and only in DEBUG mode.
+   * In RELEASE mode, this function will return an iterator points to an
+   * unpredictable position silently when the row @p r has no diagonal element.
+   */
+  const_iterator diagonal (const size_type r) const;
+
+  /**
    * Final iterator of row @p r. The result may be different from
    * <tt>end()</tt>!
    */
@@ -1373,6 +1381,19 @@ SparseMatrixEZ<number>::begin (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   const_iterator result (this, r, 0);
+  return result;
+}
+
+template <typename number>
+inline
+typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::diagonal (const size_type r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  Assert (row_info[r].diagonal != RowInfo::invalid_diagonal,
+          ExcInvalidEntry(r,r));
+
+  const_iterator result (this, r, row_info[r].diagonal);
   return result;
 }
 
