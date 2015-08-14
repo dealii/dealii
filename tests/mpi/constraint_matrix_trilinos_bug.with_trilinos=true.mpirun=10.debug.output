@@ -1,2 +1,2 @@
 
-DEAL:0:2d::Exception: TrilinosWrappers::VectorBase::ExcGhostsPresent()
+DEAL:0:2d::Exception: ExcGhostsPresent()
