@@ -35,6 +35,8 @@
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -429,10 +431,8 @@ namespace Step18
     // timestep:
     void update_quadrature_point_history ();
 
-    // After the member functions, here are the member variables. The first
-    // ones have all been discussed in more detail in previous example
-    // programs:
-    Triangulation<dim>   triangulation;
+    // This is the new shared Triangulation:
+    parallel::shared::Triangulation<dim>   triangulation;
 
     FESystem<dim>        fe;
 
@@ -523,10 +523,9 @@ namespace Step18
     // freedom that are stored on the processor with that particular number:
     std::vector<types::global_dof_index> local_dofs_per_process;
 
-    // Next, how many degrees of freedom the present processor stores. This
-    // is, of course, an abbreviation to
-    // <code>local_dofs_per_process[this_mpi_process]</code>.
-    types::global_dof_index n_local_dofs;
+    // We are storing the locally owned and the locally relevant indices:
+    IndexSet locally_owned_dofs;
+    IndexSet locally_relevant_dofs;
 
     // In the same direction, also cache how many cells the present processor
     // owns. Note that the cells that belong to a processor are not
@@ -751,6 +750,7 @@ namespace Step18
   template <int dim>
   TopLevel<dim>::TopLevel ()
     :
+    triangulation(MPI_COMM_WORLD),
     fe (FE_Q<dim>(1), dim),
     dof_handler (triangulation),
     quadrature_formula (2),
@@ -861,10 +861,7 @@ namespace Step18
 
     // As the final step, we need to set up a clean state of the data that we
     // store in the quadrature points on all cells that are treated on the
-    // present processor. To do so, we also have to know which processors are
-    // ours in the first place. This is done in the following two function
-    // calls:
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
+    // present processor.
     setup_quadrature_point_history ();
   }
 
@@ -888,25 +885,17 @@ namespace Step18
   void TopLevel<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
-    DoFRenumbering::subdomain_wise (dof_handler);
+    locally_owned_dofs = dof_handler.locally_owned_dofs();
+    DoFTools::extract_locally_relevant_dofs (dof_handler,locally_relevant_dofs);
 
     // The next thing is to store some information for later use on how many
     // cells or degrees of freedom the present processor, or any of the
     // processors has to work on. First the cells local to this processor...
     n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
-                                                           this_mpi_process);
+                                                           triangulation.locally_owned_subdomain ());
 
-    // ...and then a list of numbers of how many degrees of freedom each
-    // processor has to handle:
-    local_dofs_per_process.resize (n_mpi_processes);
-    for (unsigned int i=0; i<n_mpi_processes; ++i)
-      local_dofs_per_process[i]
-        = DoFTools::count_dofs_with_subdomain_association (dof_handler, i);
-
-    // Finally, make it easier to denote how many degrees of freedom the
-    // present process has to deal with, by introducing an abbreviation:
-    n_local_dofs = local_dofs_per_process[this_mpi_process];
+    local_dofs_per_process = dof_handler.n_locally_owned_dofs_per_processor();
 
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
@@ -931,10 +920,13 @@ namespace Step18
     // going to work with, and make sure that the condensation of hanging node
     // constraints add the necessary additional entries in the sparsity
     // pattern:
-    DynamicSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    hanging_node_constraints.condense (sparsity_pattern);
+    DynamicSparsityPattern sparsity_pattern (locally_relevant_dofs);
+    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+                                     hanging_node_constraints, /*keep constrained dofs*/ false);
+    SparsityTools::distribute_sparsity_pattern (sparsity_pattern,
+                                                local_dofs_per_process,
+                                                mpi_communicator,
+                                                locally_relevant_dofs);
     // Note that we have used the <code>DynamicSparsityPattern</code> class
     // here that was already introduced in step-11, rather than the
     // <code>SparsityPattern</code> class that we have used in all other
@@ -959,7 +951,8 @@ namespace Step18
     // row. It therefore only ever allocates as much memory as it needs at any
     // given time, and we can build it even for large 3d problems.
     //
-    // It is also worth noting that the sparsity pattern we construct is
+    // It is also worth noting that due to the specifics of parallel::shared::Triangulation,
+    // the sparsity pattern we construct is
     // global, i.e. comprises all degrees of freedom whether they will be
     // owned by the processor we are on or another one (in case this program
     // is run in %parallel via MPI). This of course is not optimal -- it
@@ -976,11 +969,10 @@ namespace Step18
     //
     // With this data structure, we can then go to the PETSc sparse matrix and
     // tell it to preallocate all the entries we will later want to write to:
-    system_matrix.reinit (mpi_communicator,
+    system_matrix.reinit (locally_owned_dofs,
+                          locally_owned_dofs,
                           sparsity_pattern,
-                          local_dofs_per_process,
-                          local_dofs_per_process,
-                          this_mpi_process);
+                          mpi_communicator);
     // After this point, no further explicit knowledge of the sparsity pattern
     // is required any more and we can let the <code>sparsity_pattern</code>
     // variable go out of scope without any problem.
@@ -990,7 +982,7 @@ namespace Step18
     // remember that the solution vector is a local one, unlike the right hand
     // side that is a distributed %parallel one and therefore needs to know
     // the MPI communicator over which it is supposed to transmit messages:
-    system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
+    system_rhs.reinit(locally_owned_dofs,mpi_communicator);
     incremental_displacement.reinit (dof_handler.n_dofs());
   }
 
@@ -1037,7 +1029,7 @@ namespace Step18
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           cell_matrix = 0;
           cell_rhs = 0;
@@ -1171,8 +1163,7 @@ namespace Step18
                                  boundary_values,
                                  fe.component_mask(z_component));
 
-    PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
-                                    n_local_dofs);
+    PETScWrappers::MPI::Vector tmp (locally_owned_dofs,mpi_communicator);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix, tmp,
                                         system_rhs, false);
@@ -1224,9 +1215,7 @@ namespace Step18
   unsigned int TopLevel<dim>::solve_linear_problem ()
   {
     PETScWrappers::MPI::Vector
-    distributed_incremental_displacement (mpi_communicator,
-                                          dof_handler.n_dofs(),
-                                          n_local_dofs);
+    distributed_incremental_displacement (locally_owned_dofs,mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
 
     SolverControl           solver_control (dof_handler.n_dofs(),
@@ -1256,87 +1245,12 @@ namespace Step18
   // 0 will write the record files the reference all the .vtu files.
   //
   // The crucial part of this function is to give the <code>DataOut</code>
-  // class a way to only work on the cells that the present process owns. This
-  // class is already well-equipped for that: it has two virtual functions
-  // <code>first_cell</code> and <code>next_cell</code> that return the first
-  // cell to be worked on, and given one cell return the next cell to be
-  // worked on. By default, these functions return the first active cell
-  // (i.e. the first one that has no children) and the next active cell. What
-  // we have to do here is derive a class from <code>DataOut</code> that
-  // overloads these two functions to only iterate over those cells with the
-  // right subdomain indicator.
-  //
-  // We do this at the beginning of this function. The <code>first_cell</code>
-  // function just starts with the first active cell, and then iterates to the
-  // next cells while the cell presently under consideration does not yet have
-  // the correct subdomain id. The only thing that needs to be taken care of
-  // is that we don't try to keep iterating when we have hit the end iterator.
-  //
-  // The <code>next_cell</code> function could be implemented in a similar
-  // way. However, we use this occasion as a pretext to introduce one more
-  // thing that the library offers: filtered iterators. These are wrappers for
-  // the iterator classes that just skip all cells (or faces, lines, etc) that
-  // do not satisfy a certain predicate (a predicate in computer-lingo is a
-  // function that when applied to a data element either returns true or
-  // false). In the present case, the predicate is that the cell has to have a
-  // certain subdomain id, and the library already has this predicate built
-  // in. If the cell iterator is not the end iterator, what we then have to do
-  // is to initialize such a filtered iterator with the present cell and the
-  // predicate, and then increase the iterator exactly once. While the more
-  // conventional loop would probably not have been much longer, this is
-  // definitely the more elegant way -- and then, these example programs also
-  // serve the purpose of introducing what is available in deal.II.
-  template<int dim>
-  class FilteredDataOut : public DataOut<dim>
-  {
-  public:
-    FilteredDataOut (const unsigned int subdomain_id)
-      :
-      subdomain_id (subdomain_id)
-    {}
-
-    virtual typename DataOut<dim>::cell_iterator
-    first_cell ()
-    {
-      typename DataOut<dim>::active_cell_iterator
-      cell = this->dofs->begin_active();
-      while ((cell != this->dofs->end()) &&
-             (cell->subdomain_id() != subdomain_id))
-        ++cell;
-
-      return cell;
-    }
-
-    virtual typename DataOut<dim>::cell_iterator
-    next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
-    {
-      if (old_cell != this->dofs->end())
-        {
-          const IteratorFilters::SubdomainEqualTo
-          predicate(subdomain_id);
-
-          return
-            ++(FilteredIterator
-               <typename DataOut<dim>::active_cell_iterator>
-               (predicate,old_cell));
-        }
-      else
-        return old_cell;
-    }
-
-  private:
-    const unsigned int subdomain_id;
-  };
-
-
+  // class a way to only work on the cells that the present process owns.
 
   template <int dim>
   void TopLevel<dim>::output_results () const
   {
-    // With this newly defined class, declare an object that is going to
-    // generate the graphical output and attach the dof handler with it from
-    // which to get the solution vector:
-    FilteredDataOut<dim> data_out(this_mpi_process);
+    DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
 
     // Then, just as in step-17, define the names of solution variables (which
@@ -1388,8 +1302,7 @@ namespace Step18
       cell = triangulation.begin_active(),
       endc = triangulation.end();
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
-        // ... and pick those that are relevant to us:
-        if (cell->subdomain_id() == this_mpi_process)
+        if (cell->is_locally_owned() )
           {
             // On these cells, add up the stresses over all quadrature
             // points...
@@ -1617,9 +1530,8 @@ namespace Step18
 
     // Then set up a global vector into which we merge the local indicators
     // from each of the %parallel processes:
-    const unsigned int n_local_cells
-      = GridTools::count_cells_with_subdomain_association (triangulation,
-                                                           this_mpi_process);
+    const unsigned int n_local_cells = triangulation.n_locally_owned_active_cells ();
+
     PETScWrappers::MPI::Vector
     distributed_error_per_cell (mpi_communicator,
                                 triangulation.n_active_cells(),
@@ -1640,7 +1552,6 @@ namespace Step18
 
     // Finally, set up quadrature point data again on the new mesh, and only
     // on those cells that we have determined to be ours:
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
     setup_quadrature_point_history ();
   }
 
@@ -1791,7 +1702,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         ++our_cells;
 
     triangulation.clear_user_data();
@@ -1824,7 +1735,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           cell->set_user_pointer (&quadrature_point_history[history_index]);
           history_index += quadrature_formula.size();
@@ -1909,7 +1820,7 @@ namespace Step18
     for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           // Next, get a pointer to the quadrature point history data local to
           // the present cell, and, as a defensive measure, make sure that

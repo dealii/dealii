@@ -27,6 +27,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <cmath>
 
@@ -35,6 +36,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
   namespace distributed
+  {
+    template <int, int> class Triangulation;
+  }
+
+  namespace shared
   {
     template <int, int> class Triangulation;
   }
@@ -3030,19 +3036,20 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
 {
   Assert (this->active(),
           ExcMessage("is_locally_owned() can only be called on active cells!"));
-#ifndef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_MPI
   return true;
 #else
   if (is_artificial())
     return false;
 
-  const parallel::distributed::Triangulation<dim,spacedim> *pdt
-    = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(this->tria);
+  const parallel::Triangulation<dim,spacedim> *pt
+    = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pdt == 0)
+  if (pt == 0)
     return true;
   else
-    return (this->subdomain_id() == pdt->locally_owned_subdomain());
+    return (this->subdomain_id() == pt->locally_owned_subdomain());
+
 #endif
 }
 
@@ -3052,16 +3059,19 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_locally_owned_on_level () const
 {
-#ifndef DEAL_II_WITH_P4EST
+
+#ifndef DEAL_II_WITH_MPI
   return true;
 #else
-  const parallel::distributed::Triangulation<dim,spacedim> *pdt
-    = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pdt == 0)
+  const parallel::Triangulation<dim,spacedim> *pt
+    = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
+
+  if (pt == 0)
     return true;
   else
-    return (this->level_subdomain_id() == pdt->locally_owned_subdomain());
+    return (this->level_subdomain_id() == pt->locally_owned_subdomain());
+
 #endif
 }
 
@@ -3073,19 +3083,21 @@ CellAccessor<dim,spacedim>::is_ghost () const
 {
   Assert (this->active(),
           ExcMessage("is_ghost() can only be called on active cells!"));
-#ifndef DEAL_II_WITH_P4EST
-  return false;
-#else
   if (is_artificial() || this->has_children())
     return false;
 
-  const parallel::distributed::Triangulation<dim,spacedim> *pdt
-    = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(this->tria);
+#ifndef DEAL_II_WITH_MPI
+  return false;
+#else
 
-  if (pdt == 0)
+  const parallel::Triangulation<dim,spacedim> *pt
+    = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
+
+  if (pt == 0)
     return false;
   else
-    return (this->subdomain_id() != pdt->locally_owned_subdomain());
+    return (this->subdomain_id() != pt->locally_owned_subdomain());
+
 #endif
 }
 
@@ -3098,10 +3110,18 @@ CellAccessor<dim,spacedim>::is_artificial () const
 {
   Assert (this->active(),
           ExcMessage("is_artificial() can only be called on active cells!"));
-#ifndef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_MPI
   return false;
 #else
-  return this->subdomain_id() == numbers::artificial_subdomain_id;
+
+  const parallel::Triangulation<dim,spacedim> *pt
+    = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
+
+  if (pt == 0)
+    return false;
+  else
+    return this->subdomain_id() == numbers::artificial_subdomain_id;
+
 #endif
 }
 

@@ -2162,16 +2162,6 @@ namespace parallel
     /* ---------------------- class Triangulation<dim,spacedim> ------------------------------ */
 
 
-
-    template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::NumberCache::NumberCache()
-      :
-      n_global_active_cells(0),
-      n_global_levels(0)
-    {}
-
-
-
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::
     Triangulation (MPI_Comm mpi_communicator,
@@ -2179,13 +2169,11 @@ namespace parallel
                    const Settings settings_)
       :
       // do not check for distorted cells
-      dealii::Triangulation<dim,spacedim>
-      (smooth_grid,
+      dealii::parallel::Triangulation<dim,spacedim>
+      (mpi_communicator,
+       smooth_grid,
        false),
-      mpi_communicator (Utilities::MPI::
-                        duplicate_communicator(mpi_communicator)),
       settings(settings_),
-      my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
       triangulation_has_content (false),
       connectivity (0),
       parallel_forest (0),
@@ -2200,9 +2188,6 @@ namespace parallel
       dealii::internal::p4est::InitFinalize::do_initialize ();
 
       parallel_ghost = 0;
-
-      number_cache.n_locally_owned_active_cells
-      .resize (Utilities::MPI::n_mpi_processes (mpi_communicator));
     }
 
 
@@ -2217,9 +2202,6 @@ namespace parallel
       Assert (connectivity == 0,    ExcInternalError());
       Assert (parallel_forest == 0, ExcInternalError());
       Assert (refinement_in_progress == false, ExcInternalError());
-
-      // get rid of the unique communicator used here again
-      MPI_Comm_free (&mpi_communicator);
     }
 
 
@@ -2264,7 +2246,7 @@ namespace parallel
           AssertThrow (false, ExcInternalError());
         }
 
-      update_number_cache ();
+      this->update_number_cache ();
     }
 
 
@@ -2605,14 +2587,14 @@ namespace parallel
 
       dealii::Triangulation<dim,spacedim>::clear ();
 
-      update_number_cache ();
+      this->update_number_cache ();
     }
 
     template <int dim, int spacedim>
     bool
     Triangulation<dim,spacedim>::has_hanging_nodes () const
     {
-      if (n_global_levels()<=1)
+      if (this->n_global_levels()<=1)
         return false; // can not have hanging nodes without refined cells
 
       // if there are any active cells with level less than n_global_levels()-1, then
@@ -2622,8 +2604,8 @@ namespace parallel
       // The problem is that we cannot just ask for the first active cell, but
       // instead need to filter over locally owned cells.
       bool have_coarser_cell = false;
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active(n_global_levels()-2);
-           cell != this->end(n_global_levels()-2);
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active(this->n_global_levels()-2);
+           cell != this->end(this->n_global_levels()-2);
            ++cell)
         if (cell->is_locally_owned())
           {
@@ -2632,7 +2614,7 @@ namespace parallel
           }
 
       // return true if at least one process has a coarser cell
-      return 0<Utilities::MPI::max(have_coarser_cell?1:0, mpi_communicator);
+      return 0<Utilities::MPI::max(have_coarser_cell?1:0, this->mpi_communicator);
     }
 
 
@@ -2678,13 +2660,13 @@ namespace parallel
 
       Assert(this->n_cells()>0, ExcMessage("Can not save() an empty Triangulation."));
 
-      if (my_subdomain==0)
+      if (this->my_subdomain==0)
         {
           std::string fname=std::string(filename)+".info";
           std::ofstream f(fname.c_str());
           f << "version nproc attached_bytes n_attached_objs n_coarse_cells" << std::endl
             << 2 << " "
-            << Utilities::MPI::n_mpi_processes (mpi_communicator) << " "
+            << Utilities::MPI::n_mpi_processes (this->mpi_communicator) << " "
             << real_data_size << " "
             << attached_data_pack_callbacks.size() << " "
             << this->n_cells(0)
@@ -2746,7 +2728,7 @@ namespace parallel
       Assert(this->n_cells(0) == n_coarse_cells, ExcMessage("Number of coarse cells differ!"));
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
 #else
-      AssertThrow(numcpus <= Utilities::MPI::n_mpi_processes (mpi_communicator),
+      AssertThrow(numcpus <= Utilities::MPI::n_mpi_processes (this->mpi_communicator),
                   ExcMessage("parallel::distributed::Triangulation::load() only supports loading "
                              "saved data with a greater or equal number of processes than were used to "
                              "save() when using p4est 0.3.4.2."));
@@ -2758,7 +2740,7 @@ namespace parallel
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext (
-                          filename, mpi_communicator,
+                          filename, this->mpi_communicator,
                           attached_size, attached_size>0,
                           autopartition, 0,
                           this,
@@ -2766,12 +2748,12 @@ namespace parallel
 #else
       (void)autopartition;
       parallel_forest = dealii::internal::p4est::functions<dim>::load (
-                          filename, mpi_communicator,
+                          filename, this->mpi_communicator,
                           attached_size, attached_size>0,
                           this,
                           &connectivity);
 #endif
-      if (numcpus != Utilities::MPI::n_mpi_processes (mpi_communicator))
+      if (numcpus != Utilities::MPI::n_mpi_processes (this->mpi_communicator))
         // We are changing the number of CPUs so we need to repartition.
         // Note that p4est actually distributes the cells between the changed
         // number of CPUs and so everything works without this call, but
@@ -2795,7 +2777,7 @@ namespace parallel
           AssertThrow (false, ExcInternalError());
         }
 
-      update_number_cache ();
+      this->update_number_cache ();
     }
 
 
@@ -2884,7 +2866,7 @@ namespace parallel
       // now create a forest out of the connectivity data structure
       parallel_forest
         = dealii::internal::p4est::functions<2>::
-          new_forest (mpi_communicator,
+          new_forest (this->mpi_communicator,
                       connectivity,
                       /* minimum initial number of quadrants per tree */ 0,
                       /* minimum level of upfront refinement */ 0,
@@ -2955,7 +2937,7 @@ namespace parallel
       // now create a forest out of the connectivity data structure
       parallel_forest
         = dealii::internal::p4est::functions<2>::
-          new_forest (mpi_communicator,
+          new_forest (this->mpi_communicator,
                       connectivity,
                       /* minimum initial number of quadrants per tree */ 0,
                       /* minimum level of upfront refinement */ 0,
@@ -3107,7 +3089,7 @@ namespace parallel
       // now create a forest out of the connectivity data structure
       parallel_forest
         = dealii::internal::p4est::functions<3>::
-          new_forest (mpi_communicator,
+          new_forest (this->mpi_communicator,
                       connectivity,
                       /* minimum initial number of quadrants per tree */ 0,
                       /* minimum level of upfront refinement */ 0,
@@ -3239,7 +3221,7 @@ namespace parallel
                   match_tree_recursively<dim,spacedim> (*tree, cell,
                                                         p4est_coarse_cell,
                                                         *parallel_forest,
-                                                        my_subdomain);
+                                                        this->my_subdomain);
                 }
             }
 
@@ -3310,7 +3292,7 @@ namespace parallel
            cell != this->end();
            ++cell)
         {
-          if (cell->subdomain_id() != my_subdomain
+          if (cell->subdomain_id() != this->my_subdomain
               &&
               cell->subdomain_id() != numbers::artificial_subdomain_id)
             ++num_ghosts;
@@ -3377,7 +3359,7 @@ namespace parallel
               determine_level_subdomain_id_recursively<dim,spacedim> (*tree, tree_index, cell,
                                                                       p4est_coarse_cell,
                                                                       *parallel_forest,
-                                                                      my_subdomain,
+                                                                      this->my_subdomain,
                                                                       marked_vertices);
             }
 
@@ -3446,7 +3428,7 @@ namespace parallel
         const unsigned int total_local_cells = this->n_active_cells();
         (void)total_local_cells;
 
-        if (Utilities::MPI::n_mpi_processes (mpi_communicator) == 1)
+        if (Utilities::MPI::n_mpi_processes (this->mpi_communicator) == 1)
           Assert (static_cast<unsigned int>(parallel_forest->local_num_quadrants) ==
                   total_local_cells,
                   ExcInternalError())
@@ -3461,7 +3443,7 @@ namespace parallel
              cell = this->begin_active();
              cell != this->end(); ++cell)
           {
-            if (cell->subdomain_id() == my_subdomain)
+            if (cell->subdomain_id() == this->my_subdomain)
               ++n_owned;
           }
 
@@ -3531,7 +3513,7 @@ namespace parallel
       RefineAndCoarsenList<dim,spacedim>
       refine_and_coarsen_list (*this,
                                p4est_tree_to_coarse_cell_permutation,
-                               my_subdomain);
+                               this->my_subdomain);
 
       // copy refine and coarsen flags into p4est and execute the refinement
       // and coarsening. this uses the refine_and_coarsen_list just built,
@@ -3616,7 +3598,7 @@ namespace parallel
 
       refinement_in_progress = false;
 
-      update_number_cache ();
+      this->update_number_cache ();
     }
 
     template <int dim, int spacedim>
@@ -3665,7 +3647,7 @@ namespace parallel
           PartitionWeights<dim,spacedim> partition_weights (*this,
                                                             cell_weights,
                                                             p4est_tree_to_coarse_cell_permutation,
-                                                            my_subdomain);
+                                                            this->my_subdomain);
           parallel_forest->user_pointer = &partition_weights;
 
           dealii::internal::p4est::functions<dim>::
@@ -3691,62 +3673,8 @@ namespace parallel
       refinement_in_progress = false;
 
       // update how many cells, edges, etc, we store locally
-      update_number_cache ();
+      this->update_number_cache ();
     }
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim,spacedim>::update_number_cache ()
-    {
-      Assert (number_cache.n_locally_owned_active_cells.size()
-              ==
-              Utilities::MPI::n_mpi_processes (mpi_communicator),
-              ExcInternalError());
-
-      std::fill (number_cache.n_locally_owned_active_cells.begin(),
-                 number_cache.n_locally_owned_active_cells.end(),
-                 0);
-
-      if (this->n_levels() == 0)
-        {
-          // Skip communication done below if we do not have any cells
-          // (meaning the Triangulation is empty on all processors). This will
-          // happen when called from the destructor of Triangulation, which
-          // can get called during exception handling causing a hang in this
-          // function.
-          number_cache.n_global_active_cells = 0;
-          number_cache.n_global_levels = 0;
-          return;
-        }
-
-      if (this->n_levels() > 0)
-        for (typename Triangulation<dim,spacedim>::active_cell_iterator
-             cell = this->begin_active();
-             cell != this->end(); ++cell)
-          if (cell->subdomain_id() == my_subdomain)
-            ++number_cache.n_locally_owned_active_cells[my_subdomain];
-
-      unsigned int send_value
-        = number_cache.n_locally_owned_active_cells[my_subdomain];
-      MPI_Allgather (&send_value,
-                     1,
-                     MPI_UNSIGNED,
-                     &number_cache.n_locally_owned_active_cells[0],
-                     1,
-                     MPI_UNSIGNED,
-                     mpi_communicator);
-
-      number_cache.n_global_active_cells
-        = std::accumulate (number_cache.n_locally_owned_active_cells.begin(),
-                           number_cache.n_locally_owned_active_cells.end(),
-                           /* ensure sum is computed with correct data type:*/
-                           static_cast<types::global_dof_index>(0));
-      number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), mpi_communicator);
-    }
-
-
-
 
 
 
@@ -3899,54 +3827,6 @@ namespace parallel
              == Utilities::MPI::sum(senders.size(), this->get_communicator()),
              ExcInternalError());
     }
-
-
-
-    template <int dim, int spacedim>
-    types::subdomain_id
-    Triangulation<dim,spacedim>::locally_owned_subdomain () const
-    {
-      Assert (dim > 1, ExcNotImplemented());
-      return my_subdomain;
-    }
-
-
-
-    template <int dim, int spacedim>
-    unsigned int
-    Triangulation<dim,spacedim>::n_locally_owned_active_cells () const
-    {
-      return number_cache.n_locally_owned_active_cells[my_subdomain];
-    }
-
-
-
-    template <int dim, int spacedim>
-    types::global_dof_index
-    Triangulation<dim,spacedim>::n_global_active_cells () const
-    {
-      return number_cache.n_global_active_cells;
-    }
-
-
-
-    template <int dim, int spacedim>
-    unsigned int
-    Triangulation<dim,spacedim>::n_global_levels () const
-    {
-      return number_cache.n_global_levels;
-    }
-
-
-
-    template <int dim, int spacedim>
-    const std::vector<unsigned int> &
-    Triangulation<dim,spacedim>::n_locally_owned_active_cells_per_processor () const
-    {
-      return number_cache.n_locally_owned_active_cells;
-    }
-
-
 
     template <int dim, int spacedim>
     unsigned int
@@ -4335,14 +4215,6 @@ namespace parallel
     }
 
 
-    template <int dim, int spacedim>
-    MPI_Comm
-    Triangulation<dim,spacedim>::get_communicator () const
-    {
-      return mpi_communicator;
-    }
-
-
     template<int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::add_periodicity
@@ -4459,7 +4331,7 @@ namespace parallel
       dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
       parallel_forest
         = dealii::internal::p4est::functions<dim>::
-          new_forest (mpi_communicator,
+          new_forest (this->mpi_communicator,
                       connectivity,
                       /* minimum initial number of quadrants per tree */ 0,
                       /* minimum level of upfront refinement */ 0,
@@ -4492,13 +4364,8 @@ namespace parallel
     Triangulation<dim,spacedim>::memory_consumption () const
     {
       std::size_t mem=
-        this->dealii::Triangulation<dim,spacedim>::memory_consumption()
-        + MemoryConsumption::memory_consumption(mpi_communicator)
-        + MemoryConsumption::memory_consumption(my_subdomain)
+        this->dealii::parallel::Triangulation<dim,spacedim>::memory_consumption()
         + MemoryConsumption::memory_consumption(triangulation_has_content)
-        + MemoryConsumption::memory_consumption(number_cache.n_locally_owned_active_cells)
-        + MemoryConsumption::memory_consumption(number_cache.n_global_active_cells)
-        + MemoryConsumption::memory_consumption(number_cache.n_global_levels)
         + MemoryConsumption::memory_consumption(connectivity)
         + MemoryConsumption::memory_consumption(parallel_forest)
         + MemoryConsumption::memory_consumption(refinement_in_progress)
@@ -4557,7 +4424,8 @@ namespace parallel
                   ExcMessage ("Parallel distributed triangulations can only "
                               "be copied, if no refinement is in progress!"));
 
-          mpi_communicator = Utilities::MPI::duplicate_communicator (old_tria_x->get_communicator ());
+          // duplicate MPI communicator, stored in the base class
+          dealii::parallel::Triangulation<dim,spacedim>::copy_triangulation (old_tria);
 
           coarse_cell_to_p4est_tree_permutation = old_tria_x->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation = old_tria_x->p4est_tree_to_coarse_cell_permutation;
@@ -4584,7 +4452,7 @@ namespace parallel
           AssertThrow (false, ExcInternalError());
         }
 
-      update_number_cache ();
+      this->update_number_cache ();
     }
 
 
@@ -4667,6 +4535,10 @@ namespace parallel
 
     template <int spacedim>
     Triangulation<1,spacedim>::Triangulation (MPI_Comm)
+      :
+      dealii::parallel::Triangulation<1,spacedim>(MPI_COMM_WORLD,
+                                                  typename dealii::Triangulation<1,spacedim>::MeshSmoothing(),
+                                                  false)
     {
       Assert (false, ExcNotImplemented());
     }
@@ -4688,40 +4560,6 @@ namespace parallel
       Assert (false, ExcNotImplemented());
     }
 
-
-    template <int spacedim>
-    types::subdomain_id
-    Triangulation<1,spacedim>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <int spacedim>
-    types::global_dof_index
-    Triangulation<1,spacedim>::n_global_active_cells () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <int spacedim>
-    unsigned int
-    Triangulation<1,spacedim>::n_global_levels () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <int spacedim>
-    MPI_Comm
-    Triangulation<1,spacedim>::get_communicator () const
-    {
-      return MPI_COMM_WORLD;
-    }
 
     template <int spacedim>
     const std::vector<types::global_dof_index> &

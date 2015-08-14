@@ -1438,6 +1438,22 @@ namespace DoFTools
                                  IndexSet &dof_set);
 
   /**
+   *
+   * For each processor, determine the set of locally owned degrees of freedom as an IndexSet.
+   * This function then returns a vector of index sets, where the vector has size equal to the
+   * number of MPI processes that participate in the DoF handler object.
+   *
+   * The function can be used for objects of type dealii::Triangulation or parallel::shared::Triangulation.
+   * It will not work for objects of type parallel::distributed::Triangulation since for such triangulations
+   * we do not have information about all cells of the triangulation available locally,
+   * and consequently can not say anything definitive about the degrees of freedom active on other
+   * processors' locally owned cells.
+   */
+  template <class DH>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_subdomain (const DH   &dof_handler);
+
+  /**
    * For each DoF, return in the output array to which subdomain (as given by
    * the <tt>cell->subdomain_id()</tt> function) it belongs. The output array
    * is supposed to have the right size already when calling this function.

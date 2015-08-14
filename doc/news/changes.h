@@ -66,6 +66,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: parallel::shared::Triangulation class which extends
+  Triangulation class to automatically partition triangulation when run
+  with MPI. Identical functionality between parallel::shared::Triangulation and
+  parallel::distributed::Triangulation is grouped in the parent class
+  parallel::Triangulation.
+  <br>
+  (Denis Davydov, 2015/08/14)
+  </li>
+
   <li> New: The online documentation of all functions now includes
   links to the file and line where that function is implemented. Both
   are clickable to provide immediate access to the source code of a

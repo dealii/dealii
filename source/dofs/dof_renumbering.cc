@@ -747,11 +747,11 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_components();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
@@ -1034,11 +1034,11 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_blocks();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
