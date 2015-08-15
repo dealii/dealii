@@ -47,7 +47,17 @@ inconvenience this causes.
   class hierarchy. As part of a general overhaul, the FEValuesData class
   has also been removed.
   <br>
-  (Wolfgang Bangerth, 2015/07/20-2015/08/06)
+  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
+  </li>
+
+  <li> Changed: The functions update_once() and update_each() in the
+  Mapping classes computed information that was, in essence, only of use
+  internally. No external piece of code actually needed to know which
+  pieces of information a mapping could compute once and which they needed
+  to compute on every cell. Consequently, these two functions have been
+  removed and have been replaced by Mapping::requires_update_flags().
+  <br>
+  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
   </li>
 
   <li> Changed: The function DoFRenumbering::random() now produces different

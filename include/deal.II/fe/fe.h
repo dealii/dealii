@@ -419,7 +419,20 @@ public:
     UpdateFlags          update_once;
 
     /**
-     * Values updated on each cell by reinit.
+     * A set of update flags specifying the kind of information that
+     * an implementation of the FiniteElement interface needs to compute on
+     * each cell or face, i.e., in FiniteElement::fill_fe_values() and
+     * friends.
+     *
+     * This set of flags is stored here by implementations of
+     * FiniteElement::get_data(), FiniteElement::get_face_data(), or
+     * FiniteElement::get_subface_data(), and is that subset of the update
+     * flags passed to those functions that require re-computation on
+     * every cell. (The subset of the flags corresponding to
+     * information that can be computed once and for all already at
+     * the time of the call to FiniteElement::get_data() -- or an
+     * implementation of that interface -- need not be stored here
+     * because it has already been taken care of.)
      */
     UpdateFlags          update_each;
 

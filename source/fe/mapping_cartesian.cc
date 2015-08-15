@@ -59,17 +59,13 @@ MappingCartesian<dim, spacedim>::InternalData::memory_consumption () const
 
 template<int dim, int spacedim>
 UpdateFlags
-MappingCartesian<dim, spacedim>::update_once (const UpdateFlags) const
+MappingCartesian<dim, spacedim>::requires_update_flags (const UpdateFlags in) const
 {
-  return update_default;
-}
-
-
-
-template<int dim, int spacedim>
-UpdateFlags
-MappingCartesian<dim, spacedim>::update_each (const UpdateFlags in) const
-{
+  // this mapping is pretty simple in that it can basically compute
+  // every piece of information wanted by FEValues without requiring
+  // computing any other quantities. boundary forms are one exception
+  // since they can be computed from the normal vectors without much
+  // further ado
   UpdateFlags out = in;
   if (out & update_boundary_forms)
     out |= update_normal_vectors;
@@ -86,7 +82,10 @@ MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
 {
   InternalData *data = new InternalData (q);
 
-  data->update_each = update_each(update_flags);
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values(). use the transitive hull of the required
+  // flags
+  data->update_each = requires_update_flags(update_flags);
 
   return data;
 }
@@ -101,7 +100,14 @@ MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
   InternalData *data
     = new InternalData (QProjector<dim>::project_to_all_faces(quadrature));
 
-  data->update_each = update_each(update_flags);
+  // verify that we have computed the transitive hull of the required
+  // flags and that FEValues has faithfully passed them on to us
+  Assert (update_flags == requires_update_flags (update_flags),
+          ExcInternalError());
+
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values()
+  data->update_each = update_flags;
 
   return data;
 }
@@ -116,7 +122,14 @@ MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flag
   InternalData *data
     = new InternalData (QProjector<dim>::project_to_all_subfaces(quadrature));
 
-  data->update_each = update_each(update_flags);
+  // verify that we have computed the transitive hull of the required
+  // flags and that FEValues has faithfully passed them on to us
+  Assert (update_flags == requires_update_flags (update_flags),
+          ExcInternalError());
+
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values()
+  data->update_each = update_flags;
 
   return data;
 }

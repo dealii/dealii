@@ -474,49 +474,14 @@ protected:
 
 
 private:
-  /**
-   * Implementation of the interface in Mapping.
-   *
-   * Description of effects:
-   * <ul>
-   * <li> if @p update_quadrature_points is required, the output will contain
-   * @p update_transformation_values. This computes the values of the
-   * transformation basis polynomials at the unit cell quadrature points.
-   * <li> if any of @p update_covariant_transformation, @p
-   * update_contravariant_transformation, @p update_JxW_values, @p
-   * update_boundary_forms, @p update_normal_vectors is required, the output
-   * will contain @p update_transformation_gradients to compute derivatives of
-   * the transformation basis polynomials.
-   * </ul>
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
-   * Implementation of the interface in Mapping.
-   *
-   * Description of effects if @p flags contains:
-   * <ul>
-   * <li> <code>update_quadrature_points</code> is copied to the output to
-   * compute the quadrature points on the real cell.
-   * <li> <code>update_JxW_values</code> is copied and requires @p
-   * update_boundary_forms on faces. The latter, because the surface element
-   * is just the norm of the boundary form.
-   * <li> <code>update_normal_vectors</code> is copied and requires @p
-   * update_boundary_forms. The latter, because the normal vector is the
-   * normalized boundary form.
-   * <li> <code>update_covariant_transformation</code> is copied and requires
-   * @p update_contravariant_transformation, since it is computed as the
-   * inverse of the latter.
-   * <li> <code>update_JxW_values</code> is copied and requires
-   * <code>update_contravariant_transformation</code>, since it is computed as
-   * one over determinant of the latter.
-   * <li> <code>update_boundary_forms</code> is copied and requires
-   * <code>update_contravariant_transformation</code>, since the boundary form
-   * is computed as the contravariant image of the normal vector to the unit
-   * cell.
-   * </ul>
+   * Implementation of the corresponding function in the base class,
+   * Mapping::requires_update_flags(). See there for more information.
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
    * Implementation of the Mapping::get_data() interface.

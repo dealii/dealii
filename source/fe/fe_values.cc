@@ -3214,8 +3214,7 @@ FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags
   UpdateFlags flags = update_flags
                       | fe->update_once (update_flags)
                       | fe->update_each (update_flags);
-  flags |= mapping->update_once (flags)
-           | mapping->update_each (flags);
+  flags |= mapping->requires_update_flags (flags);
 
   return flags;
 }
