@@ -1026,10 +1026,9 @@ namespace internal
               (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
             Assert(tr != 0, ExcInternalError());
             const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
-            const unsigned int this_process =
-              Utilities::MPI::this_mpi_process (tr->get_communicator ());
             std::vector<types::global_dof_index> gathered_new_numbers (dof_handler.n_dofs (), 0);
-            Assert(this_process == dof_handler.get_tria ().locally_owned_subdomain (),
+            Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
+                   dof_handler.get_tria ().locally_owned_subdomain (),
                    ExcInternalError())
 
             //gather new numbers among processors into one vector
@@ -1054,7 +1053,8 @@ namespace internal
                   displs[i]  = shift;
                   shift     += rcounts[i];
                 }
-              Assert(((int)new_numbers_copy.size()) == rcounts[this_process],
+              Assert(((int)new_numbers_copy.size()) ==
+                     rcounts[Utilities::MPI::this_mpi_process (tr->get_communicator ())],
                      ExcInternalError());
               MPI_Allgatherv (&new_numbers_copy[0],     new_numbers_copy.size (),
                               DEAL_II_DOF_INDEX_MPI_TYPE,
