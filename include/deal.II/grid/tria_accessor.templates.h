@@ -26,8 +26,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.templates.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria_base.h>
 
 #include <cmath>
 
@@ -35,6 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace parallel
 {
+  template <int, int> class Triangulation;
+
   namespace distributed
   {
     template <int, int> class Triangulation;
