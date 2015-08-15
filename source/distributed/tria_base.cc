@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,7 +86,9 @@ namespace parallel
   {
     std::size_t mem=
       this->dealii::Triangulation<dim,spacedim>::memory_consumption()
+#ifdef DEAL_II_WITH_MPI
       + MemoryConsumption::memory_consumption(mpi_communicator)
+#endif
       + MemoryConsumption::memory_consumption(my_subdomain)
       + MemoryConsumption::memory_consumption(number_cache.n_locally_owned_active_cells)
       + MemoryConsumption::memory_consumption(number_cache.n_global_active_cells)
@@ -98,9 +100,11 @@ namespace parallel
   template <int dim, int spacedim>
   Triangulation<dim,spacedim>::~Triangulation ()
   {
+#ifdef DEAL_II_WITH_MPI
     // get rid of the unique communicator used here again
     MPI_Comm_free (&this->mpi_communicator);
-  };
+#endif
+  }
 
   template <int dim, int spacedim>
   Triangulation<dim,spacedim>::NumberCache::NumberCache()
