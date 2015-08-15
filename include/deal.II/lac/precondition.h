@@ -1472,13 +1472,22 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
               ExcMessage ("Need to set at least two iterations to find eigenvalues."));
 
       // set a very strict tolerance to force at least two iterations
-      ReductionControl control (data.eig_cg_n_iterations, 1e-20, 1e-20);
+      ReductionControl control (data.eig_cg_n_iterations, 1e-35, 1e-10);
       GrowingVectorMemory<VECTOR> memory;
       VECTOR *rhs = memory.alloc();
       VECTOR *dummy = memory.alloc();
-      rhs->reinit(data.matrix_diagonal_inverse, true);
+      rhs->reinit(data.matrix_diagonal_inverse);
       dummy->reinit(data.matrix_diagonal_inverse);
+
+      // heuristically, a right hand side close to a constant has been shown
+      // to quickly reveal the largest eigenvalue. however, avoid to use the
+      // exact constant because that might be not in the range space of some
+      // matrices (purely Neumann matrices with constant mode filtered out by
+      // orthogonal projection in the matrix-vector product)
       *rhs = 1./std::sqrt(static_cast<double>(matrix.m()));
+      if (rhs->locally_owned_elements().is_element(0))
+        (*rhs)(0) = 0.;
+      rhs->compress(VectorOperation::insert);
 
       internal::PreconditionChebyshev::EigenvalueTracker eigenvalue_tracker;
       SolverCG<VECTOR> solver (control, memory);
@@ -1494,8 +1503,6 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       catch (SolverControl::NoConvergence &)
         {
         }
-      Assert(control.last_step() >= 2,
-             ExcMessage("Could not find eigenvalues"));
 
       memory.free(dummy);
       memory.free(rhs);
