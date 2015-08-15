@@ -39,6 +39,8 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 
+#include <deal.II/distributed/tria.h>
+
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>

@@ -7072,12 +7072,12 @@ namespace VectorTools
             }
         }
 
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
     // if this was a distributed DoFHandler, we need to do the reduction
     // over the entire domain
-    if (const parallel::distributed::Triangulation<dim,spacedim> *
-        p_d_triangulation
-        = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
+    if (const parallel::Triangulation<dim,spacedim> *
+        p_triangulation
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(&dof.get_tria()))
       {
         // The type used to store the elements of the global vector may be a
         // real or a complex number. Do the global reduction always with real
@@ -7090,7 +7090,7 @@ namespace VectorTools
 
         MPI_Allreduce (&my_values, &global_values, 3, MPI_DOUBLE,
                        MPI_SUM,
-                       p_d_triangulation->get_communicator());
+                       p_triangulation->get_communicator());
 
         set_possibly_complex_number(global_values[0], global_values[1],
                                     mean);

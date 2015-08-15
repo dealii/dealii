@@ -37,6 +37,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/distributed/tria.h>
 
 
 #include <algorithm>
@@ -1494,12 +1495,12 @@ namespace DoFTools
             ExcInternalError());
 
     // reduce information from all CPUs
-#if defined(DEAL_II_WITH_P4EST) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_WITH_MPI
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&dof_handler.get_tria())))
       {
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
@@ -1573,12 +1574,11 @@ namespace DoFTools
           += std::count(dofs_by_block.begin(), dofs_by_block.end(),
                         block);
 
-#ifdef DEAL_II_WITH_P4EST
 #ifdef DEAL_II_WITH_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
-        if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> *tria
-            = (dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+        if (const parallel::Triangulation<DH::dimension,DH::space_dimension> *tria
+            = (dynamic_cast<const parallel::Triangulation<DH::dimension,DH::space_dimension>*>
                (&dof_handler.get_tria())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
@@ -1587,7 +1587,6 @@ namespace DoFTools
                             DEAL_II_DOF_INDEX_MPI_TYPE,
                             MPI_SUM, tria->get_communicator());
           }
-#endif
 #endif
       }
   }
