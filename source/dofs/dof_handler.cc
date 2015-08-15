@@ -25,6 +25,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
 #include <set>
 #include <algorithm>

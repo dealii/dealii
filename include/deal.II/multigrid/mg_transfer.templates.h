@@ -25,6 +25,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/distributed/tria.h>
 
 #include <algorithm>
 

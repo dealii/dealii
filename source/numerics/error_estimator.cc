@@ -37,6 +37,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/distributed/tria.h>
 
 #include <deal.II/base/std_cxx11/bind.h>
 
