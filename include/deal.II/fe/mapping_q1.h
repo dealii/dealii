@@ -177,7 +177,8 @@ public:
    * Storage for internal data of d-linear mappings. See Mapping::InternalDataBase
    * for an extensive description.
    *
-   * This includes data that is computed once when the object is created
+   * For the current class MappingQ1, the InternalData class store
+   * data that is computed once when the object is created
    * (in get_data()) as well as data the class wants to store from between
    * the call to fill_fe_values(), fill_fe_face_values(), or
    * fill_fe_subface_values() until possible later calls from the finite
@@ -496,34 +497,24 @@ protected:
 
 private:
 
-  /**
-   * Implementation of the corresponding function in the base class,
-   * Mapping::requires_update_flags(). See there for more information.
-   */
+  // documentation can be found in Mapping::requires_update_flags()
   virtual
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const;
 
-  /**
-   * Implementation of the Mapping::get_data() interface.
-   *
-   * As allowed by C++ (using a feature called "covariant return
-   * types"), this function returns a pointer to a
-   * MappingQ1::InternalData object since these objects are
-   * derived from the Mapping::InternalDataBase class, pointers to
-   * which are returned by the Mapping::get_data() function. This
-   * makes some uses of this function simpler.
-   */
+  // documentation can be found in Mapping::get_data()
   virtual
   InternalData *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
+  // documentation can be found in Mapping::get_face_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
+  // documentation can be found in Mapping::get_subface_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,

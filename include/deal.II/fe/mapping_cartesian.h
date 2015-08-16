@@ -54,16 +54,19 @@ template <int dim, int spacedim=dim>
 class MappingCartesian : public Mapping<dim,spacedim>
 {
 public:
+  // documentation can be found in Mapping::get_data()
   virtual
   typename Mapping<dim, spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
+  // documentation can be found in Mapping::get_face_data()
   virtual
   typename Mapping<dim, spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
+  // documentation can be found in Mapping::get_subface_data()
   virtual
   typename Mapping<dim, spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,
@@ -224,10 +227,7 @@ protected:
                      std::vector<Point<dim> > &normal_vectors) const;
 
 private:
-  /**
-   * Implementation of the corresponding function in the base class,
-   * Mapping::requires_update_flags(). See there for more information.
-   */
+  // documentation can be found in Mapping::requires_update_flags()
   virtual
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const;

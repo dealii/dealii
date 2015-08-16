@@ -293,27 +293,19 @@ private:
                                          const TriaIterator &iter,
                                          std::vector<Point<spacedim> > &points) const;
 
-
-  /**
-   * Implementation of the Mapping::get_data() interface.
-   *
-   * As allowed by C++ (using a feature called "covariant return
-   * types"), this function returns a pointer to a
-   * MappingQ::InternalData object since these objects are
-   * derived from the Mapping::InternalDataBase class, pointers to
-   * which are returned by the Mapping::get_data() function. This
-   * makes some uses of this function simpler.
-   */
+  // documentation can be found in Mapping::get_data()
   virtual
   InternalData *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
+  // documentation can be found in Mapping::get_face_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
+  // documentation can be found in Mapping::get_subface_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,

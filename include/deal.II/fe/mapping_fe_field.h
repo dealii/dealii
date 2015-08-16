@@ -519,10 +519,7 @@ private:
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
                           typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
-  /**
-   * Implementation of the corresponding function in the base class,
-   * Mapping::requires_update_flags(). See there for more information.
-   */
+  // documentation can be found in Mapping::requires_update_flags()
   virtual
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const;
@@ -547,28 +544,19 @@ private:
                      const unsigned int     n_original_q_points,
                      InternalData           &data) const;
 
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
+  // documentation can be found in Mapping::get_data()
   virtual
   InternalData *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
+  // documentation can be found in Mapping::get_face_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
+  // documentation can be found in Mapping::get_subface_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,
