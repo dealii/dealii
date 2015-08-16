@@ -735,7 +735,7 @@ public:
    * restriction matrices of the isotropic and all anisotropic refinement
    * cases are implemented. If you are interested in the restriction matrices
    * for isotropic refinement only, use the
-   * isotropic_restriction_is_implemented function instead.
+   * isotropic_restriction_is_implemented() function instead.
    *
    * This function is mostly here in order to allow us to write more efficient
    * test programs which we run on all kinds of weird elements, and for which
@@ -752,7 +752,7 @@ public:
   /**
    * Return whether this element implements its restriction matrices for
    * isotropic children. The return value also indicates whether a call to the
-   * @p get_restriction_matrix function will generate an error or not.
+   * get_restriction_matrix() function will generate an error or not.
    *
    * This function is mostly here in order to allow us to write more efficient
    * test programs which we run on all kinds of weird elements, and for which
@@ -1957,8 +1957,8 @@ protected:
   /**
    * Projection matrices are concatenated or summed up.
    *
-   * This flags decides on how the projection matrices of the children of the
-   * same father are put together to one operator. The possible modes are
+   * These flags decide how the projection matrices of the children of the
+   * same parent are put together to one operator. The possible modes are
    * concatenation and summation.
    *
    * If the projection is defined by an interpolation operator, the child
