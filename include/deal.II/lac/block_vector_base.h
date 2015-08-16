@@ -456,13 +456,20 @@ namespace internal
        */
 
       /**
-       * Exception.
+       * Exception thrown when one performs arithmetical comparisons on
+       * iterators belonging to two different block vectors.
        */
-      DeclException0 (ExcPointerToDifferentVectors);
+      DeclExceptionMsg (ExcPointerToDifferentVectors,
+                        "Your program tried to compare iterators pointing to "
+                        "different block vectors. There is no reasonable way "
+                        "to do this.");
+
       /**
-       * Exception.
+       * Exception thrown when one attempts to copy construct a non-const
+       * iterator from a const iterator.
        */
-      DeclException0 (ExcCastingAwayConstness);
+      DeclExceptionMsg (ExcCastingAwayConstness,
+                        "A copy of a const iterator should also be const.");
       //@}
     private:
       /**
