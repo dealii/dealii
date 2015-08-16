@@ -187,7 +187,7 @@ namespace internal
       /**
        * Typedef the result of a dereferencing operation for an iterator of
        * the underlying iterator. Since this is for constant iterators, we can
-       * only return values, no actual references.
+       * only return values, not actual references.
        */
       typedef value_type dereference_type;
     };
