@@ -208,18 +208,6 @@ namespace internal
      * constant and we again have that the iterator satisfies the requirements
      * of a random access iterator.
      *
-     * The implementation of this class has to work around some problems in
-     * compilers and standard libraries. One of these requires us to write all
-     * comparison operators twice, once comparison with iterators of the same
-     * type and once with iterators pointing to numbers of opposite constness
-     * specification. The reason is that if we would have written the
-     * comparison operators as a template on the constness of the right hand
-     * side, then gcc2.95 signals an error that these operators ambiguate
-     * operators declared somewhere within the standard library. Likewise, we
-     * have to work around some problems with granting other iterators
-     * friendship. This makes the implementation somewhat non-optimal at
-     * places, but at least everything works.
-     *
      * @author Wolfgang Bangerth, 2001
      */
     template <class BlockVectorType, bool Constness>
@@ -227,13 +215,6 @@ namespace internal
       public std::iterator<std::random_access_iterator_tag,
       typename Types<BlockVectorType,Constness>::value_type>
     {
-    private:
-      /**
-       * Typedef an iterator with opposite constness requirements on the
-       * elements it points to.
-       */
-      typedef Iterator<BlockVectorType,!constness> InverseConstnessIterator;
-
     public:
       /**
        * Declare the type for container size.
@@ -283,16 +264,22 @@ namespace internal
                 const size_type  global_index);
 
       /**
+       * Copy constructor from an iterator of different constness.
+       *
+       * @note Constructing a non-const iterator from a const iterator does
+       * not make sense. If deal.II was configured with C++11 support, then
+       * attempting this will result in a compile-time error (via
+       * <code>static_assert</code>). If deal.II was not configured with C++11
+       * support, then attempting this will result in a thrown exception in
+       * debug mode.
+       */
+      Iterator (const Iterator<BlockVectorType,!Constness> &c);
+
+
+      /**
        * Copy constructor.
        */
       Iterator (const Iterator<BlockVectorType,Constness> &c);
-
-      /**
-       * Copy constructor for conversion between iterators with different
-       * constness requirements. This constructor throws an error if an
-       * attempt is made at converting a constant to a non-constant iterator.
-       */
-      Iterator (const InverseConstnessIterator &c);
 
     private:
       /**
@@ -356,75 +343,47 @@ namespace internal
        * Compare for equality of iterators. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      bool operator == (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator == (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator == (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Compare for inequality of iterators. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      bool operator != (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator != (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator != (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Check whether this iterators points to an element previous to the one
        * pointed to by the given argument. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      bool operator < (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator < (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator < (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      bool operator <= (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator <= (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator <= (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      bool operator > (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator > (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator > (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      bool operator >= (const Iterator &i) const;
-
-      /**
-       * Same, but compare with an iterator of different constness.
-       */
-      bool operator >= (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      bool operator >= (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Return the distance between the two iterators, in elements.
        */
-      difference_type operator - (const Iterator &i) const;
-
-      /**
-       * Same, but for iterators of opposite constness.
-       */
-      difference_type operator - (const InverseConstnessIterator &i) const;
+      template <bool _Constness>
+      difference_type operator - (const Iterator<BlockVectorType, _Constness> &i) const;
 
       /**
        * Return an iterator which is the given number of elements in front of
@@ -467,9 +426,13 @@ namespace internal
       /**
        * Exception thrown when one attempts to copy construct a non-const
        * iterator from a const iterator.
+       *
+       * @note when deal.II is compiled with C++11 support this check is
+       * instead performed at compile time via <code>static_assert</code>.
        */
       DeclExceptionMsg (ExcCastingAwayConstness,
-                        "A copy of a const iterator should also be const.");
+                        "Constructing a non-const iterator from a const "
+                        "iterator does not make sense.");
       //@}
     private:
       /**
@@ -512,11 +475,9 @@ namespace internal
 
 
       /**
-       * Mark all other instances of this template as friends. In fact, we
-       * only need the inverse constness iterator as friend, but this is
-       * something that ISO C++ does not allow to specify.
+       * Mark all other instances of this template as friends.
        */
-      template <typename N, bool C>
+      template <typename, bool>
       friend class Iterator;
     };
   }  // namespace BlockVectorIterators
@@ -1025,7 +986,6 @@ namespace internal
 {
   namespace BlockVectorIterators
   {
-
     template <class BlockVectorType, bool Constness>
     inline
     Iterator<BlockVectorType,Constness>::
@@ -1044,7 +1004,7 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     inline
     Iterator<BlockVectorType,Constness>::
-    Iterator (const InverseConstnessIterator &c)
+    Iterator (const Iterator<BlockVectorType,!Constness> &c)
       :
       parent (const_cast<BlockVectorType *>(c.parent)),
       global_index (c.global_index),
@@ -1053,12 +1013,17 @@ namespace internal
       next_break_forward (c.next_break_forward),
       next_break_backward (c.next_break_backward)
     {
-      // constness of the iterator we
-      // if Constness==false, then the
-      // got is true and we are trying
-      // to cast away the
-      // constness. disallow this
-      Assert (Constness==true, ExcCastingAwayConstness());
+      // Only permit copy-constructing const iterators from non-const
+      // iterators, and not vice versa (i.e., Constness must always be
+      // true). As mentioned above, try to check this at compile time if C++11
+      // support is available.
+#ifdef DEAL_II_WITH_CXX11
+      static_assert(Constness == true,
+                    "Constructing a non-const iterator from a const iterator "
+                    "does not make sense.");
+#else
+      Assert(Constness == true, ExcCastingAwayConstness());
+#endif
     }
 
 
@@ -1185,10 +1150,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator == (const Iterator &i) const
+    operator == (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1198,23 +1164,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator == (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index == i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator != (const Iterator &i) const
+    operator != (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1224,23 +1178,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator != (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index != i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator < (const Iterator &i) const
+    operator < (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1250,23 +1192,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator < (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index < i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator <= (const Iterator &i) const
+    operator <= (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1276,23 +1206,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator <= (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index <= i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator > (const Iterator &i) const
+    operator > (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1302,23 +1220,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator > (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index > i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator >= (const Iterator &i) const
+    operator >= (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1328,37 +1234,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    inline
-    bool
-    Iterator<BlockVectorType,Constness>::
-    operator >= (const InverseConstnessIterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (global_index >= i.global_index);
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
+    template <bool _Constness>
     inline
     typename Iterator<BlockVectorType,Constness>::difference_type
     Iterator<BlockVectorType,Constness>::
-    operator - (const Iterator &i) const
-    {
-      Assert (parent == i.parent, ExcPointerToDifferentVectors());
-
-      return (static_cast<signed int>(global_index) -
-              static_cast<signed int>(i.global_index));
-    }
-
-
-
-    template <class BlockVectorType, bool Constness>
-    inline
-    typename Iterator<BlockVectorType,Constness>::difference_type
-    Iterator<BlockVectorType,Constness>::
-    operator - (const InverseConstnessIterator &i) const
+    operator - (const Iterator<BlockVectorType, _Constness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
