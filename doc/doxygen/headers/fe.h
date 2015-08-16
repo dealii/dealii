@@ -100,7 +100,7 @@
  *
  * The actual workings of the FEValues class and friends is
  * complicated because it has to be general yet efficient. The page on
- * @ref UpdateFlagsEssay attempts to give an overview of how this
+ * @ref UpdateFlags attempts to give an overview of how this
  * works.
  *
  * @ingroup feall

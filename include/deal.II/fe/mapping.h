@@ -547,7 +547,7 @@ protected:
    * instead, from which the determinant can also be computed -- but
    * this does not take away from the instructiveness of the example.)
    *
-   * @see UpdateFlagsEssay
+   * @see UpdateFlags
    */
   virtual
   UpdateFlags

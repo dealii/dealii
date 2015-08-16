@@ -15,7 +15,7 @@
 
 
 /**
- * @defgroup UpdateFlagsEssay The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues
+ * @defgroup UpdateFlags The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues
  * 
  * <h2>Introduction</h2>
  * 
