@@ -107,6 +107,20 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
 
 protected:
   /**
@@ -129,6 +143,13 @@ protected:
                       VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
                       const typename Mapping<dim,spacedim>::InternalDataBase &internal,
                       const MappingType type) const;
+
+  void
+  transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > > input,
+                     VectorSlice<std::vector<Tensor<3,spacedim> > > output,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+                     const MappingType mapping_type) const;
+
   /**
    * see doc in transform_fields
    */
@@ -136,7 +157,7 @@ protected:
   void
   transform_differential_forms(
     const VectorSlice<const std::vector<DerivativeForm<rank, dim, spacedim> > >    input,
-    VectorSlice<std::vector<DerivativeForm<rank, spacedim, spacedim> > > output,
+    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
     const MappingType type) const;
 

@@ -430,7 +430,7 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
               break;
             }
             case mapping_raviart_thomas:
-            case mapping_piola_gradient:
+            case mapping_piola:
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
@@ -639,7 +639,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
               break;
             }
             case mapping_raviart_thomas:
-            case mapping_piola_gradient:
+            case mapping_piola:
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];

@@ -106,7 +106,27 @@ enum MappingType
   /**
    * The mapping used for BDM elements.
    */
-  mapping_bdm = mapping_raviart_thomas
+  mapping_bdm = mapping_raviart_thomas,
+
+  /**
+   * The mappings for 2-forms and third order tensors.
+   *
+   * These are mappings typpically applied to hessians transformed to the
+   * reference cell.
+   *
+   * Mapping of the hessian of a covariant vector field (see Mapping::transform() for details).
+   */
+  mapping_covariant_hessian,
+
+  /**
+  * Mapping of the hessian of a contravariant vector field (see Mapping::transform() for details).
+  */
+  mapping_contravariant_hessian,
+
+  /**
+  * Mapping of the hessian of a piola vector field (see Mapping::transform() for details).
+  */
+  mapping_piola_hessian
 };
 
 
@@ -856,6 +876,76 @@ public:
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
              VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+             const InternalDataBase &internal,
+             const MappingType type) const = 0;
+
+  /**
+   * Transform a tensor field from the reference cell to the physical cell.
+   * This tensors are most of times the hessians in the reference cell of
+   * vector fields that have been pulled back from the physical cell.
+   *
+   * The mapping types currently implemented by derived classes are:
+   * <ul>
+   * <li> @p mapping_covariant_gradient: maps a field of forms on the reference cell to
+   * a field of forms on the physical cell. Mathematically, it is the pull
+   * back of the differential form
+   * @f[
+   * \mathbf T_{ijk}(\mathbf x) = \hat{\mathbf  T}_{iJK}(\hat{\mathbf  x}) J_{jJ}^{\dagger} J_{kK}^{\dagger}@f],
+   *
+   * where @f[ J^{\dagger} = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
+   * @f]
+   *
+   * Hessians of spacedim-vector valued differentiable functions are
+   * transformed this way (After subtraction of the product of the
+   * derivative with the Jacobian gradient).
+   *
+   * In the case when dim=spacedim the previous formula reduces to
+   * @f[J^{\dagger} = J^{-1}@f]
+   */
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+             const InternalDataBase &internal,
+             const MappingType type) const = 0;
+
+  /**
+   * Transform a field of 3-differential forms from the reference cell to the
+   * physical cell.  It is useful to think of $\mathbf{T}_{ijk} = D^2_{jk} \mathbf u_i$ and
+   * $\mathbf{\hat T}_{IJK} = \hat D^2_{JK} \mathbf{\hat u}_I$, with $\mathbf u_i$ a vector
+   * field.
+   *
+   * The mapping types currently implemented by derived classes are:
+   * <ul>
+   * <li> @p mapping_contravariant_hessian: it assumes $\mathbf u_i(\mathbf x)
+   * = J_{iI} \hat{\mathbf  u}_I$ so that
+   * @f[
+   * \mathbf T_{ijk}(\mathbf x) =
+   * J_{iI}(\hat{\mathbf  x}) \hat{\mathbf  T}_{IJK}(\hat{\mathbf  x})
+   * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
+   * @f]
+   * <li> @p mapping_covariant_hessian: it assumes $\mathbf u_i(\mathbf x) =
+   * J_{iI}^{-T} \hat{\mathbf  u}_I$ so that
+   * @f[
+   * \mathbf T_{ijk}(\mathbf x) =
+   * J_iI(\hat{\mathbf  x})^{-1} \hat{\mathbf  T}_{IJK}(\hat{\mathbf  x})
+   * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
+   * @f]
+   * <li> @p mapping_piola_hessian: it assumes $\mathbf u_i(\mathbf x) =
+   * \frac{1}{\text{det}\;J(\mathbf x)} J_{iI}(\mathbf x) \hat{\mathbf  u}(\mathbf x)$
+   * so that
+   * @f[
+   * \mathbf T_{ijk}(\mathbf x) =
+   * \frac{1}{\text{det}\;J(\mathbf x)}
+   * J_{iI}(\hat{\mathbf  x}) \hat{\mathbf  T}_{IJK}(\hat{\mathbf  x})
+   * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
+   * @f]
+   * </ul>
+   */
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
              const InternalDataBase &internal,
              const MappingType type) const = 0;
 

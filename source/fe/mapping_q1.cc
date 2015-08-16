@@ -1318,13 +1318,8 @@ MappingQ1<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
 
-  std::vector<DerivativeForm<1, spacedim,spacedim> > aux_output1(output.size());
-  VectorSlice< std::vector<DerivativeForm<1, spacedim,spacedim> > >  aux_output( aux_output1);
+  transform_differential_forms(input, output, mapping_data, mapping_type);
 
-  transform_differential_forms(input, aux_output, mapping_data, mapping_type);
-
-  for (unsigned int i=0; i<output.size(); i++)
-    output[i] = aux_output[i];
 }
 
 
@@ -1337,6 +1332,7 @@ MappingQ1<dim,spacedim>::transform (
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
+
   switch (mapping_type)
     {
     case mapping_contravariant:
@@ -1351,9 +1347,78 @@ MappingQ1<dim,spacedim>::transform (
     default:
       Assert(false, ExcNotImplemented());
     }
+
 }
 
 
+
+template<int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::transform (
+  const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+    {
+    case mapping_covariant_gradient:
+    {
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] = data.covariant[q][j][0]
+                                     * data.covariant[q][k][0]
+                                     * input[q][i][0][0];
+                for (unsigned int J=0; J<dim; ++J)
+                  {
+                    const unsigned int K0 = (0==J)? 1 : 0;
+                    for (unsigned int K=K0; K<dim; ++K)
+                      output[q][i][j][k] += data.covariant[q][j][J]
+                                            * data.covariant[q][k][K]
+                                            * input[q][i][J][K];
+                  }
+
+              }
+    }
+    default:
+      Assert(false, ExcNotImplemented());
+    }
+
+}
+
+template<int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::transform (
+  const VectorSlice<const std::vector< Tensor<3,dim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  switch (mapping_type)
+    {
+    case mapping_piola_hessian:
+    case mapping_contravariant_hessian:
+    case mapping_covariant_hessian:
+      transform_hessians(input, output, mapping_data, mapping_type);
+      return;
+    default:
+      Assert(false, ExcNotImplemented());
+    }
+
+}
 
 template<int dim, int spacedim>
 template < int rank >
@@ -1398,15 +1463,13 @@ void MappingQ1<dim,spacedim>::transform_fields(
         }
       return;
     }
-
-
     //We still allow this operation as in the
     //reference cell Derivatives are Tensor
     //rather than DerivativeForm
     case mapping_covariant:
     {
       Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
         output[i] = apply_transformation(data.covariant[i], input[i]);
@@ -1457,8 +1520,6 @@ void MappingQ1<dim,spacedim>::transform_gradients(
     {
       Assert (data.update_each & update_covariant_transformation,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1466,14 +1527,10 @@ void MappingQ1<dim,spacedim>::transform_gradients(
           DerivativeForm<1,spacedim,dim> A =
             apply_transformation(data.covariant[i], transpose(input[i]) );
           output[i] = apply_transformation(data.covariant[i], A.transpose() );
-
         }
 
       return;
     }
-
-
-
 
     case mapping_piola_gradient:
     {
@@ -1508,10 +1565,129 @@ void MappingQ1<dim,spacedim>::transform_gradients(
 
 
 template<int dim, int spacedim>
+void MappingQ1<dim,spacedim>::transform_hessians(
+  const VectorSlice<const std::vector<Tensor<3,dim> > > input,
+  VectorSlice<std::vector<Tensor<3,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+    {
+    case mapping_contravariant_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    data.contravariant[q][i][0]
+                                        * data.covariant[q][j][0]
+                                        * data.covariant[q][k][0]
+                                        * input[q][0][0][0];
+                for (unsigned int I=0; I<dim; ++I)
+                  for (unsigned int J=0; J<dim; ++J)
+                    {
+                      const unsigned int K0 = (0==(I+J))? 1 : 0;
+                      for (unsigned int K=K0; K<dim; ++K)
+                        output[q][i][j][k] +=    data.contravariant[q][i][I]
+                                                 * data.covariant[q][j][J]
+                                                 * data.covariant[q][k][K]
+                                                 * input[q][I][J][K];
+                    }
+
+              }
+      return;
+    }
+
+    case mapping_covariant_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    data.covariant[q][i][0]
+                                        * data.covariant[q][j][0]
+                                        * data.covariant[q][k][0]
+                                        * input[q][0][0][0];
+                for (unsigned int I=0; I<dim; ++I)
+                  for (unsigned int J=0; J<dim; ++J)
+                    {
+                      const unsigned int K0 = (0==(I+J))? 1 : 0;
+                      for (unsigned int K=K0; K<dim; ++K)
+                        output[q][i][j][k] +=   data.covariant[q][i][I]
+                                                * data.covariant[q][j][J]
+                                                * data.covariant[q][k][K]
+                                                * input[q][I][J][K];
+                    }
+
+              }
+
+      return;
+    }
+
+    case mapping_piola_hessian:
+    {
+      Assert (data.update_each & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+      Assert (data.update_each & update_volume_elements,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int k=0; k<spacedim; ++k)
+              {
+                output[q][i][j][k] =    data.contravariant[q][i][0]
+                                        / data.volume_elements[q]
+                                        * data.covariant[q][j][0]
+                                        * data.covariant[q][k][0]
+                                        * input[q][0][0][0];
+                for (unsigned int I=0; I<dim; ++I)
+                  for (unsigned int J=0; J<dim; ++J)
+                    {
+                      const unsigned int K0 = (0==(I+J))? 1 : 0;
+                      for (unsigned int K=K0; K<dim; ++K)
+                        output[q][i][j][k] +=    data.contravariant[q][i][I]
+                                                 / data.volume_elements[q]
+                                                 * data.covariant[q][j][J]
+                                                 * data.covariant[q][k][K]
+                                                 * input[q][I][J][K];
+                    }
+
+              }
+
+      return;
+    }
+
+    default:
+      Assert(false, ExcNotImplemented());
+    }
+}
+
+
+
+
+template<int dim, int spacedim>
 template < int rank >
 void MappingQ1<dim,spacedim>::transform_differential_forms(
   const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-  VectorSlice<std::vector<DerivativeForm<rank, spacedim,spacedim> > > output,
+  VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
 {
@@ -1526,7 +1702,7 @@ void MappingQ1<dim,spacedim>::transform_differential_forms(
     case mapping_covariant:
     {
       Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
         output[i] = apply_transformation(data.covariant[i], input[i]);
@@ -1538,8 +1714,6 @@ void MappingQ1<dim,spacedim>::transform_differential_forms(
     }
 
 }
-
-
 
 
 
