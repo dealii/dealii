@@ -115,7 +115,7 @@ namespace internal
      * Declaration of the general template of a structure which is used to
      * determine some types based on the template arguments of other classes.
      */
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     struct Types
     {
     };
@@ -222,10 +222,10 @@ namespace internal
      *
      * @author Wolfgang Bangerth, 2001
      */
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     class Iterator :
       public std::iterator<std::random_access_iterator_tag,
-      typename Types<BlockVectorType,constness>::value_type>
+      typename Types<BlockVectorType,Constness>::value_type>
     {
     private:
       /**
@@ -246,7 +246,7 @@ namespace internal
        * number.
        */
       typedef
-      typename Types<BlockVectorType,constness>::value_type
+      typename Types<BlockVectorType,Constness>::value_type
       value_type;
 
       /**
@@ -260,7 +260,7 @@ namespace internal
       typedef value_type                                   *pointer;
 
       typedef
-      typename Types<BlockVectorType,constness>::dereference_type
+      typename Types<BlockVectorType,Constness>::dereference_type
       dereference_type;
 
       /**
@@ -268,14 +268,14 @@ namespace internal
        * depending on the second template parameter).
        */
       typedef
-      typename Types<BlockVectorType,constness>::BlockVector
+      typename Types<BlockVectorType,Constness>::BlockVector
       BlockVector;
 
       /**
        * Construct an iterator from a vector to which we point and the global
        * index of the element pointed to.
        *
-       * Depending on the value of the <tt>constness</tt> template argument of
+       * Depending on the value of the <tt>Constness</tt> template argument of
        * this class, the first argument of this constructor is either is a
        * const or non-const reference.
        */
@@ -285,7 +285,7 @@ namespace internal
       /**
        * Copy constructor.
        */
-      Iterator (const Iterator<BlockVectorType,constness> &c);
+      Iterator (const Iterator<BlockVectorType,Constness> &c);
 
       /**
        * Copy constructor for conversion between iterators with different
@@ -314,7 +314,7 @@ namespace internal
       Iterator &operator = (const Iterator &c);
 
       /**
-       * Dereferencing operator. If the template argument <tt>constness</tt>
+       * Dereferencing operator. If the template argument <tt>Constness</tt>
        * is <tt>true</tt>, then no writing to the result is possible, making
        * this a const_iterator.
        */
@@ -467,7 +467,7 @@ namespace internal
     private:
       /**
        * Pointer to the block vector object to which this iterator points.
-       * Depending on the value of the <tt>constness</tt> template argument of
+       * Depending on the value of the <tt>Constness</tt> template argument of
        * this class, this is a <tt>const</tt> or non-<tt>const</tt> pointer.
        */
       BlockVector *parent;
@@ -1019,10 +1019,10 @@ namespace internal
   namespace BlockVectorIterators
   {
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>::
-    Iterator (const Iterator<BlockVectorType,constness> &c)
+    Iterator<BlockVectorType,Constness>::
+    Iterator (const Iterator<BlockVectorType,Constness> &c)
       :
       parent (c.parent),
       global_index (c.global_index),
@@ -1034,9 +1034,9 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     Iterator (const InverseConstnessIterator &c)
       :
       parent (const_cast<BlockVectorType *>(c.parent)),
@@ -1046,19 +1046,19 @@ namespace internal
       next_break_forward (c.next_break_forward),
       next_break_backward (c.next_break_backward)
     {
-      // if constness==false, then the
       // constness of the iterator we
+      // if Constness==false, then the
       // got is true and we are trying
       // to cast away the
       // constness. disallow this
-      Assert (constness==true, ExcCastingAwayConstness());
+      Assert (Constness==true, ExcCastingAwayConstness());
     }
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     Iterator (BlockVector        &parent,
               const size_type  global_index,
               const size_type  current_block,
@@ -1077,10 +1077,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness> &
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness> &
+    Iterator<BlockVectorType,Constness>::
     operator = (const Iterator &c)
     {
       parent              = c.parent;
@@ -1095,20 +1095,20 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    typename Iterator<BlockVectorType,constness>::dereference_type
-    Iterator<BlockVectorType,constness>::operator * () const
+    typename Iterator<BlockVectorType,Constness>::dereference_type
+    Iterator<BlockVectorType,Constness>::operator * () const
     {
       return parent->block(current_block)(index_within_block);
     }
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    typename Iterator<BlockVectorType,constness>::dereference_type
-    Iterator<BlockVectorType,constness>::operator [] (const difference_type d) const
+    typename Iterator<BlockVectorType,Constness>::dereference_type
+    Iterator<BlockVectorType,Constness>::operator [] (const difference_type d) const
     {
       // if the index pointed to is
       // still within the block we
@@ -1131,10 +1131,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness> &
-    Iterator<BlockVectorType,constness>::operator ++ ()
+    Iterator<BlockVectorType,Constness> &
+    Iterator<BlockVectorType,Constness>::operator ++ ()
     {
       move_forward ();
       return *this;
@@ -1142,10 +1142,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>
-    Iterator<BlockVectorType,constness>::operator ++ (int)
+    Iterator<BlockVectorType,Constness>
+    Iterator<BlockVectorType,Constness>::operator ++ (int)
     {
       const Iterator old_value = *this;
       move_forward ();
@@ -1154,10 +1154,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness> &
-    Iterator<BlockVectorType,constness>::operator -- ()
+    Iterator<BlockVectorType,Constness> &
+    Iterator<BlockVectorType,Constness>::operator -- ()
     {
       move_backward ();
       return *this;
@@ -1165,10 +1165,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>
-    Iterator<BlockVectorType,constness>::operator -- (int)
+    Iterator<BlockVectorType,Constness>
+    Iterator<BlockVectorType,Constness>::operator -- (int)
     {
       const Iterator old_value = *this;
       move_backward ();
@@ -1177,10 +1177,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator == (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1190,10 +1190,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator == (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1203,10 +1203,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator != (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1216,10 +1216,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator != (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1229,10 +1229,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator < (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1242,10 +1242,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator < (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1255,10 +1255,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator <= (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1268,10 +1268,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator <= (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1281,10 +1281,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator > (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1294,10 +1294,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator > (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1307,10 +1307,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator >= (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1320,10 +1320,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
     bool
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>::
     operator >= (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1333,10 +1333,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    typename Iterator<BlockVectorType,constness>::difference_type
-    Iterator<BlockVectorType,constness>::
+    typename Iterator<BlockVectorType,Constness>::difference_type
+    Iterator<BlockVectorType,Constness>::
     operator - (const Iterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1347,10 +1347,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    typename Iterator<BlockVectorType,constness>::difference_type
-    Iterator<BlockVectorType,constness>::
+    typename Iterator<BlockVectorType,Constness>::difference_type
+    Iterator<BlockVectorType,Constness>::
     operator - (const InverseConstnessIterator &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
@@ -1361,10 +1361,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>
+    Iterator<BlockVectorType,Constness>::
     operator + (const difference_type &d) const
     {
       // if the index pointed to is
@@ -1386,10 +1386,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness>
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness>
+    Iterator<BlockVectorType,Constness>::
     operator - (const difference_type &d) const
     {
       // if the index pointed to is
@@ -1411,10 +1411,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness> &
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness> &
+    Iterator<BlockVectorType,Constness>::
     operator += (const difference_type &d)
     {
       // if the index pointed to is
@@ -1439,10 +1439,10 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     inline
-    Iterator<BlockVectorType,constness> &
-    Iterator<BlockVectorType,constness>::
+    Iterator<BlockVectorType,Constness> &
+    Iterator<BlockVectorType,Constness>::
     operator -= (const difference_type &d)
     {
       // if the index pointed to is
@@ -1466,8 +1466,8 @@ namespace internal
     }
 
 
-    template <class BlockVectorType, bool constness>
-    Iterator<BlockVectorType,constness>::
+    template <class BlockVectorType, bool Constness>
+    Iterator<BlockVectorType,Constness>::
     Iterator (BlockVector    &parent,
               const size_type global_index)
       :
@@ -1507,9 +1507,9 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     void
-    Iterator<BlockVectorType,constness>::move_forward ()
+    Iterator<BlockVectorType,Constness>::move_forward ()
     {
       if (global_index != next_break_forward)
         ++index_within_block;
@@ -1541,9 +1541,9 @@ namespace internal
 
 
 
-    template <class BlockVectorType, bool constness>
+    template <class BlockVectorType, bool Constness>
     void
-    Iterator<BlockVectorType,constness>::move_backward ()
+    Iterator<BlockVectorType,Constness>::move_backward ()
     {
       if (global_index != next_break_backward)
         --index_within_block;
