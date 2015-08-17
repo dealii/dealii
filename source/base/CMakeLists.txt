@@ -52,6 +52,7 @@ SET(_src
   polynomial_space.cc
   polynomials_p.cc
   polynomials_piecewise.cc
+  polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
   quadrature.cc
   quadrature_lib.cc
@@ -71,6 +72,7 @@ SET(_src
 
 SET(_inst
   data_out_base.inst.in
+  polynomials_rannacher_turek.inst.in
   time_stepping.inst.in
   )
 
