@@ -206,6 +206,78 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
 
+
+  /**
+   * Always returns @p false.
+   */
+  virtual
+  bool preserves_vertex_locations () const;
+
+  DeclException0(ExcInactiveCell);
+
+protected:
+
+  /**
+   * This function and the next allow to generate the transform require by the
+   * virtual transform() in mapping, but unfortunately in C++ one cannot
+   * declare a virtual template function.
+   */
+  template < int rank >
+  void
+  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
+                   VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
+                   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+                   const MappingType type) const;
+
+
+  /**
+   * see doc in transform_fields
+   */
+  template < int rank >
+  void
+  transform_differential_forms(
+    const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
+    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
+    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+    const MappingType mapping_type) const;
+
+
+protected:
+  /**
+   * Reference to the vector of shifts.
+   */
+
+  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> >euler_vector;
+  /**
+   * A FiniteElement object which is only needed in 3D, since it knows how to
+   * reorder shape functions/DoFs on non-standard faces. This is used to
+   * reorder support points in the same way. We could make this a pointer to
+   * prevent construction in 1D and 2D, but since memory and time requirements
+   * are not particularly high this seems unnecessary at the moment.
+   */
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
+
+
+  /**
+   * Pointer to the DoFHandler to which the mapping vector is associated.
+   */
+  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> >euler_dof_handler;
+
+
+
+private:
+
+  /**
+   * @name Interface with FEValues
+   * @{
+   */
+
+  // documentation can be found in Mapping::requires_update_flags()
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
+public:
   /**
    * Storage for internal data of this mapping. See Mapping::InternalDataBase
    * for an extensive description.
@@ -369,7 +441,57 @@ public:
     mutable std::vector<double> local_dof_values;
   };
 
+private:
 
+  // documentation can be found in Mapping::get_data()
+  virtual
+  InternalData *
+  get_data (const UpdateFlags,
+            const Quadrature<dim> &quadrature) const;
+
+  // documentation can be found in Mapping::get_face_data()
+  virtual
+  typename Mapping<dim,spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags flags,
+                 const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::get_subface_data()
+  virtual
+  typename Mapping<dim,spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags flags,
+                    const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::fill_fe_values()
+  virtual
+  CellSimilarity::Similarity
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_face_values()
+  virtual void
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_subface_values()
+  virtual void
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         subface_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  /**
+   * @}
+   */
+
+private:
   /**
    * Transforms a point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.
@@ -410,102 +532,6 @@ public:
                                         InternalData &mdata) const;
 
   /**
-   * Always returns @p false.
-   */
-  virtual
-  bool preserves_vertex_locations () const;
-
-  DeclException0(ExcInactiveCell);
-
-protected:
-  /**
-   * Compute mapping-related information for a cell.
-   * See the documentation of Mapping::fill_fe_values() for
-   * a discussion of purpose, arguments, and return value of this function.
-   */
-  virtual
-  CellSimilarity::Similarity
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const CellSimilarity::Similarity                           cell_similarity,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
-
-  /**
-   * Compute mapping-related information for a face of a cell.
-   * See the documentation of Mapping::fill_fe_face_values() for
-   * a discussion of purpose and arguments of this function.
-   */
-  virtual void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
-
-  /**
-   * Compute mapping-related information for a child of a face of a cell.
-   * See the documentation of Mapping::fill_fe_subface_values() for
-   * a discussion of purpose and arguments of this function.
-   */
-  virtual void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         subface_no,
-                          const Quadrature<dim-1>                                   &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
-
-  /**
-   * This function and the next allow to generate the transform require by the
-   * virtual transform() in mapping, but unfortunately in C++ one cannot
-   * declare a virtual template function.
-   */
-  template < int rank >
-  void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                   VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                   const MappingType type) const;
-
-
-  /**
-   * see doc in transform_fields
-   */
-  template < int rank >
-  void
-  transform_differential_forms(
-    const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-    const MappingType mapping_type) const;
-
-
-protected:
-  /**
-   * Reference to the vector of shifts.
-   */
-
-  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> >euler_vector;
-  /**
-   * A FiniteElement object which is only needed in 3D, since it knows how to
-   * reorder shape functions/DoFs on non-standard faces. This is used to
-   * reorder support points in the same way. We could make this a pointer to
-   * prevent construction in 1D and 2D, but since memory and time requirements
-   * are not particularly high this seems unnecessary at the moment.
-   */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
-
-
-  /**
-   * Pointer to the DoFHandler to which the mapping vector is associated.
-   */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> >euler_dof_handler;
-
-
-
-private:
-  /**
    * Update internal degrees of freedom.
    */
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -519,10 +545,22 @@ private:
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
                           typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
-  // documentation can be found in Mapping::requires_update_flags()
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  /*
+   * Which components to use for the mapping.
+   */
+  const ComponentMask fe_mask;
+
+
+  /**
+   * Mapping between indices in the FE space and the real space. This vector
+   * contains one index for each component of the finite element space. If the
+   * index is one for which the ComponentMask which is used to construct this
+   * element is false, then numbers::invalid_unsigned_int is returned,
+   * otherwise the component in real space is returned. For example, if we
+   * construct the mapping using ComponentMask(spacedim, true), then this
+   * vector contains {0,1,2} in spacedim = 3.
+   */
+  std::vector<unsigned int> fe_to_real;
 
   /**
    * Reimplemented from Mapping. See the documentation of the base class for
@@ -543,42 +581,6 @@ private:
                      const Quadrature<dim>  &q,
                      const unsigned int     n_original_q_points,
                      InternalData           &data) const;
-
-  // documentation can be found in Mapping::get_data()
-  virtual
-  InternalData *
-  get_data (const UpdateFlags,
-            const Quadrature<dim> &quadrature) const;
-
-  // documentation can be found in Mapping::get_face_data()
-  virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const;
-
-  // documentation can be found in Mapping::get_subface_data()
-  virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const;
-
-
-  /*
-   * Which components to use for the mapping.
-   */
-  const ComponentMask fe_mask;
-
-
-  /**
-   * Mapping between indices in the FE space and the real space. This vector
-   * contains one index for each component of the finite element space. If the
-   * index is one for which the ComponentMask which is used to construct this
-   * element is false, then numbers::invalid_unsigned_int is returned,
-   * otherwise the component in real space is returned. For example, if we
-   * construct the mapping using ComponentMask(spacedim, true), then this
-   * vector contains {0,1,2} in spacedim = 3.
-   */
-  std::vector<unsigned int> fe_to_real;
 
 
   /**

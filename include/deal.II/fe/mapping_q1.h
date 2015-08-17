@@ -83,18 +83,20 @@ public:
    * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell) or
    * whether the exception mentioned above has been thrown.
    */
-  virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const;
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                            &p) const;
 
-  virtual void
+  virtual
+  void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
              VectorSlice<std::vector<Tensor<1,spacedim> > > output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
-  virtual void
+  virtual
+  void
   transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > >    input,
              VectorSlice<std::vector<Tensor<2,spacedim> > > output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
@@ -124,7 +126,7 @@ public:
 
 protected:
   /**
-   * This function and the next allow to generate the transform require by the
+   * This function and the next ones allow to generate the transform required by the
    * virtual transform() in mapping, but unfortunately in C++ one cannot
    * declare a virtual template function.
    */
@@ -134,6 +136,7 @@ protected:
                    VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
                    const typename Mapping<dim,spacedim>::InternalDataBase &internal,
                    const MappingType type) const;
+
   /**
    * see doc in transform_fields
    */
@@ -144,6 +147,9 @@ protected:
                       const typename Mapping<dim,spacedim>::InternalDataBase &internal,
                       const MappingType type) const;
 
+  /**
+   * see doc in transform_fields
+   */
   void
   transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > > input,
                      VectorSlice<std::vector<Tensor<3,spacedim> > > output,
@@ -163,9 +169,6 @@ protected:
 
 public:
 
-
-
-
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
@@ -173,6 +176,20 @@ public:
   virtual
   Mapping<dim,spacedim> *clone () const;
 
+
+  /**
+   * Always returns @p true because MappingQ1 preserves vertex locations.
+   */
+  virtual
+  bool preserves_vertex_locations () const;
+
+
+  /**
+   * @name Interface with FEValues
+   * @{
+   */
+
+public:
   /**
    * Storage for internal data of d-linear mappings. See Mapping::InternalDataBase
    * for an extensive description.
@@ -331,19 +348,32 @@ public:
     mutable std::vector<double> volume_elements;
   };
 
-  /**
-   * Declare a convenience typedef for the class that describes offsets into
-   * quadrature formulas projected onto faces and subfaces.
-   */
-  typedef
-  typename QProjector<dim>::DataSetDescriptor
-  DataSetDescriptor;
+protected:
 
-  /**
-   * Compute mapping-related information for a cell.
-   * See the documentation of Mapping::fill_fe_values() for
-   * a discussion of purpose, arguments, and return value of this function.
-   */
+  // documentation can be found in Mapping::requires_update_flags()
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
+  // documentation can be found in Mapping::get_data()
+  virtual
+  InternalData *
+  get_data (const UpdateFlags,
+            const Quadrature<dim> &quadrature) const;
+
+  // documentation can be found in Mapping::get_face_data()
+  virtual
+  typename Mapping<dim,spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags flags,
+                 const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::get_subface_data()
+  virtual
+  typename Mapping<dim,spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags flags,
+                    const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::fill_fe_values()
   virtual
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
@@ -352,11 +382,7 @@ public:
                   const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
                   dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
 
-  /**
-   * Compute mapping-related information for a face of a cell.
-   * See the documentation of Mapping::fill_fe_face_values() for
-   * a discussion of purpose and arguments of this function.
-   */
+  // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
                        const unsigned int                                             face_no,
@@ -364,11 +390,7 @@ public:
                        const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
                        dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
 
-  /**
-   * Compute mapping-related information for a child of a face of a cell.
-   * See the documentation of Mapping::fill_fe_subface_values() for
-   * a discussion of purpose and arguments of this function.
-   */
+  // documentation can be found in Mapping::fill_fe_subface_values()
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
                           const unsigned int                                             face_no,
@@ -376,6 +398,56 @@ public:
                           const Quadrature<dim-1>                                       &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
                           dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const;
+
+  /**
+   * @}
+   */
+
+protected:
+  /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
+  template<int dim_>
+  Point<dim_>
+  transform_real_to_unit_cell_internal_codim1
+  (const typename Triangulation<dim_,dim_+1>::cell_iterator &cell,
+   const Point<dim_+1> &p,
+   const Point<dim_>         &initial_p_unit,
+   InternalData        &mdata) const;
+
+  /**
+   * Compute an initial guess to pass to the Newton method in
+   * transform_real_to_unit_cell.  For the initial guess we proceed in the
+   * following way:
+   * <ul>
+   * <li> find the least square dim-dimensional plane approximating the cell
+   * vertices, i.e. we find and affine map A x_hat + b from the reference cell
+   * to the real space.
+   * <li> Solve the equation A x_hat + b = p for x_hat
+   * <li> This x_hat is the initial solution used for the Newton Method.
+   * </ul>
+   * @note if dim<spacedim we first project p onto the plane. @note if dim==1
+   * (for any spacedim) the initial guess is the exact solution and no Newton
+   * iteration is needed.   Some details about how we compute the least square
+   * plane. We look for a  spacedim x (dim + 1) matrix  X such that  X * M = Y
+   * where M is a (dim+1) x n_vertices  matrix and Y a spacedim x n_vertices.
+   * And: The i-th column of M is unit_vertex[i] and the last row all 1's. The
+   * i-th column of Y is real_vertex[i].  If we split X=[A|b], the least
+   * square approx is A x_hat+b  Classically  X = Y * (M^t (M M^t)^{-1})  Let
+   * K = M^t * (M M^t)^{-1} = [KA Kb] this can be precomputed, and that is
+   * exactly what we do.  Finally A = Y*KA  and  b = Y*Kb.
+   */
+  Point<dim>
+  transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
+                                             const Point<spacedim>                            &p) const;
+
+
+  /**
+   * Declare a convenience typedef for the class that describes offsets into
+   * quadrature formulas projected onto faces and subfaces.
+   */
+  typedef
+  typename QProjector<dim>::DataSetDescriptor
+  DataSetDescriptor;
+
 
   /**
    * Compute shape values and/or derivatives.
@@ -451,74 +523,6 @@ public:
                                         const Point<spacedim> &p,
                                         const Point<dim> &initial_p_unit,
                                         InternalData &mdata) const;
-
-  /**
-   * Always returns @p true because MappingQ1 preserves vertex locations.
-   */
-  virtual
-  bool preserves_vertex_locations () const;
-
-protected:
-  /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
-  template<int dim_>
-  Point<dim_>
-  transform_real_to_unit_cell_internal_codim1
-  (const typename Triangulation<dim_,dim_+1>::cell_iterator &cell,
-   const Point<dim_+1> &p,
-   const Point<dim_>         &initial_p_unit,
-   InternalData        &mdata) const;
-
-  /**
-   * Compute an initial guess to pass to the Newton method in
-   * transform_real_to_unit_cell.  For the initial guess we proceed in the
-   * following way:
-   * <ul>
-   * <li> find the least square dim-dimensional plane approximating the cell
-   * vertices, i.e. we find and affine map A x_hat + b from the reference cell
-   * to the real space.
-   * <li> Solve the equation A x_hat + b = p for x_hat
-   * <li> This x_hat is the initial solution used for the Newton Method.
-   * </ul>
-   * @note if dim<spacedim we first project p onto the plane. @note if dim==1
-   * (for any spacedim) the initial guess is the exact solution and no Newton
-   * iteration is needed.   Some details about how we compute the least square
-   * plane. We look for a  spacedim x (dim + 1) matrix  X such that  X * M = Y
-   * where M is a (dim+1) x n_vertices  matrix and Y a spacedim x n_vertices.
-   * And: The i-th column of M is unit_vertex[i] and the last row all 1's. The
-   * i-th column of Y is real_vertex[i].  If we split X=[A|b], the least
-   * square approx is A x_hat+b  Classically  X = Y * (M^t (M M^t)^{-1})  Let
-   * K = M^t * (M M^t)^{-1} = [KA Kb] this can be precomputed, and that is
-   * exactly what we do.  Finally A = Y*KA  and  b = Y*Kb.
-   */
-  Point<dim>
-  transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
-                                             const Point<spacedim>                            &p) const;
-
-
-private:
-
-  // documentation can be found in Mapping::requires_update_flags()
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
-
-  // documentation can be found in Mapping::get_data()
-  virtual
-  InternalData *
-  get_data (const UpdateFlags,
-            const Quadrature<dim> &quadrature) const;
-
-  // documentation can be found in Mapping::get_face_data()
-  virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const;
-
-  // documentation can be found in Mapping::get_subface_data()
-  virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const;
 
   /**
    * Computes the support points of the mapping. For @p MappingQ1 these are

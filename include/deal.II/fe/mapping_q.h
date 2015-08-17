@@ -150,88 +150,8 @@ public:
   virtual
   Mapping<dim,spacedim> *clone () const;
 
-  /**
-   * Storage for internal data of this mapping. See Mapping::InternalDataBase
-   * for an extensive description.
-   *
-   * This includes data that is computed once when the object is created
-   * (in get_data()) as well as data the class wants to store from between
-   * the call to fill_fe_values(), fill_fe_face_values(), or
-   * fill_fe_subface_values() until possible later calls from the finite
-   * element to functions such as transform(). The latter class of
-   * member variables are marked as 'mutable'.
-   *
-   * The current class uses essentially the same fields for storage
-   * as the MappingQ1 class. Consequently, it inherits from
-   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
-   */
-  class InternalData : public MappingQ1<dim,spacedim>::InternalData
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    InternalData (const unsigned int n_shape_functions);
-
-
-    /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
-     */
-    virtual std::size_t memory_consumption () const;
-
-    /**
-     * Flag that is set by the <tt>fill_fe_[[sub]face]_values</tt> function.
-     *
-     * If this flag is @p true we are on an interior cell and the @p
-     * mapping_q1_data is used.
-     */
-    mutable bool use_mapping_q1_on_current_cell;
-
-    /**
-     * A structure to store the corresponding information for the pure
-     * $Q_1$ mapping that is, by default, used on all interior cells.
-     */
-    typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
-  };
 
 protected:
-  /**
-   * Compute mapping-related information for a cell.
-   * See the documentation of Mapping::fill_fe_values() for
-   * a discussion of purpose, arguments, and return value of this function.
-   */
-  virtual
-  CellSimilarity::Similarity
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const CellSimilarity::Similarity                           cell_similarity,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
-
-  /**
-   * Compute mapping-related information for a face of a cell.
-   * See the documentation of Mapping::fill_fe_face_values() for
-   * a discussion of purpose and arguments of this function.
-   */
-  virtual void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
-
-  /**
-   * Compute mapping-related information for a child of a face of a cell.
-   * See the documentation of Mapping::fill_fe_subface_values() for
-   * a discussion of purpose and arguments of this function.
-   */
-  virtual void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         subface_no,
-                          const Quadrature<dim-1>                                   &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape functions
@@ -293,6 +213,57 @@ private:
                                          const TriaIterator &iter,
                                          std::vector<Point<spacedim> > &points) const;
 
+  /**
+   * @name Interface with FEValues
+   * @{
+   */
+
+protected:
+
+  /**
+   * Storage for internal data of this mapping. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
+   *
+   * The current class uses essentially the same fields for storage
+   * as the MappingQ1 class. Consequently, it inherits from
+   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
+   */
+  class InternalData : public MappingQ1<dim,spacedim>::InternalData
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    InternalData (const unsigned int n_shape_functions);
+
+
+    /**
+     * Return an estimate (in bytes) or the memory consumption of this object.
+     */
+    virtual std::size_t memory_consumption () const;
+
+    /**
+     * Flag that is set by the <tt>fill_fe_[[sub]face]_values</tt> function.
+     *
+     * If this flag is @p true we are on an interior cell and the @p
+     * mapping_q1_data is used.
+     */
+    mutable bool use_mapping_q1_on_current_cell;
+
+    /**
+     * A structure to store the corresponding information for the pure
+     * $Q_1$ mapping that is, by default, used on all interior cells.
+     */
+    typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
+  };
+
   // documentation can be found in Mapping::get_data()
   virtual
   InternalData *
@@ -310,6 +281,36 @@ private:
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::fill_fe_values()
+  virtual
+  CellSimilarity::Similarity
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_face_values()
+  virtual void
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_subface_values()
+  virtual void
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         subface_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  /**
+   * @}
+   */
 
   /**
    * Compute shape values and/or derivatives.
