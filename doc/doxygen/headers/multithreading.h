@@ -20,7 +20,7 @@
  *
  * @brief A module discussing the use of parallelism on shared memory
  * machines. See the detailed documentation and
- * @ref MTToC "Table of Contents" below the lenghty list of members
+ * @ref MTToC "Table of Contents" below the lengthy list of members
  * of this module.
  *
  * @dealiiVideoLecture{39,40}
@@ -174,7 +174,7 @@
  * should be run on a separate task by simply prefixing the call with a
  * keyword (such as <code>new_task</code> here, with a similar keyword
  * <code>new_thread</code> for threads). Prefixing a call would return a
- * handle for the task that we can use to wait for the tasks's completion and
+ * handle for the task that we can use to wait for the task's completion and
  * that we may use to query the return value of the function called (unless it
  * is void, as it is here).
  *

@@ -82,7 +82,7 @@
  * certain boundary_id values used in a triangulation and to certain
  * manifold_id values.
  *
- * Befor version 8.2, the library allowed only boundary faces to
+ * Before version 8.2, the library allowed only boundary faces to
  * follow a curved geometric description. Since version 8.2 this has
  * been introduced also for interior faces and cells, and the
  * boundary_id has been separated from the manifold_id.
@@ -112,7 +112,7 @@
  * boundary) or the material_id (if the Triangulation is of
  * codimension one and the object is a cell). If the previous queries
  * resulted in a number different from numbers::invalid_manifold_id,
- * then the Triangulation looks wether a previous call to
+ * then the Triangulation looks whether a previous call to
  * Triangulation::set_manifold() (or set_boundary()) was performed
  * with the given id, and if yes, it uses the stored object to obtain
  * new vertices, otherwise it uses a FlatManifold or StraightBoundary

@@ -28,7 +28,7 @@
  * from one mesh to another.
  *
  * The namespaces MatrixCreator, MatrixTools, and VectorTools provide an
- * assortment of services, such as creating a Laplac matrix, projecting or
+ * assortment of services, such as creating a Laplace matrix, projecting or
  * interpolating a function onto the present finite element space, etc.  The
  * difference to the functions in the DoFTools and FETools functions is that
  * they work on vectors (i.e. members of a finite element function space on a

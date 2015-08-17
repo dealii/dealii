@@ -580,9 +580,9 @@
  * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly
  * used in the finite element community to indicate two slightly different,
  * but related things. The first is that we'd like to represent the finite
- * element solution as a linear combination of shape function, in the form
+ * element solution as a linear combination of shape functions, in the form
  * $u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf x)$. Here, $U_j$
- * is a vector of expension coefficients. Because we don't know their values
+ * is a vector of expansion coefficients. Because we don't know their values
  * yet (we will compute them as the solution of a linear or nonlinear system),
  * they are called "unknowns" or "degrees of freedom". The second meaning of
  * the term can be explained as follows: A mathematical description of finite
@@ -1068,7 +1068,7 @@ Article{BK07,
  *
  * <dd> Every object that makes up a Triangulation (cells, faces,
  * edges, etc.), is associated with a unique number (of type
- * types::manifol_id) that is used to identify which manifold object
+ * types::manifold_id) that is used to identify which manifold object
  * is responsible to generate new points when the mesh is refined.
  *
  * By default, all manifold indicators of a mesh are set to

@@ -240,7 +240,7 @@
  * finite element programs, but appear there as well. These classes
  * are all listed in the Classes and Namespaces views reachable from
  * the menu bar at the top of this page, and are also grouped into
- * modules of their own (see the <a href="modules.html">Modules linke</a>
+ * modules of their own (see the <a href="modules.html">Modules link</a>
  * at the top of this page).
  *
  * We provide the Doxygen tag file for those of you who would like to directly link the
