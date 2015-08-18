@@ -95,11 +95,17 @@ CHECK_CXX_SOURCE_RUNS("
   " 
   _HAVE_FP_EXCEPTIONS)
 
-IF(_HAVE_FP_EXCEPTIONS)
-  MESSAGE(STATUS "Checking for Floating Point Exception macros -- Success")
-  SET(DEAL_II_HAVE_FP_EXCEPTIONS 1)
-ELSE()
-  MESSAGE(STATUS "Checking for Floating Point Exception macros -- Failed")
+
+SET(DEAL_II_HAVE_FP_EXCEPTIONS ON CACHE BOOL "If ON, floating point exception are raised in debug mode when running the testsuite.")
+
+IF (DEAL_II_HAVE_FP_EXCEPTIONS)
+  IF(_HAVE_FP_EXCEPTIONS)
+    MESSAGE(STATUS "Checking for Floating Point Exception macros -- Success")
+    # nothing to set here -- DEAL_II_HAVE_FP_EXCEPTIONS is already ON
+  ELSE()
+    MESSAGE(STATUS "Checking for Floating Point Exception macros -- Failed")
+    SET(DEAL_II_HAVE_FP_EXCEPTIONS OFF CACHE BOOL "" FORCE)
+  ENDIF()
 ENDIF()
 
 
