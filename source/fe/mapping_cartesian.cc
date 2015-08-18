@@ -51,6 +51,7 @@ MappingCartesian<dim, spacedim>::InternalData::memory_consumption () const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption (length) +
+          MemoryConsumption::memory_consumption (volume_element) +
           MemoryConsumption::memory_consumption (quadrature_points));
 }
 
