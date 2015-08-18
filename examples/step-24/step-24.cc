@@ -54,8 +54,8 @@
 #include <fstream>
 #include <iostream>
 
-// This is the only new one: We will need a library function defined in a
-// class GridTools that computes the minimal cell diameter.
+// This is the only new one: We will need a library function defined in the
+// namespace GridTools that computes the minimal cell diameter.
 #include <deal.II/grid/grid_tools.h>
 
 // The last step is as in all previous programs:

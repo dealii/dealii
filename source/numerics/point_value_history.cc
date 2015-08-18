@@ -291,7 +291,7 @@ void PointValueHistory<dim>
   // GridTools::find_active_cell_around_point
   // to obtain a cell to search is an
   // option for these methods, but currently
-  // the GridTools method does not cater for
+  // the GridTools function does not cater for
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
   for (unsigned int component = 0;

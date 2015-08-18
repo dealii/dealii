@@ -65,7 +65,7 @@ the hp namespace. This namespace provides classes that handle
 $hp$ discretizations, assembling matrices and vectors, and other
 tasks. We will get to know many of them further down below. In
 addition, many of the functions in the DoFTools, and VectorTools
-classes accept $hp$ objects in addition to the non-$hp$ ones. Much of
+namespaces accept $hp$ objects in addition to the non-$hp$ ones. Much of
 the $hp$ implementation is also discussed in the @ref hp documentation
 module and the links found there.
 

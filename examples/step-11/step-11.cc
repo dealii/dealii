@@ -138,11 +138,11 @@ namespace Step11
     // Next task is to construct the object representing the constraint that
     // the mean value of the degrees of freedom on the boundary shall be
     // zero. For this, we first want a list of those nodes which are actually
-    // at the boundary. The <code>DoFTools</code> class has a function that
-    // returns an array of Boolean values where <code>true</code> indicates
-    // that the node is at the boundary. The second argument denotes a mask
-    // selecting which components of vector valued finite elements we want to
-    // be considered. This sort of information is encoded using the
+    // at the boundary. The <code>DoFTools</code> namespace has a function
+    // that returns an array of Boolean values where <code>true</code>
+    // indicates that the node is at the boundary. The second argument denotes
+    // a mask selecting which components of vector valued finite elements we
+    // want to be considered. This sort of information is encoded using the
     // ComponentMask class (see also @ref GlossComponentMask). Since we have a
     // scalar finite element anyway, this mask in reality should have only one
     // entry with a <code>true</code> value. However, the ComponentMask class
@@ -289,7 +289,7 @@ namespace Step11
     // mapping; or you want to assembled the matrix with a coefficient in the
     // Laplace operator. For this reason, there are quite a large number of
     // variants of these functions in the <code>MatrixCreator</code> and
-    // <code>MatrixTools</code> classes. Whenever you need a slightly
+    // <code>MatrixTools</code> namespaces. Whenever you need a slightly
     // different version of these functions than the ones called above, it is
     // certainly worthwhile to take a look at the documentation and to check
     // whether something fits your needs.

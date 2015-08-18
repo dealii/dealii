@@ -73,8 +73,8 @@
 #include <deal.II/lac/petsc_precondition.h>
 // And in addition, we need some algorithms for partitioning our meshes so
 // that they can be efficiently distributed across an MPI network. The
-// partitioning algorithm is implemented in the <code>GridTools</code> class,
-// and we need an additional include file for a function in
+// partitioning algorithm is implemented in the <code>GridTools</code>
+// namespace, and we need an additional include file for a function in
 // <code>DoFRenumbering</code> that allows to sort the indices associated with
 // degrees of freedom so that they are numbered according to the subdomain
 // they are associated with:

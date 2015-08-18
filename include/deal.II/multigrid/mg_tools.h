@@ -42,9 +42,9 @@ template <typename number> class BlockSparseMatrix;
 /**
  * This is a collection of functions operating on, and manipulating the
  * numbers of degrees of freedom in a multilevel triangulation. It is similar
- * in purpose and function to the @p DoFTools class, but operates on levels of
- * DoFHandler objects. See there and the documentation of the member functions
- * for more information.
+ * in purpose and function to the @p DoFTools namespace, but operates on
+ * levels of DoFHandler objects. See there and the documentation of the member
+ * functions for more information.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005, 2012
  */
