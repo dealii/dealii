@@ -166,10 +166,10 @@ private:
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Length of the cell in different coordinate directions,
-     * <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
+     * Extents of the last cell we have seen in the coordinate directions,
+     * i.e., <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
      */
-    mutable Tensor<1,dim> length;
+    mutable Tensor<1,dim> cell_extents;
 
     /**
      * The volume element
