@@ -32,6 +32,9 @@
 #include <sstream>
 #include <iomanip>
 
+#include <cfenv>
+
+
 // silence extra diagnostics in the testsuite
 #ifdef DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -430,6 +433,22 @@ struct SwitchOffStacktrace
     deal_II_exceptions::suppress_stacktrace_in_exceptions ();
   }
 } deal_II_stacktrace_dummy;
+
+
+
+/* Enable floating point exceptions in debug mode and if we have
+   detected that they are usable: */
+
+struct EnableFPE
+{
+  EnableFPE ()
+  {
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+    // enable floating point exceptions
+    feenableexcept(FE_DIVBYZERO|FE_INVALID);
+#endif
+    }
+} deal_II_enable_fpe;
 
 
 /* Set grainsizes for parallel mode smaller than they would otherwise be.

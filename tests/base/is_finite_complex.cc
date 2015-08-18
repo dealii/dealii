@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <fenv.h>
 
 
 template <typename T>
@@ -69,6 +70,16 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
+
+  // the isnan() function (which we call in is_finite()) helpfully
+  // produces a floating point exception when called with a signalling
+  // NaN if FP exceptions are on. this of course makes it completely
+  // unusable since we can no longer detect whether something is a
+  // NaN. that said, to make the test work in these cases, simply
+  // switch off floating point exceptions for invalid arguments
+#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  fedisableexcept(FE_INVALID);
+#endif
 
   check<std::complex<double> > ();
   check<std::complex<long double> > ();
