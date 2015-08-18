@@ -699,7 +699,7 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    maybe_compute_q_points (const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+    maybe_compute_q_points (const typename QProjector<dim>::DataSetDescriptor                 data_set,
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
                             std::vector<Point<spacedim> >                                     &quadrature_points)
     {
@@ -731,7 +731,7 @@ namespace internal
     template <int dim, int spacedim>
     void
     maybe_update_Jacobians (const CellSimilarity::Similarity                                   cell_similarity,
-                            const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+                            const typename dealii::QProjector<dim>::DataSetDescriptor          data_set,
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -808,7 +808,7 @@ namespace internal
     template <int dim, int spacedim>
     void
     maybe_update_jacobian_grads (const CellSimilarity::Similarity                                   cell_similarity,
-                                 const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+                                 const typename QProjector<dim>::DataSetDescriptor                  data_set,
                                  const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
                                  std::vector<DerivativeForm<2,dim,spacedim> >                      &jacobian_grads)
     {
@@ -1181,7 +1181,7 @@ namespace internal
                             const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                             const unsigned int                                                 face_no,
                             const unsigned int                                                 subface_no,
-                            const typename dealii::MappingQ1<dim,spacedim>::DataSetDescriptor  data_set,
+                            const typename QProjector<dim>::DataSetDescriptor                  data_set,
                             const Quadrature<dim-1>                                           &quadrature,
                             const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
                             internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)

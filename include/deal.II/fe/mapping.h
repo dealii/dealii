@@ -554,9 +554,50 @@ protected:
   requires_update_flags (const UpdateFlags update_flags) const = 0;
 
   /**
-   * Prepare internal data structures and fill in values independent of the
-   * cell. See the documentation of Mapping::InternalDataBase for more
-   * information on the purpose of this function.
+   * Create and return a pointer to an object into which mappings can
+   * store data that only needs to be computed once but that can then
+   * be used whenever the mapping is applied to a concrete cell (e.g.,
+   * in the various transform() functions, as well as in the
+   * fill_fe_values(), fill_fe_face_values() and fill_fe_subface_values()
+   * that form the interface of mappings with the FEValues class).
+   *
+   * Derived classes will return pointers to objects of a type
+   * derived from Mapping::InternalDataBase (see there for more information)
+   * and may pre-compute some information already (in accordance with what will
+   * be asked of the mapping in the future, as specified by the update
+   * flags) and for the given quadrature object. Subsequent calls to
+   * transform() or fill_fe_values() and friends will then receive back the
+   * object created here (with the same set of update flags and for the
+   * same quadrature object). Derived classes can therefore pre-compute
+   * some information in their get_data() function and store it in
+   * the internal data object.
+   *
+   * The mapping classes do not keep track of the objects created by
+   * this function. Ownership will therefore rest with the caller.
+   *
+   * @param update_flags A set of flags that define what is expected of
+   *   the mapping class in future calls to transform() or the
+   *   fill_fe_values() group of functions. This set of flags may
+   *   contain flags that mappings do not know how to deal with
+   *   (e.g., for information that is in fact computed by the
+   *   finite element classes, such as UpdateFlags::update_values).
+   *   Derived classes will need to store these flags, or at least that
+   *   subset of flags that will require the mapping to perform any
+   *   actions in fill_fe_values(), in InternalDataBase::update_each.
+   * @param quadrature The quadrature object for which mapping
+   *   information will have to be computed. This includes the
+   *   locations and weights of quadrature points.
+   * @return A pointer to a newly created object of type
+   *   InternalDataBase (or a derived class). Ownership of this
+   *   object passes to the calling function.
+   *
+   * @note C++ allows that virtual functions in derived classes
+   *   may return pointers to objects not of type InternalDataBase
+   *   but in fact pointers to objects of classes <i>derived</i>
+   *   from InternalDataBase. (This feature is called "covariant return
+   *   types".) This is useful in some contexts where the calling
+   *   is within the derived class and will immediately make use
+   *   of the returned object, knowing its real (derived) type.
    */
   virtual
   InternalDataBase *
@@ -564,10 +605,34 @@ protected:
             const Quadrature<dim> &quadrature) const = 0;
 
   /**
-   * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell. See the documentation of
-   * Mapping::InternalDataBase for more
-   * information on the purpose of this function.
+   * Like get_data(), but in preparation for later calls to
+   * transform() or fill_fe_face_values() that will need
+   * information about mappings from the reference face to a
+   * face of a concrete cell.
+   *
+   * @param update_flags A set of flags that define what is expected of
+   *   the mapping class in future calls to transform() or the
+   *   fill_fe_values() group of functions. This set of flags may
+   *   contain flags that mappings do not know how to deal with
+   *   (e.g., for information that is in fact computed by the
+   *   finite element classes, such as UpdateFlags::update_values).
+   *   Derived classes will need to store these flags, or at least that
+   *   subset of flags that will require the mapping to perform any
+   *   actions in fill_fe_values(), in InternalDataBase::update_each.
+   * @param quadrature The quadrature object for which mapping
+   *   information will have to be computed. This includes the
+   *   locations and weights of quadrature points.
+   * @return A pointer to a newly created object of type
+   *   InternalDataBase (or a derived class). Ownership of this
+   *   object passes to the calling function.
+   *
+   * @note C++ allows that virtual functions in derived classes
+   *   may return pointers to objects not of type InternalDataBase
+   *   but in fact pointers to objects of classes <i>derived</i>
+   *   from InternalDataBase. (This feature is called "covariant return
+   *   types".) This is useful in some contexts where the calling
+   *   is within the derived class and will immediately make use
+   *   of the returned object, knowing its real (derived) type.
    */
   virtual
   InternalDataBase *
@@ -575,10 +640,34 @@ protected:
                  const Quadrature<dim-1> &quadrature) const = 0;
 
   /**
-   * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell. See the documentation
-   * of Mapping::InternalDataBase for more
-   * information on the purpose of this function.
+   * Like get_data() and get_face_data(), but in preparation for later calls to
+   * transform() or fill_fe_subface_values() that will need
+   * information about mappings from the reference face to a
+   * child of a face (i.e., subface) of a concrete cell.
+   *
+   * @param update_flags A set of flags that define what is expected of
+   *   the mapping class in future calls to transform() or the
+   *   fill_fe_values() group of functions. This set of flags may
+   *   contain flags that mappings do not know how to deal with
+   *   (e.g., for information that is in fact computed by the
+   *   finite element classes, such as UpdateFlags::update_values).
+   *   Derived classes will need to store these flags, or at least that
+   *   subset of flags that will require the mapping to perform any
+   *   actions in fill_fe_values(), in InternalDataBase::update_each.
+   * @param quadrature The quadrature object for which mapping
+   *   information will have to be computed. This includes the
+   *   locations and weights of quadrature points.
+   * @return A pointer to a newly created object of type
+   *   InternalDataBase (or a derived class). Ownership of this
+   *   object passes to the calling function.
+   *
+   * @note C++ allows that virtual functions in derived classes
+   *   may return pointers to objects not of type InternalDataBase
+   *   but in fact pointers to objects of classes <i>derived</i>
+   *   from InternalDataBase. (This feature is called "covariant return
+   *   types".) This is useful in some contexts where the calling
+   *   is within the derived class and will immediately make use
+   *   of the returned object, knowing its real (derived) type.
    */
   virtual
   InternalDataBase *
@@ -749,7 +838,7 @@ protected:
 public:
 
   /**
-   * @name Functions usable by finite element fields to map points and tensors
+   * @name Functions to transform tensors from reference to real coordinates
    * @{
    */
 
