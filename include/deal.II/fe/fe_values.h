@@ -1346,7 +1346,7 @@ namespace internal
  * recommended to give <b>all</b> needed update flags to FEValues.
  *
  * The mechanisms by which this class works is also discussed on the page on
- * @ref UpdateFlagsEssay.
+ * @ref UpdateFlags.
  *
  * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001

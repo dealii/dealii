@@ -258,19 +258,30 @@ public:
   Mapping<dim,spacedim> *clone () const = 0;
 
   /**
-   * Return the mapped vertices of a cell. These values are not equal to the
-   * vertex coordinates stored by the triangulation for MappingQEulerian and
-   * MappingQ1Eulerian.
+   * Return the mapped vertices of a cell.
+   *
+   * Most of the time, these values will simply be the coordinates of the
+   * vertices of a cell as returned by <code>cell-@>vertex(v)</code> for
+   * vertex <code>v</code>, i.e., information stored by the triangulation.
+   * However, there are also mappings that add displacements or choose
+   * completely different locations, e.g., MappingQEulerian,
+   * MappingQ1Eulerian, or MappingFEField.
+   *
+   * The default implementation of this function simply returns the
+   * information stored by the triangulation, i.e.,
+   * <code>cell-@>vertex(v)</code>.
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
-   * Returns whether the mapping preserves vertex locations, i.e., whether the
+   * Returns whether the mapping preserves vertex locations. In other
+   * words, this function returns whether the
    * mapped location of the reference cell vertices (given by
    * GeometryInfo::unit_cell_vertex()) equals the result of
-   * <code>cell-@>vertex()</code>.
+   * <code>cell-@>vertex()</code> (i.e., information stored by the
+   * triangulation).
    *
    * For example, implementations in derived classes return @p true for
    * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
@@ -536,8 +547,7 @@ protected:
    * instead, from which the determinant can also be computed -- but
    * this does not take away from the instructiveness of the example.)
    *
-   * See
-   * @ref UpdateFlagsEssay.
+   * @see UpdateFlags
    */
   virtual
   UpdateFlags

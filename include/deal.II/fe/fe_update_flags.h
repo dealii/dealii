@@ -84,7 +84,7 @@ template <int,int> class FiniteElement;
  *
  * The mechanism by which all this is accomplished is also discussed on the
  * page on
- * @ref UpdateFlagsEssay.
+ * @ref UpdateFlags.
  */
 enum UpdateFlags
 {
