@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <fstream>

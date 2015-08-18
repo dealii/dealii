@@ -24,6 +24,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
