@@ -17,7 +17,7 @@
  @defgroup Iterators Iterators on mesh-like containers
  @{
 
-deal.II has several classes which are understood conceptionally as
+deal.II has several classes which are understood conceptually as
 meshes. Apart from the obvious Triangulation, these are, for example,
 DoFHandler and hp::DoFHandler. All of those define a set
 of iterators, allowing the user to traverse the whole mesh, i.e. the
@@ -78,9 +78,9 @@ quadtree (in 2d), or an octree (in 3d). The collection of these trees
 emanating from the cells of the coarse mesh then constitutes the forest that
 completely describes the triangulation, including all of its active and
 inactive cells. In particular, the active cells are those terminal nodes in
-the tree that have no decendants, i.e. cells which are not further
+the tree that have no descendants, i.e. cells which are not further
 refined. Correspondingly, inactive cells correspond to nodes in the tree with
-descendents, i.e. cells that are further refined.
+descendants, i.e. cells that are further refined.
 
 A triangulation contains forests for lines (each of which may have 2
 children), quads (each with possibly four children), and hexes (each with no
@@ -229,7 +229,7 @@ iterator are
 @endcode
 
 Since dereferencing iterators yields accessor objects, these calls are to
-member functions <code>Accesor::vertex()</code>,
+member functions <code>Accessor::vertex()</code>,
 <code>Accessor::child()</code> etc. These in turn figure out the relevant data
 from the various data structures that store this data. How this is actually
 done and what data structures are used is not really of concern to authors of

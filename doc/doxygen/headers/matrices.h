@@ -219,7 +219,7 @@ class MATRIX
  * <h4>Dynamic block sparsity patterns</h4>
  *
  * The class BlockDynamicSparsityPattern implements an array of dynamic
- * sparsity patterns for contructing block matrices. See the documentation and
+ * sparsity patterns for constructing block matrices. See the documentation and
  * step-22 for more information.
  *
  * @ingroup Matrices

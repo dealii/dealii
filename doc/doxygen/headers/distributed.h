@@ -33,7 +33,7 @@
  * - Each machine keeps the entire mesh and DoF handler locally, but
  *   only a share of the global matrix, sparsity pattern, and solution
  *   vector is stored on each machine.
- * - The mesh and DoFhandler are also distributed, i.e. each processor
+ * - The mesh and DoF handler are also distributed, i.e. each processor
  *   stores only a share of the cells and degrees of freedom. No
  *   processor has knowledge of the entire mesh, matrix, or solution,
  *   and in fact problems solved in this mode are usually so large
@@ -344,7 +344,7 @@
  * computations, there is also no way to merge the results of all
  * these local computations on a single machine, i.e. each processor
  * has to be self-sufficient. For example, each processor has to
- * generate its own parallel output files that have to be visualizated
+ * generate its own parallel output files that have to be visualized
  * by a program that can deal with multiple input files rather than
  * merging the results of calling DataOut to a single processor before
  * generating a single output file. The latter can be achieved, for

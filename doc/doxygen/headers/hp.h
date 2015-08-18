@@ -48,7 +48,7 @@
  * sufficient, but on another cell where a Q3 element is used, this would lead
  * to underintegration and we should use a QGauss(4) formula instead. Just as
  * above, there exists a class hp::QCollection that acts as a collection of
- * quadrature formulas
+ * quadrature formulas.
  *
  * Finally, one may want to use different orders for the boundary
  * approximation for cells with different orders for the finite element. The
@@ -78,7 +78,7 @@
  * 
  * This way, one can add elements of polynomial degree 1 through 4 to the
  * collection. It is not necessary to retain the added object: the collection
- * makes a coyp of it, it does not only store a pointer to the given finite
+ * makes a copy of it, it does not only store a pointer to the given finite
  * element object. This same observation also holds for the other collection
  * classes.
  *
