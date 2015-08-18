@@ -45,8 +45,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
-MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::InternalData (const FiniteElement<dim,spacedim> &fe,
-    const ComponentMask mask)
+MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::
+InternalData (const FiniteElement<dim,spacedim> &fe,
+              const ComponentMask mask)
   :
   n_shape_functions (fe.dofs_per_cell),
   mask (mask),
@@ -58,11 +59,81 @@ MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::InternalData (const Finite
 
 template<int dim, int spacedim, class VECTOR, class DH>
 std::size_t
-MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::memory_consumption () const
+MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::
+memory_consumption () const
 {
   Assert (false, ExcNotImplemented());
   return 0;
 }
+
+
+
+template<int dim, int spacedim, class DH, class VECTOR>
+double &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::
+shape (const unsigned int qpoint,
+       const unsigned int shape_nr)
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_values.size()));
+  return shape_values [qpoint*n_shape_functions + shape_nr];
+}
+
+
+template<int dim, int spacedim, class DH, class VECTOR>
+const Tensor<1,dim> &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::
+derivative (const unsigned int qpoint,
+            const unsigned int shape_nr) const
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_derivatives.size()));
+  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
+
+
+template<int dim, int spacedim, class DH, class VECTOR>
+Tensor<1,dim> &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::
+derivative (const unsigned int qpoint,
+            const unsigned int shape_nr)
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_derivatives.size()));
+  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
+
+template <int dim, int spacedim, class DH, class VECTOR>
+const Tensor<2,dim> &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::
+second_derivative (const unsigned int qpoint,
+                   const unsigned int shape_nr) const
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_second_derivatives.size()));
+  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
+
+
+template <int dim, int spacedim, class DH, class VECTOR>
+Tensor<2,dim> &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::
+second_derivative (const unsigned int qpoint,
+                   const unsigned int shape_nr)
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_second_derivatives.size()));
+  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
@@ -96,6 +167,30 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const MappingFEField<dim
   fe_mask(mapping.fe_mask),
   fe_to_real(mapping.fe_to_real)
 {}
+
+
+
+template<int dim, int spacedim, class DH, class VECTOR>
+inline
+const double &
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
+    const unsigned int shape_nr) const
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
+         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+                       shape_values.size()));
+  return shape_values [qpoint*n_shape_functions + shape_nr];
+}
+
+
+
+template <int dim, int spacedim, class DH, class VECTOR>
+bool
+MappingFEField<dim,spacedim,DH,VECTOR>::preserves_vertex_locations () const
+{
+  return false;
+}
+
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
