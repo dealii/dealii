@@ -56,6 +56,14 @@ MappingCartesian<dim, spacedim>::InternalData::memory_consumption () const
 
 
 
+template <int dim, int spacedim>
+bool
+MappingCartesian<dim,spacedim>::preserves_vertex_locations () const
+{
+  return true;
+}
+
+
 
 template<int dim, int spacedim>
 UpdateFlags
