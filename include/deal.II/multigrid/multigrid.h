@@ -129,8 +129,8 @@ public:
    * the multilevel vector #defect is filled with the residual of an outer
    * defect correction scheme. This is usually taken care of by
    * PreconditionMG). After vcycle(), the result is in the multilevel vector
-   * #solution. See <tt>copy_*_mg</tt> in class MGTools if you want to use
-   * these vectors yourself.
+   * #solution. See <tt>copy_*_mg</tt> in the MGTools namespace if you want to
+   * use these vectors yourself.
    *
    * The actual work for this function is done in level_v_step().
    */

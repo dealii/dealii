@@ -285,7 +285,7 @@ namespace Step25
   // and refines it several times. Also, all matrix and vector members of the
   // <code>SineGordonProblem</code> class are initialized to their appropriate
   // sizes once the degrees of freedom have been assembled. Like step-24, we
-  // use the <code>MatrixCreator</code> class to generate a mass matrix $M$
+  // use <code>MatrixCreator</code> functions to generate a mass matrix $M$
   // and a Laplace matrix $A$ and store them in the appropriate variables for
   // the remainder of the program's life.
   template <int dim>

@@ -193,11 +193,6 @@
                           dof_handler,
                           hanging_node_constraints);
  * @endcode
- * Note that DoFTools::make_hanging_node_constraints is a static member
- * function and so does not need an object of type DoFTools to work on.
- * (In fact, DoFTools has only static member functions and could as well be
- * a namespace instead of class; that it is a class at the time of writing
- * this is mostly a historic relic.)
  *
  * Similarly, if we want to call a member function on a different task, we can
  * do so by specifying the object on which to call the function as first

@@ -65,10 +65,6 @@ namespace GridTools
  * versions, there are sections in this global documentation stating some
  * commonalities.
  *
- * All member functions are static, so there is no need to create an object of
- * class DoFTools.
- *
- *
  * <h3>Setting up sparsity patterns</h3>
  *
  * When assembling system matrices, the entries are usually of the form
@@ -108,7 +104,7 @@ namespace GridTools
  * interior to the domain, the result would be DoFHandler::invalid_dof_index.
  * We need this mapping, for example, to build the mass matrix on the boundary
  * (for this, see make_boundary_sparsity_pattern() function, the corresponding
- * section below, as well as the MatrixCreator class documentation).
+ * section below, as well as the MatrixCreator namespace documentation).
  *
  * Actually, there are two map_dof_to_boundary_indices() functions, one
  * producing a numbering for all boundary degrees of freedom and one producing
@@ -160,14 +156,14 @@ namespace GridTools
  * are on the boundary (i.e. much smaller matrices, in which we do not even
  * build the large zero block that stems from the fact that most degrees of
  * freedom have no support on the boundary of the domain). The first of these
- * tasks is done by the map_dof_to_boundary_indices() function of this class
- * (described above).
+ * tasks is done by the map_dof_to_boundary_indices() function (described
+ * above).
  *
  * The second part requires us first to build a sparsity pattern for the
  * couplings between boundary nodes, and then to actually build the components
  * of this matrix. While actually computing the entries of these small
- * boundary matrices is discussed in the MatrixCreator class, the creation of
- * the sparsity pattern is done by the create_boundary_sparsity_pattern()
+ * boundary matrices is discussed in the MatrixCreator namespace, the creation
+ * of the sparsity pattern is done by the create_boundary_sparsity_pattern()
  * function. For its work, it needs to have a numbering of all those degrees
  * of freedom that are on those parts of the boundary that we are interested
  * in. You can get this from the map_dof_to_boundary_indices() function. It
