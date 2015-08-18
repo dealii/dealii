@@ -741,7 +741,7 @@ namespace DoFTools
    * the fine grid are not touched.
    *
    * The output of this function is a compressed format that can be given to
-   * the @p reinit functions of the SparsityPattern ad SparseMatrix classes.
+   * the @p reinit functions of the SparsityPattern and SparseMatrix classes.
    */
   template <int dim, int spacedim>
   void
