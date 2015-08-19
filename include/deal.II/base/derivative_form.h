@@ -63,9 +63,9 @@ public:
   DerivativeForm ();
 
   /**
-   * Constructor from a second order tensor.
+   * Constructor from a tensor.
    */
-  DerivativeForm (const Tensor<2,dim,Number> &);
+  DerivativeForm (const Tensor<order+1,dim,Number> &);
 
   /**
    * Read-Write access operator.
@@ -86,7 +86,7 @@ public:
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const Tensor<2,dim, Number> &);
+  DerivativeForm   &operator = (const Tensor<order+1,dim, Number> &);
 
   /**
    * Assignment operator.
@@ -94,10 +94,11 @@ public:
   DerivativeForm   &operator = (const Tensor<1,dim, Number> &);
 
   /**
-   * Converts a DerivativeForm <1,dim, dim> to Tensor<2,dim,Number>. If the
-   * derivative is the Jacobian of F, then Tensor[i] = grad(F^i).
+   * Converts a DerivativeForm <order,dim,dim> to Tensor<order+1,dim,Number>.
+   * In particular, if order==1 and the derivative is the Jacobian of F, then
+   * Tensor[i] = grad(F^i).
    */
-  operator Tensor<2,dim,Number>() const;
+  operator Tensor<order+1,dim,Number>() const;
 
   /**
    * Converts a DerivativeForm <1, dim, 1> to Tensor<1,dim,Number>.
@@ -180,11 +181,11 @@ DerivativeForm<order, dim, spacedim, Number>::DerivativeForm  ()
 
 template <int order, int dim, int spacedim, typename Number>
 inline
-DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(const Tensor<2,dim,Number> &T)
+DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(const Tensor<order+1,dim,Number> &T)
 {
-  Assert( (dim == spacedim) && (order==1),
-          ExcMessage("Only allowed for square tensors."));
-  if ((dim == spacedim) && (order==1))
+  Assert( (dim == spacedim),
+          ExcMessage("Only allowed for forms with dim==spacedim."));
+  if (dim == spacedim)
     for (unsigned int j=0; j<dim; ++j)
       (*this)[j] = T[j];
 }
@@ -207,12 +208,12 @@ operator = (const DerivativeForm<order, dim, spacedim, Number> &ta)
 template <int order, int dim, int spacedim, typename Number>
 inline
 DerivativeForm<order, dim, spacedim, Number> &DerivativeForm<order, dim, spacedim, Number>::
-operator = (const Tensor<2,dim,Number> &ta)
+operator = (const Tensor<order+1,dim,Number> &ta)
 {
-  Assert( (dim == spacedim) && (order==1),
-          ExcMessage("Only allowed for square tensors."));
+  Assert( (dim == spacedim),
+          ExcMessage("Only allowed when dim==spacedim."));
 
-  if ((dim == spacedim) && (order==1))
+  if (dim == spacedim)
     for (unsigned int j=0; j<dim; ++j)
       (*this)[j] = ta[j];
   return *this;
@@ -276,14 +277,14 @@ DerivativeForm<order, dim, spacedim, Number>::operator Tensor<1,dim,Number>() co
 
 template <int order, int dim, int spacedim, typename Number>
 inline
-DerivativeForm<order, dim, spacedim, Number>::operator Tensor<2,dim,Number>() const
+DerivativeForm<order, dim, spacedim, Number>::operator Tensor<order+1,dim,Number>() const
 {
-  Assert( (dim == spacedim) && (order==1),
-          ExcMessage("Only allowed for square tensors."));
+  Assert( (dim == spacedim),
+          ExcMessage("Only allowed when dim==spacedim."));
 
-  Tensor<2,dim,Number> t;
+  Tensor<order+1,dim,Number> t;
 
-  if ((dim == spacedim) && (order==1))
+  if (dim == spacedim)
     for (unsigned int j=0; j<dim; ++j)
       t[j] = (*this)[j];
 
