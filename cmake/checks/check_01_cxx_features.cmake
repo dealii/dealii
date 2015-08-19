@@ -103,6 +103,10 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
+    # Some versions of clang are feature complete but do not have debug
+    # information.
+    PUSH_CMAKE_REQUIRED("-g")
+
     #
     # This test does not guarantee full C++14 support, but virtually every
     # compiler with some C++14 support implements this.
