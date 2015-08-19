@@ -263,11 +263,6 @@ namespace ChunkSparseMatrixIterators
      */
     template <typename, bool>
     friend class Iterator;
-
-    /**
-     * Make the inner reference class a friend if the compiler has a bug and
-     * requires this.
-     */
   };
 
 
