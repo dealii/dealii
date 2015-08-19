@@ -134,6 +134,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: Generalized conversion between Tensor<order+1,dim> and
+  DerivativeForm<order,dim,dim> to general order using converting constructor
+  and assignment operator.
+  <br>
+  (Maien Hamed, 2015/08/01-2015/08/09)
+  </li>
+
   <li> Changed: The function Vector::add() that adds a scalar number to all
   elements of a vector has been deprecated. The same is true for the
   Vector::ratio() function, and for the corresponding functions in other
