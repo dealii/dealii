@@ -233,6 +233,9 @@ protected:
              ||
              (mapping_type == mapping_nedelec))
           data->untransformed_shape_grads.resize(n_q_points);
+
+        if ( mapping_type != mapping_none )
+          data->transformed_jacobian_grads.resize (n_q_points);
       }
 
     // if second derivatives through
@@ -357,6 +360,8 @@ protected:
     mutable std::vector<Tensor<1, spacedim> > transformed_shape_values;
     mutable std::vector<Tensor<2, spacedim > > transformed_shape_grads;
     mutable std::vector<Tensor<2, dim > > untransformed_shape_grads;
+    // pushed forward jacobian gradients
+    mutable std::vector<Tensor<3, spacedim > > transformed_jacobian_grads;
   };
 
   /**

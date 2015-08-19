@@ -971,6 +971,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
                   }
 
               }
+      return;
     }
     default:
       Assert(false, ExcNotImplemented());

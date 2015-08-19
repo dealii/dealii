@@ -1391,6 +1391,7 @@ MappingQ1<dim,spacedim>::transform (
                   }
 
               }
+      return;
     }
     default:
       Assert(false, ExcNotImplemented());

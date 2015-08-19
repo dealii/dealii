@@ -134,6 +134,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The computation of gradients in FE_PolyTensor and its derived classes (in particular in
+  FE_RaviartThomas and FE_Nedelec) forgot to account for terms that appear on non-affine
+  cells. Consequently, the computed gradients did not match the actual derivatives of the values
+  these elements report. This is now fixed.
+  <br>
+  (Maien Hamed, 2015/08/18-2015/08/20)
+  </li>
+
   <li> Improved: Generalized conversion between Tensor<order+1,dim> and
   DerivativeForm<order,dim,dim> to general order using converting constructor
   and assignment operator.
