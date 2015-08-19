@@ -1006,7 +1006,7 @@ namespace internal
     Iterator<BlockVectorType,Constness>::
     Iterator (const Iterator<BlockVectorType,!Constness> &c)
       :
-      parent (const_cast<BlockVectorType *>(c.parent)),
+      parent (c.parent),
       global_index (c.global_index),
       current_block (c.current_block),
       index_within_block (c.index_within_block),
