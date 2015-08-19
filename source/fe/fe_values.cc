@@ -3401,12 +3401,16 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
-  // then get objects into which the
-  // FE and the Mapping can store
-  // intermediate data used across
-  // calls to reinit
-  this->mapping_data.reset (this->mapping->get_data(flags, quadrature));
+  // then get objects into which the FE and the Mapping can store
+  // intermediate data used across calls to reinit. we can do this in parallel
+  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
+  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
+                                        *this->mapping,
+                                        flags,
+                                        quadrature);
+
   this->fe_data.reset (this->fe->get_data(flags, *this->mapping, quadrature));
+  this->mapping_data.reset (mapping_get_data.return_value());
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
@@ -3630,12 +3634,16 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
-  // then get objects into which the
-  // FE and the Mapping can store
-  // intermediate data used across
-  // calls to reinit
-  this->mapping_data.reset (this->mapping->get_face_data(flags, this->quadrature));
+  // then get objects into which the FE and the Mapping can store
+  // intermediate data used across calls to reinit. this can be done in parallel
+  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
+  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_face_data,
+                                        *this->mapping,
+                                        flags,
+                                        this->quadrature);
+
   this->fe_data.reset (this->fe->get_face_data(flags, *this->mapping, this->quadrature));
+  this->mapping_data.reset (mapping_get_data.return_value());
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
@@ -3775,14 +3783,19 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
-  // then get objects into which the
-  // FE and the Mapping can store
-  // intermediate data used across
-  // calls to reinit
-  this->mapping_data.reset (this->mapping->get_subface_data(flags, this->quadrature));
+  // then get objects into which the FE and the Mapping can store
+  // intermediate data used across calls to reinit. this can be done
+  // in parallel
+  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
+  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_subface_data,
+                                        *this->mapping,
+                                        flags,
+                                        this->quadrature);
+
   this->fe_data.reset (this->fe->get_subface_data(flags,
                                                   *this->mapping,
                                                   this->quadrature));
+  this->mapping_data.reset (mapping_get_data.return_value());
 
   // initialize the base classes
   internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
