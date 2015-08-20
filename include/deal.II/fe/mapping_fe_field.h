@@ -115,89 +115,6 @@ public:
    */
   MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
 
-
-  /**
-   * Transforms the point @p p on the unit cell to the point @p p_real on the
-   * real cell @p cell and returns @p p_real.
-   */
-  virtual Point<spacedim>
-  transform_unit_to_real_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<dim>                                 &p) const;
-
-  /**
-   * Transforms the point @p p on the real cell to the point @p p_unit on the
-   * unit cell @p cell and returns @p p_unit.
-   *
-   * Uses Newton iteration and the @p transform_unit_to_real_cell function.
-   *
-   * In the codimension one case, this function returns the normal projection
-   * of the real point @p p on the curve or surface identified by the @p cell.
-   */
-  virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const;
-
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
-  virtual void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-             VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
-  virtual void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > >    input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  virtual
-  void
-  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-
-
-  /**
-   * Return the degree of the mapping, i.e. the value which was passed to the
-   * constructor.
-   */
-  unsigned int get_degree () const;
-
-  /**
-   * Return the ComponentMask of the mapping, i.e. which components to use for
-   * the mapping.
-   */
-  ComponentMask get_component_mask () const;
-
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
@@ -213,57 +130,94 @@ public:
   virtual
   bool preserves_vertex_locations () const;
 
+
+  /**
+   * @name Mapping points between reference and real cells
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<spacedim>
+  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<dim>                                 &p) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                            &p) const;
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Functions to transform tensors from reference to real coordinates
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+             VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > >    input,
+             VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const MappingType type) const;
+
+  /**
+   * @}
+   */
+
+
+  /**
+   * Return the degree of the mapping, i.e. the value which was passed to the
+   * constructor.
+   */
+  unsigned int get_degree () const;
+
+  /**
+   * Return the ComponentMask of the mapping, i.e. which components to use for
+   * the mapping.
+   */
+  ComponentMask get_component_mask () const;
+
+  /**
+   * Exception
+   */
   DeclException0(ExcInactiveCell);
-
-protected:
-
-  /**
-   * This function and the next allow to generate the transform require by the
-   * virtual transform() in mapping, but unfortunately in C++ one cannot
-   * declare a virtual template function.
-   */
-  template < int rank >
-  void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                   VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                   const MappingType type) const;
-
-
-  /**
-   * see doc in transform_fields
-   */
-  template < int rank >
-  void
-  transform_differential_forms(
-    const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-    const MappingType mapping_type) const;
-
-
-protected:
-  /**
-   * Reference to the vector of shifts.
-   */
-
-  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> >euler_vector;
-  /**
-   * A FiniteElement object which is only needed in 3D, since it knows how to
-   * reorder shape functions/DoFs on non-standard faces. This is used to
-   * reorder support points in the same way. We could make this a pointer to
-   * prevent construction in 1D and 2D, but since memory and time requirements
-   * are not particularly high this seems unnecessary at the moment.
-   */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
-
-
-  /**
-   * Pointer to the DoFHandler to which the mapping vector is associated.
-   */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> >euler_dof_handler;
-
-
 
 private:
 
@@ -491,6 +445,50 @@ private:
    * @}
    */
 
+  /**
+   * This function and the next allow to generate the transform require by the
+   * virtual transform() in mapping, but unfortunately in C++ one cannot
+   * declare a virtual template function.
+   */
+  template <int rank>
+  void
+  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
+                   VectorSlice<std::vector<Tensor<rank,spacedim> > >        output,
+                   const typename Mapping<dim,spacedim>::InternalDataBase  &internal,
+                   const MappingType                                        mapping_type) const;
+
+
+  /**
+   * See transform_fields() above.
+   */
+  template <int rank>
+  void
+  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > > input,
+                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                       output,
+                               const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
+                               const MappingType                                                          mapping_type) const;
+
+
+  /**
+   * Reference to the vector of shifts.
+   */
+  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> > euler_vector;
+
+  /**
+   * A FiniteElement object which is only needed in 3D, since it knows how to
+   * reorder shape functions/DoFs on non-standard faces. This is used to
+   * reorder support points in the same way. We could make this a pointer to
+   * prevent construction in 1D and 2D, but since memory and time requirements
+   * are not particularly high this seems unnecessary at the moment.
+   */
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
+
+
+  /**
+   * Pointer to the DoFHandler to which the mapping vector is associated.
+   */
+  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> > euler_dof_handler;
+
 private:
   /**
    * Transforms a point @p p on the unit cell to the point @p p_real on the
@@ -550,7 +548,6 @@ private:
    */
   const ComponentMask fe_mask;
 
-
   /**
    * Mapping between indices in the FE space and the real space. This vector
    * contains one index for each component of the finite element space. If the
@@ -562,20 +559,12 @@ private:
    */
   std::vector<unsigned int> fe_to_real;
 
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
   void
   compute_data (const UpdateFlags      update_flags,
                 const Quadrature<dim>  &q,
                 const unsigned int     n_original_q_points,
                 InternalData           &data) const;
 
-  /**
-   * Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
-   */
   void
   compute_face_data (const UpdateFlags      update_flags,
                      const Quadrature<dim>  &q,
@@ -594,96 +583,6 @@ private:
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
-
-
-template<int dim, int spacedim, class DH, class VECTOR>
-inline
-const double &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
-    const unsigned int shape_nr) const
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
-template<int dim, int spacedim, class DH, class VECTOR>
-inline
-double &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
-    const unsigned int shape_nr)
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
-}
-
-
-template<int dim, int spacedim, class DH, class VECTOR>
-inline
-const Tensor<1,dim> &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
-    const unsigned int shape_nr) const
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
-template<int dim, int spacedim, class DH, class VECTOR>
-inline
-Tensor<1,dim> &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
-    const unsigned int shape_nr)
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-template <int dim, int spacedim, class DH, class VECTOR>
-inline
-const Tensor<2,dim> &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr) const
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_second_derivatives.size()));
-  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-
-template <int dim, int spacedim, class DH, class VECTOR>
-inline
-Tensor<2,dim> &
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr)
-{
-  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_second_derivatives.size()));
-  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
-}
-
-
-template <int dim, int spacedim, class DH, class VECTOR>
-inline
-bool
-MappingFEField<dim,spacedim,DH,VECTOR>::preserves_vertex_locations () const
-{
-  return false;
-}
 
 
 
