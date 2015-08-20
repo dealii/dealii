@@ -734,11 +734,27 @@ namespace DoFRenumbering
   hierarchical (DoFHandler<dim> &dof_handler);
 
   /**
-   * Cell-wise renumbering. This function takes the ordered set of cells in
-   * <tt>cell_order</tt>, and makes sure that all degrees of freedom in a cell
-   * with higher index are behind all degrees of freedom of a cell with lower
-   * index. The order inside a cell block will be the same as before this
-   * renumbering.
+   * Renumber degrees of freedom by cell. The function takes a vector of
+   * cell iterators (which needs to list <i>all</i> active cells of the DoF
+   * handler objects) and will give degrees of freedom new indices based
+   * on where in the given list of cells the cell is on which the degree
+   * of freedom is located. Degrees of freedom that exist at the interface
+   * between two or more cells will be numbered when they are encountered
+   * first.
+   *
+   * Degrees of freedom that are encountered first on the same cell
+   * retain their original ordering before the renumbering step.
+   *
+   * @param[in,out] dof_handler The DoFHandler whose degrees of freedom are
+   *   to be renumbered.
+   * @param[in] cell_order A vector that contains the order of the cells
+   *   that defines the order in which degrees of freedom should be
+   *   renumbered.
+   *
+   * @pre @p cell_order must have size
+   *   <code>dof_handler.get_tria().n_active_cells()</code>. Every active
+   *   cell iterator of that triangulation needs to be present in @p cell_order
+   *   exactly once.
    */
   template <class DH>
   void
@@ -746,9 +762,36 @@ namespace DoFRenumbering
              const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
-   * Computes the renumbering vector needed by the cell_wise() function. Does
-   * not perform the renumbering on the DoFHandler dofs but returns the
-   * renumbering vector.
+   * Compute a renumbering of degrees of freedom by cell. The function takes a
+   * vector of cell iterators (which needs to list <i>all</i> active cells of
+   * the DoF handler objects) and will give degrees of freedom new indices
+   * based on where in the given list of cells the cell is on which the degree
+   * of freedom is located. Degrees of freedom that exist at the interface
+   * between two or more cells will be numbered when they are encountered
+   * first.
+   *
+   * Degrees of freedom that are encountered first on the same cell
+   * retain their original ordering before the renumbering step.
+   *
+   * @param[out] renumbering A vector of length <code>dof_handler.n_dofs()</code>
+   *   that contains for each degree of freedom (in their current numbering)
+   *   their future DoF index. This vector therefore presents a
+   *   (very particular) <i>permutation</i> of the current DoF indices.
+   * @param[out] inverse_renumbering The reverse of the permutation returned
+   *   in the previous argument.
+   * @param[in] dof_handler The DoFHandler whose degrees of freedom are
+   *   to be renumbered.
+   * @param[in] cell_order A vector that contains the order of the cells
+   *   that defines the order in which degrees of freedom should be
+   *   renumbered.
+   *
+   * @pre @p cell_order must have size
+   *   <code>dof_handler.get_tria().n_active_cells()</code>. Every active
+   *   cell iterator of that triangulation needs to be present in @p cell_order
+   *   exactly once.
+   * @post For each @p i between zero and <code>dof_handler.n_dofs()</code>,
+   *   the condition <code>renumbering[inverse_renumbering[i]] == i</code>
+   *   will hold.
    */
   template <class DH>
   void
@@ -758,8 +801,8 @@ namespace DoFRenumbering
                      const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
-   * Cell-wise renumbering on one level. See the other function with the same
-   * name.
+   * Like the other cell_wise() function, but for one level
+   * of a multilevel enumeration of degrees of freedom.
    */
   template <class DH>
   void
@@ -768,9 +811,8 @@ namespace DoFRenumbering
              const std::vector<typename DH::level_cell_iterator> &cell_order);
 
   /**
-   * Computes the renumbering vector needed by the cell_wise() level
-   * renumbering function. Does not perform the renumbering on the DoFHandler
-   * dofs but returns the renumbering vector.
+   * Like the other compute_cell_wise() function, but for one level
+   * of a multilevel enumeration of degrees of freedom.
    */
   template <class DH>
   void
