@@ -29,6 +29,10 @@
 #     TEST_LIBRARIES_RELEASE
 #       - specifying additional libraries (and targets) to link against.
 #
+#     TEST_TARGET or
+#     TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
+#       - specifying a test target to be executed for a parameter run.
+#
 #     TEST_TIME_LIMIT
 #       - specifying the maximal wall clock time in seconds a test is
 #         allowed to run
