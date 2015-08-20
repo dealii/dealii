@@ -832,6 +832,7 @@ MappingCartesian<dim,spacedim>::transform (
                 output[q][i][j][k] = input[q][i][j][k] / data.length[j] / data.length[k];
 
               }
+      return;
     }
     default:
       Assert(false, ExcNotImplemented());
