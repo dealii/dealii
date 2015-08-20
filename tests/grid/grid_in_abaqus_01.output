@@ -1,0 +1,31 @@
+
+DEAL::2d_test.inp
+DEAL::  108 active cells
+DEAL::  hash=17533
+DEAL::2d_quad.inp
+DEAL::  4 active cells
+DEAL::  hash=19
+DEAL::2d_test_abaqus.inp
+DEAL::  75 active cells
+DEAL::  hash=7783
+DEAL::3d_test_cube_1.inp
+DEAL::  1 active cells
+DEAL::  hash=0
+DEAL::3d_test_cube_two_materials.inp
+DEAL::  8 active cells
+DEAL::  hash=179
+DEAL::3d_CC_cubit_old.inp
+DEAL::  16 active cells
+DEAL::  hash=920
+DEAL::3d_CC_cubit_new.inp
+DEAL::  16 active cells
+DEAL::  hash=920
+DEAL::3d_test_cube_pave_1.inp
+DEAL::  14 active cells
+DEAL::  hash=551
+DEAL::3d_other_simple.inp
+DEAL::  1 active cells
+DEAL::  hash=0
+DEAL::3d_test_abaqus.inp
+DEAL::  375 active cells
+DEAL::  hash=494873

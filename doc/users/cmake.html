@@ -184,9 +184,9 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 </pre>
       The same holds for all variables starting with <code>COMPONENT_</code>
       and all individual component names:
-      <code>DOCUMENTATION</code>, <code>EXAMPLES</code>,
-      <code>MESH_CONVERTER</code> and <code>PARAMETER_GUI</code> (which
-      will be expanded to the full <code>DEAL_II_COMPONENT_*</code> variable name).
+      <code>DOCUMENTATION</code>, <code>EXAMPLES</code>
+      and <code>PARAMETER_GUI</code> (which will be expanded to the 
+      full <code>DEAL_II_COMPONENT_*</code> variable name).
     </p>
 
 
@@ -223,7 +223,6 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 #    documentation  - build and install component 'documentation'
 #    examples       - build and install component 'examples'
 #    library        - build and install component 'library'
-#    mesh_converter - build and install component 'mesh_converter'
 #    parameter_gui  - build and install component 'parameter_gui'
 #
 #    test           - run a minimal set of tests
@@ -263,7 +262,6 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 #  Component configuration:
 #      ( DEAL_II_COMPONENT_DOCUMENTATION = OFF )
 #        DEAL_II_COMPONENT_EXAMPLES
-#        DEAL_II_COMPONENT_MESH_CONVERTER
 #      ( DEAL_II_COMPONENT_PARAMETER_GUI = OFF )
 #
 #  Detailed information (compiler flags, feature configuration) can be found in detailed.log
@@ -401,7 +399,6 @@ $ cmake -GNinja [...]
 documentation  - builds and installs the 'documentation' component
 examples       - builds and installs the 'examples' component
 library        - builds and installs the 'library' component
-mesh_converter - builds and installs the 'mesh_converter' component
 parameter_gui  - builds and installs the 'parameter_gui' component
 </pre>
 
@@ -751,17 +748,6 @@ cmake -DLAPACK_FOUND=true \
             not generate the documentation for the tutorial steps).
             This adds a component <code>examples</code> to the build system.
           </p>
-
-	<li>
-          <p>
-            <code>DEAL_II_COMPONENT_MESH_CONVERTER</code> (default
-            <code>ON</code>):
-          </p>
-          <p>
-            Enable configuration and installation of the
-            <code>mesh_converter</code> binary. This adds a component
-            <code>mesh_converter</code> to the build system.
-	  </p>
 
 	<li>
           <p>
