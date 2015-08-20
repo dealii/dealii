@@ -570,7 +570,7 @@ category/test.expect=run.output
 <pre>
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II Authors
+// Copyright (C) 2015 by the deal.II Authors
 //
 // This file is part of the deal.II library.
 //
@@ -586,19 +586,17 @@ category/test.expect=run.output
 // a short (a few lines) description of what the program does
 
 #include "../tests.h"
-#include &lt;iostream&gt;
-#include &lt;fstream&gt;
 
 // all include files you need here
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  // Initialize deallog for test output.
+  // This also reroutes deallog output to a file "output".
+  initlog();
 
   // your testcode here:
-  int i=0;
+  int i = 0;
   deallog << i << std::endl;
 
   return 0;
