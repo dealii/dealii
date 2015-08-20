@@ -89,9 +89,7 @@ SET(_categories
   slepc trilinos umfpack sharedtria
   )
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-  # Only set up mesh_converter tests if the testsuite is set up as a
-  # dependent project:
-  LIST(APPEND _categories mesh_converter)
+
 ENDIF()
 
 #

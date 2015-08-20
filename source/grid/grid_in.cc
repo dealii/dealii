@@ -757,6 +757,64 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
+namespace
+{
+  template <int dim>
+  class Abaqus_to_UCD
+  {
+  public:
+    Abaqus_to_UCD ();
+
+    void read_in_abaqus (std::istream &in);
+    void write_out_avs_ucd (std::ostream &out) const;
+
+  private:
+    const double tolerance;
+
+    std::vector<double> get_global_node_numbers (const int face_cell_no,
+                                                 const int face_cell_face_no) const;
+
+    // NL: Stored as [ global node-id (int), x-coord, y-coord, z-coord ]
+    std::vector< std::vector<double> >  node_list;
+    // CL: Stored as [ material-id (int), node1, node2, node3, node4, node5, node6, node7, node8 ]
+    std::vector< std::vector<double> >  cell_list;
+    // FL: Stored as [ sideset-id (int), node1, node2, node3, node4 ]
+    std::vector< std::vector<double> >  face_list;
+    // ELSET: Stored as [ (std::string) elset_name = (std::vector) of cells numbers]
+    std::map< std::string, std::vector<int> > elsets_list;
+  };
+}
+
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_abaqus (std::istream &in)
+{
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (dim==2 || dim==3, ExcNotImplemented());
+  AssertThrow (in, ExcIO());
+
+  // Read in the Abaqus file into an intermediate object
+  // that is to be passed along to the UCD reader
+  Abaqus_to_UCD<dim> abaqus_to_ucd;
+  abaqus_to_ucd.read_in_abaqus(in);
+
+  std::stringstream in_ucd;
+  abaqus_to_ucd.write_out_avs_ucd(in_ucd);
+
+  // This next call is wrapped in a try-catch for the following reason:
+  // It ensures that if the Abaqus mesh is read in correctly but produces
+  // an erroneous result then the user is alerted to the source of the problem
+  // and doesn't think that they've somehow called the wrong function.
+  try
+    {
+      read_ucd(in_ucd);
+    }
+  catch (...)
+    {
+      AssertThrow(false, ExcMessage("Internal conversion from ABAQUS file to UCD format was unsuccessful. \
+                                   Are you sure that your ABAQUS mesh file conforms with the requirements \
+                                   listed in the documentation?"));
+    }
+}
 
 
 template <int dim, int spacedim>
@@ -769,7 +827,6 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 
   // skip comments at start of file
   skip_comment_lines (in, '#');
-
 
   // first read in identifier string
   std::string line;
@@ -2649,6 +2706,10 @@ void GridIn<dim, spacedim>::read (std::istream &in,
       read_ucd (in);
       return;
 
+    case abaqus:
+      read_abaqus(in);
+      return;
+
     case xda:
       read_xda (in);
       return;
@@ -2687,6 +2748,8 @@ GridIn<dim, spacedim>::default_suffix (const Format format)
       return ".unv";
     case ucd:
       return ".inp";
+    case abaqus:
+      return ".inp"; // Typical suffix for Abaqus mesh files conflicts with UCD.
     case xda:
       return ".xda";
     case netcdf:
@@ -2717,6 +2780,7 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
   if (format_name == "vtk")
     return vtk;
 
+  // This is also the typical extension of Abaqus input files.
   if (format_name == "inp")
     return ucd;
 
@@ -2760,9 +2824,525 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 template <int dim, int spacedim>
 std::string GridIn<dim, spacedim>::get_format_names ()
 {
-  return "dbmesh|msh|unv|vtk|ucd|xda|netcdf|tecplot";
+  return "dbmesh|msh|unv|vtk|ucd|abaqus|xda|netcdf|tecplot";
 }
 
+namespace
+{
+  template <int dim>
+  Abaqus_to_UCD<dim>::Abaqus_to_UCD ()
+    : tolerance (5e-16) // Used to offset Cubit tolerance error when outputting value close to zero
+  {
+    AssertThrow(dim==2 || dim==3, ExcNotImplemented());
+  }
+
+  // Convert from a string to some other data type
+  // Reference: http://www.codeguru.com/forum/showthread.php?t=231054
+  template <class T> bool
+  from_string (T &t,
+               const std::string &s,
+               std::ios_base& (*f) (std::ios_base &))
+  {
+    std::istringstream iss (s);
+    return ! (iss >> f >> t).fail();
+  }
+
+  // Extract an integer from a string
+  int
+  extract_int (const std::string &s)
+  {
+    std::string tmp;
+    for (unsigned int i = 0; i<s.size(); ++i)
+      {
+        if (isdigit(s[i]))
+          {
+            tmp += s[i];
+          }
+      }
+
+    int number = 0;
+    from_string(number, tmp, std::dec);
+    return number;
+  }
+
+  template <int dim>
+  void
+  Abaqus_to_UCD<dim>::read_in_abaqus (std::istream &input_stream)
+  {
+    AssertThrow (input_stream, ExcIO());
+    std::string line;
+    std::getline (input_stream, line);
+
+    while (!input_stream.eof())
+      {
+        std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+
+        if (line.compare ("*HEADING") == 0 ||
+            line.compare (0, 2, "**") == 0 ||
+            line.compare (0, 5, "*PART") == 0)
+          {
+            // Skip header and comments
+            while (!input_stream.eof())
+              {
+                std::getline (input_stream, line);
+                if (line[0] == '*')
+                  goto cont; // My eyes, they burn!
+              }
+          }
+        else if (line.compare (0, 5, "*NODE") == 0)
+          {
+            // Extract list of vertices
+            // Header line might be:
+            // *NODE, NSET=ALLNODES
+            // *NODE
+
+            // Contains lines in the form:
+            // Index, x, y, z
+            while (!input_stream.eof())
+              {
+                std::getline (input_stream, line);
+                if (line[0] == '*')
+                  goto cont;
+
+                std::vector <double> node (dim+1);
+
+                std::istringstream iss (line);
+                char comma;
+                for (unsigned int i = 0; i < dim+1; ++i)
+                  iss >> node[i] >> comma;
+
+                node_list.push_back (node);
+              }
+          }
+        else if (line.compare (0, 8, "*ELEMENT") == 0)
+          {
+            // Element construction.
+            // There are different header formats, the details
+            // of which we're not particularly interested in except
+            // whether they represent quads or hexahedrals.
+            // *ELEMENT, TYPE=S4R, ELSET=EB<material id>
+            // *ELEMENT, TYPE=C3D8R, ELSET=EB<material id>
+            // *ELEMENT, TYPE=C3D8
+            // Elements itself (n=4 or n=8):
+            // Index, i[0], ..., i[n]
+
+            int material = 0;
+            // Scan for material id
+            {
+              const std::string before_material = "ELSET=EB";
+              const std::size_t idx = line.find (before_material);
+              if (idx != std::string::npos)
+                {
+                  from_string (material, line.substr (idx + before_material.size()), std::dec);
+                }
+            }
+
+            // Read ELEMENT definition
+            std::getline (input_stream, line);
+            while (!input_stream.eof())
+              {
+                if (line[0] == '*')
+                  goto cont;
+
+                std::istringstream iss (line);
+                char comma;
+
+                // We will store the material id in the zeroth entry of the
+                // vector and the rest of the elements represent the global
+                // node numbers
+                const unsigned int n_data_per_cell = 1+GeometryInfo<dim>::vertices_per_cell;
+                std::vector <double> cell (n_data_per_cell);
+                for (unsigned int i = 0; i < n_data_per_cell; ++i)
+                  iss >> cell[i] >> comma;
+
+                // Overwrite cell index from file by material
+                cell[0] = static_cast<double> (material);
+                cell_list.push_back (cell);
+
+                std::getline (input_stream, line);
+              }
+          }
+        else if (line.compare (0, 8, "*SURFACE") == 0)
+          {
+            // Extract the definitions of boundary surfaces
+            // Old format from Cubit:
+            // *SURFACE, NAME=SS<boundary indicator>
+            //    <element index>,     S<face number>
+            // Abaqus default format:
+            // *SURFACE, TYPE=ELEMENT, NAME=SURF-<indicator>
+
+            // Get name of the surface and extract id from it;
+            // this will be the boundary indicator
+            const std::string name_key = "NAME=";
+            const std::size_t name_idx_start = line.find(name_key) + name_key.size();
+            std::size_t name_idx_end = line.find(',', name_idx_start);
+            if (name_idx_end == std::string::npos)
+              {
+                name_idx_end = line.size();
+              }
+            const int b_indicator = extract_int(line.substr(name_idx_start, name_idx_end - name_idx_start));
+
+            // Read SURFACE definition
+            // Note that the orientation of the faces is embedded within the
+            // definition of each "set" of faces that comprise the surface
+            // These are either marked by an "S" or "E" in 3d or 2d respectively.
+            std::getline (input_stream, line);
+            while (!input_stream.eof())
+              {
+                if (line[0] == '*')
+                  goto cont;
+
+                // Change all characters to upper case
+                std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+
+                // Surface can be created from ELSET, or directly from cells
+                // If elsets_list contains a key with specific name - refers to that ELSET, otherwise refers to cell
+                std::istringstream iss (line);
+                char comma;
+                int el_idx;
+                int face_number;
+                char temp;
+
+                // Get relevant faces, taking into account the element orientation
+                std::vector <double> quad_node_list;
+                const std::string elset_name = line.substr(0, line.find(','));
+                if (elsets_list.count(elset_name) != 0)
+                  {
+                    // Surface refers to ELSET
+                    std::string stmp;
+                    iss >> stmp >> temp >> face_number;
+
+                    const std::vector<int> cells = elsets_list[elset_name];
+                    for (unsigned int i = 0; i <cells.size(); ++i)
+                      {
+                        el_idx = cells[i];
+                        quad_node_list = get_global_node_numbers (el_idx, face_number);
+                        quad_node_list.insert (quad_node_list.begin(), b_indicator);
+
+                        face_list.push_back (quad_node_list);
+                      }
+                  }
+                else
+                  {
+                    // Surface refers directly to elements
+                    iss >> el_idx >> comma >> temp >> face_number;
+                    quad_node_list = get_global_node_numbers (el_idx, face_number);
+                    quad_node_list.insert (quad_node_list.begin(), b_indicator);
+
+                    face_list.push_back (quad_node_list);
+                  }
+
+                std::getline (input_stream, line);
+              }
+          }
+        else if (line.compare (0, 6, "*ELSET") == 0)
+          {
+            // Get ELSET name.
+            // Materials are attached to elsets with specific name
+            std::string elset_name;
+            {
+              const std::string elset_key = "*ELSET, ELSET=";
+              const std::size_t idx = line.find(elset_key);
+              if (idx != std::string::npos)
+                {
+                  const std::string comma = ",";
+                  const std::size_t first_comma = line.find(comma);
+                  const std::size_t second_comma = line.find(comma, first_comma+1);
+                  const std::size_t elset_name_start = line.find(elset_key) + elset_key.size();
+                  elset_name = line.substr(elset_name_start, second_comma-elset_name_start);
+                }
+
+            }
+
+            // There are two possibilities of storing cells numbers in ELSET:
+            // 1. If the header contains the 'GENERATE' keyword, then the next line describes range of cells as:
+            //    cell_id_start, cell_id_end, cell_step
+            // 2. If the header does not contain the 'GENERATE' keyword, then the next lines contain cells numbers
+            std::vector<int> elements;
+            const std::size_t generate_idx = line.find("GENERATE");
+            if (generate_idx != std::string::npos)
+              {
+                // Option (1)
+                std::getline (input_stream, line);
+                std::istringstream iss (line);
+                char comma;
+                int elid_start;
+                int elid_end;
+                int elis_step;
+                iss >> elid_start >> comma >> elid_end >> comma >> elis_step;
+                for (int i = elid_start; i <= elid_end; i+= elis_step)
+                  {
+                    elements.push_back(i);
+                  }
+                elsets_list[elset_name] = elements;
+
+                std::getline (input_stream, line);
+              }
+            else
+              {
+                // Option (2)
+                std::getline (input_stream, line);
+                while (!input_stream.eof())
+                  {
+                    if (line[0] == '*')
+                      break;
+
+                    std::istringstream iss (line);
+                    char comma;
+                    int elid;
+                    while (!iss.eof())
+                      {
+                        iss >> elid >> comma;
+                        elements.push_back (elid);
+                      }
+
+                    std::getline (input_stream, line);
+                  }
+
+                elsets_list[elset_name] = elements;
+              }
+
+            goto cont;
+          }
+        else if (line.compare (0, 5, "*NSET") == 0)
+          {
+            // Skip nodesets; we have no use for them
+            while (!input_stream.eof())
+              {
+                std::getline (input_stream, line);
+                if (line[0] == '*')
+                  goto cont;
+              }
+          }
+        else if (line.compare(0, 14, "*SOLID SECTION") == 0)
+          {
+            // The ELSET name, which describes a section for particular material
+            const std::string elset_key = "ELSET=";
+            const std::size_t elset_start = line.find("ELSET=") + elset_key.size();
+            const std::size_t elset_end = line.find(',', elset_start+1);
+            const std::string elset_name = line.substr(elset_start, elset_end-elset_start);
+
+            // Solid material definition.
+            // We assume that material id is taken from material name,
+            // eg. "Material-1" -> ID=1
+            const std::string material_key = "MATERIAL=";
+            const std::size_t last_equal = line.find("MATERIAL=") + material_key.size();
+            const std::size_t material_id_start = line.find('-', last_equal);
+            int material_id = 0;
+            from_string(material_id, line.substr(material_id_start+1), std::dec);
+
+            // Assign material id to cells
+            const std::vector<int> &elset_cells = elsets_list[elset_name];
+            for (unsigned int i = 0; i < elset_cells.size(); ++i)
+              {
+                const int cell_id = elset_cells[i] - 1;
+                cell_list[cell_id][0] = material_id;
+              }
+          }
+        // Note: All other lines / entries are ignored
+
+        std::getline (input_stream, line);
+
+cont:
+        (void) 0;
+      }
+  }
+
+  template <int dim>
+  std::vector<double>
+  Abaqus_to_UCD<dim>::get_global_node_numbers (const int face_cell_no,
+                                               const int face_cell_face_no) const
+  {
+    std::vector<double> quad_node_list (GeometryInfo<dim>::vertices_per_face);
+
+    // These orderings were reverse engineered by hand and may
+    // conceivably be erroneous.
+    // TODO: Currently one test (2d unstructured mesh) in the test
+    // suite fails, presumably because of an ordering issue.
+    if (dim == 2)
+      {
+        if (face_cell_face_no == 1)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][1];
+            quad_node_list[1] = cell_list[face_cell_no - 1][2];
+          }
+        else if (face_cell_face_no == 2)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][2];
+            quad_node_list[1] = cell_list[face_cell_no - 1][3];
+          }
+        else if (face_cell_face_no == 3)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][3];
+            quad_node_list[1] = cell_list[face_cell_no - 1][4];
+          }
+        else if (face_cell_face_no == 4)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][4];
+            quad_node_list[1] = cell_list[face_cell_no - 1][1];
+          }
+        else
+          {
+            AssertThrow(face_cell_face_no <= 4, ExcMessage("Invalid face number in 2d"));
+          }
+      }
+    else if (dim == 3)
+      {
+        if (face_cell_face_no == 1)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][1];
+            quad_node_list[1] = cell_list[face_cell_no - 1][4];
+            quad_node_list[2] = cell_list[face_cell_no - 1][3];
+            quad_node_list[3] = cell_list[face_cell_no - 1][2];
+          }
+        else if (face_cell_face_no == 2)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][5];
+            quad_node_list[1] = cell_list[face_cell_no - 1][8];
+            quad_node_list[2] = cell_list[face_cell_no - 1][7];
+            quad_node_list[3] = cell_list[face_cell_no - 1][6];
+          }
+        else if (face_cell_face_no == 3)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][1];
+            quad_node_list[1] = cell_list[face_cell_no - 1][2];
+            quad_node_list[2] = cell_list[face_cell_no - 1][6];
+            quad_node_list[3] = cell_list[face_cell_no - 1][5];
+          }
+        else if (face_cell_face_no == 4)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][2];
+            quad_node_list[1] = cell_list[face_cell_no - 1][3];
+            quad_node_list[2] = cell_list[face_cell_no - 1][7];
+            quad_node_list[3] = cell_list[face_cell_no - 1][6];
+          }
+        else if (face_cell_face_no == 5)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][3];
+            quad_node_list[1] = cell_list[face_cell_no - 1][4];
+            quad_node_list[2] = cell_list[face_cell_no - 1][8];
+            quad_node_list[3] = cell_list[face_cell_no - 1][7];
+          }
+        else if (face_cell_face_no == 6)
+          {
+            quad_node_list[0] = cell_list[face_cell_no - 1][1];
+            quad_node_list[1] = cell_list[face_cell_no - 1][5];
+            quad_node_list[2] = cell_list[face_cell_no - 1][8];
+            quad_node_list[3] = cell_list[face_cell_no - 1][4];
+          }
+        else
+          {
+            AssertThrow(face_cell_no <= 6, ExcMessage("Invalid face number in 3d"));
+          }
+      }
+    else
+      {
+        AssertThrow(dim==2 || dim==3, ExcNotImplemented());
+      }
+
+    return quad_node_list;
+  }
+
+  template <int dim>
+  void
+  Abaqus_to_UCD<dim>::write_out_avs_ucd (std::ostream &output) const
+  {
+    AssertThrow (output, ExcIO());
+
+    // Write out title - Note: No other commented text can be inserted below the
+    // title in a UCD file
+    output << "# Abaqus to UCD mesh conversion" << std::endl;
+    output << "# Mesh type: AVS UCD" << std::endl;
+
+    // ========================================================
+    // ASCII UCD File Format
+    // The input file cannot contain blank lines or lines with leading blanks.
+    // Comments, if present, must precede all data in the file.
+    // Comments within the data will cause read errors.
+    // The general order of the data is as follows:
+    // 1. Numbers defining the overall structure, including the number of nodes,
+    //    the number of cells, and the length of the vector of data associated
+    //    with the nodes, cells, and the model.
+    //     e.g. 1:
+    //        <num_nodes> <num_cells> <num_ndata> <num_cdata> <num_mdata>
+    //     e.g. 2:
+    //        n_elements = n_hex_cells + n_bc_quads + n_quad_cells + n_bc_edges
+    //        outfile.write(str(n_nodes) + " " + str(n_elements) + " 0 0 0\n")
+    // 2. For each node, its node id and the coordinates of that node in space.
+    //    Node-ids must be integers, but any number including non sequential
+    //    numbers can be used. Mid-edge nodes are treated like any other node.
+    // 3. For each cell: its cell-id, material, cell type (hexahedral, pyramid,
+    //    etc.), and the list of node-ids that correspond to each of the cell's
+    //    vertices. The below table specifies the different cell types and the
+    //    keyword used to represent them in the file.
+
+    // Write out header
+    output
+        << node_list.size() << "\t"
+        << (cell_list.size() + face_list.size()) << "\t0\t0\t0"
+        << std::endl;
+
+    // Write out node numbers
+    for (unsigned int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
+      {
+        for (unsigned int jj = 0; jj < dim + 1; ++jj) // Loop over entries to be outputted
+          {
+            if (jj == 0)        // Node number
+              {
+                output.precision();
+                output << node_list[ii][jj] << "\t";
+              }
+            else                // Node coordinates
+              {
+                output.width (16);
+                output.setf (std::ios::scientific,
+                             std::ios::floatfield);
+                output.precision (8);
+                if (std::abs (node_list[ii][jj]) > tolerance) // invoke tolerance -> set points close to zero equal to zero
+                  output << static_cast<double> (node_list[ii][jj]) << "\t";
+                else
+                  output << 0.0 << "\t";
+              }
+          }
+        if (dim == 2)
+          output << 0.0 << "\t";
+
+        output
+            << std::endl;
+        output.unsetf (std::ios::floatfield);
+      }
+
+    // Write out cell node numbers
+    for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
+      {
+        output
+            << ii + 1 << "\t"
+            << cell_list[ii][0] << "\t"
+            << (dim == 2 ? "quad" : "hex") << "\t";
+        for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_cell + 1; ++jj)
+          output
+              << cell_list[ii][jj] << "\t";
+
+        output
+            << std::endl;
+      }
+
+    // Write out quad node numbers
+    for (unsigned int ii = 0; ii < face_list.size(); ++ii)
+      {
+        output
+            << ii + 1 << "\t"
+            << face_list[ii][0] << "\t"
+            << (dim == 2 ? "line" : "quad") << "\t";
+        for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_face + 1; ++jj)
+          output
+              << face_list[ii][jj] << "\t";
+
+        output
+            << std::endl;
+      }
+  }
+}
 
 
 //explicit instantiations

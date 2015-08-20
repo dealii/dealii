@@ -24,7 +24,6 @@
 #     DEAL_II_ALLOW_BUNDLED
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
-#     DEAL_II_COMPONENT_MESH_CONVERTER
 #     DEAL_II_COMPONENT_PARAMETER_GUI
 #     DEAL_II_COMPONENT_PACKAGE
 #     DEAL_II_FORCE_AUTODETECTION
@@ -81,11 +80,6 @@ ENDIF()
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
-  ON
-  )
-
-OPTION(DEAL_II_COMPONENT_MESH_CONVERTER
-  "Build and install the mesh_converter. This adds a COMPONENT \"mesh_converter\" to the build system."
   ON
   )
 
@@ -384,7 +378,7 @@ FOREACH(_var ${_res})
   #
   # Same for components:
   #
-  IF(_var MATCHES "^(DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PACKAGE|PARAMETER_GUI)")
+  IF(_var MATCHES "^(DOCUMENTATION|EXAMPLES|PACKAGE|PARAMETER_GUI)")
     SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
   ENDIF()

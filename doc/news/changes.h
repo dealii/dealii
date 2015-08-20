@@ -39,6 +39,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Changed: The mesh_converter program has been removed from the
+  contrib folder. The equivalent functionality can now be found in
+  the GridIn class.
+  <br>
+  (Jean-Paul Pelteret, 2015/08/12)
+  </li>
+
   <li> Changed: The signature of the FiniteElement::fill_fe_values(),
   FiniteElement::fill_fe_face_values(), and FiniteElement::fill_fe_subface_values()
   functions has been changed, in an effort to clarify which of these contain
@@ -147,6 +154,12 @@ inconvenience this causes.
   vector classes.
   <br>
   (Wolfgang Bangerth, Bruno Turcksin, 2015/08/13)
+  </li>
+
+  <li> New: Direct support for Abaqus mesh files has been added to the GridIn
+  class through the function GridIn::read_abaqus().
+  <br>
+  (Jean-Paul Pelteret, Timo Heister,  Krzysztof Bzowski, 2015/08/12)
   </li>
 
   <li> Improved: Some finite elements compute hessians analytically rather than
