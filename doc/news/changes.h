@@ -235,6 +235,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Jacobian second and third derivatives are now computed by the mapping classes and can be
+  accessed through FEValues in much the same way as the Jacobian and Jacobian gradient.
+  <br>
+  (Maien Hamed, 2015/08/28-2015/08/31)
+  </li>
+
+
   <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
   that determine which cells form a layer around a specified subdomain. There is also a function
   GridTools::compute_ghost_cell_halo_layer() that returns the smallest layer of ghost cells around

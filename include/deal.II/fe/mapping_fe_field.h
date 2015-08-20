@@ -290,6 +290,30 @@ public:
                                       const unsigned int shape_nr);
 
     /**
+     * Third derivative of shape function in quadrature point. See above.
+     */
+    const Tensor<3,dim> &third_derivative (const unsigned int qpoint,
+                                           const unsigned int shape_nr) const;
+
+    /**
+     * Fourth derivative of shape function in quadrature point. See above.
+     */
+    Tensor<3,dim> &third_derivative (const unsigned int qpoint,
+                                     const unsigned int shape_nr);
+
+    /**
+     * Fourth derivative of shape function in quadrature point. See above.
+     */
+    const Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
+                                            const unsigned int shape_nr) const;
+
+    /**
+     * Third derivative of shape function in quadrature point. See above.
+     */
+    Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
+                                      const unsigned int shape_nr);
+
+    /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
@@ -315,6 +339,22 @@ public:
      * Computed once.
      */
     std::vector<Tensor<2,dim> > shape_second_derivatives;
+
+    /**
+     * Values of shape function third derivatives. Access by function @p
+     * third_derivative.
+     *
+     * Computed once.
+     */
+    std::vector<Tensor<3,dim> > shape_third_derivatives;
+
+    /**
+     * Values of shape function fourth derivatives. Access by function @p
+     * fourth_derivative.
+     *
+     * Computed once.
+     */
+    std::vector<Tensor<4,dim> > shape_fourth_derivatives;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and

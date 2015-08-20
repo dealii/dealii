@@ -2091,6 +2091,21 @@ namespace internal
       if (flags & update_jacobian_grads)
         this->jacobian_grads.resize(n_quadrature_points);
 
+      if (flags & update_jacobian_pushed_forward_grads)
+        this->jacobian_pushed_forward_grads.resize(n_quadrature_points);
+
+      if (flags & update_jacobian_2nd_derivatives)
+        this->jacobian_2nd_derivatives.resize(n_quadrature_points);
+
+      if (flags & update_jacobian_pushed_forward_2nd_derivatives)
+        this->jacobian_pushed_forward_2nd_derivatives.resize(n_quadrature_points);
+
+      if (flags & update_jacobian_3rd_derivatives)
+        this->jacobian_3rd_derivatives.resize(n_quadrature_points);
+
+      if (flags & update_jacobian_pushed_forward_3rd_derivatives)
+        this->jacobian_pushed_forward_3rd_derivatives.resize(n_quadrature_points);
+
       if (flags & update_inverse_jacobians)
         this->inverse_jacobians.resize(n_quadrature_points);
 
@@ -2110,6 +2125,11 @@ namespace internal
       return (MemoryConsumption::memory_consumption (JxW_values) +
               MemoryConsumption::memory_consumption (jacobians) +
               MemoryConsumption::memory_consumption (jacobian_grads) +
+              MemoryConsumption::memory_consumption (jacobian_pushed_forward_grads) +
+              MemoryConsumption::memory_consumption (jacobian_2nd_derivatives) +
+              MemoryConsumption::memory_consumption (jacobian_pushed_forward_2nd_derivatives) +
+              MemoryConsumption::memory_consumption (jacobian_3rd_derivatives) +
+              MemoryConsumption::memory_consumption (jacobian_pushed_forward_3rd_derivatives) +
               MemoryConsumption::memory_consumption (inverse_jacobians) +
               MemoryConsumption::memory_consumption (quadrature_points) +
               MemoryConsumption::memory_consumption (normal_vectors) +

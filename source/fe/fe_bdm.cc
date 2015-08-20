@@ -298,13 +298,16 @@ namespace
     PolynomialsP<dim> poly(deg);
     std::vector<Tensor<1,dim> > dummy1;
     std::vector<Tensor<2,dim> > dummy2;
+    std::vector<Tensor<3,dim> > dummy3;
+    std::vector<Tensor<4,dim> > dummy4;
 
     test_values.resize(quadrature.size());
 
     for (unsigned int k=0; k<quadrature.size(); ++k)
       {
         test_values[k].resize(poly.n());
-        poly.compute(quadrature.point(k), test_values[k], dummy1, dummy2);
+        poly.compute(quadrature.point(k), test_values[k], dummy1, dummy2,
+                     dummy3, dummy4);
         for (unsigned int i=0; i < poly.n(); ++i)
           {
             test_values[k][i] *= quadrature.weight(k);

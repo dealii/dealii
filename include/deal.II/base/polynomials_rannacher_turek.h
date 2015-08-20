@@ -55,10 +55,21 @@ public:
   */
   double compute_value(const unsigned int i,
                        const Point<dim> &p) const;
+
+  /**
+   * <tparam>order</tparam>th of basis function @p i at @p p.
+   *
+   * Consider using compute() instead.
+   */
+  template <int order>
+  Tensor<order,dim> compute_derivative (const unsigned int i,
+                                        const Point<dim> &p) const;
+
   /** Gradient of basis function @p i at @p p.
   */
   Tensor<1, dim> compute_grad(const unsigned int i,
                               const Point<dim> &p) const;
+
   /** Gradient of gradient of basis function @p i at @p p.
   */
   Tensor<2, dim> compute_grad_grad(const unsigned int i,
@@ -75,8 +86,91 @@ public:
   void compute(const Point<dim> &unit_point,
                std::vector<double> &values,
                std::vector<Tensor<1, dim> > &grads,
-               std::vector<Tensor<2, dim> > &grad_grads) const;
+               std::vector<Tensor<2,dim> > &grad_grads,
+               std::vector<Tensor<3,dim> > &third_derivatives,
+               std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 };
+
+// template functions
+template <int dim>
+template <int order>
+Tensor<order,dim>
+PolynomialsRannacherTurek<dim>::compute_derivative (const unsigned int i,
+                                                    const Point<dim> &p) const
+{
+  Assert(dim == 2, ExcNotImplemented());
+  Tensor<order,dim> derivative;
+  switch (order)
+    {
+    case 1:
+    {
+      Tensor<1,dim> &grad = *reinterpret_cast<Tensor<1,dim>*>(&derivative);
+      if (i == 0)
+        {
+          grad[0] = -2.5 + 3*p(0);
+          grad[1] = 1.5 - 3*p(1);
+        }
+      else if (i == 1)
+        {
+          grad[0] = -0.5 + 3.0*p(0);
+          grad[1] = 1.5 - 3.0*p(1);
+        }
+      else if (i == 2)
+        {
+          grad[0] = 1.5 - 3.0*p(0);
+          grad[1] = -2.5 + 3.0*p(1);
+        }
+      else if (i == 3)
+        {
+          grad[0] = 1.5 - 3.0*p(0);
+          grad[1] = -0.5 + 3.0*p(1);
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+      return derivative;
+    }
+    case 2:
+    {
+      Tensor<2,dim> &grad_grad = *reinterpret_cast<Tensor<2,dim>*>(&derivative);
+      if (i == 0)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 1)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 2)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      else if (i == 3)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      return derivative;
+    }
+    default:
+    {
+      // higher derivatives are all zero
+      return Tensor<order,dim>();
+    }
+    }
+}
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -773,6 +773,62 @@ public:
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim>   &p,
                                                    const unsigned int component) const;
+
+  /**
+   * Return the tensor of third derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. If the finite element is
+   * vector-valued, then return the value of the only non-zero component of
+   * the vector value of this shape function. If the shape function has more
+   * than one non-zero component (which we refer to with the term non-
+   * primitive), then derived classes implementing this function should throw
+   * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
+   * shape_grad_grad_component() function.
+   *
+   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * FiniteElement under consideration depends on the shape of the cell in
+   * real space.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Just like for shape_3rd_derivative(), but this function will be called when
+   * the shape function has more than one non-zero vector component. In that
+   * case, this function should return the gradient of the @p component-th
+   * vector component of the @p ith shape function at point @p p.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
+   * Return the tensor of fourth derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. If the finite element is
+   * vector-valued, then return the value of the only non-zero component of
+   * the vector value of this shape function. If the shape function has more
+   * than one non-zero component (which we refer to with the term non-
+   * primitive), then derived classes implementing this function should throw
+   * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
+   * shape_grad_grad_component() function.
+   *
+   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * FiniteElement under consideration depends on the shape of the cell in
+   * real space.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Just like for shape_4th_derivative(), but this function will be called when
+   * the shape function has more than one non-zero vector component. In that
+   * case, this function should return the gradient of the @p component-th
+   * vector component of the @p ith shape function at point @p p.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index. The

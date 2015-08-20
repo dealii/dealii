@@ -295,12 +295,16 @@ fill_fe_values (const Mapping<dim,spacedim> &,
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,dim> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
   std::vector<Tensor<2,dim> > grad_grads(flags & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
+  std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
         polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values, grads, grad_grads);
+                                 values, grads, grad_grads,
+                                 empty_vector_of_3rd_order_tensors,
+                                 empty_vector_of_4th_order_tensors);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)
@@ -335,12 +339,16 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,dim> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
   std::vector<Tensor<2,dim> > grad_grads(flags & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
+  std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
         polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values, grads, grad_grads);
+                                 values, grads, grad_grads,
+                                 empty_vector_of_3rd_order_tensors,
+                                 empty_vector_of_4th_order_tensors);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)
@@ -376,12 +384,16 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,dim> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
   std::vector<Tensor<2,dim> > grad_grads(flags & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
+  std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
         polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values, grads, grad_grads);
+                                 values, grads, grad_grads,
+                                 empty_vector_of_3rd_order_tensors,
+                                 empty_vector_of_4th_order_tensors);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)

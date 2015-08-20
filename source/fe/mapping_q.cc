@@ -171,11 +171,31 @@ MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &
       grad2.resize(n_shape_functions);
     }
 
+  std::vector<Tensor<3,dim> > grad3;
+  if (data.shape_third_derivatives.size()!=0)
+    {
+      Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
+             ExcInternalError());
+      grad3.resize(n_shape_functions);
+    }
 
-  if (data.shape_values.size()!=0 || data.shape_derivatives.size()!=0)
+  std::vector<Tensor<4,dim> > grad4;
+  if (data.shape_fourth_derivatives.size()!=0)
+    {
+      Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
+             ExcInternalError());
+      grad4.resize(n_shape_functions);
+    }
+
+
+  if (data.shape_values.size()!=0 ||
+      data.shape_derivatives.size()!=0 ||
+      data.shape_second_derivatives.size()!=0 ||
+      data.shape_third_derivatives.size()!=0 ||
+      data.shape_fourth_derivatives.size()!=0 )
     for (unsigned int point=0; point<n_points; ++point)
       {
-        tensor_pols->compute(unit_points[point], values, grads, grad2);
+        tensor_pols->compute(unit_points[point], values, grads, grad2, grad3, grad4);
 
         if (data.shape_values.size()!=0)
           for (unsigned int i=0; i<n_shape_functions; ++i)
@@ -188,6 +208,14 @@ MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &
         if (data.shape_second_derivatives.size()!=0)
           for (unsigned int i=0; i<n_shape_functions; ++i)
             data.second_derivative(point,renumber[i]) = grad2[i];
+
+        if (data.shape_third_derivatives.size()!=0)
+          for (unsigned int i=0; i<n_shape_functions; ++i)
+            data.third_derivative(point,renumber[i]) = grad3[i];
+
+        if (data.shape_fourth_derivatives.size()!=0)
+          for (unsigned int i=0; i<n_shape_functions; ++i)
+            data.fourth_derivative(point,renumber[i]) = grad4[i];
       }
 }
 

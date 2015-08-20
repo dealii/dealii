@@ -115,6 +115,8 @@ protected:
     std::vector<double> values(0);
     std::vector<Tensor<1,dim-1> > grads(0);
     std::vector<Tensor<2,dim-1> > grad_grads(0);
+    std::vector<Tensor<3,dim-1> > empty_vector_of_3rd_order_tensors;
+    std::vector<Tensor<4,dim-1> > empty_vector_of_4th_order_tensors;
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -127,7 +129,9 @@ protected:
         for (unsigned int i=0; i<n_q_points; ++i)
           {
             poly_space.compute(quadrature.point(i),
-                               values, grads, grad_grads);
+                               values, grads, grad_grads,
+                               empty_vector_of_3rd_order_tensors,
+                               empty_vector_of_4th_order_tensors);
 
             for (unsigned int k=0; k<poly_space.n(); ++k)
               data->shape_values[k][i] = values[k];

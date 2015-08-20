@@ -322,6 +322,52 @@ FiniteElement<dim,spacedim>::shape_grad_grad_component (const unsigned int,
 }
 
 
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FiniteElement<dim,spacedim>::shape_3rd_derivative (const unsigned int,
+                                                   const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<3,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FiniteElement<dim,spacedim>::shape_3rd_derivative_component (const unsigned int,
+    const Point<dim> &,
+    const unsigned int) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<3,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FiniteElement<dim,spacedim>::shape_4th_derivative (const unsigned int,
+                                                   const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<4,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FiniteElement<dim,spacedim>::shape_4th_derivative_component (const unsigned int,
+    const Point<dim> &,
+    const unsigned int) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<4,dim> ();
+}
+
+
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::reinit_restriction_and_prolongation_matrices (

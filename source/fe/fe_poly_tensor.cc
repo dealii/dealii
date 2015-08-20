@@ -181,7 +181,10 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
     {
       cached_point = p;
       cached_values.resize(poly_space.n());
-      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
+
+      std::vector<Tensor<4,dim> > dummy1;
+      std::vector<Tensor<5,dim> > dummy2;
+      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
   double s = 0;
@@ -220,7 +223,10 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
     {
       cached_point = p;
       cached_grads.resize(poly_space.n());
-      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
+
+      std::vector<Tensor<4,dim> > dummy1;
+      std::vector<Tensor<5,dim> > dummy2;
+      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
   Tensor<1,dim> s;
@@ -259,7 +265,10 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int 
     {
       cached_point = p;
       cached_grad_grads.resize(poly_space.n());
-      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
+
+      std::vector<Tensor<4,dim> > dummy1;
+      std::vector<Tensor<5,dim> > dummy2;
+      poly_space.compute(p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
   Tensor<2,dim> s;

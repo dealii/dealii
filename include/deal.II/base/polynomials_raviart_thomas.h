@@ -74,7 +74,9 @@ public:
   void compute (const Point<dim>            &unit_point,
                 std::vector<Tensor<1,dim> > &values,
                 std::vector<Tensor<2,dim> > &grads,
-                std::vector<Tensor<3,dim> > &grad_grads) const;
+                std::vector<Tensor<3,dim> > &grad_grads,
+                std::vector<Tensor<4,dim> > &third_derivatives,
+                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
    * Returns the number of Raviart-Thomas polynomials.

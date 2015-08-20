@@ -76,7 +76,9 @@ public:
   void compute (const Point<dim>            &unit_point,
                 std::vector<double>         &values,
                 std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads) const;
+                std::vector<Tensor<2,dim> > &grad_grads,
+                std::vector<Tensor<3,dim> > &third_derivatives,
+                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
    * Computes the value of the <tt>i</tt>th tensor product polynomial at
@@ -92,6 +94,22 @@ public:
    */
   double compute_value (const unsigned int i,
                         const Point<dim> &p) const;
+
+  /**
+   * Computes the order @tparam order derivative of the <tt>i</tt>th tensor
+   * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
+   * tensor product numbering.
+   *
+   * Note, that using this function within a loop over all tensor product
+   * polynomials is not efficient, because then each derivative value of the
+   * underlying (one-dimensional) polynomials is (unnecessarily) computed
+   * several times.  Instead use the compute() function, see above, with
+   * the size of the appropriate parameter set to n() to get the point value
+   * of all tensor polynomials all at once and in a much more efficient way.
+   */
+  template <int order>
+  Tensor<order,dim> compute_derivative (const unsigned int i,
+                                        const Point<dim> &p) const;
 
   /**
    * Computes the grad of the <tt>i</tt>th tensor product polynomial at
@@ -168,6 +186,23 @@ unsigned int
 TensorProductPolynomialsConst<0>::n() const
 {
   return numbers::invalid_unsigned_int;
+}
+
+template <int dim>
+template <int order>
+Tensor<order,dim>
+TensorProductPolynomialsConst<dim>::compute_derivative (const unsigned int i,
+                                                        const Point<dim> &p) const
+{
+  const unsigned int max_indices = this->n_tensor_pols;
+  Assert (i<=max_indices, ExcInternalError());
+
+  // treat the regular basis functions
+  if (i<max_indices)
+    return this->TensorProductPolynomials<dim>::template compute_derivative<order>(i,p);
+  else
+    // this is for the constant function
+    return Tensor<order,dim>();
 }
 
 

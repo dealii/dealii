@@ -53,8 +53,9 @@ void
 PolynomialsNedelec<dim>::compute (const Point<dim> &unit_point,
                                   std::vector<Tensor<1,dim> > &values,
                                   std::vector<Tensor<2,dim> > &grads,
-                                  std::vector<Tensor<3,dim> > &grad_grads)
-const
+                                  std::vector<Tensor<3,dim> > &grad_grads,
+                                  std::vector<Tensor<4,dim> > &third_derivatives,
+                                  std::vector<Tensor<5,dim> > &fourth_derivatives) const
 {
   Assert(values.size () == n_pols || values.size () == 0,
          ExcDimensionMismatch(values.size (), n_pols));
@@ -62,6 +63,18 @@ const
          ExcDimensionMismatch(grads.size (), n_pols));
   Assert(grad_grads.size () == n_pols || grad_grads.size () == 0,
          ExcDimensionMismatch(grad_grads.size (), n_pols));
+  Assert(third_derivatives.size () == n_pols || third_derivatives.size () == 0,
+         ExcDimensionMismatch(third_derivatives.size (), n_pols));
+  Assert(fourth_derivatives.size () == n_pols || fourth_derivatives.size () == 0,
+         ExcDimensionMismatch(fourth_derivatives.size (), n_pols));
+
+  // third and fourth derivatives not implemented
+  (void)third_derivatives;
+  Assert(third_derivatives.size () == 0,
+         ExcNotImplemented());
+  (void)fourth_derivatives;
+  Assert(fourth_derivatives.size () == 0,
+         ExcNotImplemented());
 
   // Declare the values, derivatives
   // and second derivatives vectors of
@@ -73,13 +86,17 @@ const
   unit_point_grads ((grads.size () == 0) ? 0 : n_basis);
   std::vector<Tensor<2, dim> >
   unit_point_grad_grads ((grad_grads.size () == 0) ? 0 : n_basis);
+  std::vector<Tensor<3, dim> > empty_vector_of_3rd_order_tensors;
+  std::vector<Tensor<4, dim> > empty_vector_of_4th_order_tensors;
 
   switch (dim)
     {
     case 1:
     {
       polynomial_space.compute (unit_point, unit_point_values,
-                                unit_point_grads, unit_point_grad_grads);
+                                unit_point_grads, unit_point_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
       // Assign the correct values to the
       // corresponding shape functions.
@@ -101,7 +118,9 @@ const
     case 2:
     {
       polynomial_space.compute (unit_point, unit_point_values,
-                                unit_point_grads, unit_point_grad_grads);
+                                unit_point_grads, unit_point_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
       // Declare the values, derivatives and
       // second derivatives vectors of
@@ -119,7 +138,9 @@ const
       std::vector<Tensor<2, dim> >
       p_grad_grads ((grad_grads.size () == 0) ? 0 : n_basis);
 
-      polynomial_space.compute (p, p_values, p_grads, p_grad_grads);
+      polynomial_space.compute (p, p_values, p_grads, p_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
       // Assign the correct values to the
       // corresponding shape functions.
@@ -278,7 +299,9 @@ const
     case 3:
     {
       polynomial_space.compute (unit_point, unit_point_values,
-                                unit_point_grads, unit_point_grad_grads);
+                                unit_point_grads, unit_point_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
       // Declare the values, derivatives
       // and second derivatives vectors of
@@ -301,11 +324,15 @@ const
       p1 (0) = unit_point (1);
       p1 (1) = unit_point (2);
       p1 (2) = unit_point (0);
-      polynomial_space.compute (p1, p1_values, p1_grads, p1_grad_grads);
+      polynomial_space.compute (p1, p1_values, p1_grads, p1_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
       p2 (0) = unit_point (2);
       p2 (1) = unit_point (0);
       p2 (2) = unit_point (1);
-      polynomial_space.compute (p2, p2_values, p2_grads, p2_grad_grads);
+      polynomial_space.compute (p2, p2_values, p2_grads, p2_grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
       // Assign the correct values to the
       // corresponding shape functions.

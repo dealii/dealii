@@ -208,7 +208,30 @@ enum UpdateFlags
    */
   update_support_inverse_jacobians = 0x40000,
   /**
-   * @deprecated Use #update_quadrature_points instead.
+   * Compute the derivatives of the Jacobian of the transformation pushed
+   * forward to the real cell coordinates.
+   */
+  update_jacobian_pushed_forward_grads = 0x80000,
+  /**
+   * Compute the second derivatives of the Jacobian of the transformation.
+   */
+  update_jacobian_2nd_derivatives = 0x100000,
+  /**
+   * Compute the second derivatives of the Jacobian of the transformation
+   * pushed forward to the real cell coordinates.
+   */
+  update_jacobian_pushed_forward_2nd_derivatives = 0x200000,
+  /**
+   * Compute the third derivatives of the Jacobian of the transformation.
+   */
+  update_jacobian_3rd_derivatives = 0x400000,
+  /**
+   * Compute the third derivatives of the Jacobian of the transformation
+   * pushed forward to the real cell coordinates.
+   */
+  update_jacobian_pushed_forward_3rd_derivatives = 0x800000,
+  /**
+   * @deprecated Update quadrature points
    */
   update_q_points = update_quadrature_points,
   /**
@@ -233,22 +256,27 @@ inline
 STREAM &operator << (STREAM &s, UpdateFlags u)
 {
   s << " UpdateFlags|";
-  if (u & update_values)                       s << "values|";
-  if (u & update_gradients)                    s << "gradients|";
-  if (u & update_hessians)                     s << "hessians|";
-  if (u & update_quadrature_points)            s << "quadrature_points|";
-  if (u & update_JxW_values)                   s << "JxW_values|";
-  if (u & update_normal_vectors)               s << "normal_vectors|";
-  if (u & update_jacobians)                    s << "jacobians|";
-  if (u & update_inverse_jacobians)            s << "inverse_jacobians|";
-  if (u & update_jacobian_grads)               s << "jacobian_grads|";
-  if (u & update_covariant_transformation)     s << "covariant_transformation|";
-  if (u & update_contravariant_transformation) s << "contravariant_transformation|";
-  if (u & update_transformation_values)        s << "transformation_values|";
-  if (u & update_transformation_gradients)     s << "transformation_gradients|";
-  if (u & update_support_points)               s << "support_points|";
-  if (u & update_support_jacobians)            s << "support_jacobians|";
-  if (u & update_support_inverse_jacobians)    s << "support_inverse_jacobians|";
+  if (u & update_values)                                  s << "values|";
+  if (u & update_gradients)                               s << "gradients|";
+  if (u & update_hessians)                                s << "hessians|";
+  if (u & update_quadrature_points)                       s << "quadrature_points|";
+  if (u & update_JxW_values)                              s << "JxW_values|";
+  if (u & update_normal_vectors)                          s << "normal_vectors|";
+  if (u & update_jacobians)                               s << "jacobians|";
+  if (u & update_inverse_jacobians)                       s << "inverse_jacobians|";
+  if (u & update_jacobian_grads)                          s << "jacobian_grads|";
+  if (u & update_covariant_transformation)                s << "covariant_transformation|";
+  if (u & update_contravariant_transformation)            s << "contravariant_transformation|";
+  if (u & update_transformation_values)                   s << "transformation_values|";
+  if (u & update_transformation_gradients)                s << "transformation_gradients|";
+  if (u & update_support_points)                          s << "support_points|";
+  if (u & update_support_jacobians)                       s << "support_jacobians|";
+  if (u & update_support_inverse_jacobians)               s << "support_inverse_jacobians|";
+  if (u & update_jacobian_pushed_forward_grads)           s << "jacobian_pushed_forward_grads|";
+  if (u & update_jacobian_2nd_derivatives)                s << "jacobian_2nd_derivatives|";
+  if (u & update_jacobian_pushed_forward_2nd_derivatives) s << "jacobian_pushed_forward_2nd_derivatives|";
+  if (u &update_jacobian_3rd_derivatives)                 s << "jacobian_3rd_derivatives|";
+  if (u & update_jacobian_pushed_forward_3rd_derivatives) s << "jacobian_pushed_forward_3rd_derivatives|";
 
 //TODO: check that 'u' really only has the flags set that are handled above
   return s;
@@ -412,6 +440,37 @@ namespace internal
       std::vector<DerivativeForm<1,spacedim,dim> > inverse_jacobians;
 
       /**
+       * Array of the derivatives of the Jacobian matrices at the
+       * quadrature points, pushed forward to the real cell coordinates.
+       */
+      std::vector<Tensor<3,spacedim> > jacobian_pushed_forward_grads;
+
+      /**
+       * Array of the second derivatives of the Jacobian matrices at the
+       * quadrature points.
+       */
+      std::vector<DerivativeForm<3,dim,spacedim> > jacobian_2nd_derivatives;
+
+      /**
+       * Array of the  second derivatives of the Jacobian matrices at the
+       * quadrature points, pushed forward to the real cell coordinates.
+       */
+      std::vector<Tensor<4,spacedim> > jacobian_pushed_forward_2nd_derivatives;
+
+      /**
+       * Array of the  third derivatives of the Jacobian matrices at the
+       * quadrature points.
+       */
+      std::vector<DerivativeForm<4,dim,spacedim> > jacobian_3rd_derivatives;
+
+      /**
+       * Array of the  third derivatives of the Jacobian matrices at the
+       * quadrature points, pushed forward to the real cell coordinates.
+
+       */
+      std::vector<Tensor<5,spacedim> > jacobian_pushed_forward_3rd_derivatives;
+
+      /**
        * Array of quadrature points. This array is set up upon calling reinit()
        * and contains the quadrature points on the real element, rather than on
        * the reference element.
@@ -487,6 +546,11 @@ namespace internal
       typedef std::vector<std::vector<Tensor<2,spacedim> > > HessianVector;
 
       /**
+       * And the same also applies to the third order derivatives.
+       */
+      typedef std::vector<std::vector<Tensor<3,spacedim> > > ThirdDerivativeVector;
+
+      /**
        * Store the values of the shape functions at the quadrature points. See the
        * description of the data type for the layout of the data in this field.
        */
@@ -505,6 +569,13 @@ namespace internal
        * in this field.
        */
       HessianVector shape_hessians;
+
+      /**
+       * Store the 3nd derivatives of the shape functions at the quadrature
+       * points.  See the description of the data type for the layout of the data
+       * in this field.
+       */
+      ThirdDerivativeVector shape_3rd_derivatives;
 
       /**
        * When asked for the value (or gradient, or Hessian) of shape function i's

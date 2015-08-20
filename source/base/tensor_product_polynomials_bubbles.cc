@@ -221,7 +221,9 @@ TensorProductPolynomialsBubbles<dim>::
 compute (const Point<dim>            &p,
          std::vector<double>         &values,
          std::vector<Tensor<1,dim> > &grads,
-         std::vector<Tensor<2,dim> > &grad_grads) const
+         std::vector<Tensor<2,dim> > &grad_grads,
+         std::vector<Tensor<3,dim> > &third_derivatives,
+         std::vector<Tensor<4,dim> > &fourth_derivatives) const
 {
   const unsigned int q_degree = this->polynomials.size()-1;
   const unsigned int max_q_indices = this->n_tensor_pols;
@@ -233,8 +235,13 @@ compute (const Point<dim>            &p,
           ExcDimensionMismatch2(grads.size(), max_q_indices+n_bubbles, 0));
   Assert (grad_grads.size()==max_q_indices+n_bubbles || grad_grads.size()==0,
           ExcDimensionMismatch2(grad_grads.size(), max_q_indices+n_bubbles, 0));
+  Assert (third_derivatives.size()==max_q_indices+n_bubbles || third_derivatives.size()==0,
+          ExcDimensionMismatch2(third_derivatives.size(), max_q_indices+n_bubbles, 0));
+  Assert (fourth_derivatives.size()==max_q_indices+n_bubbles || fourth_derivatives.size()==0,
+          ExcDimensionMismatch2(fourth_derivatives.size(), max_q_indices+n_bubbles, 0));
 
   bool do_values = false, do_grads = false, do_grad_grads = false;
+  bool do_3rd_derivatives = false, do_4th_derivatives = false;
   if (values.empty() == false)
     {
       values.resize(this->n_tensor_pols);
@@ -250,8 +257,18 @@ compute (const Point<dim>            &p,
       grad_grads.resize(this->n_tensor_pols);
       do_grad_grads = true;
     }
+  if (third_derivatives.empty() == false)
+    {
+      third_derivatives.resize(this->n_tensor_pols);
+      do_3rd_derivatives = true;
+    }
+  if (fourth_derivatives.empty() == false)
+    {
+      fourth_derivatives.resize(this->n_tensor_pols);
+      do_4th_derivatives = true;
+    }
 
-  this->TensorProductPolynomials<dim>::compute(p, values, grads, grad_grads);
+  this->TensorProductPolynomials<dim>::compute(p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
   for (unsigned int i=this->n_tensor_pols; i<this->n_tensor_pols+n_bubbles; ++i)
     {
@@ -261,6 +278,10 @@ compute (const Point<dim>            &p,
         grads.push_back(compute_grad(i,p));
       if (do_grad_grads)
         grad_grads.push_back(compute_grad_grad(i,p));
+      if (do_3rd_derivatives)
+        third_derivatives.push_back(compute_derivative<3>(i,p));
+      if (do_4th_derivatives)
+        fourth_derivatives.push_back(compute_derivative<4>(i,p));
     }
 }
 

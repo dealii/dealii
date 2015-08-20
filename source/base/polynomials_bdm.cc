@@ -55,7 +55,9 @@ void
 PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
                               std::vector<Tensor<1,dim> > &values,
                               std::vector<Tensor<2,dim> > &grads,
-                              std::vector<Tensor<3,dim> > &grad_grads) const
+                              std::vector<Tensor<3,dim> > &grad_grads,
+                              std::vector<Tensor<4,dim> > &third_derivatives,
+                              std::vector<Tensor<5,dim> > &fourth_derivatives) const
 {
   Assert(values.size()==n_pols || values.size()==0,
          ExcDimensionMismatch(values.size(), n_pols));
@@ -63,6 +65,18 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
          ExcDimensionMismatch(grads.size(), n_pols));
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
+  Assert(third_derivatives.size()==n_pols|| third_derivatives.size()==0,
+         ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  Assert(fourth_derivatives.size()==n_pols|| fourth_derivatives.size()==0,
+         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+
+  // third and fourth derivatives not implemented
+  (void)third_derivatives;
+  Assert(third_derivatives.size()==0,
+         ExcNotImplemented());
+  (void)fourth_derivatives;
+  Assert(fourth_derivatives.size()==0,
+         ExcNotImplemented());
 
   const unsigned int n_sub = polynomial_space.n();
 
@@ -83,7 +97,8 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
     // will have first all polynomials
     // in the x-component, then y and
     // z.
-    polynomial_space.compute (unit_point, p_values, p_grads, p_grad_grads);
+    polynomial_space.compute (unit_point, p_values, p_grads, p_grad_grads,
+                              p_third_derivatives, p_fourth_derivatives);
 
     std::fill(values.begin(), values.end(), Tensor<1,dim>());
     for (unsigned int i=0; i<p_values.size(); ++i)
