@@ -547,6 +547,10 @@ protected:
    * instead, from which the determinant can also be computed -- but
    * this does not take away from the instructiveness of the example.)
    *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
+   *
    * @see UpdateFlags
    */
   virtual
@@ -574,6 +578,10 @@ protected:
    *
    * The mapping classes do not keep track of the objects created by
    * this function. Ownership will therefore rest with the caller.
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
    *
    * @param update_flags A set of flags that define what is expected of
    *   the mapping class in future calls to transform() or the
@@ -708,6 +716,10 @@ protected:
    * by the update flags stored in the Mapping::InternalDataBase object
    * passed to this function.
    *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
+   *
    * @param[in] cell The cell of the triangulation for which this function
    *   is to compute a mapping from the reference cell to.
    * @param[in] cell_similarity Whether or not the cell given as first
@@ -752,6 +764,13 @@ protected:
    *   cell similarity is too optimistic, and invalidate it for
    *   subsequent use in FiniteElement::fill_fe_values() by
    *   returning a less optimistic cell similarity value.
+   *
+   * @note FEValues ensures that this function is always called with
+   *   the same pair of @p internal_data and @output_data objects. In
+   *   other words, if an implementation of this function knows that it
+   *   has written a piece of data into the output argument in a previous
+   *   call, then there is no need to copy it there again in a later
+   *   call if the implementation knows that this is the same value.
    */
   virtual
   CellSimilarity::Similarity

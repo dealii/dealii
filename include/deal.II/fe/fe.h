@@ -2213,6 +2213,10 @@ protected:
    * cell. Returns a pointer to an object of which the caller of this function
    * then has to assume ownership (which includes destruction when it is no
    * more needed).
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
    */
   virtual InternalDataBase *
   get_data (const UpdateFlags      flags,
@@ -2241,6 +2245,13 @@ protected:
                     const Mapping<dim,spacedim>      &mapping,
                     const Quadrature<dim-1> &quadrature) const;
 
+  /**
+   * To be written.
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
+   */
   virtual
   void
   fill_fe_values (const Mapping<dim,spacedim>                                         &mapping,
