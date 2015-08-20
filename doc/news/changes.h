@@ -191,6 +191,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
+  that determine which cells form a layer around a specified subdomain. There is also a function
+  GridTools::compute_ghost_cell_halo_layer() that returns the smallest layer of ghost cells around
+  all locally relevant cells.
+  <br>
+  (Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015/08/21)
+  </li>
+
   <li> Documentation: How to set up a testsuite in a user project is now
   properly documented.
   <br>
