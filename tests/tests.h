@@ -32,7 +32,9 @@
 #include <sstream>
 #include <iomanip>
 
-#include <cfenv>
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#  include <cfenv>
+#endif
 
 
 // silence extra diagnostics in the testsuite
