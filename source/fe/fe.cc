@@ -152,10 +152,10 @@ FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ()
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::FiniteElement (
-  const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &r_i_a_f,
-  const std::vector<ComponentMask> &nonzero_c)
+FiniteElement<dim,spacedim>::
+FiniteElement (const FiniteElementData<dim> &fe_data,
+               const std::vector<bool> &r_i_a_f,
+               const std::vector<ComponentMask> &nonzero_c)
   :
   FiniteElementData<dim> (fe_data),
   adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
@@ -167,40 +167,21 @@ FiniteElement<dim,spacedim>::FiniteElement (
   face_system_to_base_table(this->dofs_per_face),
   component_to_base_table (this->components,
                            std::make_pair(std::make_pair(0U, 0U), 0U)),
-  restriction_is_additive_flags(r_i_a_f),
-  nonzero_components (nonzero_c)
+
+  // Special handling of vectors of length one: in this case, we
+  // assume that all entries were supposed to be equal
+  restriction_is_additive_flags(r_i_a_f.size() == 1
+                                ?
+                                std::vector<bool> (fe_data.dofs_per_cell, r_i_a_f[0])
+                                :
+                                r_i_a_f),
+  nonzero_components (nonzero_c.size() == 1
+                      ?
+                      std::vector<ComponentMask> (fe_data.dofs_per_cell, nonzero_c[0])
+                      :
+                      nonzero_c),
+  n_nonzero_components_table (compute_n_nonzero_components(nonzero_components))
 {
-  // Special handling of vectors of
-  // length one: in this case, we
-  // assume that all entries were
-  // supposed to be equal.
-
-//TODO: Do the following in a better way by expanding these arrays in the member initializer section above
-  // Normally, we should be careful
-  // with const_cast, but since this
-  // is the constructor and we do it
-  // here only, we are fine.
-  unsigned int ndofs = this->dofs_per_cell;
-  if (restriction_is_additive_flags.size() == 1 && ndofs > 1)
-    {
-      std::vector<bool> &aux
-        = const_cast<std::vector<bool>&> (restriction_is_additive_flags);
-      aux.resize(ndofs, restriction_is_additive_flags[0]);
-    }
-
-  if (nonzero_components.size() == 1 && ndofs > 1)
-    {
-      std::vector<ComponentMask> &aux
-        = const_cast<std::vector<ComponentMask>&> (nonzero_components);
-      aux.resize(ndofs, nonzero_components[0]);
-    }
-
-  // These used to be initialized in
-  // the constructor, but here we
-  // have the possibly corrected
-  // nonzero_components vector.
-  const_cast<std::vector<unsigned int>&>
-  (n_nonzero_components_table) = compute_n_nonzero_components(nonzero_components);
   this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
                                       n_nonzero_components_table.end(),
                                       std::bind2nd(std::not_equal_to<unsigned int>(),
@@ -223,7 +204,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
               ExcInternalError());
       Assert (n_nonzero_components_table[i] <= this->n_components(),
               ExcInternalError());
-    };
+    }
 
   // initialize some tables in the default way, i.e. if there is only one
   // (vector-)component; if the element is not primitive, leave these tables
