@@ -137,12 +137,7 @@ get_interpolated_dof_values (const InputVector &values,
       // there are even weird finite elements (for example the Raviart-Thomas
       // element) which have shape functions that are additive (interior ones)
       // and others that are overwriting (face degrees of freedom that need to
-      // be continuous across the face). to avoid checking this over and over
-      // again, we do this once now and cache the results
-      std::vector<bool> restriction_is_additive (dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        restriction_is_additive[i] = fe.restriction_is_additive(i);
-
+      // be continuous across the face).
       for (unsigned int child=0; child<this->n_children(); ++child)
         {
           // get the values from the present child, if necessary by
@@ -157,7 +152,7 @@ get_interpolated_dof_values (const InputVector &values,
 
           // and add up or set them in the output vector
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (restriction_is_additive[i])
+            if (fe.restriction_is_additive(i))
               interpolated_values(i) += tmp2(i);
             else if (tmp2(i) != number())
               interpolated_values(i) = tmp2(i);
