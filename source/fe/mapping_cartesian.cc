@@ -50,10 +50,19 @@ std::size_t
 MappingCartesian<dim, spacedim>::InternalData::memory_consumption () const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
-          MemoryConsumption::memory_consumption (length) +
+          MemoryConsumption::memory_consumption (cell_extents) +
+          MemoryConsumption::memory_consumption (volume_element) +
           MemoryConsumption::memory_consumption (quadrature_points));
 }
 
+
+
+template <int dim, int spacedim>
+bool
+MappingCartesian<dim,spacedim>::preserves_vertex_locations () const
+{
+  return true;
+}
 
 
 
@@ -198,16 +207,16 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
       switch (dim)
         {
         case 1:
-          data.length[0] = cell->vertex(1)(0) - start(0);
+          data.cell_extents[0] = cell->vertex(1)(0) - start(0);
           break;
         case 2:
-          data.length[0] = cell->vertex(1)(0) - start(0);
-          data.length[1] = cell->vertex(2)(1) - start(1);
+          data.cell_extents[0] = cell->vertex(1)(0) - start(0);
+          data.cell_extents[1] = cell->vertex(2)(1) - start(1);
           break;
         case 3:
-          data.length[0] = cell->vertex(1)(0) - start(0);
-          data.length[1] = cell->vertex(2)(1) - start(1);
-          data.length[2] = cell->vertex(4)(2) - start(2);
+          data.cell_extents[0] = cell->vertex(1)(0) - start(0);
+          data.cell_extents[1] = cell->vertex(2)(1) - start(1);
+          data.cell_extents[2] = cell->vertex(4)(2) - start(2);
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -248,7 +257,7 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
         {
           quadrature_points[i] = start;
           for (unsigned int d=0; d<dim; ++d)
-            quadrature_points[i](d) += data.length[d] *
+            quadrature_points[i](d) += data.cell_extents[d] *
                                        data.quadrature_points[i+offset](d);
         }
     }
@@ -352,9 +361,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   if (data.update_each & (update_JxW_values | update_volume_elements))
     if (cell_similarity != CellSimilarity::translation)
       {
-        double J = data.length[0];
+        double J = data.cell_extents[0];
         for (unsigned int d=1; d<dim; ++d)
-          J *= data.length[d];
+          J *= data.cell_extents[d];
         data.volume_element = J;
         if (data.update_each & update_JxW_values)
           for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
@@ -368,7 +377,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
         {
           output_data.jacobians[i] =  DerivativeForm<1,dim,spacedim>();
           for (unsigned int j=0; j<dim; ++j)
-            output_data.jacobians[i][j][j] = data.length[j];
+            output_data.jacobians[i][j][j] = data.cell_extents[j];
         }
   // "compute" the derivative of the Jacobian
   // at the quadrature points, which are all
@@ -387,7 +396,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
         {
           output_data.inverse_jacobians[i]=Tensor<2,dim>();
           for (unsigned int j=0; j<dim; ++j)
-            output_data.inverse_jacobians[j][j]=1./data.length[j];
+            output_data.inverse_jacobians[j][j]=1./data.cell_extents[j];
         }
 
   return cell_similarity;
@@ -425,7 +434,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   double J = 1.;
   for (unsigned int d=0; d<dim; ++d)
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
-      J *= data.length[d];
+      J *= data.cell_extents[d];
 
   if (data.update_each & update_JxW_values)
     for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
@@ -437,9 +446,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   if (data.update_each & update_volume_elements)
     {
-      J = data.length[0];
+      J = data.cell_extents[0];
       for (unsigned int d=1; d<dim; ++d)
-        J *= data.length[d];
+        J *= data.cell_extents[d];
       data.volume_element = J;
     }
 
@@ -448,7 +457,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       {
         output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          output_data.jacobians[i][d][d] = data.length[d];
+          output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
   if (data.update_each & update_inverse_jacobians)
@@ -456,7 +465,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       {
         output_data.inverse_jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1./data.length[d];
+          output_data.inverse_jacobians[i][d][d] = 1./data.cell_extents[d];
       }
 }
 
@@ -491,7 +500,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   double J = 1.;
   for (unsigned int d=0; d<dim; ++d)
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
-      J *= data.length[d];
+      J *= data.cell_extents[d];
 
   if (data.update_each & update_JxW_values)
     {
@@ -519,9 +528,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   if (data.update_each & update_volume_elements)
     {
-      J = data.length[0];
+      J = data.cell_extents[0];
       for (unsigned int d=1; d<dim; ++d)
-        J *= data.length[d];
+        J *= data.cell_extents[d];
       data.volume_element = J;
     }
 
@@ -530,7 +539,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       {
         output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          output_data.jacobians[i][d][d] = data.length[d];
+          output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
   if (data.update_each & update_inverse_jacobians)
@@ -538,7 +547,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       {
         output_data.inverse_jacobians[i] = DerivativeForm<1,spacedim,dim>();
         for (unsigned int d=0; d<dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1./data.length[d];
+          output_data.inverse_jacobians[i][d][d] = 1./data.cell_extents[d];
       }
 }
 
@@ -567,7 +576,7 @@ MappingCartesian<dim,spacedim>::transform (
 
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d=0; d<dim; ++d)
-          output[i][d] = input[i][d]/data.length[d];
+          output[i][d] = input[i][d]/data.cell_extents[d];
       return;
     }
 
@@ -578,7 +587,7 @@ MappingCartesian<dim,spacedim>::transform (
 
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d=0; d<dim; ++d)
-          output[i][d] = input[i][d]*data.length[d];
+          output[i][d] = input[i][d]*data.cell_extents[d];
       return;
     }
     case mapping_piola:
@@ -590,7 +599,7 @@ MappingCartesian<dim,spacedim>::transform (
 
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d=0; d<dim; ++d)
-          output[i][d] = input[i][d] * data.length[d] / data.volume_element;
+          output[i][d] = input[i][d] * data.cell_extents[d] / data.volume_element;
       return;
     }
     default:
@@ -623,7 +632,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] / data.length[d2];
+            output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
       return;
     }
 
@@ -635,7 +644,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2];
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2];
       return;
     }
 
@@ -647,7 +656,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] / data.length[d2] / data.length[d1];
+            output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] / data.cell_extents[d1];
       return;
     }
 
@@ -659,7 +668,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2] / data.length[d1];
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] / data.cell_extents[d1];
       return;
     }
 
@@ -673,7 +682,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2]
                                 / data.volume_element;
       return;
     }
@@ -688,8 +697,8 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
-                                / data.length[d1] / data.volume_element;
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2]
+                                / data.cell_extents[d1] / data.volume_element;
       return;
     }
 
@@ -725,7 +734,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] / data.length[d2];
+            output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
       return;
     }
 
@@ -737,7 +746,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2];
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2];
       return;
     }
 
@@ -749,7 +758,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] / data.length[d2] / data.length[d1];
+            output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] / data.cell_extents[d1];
       return;
     }
 
@@ -761,7 +770,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2] / data.length[d1];
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] / data.cell_extents[d1];
       return;
     }
 
@@ -775,7 +784,7 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2]
                                 / data.volume_element;
       return;
     }
@@ -790,8 +799,8 @@ MappingCartesian<dim,spacedim>::transform (
       for (unsigned int i=0; i<output.size(); ++i)
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int d2=0; d2<dim; ++d2)
-            output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
-                                / data.length[d1] / data.volume_element;
+            output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2]
+                                / data.cell_extents[d1] / data.volume_element;
       return;
     }
 
@@ -829,7 +838,7 @@ MappingCartesian<dim,spacedim>::transform (
             for (unsigned int k=0; k<spacedim; ++k)
               {
 
-                output[q][i][j][k] = input[q][i][j][k] / data.length[j] / data.length[k];
+                output[q][i][j][k] = input[q][i][j][k] / data.cell_extents[j] / data.cell_extents[k];
 
               }
       return;
@@ -869,9 +878,9 @@ MappingCartesian<dim,spacedim>::transform (
             for (unsigned int k=0; k<spacedim; ++k)
               {
                 output[q][i][j][k] =    input[q][i][j][k]
-                                        * data.length[i]
-                                        / data.length[j]
-                                        / data.length[k];
+                                        * data.cell_extents[i]
+                                        / data.cell_extents[j]
+                                        / data.cell_extents[k];
               }
       return;
     }
@@ -887,9 +896,9 @@ MappingCartesian<dim,spacedim>::transform (
             for (unsigned int k=0; k<spacedim; ++k)
               {
                 output[q][i][j][k] =    input[q][i][j][k]
-                                        / data.length[i]
-                                        / data.length[j]
-                                        / data.length[k];
+                                        / data.cell_extents[i]
+                                        / data.cell_extents[j]
+                                        / data.cell_extents[k];
               }
 
       return;
@@ -910,10 +919,10 @@ MappingCartesian<dim,spacedim>::transform (
             for (unsigned int k=0; k<spacedim; ++k)
               {
                 output[q][i][j][k] =    input[q][i][j][k]
-                                        * data.length[i]
+                                        * data.cell_extents[i]
                                         / data.volume_element
-                                        / data.length[j]
-                                        / data.length[k];
+                                        / data.cell_extents[j]
+                                        / data.cell_extents[k];
               }
 
       return;
