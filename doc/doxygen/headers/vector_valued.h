@@ -50,7 +50,7 @@
  * <tr><th><b>%Table of contents</b></th></tr>
  * <tr><td width="100%" valign="top">
  * <ol>
- *  <li> @ref VVPhilosophy "A philosophical view of vector-valued problems"
+ *  <li> @ref VVExamples "Examples of vector-valued problems"
  *  <li> @ref VVFEs "Describing finite element spaces"
  *  <li> @ref VVAssembling "Assembling linear systems"
  *  <li> @ref VVAlternative "An alternative approach"
@@ -61,7 +61,7 @@
  *
  *
  *
- * @anchor VVPhilosophy
+ * @anchor VVExamples
  * <h3>Examples of vector-valued problems</h3>
  *
  * The way one deals systematically with vector-valued problems is not
