@@ -18,7 +18,7 @@ Then configure, compile, and install the deal.II library with:
     $ make install    (alternatively $ make -j<N> install)
     $ make test
 
-To build from the repository, excute the following commands first.
+To build from the repository, execute the following commands first:
 
     $ git clone https://github.com/dealii/dealii
     $ cd dealii
