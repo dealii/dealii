@@ -6,14 +6,6 @@ deal.II AUTHORS, but are included by permission. For details, consult the
 stated licenses below.**
 
 
-mesh_conversion
----------------
-
-Is a program originally written by Jean-Paul Pelteret and licensed under
-the GNU General Public License (GPL) Version 2.0. See
-`mesh_conversion/README.txt`, `mesh_conversion/gpl-2.0.txt`.
-
-
 parameter_gui
 -------------
 
