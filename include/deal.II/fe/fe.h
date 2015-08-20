@@ -310,23 +310,142 @@ namespace hp
  * Don't forget to make sure that #unit_support_points or
  * #generalized_support_points are initialized before this!
  *
- * <h5>Computing the #prolongation matrices for multigrid</h5>
+ * <h5>Computing prolongation matrices</h5>
  *
- * Once the shape functions are set up, the grid transfer matrices for
- * Multigrid accessed by get_prolongation_matrix() can be computed
- * automatically, using FETools::compute_embedding_matrices().
+ * Once you have shape functions, you can define matrices that transfer
+ * data from one cell to its children or the other way around. This is
+ * a common operation in multigrid, of course, but is also used when
+ * interpolating the solution from one mesh to the one after mesh refinement,
+ * as well as in the definition of some error estimators.
  *
- * This can be achieved by
+ * To define the prolongation matrices, i.e., those matrices that
+ * describe the transfer of a finite element field from one cell to
+ * its children, implementations of finite elements can either
+ * fill the #prolongation array by hand, or can call
+ * FETools::compute_embedding_matrices().
+ *
+ * In the latter case, all that is required is the following piece of code:
  * @code
- * for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
- * this->prolongation[i].reinit (this->dofs_per_cell,
- * this->dofs_per_cell);
+ * for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+ *   this->prolongation[c].reinit (this->dofs_per_cell,
+ *                                 this->dofs_per_cell);
  * FETools::compute_embedding_matrices (*this, this->prolongation);
  * @endcode
+ * As in this example, prolongation is almost always implemented via
+ * embedding, i.e., the nodal values of the function on the children
+ * may be different from the nodal values of the function on the parent
+ * cell, but as a function of $\mathbf x\in{\mathbb R}^\text{spacedim}$,
+ * the finite element field on the child is the same as on the parent.
  *
- * <h5>Computing the #restriction matrices for error estimators</h5>
  *
- * missing...
+ * <h5>Computing restriction matrices</h5>
+ *
+ * The opposite operation, restricting a finite element function defined
+ * on the children to the parent cell is typically implemented by
+ * interpolating the finite element function on the children to the
+ * nodal values of the parent cell. In deal.II, the restriction operation
+ * is implemented as a loop over the children of a cell that each
+ * apply a matrix to the vector of unknowns on that child cell
+ * (these matrices are stored in #restriction and are accessed by
+ * get_restriction_matrix()). The operation that then needs to be
+ * implemented turns out to be surprisingly difficult to describe,
+ * but is instructive to describe because it also defines the
+ * meaning of the #restriction_is_additive_flags array
+ * (accessed via the restriction_is_additive() function).
+ *
+ * To give a concrete example, assume we use a $Q_1$ element in 1d,
+ * and that on each of the parent and child cells degrees of freedom
+ * are (locally and globally) numbered as follows:
+ * @code
+ * meshes:             *-------*                        *---*---*
+ * local DoF numbers:  0       1                        0  1|0  1
+ * global DoF numbers: 0       1                        0   1   2
+ * @endcode
+ * Then we want the restriction operation to take the value of the
+ * zeroth DoF on child 0 as the value of the zeroth DoF on the
+ * parent, and take the value of the first DoF on child 1 as the
+ * value of the first DoF on the parent. Ideally, we would like
+ * to write this follows
+ * @f[
+ *   U^\text{coarse}|_\text{parent}
+ *   = \sum_{\text{child}=0}^1 R_\text{child} U^\text{fine}|_\text{child}
+ * @f]
+ * where $U^\text{fine}|_\text{child=0}=(U^\text{fine}_0,U^\text{fine}_1)^T$
+ * and $U^\text{fine}|_\text{child=1}=(U^\text{fine}_1,U^\text{fine}_2)^T$.
+ * Writing the requested operation like this would here be possible by
+ * choosing
+ * @f[
+ *   R_0 = \left(\begin{matrix}1 & 0 \\ 0 & 0\end{matrix}\right),
+ *   \qquad\qquad
+ *   R_1 = \left(\begin{matrix}0 & 0 \\ 0 & 1\end{matrix}\right).
+ * @f]
+ * However, this approach already fails if we go to a $Q_2$ element
+ * with the following degrees of freedom:
+ * @code
+ * meshes:             *-------*                        *----*----*
+ * local DoF numbers:  0   2   1                        0 2 1|0 2 1
+ * global DoF numbers: 0   2   1                        0 2  1  4 3
+ * @endcode
+ * Writing things as the sum over matrix operations as above would not
+ * easily work because we have to add nonzero values to $U^\text{coarse}_2$
+ * twice, once for each child.
+ *
+ * Consequently, restriction is typically implemented as a <i>concatenation</i>
+ * operation. I.e., we first compute the individual restrictions from each
+ * child,
+ * @f[
+ *   \tilde U^\text{coarse}_\text{child}
+ *   = R_\text{child} U^\text{fine}|_\text{child},
+ * @f]
+ * and then compute the values of $U^\text{coarse}|_\text{parent}$ with
+ * the following code:
+ * @code
+ * for (unsigned int child=0; child<cell->n_children(); ++child)
+ *   for (unsigned int i=0; i<dofs_per_cell; ++i)
+ *     if (U_tilde_coarse[child][i] != 0)
+ *       U_coarse_on_parent[i] = U_tilde_coarse[child][i];
+ * @endcode
+ * In other words, each nonzero element of $\tilde U^\text{coarse}_\text{child}$
+ * <i>overwrites</i>, rather than adds to the corresponding element of
+ * $U^\text{coarse}|_\text{parent}$. This typically also implies that
+ * the restriction matrices from two different cells should agree on
+ * a value for coarse degrees of freedom that they both want to touch (otherwise
+ * the result would depend on the order in which we loop over children, which
+ * would be unreasonable because the order of children is an otherwise
+ * arbitrary convention). For example, in the example above, the
+ * restriction matrices will be
+ * @f[
+ *   R_0 = \left(\begin{matrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 1 & 0 \end{matrix}\right),
+ *   \qquad\qquad
+ *   R_1 = \left(\begin{matrix}0 & 0 & 0 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{matrix}\right),
+ * @f]
+ * and the compatibility condition is the $R_{0,21}=R_{1,20}$ because they both
+ * indicate that $U^\text{coarse}|_\text{parent,2}$ should be set to one times
+ * $U^\text{fine}|_\text{child=0,1}$ and $U^\text{fine}|_\text{child=1,0}$.
+ *
+ * Unfortunately, not all finite elements allow to write the restriction operation
+ * in this way. For example, for the piecewise constant FE_DGQ(0) element, the
+ * value of the finite element field on the parent cell can not be determined
+ * by interpolation from the children. Rather, the only reasonable choice is to
+ * take it as the <i>average</i> value between the children -- so we are back
+ * to the sum operation, rather than the concatenation. Further thought shows that
+ * whether restriction should be additive or not is a property of the individual
+ * shape function, not of the finite element as a whole. Consequently, the
+ * FiniteElement::restriction_is_additive() function returns whether a
+ * particular shape function should act via concatenation (a return value
+ * of @p false) or via addition (return value of @p true), and the correct
+ * code for the overall operation is then as follows (and as, in fact,
+ * implemented in DoFAccessor::get_interpolated_dof_values()):
+ * @code
+ * for (unsigned int child=0; child<cell->n_children(); ++child)
+ *   for (unsigned int i=0; i<dofs_per_cell; ++i)
+ *     if (fe.restriction_is_additive(i) == true)
+ *       U_coarse_on_parent[i] += U_tilde_coarse[child][i];
+ *     else
+ *       if (U_tilde_coarse[child][i] != 0)
+ *         U_coarse_on_parent[i] = U_tilde_coarse[child][i];
+ * @endcode
+ *
  *
  * <h5>Computing #interface_constraints</h5>
  *
@@ -473,7 +592,46 @@ public:
 
 public:
   /**
-   * Constructor
+   * Constructor: initialize the fields of this base class of all finite
+   * elements.
+   *
+   * @param[in] fe_data An object that stores identifying (typically integral)
+   *   information about the element to be constructed. In particular, this
+   *   object will contain data such as the number of degrees of freedom
+   *   per cell (and per vertex, line, etc), the number of vector components,
+   *   etc. This argument is used to initialize the base class of the current
+   *   object under construction.
+   * @param[in] restriction_is_additive_flags A vector of size
+   *   <code>dofs_per_cell</code> (or of size one, see below) that for each
+   *   shape function states whether the shape function is additive or not. The
+   *   meaning of these flags is described in the section on restriction matrices
+   *   in the general documentation of this class.
+   * @param[in] nonzero_components A vector of size
+   *   <code>dofs_per_cell</code> (or of size one, see below) that for each
+   *   shape function provides a ComponentMask (of size
+   *   <code>fe_data.n_components()</code>) that indicates in which vector
+   *   components this shape function is nonzero (after mapping the shape
+   *   function to the real cell). For "primitive" shape
+   *   functions, this component mask will have a single entry (see
+   *   @ref GlossPrimitive for more information about primitive elements).
+   *   On the other hand, for elements such as the Raviart-Thomas or Nedelec
+   *   elements, shape functions are nonzero in more than one vector component
+   *   (after mapping to the real cell) and the given component mask will
+   *   contain more than one entry. (For these two elements, all entries
+   *   will in fact be set, but this would not be the case if you couple
+   *   a FE_RaviartThomas and a FE_Nedelec together into a FESystem.)
+   *
+   * @pre <code>restriction_is_additive_flags.size() == dofs_per_cell</code>,
+   *   or <code>restriction_is_additive_flags.size() == 1</code>. In the latter
+   *   case, the array is simply interpreted as having size
+   *   <code>dofs_per_cell</code> where each element has the same value as the
+   *   single element given.
+   *
+   * @pre <code>nonzero_components.size() == dofs_per_cell</code>,
+   *   or <code>nonzero_components.size() == 1</code>. In the latter
+   *   case, the array is simply interpreted as having size
+   *   <code>dofs_per_cell</code> where each element equals the component
+   *   mask provided in the single element given.
    */
   FiniteElement (const FiniteElementData<dim> &fe_data,
                  const std::vector<bool>      &restriction_is_additive_flags,
@@ -635,15 +793,11 @@ public:
    */
 
   /**
-   * Projection from a fine grid space onto a coarse grid space. If this
-   * projection operator is associated with a matrix @p P, then the
-   * restriction of this matrix @p P_i to a single child cell is returned
-   * here.
-   *
-   * The matrix @p P is the concatenation or the sum of the cell matrices @p
-   * P_i, depending on the #restriction_is_additive_flags. This distinguishes
-   * interpolation (concatenation) and projection with respect to scalar
-   * products (summation).
+   * Return the matrix that describes restricting a finite element
+   * field from the given @p child (as obtained by the given
+   * @p refinement_case) to the parent cell. The interpretation of
+   * the returned matrix depends on what
+   * restriction_is_additive() returns for each shape function.
    *
    * Row and column indices are related to coarse grid and fine grid spaces,
    * respectively, consistent with the definition of the associated operator.
@@ -658,11 +812,13 @@ public:
                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
   /**
-   * Embedding matrix between grids.
+   * Prolongation/embedding matrix between grids.
    *
-   * The identity operator from a coarse grid space into a fine grid space is
-   * associated with a matrix @p P. The restriction of this matrix @p P_i to a
-   * single child cell is returned here.
+   * The identity operator from a coarse grid space into a fine grid space (where
+   * both spaces are identified as functions defined on the parent and child cells) is
+   * associated with a matrix @p P that maps the corresponding representations
+   * of these functions in terms of their nodal values. The restriction of this matrix
+   * @p P_i to a single child cell is returned here.
    *
    * The matrix @p P is the concatenation, not the sum of the cell matrices @p
    * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
@@ -768,8 +924,9 @@ public:
 
 
   /**
-   * Access the #restriction_is_additive_flags field. See there for more
-   * information on its contents.
+   * Access the #restriction_is_additive_flags field. See the discussion
+   * about restriction matrices in the general class documentation for
+   * more information.
    *
    * The index must be between zero and the number of shape functions of this
    * element.
@@ -1955,38 +2112,9 @@ protected:
   component_to_base_table;
 
   /**
-   * Projection matrices are concatenated or summed up.
-   *
-   * These flags decide how the projection matrices of the children of the
-   * same parent are put together to one operator. The possible modes are
-   * concatenation and summation.
-   *
-   * If the projection is defined by an interpolation operator, the child
-   * matrices are concatenated, i.e. values belonging to the same node
-   * functional are identified and enter the interpolated value only once. In
-   * this case, the flag must be @p false.
-   *
-   * For projections with respect to scalar products, the child matrices must
-   * be summed up to build the complete matrix. The flag should be @p true.
-   *
-   * For examples of use of these flags, see the places in the library where
-   * it is queried.
-   *
-   * There is one flag per shape function, indicating whether it belongs to
-   * the class of shape functions that are additive in the restriction or not.
-   *
-   * Note that in previous versions of the library, there was one flag per
-   * vector component of the element. This is based on the fact that all the
-   * shape functions that belong to the same vector component must necessarily
-   * behave in the same way, to make things reasonable. However, the problem
-   * is that it is sometimes impossible to query this flag in the vector-
-   * valued case: this used to be done with the #system_to_component_index
-   * function that returns which vector component a shape function is
-   * associated with. The point is that since we now support shape functions
-   * that are associated with more than one vector component (for example the
-   * shape functions of Raviart-Thomas, or Nedelec elements), that function
-   * can no more be used, so it can be difficult to find out which for vector
-   * component we would like to query the restriction-is-additive flags.
+   * A flag determining whether restriction matrices are to be concatenated
+   * or summed up. See the discussion about restriction matrices in the
+   * general class documentation for more information.
    */
   const std::vector<bool> restriction_is_additive_flags;
 
