@@ -758,7 +758,7 @@ protected:
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
                   const CellSimilarity::Similarity                              cell_similarity,
                   const Quadrature<dim>                                        &quadrature,
-                  const InternalDataBase                                       &internal_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase       &internal_data,
                   dealii::internal::FEValues::MappingRelatedData<dim,spacedim> &output_data) const = 0;
 
   /**
@@ -791,7 +791,7 @@ protected:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
                        const unsigned int                                            face_no,
                        const Quadrature<dim-1>                                      &quadrature,
-                       const InternalDataBase                                       &internal_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase       &internal_data,
                        dealii::internal::FEValues::MappingRelatedData<dim,spacedim> &output_data) const = 0;
 
   /**
@@ -828,7 +828,7 @@ protected:
                           const unsigned int                                             face_no,
                           const unsigned int                                             subface_no,
                           const Quadrature<dim-1>                                       &quadrature,
-                          const InternalDataBase                                        &internal_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
                           dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
@@ -893,7 +893,7 @@ public:
   void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
              VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-             const InternalDataBase &internal,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const = 0;
 
 
@@ -931,7 +931,7 @@ public:
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
              VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const InternalDataBase &internal,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const = 0;
 
 
@@ -975,7 +975,7 @@ public:
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
              VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const InternalDataBase &internal,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const = 0;
 
   /**
@@ -1005,7 +1005,7 @@ public:
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
              VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-             const InternalDataBase &internal,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const = 0;
 
   /**
@@ -1045,7 +1045,7 @@ public:
   void
   transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
              VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-             const InternalDataBase &internal,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const = 0;
 
   /**
