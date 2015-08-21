@@ -134,6 +134,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Documentation: How to set up a testsuite in a user project is now
+  properly documented.
+  <br>
+  (Matthias Maier, 2015/08/01 - 2015/08/20)
+  </li>
+
   <li> Fixed: The computation of gradients in FE_PolyTensor and its derived classes (in particular in
   FE_RaviartThomas and FE_Nedelec) forgot to account for terms that appear on non-affine
   cells. Consequently, the computed gradients did not match the actual derivatives of the values
@@ -182,6 +188,14 @@ inconvenience this causes.
   for std_cxx11::unique_ptr arguments.
   <br>
   (Wolfgang Bangerth, 2015/08/07)
+  </li>
+
+  <li> Improved: CMake configuration: The DEAL_II_ADD_TEST now also
+  supports unit tests writing to stdout and stderr. Further, a second test
+  type consisting of an internal executable target, a configuration and a
+  comparison file is now supported.
+  <br>
+  (Matthias Maier, 2015/08/03)
   </li>
 
   <li> New: VtkFlags now stores a parameter describing the compression level
