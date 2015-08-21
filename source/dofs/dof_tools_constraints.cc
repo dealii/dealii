@@ -2267,9 +2267,10 @@ namespace DoFTools
   void
   make_periodicity_constraints
   (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
-   &periodic_faces,
-   dealii::ConstraintMatrix &constraint_matrix,
-   const ComponentMask      &component_mask)
+                                   &periodic_faces,
+   dealii::ConstraintMatrix        &constraint_matrix,
+   const ComponentMask             &component_mask,
+   const std::vector<unsigned int> &first_vector_components)
   {
     typedef std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
     FaceVector;
@@ -2300,7 +2301,7 @@ namespace DoFTools
                                      it->orientation[1],
                                      it->orientation[2],
                                      it->matrix,
-                                     it->first_vector_components);
+                                     first_vector_components);
       }
   }
 
@@ -2310,12 +2311,12 @@ namespace DoFTools
 
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id       b_id1,
-                                const types::boundary_id       b_id2,
-                                const int                      direction,
-                                dealii::ConstraintMatrix       &constraint_matrix,
-                                const ComponentMask            &component_mask)
+  make_periodicity_constraints (const DH                        &dof_handler,
+                                const types::boundary_id        b_id1,
+                                const types::boundary_id        b_id2,
+                                const int                       direction,
+                                dealii::ConstraintMatrix        &constraint_matrix,
+                                const ComponentMask             &component_mask)
   {
     static const int space_dim = DH::space_dimension;
     (void)space_dim;
@@ -2341,11 +2342,11 @@ namespace DoFTools
 
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id       b_id,
-                                const int                      direction,
-                                dealii::ConstraintMatrix       &constraint_matrix,
-                                const ComponentMask            &component_mask)
+  make_periodicity_constraints (const DH                        &dof_handler,
+                                const types::boundary_id         b_id,
+                                const int                        direction,
+                                dealii::ConstraintMatrix        &constraint_matrix,
+                                const ComponentMask             &component_mask)
   {
     static const int dim = DH::dimension;
     static const int space_dim = DH::space_dimension;

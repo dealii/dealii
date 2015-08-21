@@ -936,24 +936,18 @@ namespace GridTools
     std::bitset<3> orientation;
 
     /**
-     * A matrix that describes how vector valued DoFs of the first face should
-     * be modified prior to constraining to the DoFs of the second face. If
-     * the std::vector first_vector_components is non empty the matrix is
-     * interpreted as a @p dim $\times$ @p dim rotation matrix that is applied
-     * to all vector valued blocks listed in @p first_vector_components of the
-     * FESystem. If @p first_vector_components is empty the matrix is
-     * interpreted as an interpolation matrix with size no_face_dofs $\times$
-     * no_face_dofs. For more details see make_periodicity_constraints() and
-     * the glossary
-     * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
+     * A matrix that describes how vector valued DoFs of the first face
+     * should be modified prior to constraining to the DoFs of the second
+     * face. If the std::vector first_vector_components (supplied as a
+     * parameter to DofTools::make_periodicity_constraints()) is non empty
+     * the matrix is interpreted as a @p dim $\times$ @p dim rotation
+     * matrix that is applied to all vector valued blocks listed in @p
+     * first_vector_components of the FESystem. Alternatively, if @p
+     * first_vector_components is empty the matrix is interpreted as an
+     * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
+     * For more details see DoFTools::make_periodicity_constraints().
      */
     FullMatrix<double> matrix;
-
-    /**
-     * A vector of unsigned ints pointing to the first components of all
-     * vector valued blocks that should be rotated by matrix.
-     */
-    std::vector<unsigned int> first_vector_components;
   };
 
 
@@ -1047,9 +1041,10 @@ namespace GridTools
 
 
   /**
-   * This function will collect periodic face pairs on the coarsest mesh level
-   * of the given @p container (a Triangulation or DoFHandler) and add them to
-   * the vector @p matched_pairs leaving the original contents intact.
+   * This function will collect periodic face pairs on the coarsest mesh
+   * level of the given @p container (a Triangulation or DoFHandler) and
+   * add them to the vector @p matched_pairs leaving the original contents
+   * intact.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id @p
    * b_id1 and a 'second' boundary consisting of all faces belonging to @p
@@ -1060,25 +1055,28 @@ namespace GridTools
    * orthogonal_equality().
    *
    * The bitset that is returned inside of PeriodicFacePair encodes the
-   * _relative_ orientation of the first face with respect to the second face,
-   * see the documentation of orthogonal_equality() for further details.
+   * _relative_ orientation of the first face with respect to the second
+   * face, see the documentation of orthogonal_equality() for further
+   * details.
    *
    * The @p direction refers to the space direction in which periodicity is
    * enforced.
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary. This can be
-   * used to implement conditions such as $u(0,y)=u(1,y+1)$.
+   * them to the corresponding vertices of the 'second' boundary. This can
+   * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
-   * Optionally a (dim x dim) rotation matrix @p matrix along with a vector @p
-   * first_vector_components can be specified that describes how vector valued
-   * DoFs of the first face should be modified prior to constraining to the
-   * DoFs of the second face. If @p first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all vector
-   * valued blocks listed in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
+   * Optionally a @p matrix can be specified that describes how vector
+   * valued DoFs of the first face should be modified prior to constraining
+   * to the DoFs of the second face. If the matrix has size
+   * $n\_face\_dofs\times n\_face\_dofs$, the periodicity constraints are
+   * applied as $dofs\_2 = matrix\cdot dofs\_1$. If the matrix has size
+   * $dim\times dim$, the matrix is interpreted as a rotation matrix for
+   * vector valued components.
+   * For more details see DoFTools::make_periodicity_constraints(), the
+   * glossary @ref GlossPeriodicConstraints "glossary entry on periodic
+   * conditions" and @ref step_45 "step-45".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1090,11 +1088,11 @@ namespace GridTools
    * periodicity algebraically.
    *
    * @note Because elements will be added to @p matched_pairs (and existing
-   * entries will be preserved), it is possible to call this function several
-   * times with different boundary ids to generate a vector with all periodic
-   * pairs.
+   * entries will be preserved), it is possible to call this function
+   * several times with different boundary ids to generate a vector with
+   * all periodic pairs.
    *
-   * @author Daniel Arndt, Matthias Maier, 2013, 2014
+   * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename CONTAINER>
   void
@@ -1105,8 +1103,7 @@ namespace GridTools
    const int                                                          direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const Tensor<1,CONTAINER::space_dimension>                        &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
-   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
 
 
   /**
@@ -1150,8 +1147,7 @@ namespace GridTools
    const int                                                          direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const dealii::Tensor<1,CONTAINER::space_dimension>                &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
-   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
 
   /*@}*/
   /**
