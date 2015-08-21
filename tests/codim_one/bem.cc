@@ -266,7 +266,7 @@ BEM<spacedim>::assemble_system()
   FullMatrix<double>        cell_DLP_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>            cell_rhs (dofs_per_cell);
 
-  std::vector< Point<spacedim> > cell_normals_i, cell_normals_j;
+  std::vector< Tensor<1,spacedim> > cell_normals_i, cell_normals_j;
 
   std::vector<types::global_dof_index> local_dof_indices_i (dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices_j (dofs_per_cell);
@@ -289,7 +289,7 @@ BEM<spacedim>::assemble_system()
     {
 
       fe_values_i.reinit (cell_i);
-      cell_normals_i = fe_values_i.get_normal_vectors();
+      cell_normals_i = fe_values_i.get_all_normal_vectors();
       cell_i->get_dof_indices (local_dof_indices_i);
 
 //  if (cell_i->index()%100==0)
@@ -353,7 +353,7 @@ BEM<spacedim>::assemble_system()
       for (cell_j=dof_handler.begin_active(); cell_j!=endc; ++cell_j)
         {
           fe_values_j.reinit (cell_j);
-          cell_normals_j = fe_values_j.get_normal_vectors();
+          cell_normals_j = fe_values_j.get_all_normal_vectors();
           cell_j->get_dof_indices (local_dof_indices_j);
 
           if (cell_j != cell_i)
@@ -570,7 +570,7 @@ BEM<spacedim>::solve()
                                                 update_gradients |
                                                 update_normal_vectors );
 
-  std::vector< Point<spacedim> > cell_normals(q_iterated.size());
+  std::vector< Tensor<1,spacedim> > cell_normals(q_iterated.size());
   std::vector< Point<spacedim> > cell_tangentials(q_iterated.size());
   std::vector<types::global_dof_index> local_dof_indices (fe_q.dofs_per_cell);
 
@@ -596,7 +596,7 @@ BEM<spacedim>::solve()
 //  std::cout<<std::endl;
 
 
-      cell_normals = fe_values_q.get_normal_vectors();
+      cell_normals = fe_values_q.get_all_normal_vectors();
       for (unsigned int i=0; i<q_iterated.size(); ++i)
         {
           cell_tangentials[i][0] = cell_normals[i][1];

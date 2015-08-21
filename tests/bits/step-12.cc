@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -205,7 +205,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
   Vector<double> &cell_vector) const
 {
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
 
   std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
   std::vector<double> g(fe_v.n_quadrature_points);
@@ -241,7 +241,7 @@ void DGTransportEquation<dim>::assemble_face_term1(
   FullMatrix<double> &ue_vi_matrix) const
 {
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
 
   std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
   beta_function.value_list (fe_v.get_quadrature_points(), beta);
@@ -277,7 +277,7 @@ void DGTransportEquation<dim>::assemble_face_term2(
   FullMatrix<double> &ue_ve_matrix) const
 {
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
 
   std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
 

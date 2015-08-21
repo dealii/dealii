@@ -601,8 +601,8 @@ namespace Step34
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
-        const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors();
+        const std::vector<Point<dim> >    &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1,dim> > &normals  = fe_v.get_all_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
 
         // We then form the integral over the current cell for all degrees of
@@ -687,8 +687,8 @@ namespace Step34
                 std::vector<Vector<double> > singular_cell_wind( singular_quadrature.size(),
                                                                  Vector<double>(dim) );
 
-                const std::vector<Point<dim> > &singular_normals = fe_v_singular.get_normal_vectors();
-                const std::vector<Point<dim> > &singular_q_points = fe_v_singular.get_quadrature_points();
+                const std::vector<Tensor<1,dim> > &singular_normals  = fe_v_singular.get_all_normal_vectors();
+                const std::vector<Point<dim> >    &singular_q_points = fe_v_singular.get_quadrature_points();
 
                 wind.vector_value_list(singular_q_points, singular_cell_wind);
 
@@ -957,8 +957,8 @@ namespace Step34
       {
         fe_v.reinit(cell);
 
-        const std::vector<Point<dim> > &q_points = fe_v.get_quadrature_points();
-        const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors();
+        const std::vector<Point<dim> >    &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1,dim> > &normals  = fe_v.get_all_normal_vectors();
 
         cell->get_dof_indices(dofs);
         fe_v.get_function_values(phi, local_phi);

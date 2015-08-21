@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ void check_this (Triangulation<3> &tria)
           // so their sum should be
           // close to zero
           Assert ((fe_face_values1.normal_vector(0) +
-                   fe_face_values2.normal_vector(0)).square()
+                   fe_face_values2.normal_vector(0)).norm_square()
                   < 1e-20,
                   ExcInternalError());
         }

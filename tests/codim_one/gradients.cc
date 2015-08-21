@@ -124,7 +124,7 @@ void test(std::string filename)
 
   FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
 
-  std::vector< Point<spacedim> > cell_normals(q_midpoint.size());
+  std::vector< Tensor<1,spacedim> > cell_normals(q_midpoint.size());
   std::vector< Point<spacedim> > cell_tangentials(q_midpoint.size());
   std::vector<double> shape_directional_derivative(dofs_per_cell);
   Vector<double> projected_directional_derivative(triangulation.n_cells());
@@ -140,7 +140,7 @@ void test(std::string filename)
 
       fe_values.reinit(cell);
       cell-> get_dof_indices (local_dof_indices);
-      cell_normals = fe_values.get_normal_vectors();
+      cell_normals = fe_values.get_all_normal_vectors();
 
       // The cell tangential is calculated
       // in the midpoint of the cell. For

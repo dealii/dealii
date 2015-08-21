@@ -2078,14 +2078,16 @@ public:
    * For a face, return the outward normal vector to the cell at the
    * <tt>i</tt>th quadrature point.
    *
-   * For a cell of codimension one, return the normal vector, as it is
-   * specified by the numbering of the vertices.
+   * For a cell of codimension one, return the normal vector. There
+   * are of course two normal directions to a manifold in that case,
+   * and this function returns the "up" direction as induced by the
+   * numbering of the vertices.
    *
    * The length of the vector is normalized to one.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
-  const Point<spacedim> &normal_vector (const unsigned int i) const;
+  const Tensor<1,spacedim> &normal_vector (const unsigned int i) const;
 
   /**
    * Return the normal vectors at the quadrature points. For a face, these are
@@ -2093,8 +2095,28 @@ public:
    * the orientation is given by the numbering of vertices.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   *
+   * @note This function should really be named get_normal_vectors(),
+   *   but this function already exists with a different return type
+   *   that returns a vector of Point objects, rather than a vector of
+   *   Tensor objects. This is a historical accident, but can not
+   *   be fixed in a backward compatible style. That said, the
+   *   get_normal_vectors() function is now deprecated, will be removed
+   *   in the next version, and the current function will then be renamed.
    */
-  const std::vector<Point<spacedim> > &get_normal_vectors () const;
+  const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const;
+
+  /**
+   * Return the normal vectors at the quadrature points as a vector of
+   * Point objects. This function is deprecated because normal vectors
+   * are correctly represented by rank-1 Tensor objects, not Point objects.
+   * Use get_all_normal_vectors() instead.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   *
+   * @deprecated
+   */
+  std::vector<Point<spacedim> > get_normal_vectors () const DEAL_II_DEPRECATED;
 
   /**
    * Transform a set of vectors, one for each quadrature point. The
@@ -3989,7 +4011,7 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 
 template <int dim, int spacedim>
 inline
-const Point<spacedim> &
+const Tensor<1,spacedim> &
 FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 {
   typedef FEValuesBase<dim,spacedim> FVB;

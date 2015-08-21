@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,7 +111,7 @@ double integrate_error(const DoFHandler<dim> &dof,
             {
               double diff = 0.;
               for (unsigned int d=0; d<dim; ++d)
-                diff += fe.normal_vector(k)(d) * (f_values[k](d) - fe_values[k](d));
+                diff += fe.normal_vector(k)[d] * (f_values[k](d) - fe_values[k](d));
               result += fe.JxW(k) * diff * diff;
             }
         }

@@ -76,7 +76,7 @@ private:
   double term_S(const Tensor<1,3> &r,
                 const Tensor<1,3> &a1,
                 const Tensor<1,3> &a2,
-                const Point<3> &n,
+                const Tensor<1,3> &n,
                 const double &rn_c);
 
   double term_D(const Tensor<1,3> &r,
@@ -123,9 +123,9 @@ LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(vector<double> &dst,
          ExcDimensionMismatch(dst.size(), 2));
   fe_values->reinit(cell);
   vector<DerivativeForm<1,2,3> > jacobians = fe_values->get_jacobians();
-  vector<Point<3> > normals = fe_values->get_normal_vectors();
+  vector<Tensor<1,3> > normals = fe_values->get_all_normal_vectors();
 
-  Point<3> n,n_c;
+  Tensor<1,3> n,n_c;
   Tensor<1,3> r_c = point-cell->center();
   n_c = normals[4];
 
@@ -151,7 +151,7 @@ double
 LaplaceKernelIntegration<dim>::term_S (const Tensor<1,3> &r,
                                        const Tensor<1,3> &a1,
                                        const Tensor<1,3> &a2,
-                                       const Point<3> &n,
+                                       const Tensor<1,3> &n,
                                        const double &rn_c)
 {
   Point<3> ra1, ra2, a12;

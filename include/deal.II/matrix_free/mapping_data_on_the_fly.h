@@ -123,7 +123,7 @@ namespace internal
       get_quadrature_points() const;
 
       /**
-       * Return a vector of quadrature points in real space on the given cell.
+       * Return a vector of normal vectors in real space on the given cell.
        * For compatibility with FEEvaluation, it returns tensors of vectorized
        * arrays, even though all components are equal.
        */

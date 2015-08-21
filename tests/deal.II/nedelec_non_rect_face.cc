@@ -323,7 +323,7 @@ namespace Maxwell
 
     // Neumann storage
     std::vector<Vector<double> > neumann_value_list(n_face_q_points, Vector<double>(fe.n_components()));
-    std::vector<Point<dim> > normal_vector_list(fe_face_values.get_normal_vectors());
+    std::vector<Tensor<1,dim> > normal_vector_list(fe_face_values.get_all_normal_vectors());
     Tensor<1,dim> neumann_value_vector(dim);
     Tensor<1,dim> neumann_value(dim);
     Tensor<1,dim> normal_vector;

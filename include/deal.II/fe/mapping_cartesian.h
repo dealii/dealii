@@ -246,7 +246,7 @@ private:
                      const CellSimilarity::Similarity cell_similarity,
                      const InternalData &data,
                      std::vector<Point<dim> > &quadrature_points,
-                     std::vector<Point<dim> > &normal_vectors) const;
+                     std::vector<Tensor<1,dim> > &normal_vectors) const;
 
   /**
    * Value to indicate that a given face or subface number is invalid.

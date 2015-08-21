@@ -411,14 +411,12 @@ namespace internal
       std::vector<Point<spacedim> >  quadrature_points;
 
       /**
-       * List of outward normal vectors at the quadrature points. This field is
-       * filled in by the finite element class.
+       * List of outward normal vectors at the quadrature points.
        */
-      std::vector<Point<spacedim> >  normal_vectors;
+      std::vector<Tensor<1,spacedim> >  normal_vectors;
 
       /**
-       * List of boundary forms at the quadrature points. This field is filled in
-       * by the finite element class.
+       * List of boundary forms at the quadrature points.
        */
       std::vector<Tensor<1,spacedim> >  boundary_forms;
     };
