@@ -122,6 +122,8 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     # Clang-3.5* or older, bail out with a spurious error message in case
     # of an undeduced auto return type.
     #
+    # https://llvm.org/bugs/show_bug.cgi?id=16876
+    #
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS_DEBUG}")
     CHECK_CXX_SOURCE_COMPILES(
       "
