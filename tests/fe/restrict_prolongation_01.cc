@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2013 by the deal.II authors
+ * Copyright (C) 1999 - 2013, 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -74,7 +74,7 @@ check(const FiniteElement<dim, spacedim> &fe,
     FullMatrix<double> restriction_global(dpc,n_dofs);
     FullMatrix<double> prolongation_global(n_dofs,dpc);
 
-    std::vector<unsigned int> ldi (dpc);
+    std::vector<types::global_dof_index> ldi (dpc);
 
     //now create the matrix coarse to fine (prolongation)
     //and fine to coarse (restriction) with respect to all dofs
