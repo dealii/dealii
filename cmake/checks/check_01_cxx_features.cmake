@@ -103,10 +103,6 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
-    # Some versions of clang are feature complete but do not have debug
-    # information.
-    PUSH_CMAKE_REQUIRED("-g")
-
     #
     # This test does not guarantee full C++14 support, but virtually every
     # compiler with some C++14 support implements this.
@@ -122,10 +118,28 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       "
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
 
+    #
+    # Clang-3.5* or older, bail out with a spurious error message in case
+    # of an undeduced auto return type.
+    #
+    # https://llvm.org/bugs/show_bug.cgi?id=16876
+    #
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS_DEBUG}")
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      struct foo
+      {
+        auto func();
+      };
+      int main() {}
+      "
+      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
+
     RESET_CMAKE_REQUIRED()
   ENDIF()
 
-  IF(DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
+  IF( DEAL_II_HAVE_CXX14_MAKE_UNIQUE AND
+      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK )
     SET(DEAL_II_HAVE_CXX14 TRUE)
   ELSE()
     IF(NOT _user_provided_cxx_version_flag)
