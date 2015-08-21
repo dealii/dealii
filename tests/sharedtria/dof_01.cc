@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: dof_handler_number_cache.cc 31761 2013-11-22 14:42:37Z heister $
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,7 @@ void test()
       << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
       deallog << "n_locally_owned_dofs_per_processor: ";
-      std::vector<unsigned int> v = dof_handler.n_locally_owned_dofs_per_processor();
+      std::vector<types::global_dof_index> v = dof_handler.n_locally_owned_dofs_per_processor();
       unsigned int sum = 0;
       for (unsigned int i=0;i<v.size();++i)
         {
