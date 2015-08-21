@@ -950,7 +950,7 @@ namespace DoFTools
   void
   make_periodicity_constraints
   (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
-                                   &periodic_faces,
+   &periodic_faces,
    dealii::ConstraintMatrix        &constraint_matrix,
    const ComponentMask             &component_mask = ComponentMask(),
    const std::vector<unsigned int> &first_vector_components = std::vector<unsigned int>());
