@@ -102,6 +102,7 @@ SparseMatrixEZ<number>::reinit(const size_type n_rows,
 {
   clear();
 
+  saved_default_row_length = default_row_length;
   increment = default_increment;
 
   n_columns = n_cols;
