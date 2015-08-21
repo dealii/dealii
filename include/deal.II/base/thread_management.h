@@ -2957,9 +2957,7 @@ namespace Threads
     {
       // create a task descriptor and tell it to queue itself up with
       // the scheduling system
-      task_descriptor =
-        std_cxx11::shared_ptr<internal::TaskDescriptor<RT> >
-        (new internal::TaskDescriptor<RT>(function_object));
+      task_descriptor.reset (new internal::TaskDescriptor<RT>(function_object));
       task_descriptor->queue_task ();
     }
 
