@@ -39,14 +39,28 @@ void test(const DH& dh)
   DoFVector<DH, Vector<number> > dv1(dh);
   dv1.sync();
   Vector<number>& v1 = dv1.get_data();
-  deallog << "dim " << DH::dimension << " v1: " << v1.size() << std::endl;
-  
-  const DoFVector<DH, Vector<number> > dv2(dh);
-  const Vector<number>& v2 = dv2.get_data();
+  deallog << " dim " << DH::dimension << " v1: " << v1.size() << std::endl;
+  deallog << "dv1 " << (dv1.is_const() ? 'c' : 'm')
+	  << (dv1.is_owner() ? 'o' : 'x')
+	  << std::endl;
   
   Vector<number> w(5);
-  const DoFVector<DH, Vector<number> > dv3(dh, w);
+  const DoFVector<DH, Vector<number> > dv2(dh, w);
+  deallog << "dv2 " << (dv2.is_const() ? 'c' : 'm')
+	  << (dv2.is_owner() ? 'o' : 'x')
+	  << std::endl;
+  DoFVector<DH, Vector<number> > dv3(dh, w);
   const Vector<number>& v3 = dv3.get_data();
+  deallog << "dv3 " << (dv3.is_const() ? 'c' : 'm')
+	  << (dv3.is_owner() ? 'o' : 'x')
+	  << std::endl;
+
+  const Vector<number>& cw = w;
+  DoFVector<DH, Vector<number> > dv4(dh, cw);
+  deallog << "dv4 " << (dv4.is_const() ? 'c' : 'm')
+	  << (dv4.is_owner() ? 'o' : 'x')
+	  << std::endl;
+  
 
   DoFVector<DH, BlockVector<number> > dvb(dh);
   dvb.sync();

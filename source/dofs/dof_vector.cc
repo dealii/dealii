@@ -89,6 +89,7 @@ DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co)
     other_data(0)
 {
   my_data = mem.alloc();
+  const_data = my_data;
 }
 
 
@@ -100,7 +101,18 @@ DoFVector<DH, VECTOR>::DoFVector (const DH &dh)
     other_data(0)
 {
   my_data = mem.alloc();
+  const_data = my_data;
 }
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co, VECTOR &v)
+  : dh(&dh),
+    constraints(&co),
+    my_data(0),
+    other_data(&v),
+    const_data(&v)
+{}
 
 
 template <class DH, class VECTOR>
@@ -108,7 +120,18 @@ DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co, cons
   : dh(&dh),
     constraints(&co),
     my_data(0),
-    other_data(&v)
+    other_data(0),
+    const_data(&v)
+{}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh, VECTOR &v)
+  : dh(&dh),
+    constraints(&no_constraints),
+    my_data(0),
+    other_data(&v),
+    const_data(&v)
 {}
 
 
@@ -117,7 +140,8 @@ DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const VECTOR &v)
   : dh(&dh),
     constraints(&no_constraints),
     my_data(0),
-    other_data(&v)
+    other_data(0),
+    const_data(&v)
 {}
 
 

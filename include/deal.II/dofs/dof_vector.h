@@ -88,6 +88,18 @@ public:
   /**
    * Construct an object with a DoFHandler and use the vector provided
    * as data vector without copying it. This vector is not owned by the
+   * object and the constructed object will be writeable.
+   *
+   * The life span of all objects usesd as arguments must exceed the
+   * life span of the constructed object, otherwise, Subscriptor will
+   * throw an exception complaining that a used object is being
+   * deleted.
+   */
+  DoFVector (const DH &dh, const ConstraintMatrix &constraints, VECTOR &v);
+
+  /**
+   * Construct an object with a DoFHandler and use the vector provided
+   * as data vector without copying it. This vector is not owned by the
    * object and read-access only.
    *
    * @note An object created this way is effectively constant. In
@@ -100,6 +112,19 @@ public:
    * deleted.
    */
   DoFVector (const DH &dh, const ConstraintMatrix &constraints, const VECTOR &v);
+
+  /**
+   * Construct an object with a DoFHandler but without constraints and
+  * use the vector provided as data vector without copying it. This
+  * vector is not owned by the object, but the object is writeable.
+  *
+  * The life span of the arguments of this constructor must exceed
+  * the life span of the constructed object, otherwise, Subscriptor
+  * will throw an exception complaining that a used object is being
+  * deleted.
+   */
+  DoFVector (const DH &dh, VECTOR &v);
+
 
   /**
    * Construct an object with a DoFHandler but without constraints and
@@ -179,6 +204,27 @@ public:
   VECTOR &get_data ();
   ///@}
 
+  /// @name Information on the object
+  ///@{
+  /**
+   * Tell if the vector is mutable or not. This depends on the way
+   * this object is constructed, whether the vector reference given
+   * to it was a const reference or not.
+   */
+  bool is_const ();
+
+  /**
+   * The object is not mutable, so this function invariably returns `true`.
+   */
+  bool is_const () const;
+
+  /**
+   * Tell whether this object owns the vector stored in it. The
+   * result is `false` if a vector was supplied to the constructor.
+   */
+  bool is_owner () const;
+
+  ///@}
   /**
    * Exception thrown when a function tries to modify data of an
    * object that does not own it. Check out the different
@@ -224,9 +270,20 @@ private:
 
   /**
    * The data vector if referencing a vector not owned by this
-   * object. This pointer being nonzero implies #my_data is zero.
+   * object. This pointer being nonzero implies #my_data is zero. If
+   * this pointer and #my_data are zero, it is implied that this object
+   * was created with a reference to a const vector.
    */
-  SmartPointer<const VECTOR, DoFVector<DH, VECTOR> > other_data;
+  SmartPointer<VECTOR, DoFVector<DH, VECTOR> > other_data;
+
+  /**
+   * The data vector if referencing a vector from a const object. Is
+   * equal to either #my_data or #other_data if the object is
+   * writeable. If this object was constructed with a const vector
+   * reference, both other pointers are zero, but this one is still
+   * accessible.
+   */
+  SmartPointer<const VECTOR, DoFVector<DH, VECTOR> > const_data;
 };
 
 
@@ -253,10 +310,7 @@ inline
 const VECTOR &
 DoFVector<DH, VECTOR>::get_data () const
 {
-  if (my_data != 0)
-    return *my_data;
-  Assert(other_data != 0, ExcNotInitialized());
-  return *other_data;
+  return *const_data;
 }
 
 
@@ -265,8 +319,37 @@ inline
 VECTOR &
 DoFVector<DH, VECTOR>::get_data ()
 {
-  Assert(my_data != 0, ExcNotInitialized());
-  return *my_data;
+  if (my_data)
+    return *my_data;
+  Assert (other_data != 0, ExcNotInitialized());
+  return *other_data;
+}
+
+
+template <class DH, class VECTOR>
+inline
+bool
+DoFVector<DH, VECTOR>::is_const ()
+{
+  return (my_data == 0 && other_data == 0) ? true : false;
+}
+
+
+template <class DH, class VECTOR>
+inline
+bool
+DoFVector<DH, VECTOR>::is_const () const
+{
+  return true;
+}
+
+
+template <class DH, class VECTOR>
+inline
+bool
+DoFVector<DH, VECTOR>::is_owner () const
+{
+  return my_data != 0;
 }
 
 
