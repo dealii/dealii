@@ -986,8 +986,8 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
                       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                        normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
-                                                         * fe_values.normal_vector(point)(bcomp);
+                        normal_adjustment[point][comp] = fe_values.normal_vector(point)[bcomp]
+                                                         * fe_values.normal_vector(point)[bcomp];
                   }
 
                 for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)

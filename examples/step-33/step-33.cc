@@ -260,7 +260,7 @@ namespace Step33
     // $\alpha$. It's form has also been given already in the introduction:
     template <typename InputVector>
     static
-    void numerical_normal_flux (const Point<dim>                   &normal,
+    void numerical_normal_flux (const Tensor<1,dim>                &normal,
                                 const InputVector                  &Wplus,
                                 const InputVector                  &Wminus,
                                 const double                        alpha,
@@ -374,7 +374,7 @@ namespace Step33
     static
     void
     compute_Wminus (const BoundaryKind  (&boundary_kind)[n_components],
-                    const Point<dim>     &normal_vector,
+                    const Tensor<1,dim>  &normal_vector,
                     const DataVector     &Wplus,
                     const Vector<double> &boundary_values,
                     const DataVector     &Wminus)

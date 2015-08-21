@@ -154,7 +154,7 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
                                                const CellSimilarity::Similarity cell_similarity,
                                                const InternalData             &data,
                                                std::vector<Point<dim> > &quadrature_points,
-                                               std::vector<Point<dim> > &normal_vectors) const
+                                               std::vector<Tensor<1,dim> > &normal_vectors) const
 {
   const UpdateFlags update_flags = data.update_each;
 
@@ -346,7 +346,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
-  std::vector<Point<dim> > dummy;
+  std::vector<Tensor<1,dim> > dummy;
 
   compute_fill (cell, invalid_face_number, invalid_face_number, cell_similarity,
                 data,

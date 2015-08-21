@@ -149,7 +149,7 @@ namespace internal
       /**
        * The normal vectors of the finite element function on one face
        */
-      std::vector<Point<spacedim> > normal_vectors;
+      std::vector<Tensor<1,spacedim> > normal_vectors;
 
       /**
        * Two arrays needed for the values of coefficients in the jumps, if
@@ -364,7 +364,7 @@ namespace internal
       // change the sign. We take the outward normal.
 
       parallel_data.normal_vectors =
-        fe_face_values_cell.get_present_fe_values().get_normal_vectors();
+        fe_face_values_cell.get_present_fe_values().get_all_normal_vectors();
 
       for (unsigned int n=0; n<n_solution_vectors; ++n)
         for (unsigned int component=0; component<n_components; ++component)

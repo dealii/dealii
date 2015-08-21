@@ -3148,13 +3148,31 @@ FEValuesBase<dim,spacedim>::get_cell () const
 
 
 template <int dim, int spacedim>
-const std::vector<Point<spacedim> > &
-FEValuesBase<dim,spacedim>::get_normal_vectors () const
+const std::vector<Tensor<1,spacedim> > &
+FEValuesBase<dim,spacedim>::get_all_normal_vectors () const
 {
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (this->update_flags & update_normal_vectors,
           typename FEVB::ExcAccessToUninitializedField("update_normal_vectors"));
   return this->normal_vectors;
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<Point<spacedim> >
+FEValuesBase<dim,spacedim>::get_normal_vectors () const
+{
+  typedef FEValuesBase<dim,spacedim> FEVB;
+  Assert (this->update_flags & update_normal_vectors,
+          typename FEVB::ExcAccessToUninitializedField("update_normal_vectors"));
+
+  // copy things into a vector of Points, then return that
+  std::vector<Point<spacedim> > tmp (this->normal_vectors.size());
+  for (unsigned int q=0; q<this->normal_vectors.size(); ++q)
+    tmp[q] = Point<spacedim>(this->normal_vectors[q]);
+
+  return tmp;
 }
 
 

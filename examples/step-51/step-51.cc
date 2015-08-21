@@ -810,7 +810,7 @@ namespace Step51
             const double JxW = scratch.fe_face_values.JxW(q);
             const Point<dim> quadrature_point =
               scratch.fe_face_values.quadrature_point(q);
-            const Point<dim> normal = scratch.fe_face_values.normal_vector(q);
+            const Tensor<1,dim> normal = scratch.fe_face_values.normal_vector(q);
             const Tensor<1,dim> convection
               = scratch.convection_velocity.value(quadrature_point);
 

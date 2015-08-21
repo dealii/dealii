@@ -38,6 +38,23 @@ inconvenience this causes.
 </p>
 
 <ol>
+  
+  <li> Changed: FEValues::normal_vector() for historical reasons returned a
+  value of type Point, though a normal vector is more adequately described
+  as a Tensor@<1,dim@>. Many similar cases were already clarified in deal.II
+  8.3. The current case has now also been changed: FEValues::normal_vector()
+  now returns a Tensor, rather than a Point.
+  <br>
+  In a similar spirit, the FEValues::get_normal_vectors() function that
+  still returns a vector of Points has been deprecated and a new function,
+  FEValues::get_all_normal_vectors(), that returns a vector of tensors,
+  has been added. This was necessary since there is no way to change the
+  return type of the existing function in a backward compatible way. The
+  old function will be removed in the next version, and the new function
+  will then be renamed to the old name.
+  <br>
+  (Wolfgang Bangerth, 2015/08/20)
+  </li>
 
   <li> Changed: The mesh_converter program has been removed from the
   contrib folder. The equivalent functionality can now be found in

@@ -4209,7 +4209,7 @@ namespace VectorTools
               // This avoids possible issues with the computation of the tangent.
 
               // Store the normal at this quad point:
-              Point<dim> normal_at_q_point = fe_face_values.normal_vector(q_point);
+              Tensor<1,dim> normal_at_q_point = fe_face_values.normal_vector(q_point);
               for (unsigned int j = 0; j < associated_edge_dofs; ++j)
                 {
                   const unsigned int j_face_idx = associated_edge_dof_to_face_dof[j];
@@ -4226,15 +4226,15 @@ namespace VectorTools
                       // Using n cross phi
                       edge_matrix(i,j)
                       += fe_face_values.JxW (q_point)
-                         * ((phi_i[1]*normal_at_q_point(0) - phi_i[0]*normal_at_q_point(1))
-                            * (phi_j[1]*normal_at_q_point(0) - phi_j[0]*normal_at_q_point(1)));
+                         * ((phi_i[1]*normal_at_q_point[0] - phi_i[0]*normal_at_q_point[1])
+                            * (phi_j[1]*normal_at_q_point[0] - phi_j[0]*normal_at_q_point[1]));
                     }
                   // Using n cross phi
                   edge_rhs(j)
                   += fe_face_values.JxW (q_point)
-                     * ((values[q_point] (first_vector_component+1) * normal_at_q_point (0)
-                         - values[q_point] (first_vector_component) * normal_at_q_point (1))
-                        * (phi_j[1]*normal_at_q_point(0) - phi_j[0]*normal_at_q_point(1)));
+                     * ((values[q_point] (first_vector_component+1) * normal_at_q_point[0]
+                         - values[q_point] (first_vector_component) * normal_at_q_point[1])
+                        * (phi_j[1]*normal_at_q_point[0] - phi_j[0]*normal_at_q_point[1]));
                 }
             }
 
@@ -4343,13 +4343,9 @@ namespace VectorTools
           // associated with this face. We also must include the residuals from the
           // shape funcations associated with edges.
           Tensor<1, dim> tmp;
-          Tensor<1, dim> normal_vector,
-                 cross_product_i,
+          Tensor<1, dim> cross_product_i,
                  cross_product_j,
                  cross_product_rhs;
-
-          // Store all normal vectors at quad points:
-          std::vector<Point<dim> > normal_vector_list(fe_face_values.get_normal_vectors());
 
           // Loop to construct face linear system.
           for (unsigned int q_point = 0;
@@ -4383,10 +4379,8 @@ namespace VectorTools
                 }
 
               // Tensor of normal vector on the face at q_point;
-              for (unsigned int d = 0; d < dim; ++d)
-                {
-                  normal_vector[d] = normal_vector_list[q_point](d);
-                }
+              const Tensor<1,dim> normal_vector = fe_face_values.normal_vector(q_point);
+
               // Now compute the linear system:
               // On a face:
               // The matrix entries are:
@@ -4756,7 +4750,7 @@ namespace VectorTools
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec (first_vector_component);
       const FiniteElement<2> &fe = cell->get_fe ();
-      const std::vector<Point<2> > &normals = fe_values.get_normal_vectors ();
+      const std::vector<Tensor<1,2> > &normals = fe_values.get_all_normal_vectors ();
       const unsigned int
       face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1, 1, 0, 0};
       std::vector<Vector<double> >
@@ -4837,7 +4831,7 @@ namespace VectorTools
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec (first_vector_component);
       const FiniteElement<3> &fe = cell->get_fe ();
-      const std::vector<Point<3> > &normals = fe_values.get_normal_vectors ();
+      const std::vector<Tensor<1,3> > &normals = fe_values.get_all_normal_vectors ();
       const unsigned int
       face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {{1, 2},
         {1, 2},
@@ -5410,7 +5404,7 @@ namespace VectorTools
                       = (cell->face(face_no)->get_boundary().normal_vector
                          (cell->face(face_no),
                           fe_values.quadrature_point(i)));
-                    if (normal_vector * static_cast<Tensor<1,dim> >(fe_values.normal_vector(i)) < 0)
+                    if (normal_vector * fe_values.normal_vector(i) < 0)
                       normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
                             ExcInternalError());
@@ -6211,9 +6205,8 @@ namespace VectorTools
                 {
                   // compute (f.n) n
                   const Number f_dot_n
-                    = (data.psi_grads[q][k] * Tensor<1,spacedim,Number>(fe_values.normal_vector(q)));
-                  const Tensor<1,spacedim,Number> f_dot_n_times_n
-                    = f_dot_n * Tensor<1,spacedim,Number>(fe_values.normal_vector(q));
+                    = (data.psi_grads[q][k] * fe_values.normal_vector(q));
+                  const Tensor<1,spacedim,Number> f_dot_n_times_n (f_dot_n * fe_values.normal_vector(q));
 
                   data.psi_grads[q][k] -= (data.function_grads[q][k] + f_dot_n_times_n);
                 }

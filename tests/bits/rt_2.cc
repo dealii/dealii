@@ -107,9 +107,9 @@ void evaluate_normal (DoFHandler<2>  &dof_handler,
 
               for (unsigned int q_point=0; q_point<n_q_face; ++q_point)
                 {
-                  Point<2> vn = fe_v_face.normal_vector (q_point);
-                  double nx = vn(0);
-                  double ny = vn(1);
+                  Tensor<1,2> vn = fe_v_face.normal_vector (q_point);
+                  double nx = vn[0];
+                  double ny = vn[1];
 
                   double u = this_value[q_point](0);
                   double v = this_value[q_point](1);

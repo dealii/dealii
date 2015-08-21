@@ -110,7 +110,7 @@ plot_faces(Mapping<dim> &mapping,
           for (unsigned int nx=0; nx<nq; ++nx)
             {
               const Point<dim> x = fe_values.quadrature_point(k);
-              const Point<dim> &n = fe_values.normal_vector(k);
+              const Tensor<1,dim> n = fe_values.normal_vector(k);
               const double ds = fe_values.JxW(k);
 
               deallog << x << '\t' << n << '\t' << ds << std::endl;
@@ -149,8 +149,8 @@ plot_subfaces(Mapping<dim> &mapping,
       {
         fe_values.reinit(cell, face_nr, sub_nr);
 
-        const std::vector<Point<dim> > &normals
-          =fe_values.get_normal_vectors();
+        const std::vector<Tensor<1,dim> > &normals
+          =fe_values.get_all_normal_vectors();
 
         unsigned int k=0;
         for (unsigned int ny=0; ny<((dim>2) ? nq : 1); ++ny)

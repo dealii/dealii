@@ -85,7 +85,7 @@ void check_this (Triangulation<3> &tria)
                                        fe_face_values2.JxW(q)) < 1e-14,
                              ExcInternalError());
                 AssertThrow ((fe_face_values1.normal_vector(q) +
-                              fe_face_values2.normal_vector(q)).square()
+                              fe_face_values2.normal_vector(q)).norm_square()
                              < 1e-20,
                              ExcInternalError());
               }
