@@ -429,12 +429,23 @@ public:
    */
 //@{
   /**
-   * Set the element <tt>(i,j)</tt> to @p value. Allocates the entry, if it
-   * does not exist and @p value is non-zero. If <tt>value</tt> is not a
-   * finite number an exception is thrown.
+   * Set the element <tt>(i,j)</tt> to @p value.
+   *
+   * If <tt>value</tt> is not a finite number an exception is thrown.
+   *
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
+   *
+   * If anyway a new element will be inserted and it does not exist,
+   * allocates the entry.
+   *
+   * @note You may need to insert some zero elements to keep a
+   * symmetric sparsity pattern for the matrix.
    */
   void set (const size_type i, const size_type j,
-            const number value);
+            const number value, const bool elide_zero_values = true);
 
   /**
    * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
@@ -521,11 +532,16 @@ public:
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
    *
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
+   *
    * The function returns a reference to @p this.
    */
   template <class MATRIX>
   SparseMatrixEZ<number> &
-  copy_from (const MATRIX &source);
+  copy_from (const MATRIX &source, const bool elide_zero_values = true);
 
   /**
    * Add @p matrix scaled by @p factor to this matrix.
@@ -1198,15 +1214,15 @@ template <typename number>
 inline
 void SparseMatrixEZ<number>::set (const size_type i,
                                   const size_type j,
-                                  const number value)
+                                  const number value,
+                                  const bool elide_zero_values)
 {
-
   AssertIsFinite(value);
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 
-  if (value == 0.)
+  if (elide_zero_values && value == 0.)
     {
       Entry *entry = locate(i,j);
       if (entry != 0)
@@ -1374,7 +1390,7 @@ template<typename number>
 template <class MATRIX>
 inline
 SparseMatrixEZ<number> &
-SparseMatrixEZ<number>::copy_from (const MATRIX &M)
+SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values)
 {
   reinit(M.m(), M.n());
 
@@ -1386,8 +1402,7 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M)
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
-        if (entry->value() != 0)
-          set(row, entry->column(), entry->value());
+        set(row, entry->column(), entry->value(), elide_zero_values);
     }
 
   return *this;
