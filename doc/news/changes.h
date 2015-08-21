@@ -83,6 +83,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is a new documentation module on
+  @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
+  <br>
+  (Wolfgang Bangerth, 2015/08/20)
+  </li>
+
   <li> New: parallel::shared::Triangulation class which extends
   Triangulation class to automatically partition triangulation when run
   with MPI. Identical functionality between parallel::shared::Triangulation and
