@@ -17,10 +17,6 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
-// Remark: The explicit instantiations for "TriaAccessor" were moved
-// to the top of this source file. The reason is a slightly buggy version
-// of the Apple gcc v.3.3.
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
     template class TriaAccessorBase<1,deal_II_dimension>;
 #if deal_II_dimension >= 2
     template class TriaAccessorBase<2,deal_II_dimension>;
@@ -66,7 +62,7 @@ for (deal_II_dimension : DIMENSIONS)
 
     template class TriaAccessor<1,deal_II_dimension,2>;
     template class TriaAccessor<1,deal_II_dimension,3>;
-    
+
 
 #endif
 #if deal_II_dimension == 2
@@ -95,5 +91,3 @@ for (deal_II_dimension : DIMENSIONS)
 
 #endif
   }
-
-    

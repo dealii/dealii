@@ -2277,13 +2277,7 @@ neighbor_child_on_subface (const unsigned int face,
 
 
 
-// Remark: The explicit instantiations for "TriaAccessor" were moved
-// to the top of this source file. The reason is a slightly buggy version
-// of the Apple gcc v.3.3.
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
-
 // explicit instantiations
 #include "tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
