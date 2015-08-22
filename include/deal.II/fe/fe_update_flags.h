@@ -370,7 +370,7 @@ namespace internal
        * Initialize all vectors to correct size.
        */
       void initialize (const unsigned int n_quadrature_points,
-                       const UpdateFlags         flags);
+                       const UpdateFlags  flags);
 
       /**
        * Store an array of weights times the Jacobi determinant at the quadrature

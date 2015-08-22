@@ -513,10 +513,12 @@ MappingQ1<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
         out |= update_covariant_transformation;
 
       // The contravariant transformation
-      // is a Piola transformation, which
+      // used in the Piola transformation, which
       // requires the determinant of the
       // Jacobi matrix of the transformation.
-      // Therefore these values have to be
+      // Because we have no way of knowing here whether the finite
+      // elements wants to use the contravariant of the Piola
+      // transforms, we add the JxW values to the list of flags to be
       // updated for each cell.
       if (out & update_contravariant_transformation)
         out |= update_JxW_values;
