@@ -2869,6 +2869,10 @@ namespace
   void
   Abaqus_to_UCD<dim>::read_in_abaqus (std::istream &input_stream)
   {
+    // References:
+    // http://www.egr.msu.edu/software/abaqus/Documentation/docs/v6.7/books/usb/default.htm?startat=pt01ch02.html
+    // http://www.cprogramming.com/tutorial/string.html
+
     AssertThrow (input_stream, ExcIO());
     std::string line;
     std::getline (input_stream, line);
@@ -3068,8 +3072,13 @@ namespace
                 char comma;
                 int elid_start;
                 int elid_end;
-                int elis_step;
-                iss >> elid_start >> comma >> elid_end >> comma >> elis_step;
+                int elis_step = 1; // Default value set in case stride not provided
+                // Some files don't have the stride size
+                // Compare mesh test cases ./grids/abaqus/3d/other_simple.inp to ./grids/abaqus/2d/2d_test_abaqus.inp
+                iss >> elid_start >> comma >> elid_end;
+                // https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null
+                if (iss.rdbuf()->in_avail() != 0)
+                  iss >> comma >> elis_step;
                 for (int i = elid_start; i <= elid_end; i+= elis_step)
                   {
                     elements.push_back(i);
@@ -3247,6 +3256,10 @@ cont:
   void
   Abaqus_to_UCD<dim>::write_out_avs_ucd (std::ostream &output) const
   {
+    // References:
+    // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
+    // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
+
     AssertThrow (output, ExcIO());
 
     // Write out title - Note: No other commented text can be inserted below the
