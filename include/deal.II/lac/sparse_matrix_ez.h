@@ -858,6 +858,11 @@ private:
    * Increment when a row grows.
    */
   unsigned int increment;
+
+  /**
+   * Remember the user provided default row length.
+   */
+  unsigned int saved_default_row_length;
 };
 
 /**
@@ -1392,7 +1397,10 @@ inline
 SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values)
 {
-  reinit(M.m(), M.n());
+  reinit(M.m(),
+         M.n(),
+         this->saved_default_row_length,
+         this->increment);
 
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
