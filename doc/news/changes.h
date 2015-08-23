@@ -109,7 +109,8 @@ inconvenience this causes.
 
 <ol>
   <li> Improved: The interface and documentation for periodic boundary
-  conditions have been restructured. A glossary entry has been written.
+  conditions have been restructured. A
+  @ref GlossPeriodicConstraints "glossary entry" has been written.
   <br>
   (Daniel Arndt, Matthias Maier, 2015/08/01-2015/08/21)
   </li>

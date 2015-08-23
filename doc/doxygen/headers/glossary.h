@@ -1220,13 +1220,13 @@ Article{JK10,
  * conditions</b></dt>
  * <dd>Periodic boundary condition are often used when only part of the physical
  * relevant domain is modeled. One assumes that the solution simply continues
- * periodically with respect to the boundaries that are condiered periodic.
+ * periodically with respect to the boundaries that are considered periodic.
  * In deal.II, support for this is through DoFTools::make_periodicity_constraints()
  * and GridTools::collect_periodic_faces(). As soon as a
  * parallel::distributed::Triangulation is used also
  * parallel::distributed::Triangulation::add_periodicity() has to be called to make
  * sure that all the processes know about relevant parts of the triangulation on both
- * sides of the periodic boundary. A typical process for disctributed triangulations would be:
+ * sides of the periodic boundary. A typical process for distributed triangulations would be:
  * -# Create a mesh
  * -# Gather the periodic faces using GridTools::collect_periodic_faces() (Triangulation)
  * -# Add the periodicity information to the mesh

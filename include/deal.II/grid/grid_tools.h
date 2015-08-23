@@ -942,11 +942,11 @@ namespace GridTools
      * parameter to DofTools::make_periodicity_constraints()) is non empty
      * the matrix is interpreted as a @p dim $\times$ @p dim rotation
      * matrix that is applied to all vector valued blocks listed in @p
-     * first_vector_components of the FESystem. Alternatively, if @p
-     * first_vector_components is empty the matrix is interpreted as an
-     * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
-     * For more details see DoFTools::make_periodicity_constraints() and
-     * the glossary
+     * first_vector_components of the finite element space. Alternatively,
+     * if @p first_vector_components is empty the matrix is interpreted as
+     * an interpolation matrix with size no_face_dofs $\times$
+     * no_face_dofs. For more details see
+     * DoFTools::make_periodicity_constraints() and the glossary
      * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
@@ -1123,16 +1123,16 @@ namespace GridTools
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.
    *
-   * Optionally a rotation matrix @p matrix along with a vector @p
-   * first_vector_components can be specified that describes how vector valued
-   * DoFs of the first face should be modified prior to constraining to the
-   * DoFs of the second face. If @p first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all
-   * vector valued blocks listed in @p first_vector_components of the
-   * FESystem. For more details see
-   * DoFTools::make_periodicity_constraints() and the glossary
-   *
-   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
+   * Optionally, a @p matrix can be specified that describes how vector
+   * valued DoFs of the first face should be modified prior to constraining
+   * to the DoFs of the second face. If the matrix has size
+   * $n\_face\_dofs\times n\_face\_dofs$, the periodicity constraints are
+   * applied as $dofs\_2 = matrix\cdot dofs\_1$. If the matrix has size
+   * $dim\times dim$, the matrix is interpreted as a rotation matrix for
+   * vector valued components. For more details see
+   * DoFTools::make_periodicity_constraints(), the glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
+   * and @ref step_45 "step-45".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
