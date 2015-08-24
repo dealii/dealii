@@ -28,14 +28,16 @@ namespace
 
 
 template <int dim, int spacedim>
-FE_Nothing<dim,spacedim>::FE_Nothing (const unsigned int n_components)
+FE_Nothing<dim,spacedim>::FE_Nothing (const unsigned int n_components,
+                                      const bool dominate)
   :
   FiniteElement<dim,spacedim>
   (FiniteElementData<dim>(std::vector<unsigned>(dim+1,0),
                           n_components, 0,
                           FiniteElementData<dim>::unknown),
    std::vector<bool>(),
-   std::vector<ComponentMask>() )
+   std::vector<ComponentMask>() ),
+  dominate(dominate)
 {
 // in most other elements we have to set up all sorts of stuff
 // here. there isn't much that we have to do here; in particular,
@@ -162,13 +164,34 @@ fill_fe_subface_values (const Mapping<dim,spacedim> & /*mapping*/,
   // leave data fields empty
 }
 
+template <int dim, int spacedim>
+bool
+FE_Nothing<dim,spacedim>::is_dominating() const
+{
+  return dominate;
+}
+
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_Nothing<dim,spacedim> ::
-compare_for_face_domination (const FiniteElement<dim,spacedim> &) const
+compare_for_face_domination (const FiniteElement<dim,spacedim> &fe) const
 {
-  return FiniteElementDomination::no_requirements;
+  // if FE_Nothing does not dominate, there are no requirements
+  if (!dominate)
+    {
+      return FiniteElementDomination::no_requirements;
+    }
+  // if it does and the other is FE_Nothing, either can dominate
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe) != 0)
+    {
+      return FiniteElementDomination::either_element_can_dominate;
+    }
+  // otherwise we dominate whatever fe is provided
+  else
+    {
+      return FiniteElementDomination::this_element_dominates;
+    }
 }
 
 

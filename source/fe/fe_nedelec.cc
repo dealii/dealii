@@ -2296,8 +2296,9 @@ FE_Nedelec<dim>::compare_for_face_domination (const FiniteElement<dim> &fe_other
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
+      // TODO: ???
       // the FE_Nothing has no
       // degrees of
       // freedom. nevertheless, we
@@ -2308,7 +2309,17 @@ FE_Nedelec<dim>::compare_for_face_domination (const FiniteElement<dim> &fe_other
       // and rather allow the
       // function to be discontinuous
       // along the interface
-      return FiniteElementDomination::other_element_dominates;
+//      return FiniteElementDomination::other_element_dominates;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());
