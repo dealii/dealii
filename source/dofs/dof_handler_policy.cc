@@ -1006,9 +1006,10 @@ namespace internal
       {
 
 #ifndef DEAL_II_WITH_MPI
+        (void)new_numbers;
         (void)dof_handler;
+        (void)number_cache;
         Assert (false, ExcNotImplemented());
-
 #else
         std::vector<types::global_dof_index> global_gathered_numbers (dof_handler.n_dofs (), 0);
         // as we call DoFRenumbering::subdomain_wise (dof_handler) from distribute_dofs(),
