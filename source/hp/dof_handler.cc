@@ -2244,49 +2244,28 @@ namespace hp
   DoFHandler<dim,spacedim>::
   compute_line_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
   {
-    // we will mark lines that we
-    // have already treated, so first
-    // save and clear the user flags
-    // on lines and later restore
-    // them
+    // we will mark lines that we have already treated, so first save and clear
+    // the user flags on lines and later restore them
     std::vector<bool> user_flags;
     this->get_tria().save_user_flags_line(user_flags);
     const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags_line ();
 
-    // An implementation of the
-    // algorithm described in the hp
-    // paper, including the
-    // modification mentioned later
-    // in the "complications in 3-d"
-    // subsections
+    // An implementation of the algorithm described in the hp paper, including
+    // the modification mentioned later in the "complications in 3-d" subsections
     //
-    // as explained there, we do
-    // something only if there are
-    // exactly 2 finite elements
-    // associated with an object. if
-    // there is only one, then there
-    // is nothing to do anyway, and
-    // if there are 3 or more, then
-    // we can get into trouble. note
-    // that this only happens for
-    // lines in 3d and higher, and
-    // for quads only in 4d and
-    // higher, so this isn't a
-    // particularly frequent case
+    // as explained there, we do something only if there are exactly 2 finite
+    // elements associated with an object. if there is only one, then there is
+    // nothing to do anyway, and if there are 3 or more, then we can get into
+    // trouble. note that this only happens for lines in 3d and higher, and for
+    // quads only in 4d and higher, so this isn't a particularly frequent case
     //
-    // there is one case, however, that we
-    // would like to handle (see, for
-    // example, the hp/crash_15 testcase): if
-    // we have FESystem(FE_Q(2),FE_DGQ(i))
-    // elements for a bunch of values 'i',
-    // then we should be able to handle this
-    // because we can simply unify *all*
-    // dofs, not only a some. so what we do
-    // is to first treat all pairs of finite
-    // elements that have *identical* dofs,
-    // and then only deal with those that are
-    // not identical of which we can handle
-    // at most 2
+    // there is one case, however, that we would like to handle (see, for
+    // example, the hp/crash_15 testcase): if we have FESystem(FE_Q(2),FE_DGQ(i))
+    // elements for a bunch of values 'i', then we should be able to handle this
+    // because we can simply unify *all* dofs, not only a some. so what we do
+    // is to first treat all pairs of finite elements that have *identical* dofs,
+    // and then only deal with those that are not identical of which we can
+    // handle at most 2
     Table<2,std_cxx11::shared_ptr<internal::hp::DoFIdentities> >
     line_dof_identities (finite_elements->size(),
                          finite_elements->size());
@@ -2301,8 +2280,7 @@ namespace hp
             unsigned int unique_sets_of_dofs
               = line->n_active_fe_indices();
 
-            // do a first loop over all sets of
-            // dofs and do identity
+            // do a first loop over all sets of dofs and do identity
             // uniquification
             for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
               for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
@@ -2320,11 +2298,8 @@ namespace hp
                       ((*finite_elements)[fe_index_1],
                        (*finite_elements)[fe_index_2],
                        line_dof_identities[fe_index_1][fe_index_2]);
-                      // see if these sets of dofs
-                      // are identical. the first
-                      // condition for this is that
-                      // indeed there are n
-                      // identities
+                      // see if these sets of dofs are identical. the first
+                      // condition for this is that indeed there are n identities
                       if (line_dof_identities[fe_index_1][fe_index_2]->size()
                           ==
                           (*finite_elements)[fe_index_1].dofs_per_line)
@@ -2339,17 +2314,10 @@ namespace hp
 
                           if (i == (*finite_elements)[fe_index_1].dofs_per_line)
                             {
-                              // the dofs of these
-                              // two finite
-                              // elements are
-                              // identical. as a
-                              // safety check,
-                              // ensure that none
-                              // of the two FEs is
-                              // trying to dominate
-                              // the other, which
-                              // wouldn't make any
-                              // sense in this case
+                              // the dofs of these two finite elements are
+                              // identical. as a safety check, ensure that none
+                              // of the two FEs is trying to dominate the other,
+                              // which wouldn't make any sense in this case
                               Assert ((*finite_elements)[fe_index_1].compare_for_face_domination
                                       ((*finite_elements)[fe_index_2])
                                       ==
@@ -2365,15 +2333,9 @@ namespace hp
                                   const types::global_dof_index slave_dof_index
                                     = line->dof_index (j, fe_index_2);
 
-                                  // if master dof
-                                  // was already
-                                  // constrained,
-                                  // constrain to
-                                  // that one,
-                                  // otherwise
-                                  // constrain
-                                  // slave to
-                                  // master
+                                  // if master dof was already constrained,
+                                  // constrain to that one, otherwise constrain
+                                  // slave to master
                                   if (new_dof_indices[master_dof_index] !=
                                       numbers::invalid_dof_index)
                                     {
@@ -2401,35 +2363,26 @@ namespace hp
                     }
                 }
 
-            // if at this point, there is only
-            // one unique set of dofs left, then
-            // we have taken care of everything
-            // above. if there are two, then we
-            // need to deal with them here. if
-            // there are more, then we punt, as
-            // described in the paper (and
-            // mentioned above)
+            // if at this point, there is only one unique set of dofs left, then
+            // we have taken care of everything above. if there are two, then we
+            // need to deal with them here. if there are more, then we punt, as
+            // described in the paper (and mentioned above)
 //TODO: The check for 'dim==2' was inserted by intuition. It fixes
 // the previous problems with step-27 in 3D. But an explanation
 // for this is still required, and what we do here is not what we
 // describe in the paper!.
             if ((unique_sets_of_dofs == 2) && (dim == 2))
               {
-                // find out which is the
-                // most dominating finite
-                // element of the ones that
-                // are used on this line
+                // find out which is the most dominating finite element of the
+                // ones that are used on this line
                 const unsigned int most_dominating_fe_index
                   = internal::hp::get_most_dominating_fe_index<dim,spacedim> (line);
 
                 const unsigned int n_active_fe_indices
                   = line->n_active_fe_indices ();
 
-                // loop over the indices of
-                // all the finite elements
-                // that are not dominating,
-                // and identify their dofs
-                // to the most dominating
+                // loop over the indices of all the finite elements that are not
+                // dominating, and identify their dofs to the most dominating
                 // one
                 for (unsigned int f=0; f<n_active_fe_indices; ++f)
                   if (line->nth_active_fe_index (f) !=
