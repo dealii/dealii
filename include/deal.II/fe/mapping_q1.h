@@ -166,6 +166,24 @@ public:
     InternalData(const unsigned int n_shape_functions);
 
     /**
+     * Initialize the object's member variables related to cell data
+     * based on the given arguments.
+     */
+    void
+    initialize (const UpdateFlags      update_flags,
+                const Quadrature<dim> &quadrature,
+                const unsigned int     n_original_q_points);
+
+    /**
+     * Initialize the object's member variables related to cell and
+     * face data based on the given arguments.
+     */
+    void
+    initialize_face (const UpdateFlags      update_flags,
+                     const Quadrature<dim> &quadrature,
+                     const unsigned int     n_original_q_points);
+
+    /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
@@ -413,27 +431,6 @@ protected:
    */
   void compute_shapes (const std::vector<Point<dim> > &unit_points,
                        InternalData &data) const;
-
-  /**
-   * Do the computations for the @p get_data functions. Here, the data vectors
-   * of @p InternalData are reinitialized to proper size and shape values are
-   * computed.
-   */
-  void compute_data (const UpdateFlags flags,
-                     const Quadrature<dim> &quadrature,
-                     const unsigned int n_orig_q_points,
-                     InternalData &data) const;
-
-  /**
-   * Do the computations for the @p get_face_data functions. Here, the data
-   * vectors of @p InternalData are reinitialized to proper size and shape
-   * values and derivatives are computed. Furthermore @p unit_tangential
-   * vectors of the face are computed.
-   */
-  void compute_face_data (const UpdateFlags flags,
-                          const Quadrature<dim> &quadrature,
-                          const unsigned int n_orig_q_points,
-                          InternalData &data) const;
 
   /**
    * Compute shape values and/or derivatives.

@@ -68,6 +68,116 @@ MappingQ1<dim,spacedim>::InternalData::memory_consumption () const
 }
 
 
+template <int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::InternalData::
+initialize (const UpdateFlags      update_flags,
+            const Quadrature<dim> &q,
+            const unsigned int     n_original_q_points)
+{
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values()
+  this->update_each = update_flags;
+
+  const unsigned int n_q_points = q.size();
+
+  // see if we need the (transformation) shape function values
+  // and/or gradients and resize the necessary arrays
+  if (this->update_each & update_quadrature_points)
+    shape_values.resize(n_shape_functions * n_q_points);
+
+  if (this->update_each & (update_covariant_transformation
+                           | update_contravariant_transformation
+                           | update_JxW_values
+                           | update_boundary_forms
+                           | update_normal_vectors
+                           | update_jacobians
+                           | update_jacobian_grads
+                           | update_inverse_jacobians))
+    shape_derivatives.resize(n_shape_functions * n_q_points);
+
+  if (this->update_each & update_covariant_transformation)
+    covariant.resize(n_original_q_points);
+
+  if (this->update_each & update_contravariant_transformation)
+    contravariant.resize(n_original_q_points);
+
+  if (this->update_each & update_volume_elements)
+    volume_elements.resize(n_original_q_points);
+
+  if (this->update_each & update_jacobian_grads)
+    shape_second_derivatives.resize(n_shape_functions * n_q_points);
+}
+
+
+template <int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::InternalData::
+initialize_face (const UpdateFlags      update_flags,
+                 const Quadrature<dim> &q,
+                 const unsigned int     n_original_q_points)
+{
+  initialize (update_flags, q, n_original_q_points);
+
+  if (dim > 1)
+    {
+      if (this->update_each & update_boundary_forms)
+        {
+          aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
+
+          // Compute tangentials to the
+          // unit cell.
+          const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
+          unit_tangentials.resize (nfaces*(dim-1),
+                                   std::vector<Tensor<1,dim> > (n_original_q_points));
+          if (dim==2)
+            {
+              // ensure a counterclockwise
+              // orientation of tangentials
+              static const int tangential_orientation[4]= {-1,1,1,-1};
+              for (unsigned int i=0; i<nfaces; ++i)
+                {
+                  Tensor<1,dim> tang;
+                  tang[1-i/2]=tangential_orientation[i];
+                  std::fill (unit_tangentials[i].begin(),
+                             unit_tangentials[i].end(), tang);
+                }
+            }
+          else if (dim==3)
+            {
+              for (unsigned int i=0; i<nfaces; ++i)
+                {
+                  Tensor<1,dim> tang1, tang2;
+
+                  const unsigned int nd=
+                    GeometryInfo<dim>::unit_normal_direction[i];
+
+                  // first tangential
+                  // vector in direction
+                  // of the (nd+1)%3 axis
+                  // and inverted in case
+                  // of unit inward normal
+                  tang1[(nd+1)%dim]=GeometryInfo<dim>::unit_normal_orientation[i];
+                  // second tangential
+                  // vector in direction
+                  // of the (nd+2)%3 axis
+                  tang2[(nd+2)%dim]=1.;
+
+                  // same unit tangents
+                  // for all quadrature
+                  // points on this face
+                  std::fill (unit_tangentials[i].begin(),
+                             unit_tangentials[i].end(), tang1);
+                  std::fill (unit_tangentials[nfaces+i].begin(),
+                             unit_tangentials[nfaces+i].end(), tang2);
+                }
+            }
+        }
+    }
+}
+
+
+
 
 template<int dim, int spacedim>
 MappingQ1<dim,spacedim>::MappingQ1 ()
@@ -531,51 +641,6 @@ MappingQ1<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 }
 
 
-template<int dim, int spacedim>
-void
-MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
-                                       const Quadrature<dim> &q,
-                                       const unsigned int     n_original_q_points,
-                                       InternalData          &data) const
-{
-  // store the flags in the internal data object so we can access them
-  // in fill_fe_*_values(). use the transitive hull of the required
-  // flags
-  data.update_each = requires_update_flags(update_flags);
-
-  const unsigned int n_q_points = q.size();
-
-  // see if we need the (transformation) shape function values
-  // and/or gradients and resize the necessary arrays
-  if (data.update_each & update_quadrature_points)
-    data.shape_values.resize(data.n_shape_functions * n_q_points);
-
-  if (data.update_each & (update_covariant_transformation
-                          | update_contravariant_transformation
-                          | update_JxW_values
-                          | update_boundary_forms
-                          | update_normal_vectors
-                          | update_jacobians
-                          | update_jacobian_grads
-                          | update_inverse_jacobians))
-    data.shape_derivatives.resize(data.n_shape_functions * n_q_points);
-
-  if (data.update_each & update_covariant_transformation)
-    data.covariant.resize(n_original_q_points);
-
-  if (data.update_each & update_contravariant_transformation)
-    data.contravariant.resize(n_original_q_points);
-
-  if (data.update_each & update_volume_elements)
-    data.volume_elements.resize(n_original_q_points);
-
-  if (data.update_each & update_jacobian_grads)
-    data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
-
-  compute_shapes (q.get_points(), data);
-}
-
-
 
 template<int dim, int spacedim>
 typename MappingQ1<dim,spacedim>::InternalData *
@@ -583,76 +648,10 @@ MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                    const Quadrature<dim> &q) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  compute_data (update_flags, q, q.size(), *data);
+  data->initialize (requires_update_flags(update_flags), q, q.size());
+  compute_shapes (q.get_points(), *data);
+
   return data;
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
-                                            const Quadrature<dim> &q,
-                                            const unsigned int n_original_q_points,
-                                            InternalData &data) const
-{
-  compute_data (update_flags, q, n_original_q_points, data);
-
-  if (dim > 1)
-    {
-      if (data.update_each & update_boundary_forms)
-        {
-          data.aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
-
-          // Compute tangentials to the
-          // unit cell.
-          const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-          data.unit_tangentials.resize (nfaces*(dim-1),
-                                        std::vector<Tensor<1,dim> > (n_original_q_points));
-          if (dim==2)
-            {
-              // ensure a counterclockwise
-              // orientation of tangentials
-              static const int tangential_orientation[4]= {-1,1,1,-1};
-              for (unsigned int i=0; i<nfaces; ++i)
-                {
-                  Tensor<1,dim> tang;
-                  tang[1-i/2]=tangential_orientation[i];
-                  std::fill (data.unit_tangentials[i].begin(),
-                             data.unit_tangentials[i].end(), tang);
-                }
-            }
-          else if (dim==3)
-            {
-              for (unsigned int i=0; i<nfaces; ++i)
-                {
-                  Tensor<1,dim> tang1, tang2;
-
-                  const unsigned int nd=
-                    GeometryInfo<dim>::unit_normal_direction[i];
-
-                  // first tangential
-                  // vector in direction
-                  // of the (nd+1)%3 axis
-                  // and inverted in case
-                  // of unit inward normal
-                  tang1[(nd+1)%dim]=GeometryInfo<dim>::unit_normal_orientation[i];
-                  // second tangential
-                  // vector in direction
-                  // of the (nd+2)%3 axis
-                  tang2[(nd+2)%dim]=1.;
-
-                  // same unit tangents
-                  // for all quadrature
-                  // points on this face
-                  std::fill (data.unit_tangentials[i].begin(),
-                             data.unit_tangentials[i].end(), tang1);
-                  std::fill (data.unit_tangentials[nfaces+i].begin(),
-                             data.unit_tangentials[nfaces+i].end(), tang2);
-                }
-            }
-        }
-    }
 }
 
 
@@ -663,10 +662,11 @@ MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                         const Quadrature<dim-1> &quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  compute_face_data (update_flags,
-                     QProjector<dim>::project_to_all_faces(quadrature),
-                     quadrature.size(),
-                     *data);
+  data->initialize_face (requires_update_flags(update_flags),
+                         QProjector<dim>::project_to_all_faces(quadrature),
+                         quadrature.size());
+  compute_shapes (QProjector<dim>::project_to_all_faces(quadrature).get_points(),
+                  *data);
 
   return data;
 }
@@ -679,10 +679,12 @@ MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                            const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  compute_face_data (update_flags,
-                     QProjector<dim>::project_to_all_subfaces(quadrature),
-                     quadrature.size(),
-                     *data);
+  data->initialize_face (requires_update_flags(update_flags),
+                         QProjector<dim>::project_to_all_subfaces(quadrature),
+                         quadrature.size());
+  compute_shapes (QProjector<dim>::project_to_all_subfaces(quadrature).get_points(),
+                  *data);
+
 
   return data;
 }
