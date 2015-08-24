@@ -103,6 +103,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > >    input,
@@ -110,6 +111,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
@@ -117,6 +119,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
@@ -124,58 +127,17 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
              VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
-  // for documentation, see the Mapping base class
-
-
-protected:
-  /**
-   * This function and the next ones allow to generate the transform required by the
-   * virtual transform() in mapping, but unfortunately in C++ one cannot
-   * declare a virtual template function.
-   */
-  template < int rank >
-  void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                   VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                   const MappingType type) const;
 
   /**
-   * see doc in transform_fields
+   * @}
    */
-  template < int rank >
-  void
-  transform_gradients(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                      VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                      const MappingType type) const;
-
-  /**
-   * see doc in transform_fields
-   */
-  void
-  transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > > input,
-                     VectorSlice<std::vector<Tensor<3,spacedim> > > output,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                     const MappingType mapping_type) const;
-
-  /**
-   * see doc in transform_fields
-   */
-  template < int rank >
-  void
-  transform_differential_forms(
-    const VectorSlice<const std::vector<DerivativeForm<rank, dim, spacedim> > >    input,
-    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-    const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-    const MappingType type) const;
-
 
   /**
    * @name Interface with FEValues
