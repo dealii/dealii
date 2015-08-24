@@ -1345,15 +1345,19 @@ namespace internal
  * FiniteElement to schedule auxiliary data fields for updating. Still, it is
  * recommended to give <b>all</b> needed update flags to FEValues.
  *
- * The mechanisms by which this class works is also discussed on the page on
- * @ref UpdateFlags.
+ *
+ * <h3>Internals about the implementation</h3>
+ *
+ * The mechanisms by which this class work are discussed on the page on
+ * @ref UpdateFlags "Update flags" and about the
+ * @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
+ *
  *
  * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim, int spacedim>
-class FEValuesBase : protected dealii::internal::FEValues::MappingRelatedData<dim, spacedim>,
-  protected dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim>,
+class FEValuesBase :
   public Subscriptor
 {
 public:
@@ -1398,7 +1402,9 @@ public:
    * Destructor.
    */
   ~FEValuesBase ();
-  /// @name ShapeAccess Access to shape function values. These fields are filled by the finite element
+
+
+  /// @name ShapeAccess Access to shape function values. These fields are filled by the finite element.
   //@{
 
   /**
@@ -2344,24 +2350,42 @@ protected:
   maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
   /**
-   * Storage for the mapping object.
+   * A pointer to the mapping object associated with this FEValues object.
    */
   const SmartPointer<const Mapping<dim,spacedim>,FEValuesBase<dim,spacedim> > mapping;
 
   /**
-   * Store the finite element for later use.
-   */
-  const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
-
-  /**
-   * Internal data of mapping.
+   * A pointer to the internal data object of mapping, obtained from
+   * Mapping::get_data(), Mapping::get_face_data(), or
+   * Mapping::get_subface_data().
    */
   std_cxx11::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
 
   /**
-   * Internal data of finite element.
+   * An object into which the Mapping::fill_fe_values() and similar
+   * functions place their output.
+   */
+  dealii::internal::FEValues::MappingRelatedData<dim, spacedim> mapping_output;
+
+
+  /**
+   * A pointer to the finite element object associated with this FEValues object.
+   */
+  const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
+
+  /**
+   * A pointer to the internal data object of finite element, obtained from
+   * FiniteElement::get_data(), Mapping::get_face_data(), or
+   * FiniteElement::get_subface_data().
    */
   std_cxx11::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fe_data;
+
+  /**
+   * An object into which the FiniteElement::fill_fe_values() and similar
+   * functions place their output.
+   */
+  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> finite_element_output;
+
 
   /**
    * Original update flags handed to the constructor of FEValues.
@@ -2871,9 +2895,9 @@ namespace FEValuesViews
     // except that here we know the component as fixed and we have
     // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_values(shape_function_data[shape_function]
-                                    .row_index,
-                                    q_point);
+      return fe_values.finite_element_output.shape_values(shape_function_data[shape_function]
+                                                          .row_index,
+                                                          q_point);
     else
       return 0;
   }
@@ -2900,8 +2924,8 @@ namespace FEValuesViews
     // pre-computed and cached a bunch of
     // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_gradients[shape_function_data[shape_function]
-                                       .row_index][q_point];
+      return fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function]
+                                                             .row_index][q_point];
     else
       return gradient_type();
   }
@@ -2927,7 +2951,7 @@ namespace FEValuesViews
     // pre-computed and cached a bunch of
     // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
+      return fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
       return hessian_type();
   }
@@ -2955,7 +2979,7 @@ namespace FEValuesViews
       {
         value_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.shape_values(snc,q_point);
+          = fe_values.finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -2964,7 +2988,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+              = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
 
         return return_value;
       }
@@ -2993,7 +3017,7 @@ namespace FEValuesViews
       {
         gradient_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.shape_gradients[snc][q_point];
+          = fe_values.finite_element_output.shape_gradients[snc][q_point];
         return return_value;
       }
     else
@@ -3002,7 +3026,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3031,14 +3055,14 @@ namespace FEValuesViews
       return divergence_type();
     else if (snc != -1)
       return
-        fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
+        fe_values.finite_element_output.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
     else
       {
         divergence_type return_value = 0;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value
-            += fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
+            += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
 
         return return_value;
       }
@@ -3084,9 +3108,9 @@ namespace FEValuesViews
               // can only be zero
               // or one in 2d
               if (shape_function_data[shape_function].single_nonzero_component_index == 0)
-                return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+                return_value[0] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][1];
               else
-                return_value[0] = fe_values.shape_gradients[snc][q_point][0];
+                return_value[0] = fe_values.finite_element_output.shape_gradients[snc][q_point][0];
 
               return return_value;
             }
@@ -3099,11 +3123,11 @@ namespace FEValuesViews
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                 return_value[0]
-                -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
                 return_value[0]
-                += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
 
               return return_value;
             }
@@ -3120,23 +3144,23 @@ namespace FEValuesViews
                 case 0:
                 {
                   return_value[0] = 0;
-                  return_value[1] = fe_values.shape_gradients[snc][q_point][2];
-                  return_value[2] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+                  return_value[1] = fe_values.finite_element_output.shape_gradients[snc][q_point][2];
+                  return_value[2] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][1];
                   return return_value;
                 }
 
                 case 1:
                 {
-                  return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][2];
+                  return_value[0] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][2];
                   return_value[1] = 0;
-                  return_value[2] = fe_values.shape_gradients[snc][q_point][0];
+                  return_value[2] = fe_values.finite_element_output.shape_gradients[snc][q_point][0];
                   return return_value;
                 }
 
                 default:
                 {
-                  return_value[0] = fe_values.shape_gradients[snc][q_point][1];
-                  return_value[1] = -1.0 * fe_values.shape_gradients[snc][q_point][0];
+                  return_value[0] = fe_values.finite_element_output.shape_gradients[snc][q_point][1];
+                  return_value[1] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][0];
                   return_value[2] = 0;
                   return return_value;
                 }
@@ -3153,25 +3177,25 @@ namespace FEValuesViews
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                 {
                   return_value[1]
-                  += fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
+                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
                   return_value[2]
-                  -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
                 }
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
                 {
                   return_value[0]
-                  -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
+                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
                   return_value[2]
-                  += fe_values.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
                 }
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[2])
                 {
                   return_value[0]
-                  += fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
+                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
                   return_value[1]
-                  -= fe_values.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
+                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
                 }
 
               return return_value;
@@ -3206,7 +3230,7 @@ namespace FEValuesViews
       {
         hessian_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.shape_hessians[snc][q_point];
+          = fe_values.finite_element_output.shape_hessians[snc][q_point];
         return return_value;
       }
     else
@@ -3215,7 +3239,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3318,14 +3342,14 @@ namespace FEValuesViews
       return symmetric_gradient_type();
     else if (snc != -1)
       return symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
-                                    fe_values.shape_gradients[snc][q_point]);
+                                    fe_values.finite_element_output.shape_gradients[snc][q_point]);
     else
       {
         gradient_type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
         return symmetrize(return_value);
       }
@@ -3365,7 +3389,7 @@ namespace FEValuesViews
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         return_value[value_type::unrolled_to_component_indices(comp)]
-          = fe_values.shape_values(snc,q_point);
+          = fe_values.finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -3374,7 +3398,7 @@ namespace FEValuesViews
         for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[value_type::unrolled_to_component_indices(d)]
-              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+              = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
         return return_value;
       }
   }
@@ -3451,7 +3475,7 @@ namespace FEValuesViews
         // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
         // again, all other entries of 'b' are
         // zero
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values.finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[ii] = phi_grad[jj];
@@ -3502,7 +3526,7 @@ namespace FEValuesViews
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-        return_value[indices] = fe_values.shape_values(snc,q_point);
+        return_value[indices] = fe_values.finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -3513,7 +3537,7 @@ namespace FEValuesViews
             {
               const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
               return_value[indices]
-                = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+                = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
             }
         return return_value;
       }
@@ -3564,7 +3588,7 @@ namespace FEValuesViews
         const unsigned int ii = indices[0];
         const unsigned int jj = indices[1];
 
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values.finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[jj] = phi_grad[ii];
@@ -3663,7 +3687,7 @@ FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_values(i,j);
+    return this->finite_element_output.shape_values(i,j);
   else
     {
       // otherwise, use the mapping
@@ -3675,8 +3699,8 @@ FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
       // so we can call
       // system_to_component_index
       const unsigned int
-      row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
-      return this->shape_values(row, j);
+      row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->finite_element_output.shape_values(row, j);
     }
 }
 
@@ -3706,8 +3730,8 @@ FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
   // table and take the data from
   // there
   const unsigned int
-  row = this->shape_function_to_row_table[i * fe->n_components() + component];
-  return this->shape_values(row, j);
+  row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + component];
+  return this->finite_element_output.shape_values(row, j);
 }
 
 
@@ -3724,15 +3748,15 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
           ExcAccessToUninitializedField("update_gradients"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_gradients.size(),
-          ExcIndexRange (i, 0, this->shape_gradients.size()));
-  Assert (j<this->shape_gradients[0].size(),
-          ExcIndexRange (j, 0, this->shape_gradients[0].size()));
+  Assert (i<this->finite_element_output.shape_gradients.size(),
+          ExcIndexRange (i, 0, this->finite_element_output.shape_gradients.size()));
+  Assert (j<this->finite_element_output.shape_gradients[0].size(),
+          ExcIndexRange (j, 0, this->finite_element_output.shape_gradients[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_gradients[i][j];
+    return this->finite_element_output.shape_gradients[i][j];
   else
     {
       // otherwise, use the mapping
@@ -3744,8 +3768,8 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
       // so we can call
       // system_to_component_index
       const unsigned int
-      row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
-      return this->shape_gradients[row][j];
+      row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->finite_element_output.shape_gradients[row][j];
     }
 }
 
@@ -3775,8 +3799,8 @@ FEValuesBase<dim,spacedim>::shape_grad_component (const unsigned int i,
   // table and take the data from
   // there
   const unsigned int
-  row = this->shape_function_to_row_table[i * fe->n_components() + component];
-  return this->shape_gradients[row][j];
+  row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + component];
+  return this->finite_element_output.shape_gradients[row][j];
 }
 
 
@@ -3793,15 +3817,15 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
           ExcAccessToUninitializedField("update_hessians"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_hessians.size(),
-          ExcIndexRange (i, 0, this->shape_hessians.size()));
-  Assert (j<this->shape_hessians[0].size(),
-          ExcIndexRange (j, 0, this->shape_hessians[0].size()));
+  Assert (i<this->finite_element_output.shape_hessians.size(),
+          ExcIndexRange (i, 0, this->finite_element_output.shape_hessians.size()));
+  Assert (j<this->finite_element_output.shape_hessians[0].size(),
+          ExcIndexRange (j, 0, this->finite_element_output.shape_hessians[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_hessians[i][j];
+    return this->finite_element_output.shape_hessians[i][j];
   else
     {
       // otherwise, use the mapping
@@ -3813,8 +3837,8 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
       // so we can call
       // system_to_component_index
       const unsigned int
-      row = this->shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
-      return this->shape_hessians[row][j];
+      row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->finite_element_output.shape_hessians[row][j];
     }
 }
 
@@ -3844,8 +3868,8 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   // table and take the data from
   // there
   const unsigned int
-  row = this->shape_function_to_row_table[i * fe->n_components() + component];
-  return this->shape_hessians[row][j];
+  row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + component];
+  return this->finite_element_output.shape_hessians[row][j];
 }
 
 
@@ -3886,7 +3910,7 @@ FEValuesBase<dim,spacedim>::get_quadrature_points () const
 {
   Assert (this->update_flags & update_quadrature_points,
           ExcAccessToUninitializedField("update_quadrature_points"));
-  return this->quadrature_points;
+  return this->mapping_output.quadrature_points;
 }
 
 
@@ -3898,7 +3922,7 @@ FEValuesBase<dim,spacedim>::get_JxW_values () const
 {
   Assert (this->update_flags & update_JxW_values,
           ExcAccessToUninitializedField("update_JxW_values"));
-  return this->JxW_values;
+  return this->mapping_output.JxW_values;
 }
 
 
@@ -3910,7 +3934,7 @@ FEValuesBase<dim,spacedim>::get_jacobians () const
 {
   Assert (this->update_flags & update_jacobians,
           ExcAccessToUninitializedField("update_jacobians"));
-  return this->jacobians;
+  return this->mapping_output.jacobians;
 }
 
 
@@ -3922,7 +3946,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 {
   Assert (this->update_flags & update_jacobian_grads,
           ExcAccessToUninitializedField("update_jacobians_grads"));
-  return this->jacobian_grads;
+  return this->mapping_output.jacobian_grads;
 }
 
 
@@ -3934,7 +3958,7 @@ FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 {
   Assert (this->update_flags & update_inverse_jacobians,
           ExcAccessToUninitializedField("update_inverse_jacobians"));
-  return this->inverse_jacobians;
+  return this->mapping_output.inverse_jacobians;
 }
 
 
@@ -3946,9 +3970,10 @@ FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 {
   Assert (this->update_flags & update_quadrature_points,
           ExcAccessToUninitializedField("update_quadrature_points"));
-  Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
+  Assert (i<this->mapping_output.quadrature_points.size(),
+          ExcIndexRange(i, 0, this->mapping_output.quadrature_points.size()));
 
-  return this->quadrature_points[i];
+  return this->mapping_output.quadrature_points[i];
 }
 
 
@@ -3961,9 +3986,10 @@ FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
 {
   Assert (this->update_flags & update_JxW_values,
           ExcAccessToUninitializedField("update_JxW_values"));
-  Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
+  Assert (i<this->mapping_output.JxW_values.size(),
+          ExcIndexRange(i, 0, this->mapping_output.JxW_values.size()));
 
-  return this->JxW_values[i];
+  return this->mapping_output.JxW_values[i];
 }
 
 
@@ -3975,9 +4001,10 @@ FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobians,
           ExcAccessToUninitializedField("update_jacobians"));
-  Assert (i<this->jacobians.size(), ExcIndexRange(i, 0, this->jacobians.size()));
+  Assert (i<this->mapping_output.jacobians.size(),
+          ExcIndexRange(i, 0, this->mapping_output.jacobians.size()));
 
-  return this->jacobians[i];
+  return this->mapping_output.jacobians[i];
 }
 
 
@@ -3989,9 +4016,10 @@ FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobian_grads,
           ExcAccessToUninitializedField("update_jacobians_grads"));
-  Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
+  Assert (i<this->mapping_output.jacobian_grads.size(),
+          ExcIndexRange(i, 0, this->mapping_output.jacobian_grads.size()));
 
-  return this->jacobian_grads[i];
+  return this->mapping_output.jacobian_grads[i];
 }
 
 
@@ -4003,9 +4031,10 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_inverse_jacobians,
           ExcAccessToUninitializedField("update_inverse_jacobians"));
-  Assert (i<this->inverse_jacobians.size(), ExcIndexRange(i, 0, this->inverse_jacobians.size()));
+  Assert (i<this->mapping_output.inverse_jacobians.size(),
+          ExcIndexRange(i, 0, this->mapping_output.inverse_jacobians.size()));
 
-  return this->inverse_jacobians[i];
+  return this->mapping_output.inverse_jacobians[i];
 }
 
 
@@ -4017,10 +4046,10 @@ FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
   typedef FEValuesBase<dim,spacedim> FVB;
   Assert (this->update_flags & update_normal_vectors,
           typename FVB::ExcAccessToUninitializedField("update_normal_vectors"));
-  Assert (i<this->normal_vectors.size(),
-          ExcIndexRange(i, 0, this->normal_vectors.size()));
+  Assert (i<this->mapping_output.normal_vectors.size(),
+          ExcIndexRange(i, 0, this->mapping_output.normal_vectors.size()));
 
-  return this->normal_vectors[i];
+  return this->mapping_output.normal_vectors[i];
 }
 
 
@@ -4097,12 +4126,12 @@ const Tensor<1,spacedim> &
 FEFaceValuesBase<dim,spacedim>::boundary_form (const unsigned int i) const
 {
   typedef FEValuesBase<dim,spacedim> FVB;
-  Assert (i<this->boundary_forms.size(),
-          ExcIndexRange(i, 0, this->boundary_forms.size()));
+  Assert (i<this->mapping_output.boundary_forms.size(),
+          ExcIndexRange(i, 0, this->mapping_output.boundary_forms.size()));
   Assert (this->update_flags & update_boundary_forms,
           typename FVB::ExcAccessToUninitializedField("update_boundary_forms"));
 
-  return this->boundary_forms[i];
+  return this->mapping_output.boundary_forms[i];
 }
 
 #endif // DOXYGEN

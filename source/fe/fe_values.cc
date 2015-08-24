@@ -1279,7 +1279,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1303,7 +1303,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1327,7 +1327,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
+    (dof_values, fe_values.finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1351,7 +1351,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
+    (dof_values, fe_values.finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1375,7 +1375,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1400,7 +1400,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1424,7 +1424,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_symmetric_gradients<dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data,
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data,
      symmetric_gradients);
   }
 
@@ -1450,7 +1450,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1473,7 +1473,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
     internal::do_function_curls<dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, curls);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, curls);
   }
 
 
@@ -1496,7 +1496,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
+    (dof_values, fe_values.finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1523,7 +1523,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
+    (dof_values, fe_values.finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1547,7 +1547,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1572,7 +1572,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1594,7 +1594,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1619,7 +1619,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
+    (dof_values, fe_values.finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 }
 
@@ -2102,6 +2102,23 @@ namespace internal
     }
 
 
+
+    template <int dim, int spacedim>
+    std::size_t
+    MappingRelatedData<dim,spacedim>::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (JxW_values) +
+              MemoryConsumption::memory_consumption (jacobians) +
+              MemoryConsumption::memory_consumption (jacobian_grads) +
+              MemoryConsumption::memory_consumption (inverse_jacobians) +
+              MemoryConsumption::memory_consumption (quadrature_points) +
+              MemoryConsumption::memory_consumption (normal_vectors) +
+              MemoryConsumption::memory_consumption (boundary_forms));
+    }
+
+
+
+
     template <int dim, int spacedim>
     void
     FiniteElementRelatedData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
@@ -2141,6 +2158,19 @@ namespace internal
       if (flags & update_hessians)
         this->shape_hessians.resize (n_nonzero_shape_components,
                                      std::vector<Tensor<2,spacedim> > (n_quadrature_points));
+    }
+
+
+
+
+    template <int dim, int spacedim>
+    std::size_t
+    FiniteElementRelatedData<dim,spacedim>::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (shape_values) +
+              MemoryConsumption::memory_consumption (shape_gradients) +
+              MemoryConsumption::memory_consumption (shape_hessians) +
+              MemoryConsumption::memory_consumption (shape_function_to_row_table));
     }
   }
 }
@@ -2601,7 +2631,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_values (dof_values.begin(), this->shape_values,
+  internal::do_function_values (dof_values.begin(), this->finite_element_output.shape_values,
                                 values);
 }
 
@@ -2626,14 +2656,14 @@ void FEValuesBase<dim,spacedim>::get_function_values (
       Number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->shape_values, values);
+      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, values);
     }
   else
     {
       Vector<Number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->shape_values,
+      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values,
                                    values);
     }
 }
@@ -2658,8 +2688,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   VectorSlice<std::vector<Vector<Number> > > val(values);
-  internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
-                               this->shape_function_to_row_table, val);
+  internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
+                               this->finite_element_output.shape_function_to_row_table, val);
 }
 
 
@@ -2685,8 +2715,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
       Number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->shape_values, *fe,
-                                   this->shape_function_to_row_table, val,
+      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, *fe,
+                                   this->finite_element_output.shape_function_to_row_table, val,
                                    false, indices.size()/dofs_per_cell);
     }
   else
@@ -2694,8 +2724,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
       Vector<Number> dof_values(100);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
-                                   this->shape_function_to_row_table, val,
+      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
+                                   this->finite_element_output.shape_function_to_row_table, val,
                                    false, indices.size()/dofs_per_cell);
     }
 }
@@ -2724,8 +2754,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
       Number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->shape_values, *fe,
-                                   this->shape_function_to_row_table, values,
+      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, *fe,
+                                   this->finite_element_output.shape_function_to_row_table, values,
                                    quadrature_points_fastest,
                                    indices.size()/dofs_per_cell);
     }
@@ -2734,8 +2764,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
       Vector<Number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
-                                   this->shape_function_to_row_table, values,
+      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
+                                   this->finite_element_output.shape_function_to_row_table, values,
                                    quadrature_points_fastest,
                                    indices.size()/dofs_per_cell);
     }
@@ -2761,7 +2791,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_gradients,
                                     gradients);
 }
 
@@ -2784,7 +2814,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
       Number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->shape_gradients,
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_gradients,
                                         gradients);
     }
   else
@@ -2792,7 +2822,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
       Vector<Number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
+      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_gradients,
                                         gradients);
     }
 }
@@ -2818,8 +2848,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   VectorSlice<std::vector<std::vector<Tensor<1,spacedim,Number> > > > grads(gradients);
-  internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
-                                    *fe, this->shape_function_to_row_table,
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_gradients,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
                                     grads);
 }
 
@@ -2846,8 +2876,8 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
       Number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->shape_gradients,
-                                        *fe, this->shape_function_to_row_table,
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_gradients,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
                                         gradients, quadrature_points_fastest,
                                         indices.size()/dofs_per_cell);
     }
@@ -2856,8 +2886,8 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
       Vector<Number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(),this->shape_gradients,
-                                        *fe, this->shape_function_to_row_table,
+      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_gradients,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
                                         gradients, quadrature_points_fastest,
                                         indices.size()/dofs_per_cell);
     }
@@ -2883,7 +2913,7 @@ get_function_hessians (const InputVector                &fe_function,
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_hessians,
                                     hessians);
 }
 
@@ -2906,7 +2936,7 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
       Number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->shape_hessians,
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_hessians,
                                         hessians);
     }
   else
@@ -2914,7 +2944,7 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
       Vector<Number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
+      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_hessians,
                                         hessians);
     }
 }
@@ -2941,8 +2971,8 @@ get_function_hessians (const InputVector                         &fe_function,
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   VectorSlice<std::vector<std::vector<Tensor<2,spacedim,Number> > > > hes(hessians);
-  internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
-                                    *fe, this->shape_function_to_row_table,
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_hessians,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
                                     hes, quadrature_points_fastest);
 }
 
@@ -2966,8 +2996,8 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
       Number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->shape_hessians,
-                                        *fe, this->shape_function_to_row_table,
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_hessians,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
                                         hessians, quadrature_points_fastest,
                                         indices.size()/dofs_per_cell);
     }
@@ -2976,8 +3006,8 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
       Vector<Number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(),this->shape_hessians,
-                                        *fe, this->shape_function_to_row_table,
+      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_hessians,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
                                         hessians, quadrature_points_fastest,
                                         indices.size()/dofs_per_cell);
     }
@@ -3002,7 +3032,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
+  internal::do_function_laplacians(dof_values.begin(), this->finite_element_output.shape_hessians,
                                    laplacians);
 }
 
@@ -3025,7 +3055,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
+      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
                                        laplacians);
     }
   else
@@ -3033,7 +3063,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Vector<Number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
+      internal::do_function_laplacians(dof_values.begin(), this->finite_element_output.shape_hessians,
                                        laplacians);
     }
 }
@@ -3056,8 +3086,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
-                                   *fe, this->shape_function_to_row_table,
+  internal::do_function_laplacians(dof_values.begin(), this->finite_element_output.shape_hessians,
+                                   *fe, this->finite_element_output.shape_function_to_row_table,
                                    laplacians);
 }
 
@@ -3082,8 +3112,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
-                                       *fe, this->shape_function_to_row_table,
+      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
+                                       *fe, this->finite_element_output.shape_function_to_row_table,
                                        laplacians, false,
                                        indices.size()/dofs_per_cell);
     }
@@ -3092,8 +3122,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Vector<Number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(),this->shape_hessians,
-                                       *fe, this->shape_function_to_row_table,
+      internal::do_function_laplacians(dof_values.begin(),this->finite_element_output.shape_hessians,
+                                       *fe, this->finite_element_output.shape_function_to_row_table,
                                        laplacians, false,
                                        indices.size()/dofs_per_cell);
     }
@@ -3119,8 +3149,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
-                                       *fe, this->shape_function_to_row_table,
+      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
+                                       *fe, this->finite_element_output.shape_function_to_row_table,
                                        laplacians, quadrature_points_fastest,
                                        indices.size()/dofs_per_cell);
     }
@@ -3129,8 +3159,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
       Vector<Number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(),this->shape_hessians,
-                                       *fe, this->shape_function_to_row_table,
+      internal::do_function_laplacians(dof_values.begin(),this->finite_element_output.shape_hessians,
+                                       *fe, this->finite_element_output.shape_function_to_row_table,
                                        laplacians, quadrature_points_fastest,
                                        indices.size()/dofs_per_cell);
     }
@@ -3154,7 +3184,7 @@ FEValuesBase<dim,spacedim>::get_all_normal_vectors () const
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (this->update_flags & update_normal_vectors,
           typename FEVB::ExcAccessToUninitializedField("update_normal_vectors"));
-  return this->normal_vectors;
+  return this->mapping_output.normal_vectors;
 }
 
 
@@ -3168,9 +3198,9 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
           typename FEVB::ExcAccessToUninitializedField("update_normal_vectors"));
 
   // copy things into a vector of Points, then return that
-  std::vector<Point<spacedim> > tmp (this->normal_vectors.size());
-  for (unsigned int q=0; q<this->normal_vectors.size(); ++q)
-    tmp[q] = Point<spacedim>(this->normal_vectors[q]);
+  std::vector<Point<spacedim> > tmp (this->mapping_output.normal_vectors.size());
+  for (unsigned int q=0; q<this->mapping_output.normal_vectors.size(); ++q)
+    tmp[q] = Point<spacedim>(this->mapping_output.normal_vectors[q]);
 
   return tmp;
 }
@@ -3194,26 +3224,18 @@ template <int dim, int spacedim>
 std::size_t
 FEValuesBase<dim,spacedim>::memory_consumption () const
 {
-  return (MemoryConsumption::memory_consumption (this->shape_values) +
-          MemoryConsumption::memory_consumption (this->shape_gradients) +
-          MemoryConsumption::memory_consumption (this->shape_hessians) +
-          MemoryConsumption::memory_consumption (this->JxW_values) +
-          MemoryConsumption::memory_consumption (this->jacobians) +
-          MemoryConsumption::memory_consumption (this->jacobian_grads) +
-          MemoryConsumption::memory_consumption (this->inverse_jacobians) +
-          MemoryConsumption::memory_consumption (this->quadrature_points) +
-          MemoryConsumption::memory_consumption (this->normal_vectors) +
-          MemoryConsumption::memory_consumption (this->boundary_forms) +
-          sizeof(this->update_flags) +
+  return (sizeof(this->update_flags) +
           MemoryConsumption::memory_consumption (n_quadrature_points) +
+          sizeof (cell_similarity) +
           MemoryConsumption::memory_consumption (dofs_per_cell) +
           MemoryConsumption::memory_consumption (mapping) +
-          MemoryConsumption::memory_consumption (fe) +
           MemoryConsumption::memory_consumption (mapping_data) +
           MemoryConsumption::memory_consumption (*mapping_data) +
+          MemoryConsumption::memory_consumption (mapping_output) +
+          MemoryConsumption::memory_consumption (fe) +
           MemoryConsumption::memory_consumption (fe_data) +
           MemoryConsumption::memory_consumption (*fe_data) +
-          MemoryConsumption::memory_consumption (this->shape_function_to_row_table));
+          MemoryConsumption::memory_consumption (finite_element_output));
 }
 
 
@@ -3434,8 +3456,8 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                         quadrature);
 
   // initialize the base classes
-  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
-  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 
@@ -3540,7 +3562,7 @@ void FEValues<dim,spacedim>::do_reinit ()
                                          this->cell_similarity,
                                          quadrature,
                                          *this->mapping_data,
-                                         *this);
+                                         this->mapping_output);
 
   // then call the finite element and, with the data
   // already filled by the mapping, let it compute the
@@ -3551,8 +3573,8 @@ void FEValues<dim,spacedim>::do_reinit ()
                                 quadrature,
                                 *this->mapping_data,
                                 *this->fe_data,
-                                *this,
-                                *this,
+                                this->mapping_output,
+                                this->finite_element_output,
                                 this->cell_similarity);
 
   this->fe_data->clear_first_cell ();
@@ -3597,7 +3619,7 @@ FEFaceValuesBase<dim,spacedim>::get_boundary_forms () const
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (this->update_flags & update_boundary_forms,
           typename FEVB::ExcAccessToUninitializedField("update_boundary_forms"));
-  return this->boundary_forms;
+  return this->mapping_output.boundary_forms;
 }
 
 
@@ -3674,8 +3696,8 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                         this->quadrature);
 
   // initialize the base classes
-  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
-  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 
@@ -3751,15 +3773,15 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                           face_no,
                                           this->quadrature,
                                           *this->mapping_data,
-                                          *this);
+                                          this->mapping_output);
 
   this->get_fe().fill_fe_face_values(this->get_mapping(),
                                      *this->present_cell, face_no,
                                      this->quadrature,
                                      *this->mapping_data,
                                      *this->fe_data,
-                                     *this,
-                                     *this);
+                                     this->mapping_output,
+                                     this->finite_element_output);
 
   this->fe_data->clear_first_cell ();
 }
@@ -3831,8 +3853,8 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                         this->quadrature);
 
   // initialize the base classes
-  internal::FEValues::MappingRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, flags);
-  internal::FEValues::FiniteElementRelatedData<dim,spacedim>::initialize(this->n_quadrature_points, *this->fe, flags);
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 
@@ -3993,7 +4015,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                              subface_no,
                                              this->quadrature,
                                              *this->mapping_data,
-                                             *this);
+                                             this->mapping_output);
 
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
                                         *this->present_cell,
@@ -4001,8 +4023,8 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                         this->quadrature,
                                         *this->mapping_data,
                                         *this->fe_data,
-                                        *this,
-                                        *this);
+                                        this->mapping_output,
+                                        this->finite_element_output);
 
   this->fe_data->clear_first_cell ();
 }
