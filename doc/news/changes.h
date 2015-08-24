@@ -38,7 +38,15 @@ inconvenience this causes.
 </p>
 
 <ol>
-  
+
+  <li> Changed: The parameter @p first_vector_components has been removed
+  from GridTools::collect_periodic_faces(). Instead,
+  DoFTools::make_periodicity_constraints() now accepts a parameter
+  @p first_vector_components in all (supported) variants.
+  <br>
+  (Matthias maier, 2015/08/21)
+  </li>
+
   <li> Changed: FEValues::normal_vector() for historical reasons returned a
   value of type Point, though a normal vector is more adequately described
   as a Tensor@<1,dim@>. Many similar cases were already clarified in deal.II
@@ -100,6 +108,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: The interface and documentation for periodic boundary
+  conditions have been restructured. A
+  @ref GlossPeriodicConstraints "glossary entry" has been written.
+  <br>
+  (Daniel Arndt, Matthias Maier, 2015/08/01-2015/08/21)
+  </li>
+
   <li> New: There is a new documentation module on
   @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
   <br>

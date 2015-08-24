@@ -2702,8 +2702,7 @@ next_cell:
    const int                                        direction,
    std::vector<PeriodicFacePair<CellIterator> >     &matched_pairs,
    const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset,
-   const FullMatrix<double>                         &matrix,
-   const std::vector<unsigned int>                  &first_vector_components)
+   const FullMatrix<double>                         &matrix)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
@@ -2741,8 +2740,7 @@ next_cell:
                   {cell1, cell2},
                   {face_idx1, face_idx2},
                   orientation,
-                  matrix,
-                  first_vector_components
+                  matrix
                 };
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
@@ -2768,8 +2766,7 @@ next_cell:
    const int                                  direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const Tensor<1,CONTAINER::space_dimension> &offset,
-   const FullMatrix<double>                   &matrix,
-   const std::vector<unsigned int>            &first_vector_components)
+   const FullMatrix<double>                   &matrix)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2810,8 +2807,8 @@ next_cell:
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs,
-                              offset, matrix, first_vector_components);
+    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
+                              matrix);
   }
 
 
@@ -2824,8 +2821,7 @@ next_cell:
    const int                                  direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const Tensor<1,CONTAINER::space_dimension> &offset,
-   const FullMatrix<double>                   &matrix,
-   const std::vector<unsigned int>            &first_vector_components)
+   const FullMatrix<double>                   &matrix)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2873,8 +2869,8 @@ next_cell:
 #endif
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs,
-                              offset, matrix, first_vector_components);
+    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
+                              matrix);
 
 #ifdef DEBUG
     //check for standard orientation
