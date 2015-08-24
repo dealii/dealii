@@ -445,29 +445,6 @@ private:
    * @}
    */
 
-  /**
-   * This function and the next allow to generate the transform require by the
-   * virtual transform() in mapping, but unfortunately in C++ one cannot
-   * declare a virtual template function.
-   */
-  template <int rank>
-  void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
-                   VectorSlice<std::vector<Tensor<rank,spacedim> > >        output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase  &internal,
-                   const MappingType                                        mapping_type) const;
-
-
-  /**
-   * See transform_fields() above.
-   */
-  template <int rank>
-  void
-  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > > input,
-                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                       output,
-                               const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
-                               const MappingType                                                          mapping_type) const;
-
 
   /**
    * Reference to the vector of shifts.
