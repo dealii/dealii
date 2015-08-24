@@ -2465,8 +2465,8 @@ public:
    * associated with this object. It is assumed that the finite element used
    * by the given cell is also the one used by this FEValues object.
    */
-  template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell);
+  template <template <int,int> class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given cell
@@ -2671,8 +2671,8 @@ public:
    * Reinitialize the gradients, Jacobi determinants, etc for the face with
    * number @p face_no of @p cell and the given finite element.
    */
-  template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell,
+  template <template <int,int> class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell,
                const unsigned int face_no);
 
   /**
@@ -2780,8 +2780,8 @@ public:
    * associated with this object. It is assumed that the finite element used
    * by the given cell is also the one used by this FESubfaceValues object.
    */
-  template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell,
+  template <template <int,int> class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell,
                const unsigned int                    face_no,
                const unsigned int                    subface_no);
 
