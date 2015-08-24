@@ -34,17 +34,19 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Mapping of general quadrilateral/hexahedra by d-linear shape functions.
+ * Mapping of the reference to cell to a general
+ * quadrilateral/hexahedra by $d$-linear shape functions.
  *
- * This function maps the unit cell to a general grid cell with straight lines
- * in $d$ dimensions (remark that in 3D the surfaces may be curved, even if
- * the edges are not). This is the well-known mapping for polyhedral domains.
+ * This function maps the reference (unit) cell to a general grid cell with
+ * straight lines in $d$ dimensions. (Note, however, that in 3D the
+ * <i>faces</i> of a general, trilinearly mapped cell may be curved, even if the
+ * edges are not). This is the standard mapping used for polyhedral domains. It
+ * is also the mapping used throughout deal.II for many functions that two
+ * variants, one that allows to pass a mapping argument explicitly and one
+ * that simply falls back to the MappingQ1 class declared here.
  *
- * Shape function for this mapping are the same as for the finite element FE_Q
+ * The shape functions for this mapping are the same as for the finite element FE_Q
  * of order 1. Therefore, coupling these two yields an isoparametric element.
- *
- * For more information about the <tt>spacedim</tt> template parameter check
- * the documentation of FiniteElement or the one of Triangulation.
  *
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005
  */
@@ -57,37 +59,43 @@ public:
    */
   MappingQ1 ();
 
-  virtual Point<spacedim>
-  transform_unit_to_real_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<dim>                                 &p) const;
+  // for documentation, see the Mapping base class
+  virtual
+  Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Transforms the point @p p on the real cell to the point @p p_unit on the
-   * unit cell @p cell and returns @p p_unit.
-   *
-   * Uses Newton iteration and the @p transform_unit_to_real_cell function.
-   *
-   * In the codimension one case, this function returns the normal projection
-   * of the real point @p p on the curve or surface identified by the @p cell.
-   *
-   * @note Polynomial mappings from the reference (unit) cell coordinates to
-   * the coordinate system of a real cell are not always invertible if the
-   * point for which the inverse mapping is to be computed lies outside the
-   * cell's boundaries. In such cases, the current function may fail to
-   * compute a point on the reference cell whose image under the mapping
-   * equals the given point @p p.  If this is the case then this function
-   * throws an exception of type Mapping::ExcTransformationFailed . Whether
-   * the given point @p p lies outside the cell can therefore be determined by
-   * checking whether the return reference coordinates lie inside of outside
-   * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell) or
-   * whether the exception mentioned above has been thrown.
+   * Always returns @p true because MappingQ1 preserves vertex locations.
    */
+  virtual
+  bool preserves_vertex_locations () const;
+
+  /**
+   * @name Mapping points between reference and real cells
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<spacedim>
+  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<dim>                                 &p) const;
+
+  // for documentation, see the Mapping base class
   virtual
   Point<dim>
   transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<spacedim>                            &p) const;
 
+  /**
+   * @}
+   */
+
+  /**
+   * @name Functions to transform tensors from reference to real coordinates
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
@@ -122,6 +130,7 @@ public:
              VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
+  // for documentation, see the Mapping base class
 
 
 protected:
@@ -166,22 +175,6 @@ protected:
     VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
     const MappingType type) const;
-
-public:
-
-  /**
-   * Return a pointer to a copy of the present object. The caller of this copy
-   * then assumes ownership of it.
-   */
-  virtual
-  Mapping<dim,spacedim> *clone () const;
-
-
-  /**
-   * Always returns @p true because MappingQ1 preserves vertex locations.
-   */
-  virtual
-  bool preserves_vertex_locations () const;
 
 
   /**
@@ -544,6 +537,7 @@ protected:
 };
 
 
+#ifndef DOXYGEN
 // explicit specializations
 
 template<>
@@ -573,6 +567,7 @@ transform_real_to_unit_cell_internal
  const Point<1> &initial_p_unit,
  InternalData    &mdata) const;
 
+#endif
 
 /**
  * In order to avoid creation of static MappingQ1 objects at several places in
