@@ -373,6 +373,12 @@ namespace internal
                        const UpdateFlags  flags);
 
       /**
+       * Compute and return an estimate for the memory consumption (in
+       * bytes) of this object.
+       */
+      std::size_t memory_consumption () const;
+
+      /**
        * Store an array of weights times the Jacobi determinant at the quadrature
        * points. This function is reset each time reinit() is called. The Jacobi
        * determinant is actually the reciprocal value of the Jacobi matrices
@@ -441,6 +447,12 @@ namespace internal
       void initialize (const unsigned int        n_quadrature_points,
                        const FiniteElement<dim,spacedim> &fe,
                        const UpdateFlags         flags);
+
+      /**
+       * Compute and return an estimate for the memory consumption (in
+       * bytes) of this object.
+       */
+      std::size_t memory_consumption () const;
 
       /**
        * Storage type for shape values. Each row in the matrix denotes the values
