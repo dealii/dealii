@@ -931,14 +931,15 @@ namespace DoFTools
    * into a ConstraintMatrix @p constraint_matrix.
    *
    * This is the main high level interface for above low level variant of
-   * make_periodicity_constraints(). It takes an std::vector @p periodic_faces
-   * as argument and applies above make_periodicity_constraints on each entry.
-   * @p periodic_faces can be created by GridTools::collect_periodic_faces.
+   * make_periodicity_constraints(). It takes a std::vector @p periodic_faces
+   * as argument and applies above make_periodicity_constraints() on each
+   * entry. @p periodic_faces can be created by
+   * GridTools::collect_periodic_faces.
    *
    * @note For DoFHandler objects that are built on a
    * parallel::distributed::Triangulation object
    * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
+   * before calling this function..
    *
    * @see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
@@ -975,22 +976,6 @@ namespace DoFTools
    * If this matching is successful it constrains all DoFs associated with the
    * 'first' boundary to the respective DoFs of the 'second' boundary
    * respecting the relative orientation of the two faces.
-   *
-   * This routine only constrains DoFs that are not already constrained. If
-   * this routine encounters a DoF that already is constrained (for instance
-   * by Dirichlet boundary conditions), the old setting of the constraint
-   * (dofs the entry is constrained to, inhomogeneities) is kept and nothing
-   * happens.
-   *
-   * The flags in the last parameter, @p component_mask (see
-   * @ref GlossComponentMask)
-   * denote which components of the finite element space shall be constrained
-   * with periodic boundary conditions. If it is left as specified by the
-   * default value all components are constrained. If it is different from the
-   * default value, it is assumed that the number of entries equals the number
-   * of components in the boundary functions and the finite element, and those
-   * components in the given boundary function will be used for which the
-   * respective flag was set in the component mask.
    *
    * @note: This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied paramaters and

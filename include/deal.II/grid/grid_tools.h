@@ -936,17 +936,16 @@ namespace GridTools
     std::bitset<3> orientation;
 
     /**
-     * A matrix that describes how vector valued DoFs of the first face
-     * should be modified prior to constraining to the DoFs of the second
-     * face. If the std::vector first_vector_components (supplied as a
-     * parameter to DofTools::make_periodicity_constraints()) is non empty
-     * the matrix is interpreted as a @p dim $\times$ @p dim rotation
-     * matrix that is applied to all vector valued blocks listed in @p
-     * first_vector_components of the finite element space. Alternatively,
-     * if @p first_vector_components is empty the matrix is interpreted as
-     * an interpolation matrix with size no_face_dofs $\times$
-     * no_face_dofs. For more details see
-     * DoFTools::make_periodicity_constraints() and the glossary
+     * A @p dim $\times$ @p dim rotation matrix that describes how vector
+     * valued DoFs of the first face should be modified prior to
+     * constraining to the DoFs of the second face.
+     *
+     * The rotation matrix is used in
+     * DoFTools::make_periodicity_constriants() by applying the rotation to
+     * all vector valued blocks listed in the parameter
+     * @p first_vector_components of the finite element space.
+     * For more details see DoFTools::make_periodicity_constraints() and
+     * the glossary
      * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
@@ -959,11 +958,11 @@ namespace GridTools
    * @p face1 and @p face2 are considered equal, if a one to one matching
    * between its vertices can be achieved via an orthogonal equality relation.
    *
-   * Hereby, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
+   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
    * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
    * direction @p direction. If the parameter @p matrix is a reference to a
-   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
-   * identity matrix.
+   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is
+   * the identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1
    * with respect to @p face2 is returned in the bitset @p orientation, where
@@ -1069,17 +1068,19 @@ namespace GridTools
    * them to the corresponding vertices of the 'second' boundary. This can
    * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
-   * Optionally, a @p matrix can be specified that describes how vector
-   * valued DoFs of the first face should be modified prior to constraining
-   * to the DoFs of the second face. If the matrix has size
-   * $n\_face\_dofs\times n\_face\_dofs$, the periodicity constraints are
-   * applied as $dofs\_2 = matrix\cdot dofs\_1$. If the matrix has size
-   * $dim\times dim$, the matrix is interpreted as a rotation matrix for
-   * vector valued components.
-   * For more details see DoFTools::make_periodicity_constraints(), the
+   * Optionally, a $dim\times dim$ rotation @p matrix can be specified that
+   * describes how vector valued DoFs of the first face should be modified
+   * prior to constraining to the DoFs of the second face.
+   * The @p matrix is used in two places. First, @p matrix will be supplied
+   * to orthogonal_equality() and used for matching faces: Two vertices
+   * $v_1$ and $v_2$ match if
+   * $\text{matrix}\cdot v_1 + \text{offset} - v_2$
+   * is parallel to the unit vector in unit direction @p direction.
+   * (For more details see DoFTools::make_periodicity_constraints(), the
    * glossary
    * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
-   * and @ref step_45 "step-45".
+   * and @ref step_45 "step-45"). Second, @p matrix will be stored in the
+   * PeriodicFacePair collection @p matched_pairs for further use.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1123,26 +1124,13 @@ namespace GridTools
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.
    *
-   * Optionally, a @p matrix can be specified that describes how vector
-   * valued DoFs of the first face should be modified prior to constraining
-   * to the DoFs of the second face. If the matrix has size
-   * $n\_face\_dofs\times n\_face\_dofs$, the periodicity constraints are
-   * applied as $dofs\_2 = matrix\cdot dofs\_1$. If the matrix has size
-   * $dim\times dim$, the matrix is interpreted as a rotation matrix for
-   * vector valued components. For more details see
-   * DoFTools::make_periodicity_constraints(), the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
-   * and @ref step_45 "step-45".
-   *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * See above function for further details.
    *
    * @note This version of collect_periodic_face_pairs() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
    *
-   * @author Daniel Arndt, Matthias Maier, 2013, 2014
+   * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename CONTAINER>
   void
