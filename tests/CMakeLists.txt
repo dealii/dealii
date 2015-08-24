@@ -82,15 +82,20 @@ FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
   ENDIF()
 ENDFOREACH()
 
-SET(_categories
-  a-framework algorithms all-headers aniso arpack base bits build_tests
-  codim_one deal.II distributed_grids fe gla grid hp integrators lac lapack
-  manifold matrix_free metis mpi multigrid opencascade petsc serialization
-  slepc trilinos umfpack sharedtria
+#
+# Find all testsuite subprojects, i.e., every directory that contains a
+# CMakeLists.txt file (with the exception of "quick_tests").
+#
+SET(_categories)
+FILE(GLOB _dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/*
   )
-IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-
-ENDIF()
+FOREACH(_dir ${_dirs})
+  IF( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt AND
+      NOT ${_dir} MATCHES quick_tests)
+    LIST(APPEND _categories ${_dir})
+  ENDIF()
+ENDFOREACH()
 
 #
 # Custom targets for the testsuite:
