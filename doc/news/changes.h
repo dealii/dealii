@@ -44,7 +44,7 @@ inconvenience this causes.
   DoFTools::make_periodicity_constraints() now accepts a parameter
   @p first_vector_components in all (supported) variants.
   <br>
-  (Matthias maier, 2015/08/21)
+  (Matthias Maier, 2015/08/21)
   </li>
 
   <li> Changed: FEValues::normal_vector() for historical reasons returned a
@@ -117,7 +117,7 @@ inconvenience this causes.
   <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
   associated with vertices. This is now fixed.
   <br>
-  (Jan Strebel, Wolfgang Bangerth, 2015/08/25)
+  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
   </li>
 
   <li> Improved: The interface and documentation for periodic boundary
