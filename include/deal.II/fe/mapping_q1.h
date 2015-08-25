@@ -103,6 +103,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > >    input,
@@ -110,6 +111,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
@@ -117,6 +119,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
@@ -124,58 +127,17 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
              VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
-  // for documentation, see the Mapping base class
-
-
-protected:
-  /**
-   * This function and the next ones allow to generate the transform required by the
-   * virtual transform() in mapping, but unfortunately in C++ one cannot
-   * declare a virtual template function.
-   */
-  template < int rank >
-  void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                   VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                   const MappingType type) const;
 
   /**
-   * see doc in transform_fields
+   * @}
    */
-  template < int rank >
-  void
-  transform_gradients(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
-                      VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
-                      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                      const MappingType type) const;
-
-  /**
-   * see doc in transform_fields
-   */
-  void
-  transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > > input,
-                     VectorSlice<std::vector<Tensor<3,spacedim> > > output,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-                     const MappingType mapping_type) const;
-
-  /**
-   * see doc in transform_fields
-   */
-  template < int rank >
-  void
-  transform_differential_forms(
-    const VectorSlice<const std::vector<DerivativeForm<rank, dim, spacedim> > >    input,
-    VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-    const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-    const MappingType type) const;
-
 
   /**
    * @name Interface with FEValues
@@ -202,6 +164,24 @@ public:
      * Constructor. Pass the number of shape functions.
      */
     InternalData(const unsigned int n_shape_functions);
+
+    /**
+     * Initialize the object's member variables related to cell data
+     * based on the given arguments.
+     */
+    void
+    initialize (const UpdateFlags      update_flags,
+                const Quadrature<dim> &quadrature,
+                const unsigned int     n_original_q_points);
+
+    /**
+     * Initialize the object's member variables related to cell and
+     * face data based on the given arguments.
+     */
+    void
+    initialize_face (const UpdateFlags      update_flags,
+                     const Quadrature<dim> &quadrature,
+                     const unsigned int     n_original_q_points);
 
     /**
      * Shape function at quadrature point. Shape functions are in tensor
@@ -451,27 +431,6 @@ protected:
    */
   void compute_shapes (const std::vector<Point<dim> > &unit_points,
                        InternalData &data) const;
-
-  /**
-   * Do the computations for the @p get_data functions. Here, the data vectors
-   * of @p InternalData are reinitialized to proper size and shape values are
-   * computed.
-   */
-  void compute_data (const UpdateFlags flags,
-                     const Quadrature<dim> &quadrature,
-                     const unsigned int n_orig_q_points,
-                     InternalData &data) const;
-
-  /**
-   * Do the computations for the @p get_face_data functions. Here, the data
-   * vectors of @p InternalData are reinitialized to proper size and shape
-   * values and derivatives are computed. Furthermore @p unit_tangential
-   * vectors of the face are computed.
-   */
-  void compute_face_data (const UpdateFlags flags,
-                          const Quadrature<dim> &quadrature,
-                          const unsigned int n_orig_q_points,
-                          InternalData &data) const;
 
   /**
    * Compute shape values and/or derivatives.

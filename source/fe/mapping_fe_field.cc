@@ -980,6 +980,104 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 }
 
 
+namespace
+{
+  template<int dim, int spacedim, int rank, class VECTOR, class DH>
+  void
+  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
+                   VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
+                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                   const MappingType mapping_type)
+  {
+    AssertDimension (input.size(), output.size());
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData *>(&mapping_data) != 0),
+            ExcInternalError());
+    const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData
+    &data = static_cast<const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData &>(mapping_data);
+
+    switch (mapping_type)
+      {
+      case mapping_contravariant:
+      {
+        Assert (data.update_each & update_contravariant_transformation,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+        for (unsigned int i=0; i<output.size(); ++i)
+          output[i] = apply_transformation(data.contravariant[i], input[i]);
+
+        return;
+      }
+
+      case mapping_piola:
+      {
+        Assert (data.update_each & update_contravariant_transformation,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+        Assert (data.update_each & update_volume_elements,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+        Assert (rank==1, ExcMessage("Only for rank 1"));
+        for (unsigned int i=0; i<output.size(); ++i)
+          {
+            output[i] = apply_transformation(data.contravariant[i], input[i]);
+            output[i] /= data.volume_elements[i];
+          }
+        return;
+      }
+
+
+      //We still allow this operation as in the
+      //reference cell Derivatives are Tensor
+      //rather than DerivativeForm
+      case mapping_covariant:
+      {
+        Assert (data.update_each & update_contravariant_transformation,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+        for (unsigned int i=0; i<output.size(); ++i)
+          output[i] = apply_transformation(data.covariant[i], input[i]);
+
+        return;
+      }
+
+      default:
+        Assert(false, ExcNotImplemented());
+      }
+  }
+
+
+  template<int dim, int spacedim, int rank, class VECTOR, class DH>
+  void
+  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
+                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
+                               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                               const MappingType mapping_type)
+  {
+
+    AssertDimension (input.size(), output.size());
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData *>(&mapping_data) != 0),
+            ExcInternalError());
+    const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData
+    &data = static_cast<const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData &>(mapping_data);
+
+    switch (mapping_type)
+      {
+      case mapping_covariant:
+      {
+        Assert (data.update_each & update_contravariant_transformation,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+        for (unsigned int i=0; i<output.size(); ++i)
+          output[i] = apply_transformation(data.covariant[i], input[i]);
+
+        return;
+      }
+      default:
+        Assert(false, ExcNotImplemented());
+      }
+
+  }
+}
+
+
 
 template<int dim, int spacedim, class VECTOR, class DH>
 void
@@ -991,7 +1089,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::transform (
 {
   AssertDimension (input.size(), output.size());
 
-  transform_fields(input, output, mapping_data, mapping_type);
+  transform_fields<dim,spacedim,1,VECTOR,DH>(input, output, mapping_data, mapping_type);
 }
 
 
@@ -1006,7 +1104,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::transform (
 {
   AssertDimension (input.size(), output.size());
 
-  transform_differential_forms(input, output, mapping_data, mapping_type);
+  transform_differential_forms<dim,spacedim,1,VECTOR,DH>(input, output, mapping_data, mapping_type);
 
 }
 
@@ -1090,102 +1188,6 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
   AssertThrow(false, ExcNotImplemented());
 
 }
-
-
-template<int dim, int spacedim, class VECTOR, class DH>
-template < int rank >
-void MappingFEField<dim,spacedim,VECTOR,DH>::transform_fields(
-  const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
-  VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
-{
-  AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-          ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(mapping_data);
-
-  switch (mapping_type)
-    {
-    case mapping_contravariant:
-    {
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-
-      for (unsigned int i=0; i<output.size(); ++i)
-        output[i] = apply_transformation(data.contravariant[i], input[i]);
-
-      return;
-    }
-
-    case mapping_piola:
-    {
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-      Assert (data.update_each & update_volume_elements,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
-      Assert (rank==1, ExcMessage("Only for rank 1"));
-      for (unsigned int i=0; i<output.size(); ++i)
-        {
-          output[i] = apply_transformation(data.contravariant[i], input[i]);
-          output[i] /= data.volume_elements[i];
-        }
-      return;
-    }
-
-
-    //We still allow this operation as in the
-    //reference cell Derivatives are Tensor
-    //rather than DerivativeForm
-    case mapping_covariant:
-    {
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-
-      for (unsigned int i=0; i<output.size(); ++i)
-        output[i] = apply_transformation(data.covariant[i], input[i]);
-
-      return;
-    }
-
-    default:
-      Assert(false, ExcNotImplemented());
-    }
-}
-
-
-template<int dim, int spacedim, class VECTOR, class DH>
-template < int rank >
-void MappingFEField<dim,spacedim,VECTOR,DH>::transform_differential_forms(
-  const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-  VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
-{
-
-  AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-          ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(mapping_data);
-
-  switch (mapping_type)
-    {
-    case mapping_covariant:
-    {
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-
-      for (unsigned int i=0; i<output.size(); ++i)
-        output[i] = apply_transformation(data.covariant[i], input[i]);
-
-      return;
-    }
-    default:
-      Assert(false, ExcNotImplemented());
-    }
-
-}
-
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
