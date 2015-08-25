@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,10 @@
 // indicators
 //
 // test case by Jan Strebel
+//
+// this is a variation of the grid_in_msh_02 testcase, but as in Jan's
+// original code snippet, it uses GridIn<1,3> (which wasn't
+// instantiated at the time)
 
 
 #include "../tests.h"
@@ -41,13 +45,13 @@ std::ofstream logfile("output");
 
 void check_file ()
 {
-  Triangulation<1> tria;
-  GridIn<1> gi;
+  Triangulation<1,3> tria;
+  GridIn<1,3> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (SOURCE_DIR "/../grid/grids/grid_in_msh_02.msh");
   gi.read_msh(in);
 
-  for (Triangulation<1>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
+  for (Triangulation<1,3>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
       for (unsigned int face = 0; face < 2; ++face)
       {

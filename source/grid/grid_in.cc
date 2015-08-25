@@ -37,6 +37,49 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace
+{
+  /**
+   * In 1d, boundary indicators are associated with vertices, but this is not
+   * currently passed through the SubcellData structure. This function sets
+   * boundary indicators on vertices after the triangulation has already been
+   * created.
+   *
+   * TODO: Fix this properly via SubcellData
+   */
+  template <int spacedim>
+  void
+  assign_1d_boundary_indicators (const std::map<unsigned int, types::boundary_id> &boundary_ids,
+                                 Triangulation<1,spacedim>                        &triangulation)
+  {
+    if (boundary_ids.size() > 0)
+      for (typename Triangulation<1,spacedim>::active_cell_iterator
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        for (unsigned int f=0; f<GeometryInfo<1>::faces_per_cell; ++f)
+          if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
+            {
+              AssertThrow (cell->at_boundary(f),
+                           ExcMessage ("You are trying to prescribe boundary ids on the face "
+                                       "of a 1d cell (i.e., on a vertex), but this face is not actually at "
+                                       "the boundary of the mesh. This is not allowed."));
+              cell->face(f)->set_boundary_id (boundary_ids.find(cell->vertex_index(f))->second);
+            }
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  assign_1d_boundary_indicators (const std::map<unsigned int, types::boundary_id> &,
+                                 Triangulation<dim,spacedim> &)
+  {
+    // we shouldn't get here since boundary ids are not assigned to
+    // vertices except in 1d
+    Assert (dim != 1, ExcInternalError());
+  }
+}
+
 template <int dim, int spacedim>
 GridIn<dim, spacedim>::GridIn () :
   tria(0, typeid(*this).name()), default_format(ucd)
@@ -1244,9 +1287,12 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 
   in >> n_cells;
 
-  // set up array of cells
-  std::vector<CellData<dim> > cells;
-  SubCellData                 subcelldata;
+  // set up array of cells and subcells (faces). In 1d, there is currently no
+  // standard way in deal.II to pass boundary indicators attached to individual
+  // vertices, so do this by hand via the boundary_ids_1d array
+  std::vector<CellData<dim> >                cells;
+  SubCellData                                subcelldata;
+  std::map<unsigned int, types::boundary_id> boundary_ids_1d;
 
   for (unsigned int cell=0; cell<n_cells; ++cell)
     {
@@ -1289,8 +1335,9 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 
         case 2:
         {
-          // read the tags; ignore
-          // all but the first one
+          // read the tags; ignore all but the first one which we will
+          // interpret as the material_id (for cells) or boundary_id
+          // (for faces)
           unsigned int n_tags;
           in >> n_tags;
           if (n_tags > 0)
@@ -1431,29 +1478,32 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
                                               subcelldata.boundary_quads.back().vertices[i]));
                 subcelldata.boundary_quads.back().vertices[i] =
                   numbers::invalid_unsigned_int;
-              };
+              }
 
         }
       else if (cell_type == 15)
         {
-          // Ignore vertices
-          // but read the
-          // number of nodes
-          // given
+          // read the indices of nodes given
+          unsigned int node_index;
           switch (gmsh_file_format)
             {
             case 1:
             {
               for (unsigned int i=0; i<nod_num; ++i)
-                in >> dummy;
+                in >> node_index;
               break;
             }
             case 2:
             {
-              in >> dummy;
+              in >> node_index;
               break;
             }
             }
+
+          // we only care about boundary indicators assigned to individual
+          // vertices in 1d (because otherwise the vertices are not faces)
+          if (dim == 1)
+            boundary_ids_1d[vertex_indices[node_index]] = material_id;
         }
       else
         // cannot read this, so throw
@@ -1474,7 +1524,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 
           AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
         }
-    };
+    }
 
   // Assert we reached the end of the block
   in >> line;
@@ -1499,6 +1549,11 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
     GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
+
+  // in 1d, we also have to attach boundary ids to vertices, which does not
+  // currently work through the call above
+  if (dim == 1)
+    assign_1d_boundary_indicators (boundary_ids_1d, *tria);
 }
 
 
@@ -1510,6 +1565,13 @@ void GridIn<1>::read_netcdf (const std::string &)
 
 template <>
 void GridIn<1,2>::read_netcdf (const std::string &)
+{
+  AssertThrow(false, ExcImpossibleInDim(1));
+}
+
+
+template <>
+void GridIn<1,3>::read_netcdf (const std::string &)
 {
   AssertThrow(false, ExcImpossibleInDim(1));
 }
