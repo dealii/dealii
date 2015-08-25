@@ -1571,6 +1571,13 @@ void GridIn<1,2>::read_netcdf (const std::string &)
 
 
 template <>
+void GridIn<1,3>::read_netcdf (const std::string &)
+{
+  AssertThrow(false, ExcImpossibleInDim(1));
+}
+
+
+template <>
 void GridIn<2, 3>::read_netcdf (const std::string &)
 {
   Assert(false, ExcNotImplemented());

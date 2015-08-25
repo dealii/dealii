@@ -108,6 +108,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The GridIn class was not instantiated for the
+  <code>dim==1,spacedim==3</code> case. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/08/25)
+  </li>
+
   <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
   associated with vertices. This is now fixed.
   <br>
