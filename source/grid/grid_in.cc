@@ -46,7 +46,7 @@ namespace
    * boundary indicators on vertices after the triangulation has already been
    * created.
    *
-   * TODO: This this properly via SubcellData
+   * TODO: Fix this properly via SubcellData
    */
   template <int spacedim>
   void
