@@ -298,7 +298,7 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if t he advection velocity is
+     * either have only a single entry, if the advection velocity is
      * constant, or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
@@ -360,6 +360,9 @@ namespace LocalIntegrators
      * (u_i-g) v_j \, ds
      * @f]
      *
+     * Here, <i>u</i> is the finite element function whose values are given in the argument <tt>input</tt>.
+     * <i>g</i> is the inhomogenous boundary value in the argument <tt>data</tt>.
+     *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
      * either have only a single entry, if the advection velocity is
@@ -419,13 +422,13 @@ namespace LocalIntegrators
      * value of the trial function at the outflow boundary and zero else:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
-     * [\mathbf w\cdot\mathbf n]_+
+     * [\mathbf w\cdot\mathbf n]_-
      * (u_i-g) v_j \, ds
      * @f]
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if t he advection velocity is
+     * either have only a single entry, if the advection velocity is
      * constant, or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
@@ -493,7 +496,7 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if t he advection velocity is
+     * either have only a single entry, if the advection velocity is
      * constant, or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
@@ -571,7 +574,7 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if t he advection velocity is
+     * either have only a single entry, if the advection velocity is
      * constant, or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
@@ -649,7 +652,7 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if t he advection velocity is
+     * either have only a single entry, if the advection velocity is
      * constant, or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
