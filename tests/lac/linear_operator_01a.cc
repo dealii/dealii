@@ -13,10 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-// Test the LinearOperator template on a trivial vector implementation
-// :: RightVector -> LeftVector
+// Variant of linear_operator_01 that uses std::complex<double> as
+// value_type: Test the LinearOperator template on a trivial vector
+// implementation :: RightVector -> LeftVector with complex numbers.
 
 #include "../tests.h"
+
+#include <complex>
 
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector_memory.templates.h>
@@ -28,7 +31,7 @@ using namespace dealii;
 
 struct LeftVector
 {
-  typedef double value_type;
+  typedef std::complex<double> value_type;
   value_type value;
 
   LeftVector & operator = (value_type new_value)
@@ -63,7 +66,7 @@ struct LeftVector
 
 struct RightVector
 {
-  typedef double value_type;
+  typedef std::complex<double> value_type;
   value_type value;
 
   RightVector & operator = (value_type new_value)
@@ -105,19 +108,19 @@ int main()
   LinearOperator<LeftVector, RightVector> multiply2;
   multiply2.vmult = [](LeftVector &v, const RightVector &u)
   {
-    v.value = 2 * u.value;
+    v.value = 2. * u.value;
   };
   multiply2.vmult_add = [](LeftVector &v, const RightVector &u)
   {
-    v.value += 2 * u.value;
+    v.value += 2. * u.value;
   };
   multiply2.Tvmult = [](RightVector &v, const LeftVector &u)
   {
-    v.value = 2 * u.value;
+    v.value = 2. * u.value;
   };
   multiply2.Tvmult_add = [](RightVector &v, const LeftVector &u)
   {
-    v.value += 2 * u.value;
+    v.value += 2. * u.value;
   };
   multiply2.reinit_range_vector = [](LeftVector &, bool)
   {
@@ -129,19 +132,19 @@ int main()
   auto multiply4 = multiply2;
   multiply4.vmult = [](LeftVector &v, const RightVector &u)
   {
-    v.value = 4 * u.value;
+    v.value = 4. * u.value;
   };
   multiply4.vmult_add = [](LeftVector &v, const RightVector &u)
   {
-    v.value += 4 * u.value;
+    v.value += 4. * u.value;
   };
   multiply4.Tvmult = [](RightVector &v, const LeftVector &u)
   {
-    v.value = 4 * u.value;
+    v.value = 4. * u.value;
   };
   multiply4.Tvmult_add = [](RightVector &v, const LeftVector &u)
   {
-    v.value += 4 * u.value;
+    v.value += 4. * u.value;
   };
 
 
@@ -205,7 +208,7 @@ int main()
   deallog << "(4 * 4) * " << u.value << " = " << v.value << std::endl;
 
   test = multiply4;
-  test *= 4.;
+  test *= std::complex<double>(4.);
   test.vmult(v, u);
   deallog << "(4 * 4) * " << u.value << " = " << v.value << std::endl;
 
