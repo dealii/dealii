@@ -14,9 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-// read a file in the MSH format used by the GMSH program. this
-// particular mesh has type-15 cells (nodes) with more than one
-// associated vertex. we failed to read the vertices
+// in 1d, we have to read vertex information to set boundary
+// indicators
+//
+// test case by Jan Strebel
+
 
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
@@ -37,25 +39,24 @@
 std::ofstream logfile("output");
 
 
-template<int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void check_file ()
 {
-  Triangulation<dim> tria;
-  GridIn<dim> gi;
+  Triangulation<1> tria;
+  GridIn<1> gi;
   gi.attach_triangulation (tria);
-  gi.read(name, format);
-  deallog << '\t' << tria.n_vertices()
-          << '\t' << tria.n_cells()
-          << std::endl;
+  std::ifstream in (SOURCE_DIR "/../grid/grids/grid_in_msh_02.msh");
+  gi.read_msh(in);
 
-  GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
-}
-
-void filename_resolution()
-{
-  check_file<2> (std::string(SOURCE_DIR "/grid_in_msh_02/mesh"), GridIn<2>::msh);
+  for (Triangulation<1>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
+    {
+      for (unsigned int face = 0; face < 2; ++face)
+      {
+        if (cell->at_boundary(face))
+          deallog << "vertex " << cell->face_index(face)
+                  << " has boundary indicator " << (int)cell->face(face)->boundary_indicator()
+                  << std::endl;
+      }
+    }
 }
 
 
@@ -67,6 +68,6 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  filename_resolution();
+  check_file ();
 }
 
