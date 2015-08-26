@@ -148,7 +148,7 @@ $ ctest [-j N]
 </pre>
       Here, <code>N</code> is the number of concurrent tests that should be
       run, in the same way as you can say <code>make -jN</code>. The testsuite
-      is huge and will need around 12h on current computers 
+      is huge and will need around 12h on current computers
       running single threaded.
     </p>
 
@@ -171,7 +171,7 @@ $ ctest [-j N] -E '&lt;negative regular expression&gt;'
       <a href="http://www.nongnu.org/numdiff/">numdiff</a> tool that compares
       stored and newly created output files based on floating point
       tolerances. To use it, simply export where the <code>numdiff</code>
-      executable can be found via the <code>PATH</code> 
+      executable can be found via the <code>PATH</code>
       environment variable so that it can be found during
       <code>make setup_tests</code>.
     </p>
@@ -274,7 +274,7 @@ xx: ===============================    OUTPUT END   ============================
           category: The test project failed in the configuration stage
         </li>
         <li>
-          <code>BUILD</code>: compilation error occured
+          <code>BUILD</code>: compilation error occurred
         </li>
         <li>
           <code>RUN</code>: the test executable could not be run / aborted
@@ -306,7 +306,7 @@ xx: ===============================    OUTPUT END   ============================
 
     <p>
       To run the testsuite in this mode, essentially, you have to do three
-      things: 
+      things:
       <ol>
 	<li>
 	  build the library with appropriate profiling flags
@@ -431,7 +431,7 @@ category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
       If a specific test can only be run in debug or release configurations but
-      not in both it is possible to restrict the setup by prepeding
+      not in both it is possible to restrict the setup by prepending
       <code>.debug</code> or <code>.release</code> directly before
       <code>.output</code>, e.g.:
 <pre>
@@ -498,9 +498,9 @@ category/test.with_umfpack=on.with_zlib=on.output
     <p>
       <b>Note:</b> The tests in some subdirectories of <code>tests/</code> are
       automatically run only if some feature is enabled. In this case a
-      feature constraint encoded in the output file name is 
+      feature constraint encoded in the output file name is
       redundant and should be avoided. In particular, this holds for
-      subdirectories 
+      subdirectories
       <code>distributed_grids</code>, <code>lapack</code>,
       <code>metis</code>, <code>petsc</code>, <code>slepc</code>,
       <code>trilinos</code>, <code>umfpack</code>, <code>gla</code>, and
@@ -652,7 +652,7 @@ $ ctest -V -R "category/my_new_test"
       make sure that the output is what you had expected. (For complex tests,
       it may sometimes be impossible to say whether the output is correct, and
       in this case we sometimes just take it to make
-      sure that future invokations of the test yield the same results.)
+      sure that future invocations of the test yield the same results.)
     </p>
 
     <p>

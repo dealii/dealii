@@ -27,7 +27,7 @@
     <h2>Unknown compiler</h2>
 
     <p>
-      Currently, the <acronym>deal.II</acronym> CMake Buildsystem
+      Currently, the <acronym>deal.II</acronym> CMake build system
       recognizes
       <a href="http://gcc.gnu.org/">gcc</a>,
       <a href="http://clang.llvm.org/">clang</a>, as well as
@@ -35,7 +35,7 @@
       sets up reasonable default compiler flags.
       <ul>
         <li>
-          To start porting for an unkown compiler, specify
+          To start porting to an unknown compiler, specify
           <code>-DDEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF</code> and set all
           necessary compiler flags by hand via
 <pre>
@@ -78,7 +78,7 @@ include/deal.II/base/config.h.in
       information might help:
       <ul>
         <li>
-          The buildsystem of <acronym>deal.II</acronym> uses <a
+          The build system of <acronym>deal.II</acronym> uses <a
           href="http://www.cmake.org/" target="_top">CMake</a>.  So,
           in order to port <acronym>deal.II</acronym> to a new platform,
           it is obviously necessary that <a href="http://www.cmake.org/"
@@ -130,7 +130,7 @@ include/deal.II/base/config.h.in
       You have to set up a native deal.II build directory first and run
       <code>make expand_instantiations</code> in it. The executable is
       needed for the build system (and obviously the cross compiled version
-      cannot be used). Locate the <code>expand_instantions</code>
+      cannot be used). Locate the <code>expand_instantiations</code>
       executable and export its location in the <code>PATH</code>
       environment variable.
     </p>

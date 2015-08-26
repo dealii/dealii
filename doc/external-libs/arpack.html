@@ -1,20 +1,20 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"                  
-	  "http://www.w3.org/TR/html4/loose.dtd">                        
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
 
-<html>                                                                          
-  <head>                            
+<html>
+  <head>
     <title>The deal.II Readme on interfacing to ARPACK</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="copyright" content="Copyright (C) 2010, 2013, 2015 by the deal.II authors">
-    <meta name="keywords" content="deal.II"> 
-  </head>                                                                      
-  <body> 
+    <meta name="keywords" content="deal.II">
+  </head>
+  <body>
 
-    
+
     <h2>Installation of <acronym>ARPACK</acronym></h2>
 
     <p>
-      <a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a> 
+      <a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a>
       is a collection of Fortran77 subroutines designed to solve large
       scale eigenvalue problems.
       <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a>
@@ -44,11 +44,11 @@
       <li>edit <code>ARmake.inc</code></li>
       <ul>
         <li>change home to the correct directory</li>
-        <li>choose which <acronym>BLAS</acronym> and 
+        <li>choose which <acronym>BLAS</acronym> and
         <acronym>LAPACK</acronym> you would like to use</li>
       </ul>
       <li>change the file second.f in the UTIL directory</li>
-      <li>do <code>make lib</code> in the current directory 
+      <li>do <code>make lib</code> in the current directory
       to build the standard library <code>libarpack_$(PLAT).a</code>
       </li>
     </ul>
@@ -65,14 +65,14 @@
     </p>
 
     <p>
-    Try to run one of the examples and compare the output. 
-    How the output should look like is stated in the README 
+    Try to run one of the examples and compare the output.
+    How the output should look like is stated in the README
     that can be found in the <code>EXAMPLES</code> directory.
-    </p> 
+    </p>
 
     <p>
-    If that output you produced looks like it should you can 
-    proceed to comile <acronym>deal.II</acronym> with 
+    If that output you produced looks like it should you can
+    proceed to compile <acronym>deal.II</acronym> with
     <acronym>ARPACK</acronym>.
     </p>
 
