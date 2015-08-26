@@ -26,6 +26,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -1498,6 +1499,95 @@ next_cell:
                  ExcPointNotFound<spacedim>(p));
 
     return best_cell;
+  }
+
+
+  namespace
+  {
+
+    template<class Container>
+    bool
+    contains_locally_owned_cells (const std::vector<typename Container::active_cell_iterator> &cells)
+    {
+      for (typename std::vector<typename Container::active_cell_iterator>::const_iterator
+           it = cells.begin(); it != cells.end(); ++it)
+        {
+          if ((*it)->is_locally_owned())
+            return true;
+        }
+      return false;
+    }
+
+    template<class Container>
+    bool
+    contains_artificial_cells (const std::vector<typename Container::active_cell_iterator> &cells)
+    {
+      for (typename std::vector<typename Container::active_cell_iterator>::const_iterator
+           it = cells.begin(); it != cells.end(); ++it)
+        {
+          if ((*it)->is_artificial())
+            return true;
+        }
+      return false;
+    }
+
+  }
+
+
+
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_active_cell_halo_layer (const Container                                                                    &container,
+                                  const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate)
+  {
+    std::vector<typename Container::active_cell_iterator> active_halo_layer;
+    std::vector<bool> locally_active_vertices_on_subdomain (get_tria(container).n_vertices(),
+                                                            false);
+
+    // Find the cells for which the predicate is true
+    // These are the cells around which we wish to construct
+    // the halo layer
+    for (typename Container::active_cell_iterator
+         cell = container.begin_active();
+         cell != container.end(); ++cell)
+      if (predicate(cell)) // True predicate --> Part of subdomain
+        for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
+          locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+
+    // Find the cells that do not conform to the predicate
+    // but share a vertex with the selected subdomain
+    // These comprise the halo layer
+    for (typename Container::active_cell_iterator
+         cell = container.begin_active();
+         cell != container.end(); ++cell)
+      if (!predicate(cell)) // False predicate --> Potential halo cell
+        for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
+          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] == true)
+            {
+              active_halo_layer.push_back(cell);
+              break;
+            }
+
+    return active_halo_layer;
+  }
+
+
+
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_ghost_cell_halo_layer (const Container &container)
+  {
+    const std::vector<typename Container::active_cell_iterator>
+    active_halo_layer = compute_active_cell_halo_layer (container, IteratorFilters::LocallyOwnedCell());
+
+    // Check that we never return locally owned or artificial cells
+    // What is left should only be the ghost cells
+    Assert(contains_locally_owned_cells<Container>(active_halo_layer) == false,
+           ExcMessage("Halo layer contains locally owned cells"));
+    Assert(contains_artificial_cells<Container>(active_halo_layer) == false,
+           ExcMessage("Halo layer contains artificial cells"));
+
+    return active_halo_layer;
   }
 
 

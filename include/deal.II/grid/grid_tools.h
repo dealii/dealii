@@ -556,6 +556,80 @@ namespace GridTools
   get_active_neighbors (const typename Container::active_cell_iterator        &cell,
                         std::vector<typename Container::active_cell_iterator> &active_neighbors);
 
+  /**
+   * Extract and return the active cell layer around a subdomain (set of active
+   * cells) in the @p container (i.e. those that share a common set of vertices
+   * with the subdomain but are not a part of it).
+   * Here, the "subdomain" consists of exactly all of those cells for which the
+   * @p predicate returns @p true.
+   *
+   * An example of a custom predicate is one that checks for a given material id
+   * @code
+   * template<int dim>
+   * bool
+   * pred_mat_id(const typename Triangulation<dim>::active_cell_iterator & cell)
+   * {
+   *   return cell->material_id() ==  1;
+   * }
+   * @endcode
+   * and we can then extract the layer of cells around this material with the
+   * following call:
+   * @code
+   * GridTools::compute_active_cell_halo_layer(tria, pred_mat_id<dim>);
+   * @endcode
+   *
+   * Predicates that are frequently useful can be found in namespace IteratorFilters.
+   * For example, it is possible to extracting a layer based on material id
+   * @code
+   * GridTools::compute_active_cell_halo_layer(tria,
+   *                                           IteratorFilters::MaterialIdEqualTo(1, true));
+   * @endcode
+   * or based on a set of active FE indices for an hp::DoFHandler
+   * @code
+   * GridTools::compute_active_cell_halo_layer(hp_dof_handler,
+   *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
+   * @endcode
+   * Note that in the last two examples we ensure that the predicate returns
+   * true only for locally owned cells. This means that the halo layer will
+   * not contain any artificial cells.
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer).
+   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * DoFHandler, or hp::DoFHandler).
+   * @param[in] predicate A function  (or object of a type with an operator())
+   * defining the subdomain around which the halo layer is to be extracted. It
+   * is a function that takes in an active cell and returns a boolean.
+   * @return A list of active cells sharing at least one common vertex with the
+   * predicated subdomain.
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_active_cell_halo_layer (const Container                                                                    &container,
+                                  const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate);
+
+  /**
+   * Extract and return ghost cells which are the active cell layer
+   * around all locally owned cells. This is most relevant for
+   * parallel::shared::Triangulation where it will return a subset of all
+   * ghost cells on a processor, but for parallel::distributed::Triangulation
+   * this will return all the ghost cells.
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer).
+   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * DoFHandler, or hp::DoFHandler).
+   * @return A list of ghost cells
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_ghost_cell_halo_layer (const Container &container);
+
+
   /*@}*/
   /**
    * @name Partitions and subdomains of triangulations
@@ -1280,6 +1354,7 @@ namespace GridTools
 
 namespace GridTools
 {
+
   template <int dim, typename Predicate, int spacedim>
   void transform (const Predicate    &predicate,
                   Triangulation<dim, spacedim> &triangulation)
@@ -1426,7 +1501,6 @@ namespace GridTools
             }
         }
   }
-
 
 
 
