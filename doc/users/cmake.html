@@ -208,26 +208,29 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 <pre class="cmake">
 ###
 #
-#  The following targets are available (invoke via $ make &lt;target&gt;):
+#  The following targets are available (invoke by $ make &lt;target&gt;):
 #
 #    all            - compile the library and all enabled components
 #    clean          - remove all generated files
 #    install        - install into CMAKE_INSTALL_PREFIX
-#    help           - print this help message in the toplevel directory,
-#                     otherwise print a list of targets (in subdirectories)
+#
+#    info           - print this help message
+#    help           - print a list of valid top level targets
 #
 #    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - rerun the configure and generate phases of CMake
 #
+#    compat_files   - build and install component 'compat_files'
 #    documentation  - build and install component 'documentation'
 #    examples       - build and install component 'examples'
 #    library        - build and install component 'library'
 #    parameter_gui  - build and install component 'parameter_gui'
+#    package        - build binary package
 #
 #    test           - run a minimal set of tests
 #
-#    setup_tests    - set up the testsuite subprojects
+#    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
 #
 ###
