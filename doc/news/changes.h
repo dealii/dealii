@@ -108,6 +108,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The testsuite now properly supports version constraints for
+  compilers and features. Those are annotated by
+  <code>.compiler=STRING(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>, or
+  <code>.with_FEATURE(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>.
+  <br>
+  (Matthias Maier, 2015/08/25)
+  </li>
+
   <li> Fixed: The GridIn class was not instantiated for the
   <code>dim==1,spacedim==3</code> case. This is now fixed.
   <br>
