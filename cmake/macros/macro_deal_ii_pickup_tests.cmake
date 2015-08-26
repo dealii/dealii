@@ -152,7 +152,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     #
 
     STRING(REGEX MATCHALL
-      "compiler=([a-z]|[A-Z])*(>=|<=|=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)" _matches ${_test}
+      "compiler=[a-zA-Z]*(>=|<=|=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)" _matches ${_test}
       )
 
     FOREACH(_match ${_matches})
@@ -161,10 +161,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
       # (a possible) version number from the feature constraint:
       #
       STRING(REGEX REPLACE
-        "^compiler=(([a-z]|[A-Z])*)(=|>=|<=|<).*$" "\\1"
-        _compiler ${_match}
+        "^compiler=([a-zA-Z]*)(=|>=|<=|>|<).*$" "\\1" _compiler ${_match}
         )
-      STRING(REGEX REPLACE "^compiler=(([a-z]|[A-Z])*)(>=|<=|=|>|<).*$" "\\3"  _operator ${_match})
+      STRING(REGEX REPLACE "^compiler=[a-zA-Z]*(>=|<=|=|>|<).*$" "\\1"  _operator ${_match})
       STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
       STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
 
@@ -269,22 +268,18 @@ Comparison operator \"=\" expected for boolean match.\n"
       # Process version constraints:
       #
       IF(NOT "${_version}" STREQUAL "")
-        IF(NOT ${DEAL_II_WITH_${_feature}})
-          SET(_define_test FALSE)
-        ELSEIF( "${_operator}" STREQUAL "=" AND
-                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_EQUAL "${_version}" )
-          SET(_define_test FALSE)
-        ELSEIF( "${_operator}" STREQUAL ">" AND
-                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" )
-          SET(_define_test FALSE)
-        ELSEIF( "${_operator}" STREQUAL "<" AND
-                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" )
-          SET(_define_test FALSE)
-        ELSEIF( "${_operator}" STREQUAL ">=" AND
-                "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" )
-          SET(_define_test FALSE)
-        ELSEIF( "${_operator}" STREQUAL "<=" AND
-                "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" )
+
+        IF( ( NOT ${DEAL_II_WITH_${_feature}} ) OR
+            ( "${_operator}" STREQUAL "=" AND
+              NOT "${DEAL_II_${_feature}_VERSION}" VERSION_EQUAL "${_version}" ) OR
+            ( "${_operator}" STREQUAL ">" AND
+              NOT "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) OR
+            ( "${_operator}" STREQUAL "<" AND
+              NOT "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
+            ( "${_operator}" STREQUAL ">=" AND
+              "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
+            ( "${_operator}" STREQUAL "<=" AND
+              "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) )
           SET(_define_test FALSE)
         ENDIF()
       ENDIF()
