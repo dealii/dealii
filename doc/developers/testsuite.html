@@ -424,9 +424,11 @@ category/test.output
 
     <p>
       Comparison file can actually be named in a more complex way than
-      just <code>category/test.output</code>:
+      just <code>category/test.output</code>. In pseudo code:
 <pre>
-category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt;on|off|&lt;version&gt;&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+category/test.[compiler=&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;yes|no|version&gt;.]*
+              [with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
+              [mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -455,14 +457,22 @@ category/test.release.output
       tests to specific compiler versions, e.g.:
 <pre>
 category/test.compiler=GNU=yes.output, or
-category/test.compiler=ICC-14=no.output
+category/test.compiler=GNU=no.output, or
+category/test.compiler=Intel&gt;=15.0.3.output
 </pre>
-      These tests will only be set up if the specified regular expression
-      matches (in case of <code>=yes</code>), or doesn't match
-      (<code>=no</code>) the string
-      <code>${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}</code>.
-      Common compiler names are <code>GNU</code>, <code>Clang</code> or
-      <code>Intel</code>.
+      The first test will only be set up if the specified compiler string
+      (in this case <code>GNU</code>) is equal to the string
+      <code>${CMAKE_CXX_COMPILER_ID}</code>. Similarly, the second test
+      will be set up if both strings are different. Common compiler names
+      are <code>GNU</code>, <code>Clang</code>, or <code>Intel</code>.
+    </p>
+    <p>
+      The third declaration is an example of how to specify a version
+      constraint: This tets will be set up if deal.II is configured with
+      the Intel compiler version 15.0.3 or higher. The operators
+      <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
+      <code>&gt;</code>= are supported.
+    </p>
 
     <a name="restrictfeature"></a>
     <h3>Restricting tests to feature configurations</h3>
@@ -480,14 +490,16 @@ category/test.with_zlib=off.output
 category/test.with_64bit_indices=on.output
 category/test.with_64bit_indices=off.output
 </pre>
-      Furthermore, a test can be restricted to be run only for a specific
-      minimum version of a feature being available being available. For example
+      Furthermore, a test can be restricted to be run only if specific
+      versions of a feature are available. For example
 <pre>
-category/test.with_trilinos=11.14.1.output
+category/test.with_trilinos&gt;=11.14.1.output
 </pre>
       will only be run if (a) trilinos is available, i.e.,
       <code>DEAL_II_WITH_TRILINOS=TRUE</code> and (b) if trilinos is at least
-      of version 11.14.1.
+      of version 11.14.1. Similarly, the operators
+      <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
+      <code>&gt;</code>= are supported.
     </p>
     <p>
       It is also possible to declare multiple constraints subsequently, e.g.
@@ -498,9 +510,8 @@ category/test.with_umfpack=on.with_zlib=on.output
     <p>
       <b>Note:</b> The tests in some subdirectories of <code>tests/</code> are
       automatically run only if some feature is enabled. In this case a
-      feature constraint encoded in the output file name is
-      redundant and should be avoided. In particular, this holds for
-      subdirectories
+      feature constraint encoded in the output file name is redundant and
+      should be avoided. In particular, this holds for subdirectories
       <code>distributed_grids</code>, <code>lapack</code>,
       <code>metis</code>, <code>petsc</code>, <code>slepc</code>,
       <code>trilinos</code>, <code>umfpack</code>, <code>gla</code>, and
