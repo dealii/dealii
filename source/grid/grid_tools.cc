@@ -1577,8 +1577,11 @@ next_cell:
   std::vector<typename Container::active_cell_iterator>
   compute_ghost_cell_halo_layer (const Container &container)
   {
+    std_cxx11::function<bool (const typename Container::active_cell_iterator &)> predicate
+      = IteratorFilters::LocallyOwnedCell();
+
     const std::vector<typename Container::active_cell_iterator>
-    active_halo_layer = compute_active_cell_halo_layer (container, IteratorFilters::LocallyOwnedCell());
+    active_halo_layer = compute_active_cell_halo_layer (container, predicate);
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
