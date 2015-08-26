@@ -274,7 +274,7 @@ xx: ===============================    OUTPUT END   ============================
           category: The test project failed in the configuration stage
         </li>
         <li>
-          <code>BUILD</code>: compilation error occured
+          <code>BUILD</code>: compilation error occurred
         </li>
         <li>
           <code>RUN</code>: the test executable could not be run / aborted
@@ -431,7 +431,7 @@ category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
       If a specific test can only be run in debug or release configurations but
-      not in both it is possible to restrict the setup by prepeding
+      not in both it is possible to restrict the setup by prepending
       <code>.debug</code> or <code>.release</code> directly before
       <code>.output</code>, e.g.:
 <pre>
@@ -652,7 +652,7 @@ $ ctest -V -R "category/my_new_test"
       make sure that the output is what you had expected. (For complex tests,
       it may sometimes be impossible to say whether the output is correct, and
       in this case we sometimes just take it to make
-      sure that future invokations of the test yield the same results.)
+      sure that future invocations of the test yield the same results.)
     </p>
 
     <p>
