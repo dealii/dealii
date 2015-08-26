@@ -353,15 +353,18 @@ namespace LocalIntegrators
 
     /**
      * Scalar case: Residual for upwind flux at the boundary for weak advection operator. This is the
-     * value of the trial function at the outflow boundary and zero else:
+     * value of the trial function at the outflow boundary and the value of the incoming boundary
+     * condition on the inflow boundary:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
-     * [\mathbf w\cdot\mathbf n]_-
-     * (u_i-g) v_j \, ds
+     * (\mathbf w\cdot\mathbf n)
+     * \widehat u v_j \, ds
      * @f]
      *
-     * Here, <i>u</i> is the finite element function whose values are given in the argument <tt>input</tt>.
-     * <i>g</i> is the inhomogenous boundary value in the argument <tt>data</tt>.
+     * Here, the numerical flux $\widehat u$ is the upwind value at the face,
+     * namely the finite element function whose values are given in the argument
+     * `input` on the outflow boundary.
+     * On the inflow boundary, it is the inhomogenous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
@@ -402,15 +405,13 @@ namespace LocalIntegrators
           for (unsigned int d=0; d<dim; ++d)
             nv += fe.normal_vector(k)[d] * velocity[d][k * v_increment];
 
-          if (nv > 0)
+          // Always use the upwind value
+          const double val = (nv > 0.) ? input[k] : -data[k];
+
+          for (unsigned i=0; i<n_dofs; ++i)
             {
-              for (unsigned i=0; i<n_dofs; ++i)
-                {
-                  const double v= fe.shape_value(i,k);
-                  const double u= input[k];
-                  const double g= data[k];
-                  result(i) += dx * nv *(u-g)*v;
-                }
+              const double v= fe.shape_value(i,k);
+              result(i) += dx * nv * val *v;
             }
         }
     }
@@ -419,12 +420,18 @@ namespace LocalIntegrators
 
     /**
      * Vector-valued case: Residual for upwind flux at the boundary for weak advection operator. This is the
-     * value of the trial function at the outflow boundary and zero else:
+     * value of the trial function at the outflow boundary and the value of the incoming boundary
+     * condition on the inflow boundary:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
-     * [\mathbf w\cdot\mathbf n]_-
-     * (u_i-g) v_j \, ds
+     * (\mathbf w\cdot\mathbf n)
+     * \widehat u v_j \, ds
      * @f]
+     *
+     * Here, the numerical flux $\widehat u$ is the upwind value at the face,
+     * namely the finite element function whose values are given in the argument
+     * `input` on the outflow boundary.
+     * On the inflow boundary, it is the inhomogenous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
@@ -466,16 +473,16 @@ namespace LocalIntegrators
           for (unsigned int d=0; d<dim; ++d)
             nv += fe.normal_vector(k)[d] * velocity[d][k * v_increment];
 
-          if (nv > 0)
+          std::vector<double> val(n_comp);
+
+          for (unsigned int d=0; d<n_comp; ++d)
             {
+              val[d] = (nv > 0.) ? input[d][k] : -data[d][k];
               for (unsigned i=0; i<n_dofs; ++i)
-                for (unsigned int d=0; d<n_comp; ++d)
-                  {
-                    const double v= fe.shape_value_component(i,k,d);
-                    const double u= input[d][k];
-                    const double g= data[d][k];
-                    result(i) += dx * nv *(u-g)*v;
-                  }
+                {
+                  const double v= fe.shape_value_component(i,k,d);
+                  result(i) += dx * nv * val[d] *v;
+                }
             }
         }
     }
