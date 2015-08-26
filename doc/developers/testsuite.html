@@ -148,7 +148,7 @@ $ ctest [-j N]
 </pre>
       Here, <code>N</code> is the number of concurrent tests that should be
       run, in the same way as you can say <code>make -jN</code>. The testsuite
-      is huge and will need around 12h on current computers 
+      is huge and will need around 12h on current computers
       running single threaded.
     </p>
 
@@ -171,7 +171,7 @@ $ ctest [-j N] -E '&lt;negative regular expression&gt;'
       <a href="http://www.nongnu.org/numdiff/">numdiff</a> tool that compares
       stored and newly created output files based on floating point
       tolerances. To use it, simply export where the <code>numdiff</code>
-      executable can be found via the <code>PATH</code> 
+      executable can be found via the <code>PATH</code>
       environment variable so that it can be found during
       <code>make setup_tests</code>.
     </p>
@@ -306,7 +306,7 @@ xx: ===============================    OUTPUT END   ============================
 
     <p>
       To run the testsuite in this mode, essentially, you have to do three
-      things: 
+      things:
       <ol>
 	<li>
 	  build the library with appropriate profiling flags
@@ -498,9 +498,9 @@ category/test.with_umfpack=on.with_zlib=on.output
     <p>
       <b>Note:</b> The tests in some subdirectories of <code>tests/</code> are
       automatically run only if some feature is enabled. In this case a
-      feature constraint encoded in the output file name is 
+      feature constraint encoded in the output file name is
       redundant and should be avoided. In particular, this holds for
-      subdirectories 
+      subdirectories
       <code>distributed_grids</code>, <code>lapack</code>,
       <code>metis</code>, <code>petsc</code>, <code>slepc</code>,
       <code>trilinos</code>, <code>umfpack</code>, <code>gla</code>, and
