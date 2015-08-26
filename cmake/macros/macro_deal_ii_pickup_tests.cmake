@@ -152,22 +152,59 @@ MACRO(DEAL_II_PICKUP_TESTS)
     #
 
     STRING(REGEX MATCHALL
-      "compiler=[^=]*=(on|off|yes|no|true|false)" _matches ${_test}
+      "compiler=([a-z]|[A-Z])*(>=|<=|=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)" _matches ${_test}
       )
+
     FOREACH(_match ${_matches})
+      #
+      # Extract compiler name, comparison operator, (a possible) boolean and
+      # (a possible) version number from the feature constraint:
+      #
       STRING(REGEX REPLACE
-        "^compiler=([^=]*)=(on|off|yes|no|true|false)$" "\\1"
+        "^compiler=(([a-z]|[A-Z])*)(=|>=|<=|<).*$" "\\1"
         _compiler ${_match}
         )
+      STRING(REGEX REPLACE "^compiler=(([a-z]|[A-Z])*)(>=|<=|=|>|<).*$" "\\3"  _operator ${_match})
       STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
+      STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
 
-      IF( ( "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"
-              MATCHES "^${_compiler}"
-            AND NOT ${_boolean} )
-          OR ( NOT "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"
-                   MATCHES "^${_compiler}"
-               AND ${_boolean} ) )
-        SET(_define_test FALSE)
+      #
+      # First process simple yes/no feature constraints:
+      #
+      IF(NOT "${_boolean}" STREQUAL "")
+        IF(NOT "${_operator}" STREQUAL "=")
+          MESSAGE(FATAL_ERROR "
+Invalid syntax in constraint \"${_match}\" in file
+\"${_comparison}\":
+Comparison operator \"=\" expected for boolean match.\n"
+            )
+        ENDIF()
+
+        # This is why I hate CMake :-/
+        IF( ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" AND NOT ${_boolean} ) OR
+            ( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" AND ${_boolean} ) )
+          SET(_define_test FALSE)
+        ENDIF()
+      ENDIF()
+
+      #
+      # Process version constraints:
+      #
+      IF(NOT "${_version}" STREQUAL "")
+
+        IF( ( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" ) OR
+            ( "${_operator}" STREQUAL "=" AND
+              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_EQUAL "${_version}" ) OR
+            ( "${_operator}" STREQUAL ">" AND
+              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "${_version}" ) OR
+            ( "${_operator}" STREQUAL "<" AND
+              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "${_version}" ) OR
+            ( "${_operator}" STREQUAL ">=" AND
+              "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "${_version}" ) OR
+            ( "${_operator}" STREQUAL "<=" AND
+                    "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "${_version}" ) )
+          SET(_define_test FALSE)
+        ENDIF()
       ENDIF()
     ENDFOREACH()
 
@@ -182,14 +219,25 @@ MACRO(DEAL_II_PICKUP_TESTS)
     #
 
     STRING(REGEX MATCHALL
-      "with_([0-9]|[a-z]|_)*=(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)"
+      "with_([0-9]|[a-z]|_)*(=|>=|<=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)"
       _matches ${_test}
       )
 
     FOREACH(_match ${_matches})
-      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)=.*" "\\1" _feature ${_match})
+      #
+      # Extract feature name, comparison operator, (a possible) boolean and
+      # (a possible) version number from the feature constraint:
+      #
+      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(>=|<=|=|>|<).*" "\\1" _feature ${_match})
       STRING(TOUPPER ${_feature} _feature)
+      STRING(REGEX MATCH "(>=|<=|=|>|<)" _operator ${_match})
+      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(>=|<=|=|>|<).*$" "\\3" _operator ${_match})
+      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
+      STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
 
+      #
+      # Valid feature?
+      #
       IF(NOT DEFINED DEAL_II_WITH_${_feature})
         MESSAGE(FATAL_ERROR "
 Invalid feature constraint \"${_match}\" in file
@@ -201,8 +249,16 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
       #
       # First process simple yes/no feature constraints:
       #
-      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
       IF(NOT "${_boolean}" STREQUAL "")
+        IF(NOT "${_operator}" STREQUAL "=")
+          MESSAGE(FATAL_ERROR "
+Invalid syntax in constraint \"${_match}\" in file
+\"${_comparison}\":
+Comparison operator \"=\" expected for boolean match.\n"
+            )
+        ENDIF()
+
+        # This is why I hate CMake :-/
         IF( (DEAL_II_WITH_${_feature} AND NOT ${_boolean}) OR
             (NOT DEAL_II_WITH_${_feature} AND ${_boolean}) )
           SET(_define_test FALSE)
@@ -212,18 +268,26 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
       #
       # Process version constraints:
       #
-      STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
       IF(NOT "${_version}" STREQUAL "")
-
         IF(NOT ${DEAL_II_WITH_${_feature}})
           SET(_define_test FALSE)
-        ENDIF()
-
-        IF("${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}")
+        ELSEIF( "${_operator}" STREQUAL "=" AND
+                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_EQUAL "${_version}" )
+          SET(_define_test FALSE)
+        ELSEIF( "${_operator}" STREQUAL ">" AND
+                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" )
+          SET(_define_test FALSE)
+        ELSEIF( "${_operator}" STREQUAL "<" AND
+                NOT "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" )
+          SET(_define_test FALSE)
+        ELSEIF( "${_operator}" STREQUAL ">=" AND
+                "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" )
+          SET(_define_test FALSE)
+        ELSEIF( "${_operator}" STREQUAL "<=" AND
+                "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" )
           SET(_define_test FALSE)
         ENDIF()
       ENDIF()
-
     ENDFOREACH()
 
     IF(_define_test)
