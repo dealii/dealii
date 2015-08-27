@@ -108,6 +108,23 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: Support for complex number types throughout the library.
+  Several parts of the library have been reorganized to support complex
+  number types.
+  <br>
+  <em>Classes that are now instantiated for complex number types:</em>
+  - FunctionTime
+  - Function
+  - TensorFunction
+
+  <br>
+  <em>Classes now supporting complex number types via header:</em>
+  - LinearOperator
+  - PackagedOperation
+  <br>
+  (Matthias Maier, 2015/08/25 - XXX)
+  </li>
+
   <li> Fixed: The testsuite now properly supports version constraints for
   compilers and features. Those are annotated by
   <code>.compiler=STRING(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>, or
