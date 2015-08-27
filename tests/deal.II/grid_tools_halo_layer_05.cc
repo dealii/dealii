@@ -120,8 +120,11 @@ void test ()
   }
 
   // Compute a halo layer around active fe indices 2,3 and set it to active fe index 4
+  std::set<types::material_id> material_ids;
+  material_ids.insert(2);
+  material_ids.insert(3);
   std::vector<cell_iterator> active_halo_layer
-    = GridTools::compute_active_cell_halo_layer(dof_handler, IteratorFilters::ActiveFEIndexEqualTo({2,3}, true));
+    = GridTools::compute_active_cell_halo_layer(dof_handler, IteratorFilters::ActiveFEIndexEqualTo(material_ids, true));
   AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
   for (typename std::vector<cell_iterator>::iterator
        it = active_halo_layer.begin();
