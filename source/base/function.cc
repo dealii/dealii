@@ -18,29 +18,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-
-template class Function<1>;
-template class ZeroFunction<1>;
-template class ConstantFunction<1>;
-template class ComponentSelectFunction<1>;
-template class ScalarFunctionFromFunctionObject<1>;
-template class VectorFunctionFromScalarFunctionObject<1>;
-template class VectorFunctionFromTensorFunction<1>;
-
-template class Function<2>;
-template class ZeroFunction<2>;
-template class ConstantFunction<2>;
-template class ComponentSelectFunction<2>;
-template class ScalarFunctionFromFunctionObject<2>;
-template class VectorFunctionFromScalarFunctionObject<2>;
-template class VectorFunctionFromTensorFunction<2>;
-
-template class Function<3>;
-template class ZeroFunction<3>;
-template class ConstantFunction<3>;
-template class ComponentSelectFunction<3>;
-template class ScalarFunctionFromFunctionObject<3>;
-template class VectorFunctionFromScalarFunctionObject<3>;
-template class VectorFunctionFromTensorFunction<3>;
+#include "function.inst"
 
 DEAL_II_NAMESPACE_CLOSE

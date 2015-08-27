@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,12 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/function_time.templates.h>
 
-DEAL_II_NAMESPACE_OPEN
+for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
+{
+  template class TensorFunction<rank, dim, S>;
+  template class ConstantTensorFunction<rank, dim, S>;
+  template class ZeroTensorFunction<rank, dim, S>;
+}
 
-// explicit instantiation
-#include "function_time.inst"
-
-DEAL_II_NAMESPACE_CLOSE
-
+for (S : COMPLEX_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
+{
+  template class TensorFunction<rank, dim, S>;
+  template class ConstantTensorFunction<rank, dim, S>;
+  template class ZeroTensorFunction<rank, dim, S>;
+}

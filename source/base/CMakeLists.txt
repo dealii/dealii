@@ -72,7 +72,10 @@ SET(_src
 
 SET(_inst
   data_out_base.inst.in
+  function.inst.in
+  function_time.inst.in
   polynomials_rannacher_turek.inst.in
+  tensor_function.inst.in
   time_stepping.inst.in
   )
 

@@ -17,46 +17,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Explicit instantiations:
-
-template class TensorFunction<1,1>;
-template class TensorFunction<2,1>;
-template class TensorFunction<3,1>;
-template class TensorFunction<4,1>;
-template class TensorFunction<1,2>;
-template class TensorFunction<2,2>;
-template class TensorFunction<3,2>;
-template class TensorFunction<4,2>;
-template class TensorFunction<1,3>;
-template class TensorFunction<2,3>;
-template class TensorFunction<3,3>;
-template class TensorFunction<4,3>;
-
-template class ConstantTensorFunction<1,1>;
-template class ConstantTensorFunction<2,1>;
-template class ConstantTensorFunction<3,1>;
-template class ConstantTensorFunction<4,1>;
-template class ConstantTensorFunction<1,2>;
-template class ConstantTensorFunction<2,2>;
-template class ConstantTensorFunction<3,2>;
-template class ConstantTensorFunction<4,2>;
-template class ConstantTensorFunction<1,3>;
-template class ConstantTensorFunction<2,3>;
-template class ConstantTensorFunction<3,3>;
-template class ConstantTensorFunction<4,3>;
-
-template class ZeroTensorFunction<1,1>;
-template class ZeroTensorFunction<2,1>;
-template class ZeroTensorFunction<3,1>;
-template class ZeroTensorFunction<4,1>;
-template class ZeroTensorFunction<1,2>;
-template class ZeroTensorFunction<2,2>;
-template class ZeroTensorFunction<3,2>;
-template class ZeroTensorFunction<4,2>;
-template class ZeroTensorFunction<1,3>;
-template class ZeroTensorFunction<2,3>;
-template class ZeroTensorFunction<3,3>;
-template class ZeroTensorFunction<4,3>;
-
+// explicit instantiations
+#include "tensor_function.inst"
 
 DEAL_II_NAMESPACE_CLOSE
