@@ -19,7 +19,6 @@
 #   DEAL_II_HAVE_GETHOSTNAME
 #   DEAL_II_HAVE_GETPID
 #   DEAL_II_HAVE_JN
-#   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_SYS_RESOURCE_H
 #   DEAL_II_HAVE_SYS_TIME_H
 #   DEAL_II_HAVE_SYS_TIMES_H
@@ -67,46 +66,6 @@ IF(NOT m_LIBRARY MATCHES "-NOTFOUND")
   ENDIF()
 ENDIF()
 
-
-#
-# Check that we can use feenableexcept. Sets DEAL_II_HAVE_FP_EXCEPTIONS
-#
-# The test is a bit more complicated because we also check that no garbage
-# exception is thrown if we convert -std::numeric_limits<double>::max to a
-# string. This sadly happens with some compiler support libraries :-(
-
-INCLUDE (CheckCXXSourceRuns)
-
-CHECK_CXX_SOURCE_RUNS("
-  #include <fenv.h>
-  #include <limits>
-  #include <sstream>
-
-  int main()
-  {
-    feenableexcept(FE_DIVBYZERO|FE_INVALID);
-    std::ostringstream description;
-    const double lower_bound = -std::numeric_limits<double>::max();  
-
-    description << lower_bound;
-
-    return 0;
-  }
-  " 
-  _HAVE_FP_EXCEPTIONS)
-
-
-SET(DEAL_II_HAVE_FP_EXCEPTIONS ON CACHE BOOL "If ON, floating point exception are raised in debug mode when running the testsuite.")
-
-IF (DEAL_II_HAVE_FP_EXCEPTIONS)
-  IF(_HAVE_FP_EXCEPTIONS)
-    MESSAGE(STATUS "Checking for Floating Point Exception macros -- Success")
-    # nothing to set here -- DEAL_II_HAVE_FP_EXCEPTIONS is already ON
-  ELSE()
-    MESSAGE(STATUS "Checking for Floating Point Exception macros -- Failed")
-    SET(DEAL_II_HAVE_FP_EXCEPTIONS OFF CACHE BOOL "" FORCE)
-  ENDIF()
-ENDIF()
 
 
 ########################################################################

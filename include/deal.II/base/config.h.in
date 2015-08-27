@@ -111,6 +111,7 @@
 #cmakedefine DEAL_II_HAVE_STD_ISNAN
 #cmakedefine DEAL_II_HAVE_UNDERSCORE_ISNAN
 #cmakedefine DEAL_II_HAVE_ISFINITE
+#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 
 
 /***********************************************************************
@@ -128,7 +129,6 @@
 #cmakedefine DEAL_II_HAVE_GETPID
 #cmakedefine DEAL_II_HAVE_TIMES
 #cmakedefine DEAL_II_HAVE_JN
-#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 
 #cmakedefine DEAL_II_MSVC
 

@@ -25,6 +25,7 @@
 #   DEAL_II_HAVE_ISNAN
 #   DEAL_II_HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
+#   DEAL_II_HAVE_FP_EXCEPTIONS
 #
 
 
@@ -463,3 +464,57 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_ISFINITE)
 
+
+#
+# Check that we can use feenableexcept. Sets DEAL_II_HAVE_FP_EXCEPTIONS
+#
+# The test is a bit more complicated because we also check that no garbage
+# exception is thrown if we convert -std::numeric_limits<double>::max to a
+# string. This sadly happens with some compiler support libraries :-(
+#
+# - Timo Heister, 2015
+#
+
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  CHECK_CXX_SOURCE_RUNS(
+    "
+    #include <fenv.h>
+    #include <limits>
+    #include <sstream>
+
+    int main()
+    {
+      feenableexcept(FE_DIVBYZERO|FE_INVALID);
+      std::ostringstream description;
+      const double lower_bound = -std::numeric_limits<double>::max();
+
+      description << lower_bound;
+
+      return 0;
+    }
+    "
+     DEAL_II_HAVE_FP_EXCEPTIONS)
+ELSE()
+  #
+  # If we are not allowed to do platform introspection, just test whether
+  # we can compile above code.
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <fenv.h>
+    #include <limits>
+    #include <sstream>
+
+    int main()
+    {
+      feenableexcept(FE_DIVBYZERO|FE_INVALID);
+      std::ostringstream description;
+      const double lower_bound = -std::numeric_limits<double>::max();
+
+      description << lower_bound;
+
+      return 0;
+    }
+    "
+     DEAL_II_HAVE_FP_EXCEPTIONS)
+ENDIF()
