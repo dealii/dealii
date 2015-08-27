@@ -21,6 +21,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/grid/tria_iterator_base.h>
 
+#include <set>
+
 DEAL_II_NAMESPACE_OPEN
 
 
