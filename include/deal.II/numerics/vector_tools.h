@@ -912,29 +912,31 @@ namespace VectorTools
    * degrees of freedom of this function along the boundary, are then what is
    * computed by this function.
    *
-   * @param mapping The mapping that will be used in the transformations
+   * @param[in] mapping The mapping that will be used in the transformations
    * necessary to integrate along the boundary.
-   * @param dof The DoFHandler that describes the finite element space and the
-   * numbering of degrees of freedom.
-   * @param boundary_functions A map from boundary indicators to pointers to
+   * @param[in] dof The DoFHandler that describes the finite element space and
+   * the numbering of degrees of freedom.
+   * @param[in] boundary_functions A map from boundary indicators to pointers to
    * functions that describe the desired values on those parts of the boundary
    * marked with this boundary indicator (see
    * @ref GlossBoundaryIndicator "Boundary indicator").
    * The projection happens on only those parts of the boundary whose
    * indicators are represented in this map.
-   * @param q The face quadrature used in the integration necessary to compute
-   * the mass matrix and right hand side of the projection.
-   * @param boundary_values The result of this function. It is a map
+   * @param[in] q The face quadrature used in the integration necessary to
+   * compute the mass matrix and right hand side of the projection.
+   * @param[out] boundary_values The result of this function. It is a map
    * containing all indices of degrees of freedom at the boundary (as covered
    * by the boundary parts in @p boundary_functions) and the computed dof
-   * value for this degree of freedom.  If @p boundary_values contained values
-   * before, the new ones are added, or the old ones overwritten if a node of
-   * the boundary part to be projected on was already in this map.
-   * @param component_mapping It is sometimes convenient to project a vector-
-   * valued function onto only parts of a finite element space (for example,
-   * to project a function with <code>dim</code> components onto the velocity
-   * components of a <code>dim+1</code> component DoFHandler for a Stokes
-   * problem). To allow for this, this argument allows components to be
+   * value for this degree of freedom. For each degree of freedom at the
+   * boundary, if its index is already exist in @p boundary_values then its
+   * boundary value will be overwritten, otherwise a new entry with proper index
+   * and boundary value for this degree of freedom will be inserted into
+   * @p boundary_values.
+   * @param[in] component_mapping It is sometimes convenient to project a
+   * vector-valued function onto only parts of a finite element space (for
+   * example, to project a function with <code>dim</code> components onto the
+   * velocity components of a <code>dim+1</code> component DoFHandler for a
+   * Stokes problem). To allow for this, this argument allows components to be
    * remapped. If the vector is not empty, it has to have one entry for each
    * vector component of the finite element used in @p dof. This entry is the
    * component number in @p boundary_functions that should be used for this
