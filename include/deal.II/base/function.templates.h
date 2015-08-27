@@ -125,7 +125,7 @@ Tensor<1,dim,Number> Function<dim, Number>::gradient (const Point<dim> &,
                                                       const unsigned int) const
 {
   Assert (false, ExcPureFunctionCalled());
-  return Point<dim>();
+  return Tensor<1,dim,Number>();
 }
 
 
