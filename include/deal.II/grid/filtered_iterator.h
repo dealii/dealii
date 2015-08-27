@@ -1144,8 +1144,13 @@ namespace IteratorFilters
   MaterialIdEqualTo::MaterialIdEqualTo (const types::material_id material_id,
                                         const bool only_locally_owned)
     :
-    material_ids ({material_id}),
-               only_locally_owned (only_locally_owned)
+    // Note: matrial_ids is a const member and has to be populated with a
+    // constructor. Unfortunately, C++98/03 does not allow the use of an
+    // initializer list. Therefore, treat material_id as an array of one
+    // element.
+    // This is well defined according to [expr.add].4 (ISO 14882).
+    material_ids (&material_id, &material_id+1),
+    only_locally_owned (only_locally_owned)
   {}
 
 
@@ -1177,8 +1182,13 @@ namespace IteratorFilters
   ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const unsigned int active_fe_index,
                                               const bool only_locally_owned)
     :
-    active_fe_indices ({active_fe_index}),
-                    only_locally_owned (only_locally_owned)
+    // Note: active_fe_indices is a const member and has to be populated
+    // with a constructor. Unfortunately, C++98/03 does not allow the use
+    // of an initializer list. Therefore, treat active_fe_index as an array
+    // of one element.
+    // This is well defined according to [expr.add].4 (ISO 14882).
+    active_fe_indices (&active_fe_index, &active_fe_index+1),
+    only_locally_owned (only_locally_owned)
   {}
 
 
