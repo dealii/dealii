@@ -91,6 +91,8 @@ DIMENSIONS := { 1; 2; 3 }
 
 SPACE_DIMENSIONS := { 1; 2; 3 }
 
+RANKS := { 1; 2; 3; 4 }
+
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
                        Deal_II_IntermediateFlags }
