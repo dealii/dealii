@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -115,8 +115,8 @@ void test ()
   write_active_fe_index_to_file(dof_handler);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_no_halo_" + std::to_string(dim) + "d.vtk";
-    write_vtk(dof_handler, filename);
+    const std::string filename = "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    write_vtk(dof_handler, filename.c_str());
   }
 
   // Compute a halo layer around active fe indices 2,3 and set it to active fe index 4
@@ -134,8 +134,8 @@ void test ()
   write_active_fe_index_to_file(dof_handler);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_with_halo_" + std::to_string(dim) + "d.vtk";
-    write_vtk(dof_handler, filename);
+    const std::string filename = "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    write_vtk(dof_handler, filename.c_str());
   }
 }
 
