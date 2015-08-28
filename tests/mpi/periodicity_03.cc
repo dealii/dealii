@@ -70,7 +70,7 @@ namespace Step22
     void solve ();
     void get_point_value (const Point<dim> point, const int proc,
                           Vector<double> &value) const;
-    void check_periodicity(const unsigned int cycle) const;
+    void check_periodicity() const;
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
 
@@ -78,7 +78,6 @@ namespace Step22
 
     MPI_Comm                                    mpi_communicator;
 
-    HyperShellBoundary<dim>                     boundary;
     parallel::distributed::Triangulation<dim>   triangulation;
     FESystem<dim>                               fe;
     DoFHandler<dim>                             dof_handler;
@@ -97,7 +96,6 @@ namespace Step22
     FullMatrix<double>                          rot_matrix;
     Tensor<1,dim>                               offset;
 
-    MappingQ<dim>                               mapping;
   };
 
 
@@ -142,9 +140,8 @@ namespace Step22
   (TrilinosWrappers::MPI::Vector       &dst,
    const TrilinosWrappers::MPI::Vector &src) const
   {
-    SolverControl solver_control (10*src.size(), 1e-6*src.l2_norm(), false, false);
-    TrilinosWrappers::SolverCG    cg (solver_control,
-                                      TrilinosWrappers::SolverCG::AdditionalData());
+    SolverControl solver_control (src.size(), 1e-6*src.l2_norm(), false, false);
+    SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
 
     tmp = 0.;
     cg.solve (*matrix, tmp, src, *preconditioner);
@@ -161,7 +158,6 @@ namespace Step22
                       const InverseMatrix<TrilinosWrappers::SparseMatrix,
                       Preconditioner> &A_inverse,
                       const IndexSet &owned_pres,
-                      const IndexSet &relevant_pres,
                       const MPI_Comm &mpi_communicator);
 
     void vmult (TrilinosWrappers::MPI::Vector       &dst,
@@ -182,7 +178,6 @@ namespace Step22
                    const InverseMatrix<TrilinosWrappers::SparseMatrix,
                    Preconditioner> &A_inverse,
                    const IndexSet &owned_vel,
-                   const IndexSet &relevant_vel,
                    const MPI_Comm &mpi_communicator)
     :
     system_matrix (&system_matrix),
@@ -223,8 +218,7 @@ namespace Step22
            std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator)
             == 0)),
-    rot_matrix(dim),
-    mapping(1)
+    rot_matrix(dim)
 {
   rot_matrix[0][dim-1] = -1.;
   rot_matrix[dim-1][0] = 1.;
@@ -262,10 +256,9 @@ namespace Step22
       DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
-    }
-
-    {
+    
       constraints.clear ();
+      constraints.reinit(locally_relevant_dofs);
 
       FEValuesExtractors::Vector velocities(0);
       FEValuesExtractors::Scalar pressure(dim);
@@ -281,34 +274,31 @@ namespace Step22
 
       GridTools::collect_periodic_faces
       (dof_handler, 4, 0, 1, periodicity_vector, offset,
-       rot_matrix, first_vector_components);
+       rot_matrix);
 
       DoFTools::make_periodicity_constraints<DoFHandler<dim> >
-        (periodicity_vector, constraints, fe.component_mask(velocities));
+        (periodicity_vector, constraints, fe.component_mask(velocities),
+         first_vector_components);
 
-      VectorTools::interpolate_boundary_values (mapping,
-                                                dof_handler,
+      VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
                                                 ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
-      VectorTools::interpolate_boundary_values (mapping,
-                                                dof_handler,
+      VectorTools::interpolate_boundary_values (dof_handler,
                                                 2,
                                                 ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
-      VectorTools::interpolate_boundary_values (mapping,
-                                                dof_handler,
+      VectorTools::interpolate_boundary_values (dof_handler,
                                                 3,
                                                 ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
-      VectorTools::interpolate_boundary_values (mapping,
-                                                dof_handler,
+      VectorTools::interpolate_boundary_values (dof_handler,
                                                 5,
                                                 ZeroFunction<dim>(dim+1),
                                                 constraints,
@@ -346,8 +336,7 @@ namespace Step22
 
     QGauss<dim>   quadrature_formula(degree+2);
 
-    FEValues<dim> fe_values (mapping,
-                             fe, quadrature_formula,
+    FEValues<dim> fe_values (fe, quadrature_formula,
                              update_values    |
                              update_quadrature_points  |
                              update_JxW_values |
@@ -392,7 +381,7 @@ namespace Step22
                 {
                   for (unsigned int j=0; j<=i; ++j)
                     {
-                      local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
+                    local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                             - div_phi_u[i] * phi_p[j]
                                             - phi_p[i] * div_phi_u[j]
                                             + phi_p[i] * phi_p[j])
@@ -422,8 +411,6 @@ namespace Step22
 
     system_matrix.compress (VectorOperation::add);
     system_rhs.compress (VectorOperation::add);
-
-    pcout << "   Computing preconditioner..." << std::endl << std::flush;
   }
 
 
@@ -454,22 +441,16 @@ namespace Step22
 
       SchurComplement<TrilinosWrappers::PreconditionJacobi>
       schur_complement (system_matrix, A_inverse,
-                        owned_partitioning[0], relevant_partitioning[0],
+                        owned_partitioning[0],
                         mpi_communicator);
 
       SolverControl solver_control (solution.block(1).size(),
                                     1e-6*schur_rhs.l2_norm(), false, false);
-//       TrilinosWrappers::SolverCG    cg (solver_control,
-//                                         TrilinosWrappers::SolverCG::AdditionalData(true));
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
       TrilinosWrappers::PreconditionAMG preconditioner;
       preconditioner.initialize (system_matrix.block(1,1));
 
-      InverseMatrix<TrilinosWrappers::SparseMatrix,
-                    TrilinosWrappers::PreconditionAMG>
-                    m_inverse (system_matrix.block(1,1), preconditioner,
-                               owned_partitioning[1], mpi_communicator);
 
       cg.solve (schur_complement,
                 tmp.block(1),
@@ -499,10 +480,10 @@ namespace Step22
     try
     {
       const typename DoFHandler<dim>::active_cell_iterator cell
-        = GridTools::find_active_cell_around_point (mapping, dof_handler, point).first;
+        = GridTools::find_active_cell_around_point (dof_handler, point);
 
       if (cell->is_locally_owned())
-        VectorTools::point_value (mapping, dof_handler, solution,
+        VectorTools::point_value (dof_handler, solution,
                                   point, value);
     }
     catch (GridTools::ExcPointNotFound<dim> &p)
@@ -524,17 +505,17 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::check_periodicity (const unsigned int cycle) const
+  void StokesProblem<dim>::check_periodicity () const
   {
     AssertThrow(false, ExcNotImplemented());
   }
 
   template <>
-  void StokesProblem<3>::check_periodicity (const unsigned int cycle) const
+  void StokesProblem<3>::check_periodicity () const
   {
     const unsigned int dim = 3;
     Quadrature<dim-1> q_dummy (fe.base_element(0).get_unit_face_support_points());
-    FEFaceValues<dim> fe_face_values (mapping,fe, q_dummy, update_quadrature_points);
+    FEFaceValues<dim> fe_face_values (fe, q_dummy, update_quadrature_points);
 
     DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
     DoFHandler<dim>::active_cell_iterator endc=  dof_handler.end();
@@ -771,12 +752,10 @@ namespace Step22
   void
   StokesProblem<dim>::refine_mesh ()
   {
-
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     FEValuesExtractors::Scalar pressure(dim);
-    KellyErrorEstimator<dim>::estimate (mapping,
-                                        dof_handler,
+    KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(degree+1),
                                         typename FunctionMap<dim>::type(),
                                         solution,
@@ -800,12 +779,8 @@ namespace Step22
     std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >
     periodicity_vector;
 
-    std::vector<unsigned int> first_vector_components;
-    first_vector_components.push_back(0);
-
     GridTools::collect_periodic_faces
-    (triangulation, 4, 0, 1, periodicity_vector, offset,
-     rot_matrix, first_vector_components);
+    (triangulation, 4, 0, 1, periodicity_vector, offset, rot_matrix);
     triangulation.add_periodicity(periodicity_vector);
 
     triangulation.refine_global (1);
@@ -827,7 +802,7 @@ namespace Step22
         solve ();
 
 //        output_results (refinement_cycle);
-        check_periodicity(refinement_cycle);
+        check_periodicity();
 
         pcout << std::endl;
       }
