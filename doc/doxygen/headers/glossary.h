@@ -974,7 +974,7 @@
  *
  * The full reference for this paper is as follows:
  * @code
-Article{BK07,
+@Article{BK07,
   author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
   title =        {Data Structures and Requirements for hp Finite Element
                   Software},
@@ -985,10 +985,7 @@ Article{BK07,
   pages =        {4/1--4/31}
 }
  * @endcode
- * It is available as Technical Report ISC-07-04-MATH from the
- * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
- * for Scientific Computation, Texas A&amp;M University</a>, and also
- * from http://www.math.tamu.edu/~bangerth/publications.html .
+ * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  *
  * The numerical examples shown in that paper are generated with a slightly
  * modified version of step-27. The main difference to that
@@ -1479,7 +1476,7 @@ Article{BK07,
  *
  *
  * <dt class="glossary">@anchor workstream_paper <b>%WorkStream paper</b></dt>
- * <dd>The "%WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
+ * <dd>The "WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
  *   that discusses the design and implementation of WorkStream. WorkStream is, at its
  *   core, a design pattern, i.e., something that is used over and over in finite element
  *   codes and that can, consequently, be implemented generically. In particular, the
