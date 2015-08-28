@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,10 +34,6 @@ void test ()
   parallel::distributed::Triangulation<dim> tria (mpi_communicator);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-
-//  // Write to file for visual inspection
-//  const std::string filename = "grid_" + std::to_string(dim) + "d";
-//  tria.write_mesh_vtk(filename.c_str());
 
   typedef typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell_iterator;
 

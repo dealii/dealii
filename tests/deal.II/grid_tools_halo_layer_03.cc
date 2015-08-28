@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,14 +82,17 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_no_halo_" + std::to_string(dim) + "d.vtk";
-    std::ofstream f(filename);
+    const std::string filename = "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream f(filename.c_str());
     GridOut().write_vtk (tria, f);
   }
 
   // Compute a halo layer around material ids 2 and 3 and set it to material id 4
+  std::set<types::material_id> material_ids;
+  material_ids.insert(2);
+  material_ids.insert(3);
   const std::vector<cell_iterator> active_halo_layer
-    = GridTools::compute_active_cell_halo_layer(tria, IteratorFilters::MaterialIdEqualTo({2,3}, true));
+    = GridTools::compute_active_cell_halo_layer(tria, IteratorFilters::MaterialIdEqualTo(material_ids, true));
   AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
   for (typename std::vector<cell_iterator>::const_iterator
        it = active_halo_layer.begin();
@@ -102,8 +105,8 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_with_halo_" + std::to_string(dim) + "d.vtk";
-    std::ofstream f(filename);
+    const std::string filename = "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream f(filename.c_str());
     GridOut().write_vtk (tria, f);
   }
 }

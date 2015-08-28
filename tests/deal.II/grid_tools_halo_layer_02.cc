@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,8 +77,8 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_no_halo_" + std::to_string(dim) + "d.vtk";
-    std::ofstream f(filename);
+    const std::string filename = "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream f(filename.c_str());
     GridOut().write_vtk (tria, f);
   }
 
@@ -97,8 +97,8 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_with_halo_" + std::to_string(dim) + "d.vtk";
-    std::ofstream f(filename);
+    const std::string filename = "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream f(filename.c_str());
     GridOut().write_vtk (tria, f);
   }
 }
