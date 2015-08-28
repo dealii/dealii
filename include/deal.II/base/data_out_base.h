@@ -834,10 +834,23 @@ namespace DataOutBase
     const char *zone_name;
 
     /**
+     * Strand: A set of zones that represent the same region of the solution over time.
+     * Strand ID: An integer value that uniquely identifies each strand.
+     */
+     int strand_id;
+
+     /**
+      * Solution time for each zone in a strand.
+      */
+     double solution_time;
+
+    /**
      * Constructor.
      */
     TecplotFlags (const char *tecplot_binary_file_name = NULL,
-                  const char *zone_name = NULL);
+                  const char *zone_name = NULL,
+                  const int strand_id = 1,
+                  const double solution_time = -1.0);
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this

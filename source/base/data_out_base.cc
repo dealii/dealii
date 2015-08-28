@@ -1978,11 +1978,17 @@ namespace DataOutBase
 
   TecplotFlags::
   TecplotFlags (const char *tecplot_binary_file_name,
-                const char *zone_name)
+                const char *zone_name,
+                const int strand_id,
+                const double solution_time)
     :
     tecplot_binary_file_name(tecplot_binary_file_name),
-    zone_name(zone_name)
-  {}
+    zone_name(zone_name),
+    strand_id (strand_id),
+    solution_time (solution_time)
+  {
+     Assert (strand_id >= 1, ExcMessage("strand_id must be >= 1"));
+  }
 
 
 
@@ -4093,6 +4099,9 @@ namespace DataOutBase
       out << "zone ";
       if (flags.zone_name)
         out << "t=\"" << flags.zone_name << "\" ";
+
+      if(flags.solution_time >= 0.0)
+        out << "strandid=" << flags.strand_id << ", solutiontime=" << flags.solution_time <<", ";
 
       out << "f=feblock, n=" << n_nodes << ", e=" << n_cells
           << ", et=" << tecplot_cell_type[dim] << '\n';
