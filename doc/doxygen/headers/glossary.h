@@ -974,7 +974,7 @@
  *
  * The full reference for this paper is as follows:
  * @code
-Article{BK07,
+@Article{BK07,
   author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
   title =        {Data Structures and Requirements for hp Finite Element
                   Software},
@@ -985,10 +985,7 @@ Article{BK07,
   pages =        {4/1--4/31}
 }
  * @endcode
- * It is available as Technical Report ISC-07-04-MATH from the
- * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
- * for Scientific Computation, Texas A&amp;M University</a>, and also
- * from http://www.math.tamu.edu/~bangerth/publications.html .
+ * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  *
  * The numerical examples shown in that paper are generated with a slightly
  * modified version of step-27. The main difference to that
@@ -1157,7 +1154,7 @@ Article{BK07,
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
- * "Adaptive multilevel methods with local smoothing", that
+ * "Adaptive Multilevel Methods with Local Smoothing for H1- and Hcurl-Conforming High Order Finite Element Methods", that
  * describes many of the algorithms and data structures used in the implementation
  * of the multigrid framework of deal.II. It underlies the implementation of
  * the classes that are used in step-16 for multigrid
@@ -1165,16 +1162,19 @@ Article{BK07,
  *
  * The full reference for this paper is as follows:
  * @code
-Article{JK10,
-  author =       {B. Janssen and G. Kanschat},
-  title =        {Adaptive multilevel methods with local smoothing},
-  journal =      {submitted},
-  year =         2010
-}
+@article{janssen2011adaptive,
+  title={Adaptive Multilevel Methods with Local Smoothing for H\^{}1-and H\^{}curl-Conforming High Order Finite Element Methods},
+  author={Janssen, B{\"a}rbel and Kanschat, Guido},
+  journal={SIAM Journal on Scientific Computing},
+  volume={33},
+  number={4},
+  pages={2095--2114},
+  year={2011},
+  publisher={SIAM}}
  * @endcode
- * It is available as Technical Report IAMCS-2009-131 from the
- * <a href="http://iamcs.tamu.edu/research_sub.php?tab_sub=research&cms_id=8">Institute
- * for Applied Mathematics and Computational Science, Texas A&amp;M University</a>.
+ * See 
+ * <a href="http://dx.doi.org/10.1137/090778523">DOI:10.1137/090778523</a>
+ * for the paper and <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for more details.
  * </dd>
  *
  *
@@ -1476,7 +1476,7 @@ Article{JK10,
  *
  *
  * <dt class="glossary">@anchor workstream_paper <b>%WorkStream paper</b></dt>
- * <dd>The "%WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
+ * <dd>The "WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
  *   that discusses the design and implementation of WorkStream. WorkStream is, at its
  *   core, a design pattern, i.e., something that is used over and over in finite element
  *   codes and that can, consequently, be implemented generically. In particular, the
