@@ -1,0 +1,50 @@
+
+DEAL:0:2d::n_dofs: 818
+DEAL:0:2d::n_locally_owned_dofs: 273
+DEAL:0:2d::n_locally_owned_dofs_per_processor: 273 291 254  sum: 818
+DEAL:0:2d::n_dofs: 1754
+DEAL:0:2d::n_locally_owned_dofs: 549
+DEAL:0:2d::n_locally_owned_dofs_per_processor: 549 621 584  sum: 1754
+DEAL:0:2d::n_dofs: 3056
+DEAL:0:2d::n_locally_owned_dofs: 1036
+DEAL:0:2d::n_locally_owned_dofs_per_processor: 1036 997 1023  sum: 3056
+DEAL:0:3d::n_dofs: 13282
+DEAL:0:3d::n_locally_owned_dofs: 4491
+DEAL:0:3d::n_locally_owned_dofs_per_processor: 4491 4260 4531  sum: 13282
+DEAL:0:3d::n_dofs: 41826
+DEAL:0:3d::n_locally_owned_dofs: 13849
+DEAL:0:3d::n_locally_owned_dofs_per_processor: 13849 13994 13983  sum: 41826
+
+DEAL:1:2d::n_dofs: 818
+DEAL:1:2d::n_locally_owned_dofs: 291
+DEAL:1:2d::n_locally_owned_dofs_per_processor: 273 291 254  sum: 818
+DEAL:1:2d::n_dofs: 1754
+DEAL:1:2d::n_locally_owned_dofs: 621
+DEAL:1:2d::n_locally_owned_dofs_per_processor: 549 621 584  sum: 1754
+DEAL:1:2d::n_dofs: 3056
+DEAL:1:2d::n_locally_owned_dofs: 997
+DEAL:1:2d::n_locally_owned_dofs_per_processor: 1036 997 1023  sum: 3056
+DEAL:1:3d::n_dofs: 13282
+DEAL:1:3d::n_locally_owned_dofs: 4260
+DEAL:1:3d::n_locally_owned_dofs_per_processor: 4491 4260 4531  sum: 13282
+DEAL:1:3d::n_dofs: 41826
+DEAL:1:3d::n_locally_owned_dofs: 13994
+DEAL:1:3d::n_locally_owned_dofs_per_processor: 13849 13994 13983  sum: 41826
+
+
+DEAL:2:2d::n_dofs: 818
+DEAL:2:2d::n_locally_owned_dofs: 254
+DEAL:2:2d::n_locally_owned_dofs_per_processor: 273 291 254  sum: 818
+DEAL:2:2d::n_dofs: 1754
+DEAL:2:2d::n_locally_owned_dofs: 584
+DEAL:2:2d::n_locally_owned_dofs_per_processor: 549 621 584  sum: 1754
+DEAL:2:2d::n_dofs: 3056
+DEAL:2:2d::n_locally_owned_dofs: 1023
+DEAL:2:2d::n_locally_owned_dofs_per_processor: 1036 997 1023  sum: 3056
+DEAL:2:3d::n_dofs: 13282
+DEAL:2:3d::n_locally_owned_dofs: 4531
+DEAL:2:3d::n_locally_owned_dofs_per_processor: 4491 4260 4531  sum: 13282
+DEAL:2:3d::n_dofs: 41826
+DEAL:2:3d::n_locally_owned_dofs: 13983
+DEAL:2:3d::n_locally_owned_dofs_per_processor: 13849 13994 13983  sum: 41826
+
