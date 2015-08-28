@@ -150,12 +150,30 @@ IF(EXISTS ${SACADO_CMATH_HPP})
 ENDIF()
 
 #
-# *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
+# *Boy* Sanitize variables that are exported by TrilinosConfig.cmake...
 #
+# Especially deduplicate stuff...
+#
+REMOVE_DUPLICATES(Trilinos_LIBRARIES REVERSE)
+REMOVE_DUPLICATES(Trilinos_TPL_LIBRARIES REVERSE)
+
+REMOVE_DUPLICATES(Trilinos_INCLUDE_DIRS)
 STRING(REGEX REPLACE
   "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
   Trilinos_INCLUDE_DIRS "${Trilinos_INCLUDE_DIRS}"
   )
+
+REMOVE_DUPLICATES(Trilinos_TPL_INCLUDE_DIRS)
+
+#
+# workaround: Do not pull in scotch include directory. It clashes with
+# our use of the metis headers...
+#
+FOREACH(_item ${Trilinos_TPL_INCLUDE_DIRS})
+  IF("${_item}" MATCHES "scotch$")
+    LIST(REMOVE_ITEM Trilinos_TPL_INCLUDE_DIRS ${_item})
+  ENDIF()
+ENDFOREACH()
 
 #
 # We'd like to have the full library names but the Trilinos package only

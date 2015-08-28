@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -156,7 +156,11 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
   SET(_petsc_includes)
   FOREACH(_token ${_external_includes})
-    IF(_token MATCHES "^-I")
+    #
+    # workaround: Do not pull in scotch include directory. It clashes with
+    # our use of the metis headers...
+    #
+    IF(_token MATCHES "^-I" AND NOT _token MATCHES "scotch$")
       STRING(REGEX REPLACE "^-I" "" _token "${_token}")
       LIST(APPEND _petsc_includes ${_token})
     ENDIF()
