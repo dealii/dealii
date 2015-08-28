@@ -1157,7 +1157,7 @@ Article{BK07,
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
- * "Adaptive multilevel methods with local smoothing", that
+ * "Adaptive Multilevel Methods with Local Smoothing for H1- and Hcurl-Conforming High Order Finite Element Methods", that
  * describes many of the algorithms and data structures used in the implementation
  * of the multigrid framework of deal.II. It underlies the implementation of
  * the classes that are used in step-16 for multigrid
@@ -1165,16 +1165,19 @@ Article{BK07,
  *
  * The full reference for this paper is as follows:
  * @code
-Article{JK10,
-  author =       {B. Janssen and G. Kanschat},
-  title =        {Adaptive multilevel methods with local smoothing},
-  journal =      {submitted},
-  year =         2010
-}
+@article{janssen2011adaptive,
+  title={Adaptive Multilevel Methods with Local Smoothing for H\^{}1-and H\^{}curl-Conforming High Order Finite Element Methods},
+  author={Janssen, B{\"a}rbel and Kanschat, Guido},
+  journal={SIAM Journal on Scientific Computing},
+  volume={33},
+  number={4},
+  pages={2095--2114},
+  year={2011},
+  publisher={SIAM}}
  * @endcode
- * It is available as Technical Report IAMCS-2009-131 from the
- * <a href="http://iamcs.tamu.edu/research_sub.php?tab_sub=research&cms_id=8">Institute
- * for Applied Mathematics and Computational Science, Texas A&amp;M University</a>.
+ * See 
+ * <a href="http://dx.doi.org/10.1137/090778523">DOI:10.1137/090778523</a>
+ * for the paper and <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for more details.
  * </dd>
  *
  *
