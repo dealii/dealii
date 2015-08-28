@@ -98,6 +98,12 @@ null_operator(const LinearOperator<Domain, Range> &);
  * const auto op = (op_a + k * op_b) * op_c;
  * @endcode
  *
+ * @note This class makes heavy use of <code>std::function</code> objects
+ * and lambda functions. This flexibiliy comes with a run-time penalty.
+ * Only use this object to encapsulate matrix object of medium to large
+ * size (as a rule of thumb, sparse matrices with a size $1000\times1000$,
+ * or larger).
+ *
  * @note This class is only available if deal.II was configured with C++11
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
  * configure.

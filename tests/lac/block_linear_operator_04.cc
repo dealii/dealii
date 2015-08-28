@@ -61,12 +61,14 @@ int main()
     for (unsigned int i = 0; i < 3; ++i)
         d.block(i,i).set(0,0, 1.0 / (i+i +1) );
 
-    auto op_a         = linear_operator< BlockVector<double> >(a);
-    auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
-    auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
-    auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
+    auto op_a  = linear_operator<BlockVector<double>>(a);
 
-    auto inverse_op_a = block_triangular_inverse<3, BlockSparseMatrix<double > >(a, {{d00, d11, d22}});
+    auto op_b1 = block_operator(a);
+    auto op_b2 = block_diagonal_operator(d);
+
+    auto inverse_op_a =
+        block_forward_substitution<BlockVector<double>>(op_b1, op_b2);
+
     auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;
@@ -146,14 +148,16 @@ int main()
 
     BlockSparseMatrix<double> d(sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
-        d.block(i,i).set(0,0, 1.0 / (i+i +1) );
+      d.block(i, i).set(0, 0, 1.0 / (i + i + 1));
 
-    auto op_a         = linear_operator< BlockVector<double> >(a);
-    auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
-    auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
-    auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
+    auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto inverse_op_a = block_triangular_inverse< 3, BlockSparseMatrix<double > >(a, {{d00, d11, d22}}, false);
+    auto op_b1 = block_operator(a);
+    auto op_b2 = block_diagonal_operator(d);
+
+    auto inverse_op_a =
+        block_back_substitution<BlockVector<double>>(op_b1, op_b2);
+
     auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;

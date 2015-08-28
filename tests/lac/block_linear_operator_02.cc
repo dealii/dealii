@@ -78,7 +78,7 @@ int main()
     a.block(2, 2).set(i, i, 3.);
 
 
-  auto op_a = linear_operator<BlockVector<double>>(a);
+  auto op_a = block_operator(a);
 
   auto op_b0 = linear_operator(a.block(0, 0));
   auto op_b1 = linear_operator(a.block(1, 1));
@@ -88,68 +88,71 @@ int main()
   std::array<decltype(op_b0), 3> temp{op_b0, op_b1, op_b2};
   auto op_b = block_diagonal_operator<3, BlockVector<double>>(temp);
 
-  // vmult:
 
-  BlockVector<double> u;
-  op_a.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
+  {
+
+    BlockVector<double> u;
+    op_a.reinit_domain_vector(u, false);
+    for (unsigned int i = 0; i < u.size(); ++i) {
+      u[i] = (double)(i+1);
+    }
+
+    PRINTME("u", u);
+
+    BlockVector<double> v;
+    op_a.reinit_domain_vector(v, false);
+    BlockVector<double> w;
+    op_a.reinit_domain_vector(w, false);
+    BlockVector<double> x;
+    op_a.reinit_domain_vector(x, false);
+
+    op_a.vmult(v, u);
+    PRINTME("Au", v);
+
+    op_b.vmult(w, u);
+    PRINTME("Bu", w);
+
+    x = v;
+    x -= w;
+    PRINTME("Au-Bu", x);
+
+    // Test that both objects give the same results:
+
+    auto op_x = op_a - op_b;
+
+    op_x.vmult(x, u);
+    PRINTME("(A-B).vmult", x);
+
+    x = 0.;
+    op_x.vmult_add(x, u);
+    PRINTME("(A-B).vmult_add", x);
+
+    op_x.Tvmult(x, u);
+    PRINTME("(A-B).Tvmult", x);
+
+    x = 0.;
+    op_x.Tvmult_add(x, u);
+    PRINTME("(A-B).Tvmult_add", x);
+
+
+    // Test vector reinitalization:
+
+    op_x = op_b * op_b * op_b;
+    op_x.vmult(x, u);
+    PRINTME("(B*B*B) vmult", x);
+
+    x = 0.;
+    op_x.vmult_add(x, u);
+    PRINTME("(B*B*B) vmult_add", x);
+
+    op_x.Tvmult(x, u);
+    PRINTME("(B*B*B) Tvmult", x);
+
+    x = 0.;
+    op_x.Tvmult_add(x, u);
+    PRINTME("(B*B*B) Tvmult_add", x);
+
   }
-
-  PRINTME("u", u);
-
-  BlockVector<double> v;
-  op_a.reinit_domain_vector(v, false);
-  BlockVector<double> w;
-  op_a.reinit_domain_vector(w, false);
-  BlockVector<double> x;
-  op_a.reinit_domain_vector(x, false);
-
-  op_a.vmult(v, u);
-  PRINTME("Au", v);
-
-  op_b.vmult(w, u);
-  PRINTME("Bu", w);
-
-  x = v;
-  x -= w;
-  PRINTME("Au-Bu", x);
-
-  // Test that both objects give the same results:
-
-  auto op_x = op_a - op_b;
-
-  op_x.vmult(x, u);
-  PRINTME("(A-B).vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(A-B).vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(A-B).Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(A-B).Tvmult_add", x);
-
-
-  // Test vector reinitalization:
-
-  op_x = op_b * op_b * op_b;
-  op_x.vmult(x, u);
-  PRINTME("(B*B*B) vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(B*B*B) vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(B*B*B) Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(B*B*B) Tvmult_add", x);
 
   // And finally the other block_diagonal_operator variant:
 
@@ -158,30 +161,32 @@ int main()
 
   auto op_d = block_diagonal_operator<5, BlockVector<double>>(op_b0);
 
-  op_c.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
+  {
+    BlockVector<double> u;
+    op_c.reinit_domain_vector(u, false);
+    for (unsigned int i = 0; i < u.size(); ++i) {
+      u[i] = (double)(i+1);
+    }
+    PRINTME("u", u);
+
+    BlockVector<double> x;
+    op_c.reinit_range_vector(x, false);
+
+    auto op_x = op_c - op_d;
+
+    op_x.vmult(x, u);
+    PRINTME("(C-D) vmult", x);
+
+    x = 0.;
+    op_x.vmult_add(x, u);
+    PRINTME("(C-D) vmult_add", x);
+
+    op_x.Tvmult(x, u);
+    PRINTME("(C-D) Tvmult", x);
+
+    x = 0.;
+    op_x.Tvmult_add(x, u);
+    PRINTME("(C-D) Tvmult_add", x);
   }
-  PRINTME("u", u);
-  op_c.reinit_domain_vector(x, false);
-
-  op_x = op_c - op_d;
-
-  op_x.vmult(x, u);
-  PRINTME("(C-D) vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(C-D) vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(C-D) Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(C-D) Tvmult_add", x);
 
 }
-
-
-
