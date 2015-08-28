@@ -88,9 +88,9 @@
  * producing a <i>set of flags</i> amounts to setting multiple bits
  * in an integer, which is facilitated using the operation
  * <code>update_gradients | update_JxW_values</code> (in other words, and
- * maybe slightly confusingly so, the operation "this operation <i>and</i> that
- * operation" is represented by the expression "single-bit-in-an-integer-for-this-operation
- * <i>binary-or</i> single-bit-in-an-integer-for-that-operation"). To
+ * maybe slightly confusingly so, the operation @"this operation <i>and</i> that
+ * operation@" is represented by the expression @"single-bit-in-an-integer-for-this-operation
+ * <i>binary-or</i> single-bit-in-an-integer-for-that-operation@"). To
  * make operations cheaper, FEValues and the mapping and finite element objects
  * it depends on really only compute those pieces of information that you
  * have specified in the update flags (plus some information necessary to
