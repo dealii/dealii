@@ -108,6 +108,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: A class BlockLinearOperator has been introduced that extends
+  the LinearOperator concept to block structures. A BlockLinearOperator can
+  be sliced back to a LinearOperator.
+  <br>
+  (Matthias Maier, 2015/08/27)
+
   <li> Improved: Support for complex number types throughout the library.
   Several parts of the library have been reorganized to support complex
   number types.
