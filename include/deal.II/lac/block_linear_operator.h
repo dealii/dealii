@@ -87,7 +87,43 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &,
 
 
 /**
- *  TODO: Description
+ * A class to store the concept of a block linear operator.
+ *
+ * This class increases the interface of LinearOperator (which encapsulates
+ * the  @p Matrix interface) by three additional functions:
+ * @code
+ *   std::function<unsigned int()> n_block_rows;
+ *   std::function<unsigned int()> n_block_cols;
+ *   std::function<BlockType(unsigned int, unsigned int)> block;
+ * @endcode
+ * that describe the underlying block structure (of an otherwise opaque)
+ * linear operator.
+ *
+ * Objects of type BlockLinearOperator can be created similarly to
+ * LinearOperator with a wrapper function:
+ * @code
+ * dealii::BlockSparseMatrix<double> A;
+ * const auto block_op_a = block_operator(A);
+ * @endcode
+ *
+ * A BlockLinearOperator can be sliced to a LinearOperator at any time.
+ * This removes all information about the underlying block structure
+ * (beacuse above <code>std::function</code> objects are no longer
+ * available) - the linear operator interface, however, remains intact.
+ *
+ * @note This class makes heavy use of <code>std::function</code> objects
+ * and lambda functions. This flexibiliy comes with a run-time penalty.
+ * Only use this object to encapsulate object with medium to large
+ * individual block sizes, and small block structure (as a rule of thumb,
+ * matrix blocks greater than $1000\times1000$).
+ *
+ * @note This class is only available if deal.II was configured with C++11
+ * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
+ * configure.
+ *
+ * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 class BlockLinearOperator : public LinearOperator<Range, Domain>
@@ -210,17 +246,23 @@ public:
   }
 
   /**
-   * TODO: Description
+   * Return the number of blocks in a column (i.e, the number of "block
+   * rows", or the number $m$, if interpreted as a $m\times n$ block
+   * system).
    */
   std::function<unsigned int()> n_block_rows;
 
   /**
-   * TODO: Description
+   * Return the number of blocks in a row (i.e, the number of "block
+   * columns", or the number $n$, if interpreted as a $m\times n$ block
+   * system).
    */
   std::function<unsigned int()> n_block_cols;
 
   /**
-   * TODO: Description
+   * Access the block with the given coordinates. This
+   * <code>std::function</code> object returns a LinearOperator
+   * representing the $(i,j)$-th block of the BlockLinearOperator.
    */
   std::function<BlockType(unsigned int, unsigned int)> block;
 
@@ -333,7 +375,7 @@ namespace internal
 //@{
 
 /**
- * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * A function that encapsulates a @p block_matrix into a
  * BlockLinearOperator.
@@ -383,7 +425,7 @@ block_operator(const BlockMatrix &block_matrix)
 
 
 /**
- * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * A variant of above function that encapsulates a given collection @p ops
  * of LinearOperators into a block structure. Here, it is assumed that
@@ -444,7 +486,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
 
 
 /**
- * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * This function extracts the diagonal blocks of @p block_matrix (either a
  * block matrix type or a BlockLinearOperator) and creates a
@@ -500,7 +542,7 @@ block_diagonal_operator(const BlockMatrix &block_matrix)
 
 
 /**
- * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * A variant of above function that builds up a block diagonal linear operator
  * from an array @p ops of diagonal elements (off-diagonal blocks are assumed
@@ -552,7 +594,7 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
 
 
 /**
- * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * A variant of above function that only takes a single LinearOperator
  * argument @p op and creates a blockdiagonal linear operator with @p m copies
@@ -575,8 +617,17 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
   return block_diagonal_operator(new_ops);
 }
 
+
+
+//@}
+/**
+ * @name Manipulation of a BlockLinearOperator
+ */
+//@{
+
 /**
  * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * This function implements forward substitution to invert a lower block
  * triangular matrix. As arguments, it takes a BlockLinearOperator
@@ -678,8 +729,11 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
   return return_op;
 }
 
+
+
 /**
  * @relates LinearOperator
+ * @relates BlockLinearOperator
  *
  * This function implements back substitution to invert an upper block
  * triangular matrix. As arguments, it takes a BlockLinearOperator
