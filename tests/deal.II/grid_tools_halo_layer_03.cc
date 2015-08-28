@@ -91,8 +91,10 @@ void test ()
   std::set<types::material_id> material_ids;
   material_ids.insert(2);
   material_ids.insert(3);
+  std_cxx11::function<bool (const cell_iterator &)> predicate
+    = IteratorFilters::MaterialIdEqualTo(material_ids, true);
   const std::vector<cell_iterator> active_halo_layer
-    = GridTools::compute_active_cell_halo_layer(tria, IteratorFilters::MaterialIdEqualTo(material_ids, true));
+    = GridTools::compute_active_cell_halo_layer(tria, predicate);
   AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
   for (typename std::vector<cell_iterator>::const_iterator
        it = active_halo_layer.begin();
