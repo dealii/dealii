@@ -1922,10 +1922,27 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   // Use the exact formula if available
   if (dim == spacedim && (dim == 1 || dim == 2))
     {
-      // The dimension-dependent algorithms are much faster (about 25-45x in 2D)
-      // but fail most of the time when the given point (p) is not in the
+      // The dimension-dependent algorithms are much faster (about 25-45x in
+      // 2D) but fail most of the time when the given point (p) is not in the
       // cell. The dimension-independent Newton algorithm given below is
-      // slower, but more robust (though it still sometimes fails).
+      // slower, but more robust (though it still sometimes fails). Therefore
+      // this function implements the following strategy based on the
+      // p's dimension:
+      //
+      // * In 1D this mapping is linear, so the mapping is always invertible
+      //   (and the exact formula is known) as long as the cell has non-zero
+      //   length.
+      // * In 2D the exact (quadratic) formula is called first. If either the
+      //   exact formula does not succeed (negative discriminant in the
+      //   quadratic formula) or succeeds but finds a solution outside of the
+      //   unit cell, then the Newton solver is called. The rationale for the
+      //   second choice is that the exact formula may provide two different
+      //   answers when mapping a point outside of the real cell, but the
+      //   Newton solver (if it converges) will only return one answer.
+      //   Otherwise the exact formula successfully found a point in the unit
+      //   cell and that value is returned.
+      // * In 3D there is no (known to the authors) exact formula, so the Newton
+      //   algorithm is used.
       const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
       vertices = this->get_vertices(cell);
       // These internal routines do not throw exceptions when the point does
