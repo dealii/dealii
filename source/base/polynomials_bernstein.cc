@@ -6,7 +6,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Binomial
+namespace
 {
   template <typename number>
   std::vector<number>
@@ -31,7 +31,7 @@ PolynomialsBernstein<number>:: PolynomialsBernstein (
   const unsigned int index, const unsigned int degree)
   :
   Polynomials::Polynomial<number>(
-    Binomial::get_bernstein_coefficients<number>(index, degree))
+    get_bernstein_coefficients<number>(index, degree))
 {
 }
 
