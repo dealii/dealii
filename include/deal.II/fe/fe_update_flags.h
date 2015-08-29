@@ -138,11 +138,11 @@ enum UpdateFlags
    */
   update_normal_vectors = 0x0040,
   /**
-   * @deprecated Use #update_normal_vectors
+   * @deprecated Use #update_normal_vectors instead.
    */
   update_face_normal_vectors = update_normal_vectors,
   /**
-   * @deprecated Use #update_normal_vectors
+   * @deprecated Use #update_normal_vectors instead.
    */
   update_cell_normal_vectors = update_normal_vectors,
   //! Volume element
@@ -194,23 +194,25 @@ enum UpdateFlags
    */
   update_volume_elements = 0x4000,
   /**
-   * @deprecated: this flag has no effect.
+   * @deprecated This flag has no effect.
    */
   update_support_points = 0x10000,
+  //! Jacobian at generalized support points
   /**
    * Update the Jacobian of the mapping in generalized support points.
    */
   update_support_jacobians = 0x20000,
+  //! inverse Jacobian at generalized support points
   /**
    * Update the inverse Jacobian of the mapping in generalized support points.
    */
   update_support_inverse_jacobians = 0x40000,
   /**
-   * @deprecated Update quadrature points
+   * @deprecated Use #update_quadrature_points instead.
    */
   update_q_points = update_quadrature_points,
   /**
-   * @deprecated Update second derivatives.
+   * @deprecated Use #update_hessians instead.
    */
   update_second_derivatives = update_hessians,
   //! Values needed for Piola transform
