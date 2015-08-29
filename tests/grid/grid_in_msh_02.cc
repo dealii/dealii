@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,80 +14,60 @@
 // ---------------------------------------------------------------------
 
 
+// in 1d, we have to read vertex information to set boundary
+// indicators
+//
+// test case by Jan Strebel
 
-// check whether we can read in with the gmsh format
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
-#include <cmath>
+#include <iomanip>
+#include <string>
+
+std::ofstream logfile("output");
 
 
-template <int dim>
-void gmsh_grid (const char *name)
+void check_file ()
 {
-  Triangulation<dim> tria;
-  GridIn<dim> grid_in;
-  grid_in.attach_triangulation (tria);
-  std::ifstream input_file(name);
-  grid_in.read_msh(input_file);
+  Triangulation<1> tria;
+  GridIn<1> gi;
+  gi.attach_triangulation (tria);
+  std::ifstream in (SOURCE_DIR "/../grid/grids/grid_in_msh_02.msh");
+  gi.read_msh(in);
 
-  deallog << "  " << tria.n_active_cells() << " active cells" << std::endl;
-
-  int hash = 0;
-  int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active();
-       c!=tria.end(); ++c, ++index)
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
-  deallog << "  hash=" << hash << std::endl;
+  for (Triangulation<1>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
+    {
+      for (unsigned int face = 0; face < 2; ++face)
+      {
+        if (cell->at_boundary(face))
+          deallog << "vertex " << cell->face_index(face)
+                  << " has boundary indicator " << (int)cell->face(face)->boundary_indicator()
+                  << std::endl;
+      }
+    }
 }
 
 
 int main ()
 {
-  std::ofstream logfile("output");
+  deallog << std::setprecision (2);
+  logfile << std::setprecision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  try
-    {
-      gmsh_grid<2> (SOURCE_DIR "/grids/grid_in_msh_01.2d.msh");
-      gmsh_grid<2> (SOURCE_DIR "/grids/grid_in_msh_01.2da.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3d.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3da.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3d_neg.msh");
-    }
-  catch (std::exception &exc)
-    {
-      deallog << std::endl << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      deallog << "Exception on processing: " << std::endl
-              << exc.what() << std::endl
-              << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      return 1;
-    }
-  catch (...)
-    {
-      deallog << std::endl << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      deallog << "Unknown exception!" << std::endl
-              << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      return 1;
-    };
-
-  return 0;
+  check_file ();
 }
+
