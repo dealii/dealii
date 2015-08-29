@@ -18,7 +18,7 @@ namespace Binomial
     std::vector<number> coeff(n + 1, number(0.0));
     for (unsigned int i = k; i < n + 1; ++i)
       {
-        coeff[i] = pow(number(-1), number(i - k))
+        coeff[i] = ((i - k) % 2 == 0 ? 1 : -1)
                    * boost::math::binomial_coefficient<number>(n, i)
                    * boost::math::binomial_coefficient<number>(i, k);
       }
