@@ -25,6 +25,7 @@
 #   DEAL_II_HAVE_ISNAN
 #   DEAL_II_HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
+#   DEAL_II_HAVE_FP_EXCEPTIONS
 #
 
 
@@ -423,13 +424,17 @@ ENDIF()
 # "-std=c++11" and "-std=c++14" but do not support
 # 'std::is_trivially_copyable', so check for support in C++11 or newer.
 #
-IF(DEAL_II_HAVE_CXX11)
+IF(DEAL_II_WITH_CXX11)
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
   CHECK_CXX_SOURCE_COMPILES(
     "
   #include <type_traits>
   int main(){ std::is_trivially_copyable<int> bob; }
   "
     DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+  RESET_CMAKE_REQUIRED()
+ELSE()
+  SET(DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE FALSE)
 ENDIF()
 
 CHECK_CXX_SOURCE_COMPILES(
@@ -463,3 +468,64 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_ISFINITE)
 
+
+#
+# Check that we can use feenableexcept through the C++11 header file cfenv:
+#
+# The test is a bit more complicated because we also check that no garbage
+# exception is thrown if we convert -std::numeric_limits<double>::max to a
+# string. This sadly happens with some compiler support libraries :-(
+#
+# - Timo Heister, 2015
+#
+
+# This test requires C++11
+IF(DEAL_II_WITH_CXX11)
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+    CHECK_CXX_SOURCE_RUNS(
+      "
+      #include <cfenv>
+      #include <limits>
+      #include <sstream>
+
+      int main()
+      {
+        feenableexcept(FE_DIVBYZERO|FE_INVALID);
+        std::ostringstream description;
+        const double lower_bound = -std::numeric_limits<double>::max();
+
+        description << lower_bound;
+
+        return 0;
+      }
+      "
+       DEAL_II_HAVE_FP_EXCEPTIONS)
+  ELSE()
+    #
+    # If we are not allowed to do platform introspection, just test whether
+    # we can compile above code.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <cfenv>
+      #include <limits>
+      #include <sstream>
+
+      int main()
+      {
+        feenableexcept(FE_DIVBYZERO|FE_INVALID);
+        std::ostringstream description;
+        const double lower_bound = -std::numeric_limits<double>::max();
+
+        description << lower_bound;
+
+        return 0;
+      }
+      "
+       DEAL_II_HAVE_FP_EXCEPTIONS)
+  ENDIF()
+  RESET_CMAKE_REQUIRED()
+ELSE()
+  SET(DEAL_II_HAVE_FP_EXCEPTIONS FALSE)
+ENDIF()
