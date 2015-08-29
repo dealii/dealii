@@ -656,9 +656,10 @@ namespace VectorTools
    * Compute Dirichlet boundary conditions.  This function makes up a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the
-   * boundary. If the @p boundary_values object contained values before, the
-   * new ones are added, or the old ones overwritten if a node of the boundary
-   * part to be used was already in the map of boundary values.
+   * boundary. For each degree of freedom at the boundary, if its index
+   * already exists in @p boundary_values then its boundary value will be
+   * overwritten, otherwise a new entry with proper index and boundary value
+   * for this degree of freedom will be inserted into @p boundary_values.
    *
    * The parameter @p function_map provides a list of boundary indicators to
    * be handled by this function and corresponding boundary value functions.
@@ -928,7 +929,7 @@ namespace VectorTools
    * containing all indices of degrees of freedom at the boundary (as covered
    * by the boundary parts in @p boundary_functions) and the computed dof
    * value for this degree of freedom. For each degree of freedom at the
-   * boundary, if its index is already exist in @p boundary_values then its
+   * boundary, if its index already exists in @p boundary_values then its
    * boundary value will be overwritten, otherwise a new entry with proper index
    * and boundary value for this degree of freedom will be inserted into
    * @p boundary_values.
