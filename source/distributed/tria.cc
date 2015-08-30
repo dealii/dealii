@@ -4590,37 +4590,11 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::Triangulation ()
+      :
+      dealii::parallel::Triangulation<dim,spacedim>(MPI_COMM_SELF)
     {
       Assert (false, ExcNotImplemented());
     }
-
-
-    template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::~Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <int dim, int spacedim>
-    types::subdomain_id
-    Triangulation<dim,spacedim>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-#ifdef DEAL_II_WITH_MPI
-    template <int dim, int spacedim>
-    MPI_Comm
-    Triangulation<dim,spacedim>::get_communicator () const
-    {
-      Assert (false, ExcNotImplemented());
-      return MPI_COMM_WORLD;
-    }
-#endif
   }
 }
 

@@ -37,7 +37,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
 
-#ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
   Triangulation<dim,spacedim>::Triangulation (MPI_Comm mpi_communicator,
                                               const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
@@ -49,6 +48,10 @@ namespace parallel
     my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
     n_subdomains(Utilities::MPI::n_mpi_processes(mpi_communicator))
   {
+#ifndef DEAL_II_WITH_MPI
+    Assert(false, ExcMessage("You compiled deal.II without MPI support, for "
+                             "which parallel::Triangulation is not available."));
+#endif
     number_cache.n_locally_owned_active_cells.resize (n_subdomains);
   }
 
@@ -56,6 +59,9 @@ namespace parallel
   void
   Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
   {
+#ifndef DEAL_II_WITH_MPI
+    Assert(false, ExcNotImplemented());
+#endif
     if (const dealii::parallel::Triangulation<dim,spacedim> *
         old_tria_x = dynamic_cast<const dealii::parallel::Triangulation<dim,spacedim> *>(&old_tria))
       {
@@ -63,22 +69,7 @@ namespace parallel
       }
   }
 
-#else
-  template <int dim, int spacedim>
-  Triangulation<dim,spacedim>::Triangulation()
-  {
-    Assert (false, ExcNotImplemented());
-  }
 
-  template <int dim, int spacedim>
-  void
-  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &)
-  {
-    Assert (false, ExcNotImplemented());
-  }
-
-
-#endif
 
   template <int dim, int spacedim>
   std::size_t
@@ -86,9 +77,7 @@ namespace parallel
   {
     std::size_t mem=
       this->dealii::Triangulation<dim,spacedim>::memory_consumption()
-#ifdef DEAL_II_WITH_MPI
       + MemoryConsumption::memory_consumption(mpi_communicator)
-#endif
       + MemoryConsumption::memory_consumption(my_subdomain)
       + MemoryConsumption::memory_consumption(number_cache.n_locally_owned_active_cells)
       + MemoryConsumption::memory_consumption(number_cache.n_global_active_cells)
@@ -141,7 +130,6 @@ namespace parallel
     return number_cache.n_locally_owned_active_cells;
   }
 
-#ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
   MPI_Comm
   Triangulation<dim,spacedim>::get_communicator () const
@@ -149,6 +137,7 @@ namespace parallel
     return mpi_communicator;
   }
 
+#ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
   void
   Triangulation<dim,spacedim>::update_number_cache ()
