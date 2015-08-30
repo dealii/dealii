@@ -247,6 +247,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         VERBATIM
         )
 
+      FILE(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
+
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           diff "${_test_full}" "${_run_command}" "${_test_diff}"
@@ -255,7 +257,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${_test_directory}
         DEPENDS
           ${_test_directory}/output
-          ${_comparison_file}
+          ${_comparison_files}
         VERBATIM
         )
 

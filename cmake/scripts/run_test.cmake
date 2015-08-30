@@ -90,7 +90,9 @@ MESSAGE("Test ${TEST}: ${_stage}")
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")
 
 IF("${_stage}" STREQUAL "PASSED")
-  MESSAGE("${TEST}: PASSED.")
+  STRING(REGEX REPLACE ".*\\/" "" _test ${TEST})
+  FILE(READ ${BINARY_DIR}/${_test}/diff _diff)
+  MESSAGE("${_diff}${TEST}: PASSED.")
 
 ELSE()
 

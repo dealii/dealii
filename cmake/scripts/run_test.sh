@@ -32,6 +32,9 @@ NUMDIFF_EXECUTABLE="$4"
 DIFF_EXECUTABLE="$5"
 COMPARISON_FILE="$6"
 
+# Ensure uniform sorting for pathname expansion
+export LC_ALL=C
+
 #
 # Add a top level target to run and compare the test:
 #
@@ -64,27 +67,65 @@ run(){
 }
 
 diff() {
-  rm -f failing_diff
+  rm -f failing_diff*
+  rm -f diff*
   touch diff
 
-  #
-  # run diff or numdiff (if available) to determine whether files are the
-  # same. if they are not, output the first few lines of the output of
-  # numdiff, followed by the results of regular diff since the latter is
-  # just more readable
-  #
+  test_successful=false
 
-  case ${NUMDIFF_EXECUTABLE} in
-    *numdiff)
-      ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
-                            "${COMPARISON_FILE}" output > diff
-      ;;
-    *)
-      "${DIFF_EXECUTABLE}" "${COMPARISON_FILE}" output > diff
-  esac
+  #
+  # Pick up main comparison file and all variants. A valid variant name is
+  # of the form [...].output.[STRING]
+  #
+  for file in "${COMPARISON_FILE}" "${COMPARISON_FILE}".*; do
+    # determine variant name (empty string for main comparison file):
+    variant=${file#*.output}
 
-  if [ $? -ne 0 ]; then
-    mv diff failing_diff
+    #
+    # Run diff or numdiff (if available) to determine whether files are the
+    # same. Create a diff file "diff${variant}" for each variant file that
+    # is found (including the main comparison file).
+    #
+    case ${NUMDIFF_EXECUTABLE} in
+      *numdiff)
+        ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
+                              "${file}" output > diff${variant}
+        ;;
+      *)
+        "${DIFF_EXECUTABLE}" "${file}" output > diff${variant}
+        ;;
+    esac
+
+    if [ $? -eq 0 ]; then
+      #
+      # Ensure that only a single diff file with no contents remains
+      # (numdiff has the bad habit of being very verbose...):
+      #
+      rm -f diff*
+      touch diff
+
+      if [ -n "${variant}" ]; then
+        #
+        # In case of a successful comparison against a variant, store the
+        # fact that we compared against a variant in the diff file.
+        #
+        echo "${TEST_FULL}: DIFF successful. - Variant: ${file}" > diff
+      fi
+
+      test_successful=true
+      break
+    fi
+  done
+
+  #
+  # If none of the diffs succeeded, use the diff against the main comparison
+  # file. Output the first few lines of the output of numdiff, followed by
+  # the results of regular diff since the latter is just more readable.
+  #
+  if [ $test_successful = false ] ; then
+    for file in diff*; do
+      mv "$file" failing_"$file"
+    done
     echo "${TEST_FULL}: BUILD successful."
     echo "${TEST_FULL}: RUN successful."
     echo "${TEST_FULL}: DIFF failed. ------ Source: ${COMPARISON_FILE}"

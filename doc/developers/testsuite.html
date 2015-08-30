@@ -48,11 +48,11 @@
         <li><a href="#layout">Testsuite development</a></li>
         <ol>
           <li><a href="#layoutgeneral">General layout</a></li>
-          <li><a href="#restrictcompiler">Restricting tests to specific compiler and compiler versions</a></li>
           <li><a href="#restrictbuild">Restricting tests to build configurations</a></li>
           <li><a href="#restrictfeature">Restricting tests to feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
           <li><a href="#binary">Tests with binary output</a></li>
+          <li><a href="#variants">Tests with multiple comparison files</a></li>
           <li><a href="#expect">Changing condition for success</a></li>
           <li><a href="#layoutaddtests">Adding new tests</a></li>
           <li><a href="#layoutaddcategory">Adding new categories</a></li>
@@ -426,8 +426,7 @@ category/test.output
       Comparison file can actually be named in a more complex way than
       just <code>category/test.output</code>. In pseudo code:
 <pre>
-category/test.[compiler=&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;yes|no|version&gt;.]*
-              [with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
+category/test.[with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
               [mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
@@ -448,30 +447,6 @@ category/test.debug.output
 category/test.debug.output
 category/test.release.output
 </pre>
-    </p>
-
-    <a name="restrictcompiler"></a>
-    <h3>Restricting tests to specific compiler and compiler versions</h3>
-    <p>
-      In a similar vain as for build configurations, it is possible to restrict
-      tests to specific compiler versions, e.g.:
-<pre>
-category/test.compiler=GNU=yes.output, or
-category/test.compiler=GNU=no.output, or
-category/test.compiler=Intel&gt;=15.0.3.output
-</pre>
-      The first test will only be set up if the specified compiler string
-      (in this case <code>GNU</code>) is equal to the string
-      <code>${CMAKE_CXX_COMPILER_ID}</code>. Similarly, the second test
-      will be set up if both strings are different. Common compiler names
-      are <code>GNU</code>, <code>Clang</code>, or <code>Intel</code>.
-    </p>
-    <p>
-      The third declaration is an example of how to specify a version
-      constraint: This test will be set up if deal.II is configured with
-      the Intel compiler version 15.0.3 or higher. The operators
-      <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
-      <code>&gt;</code>= are supported.
     </p>
 
     <a name="restrictfeature"></a>
@@ -532,6 +507,7 @@ category/test.mpirun=N.output
       files for different numbers of MPI processes.
     </p>
 
+
     <a name="binary"></a>
     <h3>Tests with binary output</h3>
     <p>
@@ -546,6 +522,47 @@ category/test.binary.output
       files.
     </p>
 
+
+    <a name="variants"></a>
+    <h3>Tests with multiple comparison files</h3>
+    <p>
+      Sometimes it is necessary to provide multiple comparison files for a
+      single test, for example because you want to test code on multiple
+      platforms that produce different output files that, nonetheless, all
+      should be considered correct. An example would be tests that use the
+      <code>rand()</code> function that is implemented differently on
+      different platforms. Additional comparison files have the same path
+      as the main comparison file (in this case <code>test.output</code>)
+      followed by a dot and a variant description:
+<pre>
+category/test.output
+category/test.output.2
+category/test.output.3
+category/test.output.4
+</pre>
+      The testsuite will try to match the output against all variants in
+      alphabetical order starting with the main output file.
+    </p>
+
+    <p>
+      <b>Warning:</b> This mechanism is only meant as a last resort for
+      tests where <i>no</i> alternative approach is viable. Especially,
+      consider first to
+      <ol>
+        <li> make the test more robust such that differences can be
+          expressed in round-off errors detectable by numdiff.
+        <li> restrict comparison files to specific
+          <a href="#restrictfeature">versions of an external feature</a>.
+      </ol>
+    </p>
+
+    <p>
+      <b>Note:</b> The main comparison file (i.e., the one ending in
+      <code>output</code> is mandatory. Otherwise, no test will be
+      configured.
+    </p>
+
+
     <a name="expect"></a>
     <h3>Changing condition for success</h3>
     <p>
@@ -559,7 +576,6 @@ category/test.binary.output
 category/test.expect=run.output
 </pre>
     </p>
-
 
 
     <a name="layoutaddtests"></a>

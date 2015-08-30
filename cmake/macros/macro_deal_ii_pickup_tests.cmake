@@ -147,71 +147,12 @@ MACRO(DEAL_II_PICKUP_TESTS)
       SET(_define_test FALSE)
     ENDIF()
 
-    #
-    # Respect compiler constraints:
-    #
-
-    STRING(REGEX MATCHALL
-      "compiler=[a-zA-Z]*(>=|<=|=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)" _matches ${_test}
-      )
-
-    FOREACH(_match ${_matches})
-      #
-      # Extract compiler name, comparison operator, (a possible) boolean and
-      # (a possible) version number from the feature constraint:
-      #
-      STRING(REGEX REPLACE
-        "^compiler=([a-zA-Z]*)(=|>=|<=|>|<).*$" "\\1" _compiler ${_match}
-        )
-      STRING(REGEX REPLACE "^compiler=[a-zA-Z]*(>=|<=|=|>|<).*$" "\\1"  _operator ${_match})
-      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
-      STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
-
-      #
-      # First process simple yes/no feature constraints:
-      #
-      IF(NOT "${_boolean}" STREQUAL "")
-        IF(NOT "${_operator}" STREQUAL "=")
-          MESSAGE(FATAL_ERROR "
-Invalid syntax in constraint \"${_match}\" in file
-\"${_comparison}\":
-Comparison operator \"=\" expected for boolean match.\n"
-            )
-        ENDIF()
-
-        # This is why I hate CMake :-/
-        IF( ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" AND NOT ${_boolean} ) OR
-            ( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" AND ${_boolean} ) )
-          SET(_define_test FALSE)
-        ENDIF()
-      ENDIF()
-
-      #
-      # Process version constraints:
-      #
-      IF(NOT "${_version}" STREQUAL "")
-
-        IF( ( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "${_compiler}" ) OR
-            ( "${_operator}" STREQUAL "=" AND
-              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_EQUAL "${_version}" ) OR
-            ( "${_operator}" STREQUAL ">" AND
-              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "${_version}" ) OR
-            ( "${_operator}" STREQUAL "<" AND
-              NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "${_version}" ) OR
-            ( "${_operator}" STREQUAL ">=" AND
-              "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "${_version}" ) OR
-            ( "${_operator}" STREQUAL "<=" AND
-                    "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "${_version}" ) )
-          SET(_define_test FALSE)
-        ENDIF()
-      ENDIF()
-    ENDFOREACH()
-
     # Disable tests using mpirun if MPI is not enabled
     STRING(REGEX MATCH "mpirun=" _matches ${_test})
     IF (_matches AND NOT DEAL_II_WITH_MPI)
       SET(_define_test FALSE)
     ENDIF()
+
     #
     # Query configuration and check whether we support it. Otherwise
     # set _define_test to FALSE:
