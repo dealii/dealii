@@ -140,6 +140,8 @@ namespace internal
      * the fe_index of the most
      * dominating finite element that
      * lives on this object.
+     *
+     * Return numbers::invalid_unsigned_int if we couldn't find one.
      */
     template <int dim, int spacedim, typename iterator>
     unsigned int
@@ -181,14 +183,19 @@ namespace internal
 
       // check that we have
       // found one such fe
-      Assert (dominating_fe_index != object->n_active_fe_indices(),
-              ExcNotImplemented());
-
-      // return the finite element
-      // index used on it. note
-      // that only a single fe can
-      // be active on such subfaces
-      return object->nth_active_fe_index(dominating_fe_index);
+      if (dominating_fe_index != object->n_active_fe_indices())
+        {
+          // return the finite element
+          // index used on it. note
+          // that only a single fe can
+          // be active on such subfaces
+          return object->nth_active_fe_index(dominating_fe_index);
+        }
+      else
+        {
+          // if we couldn't find the most dominating object
+          return numbers::invalid_unsigned_int;
+        }
     }
   }
 }
@@ -2378,43 +2385,50 @@ namespace hp
                 const unsigned int most_dominating_fe_index
                   = internal::hp::get_most_dominating_fe_index<dim,spacedim> (line);
 
-                const unsigned int n_active_fe_indices
-                  = line->n_active_fe_indices ();
+                // if we found the most dominating element, then use this to eliminate some of
+                // the degrees of freedom by identification. otherwise, the code that computes
+                // hanging node constraints will have to deal with it by computing
+                // appropriate constraints along this face/edge
+                if (most_dominating_fe_index != numbers::invalid_unsigned_int)
+                  {
+                    const unsigned int n_active_fe_indices
+                      = line->n_active_fe_indices ();
 
-                // loop over the indices of all the finite elements that are not
-                // dominating, and identify their dofs to the most dominating
-                // one
-                for (unsigned int f=0; f<n_active_fe_indices; ++f)
-                  if (line->nth_active_fe_index (f) !=
-                      most_dominating_fe_index)
-                    {
-                      const unsigned int
-                      other_fe_index = line->nth_active_fe_index (f);
-
-                      internal::hp::ensure_existence_of_dof_identities<1>
-                      ((*finite_elements)[most_dominating_fe_index],
-                       (*finite_elements)[other_fe_index],
-                       line_dof_identities[most_dominating_fe_index][other_fe_index]);
-
-                      internal::hp::DoFIdentities &identities
-                        = *line_dof_identities[most_dominating_fe_index][other_fe_index];
-                      for (unsigned int i=0; i<identities.size(); ++i)
+                    // loop over the indices of all the finite elements that are not
+                    // dominating, and identify their dofs to the most dominating
+                    // one
+                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                      if (line->nth_active_fe_index (f) !=
+                          most_dominating_fe_index)
                         {
-                          const types::global_dof_index master_dof_index
-                            = line->dof_index (identities[i].first, most_dominating_fe_index);
-                          const types::global_dof_index slave_dof_index
-                            = line->dof_index (identities[i].second, other_fe_index);
+                          const unsigned int
+                          other_fe_index = line->nth_active_fe_index (f);
 
-                          Assert ((new_dof_indices[master_dof_index] ==
-                                   numbers::invalid_dof_index)
-                                  ||
-                                  (new_dof_indices[slave_dof_index] ==
-                                   master_dof_index),
-                                  ExcInternalError());
+                          internal::hp::ensure_existence_of_dof_identities<1>
+                          ((*finite_elements)[most_dominating_fe_index],
+                           (*finite_elements)[other_fe_index],
+                           line_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-                          new_dof_indices[slave_dof_index] = master_dof_index;
+                          internal::hp::DoFIdentities &identities
+                            = *line_dof_identities[most_dominating_fe_index][other_fe_index];
+                          for (unsigned int i=0; i<identities.size(); ++i)
+                            {
+                              const types::global_dof_index master_dof_index
+                                = line->dof_index (identities[i].first, most_dominating_fe_index);
+                              const types::global_dof_index slave_dof_index
+                                = line->dof_index (identities[i].second, other_fe_index);
+
+                              Assert ((new_dof_indices[master_dof_index] ==
+                                       numbers::invalid_dof_index)
+                                      ||
+                                      (new_dof_indices[slave_dof_index] ==
+                                       master_dof_index),
+                                      ExcInternalError());
+
+                              new_dof_indices[slave_dof_index] = master_dof_index;
+                            }
                         }
-                    }
+                  }
               }
           }
 
@@ -2494,46 +2508,53 @@ namespace hp
             const unsigned int most_dominating_fe_index
               = internal::hp::get_most_dominating_fe_index<dim,spacedim> (quad);
 
-            const unsigned int n_active_fe_indices
-              = quad->n_active_fe_indices ();
+            // if we found the most dominating element, then use this to eliminate some of
+            // the degrees of freedom by identification. otherwise, the code that computes
+            // hanging node constraints will have to deal with it by computing
+            // appropriate constraints along this face/edge
+            if (most_dominating_fe_index != numbers::invalid_unsigned_int)
+              {
+                const unsigned int n_active_fe_indices
+                  = quad->n_active_fe_indices ();
 
-            // loop over the indices of
-            // all the finite elements
-            // that are not dominating,
-            // and identify their dofs
-            // to the most dominating
-            // one
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              if (quad->nth_active_fe_index (f) !=
-                  most_dominating_fe_index)
-                {
-                  const unsigned int
-                  other_fe_index = quad->nth_active_fe_index (f);
-
-                  internal::hp::ensure_existence_of_dof_identities<2>
-                  ((*finite_elements)[most_dominating_fe_index],
-                   (*finite_elements)[other_fe_index],
-                   quad_dof_identities[most_dominating_fe_index][other_fe_index]);
-
-                  internal::hp::DoFIdentities &identities
-                    = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
-                  for (unsigned int i=0; i<identities.size(); ++i)
+                // loop over the indices of
+                // all the finite elements
+                // that are not dominating,
+                // and identify their dofs
+                // to the most dominating
+                // one
+                for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                  if (quad->nth_active_fe_index (f) !=
+                      most_dominating_fe_index)
                     {
-                      const types::global_dof_index master_dof_index
-                        = quad->dof_index (identities[i].first, most_dominating_fe_index);
-                      const types::global_dof_index slave_dof_index
-                        = quad->dof_index (identities[i].second, other_fe_index);
+                      const unsigned int
+                      other_fe_index = quad->nth_active_fe_index (f);
 
-                      Assert ((new_dof_indices[master_dof_index] ==
-                               numbers::invalid_dof_index)
-                              ||
-                              (new_dof_indices[slave_dof_index] ==
-                               master_dof_index),
-                              ExcInternalError());
+                      internal::hp::ensure_existence_of_dof_identities<2>
+                      ((*finite_elements)[most_dominating_fe_index],
+                       (*finite_elements)[other_fe_index],
+                       quad_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-                      new_dof_indices[slave_dof_index] = master_dof_index;
+                      internal::hp::DoFIdentities &identities
+                        = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
+                      for (unsigned int i=0; i<identities.size(); ++i)
+                        {
+                          const types::global_dof_index master_dof_index
+                            = quad->dof_index (identities[i].first, most_dominating_fe_index);
+                          const types::global_dof_index slave_dof_index
+                            = quad->dof_index (identities[i].second, other_fe_index);
+
+                          Assert ((new_dof_indices[master_dof_index] ==
+                                   numbers::invalid_dof_index)
+                                  ||
+                                  (new_dof_indices[slave_dof_index] ==
+                                   master_dof_index),
+                                  ExcInternalError());
+
+                          new_dof_indices[slave_dof_index] = master_dof_index;
+                        }
                     }
-                }
+              }
           }
 
     // finally restore the user flags
