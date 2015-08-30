@@ -39,8 +39,8 @@ inconvenience this causes.
 
 <ol>
 
-  <li> Removed: The testsuite does no longer support compiler constraints
-  of the form <code>".compiler=[NAME]...</code>.
+  <li> Removed: The testsuite no longer supports compiler constraints of
+  the form "<code>.compiler=[NAME]...</code>".
   <br>
   (Matthias Maier, 2015/08/21)
   </li>

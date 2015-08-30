@@ -527,9 +527,13 @@ category/test.binary.output
     <h3>Tests with multiple comparison files</h3>
     <p>
       Sometimes it is necessary to provide multiple comparison files for a
-      single test. Additional comparison files have the same path as the
-      main comparison file (in this case <code>test.output</code>) followed
-      by a dot and a variant description:
+      single test, for example because you want to test code on multiple
+      platforms that produce different output files that, nonetheless, all
+      should be considered correct. An example would be tests that use the
+      <code>rand()</code> function that is implemented differently on
+      different platforms. Additional comparison files have the same path
+      as the main comparison file (in this case <code>test.output</code>)
+      followed by a dot and a variant description:
 <pre>
 category/test.output
 category/test.output.2
@@ -547,7 +551,7 @@ category/test.output.4
       <ol>
         <li> make the test more robust such that differences can be
           expressed in round-off errors detectable by numdiff.
-        <li> restrict comparison files to specific feature versions
+        <li> restrict comparison files to specific
           <a href="#restrictfeature">versions of an external feature</a>.
       </ol>
     </p>
