@@ -21,6 +21,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/base/std_cxx1x/function.h>
@@ -30,10 +31,6 @@
 #include <vector>
 #include <list>
 #include <utility>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
 
 
 DEAL_II_NAMESPACE_OPEN
