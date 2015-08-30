@@ -48,7 +48,6 @@
         <li><a href="#layout">Testsuite development</a></li>
         <ol>
           <li><a href="#layoutgeneral">General layout</a></li>
-          <li><a href="#restrictcompiler">Restricting tests to specific compiler and compiler versions</a></li>
           <li><a href="#restrictbuild">Restricting tests to build configurations</a></li>
           <li><a href="#restrictfeature">Restricting tests to feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
@@ -427,8 +426,7 @@ category/test.output
       Comparison file can actually be named in a more complex way than
       just <code>category/test.output</code>. In pseudo code:
 <pre>
-category/test.[compiler=&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;yes|no|version&gt;.]*
-              [with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
+category/test.[with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
               [mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
@@ -449,30 +447,6 @@ category/test.debug.output
 category/test.debug.output
 category/test.release.output
 </pre>
-    </p>
-
-    <a name="restrictcompiler"></a>
-    <h3>Restricting tests to specific compiler and compiler versions</h3>
-    <p>
-      In a similar vain as for build configurations, it is possible to restrict
-      tests to specific compiler versions, e.g.:
-<pre>
-category/test.compiler=GNU=yes.output, or
-category/test.compiler=GNU=no.output, or
-category/test.compiler=Intel&gt;=15.0.3.output
-</pre>
-      The first test will only be set up if the specified compiler string
-      (in this case <code>GNU</code>) is equal to the string
-      <code>${CMAKE_CXX_COMPILER_ID}</code>. Similarly, the second test
-      will be set up if both strings are different. Common compiler names
-      are <code>GNU</code>, <code>Clang</code>, or <code>Intel</code>.
-    </p>
-    <p>
-      The third declaration is an example of how to specify a version
-      constraint: This test will be set up if deal.II is configured with
-      the Intel compiler version 15.0.3 or higher. The operators
-      <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
-      <code>&gt;</code>= are supported.
     </p>
 
     <a name="restrictfeature"></a>
