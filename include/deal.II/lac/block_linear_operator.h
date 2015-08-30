@@ -290,7 +290,7 @@ namespace internal
         v.reinit(m);
 
         // And reinitialize every individual block with reinit_range_vectors:
-        for (size_t i = 0; i < m; ++i)
+        for (unsigned int i = 0; i < m; ++i)
           op.block(i, 0).reinit_range_vector(v.block(i), fast);
 
         v.collect_sizes();
@@ -304,7 +304,7 @@ namespace internal
         v.reinit(n);
 
         // And reinitialize every individual block with reinit_domain_vectors:
-        for (size_t i = 0; i < n; ++i)
+        for (unsigned int i = 0; i < n; ++i)
           op.block(0, i).reinit_domain_vector(v.block(i), fast);
 
         v.collect_sizes();
@@ -317,10 +317,10 @@ namespace internal
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
-        for (size_t i = 0; i < m; ++i)
+        for (unsigned int i = 0; i < m; ++i)
           {
             op.block(i, 0).vmult(v.block(i), u.block(0));
-            for (size_t j = 1; j < n; ++j)
+            for (unsigned int j = 1; j < n; ++j)
               op.block(i, j).vmult_add(v.block(i), u.block(j));
           }
       };
@@ -332,8 +332,8 @@ namespace internal
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (unsigned int i = 0; i < m; ++i)
+          for (unsigned int j = 0; j < n; ++j)
             op.block(i, j).vmult_add(v.block(i), u.block(j));
       };
 
@@ -344,10 +344,10 @@ namespace internal
         Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
         Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
-        for (size_t i = 0; i < n; ++i)
+        for (unsigned int i = 0; i < n; ++i)
           {
             op.block(0, i).Tvmult(v.block(i), u.block(0));
-            for (size_t j = 1; j < m; ++j)
+            for (unsigned int j = 1; j < m; ++j)
               op.block(j, i).Tvmult_add(v.block(i), u.block(j));
           }
       };
@@ -359,8 +359,8 @@ namespace internal
         Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
         Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
-        for (size_t i = 0; i < n; ++i)
-          for (size_t j = 0; j < m; ++j)
+        for (unsigned int i = 0; i < n; ++i)
+          for (unsigned int j = 0; j < m; ++j)
             op.block(j, i).Tvmult_add(v.block(i), u.block(j));
       };
     }
@@ -573,8 +573,8 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
   // elements of return_op.ops are populated correctly. They must be
   // null_operators, but with correct reinit_domain_vector and
   // reinit_range_vector functions.
-  for (size_t i = 0; i < m; ++i)
-    for (size_t j = 0; j < m; ++j)
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < m; ++j)
       if (i == j)
         {
           // diagonal elements are easy:
