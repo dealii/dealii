@@ -39,6 +39,12 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Removed: The testsuite does no longer support compiler constraints
+  of the form <code>".compiler=[NAME]...</code>.
+  <br>
+  (Matthias Maier, 2015/08/21)
+  </li>
+
   <li> Changed: The parameter @p first_vector_components has been removed
   from GridTools::collect_periodic_faces(). Instead,
   DoFTools::make_periodicity_constraints() now accepts a parameter
@@ -108,6 +114,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: The testsuite now supports multiple comparison files.
+  Apart from the main comparison file that ends in
+  <code>[...].output</code> all files of the form
+  <code>[...].output.[string]</code> are considered for comparison.
+  <br>
+  (Matthias Maier, 2015/08/29)
+
+  </li>
   <li> New: A class BlockLinearOperator has been introduced that extends
   the LinearOperator concept to block structures. A BlockLinearOperator can
   be sliced back to a LinearOperator.
@@ -132,8 +146,7 @@ inconvenience this causes.
   </li>
 
   <li> Fixed: The testsuite now properly supports version constraints for
-  compilers and features. Those are annotated by
-  <code>.compiler=STRING(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>, or
+  features. Those are annotated by
   <code>.with_FEATURE(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>.
   <br>
   (Matthias Maier, 2015/08/25)
