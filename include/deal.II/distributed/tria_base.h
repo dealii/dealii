@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,25 +56,19 @@ namespace parallel
     /**
      * Constructor.
      */
-#ifdef DEAL_II_WITH_MPI
     Triangulation (MPI_Comm mpi_communicator,
                    const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid = (dealii::Triangulation<dim,spacedim>::none),
                    const bool check_for_distorted_cells = false);
-#else
-    Triangulation ();
-#endif
 
     /**
      * Destructor.
      */
     virtual ~Triangulation ();
 
-#ifdef DEAL_II_WITH_MPI
     /**
      * Return MPI communicator used by this triangulation.
      */
     virtual MPI_Comm get_communicator () const;
-#endif
 
     /**
      * Implementation of the same function as in the base class.
@@ -143,14 +137,12 @@ namespace parallel
 
 
   protected:
-#ifdef DEAL_II_WITH_MPI
     /**
      * MPI communicator to be used for the triangulation. We create a unique
      * communicator for this class, which is a duplicate of the one passed
      * to the constructor.
      */
     MPI_Comm mpi_communicator;
-#endif
 
     /**
      * The subdomain id to be used for the current processor.

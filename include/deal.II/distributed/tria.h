@@ -1079,28 +1079,13 @@ namespace parallel
      * actually be created if we don't have p4est available.
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
     private:
       /**
        * Constructor.
        */
       Triangulation ();
-
-    public:
-
-      /**
-       * Destructor.
-       */
-      virtual ~Triangulation ();
-
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
 
     };
   }
