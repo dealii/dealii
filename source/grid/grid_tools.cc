@@ -29,6 +29,7 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/tria_base.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
@@ -204,14 +205,12 @@ namespace GridTools
     double global_volume = 0;
 
 #ifdef DEAL_II_WITH_MPI
-    if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
-        = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation))
+    if (const parallel::Triangulation<dim,spacedim> *p_tria
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&triangulation))
       global_volume = Utilities::MPI::sum (local_volume, p_tria->get_communicator());
     else
-      global_volume = local_volume;
-#else
-    global_volume = local_volume;
 #endif
+      global_volume = local_volume;
 
     return global_volume;
   }
