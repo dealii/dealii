@@ -77,6 +77,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # This option will split the debug info from the shared library, which will
+  # improve link times, reduce file size of the .so, and potentially speed up
+  # startup of applications/gdb.
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-gsplit-dwarf")
+
   #
   # Silence Clang warnings about unused compiler parameters (works around a
   # regression in the clang driver frontend of certain versions):
