@@ -549,10 +549,9 @@ void Step3::solve ()
   // is below $10^{-12}$. In practice, the latter criterion will be the one
   // which stops the iteration:
   SolverControl           solver_control (1000, 1e-12);
-  // Then we need the solver itself. The template parameters to the SolverCG
-  // class are the matrix type and the type of the vectors, but the empty
-  // angle brackets indicate that we simply take the default arguments (which
-  // are <code>SparseMatrix@<double@></code> and
+  // Then we need the solver itself. The template parameter to the SolverCG
+  // class is the type of the vectors, but the empty angle brackets indicate
+  // that we simply take the default argument (which is
   // <code>Vector@<double@></code>):
   SolverCG<>              solver (solver_control);
 
