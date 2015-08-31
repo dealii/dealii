@@ -2334,12 +2334,6 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
           domination = domination & base_domination;
         }
 
-      // if we've gotten here, then we've either found a winner or either
-      // element is fine being dominated
-      Assert (domination !=
-              FiniteElementDomination::neither_element_dominates,
-              ExcInternalError());
-
       return domination;
     }
 
