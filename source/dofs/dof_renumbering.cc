@@ -32,6 +32,8 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/distributed/tria.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>

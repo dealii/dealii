@@ -72,7 +72,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   void
-  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
+  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &/*old_tria*/)
   {
     Assert (false, ExcNotImplemented());
   }

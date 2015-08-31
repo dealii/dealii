@@ -1004,7 +1004,10 @@ namespace internal
       {
 
 #ifndef DEAL_II_WITH_MPI
+        (void)new_numbers;
         (void)dof_handler;
+        (void)number_cache;
+
         Assert (false, ExcNotImplemented());
 
 #else

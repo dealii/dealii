@@ -25,6 +25,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 
 #include <algorithm>
