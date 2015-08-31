@@ -359,6 +359,13 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/07/14)
   </li>
 
+  <li> New: DataOutBase::TecplotFlags now takes a third argument for solution
+  time which is useful to visualize transient data. If a user sets a non-negative
+  time, it will be saved into the tecplot file.
+  <br>
+  (Praveen Chandrashekar, 2015/08/30)
+  </li>
+
 </ol>
 
 */
