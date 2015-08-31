@@ -96,7 +96,10 @@ void test()
   deallog << "L2_norm:" << std::endl;
   // sqrt(\int_\Omega f^2) = sqrt(\int (x+y)^2+(x^2+y^2)^2)
   test<dim>(VectorTools::L2_norm, std::sqrt(161.0/90.0));
-  
+  deallog << "H1_seminorm:" << std::endl;
+  // sqrt( sum | d/dxi f |_0^2 ) = sqrt( sum \int   )
+  test<dim>(VectorTools::H1_seminorm, std::sqrt(14.0/3.0));
+
   deallog << "OK" << std::endl;
 }
 
