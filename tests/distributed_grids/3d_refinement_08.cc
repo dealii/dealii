@@ -43,14 +43,14 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr);
-    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../grid/grid_in_3d_02/747.ucd");
     gi.read (in);
   }
 
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr2);
-    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../grid/grid_in_3d_02/747.ucd");
     gi.read (in);
   }
 
