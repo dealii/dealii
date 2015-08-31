@@ -43,7 +43,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr);
-    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_02/2d.xda");
+    std::ifstream in (SOURCE_DIR "/../grid/grid_in_02/2d.xda");
     try
       {
         gi.read_xda (in);
@@ -60,7 +60,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr2);
-    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_02/2d.xda");
+    std::ifstream in (SOURCE_DIR "/../grid/grid_in_02/2d.xda");
     try
       {
         gi.read_xda (in);
