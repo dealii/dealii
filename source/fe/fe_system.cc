@@ -487,6 +487,96 @@ FESystem<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 
 
 template <int dim, int spacedim>
+Tensor<3,dim>
+FESystem<dim,spacedim>::shape_3rd_derivative (const unsigned int i,
+                                              const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (this->is_primitive(i),
+          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
+
+  return (base_element(this->system_to_base_table[i].first.first)
+          .shape_3rd_derivative(this->system_to_base_table[i].second, p));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FESystem<dim,spacedim>::shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim> &p,
+                                                        const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (component < this->n_components(),
+          ExcIndexRange (component, 0, this->n_components()));
+
+  // if this value is supposed to be zero, then return right away...
+  if (this->nonzero_components[i][component] == false)
+    return Tensor<3,dim>();
+
+  // ...otherwise: first find out to which of the base elements this desired
+  // component belongs, and which component within this base element it is
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
+
+  // then get value from base element. note that that will throw an error
+  // should the respective shape function not be primitive; thus, there is no
+  // need to check this here
+  return (base_element(base).
+          shape_3rd_derivative_component(this->system_to_base_table[i].second,
+                                         p,
+                                         component_in_base));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FESystem<dim,spacedim>::shape_4th_derivative (const unsigned int i,
+                                              const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (this->is_primitive(i),
+          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
+
+  return (base_element(this->system_to_base_table[i].first.first)
+          .shape_4th_derivative(this->system_to_base_table[i].second, p));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FESystem<dim,spacedim>::shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim> &p,
+                                                        const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (component < this->n_components(),
+          ExcIndexRange (component, 0, this->n_components()));
+
+  // if this value is supposed to be zero, then return right away...
+  if (this->nonzero_components[i][component] == false)
+    return Tensor<4,dim>();
+
+  // ...otherwise: first find out to which of the base elements this desired
+  // component belongs, and which component within this base element it is
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
+
+  // then get value from base element. note that that will throw an error
+  // should the respective shape function not be primitive; thus, there is no
+  // need to check this here
+  return (base_element(base).
+          shape_4th_derivative_component(this->system_to_base_table[i].second,
+                                         p,
+                                         component_in_base));
+}
+
+
+
+template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::get_interpolation_matrix (
   const FiniteElement<dim,spacedim> &x_source_fe,

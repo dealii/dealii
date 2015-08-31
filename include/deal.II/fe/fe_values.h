@@ -2065,6 +2065,94 @@ public:
   const std::vector<DerivativeForm<2,dim,spacedim> > &get_jacobian_grads () const;
 
   /**
+   * Return the second derivative of the transformation from unit to real
+   * cell, i.e. the first derivative of the Jacobian, at the specified
+   * quadrature point, pushed forward to the real cell coordinates, i.e.
+   * $G_{ijk}=dJ_{iJ}/d\hat x_K (J_{jJ})^{-1} (J_{kK})^{-1}$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_grads}
+   */
+  const Tensor<3,spacedim> &jacobian_pushed_forward_grad (const unsigned int quadrature_point) const;
+
+  /**
+   * Return a reference to the array holding the values returned by
+   * jacobian_pushed_forward_grads().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_grads}
+   */
+  const std::vector<Tensor<3,spacedim> > &get_jacobian_pushed_forward_grads () const;
+
+  /**
+   * Return the third derivative of the transformation from unit to real
+   * cell, i.e. the second derivative of the Jacobian, at the specified
+   * quadrature point, i.e. $G_{ijkl}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l}$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_2nd_derivatives}
+   */
+  const DerivativeForm<3,dim,spacedim> &jacobian_2nd_derivative (const unsigned int quadrature_point) const;
+
+  /**
+   * Return a reference to the array holding the values returned by
+   * jacobian_2nd_derivatives().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_2nd_derivatives}
+   */
+  const std::vector<DerivativeForm<3,dim,spacedim> > &get_jacobian_2nd_derivatives () const;
+
+  /**
+   * Return the third derivative of the transformation from unit to real
+   * cell, i.e. the second derivative of the Jacobian, at the specified
+   * quadrature point, pushed forward to the real cell coordinates, i.e.
+   * $G_{ijkl}=\frac{d^2J_{iJ}}{d\hat x_K d\hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1}(J_{lL})^{-1}$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_2nd_derivatives}
+   */
+  const Tensor<4,spacedim> &jacobian_pushed_forward_2nd_derivative (const unsigned int quadrature_point) const;
+
+  /**
+   * Return a reference to the array holding the values returned by
+   * jacobian_pushed_forward_2nd_derivatives().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_2nd_derivatives}
+   */
+  const std::vector<Tensor<4,spacedim> > &get_jacobian_pushed_forward_2nd_derivatives () const;
+
+  /**
+   * Return the fourth derivative of the transformation from unit to real
+   * cell, i.e. the third derivative of the Jacobian, at the specified
+   * quadrature point, i.e. $G_{ijklm}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l d\hat x_m}$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_3rd_derivatives}
+   */
+  const DerivativeForm<4,dim,spacedim> &jacobian_3rd_derivative (const unsigned int quadrature_point) const;
+
+  /**
+   * Return a reference to the array holding the values returned by
+   * jacobian_3rd_derivatives().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_3rd_derivatives}
+   */
+  const std::vector<DerivativeForm<4,dim,spacedim> > &get_jacobian_3rd_derivatives () const;
+
+  /**
+   * Return the fourth derivative of the transformation from unit to real
+   * cell, i.e. the third derivative of the Jacobian, at the specified
+   * quadrature point, pushed forward to the real cell coordinates, i.e.
+   * $G_{ijklm}=\frac{d^3J_{iJ}}{d\hat x_K d\hat x_L d\hat x_M} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1} (J_{mM})^{-1}$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_3rd_derivatives}
+   */
+  const Tensor<5,spacedim> &jacobian_pushed_forward_3rd_derivative (const unsigned int quadrature_point) const;
+
+  /**
+   * Return a reference to the array holding the values returned by
+   * jacobian_pushed_forward_3rd_derivatives().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_2nd_derivatives}
+   */
+  const std::vector<Tensor<5,spacedim> > &get_jacobian_pushed_forward_3rd_derivatives () const;
+
+  /**
    * Return the inverse Jacobian of the transformation at the specified
    * quadrature point, i.e.  $J_{ij}=d\hat x_i/dx_j$
    *
@@ -3949,6 +4037,125 @@ FEValuesBase<dim,spacedim>::get_jacobian_grads () const
   return this->mapping_output.jacobian_grads;
 }
 
+
+
+template <int dim, int spacedim>
+inline
+const Tensor<3,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_pushed_forward_grad (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_grads,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
+  return this->mapping_output.jacobian_pushed_forward_grads[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<Tensor<3,spacedim> > &
+FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_grads () const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_grads,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
+  return this->mapping_output.jacobian_pushed_forward_grads;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const DerivativeForm<3,dim,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_2nd_derivative (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_2nd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
+  return this->mapping_output.jacobian_2nd_derivatives[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<DerivativeForm<3,dim,spacedim> > &
+FEValuesBase<dim,spacedim>::get_jacobian_2nd_derivatives () const
+{
+  Assert (this->update_flags & update_jacobian_2nd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
+  return this->mapping_output.jacobian_2nd_derivatives;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const Tensor<4,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_pushed_forward_2nd_derivative (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_2nd_derivatives"));
+  return this->mapping_output.jacobian_pushed_forward_2nd_derivatives[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<Tensor<4,spacedim> > &
+FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_2nd_derivatives () const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_2nd_derivatives"));
+  return this->mapping_output.jacobian_pushed_forward_2nd_derivatives;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const DerivativeForm<4,dim,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_3rd_derivative (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_3rd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
+  return this->mapping_output.jacobian_3rd_derivatives[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<DerivativeForm<4,dim,spacedim> > &
+FEValuesBase<dim,spacedim>::get_jacobian_3rd_derivatives () const
+{
+  Assert (this->update_flags & update_jacobian_3rd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
+  return this->mapping_output.jacobian_3rd_derivatives;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const Tensor<5,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_pushed_forward_3rd_derivative (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_3rd_derivatives"));
+  return this->mapping_output.jacobian_pushed_forward_3rd_derivatives[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const std::vector<Tensor<5,spacedim> > &
+FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_3rd_derivatives () const
+{
+  Assert (this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
+          ExcAccessToUninitializedField("update_jacobian_pushed_forward_3rd_derivatives"));
+  return this->mapping_output.jacobian_pushed_forward_3rd_derivatives;
+}
 
 
 template <int dim, int spacedim>

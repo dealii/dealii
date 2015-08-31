@@ -93,7 +93,12 @@ initialize (const UpdateFlags      update_flags,
                            | update_normal_vectors
                            | update_jacobians
                            | update_jacobian_grads
-                           | update_inverse_jacobians))
+                           | update_inverse_jacobians
+                           | update_jacobian_pushed_forward_grads
+                           | update_jacobian_2nd_derivatives
+                           | update_jacobian_pushed_forward_2nd_derivatives
+                           | update_jacobian_3rd_derivatives
+                           | update_jacobian_pushed_forward_3rd_derivatives))
     shape_derivatives.resize(n_shape_functions * n_q_points);
 
   if (this->update_each & update_covariant_transformation)
@@ -105,8 +110,17 @@ initialize (const UpdateFlags      update_flags,
   if (this->update_each & update_volume_elements)
     volume_elements.resize(n_original_q_points);
 
-  if (this->update_each & update_jacobian_grads)
+  if (this->update_each &
+      (update_jacobian_grads | update_jacobian_pushed_forward_grads) )
     shape_second_derivatives.resize(n_shape_functions * n_q_points);
+
+  if (this->update_each &
+      (update_jacobian_2nd_derivatives | update_jacobian_pushed_forward_2nd_derivatives) )
+    shape_third_derivatives.resize(n_shape_functions * n_q_points);
+
+  if (this->update_each &
+      (update_jacobian_3rd_derivatives | update_jacobian_pushed_forward_3rd_derivatives) )
+    shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
 }
 
 
@@ -361,6 +375,30 @@ namespace internal
               data.second_derivative(k,0)[0][0] = 0;
               data.second_derivative(k,1)[0][0] = 0;
             }
+          if (data.shape_third_derivatives.size()!=0)
+            {
+              // if lower order derivative don't work, neither should this
+              Assert (spacedim == 1, ExcNotImplemented());
+
+              Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+
+              Tensor<3,1> zero;
+              data.third_derivative(k,0) = zero;
+              data.third_derivative(k,1) = zero;
+            }
+          if (data.shape_fourth_derivatives.size()!=0)
+            {
+              // if lower order derivative don't work, neither should this
+              Assert (spacedim == 1, ExcNotImplemented());
+
+              Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+
+              Tensor<4,1> zero;
+              data.fourth_derivative(k,0) = zero;
+              data.fourth_derivative(k,1) = zero;
+            }
         }
     }
 
@@ -420,6 +458,23 @@ namespace internal
               data.second_derivative(k,1)[1][1] = 0;
               data.second_derivative(k,2)[1][1] = 0;
               data.second_derivative(k,3)[1][1] = 0;
+            }
+          if (data.shape_third_derivatives.size()!=0)
+            {
+              Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+
+              Tensor<3,2> zero;
+              for (unsigned int i=0; i<4; ++i)
+                data.third_derivative(k,i) = zero;
+            }
+          if (data.shape_fourth_derivatives.size()!=0)
+            {
+              Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+              Tensor<4,2> zero;
+              for (unsigned int i=0; i<4; ++i)
+                data.fourth_derivative(k,i) = zero;
             }
         }
     }
@@ -566,6 +621,46 @@ namespace internal
               data.second_derivative(k,6)[2][1] = (1.-x);
               data.second_derivative(k,7)[2][1] = x;
             }
+          if (data.shape_third_derivatives.size()!=0)
+            {
+              // if lower order derivative don't work, neither should this
+              Assert (spacedim == 3, ExcNotImplemented());
+
+              Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+
+              for (unsigned int i=0; i<3; ++i)
+                for (unsigned int j=0; j<3; ++j)
+                  for (unsigned int l=0; l<3; ++l)
+                    if ((i==j)||(j==l)||(l==i))
+                      {
+                        for (unsigned int m=0; m<8; ++m)
+                          data.third_derivative(k,m)[i][j][l] = 0;
+                      }
+                    else
+                      {
+                        data.third_derivative(k,0)[i][j][l] = -1.;
+                        data.third_derivative(k,1)[i][j][l] = 1.;
+                        data.third_derivative(k,2)[i][j][l] = 1.;
+                        data.third_derivative(k,3)[i][j][l] = -1.;
+                        data.third_derivative(k,4)[i][j][l] = 1.;
+                        data.third_derivative(k,5)[i][j][l] = -1.;
+                        data.third_derivative(k,6)[i][j][l] = -1.;
+                        data.third_derivative(k,7)[i][j][l] = 1.;
+                      }
+
+            }
+          if (data.shape_fourth_derivatives.size()!=0)
+            {
+              // if lower order derivative don't work, neither should this
+              Assert (spacedim == 3, ExcNotImplemented());
+
+              Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
+                     ExcInternalError());
+              Tensor<4,3> zero;
+              for (unsigned int i=0; i<8; ++i)
+                data.fourth_derivative(k,i) = zero;
+            }
         }
     }
   }
@@ -619,7 +714,10 @@ MappingQ1<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
                  | update_normal_vectors))
         out |= update_contravariant_transformation;
 
-      if (out & (update_inverse_jacobians))
+      if (out & (update_inverse_jacobians
+                 | update_jacobian_pushed_forward_grads
+                 | update_jacobian_pushed_forward_2nd_derivatives
+                 | update_jacobian_pushed_forward_3rd_derivatives) )
         out |= update_covariant_transformation;
 
       // The contravariant transformation
@@ -850,6 +948,315 @@ namespace internal
             }
         }
     }
+
+    /**
+     * Update the Hessian of the transformation from unit to real cell, the
+     * Jacobian gradients, pushed forward to the real cell coordinates.
+     *
+     * Skip the computation if possible as indicated by the first argument.
+     */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_pushed_forward_grads (const CellSimilarity::Similarity                                   cell_similarity,
+                                                const typename QProjector<dim>::DataSetDescriptor                  data_set,
+                                                const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
+                                                std::vector<Tensor<3,spacedim> >                      &jacobian_pushed_forward_grads)
+    {
+      const UpdateFlags update_flags = data.update_each;
+      if (update_flags & update_jacobian_pushed_forward_grads)
+        {
+          const unsigned int n_q_points = jacobian_pushed_forward_grads.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<2,dim> *second =
+                    &data.second_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        result[i][j][l] = (second[0][j][l] *
+                                           data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          result[i][j][l]
+                          += (second[k][j][l]
+                              *
+                              data.mapping_support_points[k][i]);
+
+                  // pushing forward the derivative coordinates
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        {
+                          jacobian_pushed_forward_grads[point][i][j][l] = result[i][0][0] *
+                                                                          data.covariant[point][j][0] *
+                                                                          data.covariant[point][l][0];
+                          for (unsigned int jr=0; jr<dim; ++jr)
+                            {
+                              const unsigned int lr_start = jr==0? 1:0;
+                              for (unsigned int lr=lr_start; lr<dim; ++lr)
+                                jacobian_pushed_forward_grads[point][i][j][l] += result[i][jr][lr] *
+                                                                                 data.covariant[point][j][jr] *
+                                                                                 data.covariant[point][l][lr];
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    /**
+         * Update the third derivatives of the transformation from unit to real cell, the
+         * Jacobian hessians.
+         *
+         * Skip the computation if possible as indicated by the first argument.
+         */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_2nd_derivatives (const CellSimilarity::Similarity                              cell_similarity,
+                                           const typename QProjector<dim>::DataSetDescriptor             data_set,
+                                           const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
+                                           std::vector<DerivativeForm<3,dim,spacedim> >                 &jacobian_2nd_derivatives)
+    {
+      const UpdateFlags update_flags = data.update_each;
+      if (update_flags & update_jacobian_2nd_derivatives)
+        {
+          const unsigned int n_q_points = jacobian_2nd_derivatives.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<3,dim> *third =
+                    &data.third_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          result[i][j][l][m] = (third[0][j][l][m] *
+                                                data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            result[i][j][l][m]
+                            += (third[k][j][l][m]
+                                *
+                                data.mapping_support_points[k][i]);
+
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          jacobian_2nd_derivatives[point][i][j][l][m] = result[i][j][l][m];
+                }
+            }
+        }
+    }
+
+    /**
+     * Update the Hessian of the Hessian of the transformation from unit
+     * to real cell, the Jacobian Hessian gradients, pushed forward to the
+     * real cell coordinates.
+     *
+     * Skip the computation if possible as indicated by the first argument.
+     */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_pushed_forward_2nd_derivatives (const CellSimilarity::Similarity                                   cell_similarity,
+                                                          const typename QProjector<dim>::DataSetDescriptor                  data_set,
+                                                          const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
+                                                          std::vector<Tensor<4,spacedim> >                      &jacobian_pushed_forward_2nd_derivatives)
+    {
+      const UpdateFlags update_flags = data.update_each;
+      if (update_flags & update_jacobian_pushed_forward_2nd_derivatives)
+        {
+          const unsigned int n_q_points = jacobian_pushed_forward_2nd_derivatives.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<3,dim> *third =
+                    &data.third_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          result[i][j][l][m] = (third[0][j][l][m] *
+                                                data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            result[i][j][l][m]
+                            += (third[k][j][l][m]
+                                *
+                                data.mapping_support_points[k][i]);
+
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        for (unsigned int m=0; m<spacedim; ++m)
+                          {
+                            jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                              = result[i][0][0][0]*
+                                data.covariant[point][j][0] *
+                                data.covariant[point][l][0] *
+                                data.covariant[point][m][0];
+                            for (unsigned int jr=0; jr<dim; ++jr)
+                              for (unsigned int lr=0; lr<dim; ++lr)
+                                {
+                                  const unsigned int mr_start = (jr+lr == 0)? 1:0;
+                                  for (unsigned int mr=0; mr<mr_start; ++mr)
+                                    jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                                    += result[i][jr][lr][mr] *
+                                       data.covariant[point][j][jr] *
+                                       data.covariant[point][l][lr] *
+                                       data.covariant[point][m][mr];
+                                }
+                          }
+                }
+            }
+        }
+    }
+
+    /**
+         * Update the fourth derivatives of the transformation from unit to real cell, the
+         * Jacobian hessian gradients.
+         *
+         * Skip the computation if possible as indicated by the first argument.
+         */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_3rd_derivatives (const CellSimilarity::Similarity                              cell_similarity,
+                                           const typename QProjector<dim>::DataSetDescriptor             data_set,
+                                           const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
+                                           std::vector<DerivativeForm<4,dim,spacedim> >                 &jacobian_3rd_derivatives)
+    {
+      const UpdateFlags update_flags = data.update_each;
+      if (update_flags & update_jacobian_3rd_derivatives)
+        {
+          const unsigned int n_q_points = jacobian_3rd_derivatives.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<4,dim> *fourth =
+                    &data.fourth_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          for (unsigned int n=0; n<dim; ++n)
+                            result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
+                                                     data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              result[i][j][l][m][n]
+                              += (fourth[k][j][l][m][n]
+                                  *
+                                  data.mapping_support_points[k][i]);
+
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          for (unsigned int n=0; n<dim; ++n)
+                            jacobian_3rd_derivatives[point][i][j][l][m][n] = result[i][j][l][m][n];
+                }
+            }
+        }
+    }
+
+    /**
+     * Update the Hessian gradient of the transformation from unit to real cell, the
+     * Jacobian Hessians, pushed forward to the real cell coordinates.
+     *
+     * Skip the computation if possible as indicated by the first argument.
+     */
+    template <int dim, int spacedim>
+    void
+    maybe_update_jacobian_pushed_forward_3rd_derivatives (const CellSimilarity::Similarity                                   cell_similarity,
+                                                          const typename QProjector<dim>::DataSetDescriptor                  data_set,
+                                                          const typename dealii::MappingQ1<dim,spacedim>::InternalData      &data,
+                                                          std::vector<Tensor<5,spacedim> >                      &jacobian_pushed_forward_3rd_derivatives)
+    {
+      const UpdateFlags update_flags = data.update_each;
+      if (update_flags & update_jacobian_pushed_forward_3rd_derivatives)
+        {
+          const unsigned int n_q_points = jacobian_pushed_forward_3rd_derivatives.size();
+
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<4,dim> *fourth =
+                    &data.fourth_derivative(point+data_set, 0);
+                  double result [spacedim][dim][dim][dim][dim];
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          for (unsigned int n=0; n<dim; ++n)
+                            result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
+                                                     data.mapping_support_points[0][i]);
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              result[i][j][l][m][n]
+                              += (fourth[k][j][l][m][n]
+                                  *
+                                  data.mapping_support_points[k][i]);
+
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        for (unsigned int m=0; m<spacedim; ++m)
+                          for (unsigned int n=0; n<spacedim; ++n)
+                            {
+                              jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                = result[i][0][0][0][0] *
+                                  data.covariant[point][j][0] *
+                                  data.covariant[point][l][0] *
+                                  data.covariant[point][m][0] *
+                                  data.covariant[point][n][0];
+                              for (unsigned int jr=0; jr<dim; ++jr)
+                                for (unsigned int lr=0; lr<dim; ++lr)
+                                  for (unsigned int mr=0; mr<dim; ++mr)
+                                    {
+                                      const unsigned int nr_start = (jr+lr+mr==0)? 1:0;
+                                      for (unsigned int nr=0; nr<nr_start; ++nr)
+                                        jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                        += result[i][jr][lr][mr][nr] *
+                                           data.covariant[point][j][jr] *
+                                           data.covariant[point][l][lr] *
+                                           data.covariant[point][m][mr] *
+                                           data.covariant[point][n][nr];
+                                    }
+                            }
+                }
+            }
+        }
+    }
   }
 }
 
@@ -1019,6 +1426,31 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                                        DataSetDescriptor::cell (),
                                                        data,
                                                        output_data.jacobian_grads);
+
+  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (cell_similarity,
+      DataSetDescriptor::cell (),
+      data,
+      output_data.jacobian_pushed_forward_grads);
+
+  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (cell_similarity,
+      DataSetDescriptor::cell (),
+      data,
+      output_data.jacobian_2nd_derivatives);
+
+  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (cell_similarity,
+      DataSetDescriptor::cell (),
+      data,
+      output_data.jacobian_pushed_forward_2nd_derivatives);
+
+  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (cell_similarity,
+      DataSetDescriptor::cell (),
+      data,
+      output_data.jacobian_3rd_derivatives);
+
+  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (cell_similarity,
+      DataSetDescriptor::cell (),
+      data,
+      output_data.jacobian_pushed_forward_3rd_derivatives);
 
   return cell_similarity;
 }
@@ -1200,6 +1632,27 @@ namespace internal
                                                  data_set,
                                                  data,
                                                  output_data.jacobian_grads);
+      maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (CellSimilarity::none,
+                                                                data_set,
+                                                                data,
+                                                                output_data.jacobian_pushed_forward_grads);
+      maybe_update_jacobian_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
+                                                           data_set,
+                                                           data,
+                                                           output_data.jacobian_2nd_derivatives);
+      maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
+          data_set,
+          data,
+          output_data.jacobian_pushed_forward_2nd_derivatives);
+      maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
+                                                           data_set,
+                                                           data,
+                                                           output_data.jacobian_3rd_derivatives);
+      maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
+          data_set,
+          data,
+          output_data.jacobian_pushed_forward_3rd_derivatives);
+
       maybe_compute_face_data (mapping,
                                cell, face_no, subface_no, quadrature.size(),
                                quadrature.get_weights(), data,

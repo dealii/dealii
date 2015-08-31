@@ -387,6 +387,34 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
         output_data.jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
 
+  if (data.update_each & update_jacobian_pushed_forward_grads)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<output_data.jacobian_pushed_forward_grads.size(); ++i)
+        output_data.jacobian_pushed_forward_grads[i]=Tensor<3,spacedim>();
+
+  // "compute" the hessian of the Jacobian
+  // at the quadrature points, which are all
+  // also zero of course
+  if (data.update_each & update_jacobian_2nd_derivatives)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<output_data.jacobian_2nd_derivatives.size(); ++i)
+        output_data.jacobian_2nd_derivatives[i]=DerivativeForm<3,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<output_data.jacobian_pushed_forward_2nd_derivatives.size(); ++i)
+        output_data.jacobian_pushed_forward_2nd_derivatives[i]=Tensor<4,spacedim>();
+
+  if (data.update_each & update_jacobian_3rd_derivatives)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<output_data.jacobian_3rd_derivatives.size(); ++i)
+        output_data.jacobian_3rd_derivatives[i]=DerivativeForm<4,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i=0; i<output_data.jacobian_pushed_forward_3rd_derivatives.size(); ++i)
+        output_data.jacobian_pushed_forward_3rd_derivatives[i]=Tensor<5,spacedim>();
+
   // "compute" inverse Jacobian at the
   // quadrature points, which are all
   // the same

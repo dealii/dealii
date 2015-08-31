@@ -211,14 +211,14 @@ PolynomialSpace<dim>::compute_grad_grad (const unsigned int i,
 }
 
 
-
-
 template <int dim>
 void
 PolynomialSpace<dim>::compute (const Point<dim>            &p,
                                std::vector<double>         &values,
                                std::vector<Tensor<1,dim> > &grads,
-                               std::vector<Tensor<2,dim> > &grad_grads) const
+                               std::vector<Tensor<2,dim> > &grad_grads,
+                               std::vector<Tensor<3,dim> > &third_derivatives,
+                               std::vector<Tensor<4,dim> > &fourth_derivatives) const
 {
   const unsigned int n_1d=polynomials.size();
 
@@ -228,9 +228,14 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
          ExcDimensionMismatch2(grads.size(), n_pols, 0));
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
          ExcDimensionMismatch2(grad_grads.size(), n_pols, 0));
+  Assert(third_derivatives.size()==n_pols|| third_derivatives.size()==0,
+         ExcDimensionMismatch2(third_derivatives.size(), n_pols, 0));
+  Assert(fourth_derivatives.size()==n_pols|| fourth_derivatives.size()==0,
+         ExcDimensionMismatch2(fourth_derivatives.size(), n_pols, 0));
 
   unsigned int v_size=0;
   bool update_values=false, update_grads=false, update_grad_grads=false;
+  bool update_3rd_derivatives=false, update_4th_derivatives=false;
   if (values.size()==n_pols)
     {
       update_values=true;
@@ -245,6 +250,16 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
     {
       update_grad_grads=true;
       v_size=3;
+    }
+  if (third_derivatives.size()==n_pols)
+    {
+      update_3rd_derivatives=true;
+      v_size=4;
+    }
+  if (fourth_derivatives.size()==n_pols)
+    {
+      update_4th_derivatives=true;
+      v_size=5;
     }
 
   // Store data in a single
@@ -317,6 +332,72 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
                       * ((dim>1) ? v[1][iy][j1] : 1.)
                       * ((dim>2) ? v[2][iz][j2] : 1.);
                   }
+            }
+    }
+
+  if (update_3rd_derivatives)
+    {
+      unsigned int k = 0;
+
+      for (unsigned int iz=0; iz<((dim>2) ? n_1d : 1); ++iz)
+        for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
+          for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
+            {
+              const unsigned int k2=index_map_inverse[k++];
+              for (unsigned int d1=0; d1<dim; ++d1)
+                for (unsigned int d2=0; d2<dim; ++d2)
+                  for (unsigned int d3=0; d3<dim; ++d3)
+                    {
+                      // Derivative
+                      // order for each
+                      // direction
+                      std::vector<unsigned int> deriv_order (dim, 0);
+                      for (unsigned int x=0; x<dim; ++x)
+                        {
+                          if (d1==x) ++deriv_order[x];
+                          if (d2==x) ++deriv_order[x];
+                          if (d3==x) ++deriv_order[x];
+                        }
+
+                      third_derivatives[k2][d1][d2][d3] =
+                        v[0][ix][deriv_order[0]]
+                        * ((dim>1) ? v[1][iy][deriv_order[1]] : 1.)
+                        * ((dim>2) ? v[2][iz][deriv_order[2]] : 1.);
+                    }
+            }
+    }
+
+  if (update_4th_derivatives)
+    {
+      unsigned int k = 0;
+
+      for (unsigned int iz=0; iz<((dim>2) ? n_1d : 1); ++iz)
+        for (unsigned int iy=0; iy<((dim>1) ? n_1d-iz : 1); ++iy)
+          for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
+            {
+              const unsigned int k2=index_map_inverse[k++];
+              for (unsigned int d1=0; d1<dim; ++d1)
+                for (unsigned int d2=0; d2<dim; ++d2)
+                  for (unsigned int d3=0; d3<dim; ++d3)
+                    for (unsigned int d4=0; d4<dim; ++d4)
+                      {
+                        // Derivative
+                        // order for each
+                        // direction
+                        std::vector<unsigned int> deriv_order (dim, 0);
+                        for (unsigned int x=0; x<dim; ++x)
+                          {
+                            if (d1==x) ++deriv_order[x];
+                            if (d2==x) ++deriv_order[x];
+                            if (d3==x) ++deriv_order[x];
+                            if (d4==x) ++deriv_order[x];
+                          }
+
+                        fourth_derivatives[k2][d1][d2][d3][d4] =
+                          v[0][ix][deriv_order[0]]
+                          * ((dim>1) ? v[1][iy][deriv_order[1]] : 1.)
+                          * ((dim>2) ? v[2][iz][deriv_order[2]] : 1.);
+                      }
             }
     }
 }

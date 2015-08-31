@@ -518,6 +518,64 @@ public:
                              const unsigned int component) const;
 
   /**
+   * Return the tensor of third derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. Since this finite element is
+   * always vector-valued, we return the value of the only non-zero component
+   * of the vector value of this shape function. If the shape function has
+   * more than one non-zero component (which we refer to with the term non-
+   * primitive), then throw an exception of type @p
+   * ExcShapeFunctionNotPrimitive.
+   *
+   * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * @p FiniteElement (corresponding to the @p ith shape function) depend on
+   * the shape of the cell in real space.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the third derivatives of the @p componentth vector component of
+   * the @p ith shape function at the point @p p. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector valued in general, it relays the computation
+   * of these values to the base elements.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
+   * Return the tensor of fourth derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. Since this finite element is
+   * always vector-valued, we return the value of the only non-zero component
+   * of the vector value of this shape function. If the shape function has
+   * more than one non-zero component (which we refer to with the term non-
+   * primitive), then throw an exception of type @p
+   * ExcShapeFunctionNotPrimitive.
+   *
+   * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * @p FiniteElement (corresponding to the @p ith shape function) depend on
+   * the shape of the cell in real space.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the fourth derivatives of the @p componentth vector component of
+   * the @p ith shape function at the point @p p. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector valued in general, it relays the computation
+   * of these values to the base elements.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
    * <tt>source.dofs_per_cell</tt>.

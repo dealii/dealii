@@ -162,6 +162,50 @@ public:
                                                    const Point<dim> &p,
                                                    const unsigned int component) const;
 
+  /**
+   * Return the tensor of third derivatives of the <tt>i</tt>th shape
+   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the third derivative of the <tt>component</tt>th vector component
+   * of the <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
+   *
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the <tt>_component</tt> suffix were called, provided
+   * that the specified component is zero.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
+   * Return the tensor of fourth derivatives of the <tt>i</tt>th shape
+   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the fourth derivative of the <tt>component</tt>th vector component
+   * of the <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
+   *
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the <tt>_component</tt> suffix were called, provided
+   * that the specified component is zero.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
 protected:
   /*
    * NOTE: The following function has its definition inlined into the class declaration
@@ -194,6 +238,8 @@ protected:
     std::vector<double> values(0);
     std::vector<Tensor<1,dim> > grads(0);
     std::vector<Tensor<2,dim> > grad_grads(0);
+    std::vector<Tensor<3,dim> > third_derivatives(0);
+    std::vector<Tensor<4,dim> > fourth_derivatives(0);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -235,7 +281,7 @@ protected:
       for (unsigned int i=0; i<n_q_points; ++i)
         {
           poly_space.compute(quadrature.point(i),
-                             values, grads, grad_grads);
+                             values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
           if (flags & update_values)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)

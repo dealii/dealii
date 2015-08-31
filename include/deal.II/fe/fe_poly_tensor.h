@@ -204,6 +204,8 @@ protected:
     std::vector<Tensor<1,dim> > values(0);
     std::vector<Tensor<2,dim> > grads(0);
     std::vector<Tensor<3,dim> > grad_grads(0);
+    std::vector<Tensor<4,dim> > third_derivatives(0);
+    std::vector<Tensor<5,dim> > fourth_derivatives(0);
 
     data->sign_change.resize (this->dofs_per_cell);
 
@@ -258,7 +260,9 @@ protected:
       for (unsigned int k=0; k<n_q_points; ++k)
         {
           poly_space.compute(quadrature.point(k),
-                             values, grads, grad_grads);
+                             values, grads, grad_grads,
+                             third_derivatives,
+                             fourth_derivatives);
 
           if (flags & update_values)
             {
