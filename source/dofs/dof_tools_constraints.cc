@@ -2098,10 +2098,13 @@ namespace DoFTools
         const unsigned int n_dofs_per_face =
           face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
-               matrix.m() == (int)spacedim,
-               ExcMessage ("matrix must have either size 0 or spacedim or the "
-                           "size must be equal to the # of DoFs on the face"));
+        Assert(matrix.m() == 0
+               || (first_vector_components.empty() && matrix.m() == n_dofs_per_face)
+               || (!first_vector_components.empty() && matrix.m() == (int)spacedim),
+               ExcMessage ("The matrix must have either size 0 or spacedim "
+                           "(if first_vector_components is nonempty) "
+                           "or the size must be equal to the # of DoFs on the face "
+                           "(if first_vector_components is empty)."));
       }
 
     if (!face_2->has_children())
@@ -2110,10 +2113,13 @@ namespace DoFTools
         const unsigned int n_dofs_per_face =
           face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
-               matrix.m() == (int)spacedim,
-               ExcMessage ("matrix must have either size 0 or spacedim or the "
-                           "size must be equal to the # of DoFs on the face"));
+        Assert(matrix.m() == 0
+               || (first_vector_components.empty() && matrix.m() == n_dofs_per_face)
+               || (!first_vector_components.empty() && matrix.m() == (int)spacedim),
+               ExcMessage ("The matrix must have either size 0 or spacedim "
+                           "(if first_vector_components is nonempty) "
+                           "or the size must be equal to the # of DoFs on the face "
+                           "(if first_vector_components is empty)."));
       }
 #endif
 
