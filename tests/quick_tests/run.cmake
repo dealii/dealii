@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015 by the deal.II authors
+## Copyright (C) 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -34,6 +34,16 @@ to the mailing list linked at http://www.dealii.org\n"
     )
 
   FOREACH(test ${ALL_TESTS})  
+    IF (${test} MATCHES "^affinity" AND NOT EXISTS ${test}-OK)
+      MESSAGE("
+The affinity test can fail when you are linking in a library like BLAS
+which uses OpenMP. Even without calling any BLAS functions, OpenMP messes
+with the thread affinity which causes TBB to run single-threaded only. You
+can fix this by exporting OMP_NUM_THREADS=1. Also see GOMP_CPU_AFFINITY 
+and OMP_PROC_BIND.\n"
+        )
+    ENDIF()
+
     IF (${test} MATCHES "^step-petsc" AND NOT EXISTS ${test}-OK)
       MESSAGE("
 Additional information about PETSc issues is available
