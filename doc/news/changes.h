@@ -114,14 +114,23 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: When available, deal.II now uses the "gold" linker, a
+  reimplementation of the traditional Unix "ld" linker that is substantially
+  faster. This reduces build and, in particular, test turnaround times.
+  <br>
+  (Wolfgang Bangerth, Matthias Maier, 2015/09/06)
+  </li>
+
   <li> Improved: Allow continuation lines in ParameterHandler.
   <br>
   (Alberto Sartori, 2015/09/04)
+  </li>
 
   <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
   was computed incorrectly.
   <br>
   (Timo Heister, 2015/08/31)
+  </li>
 
   <li> Improved: The testsuite now supports multiple comparison files.
   Apart from the main comparison file that ends in
@@ -129,8 +138,8 @@ inconvenience this causes.
   <code>[...].output.[string]</code> are considered for comparison.
   <br>
   (Matthias Maier, 2015/08/29)
-
   </li>
+  
   <li> New: A class BlockLinearOperator has been introduced that extends
   the LinearOperator concept to block structures. A BlockLinearOperator can
   be sliced back to a LinearOperator.

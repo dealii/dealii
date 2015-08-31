@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,6 +44,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
+
+#
+# Use the 'gold' linker if possible, given that it's substantially faster.
+#
+ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
 
 #
 # Set ansi mode:
