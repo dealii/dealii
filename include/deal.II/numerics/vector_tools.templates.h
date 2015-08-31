@@ -6326,10 +6326,9 @@ namespace VectorTools
                                   "with at least 'dim' components. In that case, this function "
                                   "will take the divergence of the first 'dim' components."));
               double sum = 0;
-              // take the trace of the derivatives, square it, multiply it
-              // with the weight function
+              // take the trace of the derivatives scaled by the weight and square it
               for (unsigned int k=0; k<dim; ++k)
-                sum += data.psi_grads[q][k][k] * data.weight_vectors[q](k);
+                sum += data.psi_grads[q][k][k] * std::sqrt(data.weight_vectors[q](k));
               diff += sum * sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
