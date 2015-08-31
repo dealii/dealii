@@ -240,6 +240,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Introduce an option for FE_Nothing to dominate any other FE.
+  Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
+  we will force the traces of the two functions to be the same. Because the
+  FE_Nothing encodes a space that is zero everywhere, this means that the Q1
+  field will be forced to become zero at this interface.
+  <br>
+  (Denis Davydov, 2015/08/31)
+  </li>
+
   <li> New: Jacobian second and third derivatives are now computed by the mapping classes and can be
   accessed through FEValues in much the same way as the Jacobian and Jacobian gradient.
   <br>
