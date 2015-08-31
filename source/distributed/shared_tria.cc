@@ -96,13 +96,8 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::~Triangulation ()
+      :
+      dealii::parallel::Triangulation<dim,spacedim>(MPI_COMM_SELF)
     {
       Assert (false, ExcNotImplemented());
     }

@@ -121,7 +121,7 @@ namespace parallel
      * library even if it is disabled.
      *
      * Since the constructor of this class is private, no such objects
-     * can actually be created if we don't have p4est available.
+     * can actually be created if MPI is not available.
      */
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
@@ -131,13 +131,6 @@ namespace parallel
        * Constructor.
        */
       Triangulation ();
-    public:
-
-      /**
-       * Destructor.
-       */
-      virtual ~Triangulation ();
-
     };
   }
 
