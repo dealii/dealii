@@ -91,7 +91,21 @@ MESSAGE("===============================   OUTPUT BEGIN  =======================
 
 IF("${_stage}" STREQUAL "PASSED")
   STRING(REGEX REPLACE ".*\\/" "" _test ${TEST})
-  FILE(READ ${BINARY_DIR}/${_test}/diff _diff)
+  #
+  # MPI tests have a special runtime directory so rename:
+  # test.mpirun=X.BUILD -> test.BUILD/mpirun=X
+  #
+  STRING(REGEX REPLACE "\\.(mpirun=[0-9]+)(\\..*)" "\\2/\\1" _test ${_test})
+  #
+  # Also output the diff file if we guessed the location correctly. This is
+  # solely for cosmetic reasons: The diff file is either empty (if
+  # comparison against the main comparison file was successful) or contains
+  # a string explaining which comparison file variant succeeded.
+  #
+  SET(_diff "")
+  IF(EXISTS ${BINARY_DIR}/${_test}/diff)
+    FILE(READ ${BINARY_DIR}/${_test}/diff _diff)
+  ENDIF()
   MESSAGE("${_diff}${TEST}: PASSED.")
 
 ELSE()
