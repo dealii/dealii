@@ -13,8 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
+/*
+  Test that OpenMP is not messing with thread affinity, which will stop TBB
+  from creating threads.
+ */
+
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/utilities.h>
 #include <stdio.h>
 
 #if defined(__linux__)
@@ -50,6 +57,26 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
   return true;
 }
 
+int get_num_thread_env()
+{
+  const char *penv = getenv ("DEAL_II_NUM_THREADS");
+  if (penv!=NULL)
+    {
+      int max_threads_env = -1;
+      try
+	{
+	  max_threads_env = dealii::Utilities::string_to_int(std::string(penv));
+	}
+      catch (...)
+	{
+	  return -1;
+	}
+      return max_threads_env;
+    }
+
+  return -1;
+}
+
 
 int main ()
 {
@@ -62,13 +89,19 @@ int main ()
 
   unsigned int nprocs = dealii::MultithreadInfo::n_cores();
   unsigned int tbbprocs = dealii::MultithreadInfo::n_threads();
-  printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d\n",
-	 bits_set, mask, nprocs, tbbprocs );
+  int env = get_num_thread_env();
+  printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
+	 bits_set, mask, nprocs, tbbprocs, env );
 
   if (bits_set !=0  && bits_set!=nprocs)
     {
       printf("Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",bits_set, nprocs);
       return 2;
+    }
+  if (env != -1 && nprocs != tbbprocs)
+    {
+      printf("Warning: number of threads is set to %d in envirnoment using DEAL_II_NUM_THREADS.\n", env);
+      return 0; // do not return an error!
     }
   if (nprocs != tbbprocs)
     {
