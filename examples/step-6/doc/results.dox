@@ -167,6 +167,9 @@ the call to <code>DoFHandler::clear()</code>.
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+<h4>Solvers and preconditioners</h4>
+
+
 One thing that is always worth playing around with if one solves
 problems of appreciable size (much bigger than the one we have here)
 is to try different solvers or preconditioners. In the current case,
@@ -203,8 +206,8 @@ thresholding or strengthening of the diagonal.
 
 Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
-<code>solver_control.last_step()</code> call, see @ref step_4
-"step-4") as well as CPU time needed (using the Timer class,
+<code>solver_control.last_step()</code> call, see
+step-4) as well as CPU time needed (using the Timer class,
 discussed, for example, in step-12) and get the
 following results (left: iterations; right: CPU time):
 
@@ -226,7 +229,7 @@ O}(N^{1/2})$ and because each iteration requires around ${\cal
 O}(N)$ operations the total CPU time grows like ${\cal
 O}(N^{3/2})$ (for the few smallest meshes, the CPU time is so small
 that it doesn't record). Note that even though it is the simplest
-method, Jacobi is the fastest for this problem.
+method, Jacobi is the fastest for this problem. 
 
 The situation changes slightly when the finite element is not a
 bi-quadratic one as set in the constructor of this program, but a
@@ -247,7 +250,11 @@ bi-linear one. If one makes this change, the results are as follows:
 In other words, while the increase in iterations and CPU time is as
 before, Jacobi is now the method that requires the most iterations; it
 is still the fastest one, however, owing to the simplicity of the
-operations it has to perform.
+operations it has to perform. This is not to say that Jacobi
+is actually a good preconditioner -- for problems of appreciable size, it is
+definitely not, and other methods will be substantially better -- but really
+only that it is fast because its implementation is so simple that it can
+compensate for a larger number of iterations. 
 
 The message to take away from this is not that simplicity in
 preconditioners is always best. While this may be true for the current
@@ -258,15 +265,19 @@ lead to an increase in the number of iterations as the number $N$ of
 degrees of freedom grows, for example ${\cal O}(N^\alpha)$; this, in
 turn, leads to a total growth in effort as ${\cal O}(N^{1+\alpha})$
 since each iteration takes ${\cal O}(N)$ work. This behavior is
-undesirable, we would really like to solve linear systems with $N$
+undesirable: we would really like to solve linear systems with $N$
 unknowns in a total of ${\cal O}(N)$ work; there is a class
-of preconditioners that can achieve this, namely geometric (@ref
-step_16 "step-16") or algebraic (step-31) multigrid
+of preconditioners that can achieve this, namely geometric (step-16)
+or algebraic multigrid (step-31, step-40, and several others)
 preconditioners. They are, however, significantly more complex than
-the preconditioners outlined above. Finally, the last message to take
-home is that today (in 2008), linear systems with 100,000 unknowns are
+the preconditioners outlined above. 
+
+Finally, the last message to take
+home is that when the data shown above was generated (in 2008), linear
+systems with 100,000 unknowns are
 easily solved on a desktop machine in well under 10 seconds, making
 the solution of relatively simple 2d problems even to very high
 accuracy not that big a task as it used to be even in the recent
-past. Of course, the situation for 3d problems is entirely different.
-
+past. At the time, the situation for 3d problems was entirely different,
+but even that has changed substantially in the intervening time -- though
+solving problems in 3d to high accuracy remains a challenge.
