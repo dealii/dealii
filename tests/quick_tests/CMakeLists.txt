@@ -80,6 +80,11 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   make_quicktest("step" ${_build} "")
 ENDFOREACH()
 
+# Test whether thread affinity is well behaved
+IF (DEAL_II_WITH_THREADS)
+make_quicktest("affinity" ${_mybuild} "")
+ENDIF()
+
 # Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)
   make_quicktest("mpi" ${_mybuild} 2)
