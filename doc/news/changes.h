@@ -114,6 +114,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
+  was computed incorrectly.
+  <br>
+  (Timo Heister, 2015/08/31)
+
   <li> Improved: The testsuite now supports multiple comparison files.
   Apart from the main comparison file that ends in
   <code>[...].output</code> all files of the form

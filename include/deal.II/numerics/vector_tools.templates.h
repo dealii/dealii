@@ -6218,6 +6218,8 @@ namespace VectorTools
         }
 
       double diff = 0;
+
+      // First work on function values:
       switch (norm)
         {
         case mean:
@@ -6245,7 +6247,7 @@ namespace VectorTools
               diff += sum * fe_values.JxW(q);
             }
 
-          // Compute the root only, if no derivative values are added later
+          // Compute the root only if no derivative values are added later
           if (!(update_flags & update_gradients))
             diff = std::pow(diff, 1./exponent);
           break;
@@ -6275,8 +6277,10 @@ namespace VectorTools
           break;
 
         case H1_seminorm:
+        case Hdiv_seminorm:
         case W1p_seminorm:
         case W1infty_seminorm:
+          // function values are not used for these norms
           break;
 
         default:
@@ -6284,6 +6288,7 @@ namespace VectorTools
           break;
         }
 
+      // Now compute terms depending on derivatives:
       switch (norm)
         {
         case W1p_seminorm:
@@ -6321,12 +6326,10 @@ namespace VectorTools
                                   "with at least 'dim' components. In that case, this function "
                                   "will take the divergence of the first 'dim' components."));
               double sum = 0;
-              // take the trace of the derivatives, square it, multiply it
-              // with the weight function
+              // take the trace of the derivatives scaled by the weight and square it
               for (unsigned int k=0; k<dim; ++k)
-                sum += (data.psi_grads[q][k][k] * data.psi_grads[q][k][k]) *
-                       data.weight_vectors[q](k);
-              diff += sum * fe_values.JxW(q);
+                sum += data.psi_grads[q][k][k] * std::sqrt(data.weight_vectors[q](k));
+              diff += sum * sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
           break;
