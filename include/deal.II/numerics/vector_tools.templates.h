@@ -6329,9 +6329,8 @@ namespace VectorTools
               // take the trace of the derivatives, square it, multiply it
               // with the weight function
               for (unsigned int k=0; k<dim; ++k)
-                sum += (data.psi_grads[q][k][k] * data.psi_grads[q][k][k]) *
-                       data.weight_vectors[q](k);
-              diff += sum * fe_values.JxW(q);
+                sum += data.psi_grads[q][k][k] * data.weight_vectors[q](k);
+              diff += sum * sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
           break;
