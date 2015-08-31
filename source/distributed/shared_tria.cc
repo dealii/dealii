@@ -95,7 +95,8 @@ namespace parallel
   namespace shared
   {
     template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::Triangulation ()
+    Triangulation<dim,spacedim>::Triangulation ():
+      dealii::parallel::Triangulation<dim,spacedim>(0)
     {
       Assert (false, ExcNotImplemented());
     }
