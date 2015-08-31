@@ -188,6 +188,31 @@ namespace hp
     bool hp_constraints_are_implemented () const;
 
     /**
+     * Try to find a least dominant finite element inside this FECollection
+     * which dominates other finite elements provided as fe_indices in @p fes .
+     * For example, if FECollection consists of {Q1,Q2,Q3,Q4} and we are looking
+     * for the least dominant FE for Q3 and Q4 (@p fes is {2,3}), then the
+     * answer is Q3 and therefore this function will return its index in
+     * FECollection, namely 2.
+     *
+     * If we were not able to find a finite element, the function returns
+     * numbers::invalid_unsigned_int .
+     *
+     * Note that for the cases like when FECollection consists of
+     * {FE_Nothing x FE_Nothing, Q1xQ2, Q2xQ1} with @p fes = {1}, the function
+     * will not find the most dominating element as the default behavior of
+     * FE_Nothing is to return FiniteElementDomination::no_requirements when
+     * comparing for face domination. This, therefore, can't be considered as a
+     * dominating element in the sense defined in FiniteElementDomination .
+     *
+     * Finally, for the purpose of this function we consider that an element
+     * dominates itself. Thus if FECollection contains {Q1,Q2,Q4,Q3} and @p fes
+     * = {3}, the function returns 3.
+     */
+    unsigned int
+    find_least_face_dominating_fe (const std::set<unsigned int> &fes) const;
+
+    /**
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the one component is true that
      * corresponds to the given argument.
