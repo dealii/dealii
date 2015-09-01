@@ -246,6 +246,13 @@ inconvenience this causes.
   <br>
   (Denis Davydov, Wolfgang Bangerth, 2015/08/31)
   </li>
+  
+  <li> New: step-6 now has an additional subsection in the
+  "Possibilities for extensions" section that discusses how
+  to create a better mesh.
+  <br>
+  (Konstantin Ladutenko, Wolfgang Bangerth, 2015/08/31)
+  </li>
 
   <li> New: Introduce an option for FE_Nothing to dominate any other FE.
   Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
@@ -261,7 +268,6 @@ inconvenience this causes.
   <br>
   (Maien Hamed, 2015/08/28-2015/08/31)
   </li>
-
 
   <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
   that determine which cells form a layer around a specified subdomain. There is also a function
