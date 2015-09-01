@@ -584,7 +584,7 @@ ComponentSelectFunction<dim, Number>::memory_consumption () const
           + ConstantFunction<dim, Number>::memory_consumption());
 }
 
-+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 template <int dim, typename Number>
 ScalarFunctionFromFunctionObject<dim, Number>::
