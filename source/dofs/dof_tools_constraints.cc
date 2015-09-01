@@ -1083,6 +1083,27 @@ namespace DoFTools
         }
     }
 
+    namespace internal
+    {
+      /**
+       * get FECollection
+       */
+      template <int dim, int spacedim>
+      const dealii::hp::FECollection<dim,spacedim> *
+      get_fe_collection (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler)
+      {
+        return &dof_handler.get_fe();
+      }
+
+      template <int dim, int spacedim>
+      const dealii::hp::FECollection<dim,spacedim> *
+      get_fe_collection (const dealii::DoFHandler<dim,spacedim> &dof_handler)
+      {
+        AssertThrow(false, ExcInternalError());
+        return NULL;
+      }
+    }
+
 
     template <class DH>
     void
@@ -1584,12 +1605,149 @@ namespace DoFTools
 
                       case FiniteElementDomination::neither_element_dominates:
                       {
-                        // we don't presently know what exactly to do here.
-                        // it isn't quite clear what exactly we would have
-                        // to do here. sit tight until someone trips over
-                        // the following statement and see what exactly is
-                        // going on
-                        Assert (false, ExcNotImplemented());
+                        // make sure we don't get here twice from each cell
+                        if (cell < neighbor)
+                          break;
+
+                        // our best bet is to find the common space among other
+                        // FEs in FECollection and then constrain both FEs
+                        // to that one.
+                        // More precisely, we follow the strategy outlined on
+                        // page 17 of the hp paper:
+                        // First we find the dominant FE space S.
+                        // Then we divide our dofs in master and slave such that
+                        // I^{face,master}_{S^{face}->S} is invertible.
+                        // And finally constrain slave dofs to master dofs based
+                        // on the interpolation matrix.
+
+                        const unsigned int this_fe_index = cell->active_fe_index();
+                        const unsigned int neighbor_fe_index = neighbor->active_fe_index();
+                        std::set<unsigned int> fes;
+                        fes.insert(this_fe_index);
+                        fes.insert(neighbor_fe_index);
+                        const dealii::hp::FECollection<dim,spacedim> &fe_collection =
+                          *internal::get_fe_collection (dof_handler);
+                        const unsigned int dominating_fe_index = fe_collection.find_least_face_dominating_fe(fes);
+
+                        AssertThrow(dominating_fe_index != numbers::invalid_unsigned_int,
+                                    ExcMessage("could not find the dominating FE for "
+                                               +cell->get_fe().get_name()
+                                               +" and "
+                                               +neighbor->get_fe().get_name()
+                                               +" inside FECollection"));
+
+                        const FiniteElement<dim,spacedim> &dominating_fe = fe_collection[dominating_fe_index];
+
+                        // TODO: until we hit the second face, the code is
+                        // a copy-paste from h-refinement case...
+
+                        // first get the interpolation matrix from main FE
+                        // to the virtual dofs
+                        Assert (dominating_fe.dofs_per_face <=
+                                cell->get_fe().dofs_per_face,
+                                ExcInternalError());
+
+                        ensure_existence_of_face_matrix
+                        (dominating_fe,
+                         cell->get_fe(),
+                         face_interpolation_matrices
+                         [dominating_fe_index][cell->active_fe_index()]);
+
+                        // split this matrix into master and slave components.
+                        // invert the master component
+                        ensure_existence_of_master_dof_mask
+                        (cell->get_fe(),
+                         dominating_fe,
+                         (*face_interpolation_matrices
+                          [dominating_fe_index]
+                          [cell->active_fe_index()]),
+                         master_dof_masks
+                         [dominating_fe_index]
+                         [cell->active_fe_index()]);
+
+                        ensure_existence_of_split_face_matrix
+                        (*face_interpolation_matrices
+                         [dominating_fe_index][cell->active_fe_index()],
+                         (*master_dof_masks
+                          [dominating_fe_index][cell->active_fe_index()]),
+                         split_face_interpolation_matrices
+                         [dominating_fe_index][cell->active_fe_index()]);
+
+                        const FullMatrix<double> &restrict_mother_to_virtual_master_inv
+                          = (split_face_interpolation_matrices
+                             [dominating_fe_index][cell->active_fe_index()]->first);
+
+                        const FullMatrix<double> &restrict_mother_to_virtual_slave
+                          = (split_face_interpolation_matrices
+                             [dominating_fe_index][cell->active_fe_index()]->second);
+
+                        // now compute the constraint matrix as the product
+                        // between the inverse matrix and the slave part
+                        constraint_matrix.reinit (cell->get_fe().dofs_per_face -
+                                                  dominating_fe.dofs_per_face,
+                                                  dominating_fe.dofs_per_face);
+                        restrict_mother_to_virtual_slave
+                        .mmult (constraint_matrix,
+                                restrict_mother_to_virtual_master_inv);
+
+                        // then figure out the global numbers of master and
+                        // slave dofs and apply constraints
+                        scratch_dofs.resize (cell->get_fe().dofs_per_face);
+                        cell->face(face)->get_dof_indices (scratch_dofs,
+                                                           cell->active_fe_index ());
+
+                        // split dofs into master and slave components
+                        master_dofs.clear ();
+                        slave_dofs.clear ();
+                        for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+                          if ((*master_dof_masks
+                               [dominating_fe_index][cell->active_fe_index()])[i] == true)
+                            master_dofs.push_back (scratch_dofs[i]);
+                          else
+                            slave_dofs.push_back (scratch_dofs[i]);
+
+                        AssertDimension (master_dofs.size(), dominating_fe.dofs_per_face);
+                        AssertDimension (slave_dofs.size(),
+                                         cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
+
+                        filter_constraints (master_dofs,
+                                            slave_dofs,
+                                            constraint_matrix,
+                                            constraints);
+
+                        // now do the same for another FE
+                        // this is pretty much the same we do above to
+                        // resolve h-refinement constraints
+                        Assert (dominating_fe.dofs_per_face <=
+                                neighbor->get_fe().dofs_per_face,
+                                ExcInternalError());
+
+                        ensure_existence_of_face_matrix
+                        (dominating_fe,
+                         neighbor->get_fe(),
+                         face_interpolation_matrices
+                         [dominating_fe_index][neighbor->active_fe_index()]);
+
+                        const FullMatrix<double> &restrict_secondface_to_virtual
+                          = *(face_interpolation_matrices
+                              [dominating_fe_index][neighbor->active_fe_index()]);
+
+                        constraint_matrix.reinit (neighbor->get_fe().dofs_per_face,
+                                                  dominating_fe.dofs_per_face);
+
+                        restrict_secondface_to_virtual
+                        .mmult (constraint_matrix,
+                                restrict_mother_to_virtual_master_inv);
+
+                        slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+                        cell->face(face)->get_dof_indices (slave_dofs,
+                                                           neighbor->active_fe_index ());
+
+                        filter_constraints (master_dofs,
+                                            slave_dofs,
+                                            constraint_matrix,
+                                            constraints);
+
                         break;
                       }
 
