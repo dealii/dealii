@@ -2397,9 +2397,10 @@ next_cell:
         for (unsigned int c=0; c<object->n_children(); ++c)
           for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
             for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
-              old_min_product = std::min (old_min_product,
-                                          child_alternating_forms[c][i] *
-                                          parent_alternating_forms[j]);
+              old_min_product =
+                std::min<double> (old_min_product,
+                                  child_alternating_forms[c][i] *
+                                  parent_alternating_forms[j]);
 
         // for the new minimum value,
         // replace mid-object
@@ -2419,9 +2420,10 @@ next_cell:
         for (unsigned int c=0; c<object->n_children(); ++c)
           for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
             for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
-              new_min_product = std::min (new_min_product,
-                                          child_alternating_forms[c][i] *
-                                          parent_alternating_forms[j]);
+              new_min_product =
+                std::min<double> (new_min_product,
+                                  child_alternating_forms[c][i] *
+                                  parent_alternating_forms[j]);
 
         // if new minimum value is
         // better than before, then set the
