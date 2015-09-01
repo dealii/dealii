@@ -40,17 +40,9 @@ fi
 
 
 
-# loop over all directories in which we may have source files;
-# collect a list of files and then spawn a parallel process to
-# indent all of them
+# collect all header and source files and process them in batches of 50 files
+# with up to 10 in parallel
 echo "--- Indenting all deal.II header and source files"
-for dir in tests include/deal.II/* source/* examples ; do
-  files=`find $dir | egrep '\.(cc|h)$'` ;
-  if test -n "$files" ; then
-    (astyle --options=contrib/utilities/astyle.rc $files ) &
-  fi
-done
 
-# now wait for all of these processes to finish
-wait
+find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
 
