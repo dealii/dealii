@@ -74,7 +74,6 @@ namespace LAPACKSupport
       default:
         return "unknown";
       }
-    return "internal error";
   }
 
   /**
