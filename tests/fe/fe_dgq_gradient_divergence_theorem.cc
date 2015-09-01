@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,14 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Observe how the values of the shape functions change as we make a
-// cell smaller and smaller. Evaluate the values with FEFaceValues, to
-// make sure the values scale as in rt_10 where we used FEValues
-//
-// the test used to fail because of the issue with computing the
-// normals using FEFaceValue, where FEFaceValue by accident uses the
-// *face* mapping, not the *cell* mapping to compute the Piola
-// transform (leading to a missing power of h in the determinant)
+// check the correctness of fe_values.shape_gradient for FE_DGQ by comparing
+// the integral of all shape gradients with the flux over the boundary by the
+// divergence theorem
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -85,7 +80,12 @@ void test (const Triangulation<dim> &tr,
 
 		deallog << "Cell nodes:" << std::endl;
 		for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-			deallog << i << ": (" << cell->vertex(i) << ")" << std::endl;
+                  {
+                    deallog << i << ": ( ";
+                    for (unsigned int d=0; d<dim; ++d)
+                      deallog << cell->vertex(i)[d] << " ";
+                    deallog << ")" << std::endl;
+                  }
 
 		bool cell_ok = true;
 
@@ -167,4 +167,3 @@ int main()
 
 	deallog << "done..." << std::endl;
 }
-

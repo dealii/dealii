@@ -14,8 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Integrate the derivatives in the interior and compare the result to the
-// integral of the values on the boundary.
+// check the correctness of fe_values.shape_gradient for FE_RaviartThomas by
+// comparing the integral of all shape gradients with the flux over the
+// boundary by the divergence theorem
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -79,7 +80,12 @@ void test (const Triangulation<dim> &tr,
 
 		deallog << "Cell nodes:" << std::endl;
 		for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-			deallog << i << ": (" << cell->vertex(i) << ")" << std::endl;
+                  {
+                    deallog << i << ": ( ";
+                    for (unsigned int d=0; d<dim; ++d)
+                      deallog << cell->vertex(i)[d] << " ";
+                    deallog << ")" << std::endl;
+                  }
 
 		bool cell_ok = true;
 
@@ -166,5 +172,3 @@ int main()
 
 	deallog << "done..." << std::endl;
 }
-
-
