@@ -56,50 +56,50 @@ using namespace dealii;
 // we put this into a namespace to not conflict with stdlib
 namespace Testing
 {
-int rand(bool reseed=false, int seed=1) throw()
-{
-  static int r[32];
-  static int k;
-  static bool inited=false;
-  if (!inited || reseed)
-    {
-      //srand treats a seed 0 as 1 for some reason
-      r[0]=(seed==0)?1:seed;
+  int rand(bool reseed=false, int seed=1) throw()
+  {
+    static int r[32];
+    static int k;
+    static bool inited=false;
+    if (!inited || reseed)
+      {
+        //srand treats a seed 0 as 1 for some reason
+        r[0]=(seed==0)?1:seed;
 
-      for (int i=1; i<31; i++)
-        {
-          r[i] = (16807LL * r[i-1]) % 2147483647;
-          if (r[i] < 0)
-            r[i] += 2147483647;
-        }
-      k=31;
-      for (int i=31; i<34; i++)
-        {
-          r[k%32] = r[(k+32-31)%32];
-          k=(k+1)%32;
-        }
+        for (int i=1; i<31; i++)
+          {
+            r[i] = (16807LL * r[i-1]) % 2147483647;
+            if (r[i] < 0)
+              r[i] += 2147483647;
+          }
+        k=31;
+        for (int i=31; i<34; i++)
+          {
+            r[k%32] = r[(k+32-31)%32];
+            k=(k+1)%32;
+          }
 
-      for (int i=34; i<344; i++)
-        {
-          r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
-          k=(k+1)%32;
-        }
-      inited=true;
-      if (reseed==true)
-        return 0;// do not generate new no
-    }
+        for (int i=34; i<344; i++)
+          {
+            r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+            k=(k+1)%32;
+          }
+        inited=true;
+        if (reseed==true)
+          return 0;// do not generate new no
+      }
 
-  r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
-  int ret = r[k%32];
-  k=(k+1)%32;
-  return (unsigned int)ret >> 1;
-}
+    r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+    int ret = r[k%32];
+    k=(k+1)%32;
+    return (unsigned int)ret >> 1;
+  }
 
 // reseed our random number generator
-void srand(int seed) throw()
-{
-  rand(true, seed);
-}
+  void srand(int seed) throw()
+  {
+    rand(true, seed);
+  }
 }
 
 
@@ -169,22 +169,22 @@ std::string unify_pretty_function (const std::string &text)
  */
 
 #define check_solver_within_range(SOLVER_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
-{                                                                              \
-  const unsigned int previous_depth = deallog.depth_file(0);                   \
-  SOLVER_COMMAND;                                                              \
-  deallog.depth_file(previous_depth);                                          \
-  const unsigned int steps = CONTROL_COMMAND;                                  \
-  if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \
-    {                                                                          \
-      deallog << "Solver stopped within " << MIN_ALLOWED << " - "              \
-              << MAX_ALLOWED << " iterations" << std::endl;                    \
-    }                                                                          \
-  else                                                                         \
-    {                                                                          \
-      deallog << "Solver stopped after " << steps << " iterations"             \
-              << std::endl;                                                    \
-    }                                                                          \
-}
+  {                                                                              \
+    const unsigned int previous_depth = deallog.depth_file(0);                   \
+    SOLVER_COMMAND;                                                              \
+    deallog.depth_file(previous_depth);                                          \
+    const unsigned int steps = CONTROL_COMMAND;                                  \
+    if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \
+      {                                                                          \
+        deallog << "Solver stopped within " << MIN_ALLOWED << " - "              \
+                << MAX_ALLOWED << " iterations" << std::endl;                    \
+      }                                                                          \
+    else                                                                         \
+      {                                                                          \
+        deallog << "Solver stopped after " << steps << " iterations"             \
+                << std::endl;                                                    \
+      }                                                                          \
+  }
 
 
 // ------------------------------ Functions used in initializing subsystems -------------------
@@ -198,7 +198,7 @@ std::string unify_pretty_function (const std::string &text)
  */
 inline unsigned int testing_max_num_threads()
 {
-    return 5;
+  return 5;
 }
 
 struct LimitConcurrency
@@ -225,23 +225,23 @@ namespace
     // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
     // it up in stageLog->classLog, make sure it has the same number of entries:
     Assert(stageLog->stageInfo->classLog->numClasses == stageLog->classLog->numClasses,
-	   dealii::ExcInternalError());
+           dealii::ExcInternalError());
 
     bool errors = false;
-    for (int i=0;i<stageLog->stageInfo->classLog->numClasses;++i)
+    for (int i=0; i<stageLog->stageInfo->classLog->numClasses; ++i)
       {
-	if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
-	    stageLog->stageInfo->classLog->classInfo[i].creations)
-	  {
-	    errors = true;
-	    std::cerr << "ERROR: PETSc objects leaking of type '"
-		      << stageLog->classLog->classInfo[i].name << "'"
-		      << " with "
-		      << stageLog->stageInfo->classLog->classInfo[i].creations
-		      << " creations and only "
-		      << stageLog->stageInfo->classLog->classInfo[i].destructions
-		      << " destructions." << std::endl;
-	  }
+        if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
+            stageLog->stageInfo->classLog->classInfo[i].creations)
+          {
+            errors = true;
+            std::cerr << "ERROR: PETSc objects leaking of type '"
+                      << stageLog->classLog->classInfo[i].name << "'"
+                      << " with "
+                      << stageLog->stageInfo->classLog->classInfo[i].creations
+                      << " creations and only "
+                      << stageLog->stageInfo->classLog->classInfo[i].destructions
+                      << " destructions." << std::endl;
+          }
       }
 
     if (errors)
@@ -449,7 +449,7 @@ struct EnableFPE
     // enable floating point exceptions
     feenableexcept(FE_DIVBYZERO|FE_INVALID);
 #endif
-    }
+  }
 } deal_II_enable_fpe;
 
 
