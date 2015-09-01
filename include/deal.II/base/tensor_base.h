@@ -1284,6 +1284,7 @@ Tensor<1,dim,Number>::memory_consumption ()
 }
 
 
+
 template <int dim, typename Number>
 template <class Archive>
 inline
@@ -1292,6 +1293,7 @@ void Tensor<1,dim,Number>::serialize(Archive &ar, const unsigned int)
   ar &values;
 }
 #endif // DOXYGEN
+
 
 
 /**
@@ -1346,61 +1348,26 @@ std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
 
 
 
-/**
- * Multiplication of a tensor of rank 1 with a scalar Number from the right.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-operator * (const Tensor<1,dim,Number> &t,
-            const Number                factor)
-{
-  Tensor<1,dim,Number> tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
-  return tt;
-}
-
-
-
-/**
- * Multiplication of a tensor of rank 1 with a scalar Number from the left.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-operator * (const Number                factor,
-            const Tensor<1,dim,Number> &t)
-{
-  Tensor<1,dim,Number> tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
-  return tt;
-}
-
-
 #ifndef DEAL_II_WITH_CXX11
 
-template <typename T, typename U, int dim>
-struct ProductType<T,Tensor<1,dim,U> >
+template <typename T, typename U, int rank, int dim>
+struct ProductType<T,Tensor<rank,dim,U> >
 {
-  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
 };
 
-template <typename T, typename U, int dim>
-struct ProductType<Tensor<1,dim,T>,U>
+template <typename T, typename U, int rank, int dim>
+struct ProductType<Tensor<rank,dim,T>,U>
 {
-  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
 };
 
 #endif
 
+
+
 /**
- * Multiplication of a tensor of rank 1 with a scalar number from the right.
+ * Multiplication of a tensor of rank with a scalar number from the right.
  *
  * The purpose of this operator is to enable only multiplication of a tensor
  * by a scalar number (i.e., a floating point number, a complex floating point
@@ -1421,160 +1388,71 @@ struct ProductType<Tensor<1,dim,T>,U>
  * you would get if you multiplied an individual component of the input tensor
  * by the scalar factor.
  *
- * @relates Tensor<1,dim,Number>
+ * @relates Tensor
  * @relates EnableIfScalar
  */
-template <int dim, typename Number, typename OtherNumber>
+template <int rank, int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
 inline
-Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
-operator * (const Tensor<1,dim,Number> &t,
-            const OtherNumber           factor)
+Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+operator * (const Tensor<rank,dim,Number> &t,
+            const OtherNumber              factor)
 {
-  // form the product. we have to convert the two factors into the final
-  // type via explicit casts because, for awkward reasons, the C++
-  // standard committee saw it fit to not define an
-  //   operator*(float,std::complex<double>)
-  // (as well as with switched arguments and double<->float).
-  typedef typename ProductType<Number,OtherNumber>::type product_type;
-  Tensor<1,dim,product_type> tt (false);
+  // recurse over the base objects
+  Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
-    tt[d] = product_type(t[d]) * product_type(factor);
+    tt[d] = t[d] * factor;
   return tt;
 }
 
 
 
 /**
- * Multiplication of a tensor of rank 1 with a scalar number from the left.
- * See the discussion with the operator with switched arguments for more
+ * Multiplication of a tensor of general rank with a scalar number from the
+ * left. See the discussion with the operator with switched arguments for more
  * information about template arguments and the return type.
  *
- * @relates Tensor<1,dim,Number>
+ * @relates Tensor
  * @relates EnableIfScalar
  */
-template <int dim, typename Number, typename OtherNumber>
+template <int rank, int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
 inline
-Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
-operator * (const Number                     factor,
-            const Tensor<1,dim,OtherNumber> &t)
+Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+operator * (const Number                        factor,
+            const Tensor<rank,dim,OtherNumber> &t)
 {
-  // simply forward to the other operator with switched arguments
-  return (t*factor);
+  // simply forward to the operator above
+  return t * factor;
 }
 
 
 
 /**
- * Division of a tensor of rank 1 by a scalar Number.
+ * Division of a tensor of general rank with a scalar number. See the
+ * discussion on operator*() above for more information about template
+ * arguments and the return type.
  *
- * @relates Tensor<1,dim,Number>
+ * @relates Tensor
+ * @relates EnableIfScalar
  */
-template <int dim, typename Number>
+template <int rank, int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
 inline
-Tensor<1,dim,Number>
-operator / (const Tensor<1,dim,Number> &t,
-            const Number                factor)
+Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+operator / (const Tensor<rank,dim,Number> &t,
+            const OtherNumber              factor)
 {
-  Tensor<1,dim,Number> tt (false);
+  // recurse over the base objects
+  Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] / factor;
-  return tt;
-}
-
-
-
-/**
- * Multiplication of a tensor of rank 1 with a scalar double from the right.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim>
-inline
-Tensor<1,dim>
-operator * (const Tensor<1,dim> &t,
-            const double         factor)
-{
-  Tensor<1,dim> tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
-  return tt;
-}
-
-
-
-/**
- * Multiplication of a tensor of rank 1 with a scalar double from the left.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim>
-inline
-Tensor<1,dim>
-operator * (const double         factor,
-            const Tensor<1,dim> &t)
-{
-  Tensor<1,dim> tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
-  return tt;
-}
-
-
-
-/**
- * Division of a tensor of rank 1 by a scalar double.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim>
-inline
-Tensor<1,dim>
-operator / (const Tensor<1,dim> &t,
-            const double         factor)
-{
-  Tensor<1,dim> tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] / factor;
-  return tt;
-}
-
-
-
-/**
- * Multiplication of a tensor of rank 1 by a scalar complex<double> from the
- * right.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim>
-inline
-Tensor<1,dim,std::complex<double> >
-operator * (const Tensor<1,dim>        &t,
-            const std::complex<double>  factor)
-{
-  Tensor<1,dim,std::complex<double> > tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
-  return tt;
-}
-
-
-
-/**
- * Multiplication of a tensor of rank 1 by a scalar complex<double> from the
- * left.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim>
-inline
-Tensor<1,dim,std::complex<double> >
-operator * (const std::complex<double>  factor,
-            const Tensor<1,dim>        &t)
-{
-  Tensor<1,dim,std::complex<double> > tt (false);
-  for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
   return tt;
 }
 
