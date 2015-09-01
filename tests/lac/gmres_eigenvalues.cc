@@ -53,8 +53,8 @@ void test (unsigned int variant)
           matrix(i,i+1) = 1.5+i;
         if (i<n-2)
           matrix(i,i+2) = -1.65;
-	matrix(i,n-1) = 2.;
-	matrix(n-1,i) = -2.;
+        matrix(i,n-1) = 2.;
+        matrix(n-1,i) = -2.;
       }
   else
     Assert(false, ExcMessage("Invalid variant"));

@@ -45,7 +45,7 @@ void test(std::ostream & /*out*/)
     gi.attach_triangulation (tr);
     std::ifstream in (SOURCE_DIR "/../grid/grid_in_3d/4.in");
     gi.read_xda (in);
-				     //tr.refine_global (1);
+    //tr.refine_global (1);
   }
 
   {
@@ -53,7 +53,7 @@ void test(std::ostream & /*out*/)
     gi.attach_triangulation (tr2);
     std::ifstream in (SOURCE_DIR "/../grid/grid_in_3d/4.in");
     gi.read_xda (in);
-				     //tr2.refine_global (1);
+    //tr2.refine_global (1);
   }
 
   Assert (tr.n_active_cells() == tr2.n_active_cells(),

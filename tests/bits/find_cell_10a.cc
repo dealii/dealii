@@ -91,7 +91,7 @@ void test()
 {
   deallog << std::scientific;
   deallog.precision(16);
-  
+
   Point< 2 > ePos;
   ePos(0) = 0.0653630060373507487669897386695;
   ePos(1) = 1125.59175030825804242340382189;
@@ -103,12 +103,12 @@ void test()
   create_coarse_grid(triangulation); // first Tria with just one cell
 
   Triangulation<2>::active_cell_iterator it = triangulation.begin();
-				   
+
   Point<2> p;
   p = mapping.transform_real_to_unit_cell(it, ePos);
   deallog << "A: " << p << std::endl;
 
-				   // throws:
+  // throws:
   p = mapping2.transform_real_to_unit_cell(it, ePos);
   deallog << "B: " << p << std::endl;
 

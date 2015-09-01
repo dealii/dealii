@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2015 by the deal.II authors 
+//    Copyright (C) 2014 - 2015 by the deal.II authors
 //
 //    This file is subject to LGPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -39,30 +39,30 @@
 
 using namespace OpenCASCADE;
 
-int main () 
+int main ()
 {
   std::ofstream logfile("output");
 
   gp_Pnt center(.5,.5,.5);
   Standard_Real radius(Point<3>().distance(point(center)));
 
-  
+
   TopoDS_Face face = BRepPrimAPI_MakeSphere(center, radius);
-  
-				   // Create a boundary projector.
+
+  // Create a boundary projector.
   NormalProjectionBoundary<3,3> sphere(face);
-  
-  
-				   // The unit cube.
+
+
+  // The unit cube.
   Triangulation<3,3> tria;
   GridGenerator::hyper_cube(tria);
 
-				   // Set the exterior boundary
+  // Set the exterior boundary
   tria.set_manifold(1, sphere);
 
-				   // This is here to ignore the
-				   // points created in the interior
-				   // of the face.
+  // This is here to ignore the
+  // points created in the interior
+  // of the face.
   tria.begin()->set_all_manifold_ids(1);
   tria.begin()->set_manifold_id(0);
 
@@ -72,7 +72,7 @@ int main ()
   // You can open the generated file with gmsh
   GridOut gridout;
   gridout.write_msh (tria, logfile);
-  
+
   return 0;
 }
-                  
+

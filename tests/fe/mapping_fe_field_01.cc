@@ -43,7 +43,8 @@
 #define PRECISION 2
 
 template<int dim, int spacedim>
-void test(const unsigned int degree) {
+void test(const unsigned int degree)
+{
   deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;
   deallog << "degree = " << degree << std::endl;
 
@@ -78,19 +79,21 @@ void test(const unsigned int degree) {
   cell = dof_sys.begin_active(),
   endc = dof_sys.end();
 
-  for (; cell!=endc; ++cell) {
-    fe_values.reinit (cell);
-    deallog << "Cell " << cell << ": OK" << std::endl;
-  }
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      deallog << "Cell " << cell << ": OK" << std::endl;
+    }
 }
 
 int main()
 {
   initlog();
 
-  for(unsigned int d=1; d<4; ++d) {
-    test<2,2>(d);
-    test<2,3>(d);
-    test<3,3>(d);
-  }  
+  for (unsigned int d=1; d<4; ++d)
+    {
+      test<2,2>(d);
+      test<2,3>(d);
+      test<3,3>(d);
+    }
 }

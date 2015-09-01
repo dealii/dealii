@@ -91,7 +91,7 @@ int main ()
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert (0);
     GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
-                                      boundary_ids);
+                                          boundary_ids);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
 

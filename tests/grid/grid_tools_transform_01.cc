@@ -26,16 +26,16 @@
 #include <iomanip>
 
 template<int dim>
-Point<dim> trans_func(Point<dim> & p);
+Point<dim> trans_func(Point<dim> &p);
 
 template<>
-Point<2> trans_func(Point<2> & p)
+Point<2> trans_func(Point<2> &p)
 {
   Point<2> r(p(0)+p(1)*p(1),p(1));
   return r;
 }
 template<>
-Point<3> trans_func(Point<3> & p)
+Point<3> trans_func(Point<3> &p)
 {
   Point<3> r(p(0)+p(1)*p(1),p(1),p(2));
   return r;
@@ -47,13 +47,13 @@ template <int dim>
 void test ()
 {
   deallog << "dim = " << dim << std::endl;
-  
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  
+
 
   deallog << "Unchanged grid:" << std::endl;
   GridOut().write_gnuplot (tria, deallog.get_file_stream());
@@ -64,7 +64,7 @@ void test ()
   }
 
   GridTools::transform(trans_func<dim>, tria);
-  
+
   deallog << "transformed grid:" << std::endl;
   GridOut().write_gnuplot (tria, deallog.get_file_stream());
   {

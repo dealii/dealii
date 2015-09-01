@@ -179,7 +179,7 @@ int main ()
 
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
-                                          boundary_ids);
+                                              boundary_ids);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";

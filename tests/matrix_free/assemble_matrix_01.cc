@@ -53,8 +53,8 @@ void do_test (const DoFHandler<dim> &dof)
                              update_JxW_values);
 
     FEEvaluation<dim,fe_degree,fe_degree+1>
-      fe_eval (mapping, dof.get_fe(), QGauss<1>(fe_degree+1),
-               update_values | update_gradients | update_JxW_values);
+    fe_eval (mapping, dof.get_fe(), QGauss<1>(fe_degree+1),
+             update_values | update_gradients | update_JxW_values);
 
     const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();

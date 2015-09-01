@@ -219,14 +219,14 @@ namespace Step22
            (Utilities::MPI::this_mpi_process(mpi_communicator)
             == 0)),
     rot_matrix(dim)
-{
-  rot_matrix[0][dim-1] = -1.;
-  rot_matrix[dim-1][0] = 1.;
-  if (dim==3)
-    rot_matrix[1][1] =  1.;
-  offset[0] = 0;
-  offset[1] = 0;
-}
+  {
+    rot_matrix[0][dim-1] = -1.;
+    rot_matrix[dim-1][0] = 1.;
+    if (dim==3)
+      rot_matrix[1][1] =  1.;
+    offset[0] = 0;
+    offset[1] = 0;
+  }
 
 
 
@@ -256,7 +256,7 @@ namespace Step22
       DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
-    
+
       constraints.clear ();
       constraints.reinit(locally_relevant_dofs);
 
@@ -277,8 +277,8 @@ namespace Step22
        rot_matrix);
 
       DoFTools::make_periodicity_constraints<DoFHandler<dim> >
-        (periodicity_vector, constraints, fe.component_mask(velocities),
-         first_vector_components);
+      (periodicity_vector, constraints, fe.component_mask(velocities),
+       first_vector_components);
 
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
@@ -305,7 +305,7 @@ namespace Step22
                                                 fe.component_mask(velocities));
     }
     constraints.close ();
-    
+
     {
       TrilinosWrappers::BlockSparsityPattern bsp
       (owned_partitioning, owned_partitioning,
@@ -381,7 +381,7 @@ namespace Step22
                 {
                   for (unsigned int j=0; j<=i; ++j)
                     {
-                    local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
+                      local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                             - div_phi_u[i] * phi_p[j]
                                             - phi_p[i] * div_phi_u[j]
                                             + phi_p[i] * phi_p[j])
@@ -478,18 +478,18 @@ namespace Step22
   (const Point<dim> point, const int proc, Vector<double> &value) const
   {
     try
-    {
-      const typename DoFHandler<dim>::active_cell_iterator cell
-        = GridTools::find_active_cell_around_point (dof_handler, point);
+      {
+        const typename DoFHandler<dim>::active_cell_iterator cell
+          = GridTools::find_active_cell_around_point (dof_handler, point);
 
-      if (cell->is_locally_owned())
-        VectorTools::point_value (dof_handler, solution,
-                                  point, value);
-    }
+        if (cell->is_locally_owned())
+          VectorTools::point_value (dof_handler, solution,
+                                    point, value);
+      }
     catch (GridTools::ExcPointNotFound<dim> &p)
-    {
-      pcout<< "Point: " << point << " is not inside a cell!" <<std::endl;
-    }
+      {
+        pcout<< "Point: " << point << " is not inside a cell!" <<std::endl;
+      }
 
 
     std::vector<double> tmp (value.size());
@@ -525,33 +525,33 @@ namespace Step22
 
     // first collect all points locally
     for (; cell!=endc; ++cell)
-      if(cell->is_locally_owned() && cell->at_boundary())
-        for (unsigned int face_no=0;face_no<GeometryInfo<dim>::faces_per_cell;
+      if (cell->is_locally_owned() && cell->at_boundary())
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
              ++face_no)
-        {
-          const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
-          if (face->at_boundary())
           {
-            if(face->boundary_id()==0)
-            {
-              fe_face_values.reinit(cell, face_no);
-              const std::vector<Point<dim> > tmp_points
-                = fe_face_values.get_quadrature_points();
-              for (unsigned int i=0; i<tmp_points.size(); ++i)
-                for (unsigned int c=0; c<dim; ++c)
-                  local_quad_points_first.push_back(tmp_points[i](c));
-            }
-            else if(face->boundary_id()==4)
-            {
-              fe_face_values.reinit(cell, face_no);
-              const std::vector<Point<dim> > tmp_points
-                = fe_face_values.get_quadrature_points();
-              for (unsigned int i=0; i<tmp_points.size(); ++i)
-                for (unsigned int c=0; c<dim; ++c)
-                  local_quad_points_second.push_back(tmp_points[i](c));
-            }
+            const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+            if (face->at_boundary())
+              {
+                if (face->boundary_id()==0)
+                  {
+                    fe_face_values.reinit(cell, face_no);
+                    const std::vector<Point<dim> > tmp_points
+                      = fe_face_values.get_quadrature_points();
+                    for (unsigned int i=0; i<tmp_points.size(); ++i)
+                      for (unsigned int c=0; c<dim; ++c)
+                        local_quad_points_first.push_back(tmp_points[i](c));
+                  }
+                else if (face->boundary_id()==4)
+                  {
+                    fe_face_values.reinit(cell, face_no);
+                    const std::vector<Point<dim> > tmp_points
+                      = fe_face_values.get_quadrature_points();
+                    for (unsigned int i=0; i<tmp_points.size(); ++i)
+                      for (unsigned int c=0; c<dim; ++c)
+                        local_quad_points_second.push_back(tmp_points[i](c));
+                  }
+              }
           }
-        }
     // next exchange them
     std::vector<double> global_quad_points_first;
     {
@@ -573,7 +573,7 @@ namespace Step22
     }
     std::vector<double> global_quad_points_second;
     {
-       // how many elements are sent from which process?
+      // how many elements are sent from which process?
       unsigned int n_my_elements = local_quad_points_second.size();
       const unsigned int n_processes = Utilities::MPI::n_mpi_processes(mpi_communicator);
       std::vector<int> n_elements (n_processes);
@@ -595,49 +595,49 @@ namespace Step22
     // at the corresponding points on the boundary with the second indicator
     {
       for (unsigned int i=0; i<global_quad_points_first.size(); i+=dim)
-      {
-        Vector<double> value_1(dim+1);
-        Vector<double> value_2(dim+1);
-
-        Point<dim> point_1, point_2;
-        Vector<double> vector_point_1(dim);
-        for (unsigned int c=0; c<dim; ++c)
         {
-          vector_point_1(c) = global_quad_points_first[i+c];
-          point_1(c) = vector_point_1(c);
-        }
-        Vector<double> vector_point_2(dim);
-        rot_matrix.Tvmult(vector_point_2, vector_point_1);
-        for (unsigned int c=0; c<dim; ++c)
-          point_2(c) = vector_point_2(c)+offset[c];
+          Vector<double> value_1(dim+1);
+          Vector<double> value_2(dim+1);
 
-        get_point_value (point_1, 0, value_1);
-        get_point_value (point_2, 0, value_2);
-
-        if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
-        {
-          Vector<double> vel_value_1 (dim);
-          Vector<double> vel_value_2 (dim);
-          Vector<double> expected_vel (dim);
+          Point<dim> point_1, point_2;
+          Vector<double> vector_point_1(dim);
           for (unsigned int c=0; c<dim; ++c)
-          {
-            vel_value_1(c) = value_1(c);
-            vel_value_2(c) = value_2(c);
-          }
-          rot_matrix.Tvmult(expected_vel, vel_value_1);
-          pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
-          Vector<double> error = expected_vel;
-          error -= vel_value_2;
-          if (std::abs(error.l2_norm())>1e-8)
-          {
-            pcout << "first first_rotated second" <<std::endl;
-            for (unsigned int c=0; c<dim; ++c)
-              pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
-            pcout << std::endl;
-            Assert(false, ExcInternalError());
-          }
+            {
+              vector_point_1(c) = global_quad_points_first[i+c];
+              point_1(c) = vector_point_1(c);
+            }
+          Vector<double> vector_point_2(dim);
+          rot_matrix.Tvmult(vector_point_2, vector_point_1);
+          for (unsigned int c=0; c<dim; ++c)
+            point_2(c) = vector_point_2(c)+offset[c];
+
+          get_point_value (point_1, 0, value_1);
+          get_point_value (point_2, 0, value_2);
+
+          if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
+            {
+              Vector<double> vel_value_1 (dim);
+              Vector<double> vel_value_2 (dim);
+              Vector<double> expected_vel (dim);
+              for (unsigned int c=0; c<dim; ++c)
+                {
+                  vel_value_1(c) = value_1(c);
+                  vel_value_2(c) = value_2(c);
+                }
+              rot_matrix.Tvmult(expected_vel, vel_value_1);
+              pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
+              Vector<double> error = expected_vel;
+              error -= vel_value_2;
+              if (std::abs(error.l2_norm())>1e-8)
+                {
+                  pcout << "first first_rotated second" <<std::endl;
+                  for (unsigned int c=0; c<dim; ++c)
+                    pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
+                  pcout << std::endl;
+                  Assert(false, ExcInternalError());
+                }
+            }
         }
-      }
     }
 
     // consider points on the boundary with the second indicator
@@ -645,51 +645,51 @@ namespace Step22
     // at the corresponding points on the boundary with the first indicator
     {
       for (unsigned int i=0; i<global_quad_points_second.size(); i+=dim)
-      {
-        Vector<double> value_1(dim+1);
-        Vector<double> value_2(dim+1);
-
-        Point<dim> point_1, point_2;
-        Vector<double> vector_point_1(dim);
-        for (unsigned int c=0; c<dim; ++c)
         {
-          vector_point_1(c) = global_quad_points_second[i+c];
-          point_1(c) = vector_point_1(c);
-        }
-        Vector<double> vector_point_2(dim);
-        for (unsigned int c=0; c<dim; ++c)
-          vector_point_1(c) -= offset[c];
-        rot_matrix.vmult(vector_point_2, vector_point_1);
-        for (unsigned int c=0; c<dim; ++c)
-          point_2(c) = vector_point_2(c);
+          Vector<double> value_1(dim+1);
+          Vector<double> value_2(dim+1);
 
-        get_point_value (point_1, 0, value_1);
-        get_point_value (point_2, 0, value_2);
-
-        if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
-        {
-          Vector<double> vel_value_1 (dim);
-          Vector<double> vel_value_2 (dim);
-          Vector<double> expected_vel (dim);
+          Point<dim> point_1, point_2;
+          Vector<double> vector_point_1(dim);
           for (unsigned int c=0; c<dim; ++c)
-          {
-            vel_value_1(c) = value_1(c);
-            vel_value_2(c) = value_2(c);
-          }
-          rot_matrix.vmult(expected_vel, vel_value_1);
-          pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
-          Vector<double> error = expected_vel;
-          error -= vel_value_2;
-          if (std::abs(error.l2_norm())>1e-8)
-          {
-            pcout << "first first_rotated second" <<std::endl;
-            for (unsigned int c=0; c<dim; ++c)
-              pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
-            pcout << std::endl;
-            Assert(false, ExcInternalError());
-          }
+            {
+              vector_point_1(c) = global_quad_points_second[i+c];
+              point_1(c) = vector_point_1(c);
+            }
+          Vector<double> vector_point_2(dim);
+          for (unsigned int c=0; c<dim; ++c)
+            vector_point_1(c) -= offset[c];
+          rot_matrix.vmult(vector_point_2, vector_point_1);
+          for (unsigned int c=0; c<dim; ++c)
+            point_2(c) = vector_point_2(c);
+
+          get_point_value (point_1, 0, value_1);
+          get_point_value (point_2, 0, value_2);
+
+          if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
+            {
+              Vector<double> vel_value_1 (dim);
+              Vector<double> vel_value_2 (dim);
+              Vector<double> expected_vel (dim);
+              for (unsigned int c=0; c<dim; ++c)
+                {
+                  vel_value_1(c) = value_1(c);
+                  vel_value_2(c) = value_2(c);
+                }
+              rot_matrix.vmult(expected_vel, vel_value_1);
+              pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
+              Vector<double> error = expected_vel;
+              error -= vel_value_2;
+              if (std::abs(error.l2_norm())>1e-8)
+                {
+                  pcout << "first first_rotated second" <<std::endl;
+                  for (unsigned int c=0; c<dim; ++c)
+                    pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
+                  pcout << std::endl;
+                  Assert(false, ExcInternalError());
+                }
+            }
         }
-      }
     }
   }
 

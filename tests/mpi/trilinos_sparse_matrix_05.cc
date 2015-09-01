@@ -96,7 +96,7 @@ void test ()
   A.compress(VectorOperation::insert);
 
   const TrilinosWrappers::SparseMatrix &B = A;
-  
+
   // now access elements by iterator. ensure that we can iterate over
   // all rows but that iterators into rows not stored locally just
   // look empty
@@ -105,17 +105,17 @@ void test ()
        ++p)
     if (my_id == 0)
       {
-	deallog << "Looking at entry (" << p->row() << ','
-		<< p->column() << ") with value "
-		<< p->value()
-		<< std::endl;
-	AssertThrow (p->row() == 0, ExcInternalError());
+        deallog << "Looking at entry (" << p->row() << ','
+                << p->column() << ") with value "
+                << p->value()
+                << std::endl;
+        AssertThrow (p->row() == 0, ExcInternalError());
       }
     else
       {
-	AssertThrow (p->row() == 2, ExcInternalError());
-      }  
-  
+        AssertThrow (p->row() == 2, ExcInternalError());
+      }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }

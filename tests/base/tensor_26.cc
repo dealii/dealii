@@ -40,18 +40,18 @@ void test_tensor ()
     }
 
   // multiply on the right by a complex<double>
-  const Tensor<1,dim,std::complex<double> > right = 
+  const Tensor<1,dim,std::complex<double> > right =
     t * std::complex<double> (1,2);
 
   // multiply on the left by a complex<double>
-  const Tensor<1,dim,std::complex<double> > left  = 
+  const Tensor<1,dim,std::complex<double> > left  =
     std::complex<double> (1,2) * t;
 
   // they should yield the same result
   Assert (left == right, ExcInternalError ());
 
   deallog << "dim = " << dim   << std::endl
-	  << left << " : "     << right << std::endl;
+          << left << " : "     << right << std::endl;
 }
 
 

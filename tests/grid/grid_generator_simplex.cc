@@ -26,11 +26,11 @@
 #include <iomanip>
 
 
-void dim2(std::ostream& os)
+void dim2(std::ostream &os)
 {
   const unsigned int d=2;
   Triangulation<d> tr;
-  
+
   std::vector<Point<d> > vertices(d+1);
   vertices[1](0) = 0.5;
   vertices[1](1) = .85;
@@ -42,11 +42,11 @@ void dim2(std::ostream& os)
   gout.write_vtk(tr, os);
 }
 
-void dim3(std::ostream& os)
+void dim3(std::ostream &os)
 {
   const unsigned int d=3;
   Triangulation<d> tr;
-  
+
   std::vector<Point<d> > vertices(d+1);
   vertices[0](0) = 1.;
   vertices[0](1) = 0.;
@@ -70,7 +70,7 @@ void dim3(std::ostream& os)
 int main()
 {
   initlog(true);
-  std::ostream& logfile = deallog.get_file_stream();
+  std::ostream &logfile = deallog.get_file_stream();
   dim2(logfile);
   dim3(logfile);
 }

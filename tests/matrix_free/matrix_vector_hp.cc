@@ -49,31 +49,31 @@ public:
       data.create_cell_subrange_hp (cell_range, 1);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,1,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 2);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,2,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 3);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,3,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 4);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,4,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 5);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,5,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 6);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,6,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
     subrange_deg = data.create_cell_subrange_hp (cell_range, 7);
     if (subrange_deg.second > subrange_deg.first)
       helmholtz_operator<dim,7,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+                                                 subrange_deg);
   }
 
   void vmult (Vector<Number>       &dst,

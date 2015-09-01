@@ -64,7 +64,7 @@ void test(std::ostream &out)
               << "Inner radius = " << radii[i] << std::endl
               << "Outer radius = " << radiiext[i] << std::endl
               << "Depth        = " << Ls[k] << std::endl
-              << "Nzs	       = " << Nzs[l] << std::endl
+              << "Nzs          = " << Nzs[l] << std::endl
               << "No colorize    ====================" << std::endl;
 
           // No colorize

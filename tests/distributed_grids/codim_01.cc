@@ -51,6 +51,6 @@ int main(int argc, char *argv[])
   initlog();
 
   deallog.push("2-3");
-  test<2,3>(deallog.get_file_stream());  
+  test<2,3>(deallog.get_file_stream());
   deallog.pop();
 }

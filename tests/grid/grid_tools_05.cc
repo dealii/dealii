@@ -206,7 +206,7 @@ int main()
   typedef std::vector<GridTools::PeriodicFacePair<CellIterator2> > FaceVector2;
   FaceVector2 test2;
   GridTools::collect_periodic_faces
-    (triangulation2, 42, 1, test2, dealii::Tensor<1,2>());
+  (triangulation2, 42, 1, test2, dealii::Tensor<1,2>());
 
   for (FaceVector2::iterator it = test2.begin(); it != test2.end(); ++it)
     print_match(it->cell[0]->face(it->face_idx[0]),
@@ -225,7 +225,7 @@ int main()
   typedef std::vector<GridTools::PeriodicFacePair<CellIterator3> > FaceVector3;
   FaceVector3 test3;
   GridTools::collect_periodic_faces
-    (triangulation3, 42, 2, test3, dealii::Tensor<1,3>());
+  (triangulation3, 42, 2, test3, dealii::Tensor<1,3>());
 
   for (FaceVector3::iterator it = test3.begin(); it != test3.end(); ++it)
     print_match(it->cell[0]->face(it->face_idx[0]),

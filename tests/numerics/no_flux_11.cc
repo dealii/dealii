@@ -50,73 +50,73 @@ void run()
 
   {
     typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
     for (; cell!=endc; ++cell)
       {
-	if (cell->is_locally_owned())
-	  {
-	    for (unsigned int face=0;
-		 face<GeometryInfo<dim>::faces_per_cell;
-		 ++face)
-	      {
-		if (cell->face(face)->at_boundary())
-		  {
-		    if ( (std::fabs(cell->face(face)->center()(0)) < 0.1)
-			 && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
-		      {  
-			cell->face(face)->set_boundary_id (1);
-		      }
+        if (cell->is_locally_owned())
+          {
+            for (unsigned int face=0;
+                 face<GeometryInfo<dim>::faces_per_cell;
+                 ++face)
+              {
+                if (cell->face(face)->at_boundary())
+                  {
+                    if ( (std::fabs(cell->face(face)->center()(0)) < 0.1)
+                         && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
+                      {
+                        cell->face(face)->set_boundary_id (1);
+                      }
 
-		    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
-			 && (std::fabs(cell->face(face)->center()(dim-1)) < 0.1) )
-		      {
-			cell->face(face)->set_boundary_id (1);
-		      }
+                    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
+                         && (std::fabs(cell->face(face)->center()(dim-1)) < 0.1) )
+                      {
+                        cell->face(face)->set_boundary_id (1);
+                      }
 
-		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 0.1)
-			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
-		      {
-			cell->face(face)->set_boundary_id (2);
-		      }
+                    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 0.1)
+                         && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
+                      {
+                        cell->face(face)->set_boundary_id (2);
+                      }
 
-		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
-			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 0.1) )
-		      {
-			cell->face(face)->set_boundary_id (2);
-		      }
+                    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
+                         && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 0.1) )
+                      {
+                        cell->face(face)->set_boundary_id (2);
+                      }
 
-		    // no normal flux boundary
+                    // no normal flux boundary
 
-		    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.1 && std::fabs(cell->face(face)->center()(0)) <= 1.0)
-			 && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
-		      {  
-			cell->face(face)->set_boundary_id (3);
-		      }
+                    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.1 && std::fabs(cell->face(face)->center()(0)) <= 1.0)
+                         && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
+                      {
+                        cell->face(face)->set_boundary_id (3);
+                      }
 
-		    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.0 && std::fabs(cell->face(face)->center()(0)) <= 0.9)
-			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
-		      {  
-			cell->face(face)->set_boundary_id (5);
-		      }
+                    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.0 && std::fabs(cell->face(face)->center()(0)) <= 0.9)
+                         && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
+                      {
+                        cell->face(face)->set_boundary_id (5);
+                      }
 
-		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
-			 && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.0 && std::fabs(cell->face(face)->center()(dim-1)) <= 0.9) )
-		      {
-			cell->face(face)->set_boundary_id (4);
-		      }
+                    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
+                         && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.0 && std::fabs(cell->face(face)->center()(dim-1)) <= 0.9) )
+                      {
+                        cell->face(face)->set_boundary_id (4);
+                      }
 
-		    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
-			 && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.1 && std::fabs(cell->face(face)->center()(dim-1)) <= 1.0) )
-		      {
-			cell->face(face)->set_boundary_id (6);
-		      }
-		  }
-	      }
-	  }
+                    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
+                         && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.1 && std::fabs(cell->face(face)->center()(dim-1)) <= 1.0) )
+                      {
+                        cell->face(face)->set_boundary_id (6);
+                      }
+                  }
+              }
+          }
       }
   }
-  
+
   FESystem<dim> fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
@@ -125,9 +125,9 @@ void run()
   std::set<unsigned char> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (6);
   VectorTools::compute_no_normal_flux_constraints
-    (dof_handler, 0,
-     no_normal_flux_boundaries,
-     constraints);
+  (dof_handler, 0,
+   no_normal_flux_boundaries,
+   constraints);
 
   constraints.print(deallog.get_file_stream());
 

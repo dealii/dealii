@@ -138,14 +138,14 @@ void check_poly(const Point<dim> &x,
       deallog << "\t3rd\t";
       for (unsigned int d1=0; d1<dim; ++d1)
         for (unsigned int d2=0; d2<dim; ++d2)
-        	for (unsigned int d3=0; d3<dim; ++d3)
-        		deallog << third1[k][d1][d2][d3] << '\t';
+          for (unsigned int d3=0; d3<dim; ++d3)
+            deallog << third1[k][d1][d2][d3] << '\t';
       deallog << "\t4th\t";
       for (unsigned int d1=0; d1<dim; ++d1)
         for (unsigned int d2=0; d2<dim; ++d2)
-        	for (unsigned int d3=0; d3<dim; ++d3)
-        		for (unsigned int d4=0; d4<dim; ++d4)
-        			deallog << fourth1[k][d1][d2][d3][d4] << '\t';
+          for (unsigned int d3=0; d3<dim; ++d3)
+            for (unsigned int d4=0; d4<dim; ++d4)
+              deallog << fourth1[k][d1][d2][d3][d4] << '\t';
       deallog << std::endl;
     }
   deallog << std::endl;

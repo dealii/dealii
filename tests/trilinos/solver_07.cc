@@ -35,8 +35,8 @@
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
 check_solve( SOLVER &solver,
-	     const SolverControl &solver_control,
-	     const MATRIX &A,
+             const SolverControl &solver_control,
+             const MATRIX &A,
              VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;

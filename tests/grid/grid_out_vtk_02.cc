@@ -37,7 +37,7 @@
 #include <fstream>
 
 template<int dim>
-void output(parallel::distributed::Triangulation<dim> &tr, std::ostream& stream)
+void output(parallel::distributed::Triangulation<dim> &tr, std::ostream &stream)
 {
   GridOut out;
   out.write_vtk(tr, stream);
@@ -61,9 +61,9 @@ void test()
 
   // const std::string
   //   filename = ("mesh" + Utilities::int_to_string(dim)
-  // 		+ "d." +
-  // 		Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-  // 		".vtk");
+  //    + "d." +
+  //    Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
+  //    ".vtk");
   // std::ofstream stream(filename.c_str());
   output(tr, deallog.get_file_stream());
 

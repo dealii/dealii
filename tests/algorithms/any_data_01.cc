@@ -23,44 +23,44 @@
 
 double d1 = 17.;
 
-void fill(AnyData& data)
+void fill(AnyData &data)
 {
   int i = 7;
   data.add(i, " i  7");
   data.add<double>(d1, " d  17.");
-  data.add<double*>(&d1, " d* 17.");
-  data.add<const double*>(&d1, "cd* 17.");
+  data.add<double *>(&d1, " d* 17.");
+  data.add<const double *>(&d1, "cd* 17.");
   d1 = 18.;
 }
 
 
-void extract(const AnyData& data)
+void extract(const AnyData &data)
 {
   // This set of tests with old functionality. Remove when deprecating
   // index access
-  for (unsigned int i=0;i<data.size();++i)
+  for (unsigned int i=0; i<data.size(); ++i)
     deallog << i << '\t' << data.name(i) << std::endl;
   deallog << data.name(0)
-	  << '\t' << data.entry<int>(0) << std::endl;
+          << '\t' << data.entry<int>(0) << std::endl;
   deallog << data.name(1)
-	  << '\t' << data.entry<double>(1) << std::endl;
+          << '\t' << data.entry<double>(1) << std::endl;
   deallog << data.name(2)
-	  << '\t' << *data.entry<double*>(2) << std::endl;
+          << '\t' << *data.entry<double *>(2) << std::endl;
   deallog << data.name(3)
-	  << '\t' << *data.entry<const double*>(3) << std::endl;
+          << '\t' << *data.entry<const double *>(3) << std::endl;
 
   // From here on keep after deprecation
   int i1 = data.entry<int>(" i  7");
   const int i2 = data.entry<const int>(" i  7");
   double d = data.entry<double>(" d  17.");
-  double* p2 = data.entry<double*>(" d* 17.");
-  const double * p3 = data.entry<const double*>("cd* 17.");
-  
+  double *p2 = data.entry<double *>(" d* 17.");
+  const double *p3 = data.entry<const double *>("cd* 17.");
+
   deallog << i1 << std::endl
-	  << i2 << std::endl
-	  << d  << std::endl
-	  << *p2 << std::endl
-	  << *p3 << std::endl;
+          << i2 << std::endl
+          << d  << std::endl
+          << *p2 << std::endl
+          << *p3 << std::endl;
 
   deallog << *data.try_read<double>(" d  17.") << std::endl;
 
@@ -73,7 +73,7 @@ void extract(const AnyData& data)
     deallog << "(nil)" << std::endl;
   else
     AssertThrow (false, ExcInternalError());
-  
+
 // try
   //   {
   //     double* p3a = data.entry<double*>("cd* 17.");
@@ -93,11 +93,11 @@ void extract(const AnyData& data)
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-  
+
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   AnyData data;
   fill(data);
   extract(data);

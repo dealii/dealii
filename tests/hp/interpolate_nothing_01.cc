@@ -63,8 +63,8 @@ void test ()
 
   // interpolate the function
   VectorTools::interpolate (dof_handler,
-			    ZeroFunction<dim>(hp_fe[0].n_components()),
-			    interpolant);
+                            ZeroFunction<dim>(hp_fe[0].n_components()),
+                            interpolant);
   deallog << interpolant.l2_norm() << std::endl;
 }
 

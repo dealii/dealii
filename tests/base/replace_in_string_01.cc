@@ -30,11 +30,11 @@ void check(const std::string in, const std::string from, const std::string to, s
   if (result != out)
     {
       deallog << "in='" << in
-	      << "' from='" << from
-	      << "' to='" << to
-	      << "' result='" << result
-	      << "' != '" << out << "'"
-	      << std::endl;
+              << "' from='" << from
+              << "' to='" << to
+              << "' result='" << result
+              << "' != '" << out << "'"
+              << std::endl;
     }
 }
 

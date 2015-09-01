@@ -206,7 +206,7 @@ namespace Evaluation
           {
             fe_values.reinit (cell);
             fe_values.get_function_gradients (solution,
-                                          solution_gradients);
+                                              solution_gradients);
 
             unsigned int q_point = 0;
             for (; q_point<solution_gradients.size(); ++q_point)
@@ -534,7 +534,7 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<>
-      mhnc_thread = Threads::new_thread (mhnc_p,dof_handler, hanging_node_constraints);
+    mhnc_thread = Threads::new_thread (mhnc_p,dof_handler, hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
@@ -1815,7 +1815,7 @@ namespace LaplaceSolver
     ->value_list (cell_data.fe_values.get_quadrature_points(),
                   cell_data.rhs_values);
     cell_data.fe_values.get_function_hessians (primal_solution,
-                                                      cell_data.cell_grad_grads);
+                                               cell_data.cell_grad_grads);
 
     cell_data.fe_values.get_function_values (dual_weights,
                                              cell_data.dual_weights);
@@ -1844,7 +1844,7 @@ namespace LaplaceSolver
 
     face_data.fe_face_values_cell.reinit (cell, face_no);
     face_data.fe_face_values_cell.get_function_gradients (primal_solution,
-                                                      face_data.cell_grads);
+                                                          face_data.cell_grads);
 
     Assert (cell->neighbor(face_no).state() == IteratorState::valid,
             ExcInternalError());
@@ -1853,7 +1853,7 @@ namespace LaplaceSolver
     const active_cell_iterator neighbor = cell->neighbor(face_no);
     face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
     face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
-                                                          face_data.neighbor_grads);
+                                                              face_data.neighbor_grads);
 
     for (unsigned int p=0; p<n_q_points; ++p)
       face_data.jump_residual[p]
@@ -1914,11 +1914,11 @@ namespace LaplaceSolver
 
         face_data.fe_subface_values_cell.reinit (cell, face_no, subface_no);
         face_data.fe_subface_values_cell.get_function_gradients (primal_solution,
-                                                             face_data.cell_grads);
+                                                                 face_data.cell_grads);
         face_data.fe_face_values_neighbor.reinit (neighbor_child,
                                                   neighbor_neighbor);
         face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
-                                                              face_data.neighbor_grads);
+                                                                  face_data.neighbor_grads);
 
         for (unsigned int p=0; p<n_q_points; ++p)
           face_data.jump_residual[p]

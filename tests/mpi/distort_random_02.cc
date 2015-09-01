@@ -42,14 +42,14 @@ void test1 (const bool keep_boundary)
   for (typename Triangulation<dim>::active_cell_iterator
        cell = tria.begin_active(); cell != tria.end(); ++cell)
     if (cell->is_locally_owned())
-    {
-      const Point<dim> &p = cell->center();
-      bool  all_positive = true;
-      for (unsigned int d=0; d<dim; ++d)
-        if (p(d) <= 0.) all_positive = false;
-          if (all_positive)
-            cell->set_refine_flag();
-    }
+      {
+        const Point<dim> &p = cell->center();
+        bool  all_positive = true;
+        for (unsigned int d=0; d<dim; ++d)
+          if (p(d) <= 0.) all_positive = false;
+        if (all_positive)
+          cell->set_refine_flag();
+      }
   tria.execute_coarsening_and_refinement();
   GridTools::distort_random (0.1, tria, keep_boundary);
 
@@ -62,7 +62,7 @@ void test1 (const bool keep_boundary)
   filename += Utilities::int_to_string(dim);
 
   std::ofstream logfile
-    ((filename+ "-" + Utilities::int_to_string(my_id,2)).c_str());
+  ((filename+ "-" + Utilities::int_to_string(my_id,2)).c_str());
 
   GridOut().write_gnuplot (tria, logfile);
   MPI_Barrier(MPI_COMM_WORLD);
@@ -70,10 +70,10 @@ void test1 (const bool keep_boundary)
   if (my_id==0)
     for (unsigned int i=0;
          i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-    {
-      deallog << "Process " << i << ":" << std::endl;
-      cat_file((filename + "-" + Utilities::int_to_string(i,2)).c_str());
-    }
+      {
+        deallog << "Process " << i << ":" << std::endl;
+        cat_file((filename + "-" + Utilities::int_to_string(i,2)).c_str());
+      }
 
   deallog << "OK" << std::endl;
 }
@@ -85,26 +85,26 @@ int main (int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-  {
-    std::ofstream logfile("output");
-    deallog << std::setprecision(4);
-    logfile << std::setprecision(4);
-    deallog.attach(logfile);
-    deallog.depth_console(0);
-    deallog.threshold_double(1.e-10);
+    {
+      std::ofstream logfile("output");
+      deallog << std::setprecision(4);
+      logfile << std::setprecision(4);
+      deallog.attach(logfile);
+      deallog.depth_console(0);
+      deallog.threshold_double(1.e-10);
 
-    test1<2> (true);
-    test1<2> (false);
-    test1<3> (true);
-    test1<3> (false);
-  }
+      test1<2> (true);
+      test1<2> (false);
+      test1<3> (true);
+      test1<3> (false);
+    }
   else
-  {
-    test1<2> (true);
-    test1<2> (false);
-    test1<3> (true);
-    test1<3> (false);
-  }
+    {
+      test1<2> (true);
+      test1<2> (false);
+      test1<3> (true);
+      test1<3> (false);
+    }
 
   return 0;
 }

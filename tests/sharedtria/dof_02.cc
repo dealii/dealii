@@ -68,11 +68,11 @@ void test()
       for (typename Triangulation<dim>::active_cell_iterator
            cell = triangulation.begin_active();
            cell != triangulation.end(); ++cell)
-          {
-            if (flags[index])
-              cell->set_refine_flag();
-            ++index;
-          }
+        {
+          if (flags[index])
+            cell->set_refine_flag();
+          ++index;
+        }
 
       Assert (index <= triangulation.n_active_cells(), ExcInternalError());
 
@@ -84,24 +84,24 @@ void test()
       for (typename Triangulation<dim>::active_cell_iterator
            cell = triangulation.begin_active();
            cell != triangulation.end(); ++cell)
-          {
-            if (!flags[index])
-              cell->set_coarsen_flag();
-            ++index;
-          }
+        {
+          if (!flags[index])
+            cell->set_coarsen_flag();
+          ++index;
+        }
 
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
-      DoFRenumbering::component_wise(dof_handler);      
+      DoFRenumbering::component_wise(dof_handler);
 
       deallog
-        << "n_dofs: " << dof_handler.n_dofs() << std::endl
-        << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
+          << "n_dofs: " << dof_handler.n_dofs() << std::endl
+          << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
       deallog << "n_locally_owned_dofs_per_processor: ";
       std::vector<types::global_dof_index> v = dof_handler.n_locally_owned_dofs_per_processor();
       unsigned int sum = 0;
-      for (unsigned int i=0;i<v.size();++i)
+      for (unsigned int i=0; i<v.size(); ++i)
         {
           deallog << v[i] << " ";
           sum += v[i];
@@ -122,7 +122,7 @@ void test()
 
       IndexSet all (N);
       for (unsigned int i=0;
-          i<dof_handler.locally_owned_dofs_per_processor().size(); ++i)
+           i<dof_handler.locally_owned_dofs_per_processor().size(); ++i)
         {
           IndexSet intersect = all & dof_handler.locally_owned_dofs_per_processor()[i];
           Assert(intersect.n_elements()==0, ExcInternalError());

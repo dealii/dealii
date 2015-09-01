@@ -65,29 +65,29 @@ myIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &info, CellInfo &) const
 template <int dim>
 void
 myIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &info1, MeshWorker::DoFInfo<dim> &info2,
-                 CellInfo &, CellInfo &) const
+                        CellInfo &, CellInfo &) const
 {
   deallog << "F cell1 = " << info1.cell->id()
-      << " face = " << info1.face_number
-      << " cell2 = " << info2.cell->id()
-      << " face2 = " << info2.face_number
-      << std::endl;
+          << " face = " << info1.face_number
+          << " cell2 = " << info2.cell->id()
+          << " face2 = " << info2.face_number
+          << std::endl;
 }
 
 
 class DoNothingAssembler
 {
-  public:
-    template <class DOFINFO>
-    void initialize_info(DOFINFO &info, bool face) const {}
-    template<class DOFINFO>
-    void assemble(const DOFINFO &info){}
-    template<class DOFINFO>
-    void assemble(const DOFINFO &info1,
-                  const DOFINFO &info2) {}
+public:
+  template <class DOFINFO>
+  void initialize_info(DOFINFO &info, bool face) const {}
+  template<class DOFINFO>
+  void assemble(const DOFINFO &info) {}
+  template<class DOFINFO>
+  void assemble(const DOFINFO &info1,
+                const DOFINFO &info2) {}
 
 
-    };
+};
 
 template <int dim>
 void
@@ -114,11 +114,11 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 
 
   MeshWorker::integration_loop<dim, dim, typename DoFHandler<dim>::active_cell_iterator, DoNothingAssembler>
-    (dofs.begin_active(), dofs.end(),
-        dof_info, info_box,
-        local,
-        assembler,
-        lctrl);
+  (dofs.begin_active(), dofs.end(),
+   dof_info, info_box,
+   local,
+   assembler,
+   lctrl);
 
 //  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
 //    (dofs.begin_active(), dofs.end(),
@@ -134,10 +134,10 @@ template<int dim>
 void test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 {
   deallog << "* own_cells=" << lctrl.own_cells
-      << " ghost_cells=" << lctrl.ghost_cells
-      << " own_faces=" << lctrl.own_faces
-      << " faces_to_ghost=" << lctrl.faces_to_ghost
-      << std::endl;
+          << " ghost_cells=" << lctrl.ghost_cells
+          << " own_faces=" << lctrl.own_faces
+          << " faces_to_ghost=" << lctrl.faces_to_ghost
+          << std::endl;
   test_simple(dofs, lctrl);
 }
 
@@ -150,9 +150,9 @@ test()
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy*/);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   FE_DGP<dim> fe(0);
-  
+
   DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
 
@@ -180,7 +180,8 @@ test()
   */
   deallog << "*** 2. FACES ***" << std::endl;
 
-  lctrl.own_cells = false; lctrl.ghost_cells = false;
+  lctrl.own_cells = false;
+  lctrl.ghost_cells = false;
 
   lctrl.own_faces = MeshWorker::LoopControl::one;
   lctrl.faces_to_ghost = MeshWorker::LoopControl::never;

@@ -32,7 +32,7 @@
 
 #include <deal.II/fe/fe_tools.h>
 
-void logvec (const std::vector<types::global_dof_index>& v, const std::vector<types::global_dof_index>& w)
+void logvec (const std::vector<types::global_dof_index> &v, const std::vector<types::global_dof_index> &w)
 {
   deallog << '[';
   for (unsigned int i=0; i<w.size(); ++i)
@@ -49,9 +49,9 @@ void test_renumbering(const FiniteElement<dim> &fe)
 {
   std::vector<types::global_dof_index> v(fe.dofs_per_cell);
   std::vector<types::global_dof_index> w(fe.n_blocks());
-  
+
   deallog << fe.get_name() << std::endl;
-  
+
   FETools::compute_block_renumbering(fe, v, w, false);
   logvec(v,w);
   FETools::compute_block_renumbering(fe, v, w, true);
@@ -85,7 +85,7 @@ void test_renumbering()
   test_renumbering(FESystem<dim>(rt1,1,q1,1));
   test_renumbering(FESystem<dim>(rt1,2,q1,2));
   test_renumbering(FESystem<dim>(n1,1,q1,1));
-  
+
   deallog.pop();
 }
 

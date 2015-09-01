@@ -361,7 +361,7 @@ namespace Step39
     const FiniteElement<dim> &fe;
     DoFHandler<dim>         dof_handler;
     MGConstrainedDoFs mg_constraints;
-      
+
     SparsityPattern      sparsity;
     SparseMatrix<double> matrix;
     Vector<double>       solution;
@@ -399,10 +399,10 @@ namespace Step39
     types::global_dof_index n_dofs = dof_handler.n_dofs();
     solution.reinit(n_dofs);
     right_hand_side.reinit(n_dofs);
-    
+
     mg_constraints.clear();
     mg_constraints.initialize(dof_handler);
-    
+
     DynamicSparsityPattern dsp(n_dofs);
     DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
     sparsity.copy_from(dsp);

@@ -19,7 +19,7 @@
 
 /*
 crash:
-/usr/include/c++/4.8/debug/safe_iterator.h:506:error: attempt to compare a 
+/usr/include/c++/4.8/debug/safe_iterator.h:506:error: attempt to compare a
     singular iterator to a singular iterator.
 
 Objects involved in the operation:
@@ -57,16 +57,16 @@ void iterate(DynamicSparsityPattern &sp)
   {
     for (unsigned int row=0; row<sp.n_rows(); ++row)
       {
-	DynamicSparsityPattern::iterator col = sp.begin(row),
-				     end_col = sp.end(row);
-	deallog << "row " << row << ":" << std::endl;
-	for (;col != end_col;++col)
-	  {
-	    deallog << "row= " << col->row()
-		    << ", col= "<< col->column()
-		    << ", index= " << col->index()
-		    << std::endl;
-	  }
+        DynamicSparsityPattern::iterator col = sp.begin(row),
+                                         end_col = sp.end(row);
+        deallog << "row " << row << ":" << std::endl;
+        for (; col != end_col; ++col)
+          {
+            deallog << "row= " << col->row()
+                    << ", col= "<< col->column()
+                    << ", index= " << col->index()
+                    << std::endl;
+          }
       }
   }
   deallog << "OK" << std::endl;
@@ -91,7 +91,7 @@ void test ()
     sp.add (0,1);
     sp.add (3,3);
     sp.compress ();
-    
+
     deallog << "** 5 by 5 ** " << std::endl;
     iterate (sp);
   }

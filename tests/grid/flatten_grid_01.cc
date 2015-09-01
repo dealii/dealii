@@ -21,16 +21,17 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
 
-template <int dim, int spacedim1, int spacedim2> 
-void test() {
+template <int dim, int spacedim1, int spacedim2>
+void test()
+{
   deallog << "Testing <" << dim << "," << spacedim1
-	  << "> VS <" << dim << "," << spacedim2 
-	  << ">" << std::endl;
-  
+          << "> VS <" << dim << "," << spacedim2
+          << ">" << std::endl;
+
   Triangulation<dim, spacedim1> tria1;
   GridGenerator::hyper_cube(tria1);
   tria1.refine_global(1);
-  
+
   Triangulation<dim, spacedim2> tria2;
   GridGenerator::flatten_triangulation(tria1, tria2);
   GridOut go;
@@ -43,11 +44,11 @@ int main()
   test<1,1,1>();
   test<1,1,2>();
   test<1,1,3>();
-  // 
+  //
   test<1,2,1>();
   test<1,2,2>();
   test<1,2,3>();
-  // 
+  //
   test<1,3,1>();
   test<1,3,2>();
   test<1,3,3>();

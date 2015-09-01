@@ -99,16 +99,19 @@ int main()
                     {
                       double qpow = pow(quad.point(q)[0], (double) power);
                       approx_integral += qpow  * quad.weight(q);
-		      double factor = log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
-		      // This code cannot work if factor is equal to
-		      // zero. In this case, just pass the other
-		      // quadrature formula, which should be valid anyway.
-                      if(factor != 0.0) {
-			qpow *= factor;
-			approx_integral_factored += qpow * factored_quad.weight(q);
-		      } else {
-			approx_integral_factored +=  qpow * quad.weight(q);
-		      }
+                      double factor = log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
+                      // This code cannot work if factor is equal to
+                      // zero. In this case, just pass the other
+                      // quadrature formula, which should be valid anyway.
+                      if (factor != 0.0)
+                        {
+                          qpow *= factor;
+                          approx_integral_factored += qpow * factored_quad.weight(q);
+                        }
+                      else
+                        {
+                          approx_integral_factored +=  qpow * quad.weight(q);
+                        }
                     }
 
                   deallog << "   Error(n=" << quad.size()

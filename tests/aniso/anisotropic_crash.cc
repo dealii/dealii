@@ -56,9 +56,9 @@ int main()
     {
       switch (Testing::rand()%4)
         {
-          /// If a randomly drawn
-          /// number is 0 or 1 we
-          /// cut x or y, resp.
+        /// If a randomly drawn
+        /// number is 0 or 1 we
+        /// cut x or y, resp.
         case 0:
           cell->set_refine_flag( RefinementCase<2>::cut_axis(0) );
           break;

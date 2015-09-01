@@ -23,7 +23,7 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
-void check (const char * content)
+void check (const char *content)
 {
   deallog << "* check" << std::endl;
   ParameterHandler foo;

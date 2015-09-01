@@ -83,9 +83,10 @@ int main()
 
   Vector<double> u;
   op_a.reinit_domain_vector(u, true);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
+  for (unsigned int i = 0; i < u.size(); ++i)
+    {
+      u[i] = (double)(i+1);
+    }
 
   deallog << "u: " << u << std::endl;
 

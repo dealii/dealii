@@ -70,11 +70,11 @@ int main()
 
   // Come up with a simple structure:
 
-  for(unsigned int i = 0; i < a.block(0, 0).m(); ++i)
+  for (unsigned int i = 0; i < a.block(0, 0).m(); ++i)
     a.block(0, 0).set(i, i, 10.);
-  for(unsigned int i = 0; i < a.block(1, 1).m(); ++i)
+  for (unsigned int i = 0; i < a.block(1, 1).m(); ++i)
     a.block(1, 1).set(i, i, 5.);
-  for(unsigned int i = 0; i < a.block(2, 2).m(); ++i)
+  for (unsigned int i = 0; i < a.block(2, 2).m(); ++i)
     a.block(2, 2).set(i, i, 3.);
 
 
@@ -85,7 +85,7 @@ int main()
   auto op_b2 = linear_operator(a.block(2, 2));
 
 
-  std::array<decltype(op_b0), 3> temp{op_b0, op_b1, op_b2};
+  std::array<decltype(op_b0), 3> temp {op_b0, op_b1, op_b2};
   auto op_b = block_diagonal_operator<3, BlockVector<double>>(temp);
 
 
@@ -93,9 +93,10 @@ int main()
 
     BlockVector<double> u;
     op_a.reinit_domain_vector(u, false);
-    for (unsigned int i = 0; i < u.size(); ++i) {
-      u[i] = (double)(i+1);
-    }
+    for (unsigned int i = 0; i < u.size(); ++i)
+      {
+        u[i] = (double)(i+1);
+      }
 
     PRINTME("u", u);
 
@@ -156,7 +157,7 @@ int main()
 
   // And finally the other block_diagonal_operator variant:
 
-  std::array<decltype(op_b0), 5> temp2{op_b0, op_b0, op_b0, op_b0, op_b0};
+  std::array<decltype(op_b0), 5> temp2 {op_b0, op_b0, op_b0, op_b0, op_b0};
   auto op_c = block_diagonal_operator<5, BlockVector<double>>(temp2);
 
   auto op_d = block_diagonal_operator<5, BlockVector<double>>(op_b0);
@@ -164,9 +165,10 @@ int main()
   {
     BlockVector<double> u;
     op_c.reinit_domain_vector(u, false);
-    for (unsigned int i = 0; i < u.size(); ++i) {
-      u[i] = (double)(i+1);
-    }
+    for (unsigned int i = 0; i < u.size(); ++i)
+      {
+        u[i] = (double)(i+1);
+      }
     PRINTME("u", u);
 
     BlockVector<double> x;

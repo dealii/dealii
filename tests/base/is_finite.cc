@@ -73,7 +73,7 @@ int main ()
   fedisableexcept(FE_INVALID);
 #endif
 
-  
+
   check<double> ();
   check<long double> ();
 

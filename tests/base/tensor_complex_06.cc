@@ -31,7 +31,7 @@ void test_tensor_01 ()
     {
       t[i] = std::complex<double> (i,1);
     }
-  const Tensor<1,dim,std::complex<double> > res = 
+  const Tensor<1,dim,std::complex<double> > res =
     t * std::complex<double> (1,2);
 
   deallog << "dim = " << dim << ": " << res << std::endl;
@@ -46,7 +46,7 @@ void test_tensor_02 ()
     {
       t[i] = std::complex<double> (1,i);
     }
-  const Tensor<1,dim,std::complex<double> > res = 
+  const Tensor<1,dim,std::complex<double> > res =
     t * std::complex<double> (1,2);
 
   deallog << "dim = " << dim << ": " << res << std::endl;

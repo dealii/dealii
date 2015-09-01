@@ -48,13 +48,13 @@ void test ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
 
   FESystem<dim> fe(FE_Q<2>(1),1,FE_Q<2>(2),2);
-  
+
   deallog << "Number of cells: "
           << triangulation.n_active_cells() << std::endl;
 
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
-				   //DoFRenumbering::component_wise(dof_handler);
+  //DoFRenumbering::component_wise(dof_handler);
   deallog << "Number of dofs: "
           << dof_handler.n_dofs() << std::endl;
 
@@ -67,7 +67,7 @@ void test ()
   constraints.close();
   deallog << "Number of Constraints: " << constraints.n_constraints()<<std::endl;
 
-  Quadrature<2> quadrature_formula(fe.get_unit_support_points()); 
+  Quadrature<2> quadrature_formula(fe.get_unit_support_points());
   FEValues<2> fe_values (fe, quadrature_formula,
                          update_values | update_gradients | update_JxW_values|update_q_points);
 
@@ -85,14 +85,14 @@ void test ()
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-      {
-        if (constraints.is_constrained(local_dof_indices[i]))
-         deallog << "DoF "<< local_dof_indices[i] 
-                   << ", copy " << fe.system_to_base_index(i).first.second 
-                   << ", base element " << fe.system_to_base_index(i).first.first 
-                   << ", index " << fe.system_to_base_index(i).second 
-                   << ", position " << locations[i] << std::endl;
-      }
+        {
+          if (constraints.is_constrained(local_dof_indices[i]))
+            deallog << "DoF "<< local_dof_indices[i]
+                    << ", copy " << fe.system_to_base_index(i).first.second
+                    << ", base element " << fe.system_to_base_index(i).first.first
+                    << ", index " << fe.system_to_base_index(i).second
+                    << ", position " << locations[i] << std::endl;
+        }
     }
 }
 

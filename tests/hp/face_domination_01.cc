@@ -43,7 +43,7 @@ const unsigned int dim=2;
 void print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
 {
   deallog << "DoFs on cell=" << cell << ": ";
-  
+
   std::vector<types::global_dof_index> dof_indices (cell->get_fe().dofs_per_cell);
   cell->get_dof_indices (dof_indices);
   for (unsigned int i=0; i<dof_indices.size(); ++i)
@@ -63,9 +63,9 @@ int main()
   std::vector<unsigned int> subdivisions(dim, 1U);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle (triangulation,
-					     subdivisions,
-					     Point<dim>(0,0),
-					     Point<dim>(2,1));
+                                             subdivisions,
+                                             Point<dim>(0,0),
+                                             Point<dim>(2,1));
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(),1));
@@ -79,7 +79,7 @@ int main()
 
   print_dofs (dof_handler.begin_active());
   print_dofs (++dof_handler.begin_active());
-  
+
   ConstraintMatrix constraints;
   constraints.clear();
   dealii::DoFTools::make_hanging_node_constraints  (dof_handler, constraints);

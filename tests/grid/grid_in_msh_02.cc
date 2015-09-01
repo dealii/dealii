@@ -50,12 +50,12 @@ void check_file ()
   for (Triangulation<1>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
       for (unsigned int face = 0; face < 2; ++face)
-      {
-        if (cell->at_boundary(face))
-          deallog << "vertex " << cell->face_index(face)
-                  << " has boundary indicator " << (int)cell->face(face)->boundary_indicator()
-                  << std::endl;
-      }
+        {
+          if (cell->at_boundary(face))
+            deallog << "vertex " << cell->face_index(face)
+                    << " has boundary indicator " << (int)cell->face(face)->boundary_indicator()
+                    << std::endl;
+        }
     }
 }
 

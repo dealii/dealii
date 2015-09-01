@@ -54,61 +54,61 @@ void test()
 
   // write with small com
   if (myid<3)
-  {
-    deallog << "writing with " <<  Utilities::MPI::n_mpi_processes(com_small) << std::endl;
-    
-    parallel::distributed::Triangulation<dim> tr (com_small);
-    GridGenerator::hyper_cube (tr);
-    tr.refine_global (2);
-    for (typename Triangulation<dim>::active_cell_iterator
-         cell = tr.begin_active();
-         cell != tr.end(); ++cell)
-      if (!cell->is_ghost() && !cell->is_artificial())
-        if (cell->center().norm() < 0.3)
-          {
-            cell->set_refine_flag();
-          }
+    {
+      deallog << "writing with " <<  Utilities::MPI::n_mpi_processes(com_small) << std::endl;
 
-    tr.execute_coarsening_and_refinement ();
+      parallel::distributed::Triangulation<dim> tr (com_small);
+      GridGenerator::hyper_cube (tr);
+      tr.refine_global (2);
+      for (typename Triangulation<dim>::active_cell_iterator
+           cell = tr.begin_active();
+           cell != tr.end(); ++cell)
+        if (!cell->is_ghost() && !cell->is_artificial())
+          if (cell->center().norm() < 0.3)
+            {
+              cell->set_refine_flag();
+            }
 
-    FE_Q<dim> fe (1);
-    DoFHandler<dim> dh (tr);
-    dh.distribute_dofs (fe);
+      tr.execute_coarsening_and_refinement ();
 
-    IndexSet locally_owned_dofs = dh.locally_owned_dofs ();
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
+      FE_Q<dim> fe (1);
+      DoFHandler<dim> dh (tr);
+      dh.distribute_dofs (fe);
 
-    PETScWrappers::MPI::Vector x (locally_owned_dofs, com_small);
-    PETScWrappers::MPI::Vector rel_x (locally_owned_dofs, locally_relevant_dofs, com_small);
+      IndexSet locally_owned_dofs = dh.locally_owned_dofs ();
+      IndexSet locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
 
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
+      PETScWrappers::MPI::Vector x (locally_owned_dofs, com_small);
+      PETScWrappers::MPI::Vector rel_x (locally_owned_dofs, locally_relevant_dofs, com_small);
 
-    for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
-      {
-        unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        x (idx) = idx;
-        deallog << '[' << idx << ']' << ' ' << x(idx) << std::endl;
-      }
+      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
 
-    
-    x.compress(VectorOperation::insert);
-    rel_x=x;
+      for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
+        {
+          unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
+          x (idx) = idx;
+          deallog << '[' << idx << ']' << ' ' << x(idx) << std::endl;
+        }
 
-    soltrans.prepare_serialization (rel_x);
 
-    tr.save ("file");
-    //    tr.write_mesh_vtk("before");
-    deallog << "#cells = " << tr.n_global_active_cells() << " norm= " << x.l2_norm() << std::endl;
-    deallog << "Checksum: "
-            << tr.get_checksum ()
-            << std::endl;
-  }
-  
+      x.compress(VectorOperation::insert);
+      rel_x=x;
+
+      soltrans.prepare_serialization (rel_x);
+
+      tr.save ("file");
+      //    tr.write_mesh_vtk("before");
+      deallog << "#cells = " << tr.n_global_active_cells() << " norm= " << x.l2_norm() << std::endl;
+      deallog << "Checksum: "
+              << tr.get_checksum ()
+              << std::endl;
+    }
+
   MPI_Barrier (MPI_COMM_WORLD);
 
   deallog << "reading with " << Utilities::MPI::n_mpi_processes(com_all) << std::endl;
-  
+
   {
     parallel::distributed::Triangulation<dim> tr (com_all);
 
@@ -125,7 +125,7 @@ void test()
 
     PETScWrappers::MPI::Vector solution (locally_owned_dofs, com_all);
     solution = 0;
-    
+
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
     soltrans.deserialize (solution);
 
@@ -140,7 +140,7 @@ void test()
             << tr.get_checksum ()
             << std::endl;
     deallog << "norm: "
-            << solution.l2_norm() 
+            << solution.l2_norm()
             << std::endl;
     //    tr.write_mesh_vtk("after");
   }

@@ -57,8 +57,9 @@ public:
   double alen, blen, clen;
 private:
   enum
-  {omega1_domain_id,
-   omega2_domain_id
+  {
+    omega1_domain_id,
+    omega2_domain_id
   };
 
   static bool
@@ -77,32 +78,34 @@ private:
   FESystem<dim>        omega2_fe;
   hp::FECollection<dim> fe_collection;
   hp::DoFHandler<dim>      dof_handler;
-  QGauss<dim>  	       quadrature_formula;
-  QGauss<dim-1>	       face_quadrature_formula;
+  QGauss<dim>          quadrature_formula;
+  QGauss<dim-1>        face_quadrature_formula;
   SparsityPattern      sparsity_pattern;
   std::map<types::global_dof_index, double>    boundary_values;
-     
+
   Vector<double>       system_rhs, U, Un, dU, U0;
-    
+
   //solution variables
   std::vector<std::string> nodal_solution_names;
 };
 
 // Constructor
 template <int dim>
-diffusionMechanics<dim>::diffusionMechanics (const unsigned int mech_degree, const unsigned int diff_degree): 
-mech_degree (mech_degree), 
-diff_degree (diff_degree), 
-omega1_fe (FE_Q<dim>(mech_degree), dim,
-	   FE_Q<dim>(diff_degree),   1), 
-omega2_fe (FE_Q<dim>(mech_degree), dim,
-	   FE_Nothing<dim>(),   1),
-dof_handler (triangulation), quadrature_formula(3), face_quadrature_formula(2){
-		
+diffusionMechanics<dim>::diffusionMechanics (const unsigned int mech_degree, const unsigned int diff_degree):
+  mech_degree (mech_degree),
+  diff_degree (diff_degree),
+  omega1_fe (FE_Q<dim>(mech_degree), dim,
+             FE_Q<dim>(diff_degree),   1),
+  omega2_fe (FE_Q<dim>(mech_degree), dim,
+             FE_Nothing<dim>(),   1),
+  dof_handler (triangulation), quadrature_formula(3), face_quadrature_formula(2)
+{
+
   //Nodal Solution names
-  for (unsigned int i=0; i<dim; ++i){
-    nodal_solution_names.push_back("u");
-  }
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      nodal_solution_names.push_back("u");
+    }
   nodal_solution_names.push_back("c");
 
   //FE object
@@ -111,19 +114,24 @@ dof_handler (triangulation), quadrature_formula(3), face_quadrature_formula(2){
   alen = 10.0, blen = 10.0, clen = 4.0;
 }
 template <int dim>
-diffusionMechanics<dim>::~diffusionMechanics (){dof_handler.clear ();}
+diffusionMechanics<dim>::~diffusionMechanics ()
+{
+  dof_handler.clear ();
+}
 
 //Initial conditions - use only if FE_Nothing not used. Else an error occurs with VectorTools::interpolate
 template <int dim>
-class InitialConditions: public Function<dim>{
+class InitialConditions: public Function<dim>
+{
 public:
-  InitialConditions (): Function<dim>(totalDOF){}
-  void vector_value (const Point<dim>   &p, Vector<double>   &values) const{
+  InitialConditions (): Function<dim>(totalDOF) {}
+  void vector_value (const Point<dim>   &p, Vector<double>   &values) const
+  {
     Assert (values.size() == totalDOF, ExcDimensionMismatch (values.size(), totalDOF));
     values(totalDOF-4)=0; // u=0
-    values(totalDOF-3)=0; 
-    values(totalDOF-2)=0; 
-    values(totalDOF-1)=1.0; 
+    values(totalDOF-3)=0;
+    values(totalDOF-2)=0;
+    values(totalDOF-1)=1.0;
   };
 };
 // Boolean functions for specifying sub-domains
@@ -132,14 +140,14 @@ bool
 diffusionMechanics<dim>::
 cell_is_in_omega1_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return(cell->material_id() == omega1_domain_id);
+  return (cell->material_id() == omega1_domain_id);
 }
 template <int dim>
 bool
 diffusionMechanics<dim>::
 cell_is_in_omega2_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return(cell->material_id() == omega2_domain_id);
+  return (cell->material_id() == omega2_domain_id);
 }
 
 // Set active fe indices in each sub-domain
@@ -151,11 +159,11 @@ diffusionMechanics<dim>::set_active_fe_indices()
        cell != dof_handler.end(); ++cell)
     {
       if (cell_is_in_omega1_domain(cell))
-	cell->set_active_fe_index(0);
+        cell->set_active_fe_index(0);
       else if (cell_is_in_omega2_domain(cell))
-	cell->set_active_fe_index(1);
+        cell->set_active_fe_index(1);
       else
-	Assert(false, ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
     }
 }
 
@@ -172,19 +180,26 @@ diffusionMechanics<dim>::setup_dofs()
 
 //Setup
 template <int dim>
-void diffusionMechanics<dim>::setup_system(){
+void diffusionMechanics<dim>::setup_system()
+{
   dof_handler.distribute_dofs (fe_collection);
   sparsity_pattern.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);  sparsity_pattern.compress();
-  U.reinit (dof_handler.n_dofs()); Un.reinit (dof_handler.n_dofs());  dU.reinit (dof_handler.n_dofs()); system_rhs.reinit (dof_handler.n_dofs()); U0.reinit (dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  sparsity_pattern.compress();
+  U.reinit (dof_handler.n_dofs());
+  Un.reinit (dof_handler.n_dofs());
+  dU.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
+  U0.reinit (dof_handler.n_dofs());
   deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl;
-  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl; 
+  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 }
 
 
 //Run
 template <int dim>
-void diffusionMechanics<dim>::run (){
+void diffusionMechanics<dim>::run ()
+{
 
   //subdivided_hyper
   std::vector<unsigned int> repetitions(3);
@@ -203,12 +218,13 @@ void diffusionMechanics<dim>::run (){
     else
       cell->set_material_id(omega2_domain_id);
   setup_dofs();
-  setup_system(); 
+  setup_system();
 
   //Initial conditions
-  VectorTools::interpolate(dof_handler, InitialConditions<dim>(), Un); 
-  //  VectorTools::interpolate(dof_handler, ZeroFunction<dim>(fe_collection.n_components()), Un); 
-  U=Un; U0=Un;
+  VectorTools::interpolate(dof_handler, InitialConditions<dim>(), Un);
+  //  VectorTools::interpolate(dof_handler, ZeroFunction<dim>(fe_collection.n_components()), Un);
+  U=Un;
+  U0=Un;
 
   deallog << Un.l2_norm() << std::endl;
 }

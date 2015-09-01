@@ -138,11 +138,11 @@ void print_matching(DoFHandler<dim> &dof_handler)
   deallog << "DoFs of face_1:" << std::endl;
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
     deallog << dofs_1[i] << " is located at "
-	    << support_points[dofs_1[i]] << std::endl;
+            << support_points[dofs_1[i]] << std::endl;
   deallog << "DoFs of face_2:" << std::endl;
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
     deallog << dofs_2[i] << " is located at "
-	    << support_points[dofs_2[i]] << std::endl;
+            << support_points[dofs_2[i]] << std::endl;
 
 
   std::bitset<3> orientation;

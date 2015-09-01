@@ -37,8 +37,8 @@
 
 
 SolverControl::State monitor_norm (const unsigned int    iteration,
-				   const double          check_value,
-				   const Vector<double> &current_iterate)
+                                   const double          check_value,
+                                   const Vector<double> &current_iterate)
 {
   deallog << "   -- " << iteration << ' ' << check_value << std::endl;
   deallog << "   Norm=" << current_iterate.l2_norm() << std::endl;
@@ -47,8 +47,8 @@ SolverControl::State monitor_norm (const unsigned int    iteration,
 
 
 SolverControl::State monitor_mean (const unsigned int    iteration,
-				   const double          check_value,
-				   const Vector<double> &current_iterate)
+                                   const double          check_value,
+                                   const Vector<double> &current_iterate)
 {
   deallog << "   Mean=" << current_iterate.mean_value() << std::endl;
   return SolverControl::success;
@@ -89,11 +89,11 @@ int main()
   // create CG and GMRES solvers and attach monitors to it
   SolverCG<> cg(control, mem);
   cg.connect (&monitor_norm);
-  cg.connect (&monitor_mean);  
+  cg.connect (&monitor_mean);
 
   SolverGMRES<> gmres(control, mem, 8);
   gmres.connect (&monitor_norm);
-  gmres.connect (&monitor_mean);  
+  gmres.connect (&monitor_mean);
 
   for (unsigned int size=4; size <= 30; size *= 3)
     {

@@ -44,7 +44,7 @@ void test ()
 
   i = sp.begin(1);
   deallog << i->row() << ' ' << i->column() << std::endl;
-  deallog << "OK" << std::endl;  
+  deallog << "OK" << std::endl;
 }
 
 

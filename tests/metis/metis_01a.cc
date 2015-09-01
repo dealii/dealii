@@ -41,7 +41,7 @@
 
 
 void partition (const SparsityPattern     &sparsity_pattern,
-		const unsigned int         n_partitions)
+                const unsigned int         n_partitions)
 {
   // generate the data structures for
   // METIS. Note that this is particularly
@@ -49,10 +49,10 @@ void partition (const SparsityPattern     &sparsity_pattern,
   // compressed row storage format. we only
   // have to set up a few auxiliary arrays
   idx_t
-    n       = static_cast<signed int>(sparsity_pattern.n_rows()),
-    ncon    = 1,                              // number of balancing constraints (should be >0)
-    nparts  = static_cast<int>(n_partitions), // number of subdomains to create
-    dummy;                                    // the numbers of edges cut by the
+  n       = static_cast<signed int>(sparsity_pattern.n_rows()),
+  ncon    = 1,                              // number of balancing constraints (should be >0)
+  nparts  = static_cast<int>(n_partitions), // number of subdomains to create
+  dummy;                                    // the numbers of edges cut by the
   // resulting partition
 
   // use default options for METIS
@@ -69,8 +69,8 @@ void partition (const SparsityPattern     &sparsity_pattern,
   for (SparsityPattern::size_type row=0; row<sparsity_pattern.n_rows(); ++row)
     {
       for (SparsityPattern::iterator col=sparsity_pattern.begin(row);
-	   col < sparsity_pattern.end(row); ++col)
-	int_colnums.push_back(col->column());
+           col < sparsity_pattern.end(row); ++col)
+        int_colnums.push_back(col->column());
       int_rowstart.push_back(int_colnums.size());
     }
 
@@ -90,8 +90,8 @@ void partition (const SparsityPattern     &sparsity_pattern,
     deallog << options[i] << ' ';
   deallog << std::endl;
   deallog << sizeof(idx_t) << std::endl;
-  
-  
+
+
   // Make use of METIS' error code.
   int ierr;
 
@@ -99,9 +99,9 @@ void partition (const SparsityPattern     &sparsity_pattern,
   // create
 
   ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
-				  NULL, NULL, NULL,
-				  &nparts,NULL,NULL,&options[0],
-				  &dummy,&int_partition_indices[0]);
+                                  NULL, NULL, NULL,
+                                  &nparts,NULL,NULL,&options[0],
+                                  &dummy,&int_partition_indices[0]);
 
   deallog << "METIS outputs:" << std::endl;
   deallog << dummy << std::endl;
@@ -121,7 +121,7 @@ void test ()
   SparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells (triangulation, cell_connectivity);
 
-  partition (cell_connectivity, 5);  
+  partition (cell_connectivity, 5);
 }
 
 

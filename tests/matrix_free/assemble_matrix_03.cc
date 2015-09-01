@@ -147,13 +147,13 @@ void do_test (const DoFHandler<dim> &dof)
 
   unsigned int dummy = 0;
   WorkStream::
-    run (dof.begin_active(), dof.end(),
-         &assemble_on_cell<dim,fe_degree>,
-         &copy_data_local_to_global,
-         Assembly::Scratch::Data<dim,fe_degree>(dof.get_fe()),
-         dummy,
-         2*MultithreadInfo::n_threads(),
-         1);
+  run (dof.begin_active(), dof.end(),
+       &assemble_on_cell<dim,fe_degree>,
+       &copy_data_local_to_global,
+       Assembly::Scratch::Data<dim,fe_degree>(dof.get_fe()),
+       dummy,
+       2*MultithreadInfo::n_threads(),
+       1);
   deallog << "OK" << std::endl;
 }
 

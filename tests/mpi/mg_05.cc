@@ -19,11 +19,11 @@
 /*
 An error occurred in line <126> of file <mg_05.cc> in function
     void test() [with int dim = 2]
-The violated condition was: 
+The violated condition was:
     cell->neighbor(f)->level_subdomain_id()<100
 The name and call sequence of the exception was:
     ExcInternalError()
-Additional Information: 
+Additional Information:
 (none)
 */
 
@@ -93,60 +93,60 @@ void test()
   GridGenerator::hyper_cube(tr);
   tr.refine_global(3);
 
-  for (unsigned int ii=0;ii<5;++ii)
+  for (unsigned int ii=0; ii<5; ++ii)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = tr.begin_active(),
-        endc = tr.end();
-      
+      cell = tr.begin_active(),
+      endc = tr.end();
+
       for (; cell!=endc; ++cell)
-	if (Testing::rand()%42==1)
-	  cell->set_refine_flag ();
-      
+        if (Testing::rand()%42==1)
+          cell->set_refine_flag ();
+
       tr.execute_coarsening_and_refinement ();
-      
+
       DoFHandler<dim> dofh(tr);
-      
-				       //output(tr);
-      
+
+      //output(tr);
+
       static const FE_Q<dim> fe(1);
       dofh.distribute_dofs (fe);
       dofh.distribute_mg_dofs (fe);
-      
+
       {
-	for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
-	  {
-//	    deallog << "level " << lvl << ": "<< std::endl;
-	    typename DoFHandler<dim>::cell_iterator
-	      cell = dofh.begin(lvl),
-	      endc = dofh.end(lvl);
+        for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
+          {
+//      deallog << "level " << lvl << ": "<< std::endl;
+            typename DoFHandler<dim>::cell_iterator
+            cell = dofh.begin(lvl),
+            endc = dofh.end(lvl);
 
-	    for (; cell!=endc; ++cell)
-	      {
-		if (cell->level_subdomain_id()!=tr.locally_owned_subdomain())
-		  continue;
-		for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-		  {
-		    if (cell->at_boundary(f))
-		      continue;
+            for (; cell!=endc; ++cell)
+              {
+                if (cell->level_subdomain_id()!=tr.locally_owned_subdomain())
+                  continue;
+                for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+                  {
+                    if (cell->at_boundary(f))
+                      continue;
 
-//		    deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
-						     // is cell level-artificial?
-		    Assert(cell->neighbor(f)->level_subdomain_id()<100, ExcInternalError());
-		
-		    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
-		    cell->neighbor(f)->get_mg_dof_indices(dofs);
-		    for (unsigned int i=0;i<fe.n_dofs_per_cell();++i)
-		      {
-			Assert(dofs[i]!=numbers::invalid_dof_index, ExcInternalError());
-		      }
-		  
-		  }
-	      }
-	  }
+//        deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
+                    // is cell level-artificial?
+                    Assert(cell->neighbor(f)->level_subdomain_id()<100, ExcInternalError());
+
+                    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
+                    cell->neighbor(f)->get_mg_dof_indices(dofs);
+                    for (unsigned int i=0; i<fe.n_dofs_per_cell(); ++i)
+                      {
+                        Assert(dofs[i]!=numbers::invalid_dof_index, ExcInternalError());
+                      }
+
+                  }
+              }
+          }
       }
     }
-  
+
   if (myid==0)
     deallog << "OK" << std::endl;
 }

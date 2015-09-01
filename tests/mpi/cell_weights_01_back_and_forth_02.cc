@@ -42,8 +42,8 @@ void test()
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                               dealii::Triangulation<dim>::none,
+                                               parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
   GridGenerator::subdivided_hyper_cube(tr, 16);
   tr.refine_global(1);
@@ -59,15 +59,15 @@ void test()
   {
     tr.repartition ();
   }
-  
+
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
       deallog << "processor " << p
-	      << ": "
-	      << tr.n_locally_owned_active_cells_per_processor ()[p]
-	      << " locally owned active cells"
-	      << std::endl;
+              << ": "
+              << tr.n_locally_owned_active_cells_per_processor ()[p]
+              << " locally owned active cells"
+              << std::endl;
 }
 
 

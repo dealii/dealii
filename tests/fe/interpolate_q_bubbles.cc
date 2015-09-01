@@ -25,7 +25,7 @@
 
 template <int dim>
 void check_q_bubbles(const Function<dim> &f,
-                 const unsigned int degree)
+                     const unsigned int degree)
 {
   FE_Q_Bubbles<dim> fe(degree);
   deallog << fe.get_name() << ' ';

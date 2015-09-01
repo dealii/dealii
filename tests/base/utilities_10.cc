@@ -31,35 +31,35 @@ void test ()
   // verify the documented behavior of eating trailing delimiters
   {
     deallog << Utilities::split_string_list (",").size()
-	    << std::endl;
+            << std::endl;
     deallog << Utilities::split_string_list (" , ").size()
-	    << std::endl;
+            << std::endl;
   }
 
   {
     deallog << Utilities::split_string_list (",,").size()
-	    << std::endl;
+            << std::endl;
     deallog << Utilities::split_string_list (" , , ").size()
-	    << std::endl;
+            << std::endl;
   }
 
   // try some more esoteric cases:
   {
     deallog << Utilities::split_string_list (" , , ", ' ').size()
-	    << std::endl;
+            << std::endl;
   }
 
   {
     deallog << Utilities::split_string_list (" ", ' ').size()
-	    << std::endl;
+            << std::endl;
     deallog << Utilities::split_string_list ("   ", ' ').size()
-	    << std::endl;
+            << std::endl;
   }
 
   Assert (Utilities::split_string_list(" ; ", ';').size() == 1,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (Utilities::split_string_list(" ; ", ';')[0] == "",
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 

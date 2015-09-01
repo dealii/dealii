@@ -16,7 +16,7 @@
 
 
 // check correct behaviour of sadd of Trilinos vectors
-// if there are processes that doesn't own anything 
+// if there are processes that doesn't own anything
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -42,11 +42,11 @@ void test ()
   const unsigned int local_end = entries_per_process*(n_proc-1);
 
   if (my_id != n_proc-1)
-  {
-    locally_owned.add_range(begin_index, end_index);
-    locally_relevant.add_range(local_begin, local_end);
-  }
- 
+    {
+      locally_owned.add_range(begin_index, end_index);
+      locally_relevant.add_range(local_begin, local_end);
+    }
+
   distributed.reinit(locally_owned, MPI_COMM_WORLD);
   distributed2.reinit(locally_owned, MPI_COMM_WORLD);
   ghosted.reinit (locally_owned, locally_relevant, MPI_COMM_WORLD);
@@ -143,21 +143,21 @@ void test ()
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-  
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-  
+
   if (myid == 0)
-  {
-    std::ofstream logfile("output");
-    deallog.attach(logfile);
-    deallog << std::setprecision(4);
-    deallog.depth_console(0);
-    deallog.threshold_double(1.e-10);
-    
-    test();
-  }
+    {
+      std::ofstream logfile("output");
+      deallog.attach(logfile);
+      deallog << std::setprecision(4);
+      deallog.depth_console(0);
+      deallog.threshold_double(1.e-10);
+
+      test();
+    }
   else
     test();
-  
+
 }

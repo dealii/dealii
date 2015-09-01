@@ -36,7 +36,7 @@ int main()
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
-    }  
+    }
 }
 
 

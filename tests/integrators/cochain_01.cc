@@ -110,7 +110,7 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   sparsity.reinit(dof.block_info().global().size(),
                   dof.block_info().global().size());
   BlockDynamicSparsityPattern c_sparsity(dof.block_info().global(),
-					 dof.block_info().global());
+                                         dof.block_info().global());
   DoFTools::make_flux_sparsity_pattern(dof, c_sparsity, constraints, false);
   sparsity.copy_from(c_sparsity);
 

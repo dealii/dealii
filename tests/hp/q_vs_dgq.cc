@@ -44,7 +44,7 @@ namespace Step27
 
   private:
 
-    Triangulation<dim>  	 triangulation;
+    Triangulation<dim>     triangulation;
     hp::DoFHandler<dim>      dof_handler;
     hp::FECollection<dim>    fe_collection;
 
@@ -52,8 +52,8 @@ namespace Step27
 
   template <int dim>
   MixedFECollection<dim>::MixedFECollection ()
-  :
-  dof_handler (triangulation)
+    :
+    dof_handler (triangulation)
   {
 
   }
@@ -78,18 +78,18 @@ namespace Step27
 
     // looping over all cells and assigning the FE_DG object to the first cell
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
     for (unsigned int counter = 0; cell!=endc; ++cell, counter ++)
       if (counter == 0)
-	{
-	  cell->set_active_fe_index (cell->active_fe_index() + 1);
-	}
+        {
+          cell->set_active_fe_index (cell->active_fe_index() + 1);
+        }
 
     dof_handler.distribute_dofs (fe_collection);
 
     deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
-	    << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
   }
 }
 

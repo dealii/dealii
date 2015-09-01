@@ -197,9 +197,9 @@ check ()
       // multiply matrix by 100 to
       // make test more sensitive
       for (SparseMatrix<double>::const_iterator p=matrix.begin();
-	   p!=matrix.end(); ++p)
-	deallog.get_file_stream() << p->value() * 100
-				  << std::endl;
+           p!=matrix.end(); ++p)
+        deallog.get_file_stream() << p->value() * 100
+                                  << std::endl;
     };
 
   if (dim > 1)

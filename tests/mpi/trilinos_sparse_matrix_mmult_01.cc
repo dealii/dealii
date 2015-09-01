@@ -156,17 +156,17 @@ int main (int argc, char **argv)
   try
     {
       if (myid == 0)
-	{
-	  std::ofstream logfile("output");
-	  deallog.attach(logfile);
-	  deallog << std::setprecision(4);
-	  deallog.depth_console(0);
-	  deallog.threshold_double(1.e-10);
+        {
+          std::ofstream logfile("output");
+          deallog.attach(logfile);
+          deallog << std::setprecision(4);
+          deallog.depth_console(0);
+          deallog.threshold_double(1.e-10);
 
-	  test();
-	}
+          test();
+        }
       else
-	test();
+        test();
     }
   catch (const char *p)
     {

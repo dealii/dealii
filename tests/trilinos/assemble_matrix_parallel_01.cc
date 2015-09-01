@@ -301,9 +301,9 @@ LaplaceProblem<dim>::local_assemble (const typename hp::DoFHandler<dim>::active_
                                        fe_values.shape_grad(j,q_point) *
                                        fe_values.JxW(q_point));
 
-            data.local_rhs(i) += (fe_values.shape_value(i,q_point) *
-                                  rhs_value *
-                                  fe_values.JxW(q_point));
+          data.local_rhs(i) += (fe_values.shape_value(i,q_point) *
+                                rhs_value *
+                                fe_values.JxW(q_point));
         }
     }
 
@@ -356,21 +356,21 @@ void LaplaceProblem<dim>::assemble_test ()
   test_rhs = 0;
 
   WorkStream::
-    run (graph,
-         std_cxx11::bind (&LaplaceProblem<dim>::
-                          local_assemble,
-                          this,
-                          std_cxx11::_1,
-                          std_cxx11::_2,
-                          std_cxx11::_3),
-         std_cxx11::bind (&LaplaceProblem<dim>::
-                          copy_local_to_global,
-                          this,
-                          std_cxx11::_1),
-         Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-         Assembly::Copy::Data (),
-         2*MultithreadInfo::n_threads(),
-         1);
+  run (graph,
+       std_cxx11::bind (&LaplaceProblem<dim>::
+                        local_assemble,
+                        this,
+                        std_cxx11::_1,
+                        std_cxx11::_2,
+                        std_cxx11::_3),
+       std_cxx11::bind (&LaplaceProblem<dim>::
+                        copy_local_to_global,
+                        this,
+                        std_cxx11::_1),
+       Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
+       Assembly::Copy::Data (),
+       2*MultithreadInfo::n_threads(),
+       1);
   test_matrix.compress(VectorOperation::add);
   test_rhs.compress(VectorOperation::add);
 

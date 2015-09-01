@@ -121,18 +121,18 @@ void test (IndexSet &index_set)
 
   // Assignment
   {
-      IndexSet::IntervalIterator it = index_set.begin_intervals();
-      Assert(it->is_valid() || index_set.n_elements()==0, ExcInternalError());
-      it = index_set.end_intervals();
-      Assert(!it->is_valid(), ExcInternalError());
+    IndexSet::IntervalIterator it = index_set.begin_intervals();
+    Assert(it->is_valid() || index_set.n_elements()==0, ExcInternalError());
+    it = index_set.end_intervals();
+    Assert(!it->is_valid(), ExcInternalError());
   }
 
   // Construct empty iterator
   {
-      IndexSet::IntervalIterator it;
-      Assert(!it->is_valid(), ExcInternalError());
-      it = index_set.begin_intervals();
-      Assert(it->is_valid() || index_set.n_elements()==0, ExcInternalError());
+    IndexSet::IntervalIterator it;
+    Assert(!it->is_valid(), ExcInternalError());
+    it = index_set.begin_intervals();
+    Assert(it->is_valid() || index_set.n_elements()==0, ExcInternalError());
   }
 }
 

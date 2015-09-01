@@ -16,7 +16,7 @@
 
 
 // test get_name()
- 
+
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
@@ -66,7 +66,7 @@ main()
     test(fe);
   }
 
-  
+
 
   return 0;
 }

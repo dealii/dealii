@@ -34,7 +34,7 @@
 
 template <int dim>
 std::vector<types::global_dof_index> get_conflict_indices_cfem(
-    typename DoFHandler<dim>::active_cell_iterator const &it) 
+  typename DoFHandler<dim>::active_cell_iterator const &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
@@ -57,28 +57,28 @@ void check()
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active();
   for (; cell<dof_handler.end(); ++cell)
-  {
-    if ((cell->center()[0]==0.625) && (cell->center()[1]==0.625))
-    cell->set_refine_flag();
-  }
+    {
+      if ((cell->center()[0]==0.625) && (cell->center()[1]==0.625))
+        cell->set_refine_flag();
+    }
   triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
 
   // Create the coloring
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring(
-      GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
-        std_cxx11::function<std::vector<types::global_dof_index> (typename 
-          DoFHandler<dim>::active_cell_iterator const &)> (&get_conflict_indices_cfem<dim>)));
+    GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
+                                       std_cxx11::function<std::vector<types::global_dof_index> (typename
+                                           DoFHandler<dim>::active_cell_iterator const &)> (&get_conflict_indices_cfem<dim>)));
 
   // Output the coloring
   for (unsigned int color=0; color<coloring.size(); ++color)
-  {
-    deallog<<"Color: "<<color<<std::endl;
-    for (unsigned int i=0; i<coloring[color].size(); ++i)
-      for (unsigned int j=0; j<dim; ++j)
-        deallog<<coloring[color][i]->center()[j]<<" ";
-    deallog<<std::endl;
-  }
+    {
+      deallog<<"Color: "<<color<<std::endl;
+      for (unsigned int i=0; i<coloring[color].size(); ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          deallog<<coloring[color][i]->center()[j]<<" ";
+      deallog<<std::endl;
+    }
 }
 
 int main()

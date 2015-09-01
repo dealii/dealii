@@ -69,11 +69,11 @@ public:
       void compress(VectorOperation::values op)
       {}
 
-	bool all_zero()
-	  {
-	    return false;
-	  }	
-	
+      bool all_zero()
+      {
+        return false;
+      }
+
       bool has_ghost_elements()
       {
         return false;

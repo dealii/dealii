@@ -73,7 +73,7 @@ int main ()
   boundary_ids.insert(0);
 
   GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
-                                    boundary_ids);
+                                        boundary_ids);
   triangulation.set_boundary (0);
   GridTools::transform (&warp<3>, triangulation);
 

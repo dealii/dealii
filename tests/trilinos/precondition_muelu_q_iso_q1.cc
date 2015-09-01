@@ -275,7 +275,7 @@ void Step4<dim>::solve ()
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve (system_matrix, solution, system_rhs,
-		    preconditioner),
+                    preconditioner),
       solver_control.last_step(), 31, 33);
   }
   deallog.pop();
@@ -289,7 +289,7 @@ void Step4<dim>::solve ()
     preconditioner.initialize(preconditioner_matrix);
     check_solver_within_range(
       solver.solve (system_matrix, solution, system_rhs,
-		    preconditioner),
+                    preconditioner),
       solver_control.last_step(), 24, 38);
   }
   deallog.pop();

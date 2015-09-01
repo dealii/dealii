@@ -73,7 +73,7 @@ void test ()
   typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin(0);
   Vector<double> local (fe[0].dofs_per_cell);
   cell->get_interpolated_dof_values (solution, local,
-				     0);
+                                     0);
   for (unsigned int i=0; i<local.size(); ++i)
     deallog << local[i] << ' ';
   deallog << std::endl;
@@ -86,7 +86,7 @@ void test ()
       cell->get_dof_values (solution, x);
       deallog << "cell =" << cell << ":  ";
       for (unsigned int i=0; i<x.size(); ++i)
-	deallog << x[i] << ' ';
+        deallog << x[i] << ' ';
       deallog << std::endl;
     }
 }

@@ -48,8 +48,8 @@ void test (unsigned p1, unsigned p2)
   GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
                                              Point<dim>(),
                                              (dim == 3 ?
-                                                Point<dim>(2,1,1) :
-                                                Point<dim>(2,1)));
+                                              Point<dim>(2,1,1) :
+                                              Point<dim>(2,1)));
   (++triangulation.begin_active())->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
 
@@ -68,26 +68,26 @@ void test (unsigned p1, unsigned p2)
 
   bool is_zero_column = true;
   for (unsigned int i=0; i<face_int_matrix.n(); ++i)
-  {
-    is_zero_column = true;
-    for (unsigned int j=0; j<face_int_matrix.m(); ++j)
     {
-      if(fabs(face_int_matrix(j, i)) > 1e-10)
-      {
-        is_zero_column = false;
-        break;
-      }
+      is_zero_column = true;
+      for (unsigned int j=0; j<face_int_matrix.m(); ++j)
+        {
+          if (fabs(face_int_matrix(j, i)) > 1e-10)
+            {
+              is_zero_column = false;
+              break;
+            }
+        }
+
+      if (is_zero_column)
+        {
+          deallog << "Column " << i
+                  << " has no non-zero elements."
+                  << std::endl;
+        }
     }
 
-    if(is_zero_column)
-    {
-      deallog << "Column " << i
-              << " has no non-zero elements."
-              << std::endl;
-    }
-  }
-
-  if(!is_zero_column)
+  if (!is_zero_column)
     deallog << "OK" << std::endl;
   else
     deallog << "Failed" << std::endl;

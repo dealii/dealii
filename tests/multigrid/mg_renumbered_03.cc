@@ -233,7 +233,7 @@ private:
   DoFHandler<dim>    mg_dof_handler_renumbered;
 
   const unsigned int degree;
-    std::vector<std::set<types::global_dof_index> >
+  std::vector<std::set<types::global_dof_index> >
   boundary_indices, boundary_indices_renumbered;
 
 };

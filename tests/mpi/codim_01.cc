@@ -51,12 +51,12 @@ void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
       cat_file((std::string(filename) + "_0000.vtu").c_str());
     }
   else if (myid==1)
-      cat_file((std::string(filename) + "_0001.vtu").c_str());
+    cat_file((std::string(filename) + "_0001.vtu").c_str());
   else if (myid==2)
-      cat_file((std::string(filename) + "_0002.vtu").c_str());
+    cat_file((std::string(filename) + "_0002.vtu").c_str());
   else
     AssertThrow(false, ExcNotImplemented());
-  
+
 }
 
 template<int dim, int spacedim>
@@ -80,21 +80,21 @@ void test(std::ostream & /*out*/)
   deallog << "dofs " << dh.n_dofs() << std::endl;
 
   DataOut<dim,DoFHandler<dim,spacedim> > data_out;
-    data_out.attach_triangulation (tr);
-    Vector<float> subdomain (tr.n_active_cells());
-   for (unsigned int i=0; i<subdomain.size(); ++i)
-      subdomain(i) = tr.locally_owned_subdomain();
-   data_out.add_data_vector (subdomain, "subdomain");
+  data_out.attach_triangulation (tr);
+  Vector<float> subdomain (tr.n_active_cells());
+  for (unsigned int i=0; i<subdomain.size(); ++i)
+    subdomain(i) = tr.locally_owned_subdomain();
+  data_out.add_data_vector (subdomain, "subdomain");
 
-   std::string name = "f0.vtu";
-   name[1] += tr.locally_owned_subdomain();
+  std::string name = "f0.vtu";
+  name[1] += tr.locally_owned_subdomain();
 
-   {
-     std::ofstream file(name.c_str());
-     data_out.build_patches ();
-     data_out.write_vtu (file);
-   }
-   cat_file(name.c_str());
+  {
+    std::ofstream file(name.c_str());
+    data_out.build_patches ();
+    data_out.write_vtu (file);
+  }
+  cat_file(name.c_str());
 }
 
 

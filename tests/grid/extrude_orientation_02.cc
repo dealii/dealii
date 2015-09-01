@@ -44,10 +44,10 @@ void test(std::ostream &out)
        c!=tr.end(); ++c)
     {
       deallog << "2d cell " << c << " has the following face orientations:"
-	      << std::endl;
+              << std::endl;
       for (unsigned int l=0; l<GeometryInfo<2>::faces_per_cell; ++l)
-	deallog << "    " << (c->face_orientation(l) ? "true" : "false")
-		<< std::endl;
+        deallog << "    " << (c->face_orientation(l) ? "true" : "false")
+                << std::endl;
     }
 
   Triangulation<3> tr3;
@@ -57,15 +57,15 @@ void test(std::ostream &out)
        c!=tr3.end(); ++c)
     {
       deallog << "3d cell " << c << " has the following face orientation/flips and edge orientations:"
-	      << std::endl;
+              << std::endl;
       for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-	deallog << "    face=" << f 
-		<< (c->face_orientation(f) ? " -> true" : " -> false")
-		<< (c->face_flip(f) ? "/true" : "/false")
-		<< std::endl;
+        deallog << "    face=" << f
+                << (c->face_orientation(f) ? " -> true" : " -> false")
+                << (c->face_flip(f) ? "/true" : "/false")
+                << std::endl;
       for (unsigned int e=0; e<GeometryInfo<3>::lines_per_cell; ++e)
-	deallog << "    edge=" << e << (c->line_orientation(e) ? " -> true" : " -> false")
-		<< std::endl;
+        deallog << "    edge=" << e << (c->line_orientation(e) ? " -> true" : " -> false")
+                << std::endl;
     }
 }
 

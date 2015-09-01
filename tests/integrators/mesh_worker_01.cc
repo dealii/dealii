@@ -99,13 +99,13 @@ Local<dim>::cell(MeshWorker::DoFInfo<dim> &info, CellInfo &) const
 
 template <int dim>
 void
-Local<dim>::bdry(MeshWorker::DoFInfo<dim> & , CellInfo &) const
+Local<dim>::bdry(MeshWorker::DoFInfo<dim> &, CellInfo &) const
 {}
 
 
 template <int dim>
 void
-Local<dim>::face(MeshWorker::DoFInfo<dim> & , MeshWorker::DoFInfo<dim> &,
+Local<dim>::face(MeshWorker::DoFInfo<dim> &, MeshWorker::DoFInfo<dim> &,
                  CellInfo &, CellInfo &) const
 {}
 

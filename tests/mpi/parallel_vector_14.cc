@@ -81,7 +81,7 @@ void test ()
 
       // copy vector content to non-ghosted vectors, manually created.
       parallel::distributed::Vector<double> v_dist(local_owned, MPI_COMM_WORLD),
-        w_dist(v_dist), u_dist(v_dist);
+               w_dist(v_dist), u_dist(v_dist);
 
       v_dist = v;
       w_dist = w;

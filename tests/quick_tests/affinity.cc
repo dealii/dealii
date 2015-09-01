@@ -33,7 +33,7 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
 {
   bits_set = 0;
   mask = 0x00;
-  
+
 #if defined(__linux__)
   cpu_set_t my_set;
   CPU_ZERO(&my_set);
@@ -46,10 +46,10 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
       printf("sched_getaffinity() failed, return value: %d\n", ret);
       return false;
     }
-  for (int i=0;i<CPU_SETSIZE;++i)
+  for (int i=0; i<CPU_SETSIZE; ++i)
     bits_set += CPU_ISSET(i,&my_set);
 
-  mask = *(int*)(&my_set);
+  mask = *(int *)(&my_set);
 #else
   // sadly we don't have an implementation
   // for mac/windows
@@ -64,13 +64,13 @@ int get_num_thread_env()
     {
       int max_threads_env = -1;
       try
-	{
-	  max_threads_env = dealii::Utilities::string_to_int(std::string(penv));
-	}
+        {
+          max_threads_env = dealii::Utilities::string_to_int(std::string(penv));
+        }
       catch (...)
-	{
-	  return -1;
-	}
+        {
+          return -1;
+        }
       return max_threads_env;
     }
 
@@ -91,7 +91,7 @@ int main ()
   unsigned int tbbprocs = dealii::MultithreadInfo::n_threads();
   int env = get_num_thread_env();
   printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
-	 bits_set, mask, nprocs, tbbprocs, env );
+         bits_set, mask, nprocs, tbbprocs, env );
 
   if (bits_set !=0  && bits_set!=nprocs)
     {
@@ -106,9 +106,9 @@ int main ()
   if (nprocs != tbbprocs)
     {
       printf("Warning: for some reason TBB only wants to use %d out of %d CPUs.\n",
-	     tbbprocs, nprocs);
+             tbbprocs, nprocs);
       return 3;
     }
-  
+
   return 0;
 }

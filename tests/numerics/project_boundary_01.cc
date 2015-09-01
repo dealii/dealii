@@ -126,7 +126,7 @@ check ()
   // boundary value functions
   std::vector<const FiniteElement<dim>*> fe_list;
   std::vector<MySquareFunction<dim>*> function_list;
-  
+
   // FE1: a system of a quadratic and a linear element
   fe_list.push_back (new FESystem<dim> (FE_Q<dim>(2), 1, FE_Q<dim>(1), 1));
   function_list.push_back (new MySquareFunction<dim>(2));

@@ -24,56 +24,56 @@
 #include <iomanip>
 
 template<typename number>
-  void
-  checkReinit3(const Vector<number> &V)
-  {
-    deallog
-        << "Reinit a ReadOnly VectorView<number> with const Vector<number> and const size"
-        << std::endl;
+void
+checkReinit3(const Vector<number> &V)
+{
+  deallog
+      << "Reinit a ReadOnly VectorView<number> with const Vector<number> and const size"
+      << std::endl;
 
-    deallog
-        << "Creating dummy Vector<number> of size V.size() and filling with zeros"
-        << std::endl;
+  deallog
+      << "Creating dummy Vector<number> of size V.size() and filling with zeros"
+      << std::endl;
 
-    Vector<number> _V(V.size());
-    for (unsigned int i = 0; i < _V.size(); i++)
-      _V(i) = 0;
+  Vector<number> _V(V.size());
+  for (unsigned int i = 0; i < _V.size(); i++)
+    _V(i) = 0;
 
-    deallog << "Creating VectorView<number> pointing to dummy Vector<number>"
-        << std::endl;
-    VectorView<number> VV(_V.size(), _V.begin());
+  deallog << "Creating VectorView<number> pointing to dummy Vector<number>"
+          << std::endl;
+  VectorView<number> VV(_V.size(), _V.begin());
 
-    deallog << "Printing dummy Vector<number>" << std::endl;
-    for (unsigned int i = 0; i < _V.size(); ++i)
-      deallog << _V(i) << '\t';
-    deallog << std::endl;
+  deallog << "Printing dummy Vector<number>" << std::endl;
+  for (unsigned int i = 0; i < _V.size(); ++i)
+    deallog << _V(i) << '\t';
+  deallog << std::endl;
 
-    deallog << "Printing VectorView<number> pointing to dummy Vector<number>"
-        << std::endl;
-    for (unsigned int i = 0; i < VV.size(); ++i)
-      deallog << VV(i) << '\t';
-    deallog << std::endl;
+  deallog << "Printing VectorView<number> pointing to dummy Vector<number>"
+          << std::endl;
+  for (unsigned int i = 0; i < VV.size(); ++i)
+    deallog << VV(i) << '\t';
+  deallog << std::endl;
 
-    deallog << "Reinit VectorView<number> to half of Vector<number>"
-        << std::endl;
-    VV.reinit(V.size() / 2, V.begin());
+  deallog << "Reinit VectorView<number> to half of Vector<number>"
+          << std::endl;
+  VV.reinit(V.size() / 2, V.begin());
 
-    deallog << "Printing Vector<number>" << std::endl;
-    for (unsigned int i = 0; i < V.size(); ++i)
-      deallog << V(i) << '\t';
-    deallog << std::endl;
+  deallog << "Printing Vector<number>" << std::endl;
+  for (unsigned int i = 0; i < V.size(); ++i)
+    deallog << V(i) << '\t';
+  deallog << std::endl;
 
-    deallog << "Printing VectorView<number> pointing to half of Vector<number>"
-        << std::endl;
-    for (unsigned int i = 0; i < VV.size(); ++i)
-      deallog << VV(i) << '\t';
-    deallog << std::endl;
+  deallog << "Printing VectorView<number> pointing to half of Vector<number>"
+          << std::endl;
+  for (unsigned int i = 0; i < VV.size(); ++i)
+    deallog << VV(i) << '\t';
+  deallog << std::endl;
 
-    /* deallog << "Incrementing Vector<number> elements using Read-only handle of VectorView<number>" << std::endl;
-     deallog << "Function fails beyond this point" << std::endl;
-     for (unsigned int i=0; i<VV.size(); ++i)
-     VV(i)=VV(i)+1; */
-  }
+  /* deallog << "Incrementing Vector<number> elements using Read-only handle of VectorView<number>" << std::endl;
+   deallog << "Function fails beyond this point" << std::endl;
+   for (unsigned int i=0; i<VV.size(); ++i)
+   VV(i)=VV(i)+1; */
+}
 
 int
 main()

@@ -100,17 +100,17 @@ void test ()
        ++p)
     if (my_id == 0)
       {
-	deallog << "Looking at entry (" << p->row() << ','
-		<< p->column() << ") with value "
-		<< p->value()
-		<< std::endl;
-	AssertThrow (p->row() == 0, ExcInternalError());
+        deallog << "Looking at entry (" << p->row() << ','
+                << p->column() << ") with value "
+                << p->value()
+                << std::endl;
+        AssertThrow (p->row() == 0, ExcInternalError());
       }
     else
       {
-	AssertThrow (p->row() == 2, ExcInternalError());
-      }  
-  
+        AssertThrow (p->row() == 2, ExcInternalError());
+      }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }

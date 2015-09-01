@@ -46,8 +46,8 @@ void test1()
   tr1.copy_triangulation(tr2);
 
   dofh.begin_active()->set_active_fe_index(0);
-  
-  
+
+
 }
 
 int main()

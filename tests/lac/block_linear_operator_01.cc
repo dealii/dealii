@@ -64,14 +64,16 @@ int main()
   dsp.block(0, 1).reinit (n_u, n_p);
   dsp.block(1, 1).reinit (n_p, n_p);
 
-  for (unsigned int i = 0; i < n_u; ++i) {
-    for (unsigned int j = 0; j < n_u; ++j)
-      dsp.block(0, 0).add(i, j);
-    for (unsigned int j = 0; j < n_p; ++j) {
-      dsp.block(0, 1).add(i, j);
-      dsp.block(1, 0).add(j, i);
+  for (unsigned int i = 0; i < n_u; ++i)
+    {
+      for (unsigned int j = 0; j < n_u; ++j)
+        dsp.block(0, 0).add(i, j);
+      for (unsigned int j = 0; j < n_p; ++j)
+        {
+          dsp.block(0, 1).add(i, j);
+          dsp.block(1, 0).add(j, i);
+        }
     }
-  }
   for (unsigned int i = 0; i < n_p; ++i)
     for (unsigned int j = 0; j < n_p; ++j)
       dsp.block(1, 1).add(i, j);
@@ -85,16 +87,16 @@ int main()
 
   // Come up with some simple, but non-trivial structure:
 
-  for(unsigned int i = 0; i < a.block(0, 0).n(); ++i)
+  for (unsigned int i = 0; i < a.block(0, 0).n(); ++i)
     a.block(0, 0).set(i, i, 10.);
 
-  for(unsigned int i = 0; i < a.block(1, 1).n(); ++i)
+  for (unsigned int i = 0; i < a.block(1, 1).n(); ++i)
     a.block(1, 1).set(i, i, 5.);
 
-  for(unsigned int i = 0; i < a.block(1, 0).m(); ++i)
+  for (unsigned int i = 0; i < a.block(1, 0).m(); ++i)
     a.block(0, 1).set(i, i, 3.);
 
-  for(unsigned int i = 0; i < a.block(0, 1).n(); ++i)
+  for (unsigned int i = 0; i < a.block(0, 1).n(); ++i)
     a.block(1, 0).set(i, i, 1.);
 
 
@@ -105,17 +107,19 @@ int main()
   auto op_b10 = linear_operator(a.block(1, 0));
   auto op_b11 = linear_operator(a.block(1, 1));
 
-  std::array<std::array<decltype(op_b00), 2>, 2> temp{op_b00, op_b01, op_b10,
-                                                      op_b11};
+  std::array<std::array<decltype(op_b00), 2>, 2> temp {op_b00, op_b01, op_b10,
+                                                       op_b11
+                                                      };
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   // vmult:
 
   BlockVector<double> u;
   op_a.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
+  for (unsigned int i = 0; i < u.size(); ++i)
+    {
+      u[i] = (double)(i+1);
+    }
 
   PRINTME("u", u);
 
@@ -174,14 +178,17 @@ int main()
 
   // And finally complicated block structures:
 
-  std::array<std::array<decltype(op_b00), 3>, 3> temp2{
-      op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10};
+  std::array<std::array<decltype(op_b00), 3>, 3> temp2
+  {
+    op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10
+  };
   auto op_upp_x_upu = block_operator<3, 3, BlockVector<double>>(temp2);
 
   op_upp_x_upu.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
+  for (unsigned int i = 0; i < u.size(); ++i)
+    {
+      u[i] = (double)(i+1);
+    }
   PRINTME("u", u);
 
   op_upp_x_upu.reinit_range_vector(v, false);
@@ -192,18 +199,19 @@ int main()
   op_upp_x_upu.vmult_add(v, u);
   PRINTME("v", v);
 
-  std::array<std::array<decltype(op_b01), 1>, 3> temp3{op_b01, op_b11, op_b11};
+  std::array<std::array<decltype(op_b01), 1>, 3> temp3 {op_b01, op_b11, op_b11};
   auto op_upp_x_p = block_operator<3, 1, BlockVector<double>>(temp3);
 
-  std::array<std::array<decltype(op_b01), 3>, 1> temp4{op_b00, op_b01, op_b00};
+  std::array<std::array<decltype(op_b01), 3>, 1> temp4 {op_b00, op_b01, op_b00};
   auto op_u_x_upu = block_operator<1, 3, BlockVector<double>>(temp4);
 
   auto op_long = op_u_x_upu * transpose_operator(op_upp_x_upu) * op_upp_x_p;
 
   op_long.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
+  for (unsigned int i = 0; i < u.size(); ++i)
+    {
+      u[i] = (double)(i+1);
+    }
   PRINTME("u", u);
 
   op_long.reinit_range_vector(v, false);

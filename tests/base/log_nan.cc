@@ -41,7 +41,7 @@ int main ()
 #if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
   fedisableexcept(FE_INVALID);
 #endif
-  
+
   deallog << std::numeric_limits<double>::quiet_NaN() << std::endl;
   deallog << std::numeric_limits<double>::signaling_NaN() << std::endl;
 

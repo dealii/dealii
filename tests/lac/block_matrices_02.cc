@@ -36,7 +36,7 @@
 
 
 void do_set (const bool even_or_odd,
-	     BlockSparseMatrix<double> &bsm)
+             BlockSparseMatrix<double> &bsm)
 {
   BlockSparseMatrix<double>::size_type col_indices[5];
   for (unsigned int i=0; i<5 ; ++i)
