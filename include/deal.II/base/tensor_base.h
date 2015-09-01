@@ -267,21 +267,6 @@ private:
    * The value of this scalar object.
    */
   Number value;
-
-  template <int dim2, typename Number2, typename OtherNumber>
-  friend Tensor<0, dim2, typename ProductType<Number2, OtherNumber>::type>
-  operator*(const Tensor<0, dim2, Number2> &,
-            const Tensor<0, dim2, OtherNumber> &);
-
-  template <int dim2, typename Number2, typename OtherNumber>
-  friend Tensor<0, dim2, typename ProductType<Number2, OtherNumber>::type>
-  operator+(const Tensor<0, dim2, Number2> &,
-            const Tensor<0, dim2, OtherNumber> &);
-
-  template <int dim2, typename Number2, typename OtherNumber>
-  friend Tensor<0, dim2, typename ProductType<Number2, OtherNumber>::type>
-  operator-(const Tensor<0, dim2, Number2> &,
-            const Tensor<0, dim2, OtherNumber> &);
 };
 
 
@@ -832,7 +817,7 @@ template <int dim, typename Number>
 inline
 void Tensor<0,dim,Number>::clear ()
 {
-  value = 0;
+  value = value_type();
 }
 
 
@@ -843,45 +828,6 @@ inline
 void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
   ar &value;
-}
-
-
-
-/**
- * Returns the product of two Tensors of rank 0.
- */
-template <int dim, typename Number, typename OtherNumber>
-inline
-Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-operator* (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
-{
-  return p.value * q.value;
-}
-
-
-
-/**
- * Add two tensors of rank 0.
- */
-template <int dim, typename Number, typename OtherNumber>
-inline
-Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
-{
-  return p.value + q.value;
-}
-
-
-
-/**
- * Subtract two tensors of rank 0.
- */
-template <int dim, typename Number, typename OtherNumber>
-inline
-Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
-{
-  return p.value - q.value;
 }
 
 
@@ -960,6 +906,47 @@ operator / (const Tensor<0,dim,Number> &t,
             const OtherNumber           factor)
 {
   return static_cast<Number>(t) / factor;
+}
+
+
+
+/**
+ * Add two tensors of rank 0.
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) + static_cast<OtherNumber>(q);
+}
+
+
+
+/**
+ * Subtract two tensors of rank 0.
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) - static_cast<OtherNumber>(q);
+}
+
+
+
+/**
+ * Returns the contraction of two Tensors of rank 0.
+ *
+ * @relates Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number, OtherNumber>::type
+operator* (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) * static_cast<OtherNumber>(q);
 }
 
 
