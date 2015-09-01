@@ -24,25 +24,25 @@
 
 int main(int argc, char *argv[] )
 {
-  MPI_Init( &argc, &argv ); 
+  MPI_Init( &argc, &argv );
 
   int myrank, nproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
   std::cout << " Hi from " << myrank << "/" << nproc << std::endl;
-  
+
   if (nproc != 2)
     {
       std::cerr << "ERROR: process does not see nproc=2!" << std::endl;
       return -1;
     }
-  
+
   MPI_Barrier(MPI_COMM_WORLD);
 
   int err;
   int value = myrank;
-  
+
   if (myrank==1)
     err = MPI_Send(&value, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
   else if (myrank==0)
@@ -56,14 +56,14 @@ int main(int argc, char *argv[] )
 
   value = 1;
   int output = 0;
-  
+
   MPI_Allreduce(&value, &output, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   if (output != nproc)
     {
       std::cerr << "ERROR: MPI_Allreduce doesn't seem to work!" << std::endl;
       return -1;
     }
-    
+
   // we need this, otherwise gcc will not link against deal.II
   dealii::Triangulation<2> test;
 

@@ -218,7 +218,7 @@ void MinimizationProblem<dim>::assemble_step ()
       fe_values.get_present_fe_values().get_function_values (present_solution,
                                                              local_solution_values);
       fe_values.get_present_fe_values().get_function_gradients (present_solution,
-                                                            local_solution_grads);
+                                                                local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
@@ -539,7 +539,7 @@ MinimizationProblem<dim>::energy (const hp::DoFHandler<dim> &dof_handler,
       fe_values.get_present_fe_values().get_function_values (function,
                                                              local_solution_values);
       fe_values.get_present_fe_values().get_function_gradients (function,
-                                                            local_solution_grads);
+                                                                local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         energy += (std::pow (fe_values.get_present_fe_values().quadrature_point(q_point)(0)

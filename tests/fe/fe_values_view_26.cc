@@ -44,8 +44,8 @@ Tensor<1,1> curl (const Tensor<2,2> &grads)
 Tensor<1,3> curl (const Tensor<2,3> &grads)
 {
   return Point<3>(grads[2][1] - grads[1][2],
-		  grads[0][2] - grads[2][0],
-		  grads[1][0] - grads[0][1]);
+                  grads[0][2] - grads[2][0],
+                  grads[1][0] - grads[0][1]);
 }
 
 
@@ -81,10 +81,10 @@ void test (const Triangulation<dim> &tr,
   for (unsigned int q=0; q<quadrature.size(); ++q)
     {
       deallog << "  curls[q]= " << curls[q] << std::endl
-	      << "  grads[q]= " << grads[q] << std::endl;
+              << "  grads[q]= " << grads[q] << std::endl;
       Assert ((curl(grads[q]) - curls[q]).norm()
-	      <= 1e-10,
-	      ExcInternalError());
+              <= 1e-10,
+              ExcInternalError());
     }
 }
 

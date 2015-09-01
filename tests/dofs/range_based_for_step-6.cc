@@ -242,10 +242,10 @@ void Step6<dim>::assemble_system ()
 
       cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (cell_matrix,
-					      cell_rhs,
-					      local_dof_indices,
-					      system_matrix,
-					      system_rhs);
+                                              cell_rhs,
+                                              local_dof_indices,
+                                              system_matrix,
+                                              system_rhs);
     }
 }
 
@@ -327,14 +327,14 @@ void Step6<dim>::run ()
 
 
       deallog << "   Number of active cells:       "
-                << triangulation.n_active_cells()
-                << std::endl;
+              << triangulation.n_active_cells()
+              << std::endl;
 
       setup_system ();
 
       deallog << "   Number of degrees of freedom: "
-                << dof_handler.n_dofs()
-                << std::endl;
+              << dof_handler.n_dofs()
+              << std::endl;
 
       assemble_system ();
       solve ();

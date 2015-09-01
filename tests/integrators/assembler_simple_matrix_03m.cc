@@ -49,8 +49,8 @@ void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
       for (unsigned int i=0; i<M.m(); ++i)
         for (unsigned int j=0; j<M.n(); ++j)
           {
-	    number entry = base + 10*i+j;
-//	    if (k >= results.n_matrices()/2) entry *= -1;
+            number entry = base + 10*i+j;
+//      if (k >= results.n_matrices()/2) entry *= -1;
             M(i,j) = entry;
             if (face)
               results.matrix(k, true).matrix(i,j) = entry;

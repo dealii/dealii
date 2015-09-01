@@ -44,7 +44,7 @@
 template <int dim>
 void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
 {
-				   // Vector DG elements
+  // Vector DG elements
   fe_datas.push_back(new FE_DGRaviartThomas<dim>(0));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGRaviartThomas<dim>(1));
@@ -58,7 +58,7 @@ void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
   fe_datas.push_back(new FE_DGNedelec<dim>(1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
-				   // Hdiv elements
+  // Hdiv elements
   FE_RaviartThomas<dim> *rt0 = new FE_RaviartThomas<dim>(0);
   fe_datas.push_back(rt0);
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
@@ -70,7 +70,7 @@ void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
   fe_datas.push_back(new FE_RaviartThomas<dim>(2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(*rt1, 1,
-				       FE_DGQ<dim> (1), 1));
+                                       FE_DGQ<dim> (1), 1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
   fe_datas.push_back(new FE_BDM<dim>(1));
@@ -78,7 +78,7 @@ void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
   fe_datas.push_back(new FE_BDM<dim>(2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
-				   // Hcurl elements
+  // Hcurl elements
   FE_Nedelec<dim> *ned0 = new FE_Nedelec<dim>(0);
   fe_datas.push_back(ned0);
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
@@ -131,14 +131,14 @@ void test_fe_datas()
                                        FE_Q<dim> (2), 1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
-				   // Face Q elements
+  // Face Q elements
   fe_datas.push_back(new FE_FaceQ<dim> (0));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_FaceQ<dim> (1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_FaceQ<dim> (3));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-				   // Face P elements
+  // Face P elements
   fe_datas.push_back(new FE_FaceP<dim> (0));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_FaceP<dim> (1));

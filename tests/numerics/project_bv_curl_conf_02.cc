@@ -82,36 +82,36 @@ void test(unsigned order)
     test_boundary_values (fe, constraints_fes);
   }
 
-  if(constraints_fes.n_constraints() == constraints_fe.n_constraints())
-  {
-    const IndexSet& lines = constraints_fes.get_local_lines ();
-
-    for(unsigned i = 0; i < lines.n_elements(); ++i)
+  if (constraints_fes.n_constraints() == constraints_fe.n_constraints())
     {
-      if(!constraints_fe.is_constrained(lines.nth_index_in_set(i)))
-      {
-        deallog << "Failed" << std::endl;
-        return;
-      }
+      const IndexSet &lines = constraints_fes.get_local_lines ();
 
-      const std::vector<std::pair<types::global_dof_index,double> >& c1
-              = *constraints_fes.get_constraint_entries(lines.nth_index_in_set(i));
-      const std::vector<std::pair<types::global_dof_index,double> >& c2
-              = *constraints_fe.get_constraint_entries(lines.nth_index_in_set(i));
-
-      for(size_t j = 0; j < c1.size(); ++j)
-        if((c1[j].first != c2[j].first) || (fabs(c1[j].second - c2[j].second) > 1e-14))
+      for (unsigned i = 0; i < lines.n_elements(); ++i)
         {
-          deallog << "Failed" << std::endl;
-          return;
+          if (!constraints_fe.is_constrained(lines.nth_index_in_set(i)))
+            {
+              deallog << "Failed" << std::endl;
+              return;
+            }
+
+          const std::vector<std::pair<types::global_dof_index,double> > &c1
+            = *constraints_fes.get_constraint_entries(lines.nth_index_in_set(i));
+          const std::vector<std::pair<types::global_dof_index,double> > &c2
+            = *constraints_fe.get_constraint_entries(lines.nth_index_in_set(i));
+
+          for (size_t j = 0; j < c1.size(); ++j)
+            if ((c1[j].first != c2[j].first) || (fabs(c1[j].second - c2[j].second) > 1e-14))
+              {
+                deallog << "Failed" << std::endl;
+                return;
+              }
         }
     }
-  }
   else
-  {
-    deallog << "Failed" << std::endl;
-    return;
-  }
+    {
+      deallog << "Failed" << std::endl;
+      return;
+    }
 
   deallog << "OK" << std::endl;
 }

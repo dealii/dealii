@@ -105,7 +105,7 @@ void test_mpi()
     bla.add_index(0);
 
   partitioning.push_back(bla);
-  
+
   csp.reinit(partitioning);
   for (unsigned int i=0; i<n; ++i)
     csp.add(i, myid);
@@ -114,7 +114,7 @@ void test_mpi()
   for (unsigned int i=0; i<numprocs; ++i)
     locally_owned_dofs_per_cpu2[i].add_range((i)*num_local, (i+1)*num_local);
 
-  
+
   SparsityTools::distribute_sparsity_pattern<>(csp,
                                                locally_owned_dofs_per_cpu2,
                                                MPI_COMM_WORLD,

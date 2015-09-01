@@ -26,25 +26,25 @@
 
 template <int dim>
 void
-write_active_fe_index_to_file (const hp::DoFHandler<dim> & dof_handler)
+write_active_fe_index_to_file (const hp::DoFHandler<dim> &dof_handler)
 {
   int count = 0;
   typename hp::DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
-  {
-    deallog
-      << count << " "
-      << cell->active_fe_index()
-      << std::endl;
-  }
+    {
+      deallog
+          << count << " "
+          << cell->active_fe_index()
+          << std::endl;
+    }
   deallog << std::endl;
 }
 
 template <int dim>
 void
-write_vtk (const hp::DoFHandler<dim> & dof_handler, const std::string filename)
+write_vtk (const hp::DoFHandler<dim> &dof_handler, const std::string filename)
 {
   Vector<double> active_fe_index (dof_handler.get_tria().n_active_cells());
   int count = 0;
@@ -52,9 +52,9 @@ write_vtk (const hp::DoFHandler<dim> & dof_handler, const std::string filename)
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
-  {
-    active_fe_index[count] = cell->active_fe_index();
-  }
+    {
+      active_fe_index[count] = cell->active_fe_index();
+    }
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
   data_component_interpretation
@@ -90,26 +90,26 @@ void test ()
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell != endc; ++cell)
-  {
-    bool mark = true;
-    for (unsigned int d=0; d < dim; ++d)
-      if (cell->center()[d] > 0.5)
-      {
-        mark = false;
-        break;
-      }
-
-    if (mark == true)
     {
+      bool mark = true;
+      for (unsigned int d=0; d < dim; ++d)
+        if (cell->center()[d] > 0.5)
+          {
+            mark = false;
+            break;
+          }
 
-      if (cell->center()[0] < 0.25)
-        cell->set_active_fe_index(2);
+      if (mark == true)
+        {
+
+          if (cell->center()[0] < 0.25)
+            cell->set_active_fe_index(2);
+          else
+            cell->set_active_fe_index(3);
+        }
       else
-        cell->set_active_fe_index(3);
+        cell->set_active_fe_index(1);
     }
-    else
-      cell->set_active_fe_index(1);
-  }
 
   deallog << "Grid without halo:" << std::endl;
   write_active_fe_index_to_file(dof_handler);
@@ -131,9 +131,9 @@ void test ()
   for (typename std::vector<cell_iterator>::iterator
        it = active_halo_layer.begin();
        it != active_halo_layer.end(); ++it)
-  {
-    (*it)->set_active_fe_index(4);
-  }
+    {
+      (*it)->set_active_fe_index(4);
+    }
 
   deallog << "Grid with halo:" << std::endl;
   write_active_fe_index_to_file(dof_handler);

@@ -31,7 +31,7 @@ std::pair<double,double> test ()
 {
   const double mu    = 13;
   const double sigma = 3;
-  
+
   unsigned int N = 1000000;
   double sum        = 0;
   double sum_square = 0;
@@ -70,18 +70,18 @@ int main()
   tg[1].join();
   tg[2].join();
   tg[3].join();
-  
-  
+
+
   // the random number generator is thread-local, so we should get the
   // same result every time
   deallog << tg[0].return_value().first
-	  << ' '
-	  << tg[0].return_value().second
-	  << std::endl;
+          << ' '
+          << tg[0].return_value().second
+          << std::endl;
   AssertThrow (tg[1].return_value() == tg[0].return_value(),
-	       ExcInternalError());
+               ExcInternalError());
   AssertThrow (tg[2].return_value() == tg[0].return_value(),
-	       ExcInternalError());
+               ExcInternalError());
   AssertThrow (tg[3].return_value() == tg[0].return_value(),
-	       ExcInternalError());
+               ExcInternalError());
 }

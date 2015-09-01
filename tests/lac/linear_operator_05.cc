@@ -24,8 +24,14 @@
 class MyMatrix1
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   void vmult(Vector<double> &, const Vector<double> &) const
   {
@@ -42,8 +48,14 @@ public:
 class MyMatrix2
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   void vmult(Vector<double> &, const Vector<double> &) const
   {
@@ -69,8 +81,14 @@ public:
 class MyMatrix3
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   template<typename OutVector, typename InVector>
   void vmult(OutVector &, const InVector &) const
@@ -100,8 +118,14 @@ public:
 class MyMatrix4
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   template<typename OutVector, typename InVector>
   void vmult(OutVector &, const InVector &, bool = true) const
@@ -131,8 +155,14 @@ public:
 class MyMatrix5
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   template<typename number>
   void vmult(Vector<number> &, const Vector<number> &, bool = true) const
@@ -162,8 +192,14 @@ public:
 class MyMatrix6
 {
 public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+  size_t m() const
+  {
+    return 1;
+  };
+  size_t n() const
+  {
+    return 1;
+  };
 
   template<typename number, typename number2>
   void vmult(Vector<number> &, const Vector<number2> &, bool = true) const

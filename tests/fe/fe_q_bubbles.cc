@@ -59,13 +59,13 @@ class BubbleFunction : public Function<dim>
 {
 public:
   BubbleFunction
-    (unsigned int degree, unsigned int direction);
+  (unsigned int degree, unsigned int direction);
 
   virtual double value
-    (const Point<dim> &p, const unsigned int component = 0) const;
+  (const Point<dim> &p, const unsigned int component = 0) const;
 
   virtual Tensor<1,dim> gradient
-    (const Point<dim> &p, const unsigned int component = 0) const;
+  (const Point<dim> &p, const unsigned int component = 0) const;
 
 private:
   unsigned int m_degree;
@@ -74,15 +74,15 @@ private:
 
 template <int dim>
 BubbleFunction<dim>::BubbleFunction (unsigned int degree,
-                           unsigned int direction)
-: Function<dim>(),
-  m_degree(degree),
-  m_direction(direction)
+                                     unsigned int direction)
+  : Function<dim>(),
+    m_degree(degree),
+    m_direction(direction)
 {}
 
 template <int dim>
 double BubbleFunction<dim>::value (const Point<dim> &p,
-                              const unsigned int) const
+                                   const unsigned int) const
 {
   double return_value = 1.;
   for (unsigned int i=0; i<dim; ++i)
@@ -94,29 +94,29 @@ double BubbleFunction<dim>::value (const Point<dim> &p,
 
 template <int dim>
 Tensor<1,dim> BubbleFunction<dim>::gradient (const Point<dim> &p,
-                                        const unsigned int) const
+                                             const unsigned int) const
 {
   Tensor<1,dim> grad;
 
   for (unsigned int d=0; d<dim ; ++d)
-  {
-    grad[d] = 1.;
-    //compute grad(\prod_{i=1}^d (1-x_i^2))(p)
-    for (unsigned j=0; j<dim; ++j)
-      grad[d] *= (d==j ? -2*p(j) : (1-p(j)*p(j)));
-    // and multiply with x_i^{r-1}
-    grad[d]*=std::pow(p(m_direction),m_degree-1);
-  }
+    {
+      grad[d] = 1.;
+      //compute grad(\prod_{i=1}^d (1-x_i^2))(p)
+      for (unsigned j=0; j<dim; ++j)
+        grad[d] *= (d==j ? -2*p(j) : (1-p(j)*p(j)));
+      // and multiply with x_i^{r-1}
+      grad[d]*=std::pow(p(m_direction),m_degree-1);
+    }
 
-  if(m_degree>=2)
-  {
-    //add \prod_{i=1}^d (1-x_i^2))(p)
-    double value=1.;
-    for (unsigned int j=0; j < dim; ++j)
-      value*=(1-p(j)*p(j));
-    //and multiply with grad(x_i^{r-1})
+  if (m_degree>=2)
+    {
+      //add \prod_{i=1}^d (1-x_i^2))(p)
+      double value=1.;
+      for (unsigned int j=0; j < dim; ++j)
+        value*=(1-p(j)*p(j));
+      //and multiply with grad(x_i^{r-1})
       grad[m_direction]+=value*(m_degree-1)*std::pow(p(m_direction),m_degree-2);
-  }
+    }
 
   return grad;
 }
@@ -218,15 +218,15 @@ void Step3<dim>::assemble_system (unsigned int i)
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
-            cell_matrix(i,j) += (fe_values.shape_value (i, q_point) *
-                                 fe_values.shape_value (j, q_point) *
-                                 fe_values.JxW (q_point));
-          cell_rhs(i) += (fe_values.shape_value (i, q_point) *
-                          bubble_function.value(fe_values.quadrature_point(q_point)) *
-                          fe_values.JxW (q_point));
-        }
+          {
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j) += (fe_values.shape_value (i, q_point) *
+                                   fe_values.shape_value (j, q_point) *
+                                   fe_values.JxW (q_point));
+            cell_rhs(i) += (fe_values.shape_value (i, q_point) *
+                            bubble_function.value(fe_values.quadrature_point(q_point)) *
+                            fe_values.JxW (q_point));
+          }
 
       cell->get_dof_indices (local_dof_indices);
 
@@ -266,7 +266,7 @@ void Step3<dim>::output_results (unsigned int i) const
 
 
   std::ofstream output
-    ((fe->get_name()+"."+Utilities::int_to_string (i,1)+".vtk").c_str());
+  ((fe->get_name()+"."+Utilities::int_to_string (i,1)+".vtk").c_str());
   data_out.write_vtk (output);
 #endif
 
@@ -310,11 +310,11 @@ void Step3<dim>::run ()
   make_grid ();
   setup_system();
   for (unsigned int i=0; i<dim; ++i)
-  {
-    assemble_system (i);
-    solve ();
-    output_results (i);
-  }
+    {
+      assemble_system (i);
+      solve ();
+      output_results (i);
+    }
 }
 
 
@@ -324,18 +324,18 @@ int main ()
   deallog.depth_file (1);
   deallog.threshold_double(1.e-11);
   for (unsigned int degree = 1; degree <=3; ++degree)
-  {
+    {
 //     {
 //       FiniteElement<2> *fe = new FE_Q<2>(degree);
 //       Step3<2> laplace_problem(fe, degree);
 //       laplace_problem.run();
 //     }
 
-    {
-      FiniteElement<2> *fe = new FE_Q_Bubbles<2>(degree);
-      Step3<2> laplace_problem(fe, degree);
-      laplace_problem.run();
-    }
+      {
+        FiniteElement<2> *fe = new FE_Q_Bubbles<2>(degree);
+        Step3<2> laplace_problem(fe, degree);
+        laplace_problem.run();
+      }
 
 //     {
 //       FiniteElement<3> *fe = new FE_Q<3>(degree);
@@ -343,11 +343,11 @@ int main ()
 //       laplace_problem.run();
 //     }
 
-    {
-      FiniteElement<3> *fe = new FE_Q_Bubbles<3>(degree);
-      Step3<3> laplace_problem(fe, degree);
-      laplace_problem.run();
+      {
+        FiniteElement<3> *fe = new FE_Q_Bubbles<3>(degree);
+        Step3<3> laplace_problem(fe, degree);
+        laplace_problem.run();
+      }
     }
-  }
   return 0;
 }

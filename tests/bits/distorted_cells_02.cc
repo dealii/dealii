@@ -41,7 +41,7 @@ void check ()
 
   GridIn<dim> gi;
   std::ifstream in (dim == 2 ? SOURCE_DIR "/grids/2d" :
-      SOURCE_DIR "/grids/3d");
+                    SOURCE_DIR "/grids/3d");
 
   gi.attach_triangulation (coarse_grid);
 

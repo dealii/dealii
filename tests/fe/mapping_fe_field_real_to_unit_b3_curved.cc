@@ -45,7 +45,7 @@ using namespace dealii;
 template<int dim, int spacedim>
 void test_real_to_unit_cell()
 {
-	deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
+  deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   // define a boundary that fits the
   // the vertices of the hyper cube
@@ -62,63 +62,63 @@ void test_real_to_unit_cell()
   triangulation.begin_active()->face(0)->set_boundary_indicator (1);
 
 
- const unsigned int n_points = 5;
- std::vector< Point<dim> > unit_points(Utilities::fixed_power<dim>(n_points));
+  const unsigned int n_points = 5;
+  std::vector< Point<dim> > unit_points(Utilities::fixed_power<dim>(n_points));
 
- switch (dim)
-   {
-   case 1:
-     for (unsigned int x=0; x<n_points; ++x)
-       unit_points[x][0] = double(x)/double(n_points);
-     break;
+  switch (dim)
+    {
+    case 1:
+      for (unsigned int x=0; x<n_points; ++x)
+        unit_points[x][0] = double(x)/double(n_points);
+      break;
 
-   case 2:
-     for (unsigned int x=0; x<n_points; ++x)
-       for (unsigned int y=0; y<n_points; ++y)
-         {
-           unit_points[y * n_points + x][0] = double(x)/double(n_points);
-           unit_points[y * n_points + x][1] = double(y)/double(n_points);
-         }
-     break;
+    case 2:
+      for (unsigned int x=0; x<n_points; ++x)
+        for (unsigned int y=0; y<n_points; ++y)
+          {
+            unit_points[y * n_points + x][0] = double(x)/double(n_points);
+            unit_points[y * n_points + x][1] = double(y)/double(n_points);
+          }
+      break;
 
-   case 3:
-     for (unsigned int x=0; x<n_points; ++x)
-       for (unsigned int y=0; y<n_points; ++y)
-         for (unsigned int z=0; z<n_points; ++z)
-           {
-             unit_points[z * n_points * n_points + y * n_points + x][0] = double(x)/double(n_points);
-             unit_points[z * n_points * n_points + y * n_points + x][1] = double(y)/double(n_points);
-             unit_points[z * n_points * n_points + y * n_points + x][2] = double(z)/double(n_points);
-           }
-     break;
-   }
+    case 3:
+      for (unsigned int x=0; x<n_points; ++x)
+        for (unsigned int y=0; y<n_points; ++y)
+          for (unsigned int z=0; z<n_points; ++z)
+            {
+              unit_points[z * n_points * n_points + y * n_points + x][0] = double(x)/double(n_points);
+              unit_points[z * n_points * n_points + y * n_points + x][1] = double(y)/double(n_points);
+              unit_points[z * n_points * n_points + y * n_points + x][2] = double(z)/double(n_points);
+            }
+      break;
+    }
 
- const FE_Bernstein<dim,spacedim> feb(3);
- const FESystem<dim,spacedim> fesystem(feb, spacedim);
- DoFHandler<dim,spacedim> dhb(triangulation);
- dhb.distribute_dofs(fesystem);
- Vector<double> eulerq(dhb.n_dofs());
- const ComponentMask mask(spacedim, true);
+  const FE_Bernstein<dim,spacedim> feb(3);
+  const FESystem<dim,spacedim> fesystem(feb, spacedim);
+  DoFHandler<dim,spacedim> dhb(triangulation);
+  dhb.distribute_dofs(fesystem);
+  Vector<double> eulerq(dhb.n_dofs());
+  const ComponentMask mask(spacedim, true);
 
- VectorTools::get_position_vector(dhb, eulerq, mask);
- MappingFEField<dim,spacedim> map(dhb, eulerq, mask);
- 
+  VectorTools::get_position_vector(dhb, eulerq, mask);
+  MappingFEField<dim,spacedim> map(dhb, eulerq, mask);
 
- typename Triangulation<dim, spacedim >::active_cell_iterator
- cell = triangulation.begin_active();
 
-      for (unsigned int i=0; i<unit_points.size(); ++i)
-      {
-            	  // for each of the points,
-            	  // verify that if we apply
-            	  // the forward map and then
-            	  // pull back that we get
-            	  // the same point again 
-       const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
-       const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
-       
-       AssertThrow (unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
-     }
+  typename Triangulation<dim, spacedim >::active_cell_iterator
+  cell = triangulation.begin_active();
+
+  for (unsigned int i=0; i<unit_points.size(); ++i)
+    {
+      // for each of the points,
+      // verify that if we apply
+      // the forward map and then
+      // pull back that we get
+      // the same point again
+      const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
+      const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
+
+      AssertThrow (unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
+    }
 
   deallog << "OK" << std::endl;
 
@@ -128,19 +128,19 @@ void test_real_to_unit_cell()
 int
 main()
 {
-	std::ofstream logfile ("output");
-	deallog.attach(logfile);
-	deallog.depth_console(0);
-	deallog.threshold_double(1.e-10);
+  std::ofstream logfile ("output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
-	test_real_to_unit_cell<1,1>();
-	test_real_to_unit_cell<2,2>();
+  test_real_to_unit_cell<1,1>();
+  test_real_to_unit_cell<2,2>();
   test_real_to_unit_cell<3,3>();
 
-	test_real_to_unit_cell<1,2>();
-	test_real_to_unit_cell<2,3>();
+  test_real_to_unit_cell<1,2>();
+  test_real_to_unit_cell<2,3>();
 
 
   // test_real_to_unit_cell<1,3>();
-	return 0;
+  return 0;
 }

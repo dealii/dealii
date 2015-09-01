@@ -37,7 +37,7 @@ plot_shape_functions(const unsigned int degree)
 {
   FE_BDM<dim> fe_rt(degree);
   deallog.push(fe_rt.get_name());
-  
+
   const unsigned int div=2;
   for (unsigned int mz=0; mz<=((dim>2) ? div : 0) ; ++mz)
     for (unsigned int my=0; my<=((dim>1) ? div : 0) ; ++my)
@@ -95,7 +95,7 @@ main()
       plot_shape_functions<2>(degree);
       plot_shape_functions<3>(degree);
     }
-  
+
   return 0;
 }
 

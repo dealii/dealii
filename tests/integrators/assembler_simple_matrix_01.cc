@@ -76,7 +76,7 @@ int main()
   std::vector<FullMatrix<double> > matrices(2);
   MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass1;
   ass1.initialize(matrices[0]);
-  
+
   deallog.push("Single block");
   test(info1, ass1);
   deallog.pop();

@@ -148,14 +148,14 @@ namespace Step22
 
     switch (component)
       {
-        //velocity
+      //velocity
       case 0:
         return 2*(x-1)*(x-1)*x*x*(y-1)*y*(2*y-1);
         break;
       case 1:
         return -2*(y-1)*(y-1)*y*y*(x-1)*x*(2*x-1);
         break;
-        //pressure
+      //pressure
       case 2:
         //discontinuous Boffi
         return y*(1-y)*exp((x-.5)*(x-.5))-.5+(x<.5);
@@ -185,7 +185,7 @@ namespace Step22
 
     switch (component)
       {
-        //velocity
+      //velocity
       case 0:
         gradient[0]=x*(x*(x*y*(y*(16*y-24)+8)+y*((36-24*y)*y-12))
                        +y*(y*(8*y-12)+4));
@@ -197,7 +197,7 @@ namespace Step22
         gradient[1]=x*(x*(x*y*((24-16*y)*y-8)+y*(y*(24*y-36)+12))
                        +y*((12-8*y)*y-4));
         break;
-        //pressure
+      //pressure
       case 2:
         //discontinuous Boffi
         gradient[0]=-exp((x-.5)*(x-.5))*(2*x-1)*(y-1)*y;
@@ -227,7 +227,7 @@ namespace Step22
 
     switch (component)
       {
-        //velocity
+      //velocity
       case 0:
         return x*(x*(x*(x*(24*y-12)-48*y+24)
                      +y*(y*(48*y-72)+48)-12)

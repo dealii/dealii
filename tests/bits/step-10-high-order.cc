@@ -84,8 +84,8 @@ void compute_pi_by_area ()
       long double area = 0;
 
       typename DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
       for (; cell!=endc; ++cell)
         {
           x_fe_values.reinit (cell);
@@ -150,8 +150,8 @@ void compute_pi_by_perimeter ()
       dof_handler.distribute_dofs (fe);
 
       typename DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
       long double perimeter = 0;
       for (; cell!=endc; ++cell)
         for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)

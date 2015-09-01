@@ -29,7 +29,7 @@ void check ()
 {
   ParameterHandler prm;
   prm.declare_entry ("a", "this that and the other", Patterns::Anything(),
-		     "");
+                     "");
   try
     {
       prm.get_double ("a");
@@ -56,7 +56,7 @@ void check ()
     {
       deallog << "get_bool() detected the mistake" << std::endl;
     }
-  
+
 }
 
 

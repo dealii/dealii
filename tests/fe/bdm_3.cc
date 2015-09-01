@@ -64,7 +64,7 @@ main()
       test<2>(degree);
       test<3>(degree);
     }
-  
+
   return 0;
 }
 

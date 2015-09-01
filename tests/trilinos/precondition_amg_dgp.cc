@@ -74,9 +74,9 @@ void MatrixIntegrator<dim>
 {
   const unsigned int deg = info.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace
-    ::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
-                     LocalIntegrators::Laplace::
-                     compute_penalty(dinfo, dinfo, deg, deg));
+  ::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
+                   LocalIntegrators::Laplace::
+                   compute_penalty(dinfo, dinfo, deg, deg));
 }
 
 template <int dim>
@@ -88,10 +88,10 @@ void MatrixIntegrator<dim>
 {
   const unsigned int deg = info1.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace
-    ::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
-                dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-                info1.fe_values(0), info2.fe_values(0),
-                LocalIntegrators::Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+  ::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
+              dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+              info1.fe_values(0), info2.fe_values(0),
+              LocalIntegrators::Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
 
@@ -163,7 +163,7 @@ void Step4<dim>::setup_system ()
                                          dof_handler.end(),
                                          dof_info, info_box,
                                          integrator, assembler);
-      
+
   system_matrix.compress(VectorOperation::add);
 
   for (unsigned int i=0; i<system_rhs.size(); ++i)

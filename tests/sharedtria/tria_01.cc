@@ -33,23 +33,23 @@
 
 template <int dim, int spacedim>
 void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
-                const char                                *filename_)
+                 const char                                *filename_)
 {
-    DataOut<dim> data_out;
-    data_out.attach_triangulation (tria);
-    Vector<float> subdomain (tria.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
-      subdomain(i) = tria.locally_owned_subdomain();
-    data_out.add_data_vector (subdomain, "subdomain");
+  DataOut<dim> data_out;
+  data_out.attach_triangulation (tria);
+  Vector<float> subdomain (tria.n_active_cells());
+  for (unsigned int i=0; i<subdomain.size(); ++i)
+    subdomain(i) = tria.locally_owned_subdomain();
+  data_out.add_data_vector (subdomain, "subdomain");
 
-    data_out.build_patches ();
-    const std::string filename = (filename_ +
-                                  Utilities::int_to_string
-                                  (tria.locally_owned_subdomain(), 4));
-    {
-      std::ofstream output ((filename + ".vtu").c_str());
-      data_out.write_vtu (output);
-    }
+  data_out.build_patches ();
+  const std::string filename = (filename_ +
+                                Utilities::int_to_string
+                                (tria.locally_owned_subdomain(), 4));
+  {
+    std::ofstream output ((filename + ".vtu").c_str());
+    data_out.write_vtu (output);
+  }
 }
 
 
@@ -67,13 +67,13 @@ void test()
   tr.execute_coarsening_and_refinement ();
 
   deallog
-    << " locally_owned_subdomain(): " << tr.locally_owned_subdomain() << "\n"
-    << " n_active_cells: " << tr.n_active_cells() << "\n"
-    << " n_levels: " << tr.n_levels() << "\n"
-    << " n_global_levels: " << tr.n_global_levels()  << "\n"
-    //<< " n_locally_owned_active_cells: " << tr.n_locally_owned_active_cells() << "\n"
-    //<< " n_global_active_cells: " << tr.n_global_active_cells() << "\n"
-    << std::endl;
+      << " locally_owned_subdomain(): " << tr.locally_owned_subdomain() << "\n"
+      << " n_active_cells: " << tr.n_active_cells() << "\n"
+      << " n_levels: " << tr.n_levels() << "\n"
+      << " n_global_levels: " << tr.n_global_levels()  << "\n"
+      //<< " n_locally_owned_active_cells: " << tr.n_locally_owned_active_cells() << "\n"
+      //<< " n_global_active_cells: " << tr.n_global_active_cells() << "\n"
+      << std::endl;
 
   /*deallog << "n_locally_owned_active_cells_per_processor: ";
   std::vector<unsigned int> v = tr.n_locally_owned_active_cells_per_processor();

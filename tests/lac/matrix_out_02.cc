@@ -52,7 +52,7 @@ int main (int argc, char **argv)
       for (unsigned int i=0; i<4; ++i)
         for (unsigned int j=0; j<8; ++j)
           if (i==j+1)
-	    sparse_matrix.set(i,j, i+3*j);
+            sparse_matrix.set(i,j, i+3*j);
 
       MatrixOut matrix_out;
       matrix_out.build_patches (sparse_matrix, "sparse_matrix",

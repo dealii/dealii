@@ -23,18 +23,18 @@
 #include <fstream>
 #include <sstream>
 
-void check (const char *defaults, const char* defined, const char *input)
+void check (const char *defaults, const char *defined, const char *input)
 {
   ParameterHandler prm;
   prm.declare_entry ("v", defaults, Patterns::MultipleSelection(defined), "");
-  
+
   std::stringstream in(input);
   prm.read_input (in);
 
   deallog << "defaults='" << defaults
-	  << "' defined='" << defined
-	  << "' input='" << input
-	  << "' result='" << prm.get("v") << "'" << std::endl;
+          << "' defined='" << defined
+          << "' input='" << input
+          << "' result='" << prm.get("v") << "'" << std::endl;
 }
 
 void test()

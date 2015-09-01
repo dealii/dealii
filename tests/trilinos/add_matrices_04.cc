@@ -53,7 +53,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
   m.copy_from(m2);
   m.add(-1., m2);
-  
+
   deallog << std::endl << "Frobenius norm: " << m.frobenius_norm() << std::endl;
 
   deallog << "OK" << std::endl;

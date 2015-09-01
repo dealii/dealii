@@ -40,7 +40,7 @@ template <int dim>
 void check ()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   Triangulation<dim> triangulation;
   double r1 = 0.5, r2 = 1.0, halfl = 0.25;
   GridGenerator::truncated_cone (triangulation, r1, r2, halfl);

@@ -51,14 +51,14 @@ namespace dealii
             if (c1->vertex_index(v) != c2->vertex_index(v))
               return false;
           }
-	
+
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
 
-	    if (c1->face(f)->manifold_id() != c2->face(f)->manifold_id())
-	      return false;
+            if (c1->face(f)->manifold_id() != c2->face(f)->manifold_id())
+              return false;
 
             if (c1->face(f)->at_boundary())
               {
@@ -91,16 +91,16 @@ namespace dealii
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
 
-	if (c1->manifold_id() != c2->manifold_id())
-	  return false;
+        if (c1->manifold_id() != c2->manifold_id())
+          return false;
 
-	if (c1->active() && c2->active())
-	  if (c1->active_cell_index() != c2->active_cell_index())
-	    return false;
+        if (c1->active() && c2->active())
+          if (c1->active_cell_index() != c2->active_cell_index())
+            return false;
 
-	if (c1->level()>0)
-	  if (c1->parent_index() != c2->parent_index())
-	    return false;
+        if (c1->level()>0)
+          if (c1->parent_index() != c2->parent_index())
+            return false;
       }
 
     // also check the order of raw iterators as they contain
@@ -128,10 +128,11 @@ void do_boundary (Triangulation<dim,spacedim> &t1)
   c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (c1->at_boundary(f)) {
-        c1->face(f)->set_boundary_id (42);
-	//        c1->face(f)->set_manifold_id (43);
-      }
+      if (c1->at_boundary(f))
+        {
+          c1->face(f)->set_boundary_id (42);
+          //        c1->face(f)->set_manifold_id (43);
+        }
 }
 
 

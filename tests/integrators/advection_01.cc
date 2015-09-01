@@ -188,9 +188,9 @@ void test_face(const FEValuesBase<dim> &fev1,
         w2 = 0.;
         fev1.get_function_values(u1, indices1, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
         upwind_face_residual(w1, w2, fev1, fev2,
-                    make_slice(u1val),
-                    make_slice(nullval),
-                    vel);
+                             make_slice(u1val),
+                             make_slice(nullval),
+                             vel);
         M11.vmult(v1,u1);
         w1.add(-1., v1);
         M21.vmult(v2,u1);
@@ -211,9 +211,9 @@ void test_face(const FEValuesBase<dim> &fev1,
         w2 = 0.;
         fev2.get_function_values(u1, indices2, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
         upwind_face_residual(w1, w2, fev1, fev2,
-                    make_slice(nullval),
-                    make_slice(u1val),
-                    vel);
+                             make_slice(nullval),
+                             make_slice(u1val),
+                             vel);
         M12.vmult(v1,u1);
         w1.add(-1., v1);
         M22.vmult(v2,u1);

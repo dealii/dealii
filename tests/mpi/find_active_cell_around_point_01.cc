@@ -52,26 +52,26 @@ void test()
       // at the interface between cells
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = 1./3;
-      
+        p[d] = 1./3;
+
       typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-	cell = GridTools::find_active_cell_around_point (tr, p);
+      cell = GridTools::find_active_cell_around_point (tr, p);
 
       const unsigned int
-	n_locally_owned
-	= Utilities::MPI::sum (cell->is_locally_owned() ? 1 : 0,
-			       MPI_COMM_WORLD);
-      
+      n_locally_owned
+        = Utilities::MPI::sum (cell->is_locally_owned() ? 1 : 0,
+                               MPI_COMM_WORLD);
+
       const unsigned int
-	n_locally_owned_or_ghost
-	= Utilities::MPI::sum (!cell->is_artificial() ? 1 : 0,
-			       MPI_COMM_WORLD);
-      
+      n_locally_owned_or_ghost
+        = Utilities::MPI::sum (!cell->is_artificial() ? 1 : 0,
+                               MPI_COMM_WORLD);
+
       if (myid == 0)
         deallog << "Locally owned: "
                 << n_locally_owned
                 << std::endl
-		<< "Locally owned or ghost: "
+                << "Locally owned or ghost: "
                 << n_locally_owned_or_ghost
                 << std::endl;
     }

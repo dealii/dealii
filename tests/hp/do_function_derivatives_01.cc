@@ -104,10 +104,10 @@ int main()
     {
       x_fe_values.reinit (cell);
       std::vector<std::vector<Tensor<1,2> > >
-	derivatives (q[0].size(), std::vector<Tensor<1,2> >(cell->get_fe().n_components()));
+      derivatives (q[0].size(), std::vector<Tensor<1,2> >(cell->get_fe().n_components()));
 
       x_fe_values.get_present_fe_values().get_function_gradients (new_solution,
-								  derivatives);
+                                                                  derivatives);
     }
 
   // we are good if we made it to here

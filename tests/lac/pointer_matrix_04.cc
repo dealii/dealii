@@ -22,13 +22,13 @@
 #include <deal.II/lac/vector.h>
 
 template<typename number>
-  void
-  checkConstructor4(const FullMatrix<number> &A, char *name)
-  {
-    deallog << "Init with matrix name and matrix" << std::endl;
-    PointerMatrix<FullMatrix<number>, Vector<number> > P(&A, name);
-    deallog << "Is matrix empty:" << P.empty() << std::endl;
-  }
+void
+checkConstructor4(const FullMatrix<number> &A, char *name)
+{
+  deallog << "Init with matrix name and matrix" << std::endl;
+  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A, name);
+  deallog << "Is matrix empty:" << P.empty() << std::endl;
+}
 
 int
 main()
@@ -42,7 +42,7 @@ main()
   deallog.threshold_double(1.e-10);
 
   const double Adata[] =
-    { 2, 3, 4, 5 };
+  { 2, 3, 4, 5 };
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

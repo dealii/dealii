@@ -47,9 +47,9 @@ void test ()
     {
       // should be { [0, 2), [2, n_rows) }
       if (my_id == 0)
-	locally_owned.add_range(0, 2);
+        locally_owned.add_range(0, 2);
       else if (my_id == 1)
-	locally_owned.add_range(2, n_rows);
+        locally_owned.add_range(2, n_rows);
     }
   else
     Assert (false, ExcNotImplemented());
@@ -68,25 +68,25 @@ void test ()
   A.reinit (sp);
   TrilinosWrappers::SparseMatrix B;
   B.reinit (A);
- 
+
   A.add(0, 0, 0.1);
   A.add(0, 2, 0.2);
   if ((n_procs == 1) || (my_id == 1))
-      A.add(2,3, 0.3);
+    A.add(2,3, 0.3);
 
   double l1a = (n_procs==1) ? 0.3 : 0.4;
   double l1b = n_procs*1.2;
-  
+
   A.compress(VectorOperation::add);
   deallog << "1: " << A.l1_norm() << " " << B.l1_norm()
-	  << " (should be " << l1a << " 0.0)" << std::endl;
+          << " (should be " << l1a << " 0.0)" << std::endl;
 
   deallog << "set B=A..." << std::endl;
-  
-  B.copy_from(A);  
-  
+
+  B.copy_from(A);
+
   deallog << "2: " << A.l1_norm() << " " << B.l1_norm()
-	  << " (should be " << l1a << " " << l1a << ")" << std::endl;
+          << " (should be " << l1a << " " << l1a << ")" << std::endl;
 
   if (my_id==0)
     {
@@ -95,13 +95,13 @@ void test ()
     }
 
   deallog << "reassemble A..." << std::endl;
-  
+
   A = 0;
   A.add(0, 0, -1.2);
   A.compress(VectorOperation::add);
   deallog << "3: " << A.l1_norm() << " " << B.l1_norm()
-	  << " (should be " << l1b << " " << l1a << ")" << std::endl;
-  
+          << " (should be " << l1b << " " << l1a << ")" << std::endl;
+
   if (my_id==0)
     {
       deallog << "A(0,0)=" << A(0,0) << std::endl;

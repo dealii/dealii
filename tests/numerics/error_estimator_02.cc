@@ -103,7 +103,7 @@ class MyFunction : public dealii::Function<dim>
 public:
   MyFunction(const double k);
 
-  virtual double value(const dealii::Point<dim> & point,
+  virtual double value(const dealii::Point<dim> &point,
                        const unsigned int component = 0 ) const;
 
   double get_k() const;
@@ -114,15 +114,15 @@ private:
 
 template<int dim>
 MyFunction<dim>::MyFunction(const double k)
-:
-dealii::Function<dim>(1),
-k(k)
+  :
+  dealii::Function<dim>(1),
+  k(k)
 {
 
 }
 
 template<int dim>
-double MyFunction<dim>::value(const dealii::Point<dim> & point,
+double MyFunction<dim>::value(const dealii::Point<dim> &point,
                               const unsigned int ) const
 {
   const double x = point[0]-1.0;
@@ -146,7 +146,7 @@ class NeumanBC : public dealii::Function<dim>
 public:
   NeumanBC(const double c);
 
-  virtual double value(const dealii::Point<dim> & point,
+  virtual double value(const dealii::Point<dim> &point,
                        const unsigned int component = 0 ) const;
 
   double get_c() const;
@@ -157,14 +157,14 @@ private:
 
 template<int dim>
 NeumanBC<dim>::NeumanBC(const double c)
-:
-dealii::Function<dim>(1),
-c(c)
+  :
+  dealii::Function<dim>(1),
+  c(c)
 {
 }
 
 template<int dim>
-double NeumanBC<dim>::value(const dealii::Point<dim> & point,
+double NeumanBC<dim>::value(const dealii::Point<dim> &point,
                             const unsigned int ) const
 {
   return c;
@@ -345,7 +345,7 @@ void test_regular(const MyFunction<dim> &func)
   p_degree.push_back(p1);
   p_degree.push_back(p2);
 
-  for (unsigned int i=0;i<p_degree.size();i++)
+  for (unsigned int i=0; i<p_degree.size(); i++)
     {
       const unsigned int &p = p_degree[i];
       fe_collection.push_back(dealii::FE_Q<dim>(p));
@@ -373,9 +373,9 @@ void test_regular(const MyFunction<dim> &func)
                                                  /*colorize*/ false);
 
     typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (;cell != endc; cell++)
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell != endc; cell++)
       if (cell->center()[0] > 1.0)
         {
           cell->set_active_fe_index(1);
@@ -459,7 +459,7 @@ void test_irregular(const MyFunction<dim> &func)
   p_degree.push_back(p2);
   p_degree.push_back(p3);
 
-  for (unsigned int i=0;i<p_degree.size();i++)
+  for (unsigned int i=0; i<p_degree.size(); i++)
     {
       const unsigned int &p = p_degree[i];
       fe_collection.push_back(dealii::FE_Q<dim>(p));
@@ -494,9 +494,9 @@ void test_irregular(const MyFunction<dim> &func)
     }
 
     typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (;cell != endc; cell++)
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell != endc; cell++)
       if (cell->center()[0] > 1.0) // right
         {
           cell->set_active_fe_index(0);
@@ -560,7 +560,7 @@ void test_irregular(const MyFunction<dim> &func)
   const double expected_squared_1 = h*A*std::pow(func.get_k(),2)/2.0/std::max(p3,p1);
   const double expected_squared_2 = h*A*std::pow(func.get_k(),2)/2.0/std::max(p2,p1);
   const double expected_squared_3 = (dim==2) ?
-                                      expected_squared_1 +   expected_squared_2:
+                                    expected_squared_1 +   expected_squared_2:
                                     2*expected_squared_1 + 2*expected_squared_2;
 
   std::vector<double> expected_error(error.size(),0.0);
@@ -592,21 +592,21 @@ class MySecondFunction : public dealii::Function<dim>
 public:
   MySecondFunction();
 
-  virtual double value(const dealii::Point<dim> & point,
+  virtual double value(const dealii::Point<dim> &point,
                        const unsigned int component = 0 ) const;
 };
 
 template<int dim>
 MySecondFunction<dim>::MySecondFunction()
-:
-dealii::Function<dim>(1)
+  :
+  dealii::Function<dim>(1)
 {
 
 }
 
 template<int dim>
-double MySecondFunction<dim>::value(const dealii::Point<dim> & point,
-                              const unsigned int ) const
+double MySecondFunction<dim>::value(const dealii::Point<dim> &point,
+                                    const unsigned int ) const
 {
   double f = 0.0;
   const double &x = point[0];
@@ -630,11 +630,11 @@ void test(const MySecondFunction<dim> &func)
   dealii::hp::QCollection<dim-1> face_quadrature_formula;
   dealii::ConstraintMatrix constraints;
   for (unsigned int p = 1; p <=3; p++)
-  {
-    fe_collection.push_back(dealii::FE_Q<dim>(p));
-    quadrature_formula.push_back(dealii::QGauss<dim>(p+1));
-    face_quadrature_formula.push_back(dealii::QGauss<dim-1>(p+1));
-  }
+    {
+      fe_collection.push_back(dealii::FE_Q<dim>(p));
+      quadrature_formula.push_back(dealii::QGauss<dim>(p+1));
+      face_quadrature_formula.push_back(dealii::QGauss<dim-1>(p+1));
+    }
   dealii::GridGenerator::hyper_cube (triangulation,0.0,1.0); // reference cell
 
   // refine
@@ -646,9 +646,9 @@ void test(const MySecondFunction<dim> &func)
     dof_handler.distribute_dofs (fe_collection);
 
     typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (;cell != endc; cell++)
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell != endc; cell++)
       {
         bool in_top_left = true;
         for (unsigned int d=0; d< dim; d++)
@@ -668,7 +668,7 @@ void test(const MySecondFunction<dim> &func)
 
     cell = dof_handler.begin_active();
 
-    for (;cell != endc; cell++)
+    for (; cell != endc; cell++)
       {
         if (cell->center()[0] < 0.25)
           {

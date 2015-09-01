@@ -22,40 +22,40 @@
 #include <deal.II/lac/vector.h>
 
 template<typename number>
-  void
-  checkVmult_add(FullMatrix<number> &A, Vector<number> &V, char *name =
-      "Test Matrix")
-  {
-    deallog << "vmult_add" << std::endl;
+void
+checkVmult_add(FullMatrix<number> &A, Vector<number> &V, char *name =
+                 "Test Matrix")
+{
+  deallog << "vmult_add" << std::endl;
 
-    PointerMatrix<FullMatrix<number>, Vector<number> > P(&A, name);
+  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A, name);
 
-    deallog << "Result vector set to all ones and to be added with result"
-        << std::endl;
-    Vector<number> O(V.size());
-    for (unsigned int i = 0; i < O.size(); ++i)
-      O(i) = 1;
+  deallog << "Result vector set to all ones and to be added with result"
+          << std::endl;
+  Vector<number> O(V.size());
+  for (unsigned int i = 0; i < O.size(); ++i)
+    O(i) = 1;
 
-    P.vmult_add(O, V);
+  P.vmult_add(O, V);
 
-    // Check the dimensions of the result matrix
-    Assert(A.m() == O.size(), ExcInternalError());
-    deallog << "Dimensions of result vector verified" << std::endl;
+  // Check the dimensions of the result matrix
+  Assert(A.m() == O.size(), ExcInternalError());
+  deallog << "Dimensions of result vector verified" << std::endl;
 
-    // Verifying results with Method 2: O=O+A*V	
-    Vector<number> O_(V.size());
-    for (unsigned int i = 0; i < O_.size(); ++i)
-      O_(i) = 1;
+  // Verifying results with Method 2: O=O+A*V
+  Vector<number> O_(V.size());
+  for (unsigned int i = 0; i < O_.size(); ++i)
+    O_(i) = 1;
 
-    A.vmult_add(O_, V);
+  A.vmult_add(O_, V);
 
-    Assert(O == O_, ExcInternalError());
-    deallog << "Result vector data verified" << std::endl;
+  Assert(O == O_, ExcInternalError());
+  deallog << "Result vector data verified" << std::endl;
 
-    for (unsigned int i = 0; i < O.size(); ++i)
-      deallog << O(i) << '\t';
-    deallog << std::endl;
-  }
+  for (unsigned int i = 0; i < O.size(); ++i)
+    deallog << O(i) << '\t';
+  deallog << std::endl;
+}
 
 int
 main()
@@ -69,7 +69,7 @@ main()
   deallog.threshold_double(1.e-10);
 
   const double Adata[] =
-    { 2, 3, 4, 5 };
+  { 2, 3, 4, 5 };
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

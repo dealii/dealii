@@ -75,7 +75,7 @@ int main()
   deallog.threshold_double(1.e-10);
 
   const unsigned int n = testing_max_num_threads();
-  
+
   // if we have a machine with less than 5 cores fake the output:
   if (MultithreadInfo::n_threads()<n)
     {

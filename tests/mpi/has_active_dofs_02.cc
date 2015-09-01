@@ -48,7 +48,7 @@ void test()
   FE_Nothing<dim> fe(1);
   DoFHandler<dim> dof_handler (tr);
   dof_handler.distribute_dofs (fe);
-  
+
   // there are 2^(2*dim) cells to be owned by this distributed
   // triangulation. however, since p4est makes sure that all active
   // children belonging to the same parent are stored on the same
@@ -58,46 +58,46 @@ void test()
   // cells or now by setting a bit mask that we then add up.
   // output which processor owns something and which don't
   const int cells_owned = Utilities::MPI::sum (tr.n_locally_owned_active_cells() > 0
-					       ?
-					       1 << Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)
-					       :
-					       0,
-					       MPI_COMM_WORLD);
+                                               ?
+                                               1 << Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)
+                                               :
+                                               0,
+                                               MPI_COMM_WORLD);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
-	deallog << "Processor " << i << " has cells: "
-		<< ((cells_owned & (1 << i)) ? "yes" : "no")
-		<< std::endl;
-      
-      unsigned int n_owning_processors = 0;      
+        deallog << "Processor " << i << " has cells: "
+                << ((cells_owned & (1 << i)) ? "yes" : "no")
+                << std::endl;
+
+      unsigned int n_owning_processors = 0;
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
-	if (cells_owned & (1 << i))
-	  ++n_owning_processors;
+        if (cells_owned & (1 << i))
+          ++n_owning_processors;
       deallog << "# processors owning cells=" << n_owning_processors << std::endl;
     }
 
   // now check how many processors own DoFs using the same procedure
   const int dofs_owned = Utilities::MPI::sum (dof_handler.has_active_dofs()
-					      ?
-					      1 << Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)
-					      :
-					      0,
-					      MPI_COMM_WORLD);
+                                              ?
+                                              1 << Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)
+                                              :
+                                              0,
+                                              MPI_COMM_WORLD);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
-	deallog << "Processor " << i << " has dofs: "
-		<< ((dofs_owned & (1 << i)) ? "yes" : "no")
-		<< std::endl;
-      
-      unsigned int n_owning_processors = 0;      
+        deallog << "Processor " << i << " has dofs: "
+                << ((dofs_owned & (1 << i)) ? "yes" : "no")
+                << std::endl;
+
+      unsigned int n_owning_processors = 0;
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
-	if (dofs_owned & (1 << i))
-	  ++n_owning_processors;
+        if (dofs_owned & (1 << i))
+          ++n_owning_processors;
       deallog << "# processors owning dofs=" << n_owning_processors << std::endl;
     }
-  
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << std::endl;
 }

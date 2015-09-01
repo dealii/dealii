@@ -15,22 +15,22 @@ void test1()
   std::string variables = "x,y";
   std::string expression = "cos(x)+sqrt(y)";
   std::map<std::string,double> constants;
-  
+
   // FunctionParser with 2 variables and 1 component:
   FunctionParser<2> fp(1);
   fp.initialize(variables,
-		expression,
-		constants);
+                expression,
+                constants);
 
   // Point at which we want to evaluate the function
   Point<2> point(0.0, 4.0);
 
   // evaluate the expression at 'point':
   double result = fp.value(point);
-  
+
   deallog << "Function '" << expression << "'"
-	  << " @ " << point
-	  << " is " << result << std::endl;
+          << " @ " << point
+          << " is " << result << std::endl;
 }
 
 
@@ -54,8 +54,8 @@ void test2()
 
   // And populate it with the newly created objects.
   vector_function.initialize(variables,
-			     expressions,
-			     constants);
+                             expressions,
+                             constants);
 
   // Point at which we want to evaluate the function
   Point<3> point(0.0, 1.0, 1.0);
@@ -71,9 +71,9 @@ void test2()
 
   // Output the evaluated function
   deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
-	  << " @ " << point
-	  << " is " << result << std::endl;
-  }
+          << " @ " << point
+          << " is " << result << std::endl;
+}
 
 
 int main()
@@ -82,5 +82,5 @@ int main()
 
   test1();
   test2();
-  
+
 }

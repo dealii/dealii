@@ -32,7 +32,7 @@ void check (const char *p)
   std::ifstream in(p);
   bool status = prm.read_input (in);
   Assert (status == false, ExcInternalError());
-  
+
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
 }
 

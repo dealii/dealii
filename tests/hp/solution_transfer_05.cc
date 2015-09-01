@@ -66,7 +66,7 @@ int main()
 
   // Assign FE to cells
   hp::DoFHandler<2>::active_cell_iterator cell;
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();      
+  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
   cell = dof_handler.begin_active();
@@ -91,7 +91,7 @@ int main()
 
   triangulation.execute_coarsening_and_refinement ();
   dof_handler.distribute_dofs (fe_collection);
-  
+
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
 
@@ -102,7 +102,7 @@ int main()
   data_out2.add_data_vector (new_solution, "Solution");
   data_out2.build_patches();
   data_out2.write_vtu(deallog.get_file_stream());
-  
+
   // we are good if we made it to here
   deallog << "OK" << std::endl;
 }

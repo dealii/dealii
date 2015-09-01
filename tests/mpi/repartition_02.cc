@@ -35,7 +35,7 @@
 template<int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
                     const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                  void *data)
+                    void *data)
 {
   static int some_number = cell->index();
   deallog << "packing cell " << cell->id() << " with data=" << some_number << " status=";
@@ -55,8 +55,8 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
     {
       Assert(!cell->has_children(), ExcInternalError());
     }
-  
-  int * intdata = reinterpret_cast<int*>(data);
+
+  int *intdata = reinterpret_cast<int *>(data);
   *intdata = some_number;
 
   ++some_number;
@@ -64,16 +64,16 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
 
 template<int dim>
 void unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-                    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                  const void *data)
+                      const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                      const void *data)
 {
-  const int * intdata = reinterpret_cast<const int*>(data);
+  const int *intdata = reinterpret_cast<const int *>(data);
 
   deallog << "unpacking cell " << cell->id() << " with data=" << (*intdata) << " status=";
   if (status==parallel::distributed::Triangulation<dim,dim>::CELL_PERSIST)
     deallog << "PERSIST";
   else if (status==parallel::distributed::Triangulation<dim,dim>::CELL_REFINE)
-      deallog << "REFINE";
+    deallog << "REFINE";
   else if (status==parallel::distributed::Triangulation<dim,dim>::CELL_COARSEN)
     deallog << "COARSEN";
   deallog << std::endl;
@@ -96,50 +96,50 @@ void test()
   if (true)
     {
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-						   dealii::Triangulation<dim,dim>::none,
-						   parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                                   dealii::Triangulation<dim,dim>::none,
+                                                   parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
       GridGenerator::hyper_cube(tr);
       tr.refine_global(1);
 
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
 
-      deallog << "* global refine:" << std::endl;      
-      
+      deallog << "* global refine:" << std::endl;
+
       unsigned int offset = tr.register_data_attach(sizeof(int), pack_function<dim>);
-     
+
       tr.refine_global(1);
 
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
 
-      tr.notify_ready_to_unpack(offset, unpack_function<dim>);      
-      
+      tr.notify_ready_to_unpack(offset, unpack_function<dim>);
+
       //tr.write_mesh_vtk("a");
 
 
 
-      
+
       deallog << "* repartition:" << std::endl;
-      
+
       offset = tr.register_data_attach(sizeof(int), pack_function<dim>);
 
       tr.repartition();
-      
-      //tr.write_mesh_vtk("b");
-      
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
 
-      tr.notify_ready_to_unpack(offset, unpack_function<dim>);      
-      
+      //tr.write_mesh_vtk("b");
+
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
+
+      tr.notify_ready_to_unpack(offset, unpack_function<dim>);
+
       const unsigned int checksum = tr.get_checksum ();
       if (myid == 0)
         deallog << "Checksum: "

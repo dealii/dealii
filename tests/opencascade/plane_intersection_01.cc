@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2015 by the deal.II authors 
+//    Copyright (C) 2014 - 2015 by the deal.II authors
 //
 //    This file is subject to LGPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -52,14 +52,14 @@ int main()
   Standard_Real radius(Point<3>().distance(point(center)));
 
   TopoDS_Face face = BRepPrimAPI_MakeSphere(center, radius);
-  
+
   // Intersect the sphere with the plane z = 0
   TopoDS_Shape intersect = intersect_plane(face, 0, 0, 1, 0);
   // This shape should be the standard circle. Only one edge should be
   // in intersect: our edge.
   TopExp_Explorer exp(intersect, TopAbs_EDGE);
   TopoDS_Edge edge = TopoDS::Edge(exp.Current());
-  
+
   ArclengthProjectionLineManifold<2,3> boundary_line(edge);
 
   // The unit square.

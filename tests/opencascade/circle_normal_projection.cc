@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2015 by the deal.II authors 
+//    Copyright (C) 2014 - 2015 by the deal.II authors
 //
 //    This file is subject to LGPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -38,57 +38,57 @@
 
 using namespace OpenCASCADE;
 
-int main () 
+int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-				   // The circle passing through the
-				   // vertices of the unit square
+  // The circle passing through the
+  // vertices of the unit square
   gp_Dir z_axis(0.,0.,1.);
   gp_Pnt center(.5,.5,0.);
   gp_Ax2 axis(center, z_axis);
   Standard_Real radius(std::sqrt(2.)/2.);
-  
+
   Handle(Geom_Curve) circle = GC_MakeCircle(axis, radius);
   TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
-  
-  
-				   // Create a boundary projector.
+
+
+  // Create a boundary projector.
   NormalProjectionBoundary<2,3> boundary_line(edge);
-  
-				   // This one is for checking: This
-				   // is what deal.II would do for a
-				   // circle.
+
+  // This one is for checking: This
+  // is what deal.II would do for a
+  // circle.
   HyperBallBoundary<2,3> boundary_line_deal (Point<3>(.5,.5,0),
-					     std::sqrt(2.)/2.);
-  
-  
-  
-				   // The unit square.
+                                             std::sqrt(2.)/2.);
+
+
+
+  // The unit square.
   Triangulation<2,3> tria;
   GridGenerator::hyper_cube(tria);
 
-				   // Set the exterior boundary
+  // Set the exterior boundary
   tria.set_boundary(0, boundary_line);
 
-				   // This is here to ignore the
-				   // points created in the interior
-				   // of the face.
+  // This is here to ignore the
+  // points created in the interior
+  // of the face.
   tria.begin()->set_material_id(1);
 
-				   // We refine twice, and expect the
-				   // outer points to end up on the
-				   // circle.
+  // We refine twice, and expect the
+  // outer points to end up on the
+  // circle.
   tria.refine_global(2);
 
 
-				   // You can open the generated file
-				   // with paraview.
+  // You can open the generated file
+  // with paraview.
   GridOut gridout;
   gridout.write_ucd (tria, logfile);
-  
+
   return 0;
 }
-                  
+

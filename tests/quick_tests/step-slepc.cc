@@ -48,19 +48,19 @@ class LaplaceEigenspectrumProblem
 public:
   LaplaceEigenspectrumProblem ();
   void run ();
-  
+
 private:
   void setup_system ();
   void assemble_system ();
   void solve ();
-  
+
   Triangulation<2> triangulation;
   FE_Q<2>          fe;
   DoFHandler<2>    dof_handler;
-  
+
   PETScWrappers::SparseMatrix        A, B;
   std::vector<PETScWrappers::Vector> x;
-  std::vector<double>                lambda;  
+  std::vector<double>                lambda;
   ConstraintMatrix                   constraints;
 
   TableHandler output_table;
@@ -75,16 +75,16 @@ LaplaceEigenspectrumProblem::LaplaceEigenspectrumProblem ()
 void LaplaceEigenspectrumProblem::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
-  
+
   constraints.clear ();
   DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
   constraints.close ();
-  
+
   A.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
-	    dof_handler.max_couplings_between_dofs());
+            dof_handler.max_couplings_between_dofs());
   B.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
-	    dof_handler.max_couplings_between_dofs());
-  
+            dof_handler.max_couplings_between_dofs());
+
   x.resize (1);
   x[0].reinit (dof_handler.n_dofs ());
   lambda.resize (1);
@@ -98,56 +98,56 @@ void LaplaceEigenspectrumProblem::setup_system ()
 void LaplaceEigenspectrumProblem::assemble_system ()
 {
   QGauss<2> quadrature_formula(2);
-  
+
   FEValues<2> fe_values (fe, quadrature_formula,
-			 update_values            | 
-			 update_gradients         |
-			 update_quadrature_points | 
-			 update_JxW_values);
-  
+                         update_values            |
+                         update_gradients         |
+                         update_quadrature_points |
+                         update_JxW_values);
+
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
-  
+
   FullMatrix<double> cell_A (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> cell_B (dofs_per_cell, dofs_per_cell);
-  
+
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-  
+
   typename DoFHandler<2>::active_cell_iterator
-    cell = dof_handler.begin_active (),
-    endc = dof_handler.end ();
-  
+  cell = dof_handler.begin_active (),
+  endc = dof_handler.end ();
+
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
       cell_A = 0;
       cell_B = 0;
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    {
-	      cell_A (i, j)
-		+= 
-		fe_values.shape_grad (i, q_point) *
-		fe_values.shape_grad (j, q_point)
-		* 
-		fe_values.JxW (q_point);
-	      
-	      cell_B (i, j)
-                += 
-		fe_values.shape_value (i, q_point) *
-		fe_values.shape_value (j, q_point)
-		* 
-		fe_values.JxW (q_point);
-	    }
-      
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            {
+              cell_A (i, j)
+              +=
+                fe_values.shape_grad (i, q_point) *
+                fe_values.shape_grad (j, q_point)
+                *
+                fe_values.JxW (q_point);
+
+              cell_B (i, j)
+              +=
+                fe_values.shape_value (i, q_point) *
+                fe_values.shape_value (j, q_point)
+                *
+                fe_values.JxW (q_point);
+            }
+
       cell->get_dof_indices (local_dof_indices);
-      
+
       constraints.distribute_local_to_global (cell_A, local_dof_indices, A);
       constraints.distribute_local_to_global (cell_B, local_dof_indices, B);
     }
-  
+
   A.compress (VectorOperation::add);
   B.compress (VectorOperation::add);
 }

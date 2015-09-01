@@ -35,20 +35,24 @@ void test(unsigned int ref=1)
   GridGenerator::hyper_cube (tria);
   tria.refine_global(1);
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator 
-    cell;
-  
-  for(cell=tria.begin_active(); cell!=tria.end(); ++cell) {
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell;
 
-	  // check that FlatManifold returns the middle of the cell. 
-	  deallog << "Cell: " << cell << std::endl;
-	  if(cell->get_manifold().get_new_point_on_cell(cell).distance(cell->center()) > 1e-6) {
-		  deallog << "Default manifold: " << cell->get_manifold().get_new_point_on_cell(cell) << std::endl;
-		  deallog << "Center of cell  : " << cell->center() << std::endl;
-	  } else {
-		deallog << "OK!" << std::endl;
-	  }
-   }
+  for (cell=tria.begin_active(); cell!=tria.end(); ++cell)
+    {
+
+      // check that FlatManifold returns the middle of the cell.
+      deallog << "Cell: " << cell << std::endl;
+      if (cell->get_manifold().get_new_point_on_cell(cell).distance(cell->center()) > 1e-6)
+        {
+          deallog << "Default manifold: " << cell->get_manifold().get_new_point_on_cell(cell) << std::endl;
+          deallog << "Center of cell  : " << cell->center() << std::endl;
+        }
+      else
+        {
+          deallog << "OK!" << std::endl;
+        }
+    }
 }
 
 int main ()

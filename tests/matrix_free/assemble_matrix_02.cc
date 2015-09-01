@@ -52,9 +52,9 @@ void do_test (const DoFHandler<dim> &dof)
                              update_JxW_values);
 
     FEEvaluation<dim,degree_p+1,degree_p+2,dim>
-      phi_u (mapping, dof.get_fe(), QGauss<1>(degree_p+2),
-             update_values | update_gradients | update_JxW_values,
-             0);
+    phi_u (mapping, dof.get_fe(), QGauss<1>(degree_p+2),
+           update_values | update_gradients | update_JxW_values,
+           0);
     FEEvaluation<dim,degree_p,degree_p+2> phi_p (dof.get_fe(), phi_u, dim);
 
     const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;

@@ -69,7 +69,7 @@ int main ()
                            "docs 3");
         prm.declare_alias ("double",
                            "double_alias",
-			   true);
+                           true);
       }
       prm.leave_subsection ();
 

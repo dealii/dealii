@@ -35,157 +35,157 @@
 
 template <int dim>
 void do_test(const Triangulation<dim> &tria,
-		const Mapping<dim>       &mapping)
+             const Mapping<dim>       &mapping)
 {
-	FE_Nothing<dim> dummy;
-	// choose a point that is not right in the
-	// middle of the cell so that the Jacobian
-	// contains many nonzero entries
-	Point<dim> quad_p;
-	for (int d=0; d<dim; ++d)
-		quad_p(d) = 0.42 + 0.11 * d;
-	Quadrature<dim> quad(quad_p);
+  FE_Nothing<dim> dummy;
+  // choose a point that is not right in the
+  // middle of the cell so that the Jacobian
+  // contains many nonzero entries
+  Point<dim> quad_p;
+  for (int d=0; d<dim; ++d)
+    quad_p(d) = 0.42 + 0.11 * d;
+  Quadrature<dim> quad(quad_p);
 
-	{
-		deallog << dim << "D Jacobians:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobians);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+  {
+    deallog << dim << "D Jacobians:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobians);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					deallog << fe_val.jacobian(0)[d][e] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D inverse Jacobians:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_inverse_jacobians);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            deallog << fe_val.jacobian(0)[d][e] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D inverse Jacobians:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_inverse_jacobians);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian gradients:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_grads);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian gradients:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_grads);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_grads);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_grads);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						deallog << fe_val.jacobian_pushed_forward_grad(0)[d][e][f] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian hessians:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_2nd_derivatives);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              deallog << fe_val.jacobian_pushed_forward_grad(0)[d][e][f] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian hessians:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_2nd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						for (unsigned int g=0; g<dim; ++g)
-							deallog << fe_val.jacobian_2nd_derivative(0)[d][e][f][g] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian pushed forward hessians:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              for (unsigned int g=0; g<dim; ++g)
+                deallog << fe_val.jacobian_2nd_derivative(0)[d][e][f][g] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian pushed forward hessians:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						for (unsigned int g=0; g<dim; ++g)
-							deallog << fe_val.jacobian_pushed_forward_2nd_derivative(0)[d][e][f][g] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian hessian gradients:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_3rd_derivatives);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              for (unsigned int g=0; g<dim; ++g)
+                deallog << fe_val.jacobian_pushed_forward_2nd_derivative(0)[d][e][f][g] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian hessian gradients:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_3rd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						for (unsigned int g=0; g<dim; ++g)
-							for (unsigned int h=0; h<dim; ++h)
-								deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
-	{
-		deallog << dim << "D Jacobian pushed forward hessian gradients:" << std::endl;
-		FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
-		typename Triangulation<dim>::active_cell_iterator
-		cell = tria.begin_active(), endc = tria.end();
-		for ( ; cell != endc; ++cell)
-		{
-			fe_val.reinit (cell);
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              for (unsigned int g=0; g<dim; ++g)
+                for (unsigned int h=0; h<dim; ++h)
+                  deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
+  {
+    deallog << dim << "D Jacobian pushed forward hessian gradients:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(), endc = tria.end();
+    for ( ; cell != endc; ++cell)
+      {
+        fe_val.reinit (cell);
 
-			for (unsigned int d=0; d<dim; ++d)
-				for (unsigned int e=0; e<dim; ++e)
-					for (unsigned int f=0; f<dim; ++f)
-						for (unsigned int g=0; g<dim; ++g)
-							for (unsigned int h=0; h<dim; ++h)
-								deallog << fe_val.jacobian_pushed_forward_3rd_derivative(0)[d][e][f][g][h] << " ";
-			deallog << std::endl;
-		}
-		deallog << std::endl;
-	}
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int e=0; e<dim; ++e)
+            for (unsigned int f=0; f<dim; ++f)
+              for (unsigned int g=0; g<dim; ++g)
+                for (unsigned int h=0; h<dim; ++h)
+                  deallog << fe_val.jacobian_pushed_forward_3rd_derivative(0)[d][e][f][g][h] << " ";
+        deallog << std::endl;
+      }
+    deallog << std::endl;
+  }
 }
 
 
@@ -193,44 +193,44 @@ void do_test(const Triangulation<dim> &tria,
 template<int dim>
 void test()
 {
-	Triangulation<dim> tria;
-	GridGenerator::hyper_ball (tria);
-	static const HyperBallBoundary<dim> boundary;
-	tria.set_boundary (0, boundary);
+  Triangulation<dim> tria;
+  GridGenerator::hyper_ball (tria);
+  static const HyperBallBoundary<dim> boundary;
+  tria.set_boundary (0, boundary);
 
-	{
-		deallog << "========== MappingQ ==========" << std::endl;
-		MappingQ<dim> mapping(5);
-		do_test(tria, mapping);
-	}
+  {
+    deallog << "========== MappingQ ==========" << std::endl;
+    MappingQ<dim> mapping(5);
+    do_test(tria, mapping);
+  }
 
-	{
-		deallog << "========== MappingFEField ==========" << std::endl;
-		FESystem<dim>   fe_euler(FE_Q<dim> (QGaussLobatto<1>(4)), dim);
-		DoFHandler<dim> map_dh(tria);
-		map_dh.distribute_dofs (fe_euler);
+  {
+    deallog << "========== MappingFEField ==========" << std::endl;
+    FESystem<dim>   fe_euler(FE_Q<dim> (QGaussLobatto<1>(4)), dim);
+    DoFHandler<dim> map_dh(tria);
+    map_dh.distribute_dofs (fe_euler);
 
-		Vector<double> euler_vec(map_dh.n_dofs());
-		VectorTools::get_position_vector(map_dh, euler_vec);
+    Vector<double> euler_vec(map_dh.n_dofs());
+    VectorTools::get_position_vector(map_dh, euler_vec);
 
-		MappingFEField<dim> mapping(map_dh, euler_vec);
-		do_test(tria, mapping);
-	}
+    MappingFEField<dim> mapping(map_dh, euler_vec);
+    do_test(tria, mapping);
+  }
 }
 
 
 int
 main()
 {
-	std::ofstream logfile ("output");
-	deallog << std::setprecision(8) << std::fixed;
-	deallog.attach(logfile);
-	deallog.depth_console(0);
-	deallog.threshold_double(1.e-10);
+  std::ofstream logfile ("output");
+  deallog << std::setprecision(8) << std::fixed;
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
-	test<2>();
-	test<3>();
+  test<2>();
+  test<3>();
 
-	return 0;
+  return 0;
 }
 

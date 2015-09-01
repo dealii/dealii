@@ -562,7 +562,7 @@ namespace Step39
     SolverControl coarse_solver_control (1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(coarse_solver_control);
     PreconditionIdentity identity;
-    TrilinosWrappers::SparseMatrix & coarse_matrix = mg_matrix[0];
+    TrilinosWrappers::SparseMatrix &coarse_matrix = mg_matrix[0];
     MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,TrilinosWrappers::MPI::Vector>
     coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
@@ -630,9 +630,9 @@ namespace Step39
     // assemble all faces adjacent to ghost cells to get the full
     // information for all own cells without communication
     lctrl.faces_to_ghost = MeshWorker::LoopControl::both;
-    
+
     MeshWorker::integration_loop<dim, dim> (
-        dof_handler.begin_active(), dof_handler.end(),
+      dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
       integrator, assembler, lctrl);
 
@@ -698,7 +698,7 @@ int main(int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;
-  
+
   try
     {
       FE_DGQ<2> fe1(2);

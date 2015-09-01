@@ -40,7 +40,7 @@
 
 #define PRINTME(name, var) \
   deallog << name << ": [block 0] " << var.block(0) \
-                  << "  [block 1] " << var.block(1) << std::endl;
+          << "  [block 1] " << var.block(1) << std::endl;
 
 
 using namespace dealii;
@@ -82,11 +82,11 @@ int main()
   BlockSparseMatrix<double> a (sparsity_pattern);
   BlockSparseMatrix<double> b (sparsity_pattern);
 
-  for(unsigned int i = 0; i < a.n(); ++i)
-  {
-    a.set(i, i, 1.);
-    b.set(i, i, 5.);
-  }
+  for (unsigned int i = 0; i < a.n(); ++i)
+    {
+      a.set(i, i, 1.);
+      b.set(i, i, 5.);
+    }
 
   // Constructors and assignment:
 
@@ -103,9 +103,10 @@ int main()
 
   BlockVector<double> u;
   op_a.reinit_domain_vector(u, true);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
+  for (unsigned int i = 0; i < u.size(); ++i)
+    {
+      u[i] = (double)(i+1);
+    }
 
   PRINTME("u", u);
 

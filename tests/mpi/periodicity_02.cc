@@ -325,7 +325,7 @@ namespace Step22
       DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
-    
+
       constraints.clear ();
       constraints.reinit(locally_relevant_dofs);
 
@@ -364,11 +364,11 @@ namespace Step22
       first_vector_components.push_back(0);
 
       GridTools::collect_periodic_faces(
-          dof_handler, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
+        dof_handler, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
 
       DoFTools::make_periodicity_constraints<DoFHandler<dim>>(
-          periodicity_vector, constraints, fe.component_mask(velocities),
-          first_vector_components);
+                                                             periodicity_vector, constraints, fe.component_mask(velocities),
+                                                             first_vector_components);
 #endif
     }
 
@@ -728,7 +728,7 @@ namespace Step22
     first_vector_components.push_back(0);
 
     GridTools::collect_periodic_faces(
-        triangulation, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
+      triangulation, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
 
     triangulation.add_periodicity(periodicity_vector);
 #endif

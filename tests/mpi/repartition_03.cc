@@ -33,10 +33,10 @@
 #include <fstream>
 
 template<int dim>
-void print_cells(parallel::distributed::Triangulation<dim> & tr)
+void print_cells(parallel::distributed::Triangulation<dim> &tr)
 {
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tr.begin_active();
+       cell = tr.begin_active();
        cell != tr.end(); ++cell)
     if (cell->is_locally_owned())
       deallog << cell->id() << std::endl;
@@ -50,41 +50,41 @@ void test()
   if (true)
     {
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-						   dealii::Triangulation<dim,dim>::none,
-						   parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                                   dealii::Triangulation<dim,dim>::none,
+                                                   parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
       GridGenerator::hyper_cube(tr);
       tr.refine_global(2);
 
       deallog << "*** 1. everything on one core:" << std::endl;
-      
+
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
       print_cells(tr);
-      
+
       deallog << "*** 2. repartition:" << std::endl;
 
       tr.repartition();
-      
+
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
 
       print_cells(tr);
 
       deallog << "*** 3. repartition again (noop):" << std::endl;
       tr.repartition();
-      
+
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
 
       print_cells(tr);
-      
+
       const unsigned int checksum = tr.get_checksum ();
       if (myid == 0)
         deallog << "Checksum: "

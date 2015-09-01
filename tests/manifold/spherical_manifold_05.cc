@@ -9,7 +9,7 @@
 //----------------------------  spherical_manifold_04.cc  ---------------------------
 
 
-// Test that the flat manifold does what it should on a sphere surface. 
+// Test that the flat manifold does what it should on a sphere surface.
 
 #include "../tests.h"
 
@@ -38,15 +38,15 @@
 template <int dim>
 void test(unsigned int degree)
 {
-  deallog << "Testing dim=" << dim <<", degree=" 
-	  << degree << std::endl;
-  
+  deallog << "Testing dim=" << dim <<", degree="
+          << degree << std::endl;
+
   SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
   GridGenerator::hyper_shell(tria, Point<dim>(), .4, .6, 6);
   typename Triangulation<dim>::active_cell_iterator cell;
-  
-  for(cell = tria.begin_active(); cell != tria.end(); ++cell) 
+
+  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     cell->set_all_manifold_ids(1);
 
   tria.set_manifold(1, manifold);
@@ -56,22 +56,24 @@ void test(unsigned int degree)
   DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
   QGaussLobatto<dim> quad(degree+1);
-  
+
   FEValues<dim> fe_v(mapping, fe, quad, update_quadrature_points);
 
   // char fname[50];
   // sprintf(fname, "out_%d_%d.gpl", dim, degree);
   // std::ofstream ofile(fname);
-  std::ostream &ofile = deallog.get_file_stream(); 
+  std::ostream &ofile = deallog.get_file_stream();
 
-  for(typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
-      cell != dh.end(); ++cell) {
-    fe_v.reinit(cell);
-    for(unsigned int q=0; q<quad.size(); ++q) {
-      ofile << fe_v.get_quadrature_points()[q] << std::endl;
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+       cell != dh.end(); ++cell)
+    {
+      fe_v.reinit(cell);
+      for (unsigned int q=0; q<quad.size(); ++q)
+        {
+          ofile << fe_v.get_quadrature_points()[q] << std::endl;
+        }
+      ofile << std::endl;
     }
-    ofile << std::endl;
-  }
   ofile << std::endl;
 }
 
@@ -82,10 +84,11 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  for(unsigned int d=1; d<5; ++d) {
-    test<2>(d);
-    test<3>(d);
-  }
+  for (unsigned int d=1; d<5; ++d)
+    {
+      test<2>(d);
+      test<3>(d);
+    }
   return 0;
 }
 

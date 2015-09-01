@@ -25,7 +25,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/fe/fe_q.h> 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -46,9 +46,9 @@ int main()
   deallog.threshold_double(1.e-10);
 
   Triangulation<2> triangulation(Triangulation<2>::none);
-  GridGenerator::hyper_cube (triangulation); 
+  GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global(1);
-	 
+
   hp::FECollection<2> fe_collection;
   fe_collection.push_back(FE_Q<2>(1));
   fe_collection.push_back(FE_Nothing<2>());
@@ -57,7 +57,7 @@ int main()
 
   // Assign FEQ to all cells
   hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();  
+  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
 
@@ -65,7 +65,7 @@ int main()
    * -----------
    * |  0 |  0 |
    * -----------
-   * |  1 |  1 |		0 - FEQ, 1 - FE_Nothing
+   * |  1 |  1 |    0 - FEQ, 1 - FE_Nothing
    * -----------
    */
 
@@ -88,7 +88,7 @@ int main()
    * -----------
    * |    |  R |
    * -----------
-   * |  R |    |		
+   * |  R |    |
    * -----------
    */
 

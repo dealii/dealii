@@ -51,15 +51,15 @@ int main()
 
     BlockSparseMatrix<double> a (sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
-    {
-      a.block(i,i).set(0, 0, i+i +1);
-      for (unsigned int j = 0; j < i; ++j)
-        a.block(i,j).set(0, 0, 10);
-    }
+      {
+        a.block(i,i).set(0, 0, i+i +1);
+        for (unsigned int j = 0; j < i; ++j)
+          a.block(i,j).set(0, 0, 10);
+      }
 
     BlockSparseMatrix<double> d(sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
-        d.block(i,i).set(0,0, 1.0 / (i+i +1) );
+      d.block(i,i).set(0,0, 1.0 / (i+i +1) );
 
     auto op_a  = linear_operator<BlockVector<double>>(a);
 
@@ -67,7 +67,7 @@ int main()
     auto op_b2 = block_diagonal_operator(d);
 
     auto inverse_op_a =
-        block_forward_substitution<BlockVector<double>>(op_b1, op_b2);
+      block_forward_substitution<BlockVector<double>>(op_b1, op_b2);
 
     auto identity = inverse_op_a * op_a;
 
@@ -77,53 +77,53 @@ int main()
     deallog << " -- Matrix -- " << std::endl;
     op_a.reinit_domain_vector(u, false);
     op_a.reinit_range_vector(v, false);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;
+
+        op_a.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;
-
-      op_a.vmult(v, u);
-
-      PRINTME("v", v);
-    }
 
     deallog << " -- Inverse -- " << std::endl;
     inverse_op_a.reinit_domain_vector(u, false);
     inverse_op_a.reinit_range_vector(v, true);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;;
+
+        inverse_op_a.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;;
-
-      inverse_op_a.vmult(v, u);
-
-      PRINTME("v", v);
-    }
 
     deallog << " -- Identity -- " << std::endl;
     identity.reinit_domain_vector(u, false);
     identity.reinit_range_vector(v, false);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;;
+
+        identity.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;;
-
-      identity.vmult(v, u);
-
-      PRINTME("v", v);
-    }
   }
 
 
@@ -140,11 +140,11 @@ int main()
 
     BlockSparseMatrix<double> a (sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
-    {
-      a.block(i,i).set(0, 0, i+i +1);
-      for (unsigned int j = i+1; j < 3; ++j)
-        a.block(i,j).set(0, 0, 10);
-    }
+      {
+        a.block(i,i).set(0, 0, i+i +1);
+        for (unsigned int j = i+1; j < 3; ++j)
+          a.block(i,j).set(0, 0, 10);
+      }
 
     BlockSparseMatrix<double> d(sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
@@ -156,7 +156,7 @@ int main()
     auto op_b2 = block_diagonal_operator(d);
 
     auto inverse_op_a =
-        block_back_substitution<BlockVector<double>>(op_b1, op_b2);
+      block_back_substitution<BlockVector<double>>(op_b1, op_b2);
 
     auto identity = inverse_op_a * op_a;
 
@@ -166,52 +166,52 @@ int main()
     deallog << " -- Matrix -- " << std::endl;
     op_a.reinit_domain_vector(u, false);
     op_a.reinit_range_vector(v, false);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;
+
+        op_a.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;
-
-      op_a.vmult(v, u);
-
-      PRINTME("v", v);
-    }
 
     deallog << " -- Inverse -- " << std::endl;
     inverse_op_a.reinit_domain_vector(u, false);
     inverse_op_a.reinit_range_vector(v, true);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;;
+
+        inverse_op_a.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;;
-
-      inverse_op_a.vmult(v, u);
-
-      PRINTME("v", v);
-    }
 
     deallog << " -- Identity -- " << std::endl;
     identity.reinit_domain_vector(u, false);
     identity.reinit_range_vector(v, false);
-    for(unsigned int j = 0; j<3; ++j)
-    {
-      for(unsigned int i = 0; i<3; ++i)
+    for (unsigned int j = 0; j<3; ++j)
       {
-        u.block(i)[0] = 0;;
-        v.block(i)[0] = 0;
+        for (unsigned int i = 0; i<3; ++i)
+          {
+            u.block(i)[0] = 0;;
+            v.block(i)[0] = 0;
+          }
+        u.block(j)[0] = 1;;
+
+        identity.vmult(v, u);
+
+        PRINTME("v", v);
       }
-      u.block(j)[0] = 1;;
-
-      identity.vmult(v, u);
-
-      PRINTME("v", v);
-    }
   }
 }

@@ -29,22 +29,23 @@
 template <int dim, int spacedim>
 void test(unsigned int ref=1)
 {
-  deallog << "Testing dim " << dim 
-	  << ", spacedim " << spacedim << std::endl;
-  
+  deallog << "Testing dim " << dim
+          << ", spacedim " << spacedim << std::endl;
+
   // Here the only allowed axis is z. In cylinder the default is x.
   CylindricalManifold<dim,spacedim> manifold(2);
-  
+
   Triangulation<dim,spacedim> tria;
   GridGenerator::cylinder_shell (tria, .5, .1, .25);
 
-  for(typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell) {
-    cell->set_all_manifold_ids(1);
-  }
-  
+  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
+    {
+      cell->set_all_manifold_ids(1);
+    }
+
   tria.set_manifold(1, manifold);
   tria.refine_global(1);
-  
+
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
 }
@@ -55,9 +56,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<3,3>();
-  
+
   return 0;
 }
 

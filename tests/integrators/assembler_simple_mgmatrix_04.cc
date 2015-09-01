@@ -15,7 +15,7 @@
 
 
 /**
- * @file Test whether 
+ * @file Test whether
  */
 
 #include "../tests.h"
@@ -50,10 +50,10 @@ class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   LaplaceMatrix();
-  virtual void cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const;
-  virtual void boundary(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const;
-  virtual void face(MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-		    MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const;
+  virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void boundary(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+                    MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 
@@ -63,82 +63,82 @@ LaplaceMatrix<dim>::LaplaceMatrix()
 
 
 template <int dim>
-void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const
+void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
 {
   Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
 }
 
 
 template <int dim>
-void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
-				       typename MeshWorker::IntegrationInfo<dim>& info) const
+void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo,
+                                  typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values().get_fe().tensor_degree();
   Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(),
-			      Laplace::compute_penalty(dinfo, dinfo, deg, deg));
+                          Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
 
 
 template <int dim>
 void LaplaceMatrix<dim>::face(
-  MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-  MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const
+  MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+  MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const
 {
   if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::H1))
     return;
-  
+
   const unsigned int deg = info1.fe_values().get_fe().tensor_degree();
-  
+
   if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
-	  !info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hcurl))
-	Laplace::ip_tangential_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
-				      dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-				      info1.fe_values(), info2.fe_values(),
-				      Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
-      else
-	Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
-			   dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-			   info1.fe_values(), info2.fe_values(),
-			   Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+      !info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hcurl))
+    Laplace::ip_tangential_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
+                                  dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+                                  info1.fe_values(), info2.fe_values(),
+                                  Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+  else
+    Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
+                       dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+                       info1.fe_values(), info2.fe_values(),
+                       Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
 
 template <int dim>
-void assemble_mg_matrix(DoFHandler<dim>& dof_handler,
-   MeshWorker::LocalIntegrator<dim>& matrix_integrator, mg::SparseMatrixCollection<double>& mg)
+void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
+                        MeshWorker::LocalIntegrator<dim> &matrix_integrator, mg::SparseMatrixCollection<double> &mg)
 {
   MGConstrainedDoFs mg_constraints;
   mg_constraints.clear();
   mg_constraints.initialize(dof_handler);
-  
+
   mg.set_zero();
 
   MappingQ1<dim> mapping;
-  
+
   MeshWorker::IntegrationInfoBox<dim> info_box;
   UpdateFlags update_flags = update_values | update_gradients | update_hessians;
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(dof_handler.get_fe(), mapping);
 
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
-  
+
   MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(mg_constraints);
   assembler.initialize(mg.matrix);
   assembler.initialize_interfaces(mg.matrix_in, mg.matrix_out);
   assembler.initialize_fluxes(mg.matrix_up, mg.matrix_down);
-  
+
   MeshWorker::integration_loop<dim, dim> (
     dof_handler.begin_mg(), dof_handler.end_mg(),
     dof_info, info_box, matrix_integrator, assembler);
 
   const unsigned int nlevels = dof_handler.get_tria().n_levels();
-  for (unsigned int level=0;level<nlevels;++level)
-  {
-    for(unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
-      if(mg.matrix[level].diag_element(i)==0)
-        mg.matrix[level].set(i,i,1.);
-  }
+  for (unsigned int level=0; level<nlevels; ++level)
+    {
+      for (unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
+        if (mg.matrix[level].diag_element(i)==0)
+          mg.matrix[level].set(i,i,1.);
+    }
 }
 
 
@@ -155,9 +155,9 @@ void test(FiniteElement<dim> &fe)
   GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
-  
+
   LaplaceMatrix<dim> matrix_integrator;
-  
+
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
@@ -166,25 +166,25 @@ void test(FiniteElement<dim> &fe)
   mg.reinit(dof);
   assemble_mg_matrix(dof, matrix_integrator, mg);
 
-  for (unsigned int level=0;level<tr.n_levels();++level)
-  {
-    const unsigned int prec = 6;
-    const unsigned int wd = 5;
-    
-    deallog << "Level " << level << std::endl << "mg" << std::endl;
-    mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-    if (level>0)
-      {
-	deallog << "in" << std::endl;
-	mg.matrix_in[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-	deallog << "out" << std::endl;
-	mg.matrix_out[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-	deallog << "up" << std::endl;
-	mg.matrix_up[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-	deallog << "down" << std::endl;
-	mg.matrix_down[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-      }
-  }
+  for (unsigned int level=0; level<tr.n_levels(); ++level)
+    {
+      const unsigned int prec = 6;
+      const unsigned int wd = 5;
+
+      deallog << "Level " << level << std::endl << "mg" << std::endl;
+      mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+      if (level>0)
+        {
+          deallog << "in" << std::endl;
+          mg.matrix_in[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          deallog << "out" << std::endl;
+          mg.matrix_out[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          deallog << "up" << std::endl;
+          mg.matrix_up[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          deallog << "down" << std::endl;
+          mg.matrix_down[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+        }
+    }
 }
 
 

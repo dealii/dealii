@@ -73,7 +73,7 @@ int main ()
   // Some of the finite element types are commented out, since their
   // implementation or instantiation for codimension != 0 is still
   // missing. This was opened as issue #92.
-  
+
   // gen.generate("FE_Q_Hierarchical(1)");
   // gen.generate("FE_DGPNonparametric(1)");
   gen.generate("FE_DGQ(1)");

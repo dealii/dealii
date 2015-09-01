@@ -90,9 +90,9 @@ void run()
   no_normal_flux_boundaries.insert (5); // z=1
 
   VectorTools::compute_no_normal_flux_constraints
-    (dof_handler, 0,
-     no_normal_flux_boundaries,
-     constraints);
+  (dof_handler, 0,
+   no_normal_flux_boundaries,
+   constraints);
 
   constraints.print(deallog.get_file_stream());
 

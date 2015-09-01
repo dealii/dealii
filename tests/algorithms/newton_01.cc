@@ -68,7 +68,7 @@ public:
 
 void SquareRoot::residual (AnyData &out, const AnyData &in)
 {
-  Vector<double>& v = *out.entry<Vector<double>*>(0);
+  Vector<double> &v = *out.entry<Vector<double>*>(0);
   //residuum = 0
   v(0) = 0.;
   const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
@@ -77,7 +77,7 @@ void SquareRoot::residual (AnyData &out, const AnyData &in)
 
 void SquareRoot::solve (AnyData &out, const AnyData &in)
 {
-  Vector<double>& v = *out.entry<Vector<double>*>(0);
+  Vector<double> &v = *out.entry<Vector<double>*>(0);
   v(0) = 0;
   const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
   const Vector<double> &r = *in.entry<const Vector<double>*>("Newton residual");

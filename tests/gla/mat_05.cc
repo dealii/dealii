@@ -72,7 +72,7 @@ void test ()
   deallog << "l1-norm: " << mat.l1_norm() << std::endl;
   if (myid==0)
     deallog << "mat(0,1): " << mat(0,1) << std::endl;
-  
+
   {
     // disabled:
     //typename LA::MPI::SparseMatrix mat2(mat);
@@ -82,7 +82,7 @@ void test ()
     //typename LA::MPI::SparseMatrix mat2;
     //mat2 = mat;
   }
-  
+
   {
     deallog << "* reinit(other):" << std::endl;
     typename LA::MPI::SparseMatrix mat2;

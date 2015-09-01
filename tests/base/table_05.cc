@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check that Table<{1,2,3},T>::reinit(TableIndices) work 
+// check that Table<{1,2,3},T>::reinit(TableIndices) work
 
 #include "../tests.h"
 #include <cmath>

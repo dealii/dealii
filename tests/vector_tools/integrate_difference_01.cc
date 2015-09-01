@@ -37,20 +37,20 @@ using namespace dealii;
 template <int dim>
 class Ref : public Function<dim>
 {
-  public:
-    Ref()
-		    :Function<dim>(dim)
-      {}
-    
-    double value (const Point<dim> &p, const unsigned int c) const
-      {
-	if (c==0)
-	  return p[0]+p[1]+((dim==3)?p[2]:0.0);
-	if (c==1)
-	  return p[0]*p[0]+p[1]*p[1];
-	if (c==2)
-	  return p[2]+p[0]*p[1];
-      }    
+public:
+  Ref()
+    :Function<dim>(dim)
+  {}
+
+  double value (const Point<dim> &p, const unsigned int c) const
+  {
+    if (c==0)
+      return p[0]+p[1]+((dim==3)?p[2]:0.0);
+    if (c==1)
+      return p[0]*p[0]+p[1]*p[1];
+    if (c==2)
+      return p[2]+p[0]*p[1];
+  }
 };
 
 
@@ -68,22 +68,22 @@ void test(VectorTools::NormType norm, double value)
 
   Vector<double> solution (dofh.n_dofs ());
   VectorTools::interpolate(dofh, Ref<dim>(), solution);
-  
+
   Vector<double> cellwise_errors (tria.n_active_cells());
   VectorTools::integrate_difference (dofh,
-				     solution,
-				     ZeroFunction<dim>(dim),
-				     cellwise_errors,
-				     QGauss<dim>(5),
-				     norm);
-  
+                                     solution,
+                                     ZeroFunction<dim>(dim),
+                                     cellwise_errors,
+                                     QGauss<dim>(5),
+                                     norm);
+
   const double error = cellwise_errors.l2_norm();
 
   const double difference = std::abs(error-value);
   deallog << "computed: " << error
-	  << " expected: " << value
-	  << " difference: " << difference
-	  << std::endl;
+          << " expected: " << value
+          << " difference: " << difference
+          << std::endl;
   Assert(difference<1e-10, ExcMessage("Error in integrate_difference"));
 }
 

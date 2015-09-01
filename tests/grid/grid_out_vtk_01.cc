@@ -33,7 +33,7 @@
 
 
 template <int dim, int spacedim>
-void test (std::ostream& logfile)
+void test (std::ostream &logfile)
 {
   Triangulation<dim,spacedim> tria;
   std::vector<unsigned int> legs(2*dim, 1);

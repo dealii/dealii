@@ -89,7 +89,7 @@ private:
 };
 
 Deal2PeriodicBug::Deal2PeriodicBug()
-:  fe(2), dof_handler(triangulation)
+  :  fe(2), dof_handler(triangulation)
 {}
 
 

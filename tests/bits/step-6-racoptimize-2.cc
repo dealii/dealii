@@ -300,8 +300,8 @@ void LaplaceProblem<dim>::refine_grid ()
                                       estimated_error_per_cell);
 
   GridRefinement::refine_and_coarsen_optimize (triangulation,
-					       estimated_error_per_cell,
-					       5);
+                                               estimated_error_per_cell,
+                                               5);
 
   triangulation.execute_coarsening_and_refinement ();
 }

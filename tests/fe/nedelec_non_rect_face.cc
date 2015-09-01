@@ -442,10 +442,10 @@ namespace Maxwell
       }
 
     deallog << "p = " << p_order << std::endl;
-    
+
     //convergence_table.set_precision("L2 Error",4);
     convergence_table.set_scientific("L2 Error",true);
-      
+
     //convergence_table.set_precision("H(curl) Error",4);
     convergence_table.set_scientific("H(curl) Error",true);
 
@@ -457,11 +457,11 @@ namespace Maxwell
 int main ()
 {
   using namespace Maxwell;
-  
+
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   for (unsigned int p=0; p<3; ++p)
     {
       MaxwellProblem<3> (p).run();

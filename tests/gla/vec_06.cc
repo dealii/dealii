@@ -57,16 +57,16 @@ void test ()
   vb.compress(VectorOperation::insert);
   v=vb;
 
-  {  
+  {
     typename LA::MPI::Vector x;
     typename LA::MPI::Vector y;
     x=y;
   }
-  {  
+  {
     typename LA::MPI::Vector x;
     x=v;
   }
-  {  
+  {
     typename LA::MPI::Vector x;
     x=vb;
   }

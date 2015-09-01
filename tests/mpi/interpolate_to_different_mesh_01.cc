@@ -39,20 +39,20 @@ public:
 };
 
 template<int dim>
-void setup(DoFHandler<dim> & dh,
-	   FE_Q<dim> & fe,
-	   LA::MPI::Vector & vec,
-	   LA::MPI::Vector & lr_vec)
+void setup(DoFHandler<dim> &dh,
+           FE_Q<dim> &fe,
+           LA::MPI::Vector &vec,
+           LA::MPI::Vector &lr_vec)
 {
   dh.distribute_dofs (fe);
   vec.reinit(dh.locally_owned_dofs(), MPI_COMM_WORLD);
   IndexSet locally_relevant;
   DoFTools::extract_locally_relevant_dofs (dh, locally_relevant);
-  lr_vec.reinit(locally_relevant, MPI_COMM_WORLD);  
+  lr_vec.reinit(locally_relevant, MPI_COMM_WORLD);
 }
 
 template<int dim>
-void output(DoFHandler<dim> & dh, LA::MPI::Vector & v, unsigned int loop, const std::string filename_)
+void output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const std::string filename_)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -61,26 +61,26 @@ void output(DoFHandler<dim> & dh, LA::MPI::Vector & v, unsigned int loop, const 
   data_out.build_patches (1);
   std::ostringstream filename;
   filename << filename_
-	   << Utilities::int_to_string (loop, 2)
-	   << "."
-	   << Utilities::int_to_string (myid,2)
-	   << ".vtu";
-	
+           << Utilities::int_to_string (loop, 2)
+           << "."
+           << Utilities::int_to_string (myid,2)
+           << ".vtu";
+
   std::ofstream output (filename.str().c_str());
   data_out.write_vtu (output);
   if (myid)
     {
       std::vector<std::string> filenames;
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-	filenames.push_back (filename_ +
-			     Utilities::int_to_string (loop, 2) +
-			     "." +
-			     Utilities::int_to_string(i, 2) +
-			     ".vtu");
+        filenames.push_back (filename_ +
+                             Utilities::int_to_string (loop, 2) +
+                             "." +
+                             Utilities::int_to_string(i, 2) +
+                             ".vtu");
       const std::string
-	pvtu_master_filename = (filename_ +
-				Utilities::int_to_string (loop, 2) +
-				".pvtu");
+      pvtu_master_filename = (filename_ +
+                              Utilities::int_to_string (loop, 2) +
+                              ".pvtu");
       std::ofstream pvtu_master (pvtu_master_filename.c_str());
       data_out.write_pvtu_record (pvtu_master, filenames);
     }
@@ -92,24 +92,24 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim,dim>::none,
-					       parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                               dealii::Triangulation<dim,dim>::none,
+                                               parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
   parallel::distributed::Triangulation<dim> tr2(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim,dim>::none,
-					       parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                                dealii::Triangulation<dim,dim>::none,
+                                                parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
   GridGenerator::hyper_cube(tr2);
   tr2.refine_global(2);
-  
+
   FE_Q<dim> fe(1);
   DoFHandler<dim> dh(tr);
   DoFHandler<dim> dh2(tr2);
 
   SomeFunction<dim> func;
-  
+
 
   for (unsigned int loop = 0; loop < 5; ++loop)
     {
@@ -117,26 +117,26 @@ void test()
       std::vector<bool> r_flags(tr.n_active_cells()*dim, false);
       std::vector<bool> c_flags(tr.n_active_cells(), false);
 
-      for (unsigned int i=0;i<c_flags.size();++i)
-	{
-	  int roll = Testing::rand()%4;
-	  if (roll >= 2)
-	    {
-	      for (unsigned int j=0;j<dim;++j)
-		r_flags[i*dim+j] = true;
-	    }
-	  else if (roll == 1)
-	    c_flags[i] = true;
-	}
+      for (unsigned int i=0; i<c_flags.size(); ++i)
+        {
+          int roll = Testing::rand()%4;
+          if (roll >= 2)
+            {
+              for (unsigned int j=0; j<dim; ++j)
+                r_flags[i*dim+j] = true;
+            }
+          else if (roll == 1)
+            c_flags[i] = true;
+        }
 
       tr.load_coarsen_flags(c_flags);
       tr.load_refine_flags(r_flags);
 
       tr.execute_coarsening_and_refinement ();
       deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-	      << " / "
-	      << tr.n_global_active_cells()
-	      << std::endl;
+              << " / "
+              << tr.n_global_active_cells()
+              << std::endl;
 
 
       LA::MPI::Vector vec1;
@@ -156,19 +156,19 @@ void test()
       lr_vec1 = vec1;
 
       {
-	Vector<double> local_errors (tr.n_active_cells());
-	VectorTools::integrate_difference	(dh, lr_vec1, func, local_errors,
-						 QGauss<dim>(3), VectorTools::L2_norm);
-	double total_local_error = local_errors.l2_norm();
-	const double total_global_error
-	  = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error, MPI_COMM_WORLD));
-	if (myid == 0)
-	  deallog << "err: " << total_global_error << std::endl;
+        Vector<double> local_errors (tr.n_active_cells());
+        VectorTools::integrate_difference (dh, lr_vec1, func, local_errors,
+                                           QGauss<dim>(3), VectorTools::L2_norm);
+        double total_local_error = local_errors.l2_norm();
+        const double total_global_error
+          = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error, MPI_COMM_WORLD));
+        if (myid == 0)
+          deallog << "err: " << total_global_error << std::endl;
       }
-      
+
       //output(dh, lr_vec1, loop, "solutionA-");
       //output(dh2, lr_vec2, loop, "solutionB-");
-            
+
       // also update tr2 to be the same as tr1
       tr2.load_coarsen_flags(c_flags);
       tr2.load_refine_flags(r_flags);
@@ -182,9 +182,9 @@ void test()
       const unsigned int checksum = tr.get_checksum ();
       const unsigned int checksum2 = tr2.get_checksum ();
       if (myid == 0)
-	deallog << "Checksum: "
-		<< checksum << " " << checksum2
-		<< std::endl;
+        deallog << "Checksum: "
+                << checksum << " " << checksum2
+                << std::endl;
     }
 }
 

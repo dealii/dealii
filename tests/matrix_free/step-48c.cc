@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// simplified form for step-48 test 
+// simplified form for step-48 test
 
 
 #include "../tests.h"
@@ -171,7 +171,7 @@ namespace Step48
   {
   public:
     InitialSolution (const unsigned int n_components = 1,
-                   const double time = 0.) : Function<dim>(n_components, time) {}
+                     const double time = 0.) : Function<dim>(n_components, time) {}
     virtual double value (const Point<dim> &p,
                           const unsigned int component = 0) const;
   };

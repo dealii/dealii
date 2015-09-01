@@ -110,7 +110,7 @@ main()
       test<2>(i);
       test<3>(i);
     }
-  
+
   return 0;
 }
 

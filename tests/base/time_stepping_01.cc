@@ -19,8 +19,8 @@
 #include <deal.II/lac/vector.h>
 
 // test Runge-Kutta methods
-Vector<double> f1(double const t, Vector<double> const &y) 
-{ 
+Vector<double> f1(double const t, Vector<double> const &y)
+{
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
     values[i] = 1.0;
@@ -28,96 +28,96 @@ Vector<double> f1(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> f2(double const t, Vector<double> const &y) 
-{ 
+Vector<double> f2(double const t, Vector<double> const &y)
+{
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
     values[i] = 2.0*t;
 
-  return values; 
+  return values;
 }
 
-Vector<double> f3(double const t, Vector<double> const &y) 
-{ 
+Vector<double> f3(double const t, Vector<double> const &y)
+{
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
     values[i] = 3.0*t*t;
 
-  return values; 
+  return values;
 }
 
-Vector<double> f4(double const t, Vector<double> const &y) 
-{ 
+Vector<double> f4(double const t, Vector<double> const &y)
+{
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
     values[i] = 4.0*t*t*t;
-  
-  return values; 
+
+  return values;
 }
 
-Vector<double> f5(double const t, Vector<double> const &y) 
+Vector<double> f5(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
     values[i] = 5.0*t*t*t*t;
-  
-  return values; 
+
+  return values;
 }
 
-Vector<double> id_minus_tau_J_inv1(double const t, double const tau, Vector<double> const &y) 
+Vector<double> id_minus_tau_J_inv1(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv2(double const t, double const tau, Vector<double> const &y) 
+Vector<double> id_minus_tau_J_inv2(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv3(double const t, double const tau, Vector<double> const &y) 
+Vector<double> id_minus_tau_J_inv3(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv4(double const t, double const tau, Vector<double> const &y) 
+Vector<double> id_minus_tau_J_inv4(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv5(double const t, double const tau, Vector<double> const &y) 
+Vector<double> id_minus_tau_J_inv5(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-double my1(double const t) 
-{ 
-  return t; 
+double my1(double const t)
+{
+  return t;
 }
 
-double my2(double const t) 
-{ 
-  return t*t; 
+double my2(double const t)
+{
+  return t*t;
 }
 
-double my3(double const t) 
-{ 
-  return t*t*t; 
+double my3(double const t)
+{
+  return t*t*t;
 }
 
-double my4(double const t) 
-{ 
-  return t*t*t*t; 
+double my4(double const t)
+{
+  return t*t*t*t;
 }
 
-double my5(double const t) 
-{ 
-  return t*t*t*t*t; 
+double my5(double const t)
+{
+  return t*t*t*t*t;
 }
 
 void test(TimeStepping::RungeKutta<Vector<double> > &solver,
-    std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
-    std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-    std_cxx11::function<double (double const)> my)
+          std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
+          std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+          std_cxx11::function<double (double const)> my)
 {
   unsigned int n_time_steps = 1;
   unsigned int size = 1;
@@ -127,10 +127,10 @@ void test(TimeStepping::RungeKutta<Vector<double> > &solver,
   Vector<double> solution(size);
   Vector<double> exact_solution(size);
   for (unsigned int i=0; i<size; ++i)
-  {
-    solution[i] = my(initial_time);
-    exact_solution[i] = my(final_time);
-  }
+    {
+      solution[i] = my(initial_time);
+      exact_solution[i] = my(final_time);
+    }
 
   for (unsigned int i=0; i<n_time_steps; ++i)
     time = solver.evolve_one_time_step(f,id_minus_tau_J_inv,time,time_step,solution);
@@ -142,9 +142,9 @@ void test(TimeStepping::RungeKutta<Vector<double> > &solver,
 }
 
 void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
-    std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
-    std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-    std_cxx11::function<double (double const)> my)
+           std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
+           std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+           std_cxx11::function<double (double const)> my)
 {
   double initial_time = 0.0, final_time = 1.0;
   double time_step = 1.0;
@@ -154,19 +154,19 @@ void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
   Vector<double> solution(size);
   Vector<double> exact_solution(size);
   for (unsigned int i=0; i<size; ++i)
-  {
-    solution[i] = my(initial_time);
-    exact_solution[i] = my(final_time);
-  }
+    {
+      solution[i] = my(initial_time);
+      exact_solution[i] = my(final_time);
+    }
 
 
   while (time<final_time)
-  {
-    if (time+time_step>final_time)
-      time_step = final_time - time;
-    time = solver.evolve_one_time_step(f,id_minus_tau_J_inv,time,time_step,solution);
-    time_step = solver.get_status().delta_t_guess;
-  }
+    {
+      if (time+time_step>final_time)
+        time_step = final_time - time;
+      time = solver.evolve_one_time_step(f,id_minus_tau_J_inv,time,time_step,solution);
+      time_step = solver.get_status().delta_t_guess;
+    }
 
   Vector<double> error(exact_solution);
   error.sadd(1.0,-1.0,solution);

@@ -36,7 +36,7 @@ void test ()
 
   bool okay = foo.read_input(SOURCE_DIR "/parameter_handler_18.prm");
   Assert(okay, ExcMessage("read_input failed"));
-  
+
   foo.enter_subsection("bar");
   deallog << foo.get ("val") << std::endl;
   foo.leave_subsection();

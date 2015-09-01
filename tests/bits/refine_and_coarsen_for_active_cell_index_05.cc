@@ -42,7 +42,7 @@ void check (const Triangulation<dim> &tria)
 {
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-      cell!=tria.end(); ++cell, ++index)
+       cell!=tria.end(); ++cell, ++index)
     Assert (cell->active_cell_index() == index, ExcInternalError());
 }
 
@@ -108,7 +108,7 @@ void check ()
   check (tria);
   {
     Triangulation<dim> x;
-    
+
     // save data to archive
     std::ostringstream oss;
     {
@@ -122,7 +122,7 @@ void check ()
       // restore triangulation
       ia >> x;
     }
-    
+
     check(x);
   }
 
@@ -137,7 +137,7 @@ void check ()
   check (tria);
   {
     Triangulation<dim> x;
-    
+
     // save data to archive
     std::ostringstream oss;
     {
@@ -151,7 +151,7 @@ void check ()
       // restore triangulation
       ia >> x;
     }
-    
+
     check(x);
   }
 

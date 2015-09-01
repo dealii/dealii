@@ -53,7 +53,7 @@ test ()
   DataOut<dim> data_out;
   data_out.add_data_vector (dof1, v1, "scalar");
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation(dim,DataComponentInterpretation::component_is_part_of_vector);
+  component_interpretation(dim,DataComponentInterpretation::component_is_part_of_vector);
   data_out.add_data_vector (dof2, v2, std::vector<std::string>(dim,"vector"),
                             component_interpretation);
   data_out.build_patches ();

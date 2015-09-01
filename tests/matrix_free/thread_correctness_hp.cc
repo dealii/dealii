@@ -50,9 +50,9 @@ public:
     // orders
     std::pair<unsigned int,unsigned int> subrange_deg;
 #define CALL_METHOD(degree)                                             \
-    subrange_deg = data.create_cell_subrange_hp(cell_range, degree);    \ 
-    if (subrange_deg.second > subrange_deg.first)                       \
-      helmholtz_operator<dim,degree,Vector<Number> > (data, dst, src, subrange_deg)
+  subrange_deg = data.create_cell_subrange_hp(cell_range, degree);    \
+  if (subrange_deg.second > subrange_deg.first)                       \
+    helmholtz_operator<dim,degree,Vector<Number> > (data, dst, src, subrange_deg)
 
     CALL_METHOD(1);
     CALL_METHOD(2);

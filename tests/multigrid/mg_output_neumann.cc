@@ -247,18 +247,18 @@ void check_simple(const FiniteElement<dim> &fe)
 
   MGTransferPrebuilt<Vector<double> > transfer_renumbered(hnc_renumbered, mg_constrained_dofs_renumbered);
   transfer_renumbered.build_matrices(mgdof_renumbered);
-  
+
   // Fill vector u with some cell based numbering
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof,u);
 
   MGLevelObject<Vector<double> > v(0, tr.n_levels()-1);
   reinit_vector(mgdof, v);
-  
+
   // Copy u to a multigrid vector and print
   transfer.copy_to_mg(mgdof, v, u);
   print(mgdof, v);
-  
+
   // Forget everything so far and fill v with a cell based
   // numbering. Prolongate from coarse grid up and transfer to u.
   u=0;
@@ -268,14 +268,14 @@ void check_simple(const FiniteElement<dim> &fe)
 
   transfer.copy_from_mg(mgdof, u, v);
   Vector<double> diff = u;
-  
+
   // Do the same for the renumbered mesh
   initialize(mgdof_renumbered,u);
   reinit_vector(mgdof_renumbered, v);
   transfer_renumbered.copy_to_mg(mgdof_renumbered, v, u);
   deallog << "copy_to_mg" << std::endl;
   print(mgdof_renumbered, v);
-  
+
   // Prolongate up from coarse mesh and make sure the result does not
   // depend on numbering
   u=0;

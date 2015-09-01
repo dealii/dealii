@@ -104,10 +104,10 @@ int main()
     {
       x_fe_values.reinit (cell);
       std::vector<Vector<double> >
-	derivatives (q[0].size(), Vector<double>(cell->get_fe().n_components()));
+      derivatives (q[0].size(), Vector<double>(cell->get_fe().n_components()));
 
       x_fe_values.get_present_fe_values().get_function_laplacians (new_solution,
-								   derivatives);
+          derivatives);
     }
 
   // we are good if we made it to here

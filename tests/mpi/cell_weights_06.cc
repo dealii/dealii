@@ -48,8 +48,8 @@ void test()
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                               dealii::Triangulation<dim>::none,
+                                               parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
 
   // create a 16x16 or 16x16x16 mesh where each cell has size 1x1 ir 1x1x1
   GridGenerator::subdivided_hyper_cube(tr, 8, 0, 16);
@@ -58,59 +58,59 @@ void test()
   // repartition the mesh; attach different weights to all cells
   std::vector<unsigned int> weights (tr.n_active_cells());
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tr.begin_active(); cell != tr.end(); ++cell)
+       cell = tr.begin_active(); cell != tr.end(); ++cell)
     weights[cell->active_cell_index()]
       = (
-	// bottom left corner
-	(cell->center()[0] < 1)
-	&&
-	(cell->center()[1] < 1)
-	&&
-	(dim == 3 ?
-	 (cell->center()[2] < 1) :
-	 true)
-	?
-	// one cell has more weight than all others together
-	tr.n_global_active_cells()
-	:
-	1);
+          // bottom left corner
+          (cell->center()[0] < 1)
+          &&
+          (cell->center()[1] < 1)
+          &&
+          (dim == 3 ?
+           (cell->center()[2] < 1) :
+           true)
+          ?
+          // one cell has more weight than all others together
+          tr.n_global_active_cells()
+          :
+          1);
   tr.repartition (weights);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
       deallog << "processor " << p
-	      << ": "
-	      << tr.n_locally_owned_active_cells_per_processor ()[p]
-	      << " locally owned active cells"
-	      << std::endl;
+              << ": "
+              << tr.n_locally_owned_active_cells_per_processor ()[p]
+              << " locally owned active cells"
+              << std::endl;
 
   // let each processor sum up its weights
   std::vector<double> integrated_weights (numproc, 0.0);
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tr.begin_active(); cell != tr.end(); ++cell)
+       cell = tr.begin_active(); cell != tr.end(); ++cell)
     if (cell->is_locally_owned())
       integrated_weights[myid]
-	+= (
-	  // bottom left corner
-	  (cell->center()[0] < 1)
-	  &&
-	  (cell->center()[1] < 1)
-	  &&
-	  (dim == 3 ?
-	   (cell->center()[2] < 1) :
-	   true)
-	  ?
-	  tr.n_global_active_cells()
-	  :
-	  1);
+      += (
+           // bottom left corner
+           (cell->center()[0] < 1)
+           &&
+           (cell->center()[1] < 1)
+           &&
+           (dim == 3 ?
+            (cell->center()[2] < 1) :
+            true)
+           ?
+           tr.n_global_active_cells()
+           :
+           1);
   Utilities::MPI::sum (integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
       deallog << "processor " << p
-	      << ": "
-	      << integrated_weights[p]
-	      << " weight"
-	      << std::endl;
+              << ": "
+              << integrated_weights[p]
+              << " weight"
+              << std::endl;
 }
 
 

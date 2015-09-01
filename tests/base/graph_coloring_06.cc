@@ -34,7 +34,7 @@
 
 template <int dim>
 std::vector<types::global_dof_index> get_conflict_indices_cfem(
-    typename DoFHandler<dim>::active_cell_iterator const &it) 
+  typename DoFHandler<dim>::active_cell_iterator const &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
@@ -46,7 +46,7 @@ template <int dim>
 void check()
 {
   deallog << "dim=" << dim <<  std::endl;
-  
+
   // Create the Triangulation and the DoFHandler
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, -1, 1);
@@ -59,25 +59,25 @@ void check()
   for (unsigned int l=0; l<11-2*dim; ++l)
     {
       typename DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active();
+      cell = dof_handler.begin_active();
       for (; cell<dof_handler.end(); ++cell)
-	if (cell->center().distance (Point<dim>()) < cell->diameter())
-	  cell->set_refine_flag();
+        if (cell->center().distance (Point<dim>()) < cell->diameter())
+          cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
     }
   dof_handler.distribute_dofs(fe);
 
   deallog << "Total number of cells = " << triangulation.n_active_cells()
-	  << std::endl;
-  
+          << std::endl;
+
   // Create the coloring
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> >
-    coloring
+  coloring
     = GraphColoring::make_graph_coloring(dof_handler.begin_active(),
-					 dof_handler.end(),
-					 std_cxx11::function<std::vector<types::global_dof_index>
-					 (typename DoFHandler<dim>::active_cell_iterator const &)>
-					 (&get_conflict_indices_cfem<dim>));
+                                         dof_handler.end(),
+                                         std_cxx11::function<std::vector<types::global_dof_index>
+                                         (typename DoFHandler<dim>::active_cell_iterator const &)>
+                                         (&get_conflict_indices_cfem<dim>));
 
   for (unsigned int color=0; color<coloring.size(); ++color)
     deallog << coloring[color].size() << std::endl;

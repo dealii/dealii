@@ -42,7 +42,7 @@ void test()
     if (myid==0)
       deallog << sums[0] << ' ' << sums[1] << std::endl;
   }
-  
+
   {
     Vector<double> values(2);
     values[0] = 1.5;

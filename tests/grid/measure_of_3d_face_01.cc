@@ -29,9 +29,9 @@
 
 // move backward two adjacent vertices of the top face up by one
 // unit. all faces remain flat this way
-Point<3> distort_planar(Point<3> p) 
+Point<3> distort_planar(Point<3> p)
 {
-  if (p(1) > 0.5 && p(2) > 0.5) 
+  if (p(1) > 0.5 && p(2) > 0.5)
     {
       p(1) += 1;
     }
@@ -41,9 +41,9 @@ Point<3> distort_planar(Point<3> p)
 
 // lift two opposite vertices of the top face up by one unit to create
 // a saddle surface
-Point<3> distort_twisted(Point<3> p) 
+Point<3> distort_twisted(Point<3> p)
 {
-  if (p(2) > 0.5 && (p(0) > 0.5 ^ p(1) > 0.5)) 
+  if (p(2) > 0.5 && (p(0) > 0.5 ^ p(1) > 0.5))
     {
       p(2) += 1;
     }
@@ -70,7 +70,7 @@ void test ()
       double m = cell->face(i)->measure();
       deallog << i << '\t' << measure_planar[i] << '\t' << m << std::endl;
     }
- 
+
   deallog << "Twisted\n";
   tria.clear();
   GridGenerator::hyper_cube(tria);
@@ -84,13 +84,13 @@ void test ()
     {
       double m;
       try
-	{
-	  m = cell->face(i)->measure();
-	}
+        {
+          m = cell->face(i)->measure();
+        }
       catch (...)
-	{
-	  m = std::numeric_limits<double>::quiet_NaN();
-	}
+        {
+          m = std::numeric_limits<double>::quiet_NaN();
+        }
       deallog << i << '\t' << measure_twisted[i] << '\t' << m << std::endl;
     }
 
@@ -112,7 +112,7 @@ int main()
   // out, but we'd still like to print and check the data for the
   // remaining faces
   deal_II_exceptions::disable_abort_on_exception();
-  
+
   test ();
 }
 

@@ -50,7 +50,7 @@ int main ()
                          Patterns::Double(),
                          "docs 3");
       prm.declare_alias ("int",
-			 "int_alias");
+                         "int_alias");
       prm.leave_subsection ();
 
       // read and then write parameters

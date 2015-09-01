@@ -52,7 +52,7 @@ int main()
   vertices.push_back(Point<3>(0,1,0));
   vertices.push_back(Point<3>(0,0,0));
   TopoDS_Edge edge = interpolation_curve(vertices, Point<3>(), true);
-  
+
   // Create a boundary projector.
   ArclengthProjectionLineManifold<2,3> boundary_line(edge);
 

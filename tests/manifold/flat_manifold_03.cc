@@ -30,17 +30,17 @@ void test(unsigned int ref=1)
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
-  
+
   Point<spacedim> periodicity;
   periodicity[0] = 5.0;
-  
+
   FlatManifold<dim,spacedim> manifold(periodicity);
-  
+
   Quadrature<spacedim> quad;
   std::vector<std::vector<Point<spacedim> > >ps(10,std::vector<Point<spacedim> >(2));
   Point<spacedim> middle;
   std::vector<double > ws(2, 0.5);
-  
+
   // Case 1: both points are close to left boundary of periodicity
   ps[0][0][0] = 1;
   ps[0][1][0] = 2;
@@ -75,13 +75,14 @@ void test(unsigned int ref=1)
   // Case 10: same, opposite order
   ps[9][0][0] = 5+1e-10;
   ps[9][1][0] = -1e-10;
-  
-  for(unsigned int i=0; i<ps.size(); ++i) {
-    quad = Quadrature<spacedim>(ps[i],ws);
-    middle = manifold.get_new_point(quad);
-    deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1] << " , Middle: " << middle << std::endl;
-  }
-  
+
+  for (unsigned int i=0; i<ps.size(); ++i)
+    {
+      quad = Quadrature<spacedim>(ps[i],ws);
+      middle = manifold.get_new_point(quad);
+      deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1] << " , Middle: " << middle << std::endl;
+    }
+
 }
 
 int main ()
@@ -90,13 +91,13 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-8);
-  
+
   test<1,1>();
   test<1,2>();
   test<2,2>();
   test<2,3>();
   test<3,3>();
-  
+
   return 0;
 }
 

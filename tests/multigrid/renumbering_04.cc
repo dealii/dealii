@@ -101,23 +101,23 @@ int main()
   initlog(__FILE__);
 
   {
-      FESystem<1> fe(FE_Q<1>(1), 1, FE_DGQ<1>(0), 1);
-      check<1> (fe);
+    FESystem<1> fe(FE_Q<1>(1), 1, FE_DGQ<1>(0), 1);
+    check<1> (fe);
   }
 
 
   {
-      FESystem<2> fe(FE_RaviartThomas<2>(0),1, FE_DGQ<2>(0), 1);
-      check<2> (fe);
+    FESystem<2> fe(FE_RaviartThomas<2>(0),1, FE_DGQ<2>(0), 1);
+    check<2> (fe);
   }
   {
-      FESystem<2> fe(FE_Q<2>(1), 1, FE_DGQ<2>(0), 1);
-      check<2> (fe);
+    FESystem<2> fe(FE_Q<2>(1), 1, FE_DGQ<2>(0), 1);
+    check<2> (fe);
   }
 
   {
-      FESystem<3> fe(FE_Q<3>(1), 1, FE_DGQ<3>(0), 1);
-      check<3> (fe);
+    FESystem<3> fe(FE_Q<3>(1), 1, FE_DGQ<3>(0), 1);
+    check<3> (fe);
   }
 
   deallog << "OK" << endl;

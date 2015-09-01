@@ -25,20 +25,20 @@
 
 template <int dim>
 void
-write_mat_id_to_file (const Triangulation<dim> & tria)
+write_mat_id_to_file (const Triangulation<dim> &tria)
 {
-    int count = 0;
-    typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
-    for (; cell != endc; ++cell, ++count)
+  int count = 0;
+  typename Triangulation<dim>::active_cell_iterator
+  cell = tria.begin_active(),
+  endc = tria.end();
+  for (; cell != endc; ++cell, ++count)
     {
       deallog
-        << count << " "
-        << static_cast<int>(cell->material_id())
-        << std::endl;
+          << count << " "
+          << static_cast<int>(cell->material_id())
+          << std::endl;
     }
-    deallog << std::endl;
+  deallog << std::endl;
 }
 
 
@@ -58,20 +58,20 @@ void test ()
   cell = tria.begin_active(),
   endc = tria.end();
   for (; cell != endc; ++cell)
-  {
-    bool mark = true;
-    for (unsigned int d=0; d < dim; ++d)
-      if (cell->center()[d] > 0.5)
-      {
-        mark = false;
-        break;
-      }
+    {
+      bool mark = true;
+      for (unsigned int d=0; d < dim; ++d)
+        if (cell->center()[d] > 0.5)
+          {
+            mark = false;
+            break;
+          }
 
-    if (mark == true)
-      cell->set_material_id(2);
-    else
-      cell->set_material_id(1);
-  }
+      if (mark == true)
+        cell->set_material_id(2);
+      else
+        cell->set_material_id(1);
+    }
 
   deallog << "Grid without halo:" << std::endl;
   write_mat_id_to_file(tria);
@@ -91,9 +91,9 @@ void test ()
   for (typename std::vector<cell_iterator>::const_iterator
        it = active_halo_layer.begin();
        it != active_halo_layer.end(); ++it)
-  {
-    (*it)->set_material_id(3);
-  }
+    {
+      (*it)->set_material_id(3);
+    }
 
   deallog << "Grid with halo:" << std::endl;
   write_mat_id_to_file(tria);

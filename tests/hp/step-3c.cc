@@ -226,8 +226,8 @@ void LaplaceProblem::solve ()
   SolverCG<>              cg (solver_control);
 
   check_solver_within_range(
-      cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
-      solver_control.last_step(), 629, 630);
+    cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
+    solver_control.last_step(), 629, 630);
 
   solution.print (deallog.get_file_stream());
 

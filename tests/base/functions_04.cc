@@ -181,7 +181,7 @@ check_function(const Functions::FlowFunction<dim> &f,
     {
       names[i] = std::string("comp");
     }
-  
+
   DataOutBase::DXFlags dxflags;
   DataOutBase::GnuplotFlags gflags;
   std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;

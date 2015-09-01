@@ -15,8 +15,8 @@
 
 
 
-// check the creation of inhomogeneous normal-flux boundary conditions 
-// for a finite element that consists of only a single set of vector 
+// check the creation of inhomogeneous normal-flux boundary conditions
+// for a finite element that consists of only a single set of vector
 // components (i.e. it has dim components)
 
 #include "../tests.h"
@@ -42,12 +42,12 @@ void test (const Triangulation<dim> &tr,
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
- 
+
   ConstantFunction<dim> constant_function(1.,dim);
   typename FunctionMap<dim>::type function_map;
   for (unsigned int j=0; j<GeometryInfo<dim>::faces_per_cell; ++j)
     function_map[j] = &constant_function;
-  
+
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "FE=" << fe.get_name()
@@ -60,14 +60,14 @@ void test (const Triangulation<dim> &tr,
 
       ConstraintMatrix cm;
       VectorTools::compute_nonzero_normal_flux_constraints
-        (dof, 0, boundary_ids, function_map,  cm);
+      (dof, 0, boundary_ids, function_map,  cm);
 
       cm.print (deallog.get_file_stream ());
     }
   //Get the location of all boundary dofs
   std::vector<types::global_dof_index> face_dofs;
   const std::vector<Point<dim-1> > &
-    unit_support_points = fe.get_unit_face_support_points();
+  unit_support_points = fe.get_unit_face_support_points();
   Quadrature<dim-1> quadrature(unit_support_points);
   FEFaceValues<dim, dim> fe_face_values(fe, quadrature, update_q_points);
   typename DoFHandler<dim>::active_cell_iterator
@@ -77,22 +77,22 @@ void test (const Triangulation<dim> &tr,
     for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
          ++face_no)
       if (cell->face(face_no)->at_boundary())
-      {
-        typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
-        face_dofs.resize (fe.dofs_per_face);
-        face->get_dof_indices (face_dofs);
-        
-        fe_face_values.reinit(cell, face_no);
-        for (unsigned int i=0; i<face_dofs.size(); ++i)
         {
-          std::cout << face_dofs[i] << "\t"
-                    << fe_face_values.quadrature_point(i) << "\t"
-                    << fe.face_system_to_component_index(i).first
-                    << std::endl;
-        }
-      }
+          typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+          face_dofs.resize (fe.dofs_per_face);
+          face->get_dof_indices (face_dofs);
 
-    
+          fe_face_values.reinit(cell, face_no);
+          for (unsigned int i=0; i<face_dofs.size(); ++i)
+            {
+              std::cout << face_dofs[i] << "\t"
+                        << fe_face_values.quadrature_point(i) << "\t"
+                        << fe.face_system_to_component_index(i).first
+                        << std::endl;
+            }
+        }
+
+
 }
 
 

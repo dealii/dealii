@@ -53,7 +53,7 @@ void test ()
   std::vector<IndexSet> relevant = partitioning;
   relevant[0].add_index(0);
   relevant[1].add_range(0,numproc);
-  
+
   typename LA::MPI::BlockVector v(partitioning, MPI_COMM_WORLD);
   typename LA::MPI::BlockVector v2(partitioning, relevant, MPI_COMM_WORLD);
 
@@ -70,7 +70,7 @@ void test ()
   Assert(v.block(1).has_ghost_elements(), ExcInternalError());
   v.reinit(partitioning, MPI_COMM_WORLD);
   Assert(!v.has_ghost_elements(), ExcInternalError());
-  
+
 
   typename LA::MPI::BlockVector v3 = v2;
   Assert(v3.has_ghost_elements(), ExcInternalError());
@@ -80,7 +80,7 @@ void test ()
 
   typename LA::MPI::Vector x = v2.block(0);
   Assert(x.has_ghost_elements(), ExcInternalError());
-  
+
   // done
   if (myid==0)
     deallog << "OK" << std::endl;

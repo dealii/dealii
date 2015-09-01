@@ -312,7 +312,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
     }
 
   typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                            endc = mg_dof_handler.end();
+                                          endc = mg_dof_handler.end();
 
   for (; cell!=endc; ++cell)
     {

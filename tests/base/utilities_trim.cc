@@ -25,7 +25,7 @@
 #include <deal.II/base/utilities.h>
 
 
-void check(const std::string & input, const std::string & expected)
+void check(const std::string &input, const std::string &expected)
 {
   deallog << "trim(\"" << input << "\") = \"" << Utilities::trim(input) << "\"" << std::endl;
   Assert(Utilities::trim(input) == expected, ExcInternalError());

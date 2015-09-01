@@ -37,11 +37,11 @@ struct scratch_data
 
 struct copy_data
 {
-    int value;
-    copy_data():
-		    value(0)
-      {}
-    
+  int value;
+  copy_data():
+    value(0)
+  {}
+
 };
 
 
@@ -53,11 +53,11 @@ void assemble(const std::vector<int>::iterator &it,
   double value = fp.value(Point<2>(s, 2.5));
   Assert(abs(1.0+s*2.5 - value) < 1e-10, ExcMessage("wrong value"));
   std::cout << data.value  << std::endl;
-  
+
   data.value = (abs(1.0+s*2.5 - value) < 1e-10)?1:0;
 }
 
-void copy(int & value, const copy_data &data)
+void copy(int &value, const copy_data &data)
 {
   value += data.value;
 }
@@ -70,7 +70,7 @@ void test2()
   fp.initialize("s,t", "s*t+c", constants);
 
   std::vector<int> v(10000);
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     v[i] = i;
 
   int result = 0;

@@ -35,10 +35,10 @@ class Coefficient : public Function<dim>
 {
 public:
   virtual double value (const Point<dim> &p,
-			const unsigned int) const
-    {
-      return (p[0]>0 ? 10 : 1);
-    }
+                        const unsigned int) const
+  {
+    return (p[0]>0 ? 10 : 1);
+  }
 };
 
 

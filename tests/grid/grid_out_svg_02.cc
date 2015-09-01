@@ -39,29 +39,29 @@ Triangulation<2,2> create_grid()
   GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, inner_radius, outer_radius);
   triangulation.refine_global(1);
 
-  for (unsigned int l=0;l<3;++l)
+  for (unsigned int l=0; l<3; ++l)
     {
       Triangulation<2>::active_cell_iterator
-	cell = triangulation.begin_active(),
-	endc = triangulation.end();
-      
+      cell = triangulation.begin_active(),
+      endc = triangulation.end();
+
       for (; cell!=endc; ++cell)
-	{
-	  for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
-	    {
-	      const double distance_from_center = center.distance(cell->vertex(v));
-	      
-	      if (std::fabs(distance_from_center - inner_radius) < .25)
-		{
-		  cell->set_refine_flag();
-		  break;
-		}
-	    }
-	}
-      
+        {
+          for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+            {
+              const double distance_from_center = center.distance(cell->vertex(v));
+
+              if (std::fabs(distance_from_center - inner_radius) < .25)
+                {
+                  cell->set_refine_flag();
+                  break;
+                }
+            }
+        }
+
       triangulation.execute_coarsening_and_refinement();
     }
-  
+
   return triangulation;
 }
 

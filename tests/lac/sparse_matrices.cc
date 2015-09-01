@@ -287,13 +287,13 @@ int main()
   deallog.threshold_double(1.e-10);
   const unsigned int size = 5;
   const unsigned int row_length = 3;
-/*#else
-  deallog.depth_console(1000);
-  deallog.log_execution_time(true);
-  deallog.log_time_differences(true);
-  const unsigned int size = 50;
-  const unsigned int row_length = 9;
-  #endif*/
+  /*#else
+    deallog.depth_console(1000);
+    deallog.log_execution_time(true);
+    deallog.log_time_differences(true);
+    const unsigned int size = 50;
+    const unsigned int row_length = 9;
+    #endif*/
 
   check_ez_iterator();
   check_conjugate(logfile);
@@ -395,7 +395,7 @@ int main()
   std::remove ("sparse_matrices.tmp");
 
   SparseMatrix<double>::const_iterator p    =A.begin(),
-				       p_tmp=A_tmp.begin();
+                                       p_tmp=A_tmp.begin();
   for (; p!=A.end(); ++p, ++p_tmp)
     if (std::fabs(p->value() - p_tmp->value()) <=
         std::fabs(1e-14*p->value()))

@@ -41,16 +41,16 @@ template<int dim>
 void mesh_info(const Triangulation<dim> &tria)
 {
   deallog << "Mesh info:" << std::endl
-	  << " dimension: " << dim << std::endl
-	  << " no. of cells: " << tria.n_active_cells() << std::endl;
+          << " dimension: " << dim << std::endl
+          << " no. of cells: " << tria.n_active_cells() << std::endl;
 
   // Next loop over all faces of all cells and find how often each boundary
   // indicator is used:
   {
     std::map<unsigned int, unsigned int> boundary_count;
     typename Triangulation<dim>::active_cell_iterator
-      cell = tria.begin_active(),
-      endc = tria.end();
+    cell = tria.begin_active(),
+    endc = tria.end();
     for (; cell!=endc; ++cell)
       {
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -81,7 +81,7 @@ void make_grid ()
 {
   Triangulation<2> tria1;
   GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
-  
+
   Triangulation<2> tria3;
   GridGenerator::hyper_cube_with_cylindrical_hole (tria3, 0.25, 1.0);
   GridTools::shift (Point<2>(0,-2), tria3);
@@ -93,11 +93,11 @@ void make_grid ()
 
   mesh_info(triangulation2);
   deallog << "Number of active cells: "
-	  << triangulation2.n_active_cells()
-	  << std::endl;
+          << triangulation2.n_active_cells()
+          << std::endl;
   deallog << "Total number of cells: "
-	  << triangulation2.n_cells()
-	  << std::endl;
+          << triangulation2.n_cells()
+          << std::endl;
 
 }
 

@@ -22,42 +22,42 @@
 #include <deal.II/lac/vector.h>
 
 template<typename number>
-  void
-  checkClear(FullMatrix<number> &A)
-  {
-    deallog << "clear" << std::endl;
-    deallog << "Init with matrix 1" << std::endl;
+void
+checkClear(FullMatrix<number> &A)
+{
+  deallog << "clear" << std::endl;
+  deallog << "Init with matrix 1" << std::endl;
 
-    PointerMatrix<FullMatrix<number>, Vector<number> > P(&A);
+  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A);
 
-    deallog << "Multiplying with all ones vector" << std::endl;
-    Vector<number> V(A.n());
-    for (unsigned int i = 0; i < V.size(); ++i)
-      V(i) = 1;
+  deallog << "Multiplying with all ones vector" << std::endl;
+  Vector<number> V(A.n());
+  for (unsigned int i = 0; i < V.size(); ++i)
+    V(i) = 1;
 
-    Vector<number> O(A.m());
-    P.vmult(O, V);
+  Vector<number> O(A.m());
+  P.vmult(O, V);
 
-    // Check the dimensions of the result vector
-    Assert(A.m() == O.size(), ExcInternalError());
-    deallog << "Dimensions of result vector verified" << std::endl;
+  // Check the dimensions of the result vector
+  Assert(A.m() == O.size(), ExcInternalError());
+  deallog << "Dimensions of result vector verified" << std::endl;
 
-    // Verifying results with Method 2: O=A*V
-    Vector<number> O_(A.m());
-    A.vmult(O_, V);
+  // Verifying results with Method 2: O=A*V
+  Vector<number> O_(A.m());
+  A.vmult(O_, V);
 
-    Assert(O == O_, ExcInternalError());
-    deallog << "Result vector data verified" << std::endl;
+  Assert(O == O_, ExcInternalError());
+  deallog << "Result vector data verified" << std::endl;
 
-    for (unsigned int i = 0; i < O.size(); ++i)
-      deallog << O(i) << '\t';
-    deallog << std::endl;
+  for (unsigned int i = 0; i < O.size(); ++i)
+    deallog << O(i) << '\t';
+  deallog << std::endl;
 
-    deallog << "Clearing pointer matrix" << std::endl;
-    P.clear();
+  deallog << "Clearing pointer matrix" << std::endl;
+  P.clear();
 
-    deallog << "Is matrix empty:" << P.empty() << std::endl;
-  }
+  deallog << "Is matrix empty:" << P.empty() << std::endl;
+}
 
 int
 main()
@@ -71,7 +71,7 @@ main()
   deallog.threshold_double(1.e-10);
 
   const double Adata[] =
-    { 2, 3, 4, 5 };
+  { 2, 3, 4, 5 };
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

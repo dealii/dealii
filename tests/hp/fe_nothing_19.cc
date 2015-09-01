@@ -40,13 +40,13 @@ void test()
   triangulation.refine_global (1);
 
   FESystem<dim> elasticity_fe (FE_Q<dim>(1), 1,
-			       FE_Nothing<dim>(), 1);
+                               FE_Nothing<dim>(), 1);
   FESystem<dim> elasticity_w_lagrange_fe(FE_Q<dim>(1), 1,
-					 FE_Q<dim>(1), 1);
+                                         FE_Q<dim>(1), 1);
   hp::FECollection<dim> fe;
   fe.push_back (elasticity_fe);
   fe.push_back (elasticity_w_lagrange_fe);
-  
+
   hp::DoFHandler<dim> dof_handler (triangulation);
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
   cell->set_active_fe_index(0);
@@ -55,14 +55,14 @@ void test()
   dof_handler.distribute_dofs (fe);
   ConstraintMatrix hanging_node_constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
+                                           hanging_node_constraints);
   hanging_node_constraints.close ();
 
   // print constraints. there shouldn't be any
   deallog << hanging_node_constraints.n_constraints() << std::endl;
   hanging_node_constraints.print (deallog.get_file_stream());
-}  
-  
+}
+
 
 int main()
 {

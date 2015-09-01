@@ -34,22 +34,22 @@ struct LeftVector
   typedef std::complex<double> value_type;
   value_type value;
 
-  LeftVector & operator = (value_type new_value)
+  LeftVector &operator = (value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  LeftVector & operator *= (value_type scale)
+  LeftVector &operator *= (value_type scale)
   {
     value *= scale;
     return *this;
   }
-  LeftVector & operator /= (value_type scale)
+  LeftVector &operator /= (value_type scale)
   {
     value /= scale;
     return *this;
   }
-  LeftVector & operator += (const LeftVector &u)
+  LeftVector &operator += (const LeftVector &u)
   {
     value += u.value;
     return *this;
@@ -69,22 +69,22 @@ struct RightVector
   typedef std::complex<double> value_type;
   value_type value;
 
-  RightVector & operator = (value_type new_value)
+  RightVector &operator = (value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  RightVector & operator *= (value_type scale)
+  RightVector &operator *= (value_type scale)
   {
     value *= scale;
     return *this;
   }
-  RightVector & operator /= (value_type scale)
+  RightVector &operator /= (value_type scale)
   {
     value /= scale;
     return *this;
   }
-  RightVector & operator += (const RightVector &u)
+  RightVector &operator += (const RightVector &u)
   {
     value += u.value;
     return *this;

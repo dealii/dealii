@@ -62,7 +62,7 @@ void vector_values(const FiniteElement<dim> &fe)
 
   FEValues<dim> feval(fe, quadrature, update_values);
   std::vector<Vector<float> > local(quadrature.size(),
-                                   Vector<float>(fe.n_components()));
+                                    Vector<float>(fe.n_components()));
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   const typename DoFHandler<dim>::active_cell_iterator end = dof.end();

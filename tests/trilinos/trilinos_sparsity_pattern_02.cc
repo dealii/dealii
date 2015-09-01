@@ -72,7 +72,7 @@ namespace Step22
     fe (FE_Q<dim>(degree+1), dim,
         FE_Q<dim>(degree)  , 1),
     dof_handler (triangulation)
-{}
+  {}
 
 
 
@@ -108,11 +108,11 @@ namespace Step22
     new_constraints.close();
     {
       TrilinosWrappers::BlockSparsityPattern bsp
-        (owned_partitioning, owned_partitioning,
-         relevant_partitioning, mpi_communicator);
+      (owned_partitioning, owned_partitioning,
+       relevant_partitioning, mpi_communicator);
       DoFTools::make_sparsity_pattern (dof_handler, bsp,
-      new_constraints,
-      false, Utilities::MPI::this_mpi_process(mpi_communicator));
+                                       new_constraints,
+                                       false, Utilities::MPI::this_mpi_process(mpi_communicator));
 
       bsp.compress();
     }

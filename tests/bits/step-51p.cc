@@ -73,27 +73,27 @@ namespace Step51
   template <>
   const Point<1>
   SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
-  = { Point<1>(-1.0 / 3.0),
-      Point<1>(0.0),
-      Point<1>(+1.0 / 3.0)
-    };
+    = { Point<1>(-1.0 / 3.0),
+        Point<1>(0.0),
+        Point<1>(+1.0 / 3.0)
+      };
 
 
   template <>
   const Point<2>
   SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
-  = { Point<2>(-0.5, +0.5),
-      Point<2>(-0.5, -0.5),
-      Point<2>(+0.5, -0.5)
-    };
+    = { Point<2>(-0.5, +0.5),
+        Point<2>(-0.5, -0.5),
+        Point<2>(+0.5, -0.5)
+      };
 
   template <>
   const Point<3>
   SolutionBase<3>::source_centers[SolutionBase<3>::n_source_centers]
-  = { Point<3>(-0.5, +0.5, 0.25),
-      Point<3>(-0.6, -0.5, -0.125),
-      Point<3>(+0.5, -0.5, 0.5)
-    };
+    = { Point<3>(-0.5, +0.5, 0.25),
+        Point<3>(-0.6, -0.5, -0.125),
+        Point<3>(+0.5, -0.5, 0.5)
+      };
 
   template <int dim>
   const double SolutionBase<dim>::width = 1./5.;
@@ -598,9 +598,9 @@ namespace Step51
     for (unsigned int q=0; q<n_q_points; ++q)
       {
         const double rhs_value
-        = scratch.right_hand_side.value(scratch.fe_values_local.quadrature_point(q));
+          = scratch.right_hand_side.value(scratch.fe_values_local.quadrature_point(q));
         const Tensor<1,dim> convection
-        = scratch.convection_velocity.value(scratch.fe_values_local.quadrature_point(q));
+          = scratch.convection_velocity.value(scratch.fe_values_local.quadrature_point(q));
         const double JxW = scratch.fe_values_local.JxW(q);
         for (unsigned int k=0; k<loc_dofs_per_cell; ++k)
           {
@@ -640,7 +640,7 @@ namespace Step51
               scratch.fe_face_values.quadrature_point(q);
             const Tensor<1,dim> normal = scratch.fe_face_values.normal_vector(q);
             const Tensor<1,dim> convection
-            = scratch.convection_velocity.value(quadrature_point);
+              = scratch.convection_velocity.value(quadrature_point);
 
             const double tau_stab = (5. +
                                      std::abs(convection * normal));
@@ -711,7 +711,7 @@ namespace Step51
                   const unsigned int jj=scratch.fe_local_support_on_face[face][j];
                   scratch.ll_matrix(ii,jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
                 }
-  
+
             if (task_data.trace_reconstruct)
               for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
                 {
@@ -955,11 +955,11 @@ namespace Step51
     convergence_table.set_scientific("val L2-post", true);
 
     convergence_table
-      .evaluate_convergence_rates("val L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
+    .evaluate_convergence_rates("val L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
     convergence_table
-      .evaluate_convergence_rates("grad L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
+    .evaluate_convergence_rates("grad L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
     convergence_table
-      .evaluate_convergence_rates("val L2-post", "cells", ConvergenceTable::reduction_rate_log2, dim);
+    .evaluate_convergence_rates("val L2-post", "cells", ConvergenceTable::reduction_rate_log2, dim);
     convergence_table.write_text(deallog.get_file_stream());
   }
 
