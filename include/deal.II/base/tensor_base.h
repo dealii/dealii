@@ -137,7 +137,8 @@ public:
   /**
    * Constructor, where the data is copied from a C-style array.
    */
-  Tensor (const value_type &initializer);
+  template <typename OtherNumber>
+  Tensor (const OtherNumber initializer);
 
   /**
    * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
@@ -636,8 +637,9 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<0,dim,Number>::Tensor (const value_type &initializer)
+Tensor<0,dim,Number>::Tensor (const OtherNumber initializer)
 {
   Assert (dim>0, ExcDimTooSmall(dim));
 
@@ -850,8 +852,8 @@ template <int dim,
          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<0,dim,typename ProductType<OtherNumber, Number>::type>
-operator * (const Number                     factor,
-            const Tensor<0,dim,OtherNumber> &t)
+operator * (const OtherNumber           factor,
+            const Tensor<0,dim,Number> &t)
 {
   return factor * static_cast<Number>(t);
 }
