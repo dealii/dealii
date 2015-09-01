@@ -44,7 +44,7 @@ fi
 # collect a list of files and then spawn a parallel process to
 # indent all of them
 echo "--- Indenting all deal.II header and source files"
-for dir in include/deal.II/* source/* examples ; do
+for dir in tests include/deal.II/* source/* examples ; do
   files=`find $dir | egrep '\.(cc|h)$'` ;
   if test -n "$files" ; then
     (astyle --options=contrib/utilities/astyle.rc $files ) &

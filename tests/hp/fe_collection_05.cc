@@ -45,7 +45,7 @@ void test ()
 
   // {Q1,Q2,Q3,Q4}
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FE_Q<dim>(1));
     fe_collection.push_back (FE_Q<dim>(2));
     fe_collection.push_back (FE_Q<dim>(3));
@@ -55,7 +55,7 @@ void test ()
 
   // {Q1xQ1, Q2xQ2, Q3xQ4, Q4xQ3}
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1),1,
                                            FE_Q<dim>(1),1));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),1,
@@ -69,7 +69,7 @@ void test ()
 
   // {Q1xQ1, Q3xQ4, Q4xQ3}
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1),1,
                                            FE_Q<dim>(1),1));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(3),1,
@@ -82,9 +82,9 @@ void test ()
     deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
   }
 
-  // {0x0, 0x0, Q1x0, 0xQ1} 
+  // {0x0, 0x0, Q1x0, 0xQ1}
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(),1,
                                            FE_Nothing<dim>(),1));
     fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(),1,
@@ -99,11 +99,11 @@ void test ()
     else
       deallog << ind << std::endl;
   }
-  
+
   // dominating FE_Nothing
-  // {0x0, 0x0, Q1x0, 0xQ1} 
+  // {0x0, 0x0, Q1x0, 0xQ1}
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(1,true),1,
                                            FE_Nothing<dim>(1,true),1));
     fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(1,true),1,
@@ -118,8 +118,8 @@ void test ()
 
   // {Q1xQ1,Q1xQ1,Q2xQ1,Q1,Q2}
   {
-  	hp::FECollection<dim> fe_collection;
-  	fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1),1,
+    hp::FECollection<dim> fe_collection;
+    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1),1,
                                            FE_Q<dim>(1),1));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1),1,
                                            FE_Q<dim>(1),1));
@@ -129,10 +129,10 @@ void test ()
                                            FE_Q<dim>(2),1));
     deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
   }
-  
+
   // {Q4xQ4, Q5xQ5, Q3xQ4, Q4xQ3
   {
-  	hp::FECollection<dim> fe_collection;
+    hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(4),1,
                                            FE_Q<dim>(4),1));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(5),1,
@@ -147,7 +147,7 @@ void test ()
     else
       deallog << ind << std::endl;
   }
-  
+
   // {Q1,Q2,Q4,Q3}
   {
     hp::FECollection<dim> fe_collection;
