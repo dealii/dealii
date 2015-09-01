@@ -240,6 +240,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: introduced hp::FECollection::find_least_face_dominating_fe(const std::set<unsigned int> &fes)
+  which aims to find the least dominating finite element w.r.t. those provided
+  as fe_indices in @p fes.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2015/08/31)
+  </li>
+
   <li> New: Introduce an option for FE_Nothing to dominate any other FE.
   Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
   we will force the traces of the two functions to be the same. Because the
