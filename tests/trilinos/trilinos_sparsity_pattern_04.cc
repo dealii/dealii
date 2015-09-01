@@ -45,7 +45,7 @@ void test ()
   columns.compress();
 
   // this creates a matrix with optimized path for off-processor entries
-  sp.reinit(rows, columns, writable_rows, MPI_COMM_WORLD, 0);
+  sp.reinit(rows, columns, writable_rows, MPI_COMM_WORLD, 0u);
 
   for (unsigned int i=2*myid; i<2*myid+2; ++i)
     for (unsigned int j=0; j<3*n_procs; ++j)
@@ -83,7 +83,7 @@ void test ()
 
   // reinit, this time without giving writable rows -> Trilinos must manage
   // ghost entries and throw away the off-processor sparsity pattern
-  sp.reinit(rows, columns, MPI_COMM_WORLD, 0);
+  sp.reinit(rows, columns, MPI_COMM_WORLD, 0u);
 
   for (unsigned int i=2*myid; i<2*myid+2; ++i)
     for (unsigned int j=0; j<3*n_procs; ++j)
@@ -119,7 +119,7 @@ void test ()
 
 
   // now create again a pattern with writable rows
-  sp.reinit(rows, columns, writable_rows, MPI_COMM_WORLD, 0);
+  sp.reinit(rows, columns, writable_rows, MPI_COMM_WORLD, 0u);
 
   for (unsigned int i=2*myid; i<2*myid+2; ++i)
     for (unsigned int j=0; j<3*n_procs; ++j)
