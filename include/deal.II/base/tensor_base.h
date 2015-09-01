@@ -886,6 +886,84 @@ operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
 
 
 
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<T,Tensor<rank,dim,U> >
+{
+  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<Tensor<rank,dim,T>,U>
+{
+  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+#endif
+
+
+
+/**
+ * TODO
+ *
+ * @relates Tensor
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<OtherNumber, Number>::type>
+operator * (const Number                     factor,
+            const Tensor<0,dim,OtherNumber> &t)
+{
+  return factor * static_cast<Number>(t);
+}
+
+
+
+/**
+ * TODO
+ *
+ * @relates Tensor
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+operator * (const Tensor<0,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  return static_cast<Number>(t) * factor;
+}
+
+
+
+/**
+ * TODO
+ *
+ * @relates Tensor
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+operator / (const Tensor<0,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  return static_cast<Number>(t) / factor;
+}
+
+
+
 /*---------------------- Inline functions: Tensor<1,dim> ---------------------*/
 
 
@@ -1345,24 +1423,6 @@ std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
 
   return out;
 }
-
-
-
-#ifndef DEAL_II_WITH_CXX11
-
-template <typename T, typename U, int rank, int dim>
-struct ProductType<T,Tensor<rank,dim,U> >
-{
-  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
-};
-
-template <typename T, typename U, int rank, int dim>
-struct ProductType<Tensor<rank,dim,T>,U>
-{
-  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
-};
-
-#endif
 
 
 
