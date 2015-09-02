@@ -24,6 +24,7 @@
 // {Q1xQ1,Q1xQ1,Q2xQ1,Q1,Q2}    with {2,3} => Q1          0
 // {Q4xQ4, Q5xQ5, Q3xQ4, Q4xQ3} with {2,3} => none        invalid_unsigned_int
 // {Q1,Q2,Q4,Q3}                with {3}   => Q3          3
+// {Q3,Q4,Q1,Q1}                with {2,3} => Q1          2    // self-domination
 
 
 #include "../tests.h"
@@ -159,6 +160,16 @@ void test ()
     fes.insert(3);
     deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
   }
+
+  {
+    hp::FECollection<dim> fe_collection;
+    fe_collection.push_back (FE_Q<dim>(3));
+    fe_collection.push_back (FE_Q<dim>(4));
+    fe_collection.push_back (FE_Q<dim>(1));
+    fe_collection.push_back (FE_Q<dim>(1));
+    deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
+  }
+
 
 
 }

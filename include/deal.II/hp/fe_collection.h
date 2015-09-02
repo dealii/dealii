@@ -195,6 +195,11 @@ namespace hp
      * answer is Q3 and therefore this function will return its index in
      * FECollection, namely 2.
      *
+     * For the purpose of this function by domination we consider either
+     * this_element_dominate or either_element_can_dominate ; therefore the
+     * element can dominate itself. Thus if FECollection contains {Q1,Q2,Q4,Q3}
+     * and @p fes = {3}, the function returns 3.
+     *
      * If we were not able to find a finite element, the function returns
      * numbers::invalid_unsigned_int .
      *
@@ -203,11 +208,7 @@ namespace hp
      * will not find the most dominating element as the default behavior of
      * FE_Nothing is to return FiniteElementDomination::no_requirements when
      * comparing for face domination. This, therefore, can't be considered as a
-     * dominating element in the sense defined in FiniteElementDomination .
-     *
-     * Finally, for the purpose of this function we consider that an element
-     * dominates itself. Thus if FECollection contains {Q1,Q2,Q4,Q3} and @p fes
-     * = {3}, the function returns 3.
+     * dominating element in the sense described above .
      */
     unsigned int
     find_least_face_dominating_fe (const std::set<unsigned int> &fes) const;
