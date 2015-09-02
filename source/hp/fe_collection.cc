@@ -40,7 +40,7 @@ namespace hp
     const hp::FECollection<dim,spacedim> &fe_collection = *this;
     std::set<unsigned int> candidate_fes;
 
-    // first loop over all FEs and check which can dominate those given in FEs:
+    // first loop over all FEs and check which can dominate those given in @p fes:
     for (unsigned int cur_fe = 0; cur_fe < fe_collection.size(); cur_fe++)
       {
         FiniteElementDomination::Domination domination = FiniteElementDomination::no_requirements;
@@ -56,7 +56,8 @@ namespace hp
           }
 
         // if we found dominating element, keep them in a set.
-        if (domination == FiniteElementDomination::this_element_dominates)
+        if (domination == FiniteElementDomination::this_element_dominates ||
+            domination == FiniteElementDomination::either_element_can_dominate /*covers cases like {Q2,Q3,Q1,Q1} with fes={2,3}*/)
           candidate_fes.insert(cur_fe);
       }
 

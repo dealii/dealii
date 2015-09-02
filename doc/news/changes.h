@@ -240,6 +240,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: DoFTools::make_hanging_node_constraints() now supports
+  hp-refinement cases when neither_element_dominates. To that end we look for
+  a least face dominating FE inside FECollection.
+  <br>
+  (Denis Davydov, 2015/09/02)
+  </li>
+
   <li> Changed: FEValues::transform() has been deprecated. The functionality
   of this function is a (small) subset of what the Mapping classes
   already provide.
