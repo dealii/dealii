@@ -240,6 +240,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: FEValues::transform() has been deprecated. The functionality
+  of this function is a (small) subset of what the Mapping classes
+  already provide.
+  <br>
+  (Wolfgang Bangerth, 2015/09/02)
+  </li>
+
   <li> New: introduced hp::FECollection::find_least_face_dominating_fe(const std::set<unsigned int> &fes)
   which aims to find the least dominating finite element w.r.t. those provided
   as fe_indices in @p fes.

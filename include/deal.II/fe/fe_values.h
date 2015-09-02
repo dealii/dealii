@@ -2215,10 +2215,12 @@ public:
   /**
    * Transform a set of vectors, one for each quadrature point. The
    * <tt>mapping</tt> can be any of the ones defined in MappingType.
+   *
+   * @deprecated Use the various Mapping::transform() functions instead.
    */
   void transform (std::vector<Tensor<1,spacedim> > &transformed,
                   const std::vector<Tensor<1,dim> > &original,
-                  MappingType mapping) const;
+                  MappingType mapping) const DEAL_II_DEPRECATED;
 
   //@}
 
