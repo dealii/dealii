@@ -465,69 +465,6 @@ namespace DoFTools
       }
 
 
-      /**
-       * For a given face belonging to an active cell that borders to a
-       * more refined cell, return the fe_index of the most dominating
-       * finite element used on any of the face's subfaces.
-       */
-      template <typename face_iterator>
-      unsigned int
-      get_most_dominating_subface_fe_index (const face_iterator &face)
-      {
-        const unsigned int dim
-          = face_iterator::AccessorType::dimension;
-        const unsigned int spacedim
-          = face_iterator::AccessorType::space_dimension;
-
-        unsigned int dominating_subface_no = 0;
-        for (; dominating_subface_no<face->n_children();
-             ++dominating_subface_no)
-          {
-            // each of the subfaces can have only a single fe_index
-            // associated with them, since there is no cell on the other
-            // side
-            Assert (face->child(dominating_subface_no)
-                    ->n_active_fe_indices()
-                    == 1,
-                    ExcInternalError());
-
-            const FiniteElement<dim,spacedim> &
-            this_subface_fe = (face->child(dominating_subface_no)
-                               ->get_fe (face->child(dominating_subface_no)
-                                         ->nth_active_fe_index(0)));
-
-            FiniteElementDomination::Domination
-            domination = FiniteElementDomination::either_element_can_dominate;
-            for (unsigned int sf=0; sf<face->n_children(); ++sf)
-              if (sf != dominating_subface_no)
-                {
-                  const FiniteElement<dim,spacedim> &
-                  that_subface_fe = (face->child(sf)
-                                     ->get_fe (face->child(sf)
-                                               ->nth_active_fe_index(0)));
-
-                  domination = domination &
-                               this_subface_fe.compare_for_face_domination(that_subface_fe);
-                }
-
-            // see if the element on this subface is able to dominate the
-            // ones on all other subfaces, and if so take it
-            if ((domination == FiniteElementDomination::this_element_dominates)
-                ||
-                (domination == FiniteElementDomination::either_element_can_dominate))
-              break;
-          }
-
-        // check that we have found one such subface
-        Assert (dominating_subface_no < face->n_children(),
-                ExcNotImplemented());
-
-        // return the finite element index used on it. note that only a
-        // single fe can be active on such subfaces
-        return face->child (dominating_subface_no)->nth_active_fe_index(0);
-      }
-
-
 
       /**
        * Copy constraints into a constraint matrix object.
@@ -1211,12 +1148,21 @@ namespace DoFTools
                 FiniteElementDomination::Domination
                 mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 
+                // auxiliary variable which holds FE indices of the mother face
+                // and its subfaces. This knowledge will be needed in hp-case
+                // with neither_element_dominates.
+                std::set<unsigned int> fe_ind_face_subface;
+                fe_ind_face_subface.insert(cell->active_fe_index());
+
                 if (DoFHandlerSupportsDifferentFEs<DH>::value == true)
                   for (unsigned int c=0; c<cell->face(face)->number_of_children(); ++c)
                     if (!cell->neighbor_child_on_subface (face, c)->is_artificial())
-                      mother_face_dominates = mother_face_dominates &
-                                              (cell->get_fe().compare_for_face_domination
-                                               (cell->neighbor_child_on_subface (face, c)->get_fe()));
+                      {
+                        mother_face_dominates = mother_face_dominates &
+                                                (cell->get_fe().compare_for_face_domination
+                                                 (cell->neighbor_child_on_subface (face, c)->get_fe()));
+                        fe_ind_face_subface.insert(cell->neighbor_child_on_subface (face, c)->active_fe_index());
+                      }
 
                 switch (mother_face_dominates)
                   {
@@ -1331,27 +1277,33 @@ namespace DoFTools
                     Assert (DoFHandlerSupportsDifferentFEs<DH>::value == true,
                             ExcInternalError());
 
+                    const dealii::hp::FECollection<dim,spacedim> &fe_collection =
+                      *internal::get_fe_collection (dof_handler);
                     // we first have to find the finite element that is
                     // able to generate a space that all the other ones can
-                    // be constrained to
-                    const unsigned int dominating_fe_index
-                      = get_most_dominating_subface_fe_index (cell->face(face));
+                    // be constrained to.
+                    // At this point we potentially have different scenarios:
+                    // 1) sub-faces dominate mother face and there is a
+                    // dominating FE among sub faces. We could loop over sub
+                    // faces to find the needed FE index. However, this will not
+                    // work in the case when
+                    // 2) there is no dominating FE among sub faces (e.g. Q1xQ2 vs Q2xQ1),
+                    // but subfaces still dominate mother face (e.g. Q2xQ2).
+                    // To cover this case we would have to use find_least_face_dominating_fe()
+                    // of FECollection with fe_indices of sub faces.
+                    // 3) Finally, it could happen that we got here because
+                    // neither_element_dominates (e.g. Q1xQ1xQ2 and Q1xQ2xQ1 for
+                    // subfaces and Q2xQ1xQ1 for mother face).
+                    // This requires usage of find_least_face_dominating_fe()
+                    // with fe_indices of sub-faces and the mother face.
+                    // Note that the last solution covers the first two scenarios,
+                    // thus we stick with it assuming that we won't loose much time/efficiency.
+                    const unsigned int dominating_fe_index = fe_collection.find_least_face_dominating_fe(fe_ind_face_subface);
+                    AssertThrow(dominating_fe_index != numbers::invalid_unsigned_int,
+                                ExcMessage("Could not find a least face dominating FE."));
 
                     const FiniteElement<dim,spacedim> &dominating_fe
                       = dof_handler.get_fe()[dominating_fe_index];
-
-                    // check also that it is able to constrain the mother
-                    // face. it should be, or we wouldn't have gotten into
-                    // the branch for the 'complex' case
-                    Assert ((dominating_fe.compare_for_face_domination
-                             (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
-                             == FiniteElementDomination::this_element_dominates)
-                            ||
-                            (dominating_fe.compare_for_face_domination
-                             (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
-                             == FiniteElementDomination::either_element_can_dominate),
-                            ExcInternalError());
-
 
                     // first get the interpolation matrix from the mother
                     // to the virtual dofs
@@ -1630,11 +1582,11 @@ namespace DoFTools
                         const unsigned int dominating_fe_index = fe_collection.find_least_face_dominating_fe(fes);
 
                         AssertThrow(dominating_fe_index != numbers::invalid_unsigned_int,
-                                    ExcMessage("could not find the dominating FE for "
+                                    ExcMessage("Could not find the dominating FE for "
                                                +cell->get_fe().get_name()
                                                +" and "
                                                +neighbor->get_fe().get_name()
-                                               +" inside FECollection"));
+                                               +" inside FECollection."));
 
                         const FiniteElement<dim,spacedim> &dominating_fe = fe_collection[dominating_fe_index];
 
