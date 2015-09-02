@@ -23,10 +23,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
-
+/**
+ * @name Output functions for Tensor objects
+ */
+//@{
 
 /**
  * Output operator for tensors. Print the elements consecutively, with a space
@@ -46,10 +48,13 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
   return out;
 }
 
-#ifndef DOXYGEN
 
 /**
- * Specialization for 1D.
+ * Output operator for tensors and dimension 1. This is implemented
+ * specialized from the general template in order to avoid a compiler
+ * warning that the loop is empty.
+ *
+ * @relates Tensor
  */
 template <int rank_>
 inline
@@ -60,7 +65,212 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
   return out;
 }
 
-#endif // DOXYGEN
+
+/**
+ * Output operator for tensors of rank 0. Since such tensors are scalars, we
+ * simply print this one value.
+ *
+ * @relates Tensor<0,dim,Number>
+ */
+template <int dim, typename Number>
+inline
+std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
+{
+  out << static_cast<Number>(p);
+  return out;
+}
+
+
+/**
+ * Output operator for tensors of rank 1. Print the elements consecutively,
+ * with a space in between.
+ *
+ * @relates Tensor<1,dim,Number>
+ */
+template <int dim, typename Number>
+inline
+std::ostream &operator << (std::ostream &out, const Tensor<1,dim,Number> &p)
+{
+  for (unsigned int i=0; i<dim-1; ++i)
+    out << p[i] << ' ';
+  out << p[dim-1];
+
+  return out;
+}
+
+
+/**
+ * Output operator for tensors of rank 1 and dimension 1. This is implemented
+ * specialized from the general template in order to avoid a compiler warning
+ * that the loop is empty.
+ *
+ * @relates Tensor<1,dim,Number>
+ */
+inline
+std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
+{
+  out << p[0];
+
+  return out;
+}
+
+
+//@}
+/**
+ * @name Vector space operations on Tensor objects:
+ */
+//@{
+
+/**
+ * Scalar multiplication of a tensor of rank 0 with a scalar from the left.
+ *
+ * @relates Tensor<0,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<OtherNumber, Number>::type>
+operator * (const OtherNumber           factor,
+            const Tensor<0,dim,Number> &t)
+{
+  return factor * static_cast<Number>(t);
+}
+
+
+/**
+ * Scalar multiplication of a tensor of rank 0 with a scalar from the right.
+ *
+ * @relates Tensor<0,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+operator * (const Tensor<0,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  return static_cast<Number>(t) * factor;
+}
+
+
+/**
+ * Division of a tensor of rank 0 with a scalar number.
+ *
+ * @relates Tensor<0,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim,
+         typename Number,
+         typename OtherNumber,
+         typename = typename EnableIfScalar<OtherNumber>::type>
+inline
+Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+operator / (const Tensor<0,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  return static_cast<Number>(t) / factor;
+}
+
+
+/**
+ * Add two tensors of rank 0.
+ *
+ * @relates Tensor<0,dim,Number>
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) + static_cast<OtherNumber>(q);
+}
+
+
+/**
+ * Subtract two tensors of rank 0.
+ *
+ * @relates Tensor<0,dim,Number>
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) - static_cast<OtherNumber>(q);
+}
+
+
+//@}
+/**
+ * @name Contraction operations on Tensors
+ */
+//@{
+
+/**
+ * Returns the contraction of two Tensors of rank 0.
+ *
+ * @relates Tensor<0,dim,Number>
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number, OtherNumber>::type
+operator* (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
+{
+  return static_cast<Number>(p) * static_cast<OtherNumber>(q);
+}
+
+//@}
+
+
+/**
+ * Contract a tensor of rank 1 with a tensor of rank 1. The result is
+ * <tt>sum_j src1[j] src2[j]</tt>.
+ *
+ * @relates Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+contract (const Tensor<1,dim,Number> &src1,
+          const Tensor<1,dim,OtherNumber> &src2)
+{
+  typename ProductType<Number,OtherNumber>::type res
+    = typename ProductType<Number,OtherNumber>::type();
+  for (unsigned int i=0; i<dim; ++i)
+    res += src1[i] * src2[i];
+
+  return res;
+}
+
+
+/**
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
+ *
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
+ *
+ * @relates Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+operator * (const Tensor<1,dim,Number> &src1,
+            const Tensor<1,dim,OtherNumber> &src2)
+{
+  return contract(src1, src2);
+}
 
 
 /**
