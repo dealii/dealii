@@ -1034,7 +1034,7 @@ namespace DoFTools
 
       template <int dim, int spacedim>
       const dealii::hp::FECollection<dim,spacedim> *
-      get_fe_collection (const dealii::DoFHandler<dim,spacedim> &dof_handler)
+      get_fe_collection (const dealii::DoFHandler<dim,spacedim> &)
       {
         AssertThrow(false, ExcInternalError());
         return NULL;
