@@ -141,6 +141,22 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
 
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+             const MappingType                                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
+
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.

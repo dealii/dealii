@@ -1086,6 +1086,68 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
 }
 
 
+
+template<int dim, int spacedim>
+void
+MappingQ<dim,spacedim>::
+transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim>  > >  input,
+           const MappingType                                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
+{
+  AssertDimension (input.size(), output.size());
+  // The data object may be just a MappingQ1::InternalData, so we have to test
+  // for this first.
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
+  Assert(q1_data!=0, ExcInternalError());
+
+  // If it is a genuine MappingQ::InternalData, we have to test further
+  if (!q1_data->is_mapping_q1_data)
+    {
+      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+              ExcInternalError());
+      const InternalData &data = static_cast<const InternalData &>(mapping_data);
+      // If we only use the Q1-portion, we have to extract that data object
+      if (data.use_mapping_q1_on_current_cell)
+        q1_data = &data.mapping_q1_data;
+    }
+  // Now, q1_data should have the right tensors in it and we call the base
+  // classes transform function
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+}
+
+
+template<int dim, int spacedim>
+void MappingQ<dim,spacedim>::
+transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+           const MappingType                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
+{
+  AssertDimension (input.size(), output.size());
+  // The data object may be just a MappingQ1::InternalData, so we have to test
+  // for this first.
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
+  Assert(q1_data!=0, ExcInternalError());
+
+  // If it is a genuine MappingQ::InternalData, we have to test further
+  if (!q1_data->is_mapping_q1_data)
+    {
+      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+              ExcInternalError());
+      const InternalData &data = static_cast<const InternalData &>(mapping_data);
+      // If we only use the Q1-portion, we have to extract that data object
+      if (data.use_mapping_q1_on_current_cell)
+        q1_data = &data.mapping_q1_data;
+    }
+  // Now, q1_data should have the right tensors in it and we call the base
+  // classes transform function
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+}
+
+
 template<int dim, int spacedim>
 Point<spacedim>
 MappingQ<dim,spacedim>::
