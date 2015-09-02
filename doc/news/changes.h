@@ -126,6 +126,13 @@ inconvenience this causes.
   (Alberto Sartori, 2015/09/04)
   </li>
 
+  <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
+  up (a lot of unnecessary partial template specializations have been
+  removed). The specialization Tensor<1,dim,Number> has been removed.
+  <br>
+  (Matthias Maier, 2015/09/02)
+  </li>
+
   <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
   was computed incorrectly.
   <br>
@@ -156,9 +163,12 @@ inconvenience this causes.
   - TensorFunction
 
   <br>
-  <em>Classes now supporting complex number types via header:</em>
+  <em>Classes with fixed interface that now fully support complex number
+  types (pure template classes without explicit instantiations in the
+  library):</em>
   - LinearOperator
   - PackagedOperation
+  - Tensor
   <br>
   (Matthias Maier, 2015/08/25 - XXX)
   </li>
