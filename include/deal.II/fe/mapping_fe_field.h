@@ -160,42 +160,42 @@ public:
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-             VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+             const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > >    input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > > input,
+             const MappingType                                                        type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                  &internal,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >                           output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+             const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+             const MappingType                                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >     input,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+             const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
 
   /**
    * @}

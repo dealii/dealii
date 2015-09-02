@@ -3236,7 +3236,7 @@ FEValuesBase<dim,spacedim>::transform (
 {
   VectorSlice<const std::vector<Tensor<1,dim> > > src(original);
   VectorSlice<std::vector<Tensor<1,spacedim> > > dst(transformed);
-  mapping->transform(src, dst, *mapping_data, type);
+  mapping->transform(src, type,*mapping_data, dst);
 }
 
 

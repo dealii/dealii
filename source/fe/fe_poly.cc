@@ -56,9 +56,10 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
@@ -71,9 +72,10 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
           correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
                                           mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(fe_data.untransformed_shape_hessians,
-                            output_data.shape_hessians[k],
-                            mapping_internal, mapping_covariant_gradient);
+          mapping.transform (fe_data.untransformed_shape_hessians,
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }
@@ -107,9 +109,10 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
@@ -122,9 +125,10 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
           correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
                                           mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(fe_data.untransformed_shape_hessians,
-                            output_data.shape_hessians[k],
-                            mapping_internal, mapping_covariant_gradient);
+          mapping.transform (fe_data.untransformed_shape_hessians,
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }
@@ -159,9 +163,10 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
@@ -174,9 +179,10 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
           correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
                                           mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(fe_data.untransformed_shape_hessians,
-                            output_data.shape_hessians[k],
-                            mapping_internal, mapping_covariant_gradient);
+          mapping.transform (fe_data.untransformed_shape_hessians,
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }
@@ -207,9 +213,10 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
 
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
@@ -222,9 +229,10 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
           correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
                                           mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(fe_data.untransformed_shape_hessians,
-                            output_data.shape_hessians[k],
-                            mapping_internal, mapping_covariant_gradient);
+          mapping.transform (fe_data.untransformed_shape_hessians,
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }

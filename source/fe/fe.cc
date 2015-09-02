@@ -1461,7 +1461,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
         // cell
         for (unsigned int d=0; d<spacedim; ++d)
           {
-            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
+            mapping.transform (diff_quot[d], mapping_covariant, mapping_internal, diff_quot2);
 
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<spacedim; ++d1)
