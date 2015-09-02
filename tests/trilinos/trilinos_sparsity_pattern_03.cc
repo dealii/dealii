@@ -39,7 +39,7 @@ void test ()
   columns.add_range(3*myid, 3*myid+3);
   columns.compress();
 
-  sp.reinit(rows, columns, MPI_COMM_WORLD, 0);
+  sp.reinit(rows, columns, MPI_COMM_WORLD, 0u);
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
   for (unsigned int i=2*myid; i<2*myid+2; ++i)

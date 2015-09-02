@@ -41,8 +41,10 @@ int main()
 
   auto op_a = LinearOperator<>();
 
+
   {
-    std::array<std::array<decltype(op_a), 2>, 2> temp {op_a, op_a, op_a, op_a};
+    std::array<decltype(op_a), 2> a {{op_a, op_a}};
+    std::array<std::array<decltype(op_a), 2>, 2> temp {{a,a}};
 
     BlockLinearOperator<> op_b(temp);
     auto op_c = block_operator<2, 2, BlockVector<double>>(temp);
@@ -53,7 +55,7 @@ int main()
   }
 
   {
-    std::array<decltype(op_a), 2> temp {op_a, op_a};
+    std::array<decltype(op_a), 2> temp {{op_a, op_a}};
 
     auto op_c = block_diagonal_operator<2, BlockVector<double>>(temp);
     op_c = temp;
