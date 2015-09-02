@@ -167,6 +167,9 @@ the call to <code>DoFHandler::clear()</code>.
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+<h4>Solvers and preconditioners</h4>
+
+
 One thing that is always worth playing around with if one solves
 problems of appreciable size (much bigger than the one we have here)
 is to try different solvers or preconditioners. In the current case,
@@ -203,8 +206,8 @@ thresholding or strengthening of the diagonal.
 
 Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
-<code>solver_control.last_step()</code> call, see @ref step_4
-"step-4") as well as CPU time needed (using the Timer class,
+<code>solver_control.last_step()</code> call, see
+step-4) as well as CPU time needed (using the Timer class,
 discussed, for example, in step-12) and get the
 following results (left: iterations; right: CPU time):
 
@@ -226,7 +229,7 @@ O}(N^{1/2})$ and because each iteration requires around ${\cal
 O}(N)$ operations the total CPU time grows like ${\cal
 O}(N^{3/2})$ (for the few smallest meshes, the CPU time is so small
 that it doesn't record). Note that even though it is the simplest
-method, Jacobi is the fastest for this problem.
+method, Jacobi is the fastest for this problem. 
 
 The situation changes slightly when the finite element is not a
 bi-quadratic one as set in the constructor of this program, but a
@@ -247,7 +250,11 @@ bi-linear one. If one makes this change, the results are as follows:
 In other words, while the increase in iterations and CPU time is as
 before, Jacobi is now the method that requires the most iterations; it
 is still the fastest one, however, owing to the simplicity of the
-operations it has to perform.
+operations it has to perform. This is not to say that Jacobi
+is actually a good preconditioner -- for problems of appreciable size, it is
+definitely not, and other methods will be substantially better -- but really
+only that it is fast because its implementation is so simple that it can
+compensate for a larger number of iterations. 
 
 The message to take away from this is not that simplicity in
 preconditioners is always best. While this may be true for the current
@@ -258,15 +265,224 @@ lead to an increase in the number of iterations as the number $N$ of
 degrees of freedom grows, for example ${\cal O}(N^\alpha)$; this, in
 turn, leads to a total growth in effort as ${\cal O}(N^{1+\alpha})$
 since each iteration takes ${\cal O}(N)$ work. This behavior is
-undesirable, we would really like to solve linear systems with $N$
+undesirable: we would really like to solve linear systems with $N$
 unknowns in a total of ${\cal O}(N)$ work; there is a class
-of preconditioners that can achieve this, namely geometric (@ref
-step_16 "step-16") or algebraic (step-31) multigrid
+of preconditioners that can achieve this, namely geometric (step-16,
+step-37, step-39)
+or algebraic multigrid (step-31, step-40, and several others)
 preconditioners. They are, however, significantly more complex than
-the preconditioners outlined above. Finally, the last message to take
-home is that today (in 2008), linear systems with 100,000 unknowns are
+the preconditioners outlined above. 
+
+Finally, the last message to take
+home is that when the data shown above was generated (in 2008), linear
+systems with 100,000 unknowns are
 easily solved on a desktop machine in well under 10 seconds, making
 the solution of relatively simple 2d problems even to very high
 accuracy not that big a task as it used to be even in the recent
-past. Of course, the situation for 3d problems is entirely different.
+past. At the time, the situation for 3d problems was entirely different,
+but even that has changed substantially in the intervening time -- though
+solving problems in 3d to high accuracy remains a challenge.
 
+
+<h4>A better mesh</h4>
+
+If you look at the meshes above, you will see even though the domain is the 
+unit disk, and the jump in the coefficient lies along a circle, the cells 
+that make up the mesh do not track this geometry well. The reason, already hinted
+at in step-1, is that by default the Triangulation class only sees a bunch of
+coarse grid cells but has, of course, no real idea what kind of geometry they
+might represent when looked at together. For this reason, we need to tell
+the Triangulation what to do when a cell is refined: where should the new
+vertices at the edge midpoints and the cell midpoint be located so that the
+child cells better represent the desired geometry than the parent cell.
+
+In the code above, we already do this for faces that sit at the boundary:
+we use the code
+@code
+          static const SphericalManifold<dim> boundary;
+          triangulation.set_all_manifold_ids_on_boundary(0);
+          triangulation.set_manifold (0, boundary);
+@endcode
+to tell the Triangulation where to ask when refining a boundary face.
+To make the mesh <i>interior</i> also track a circular domain, we need to work
+a bit harder, though.
+
+First, recall that our coarse mesh consists of a central square
+cell and four cells around it. Now first consider what would happen if we
+also attached the SphericalManifold object not only to the four exterior faces
+but also the four cells at the perimeter as well as all of their faces. We can
+do this by replacing the existing mesh creation code
+@code
+          GridGenerator::hyper_ball (triangulation);
+
+          static const SphericalManifold<dim> boundary;
+          triangulation.set_all_manifold_ids_on_boundary(0);
+          triangulation.set_manifold (0, boundary);
+
+          triangulation.refine_global (1);
+@endcode
+by the following snippet (testing that the center of a cell is larger
+than a small multiple, say one tenth, of the cell diameter away from
+center of the mesh only fails for the central square of the mesh):
+@code
+          GridGenerator::hyper_ball (triangulation);
+
+          static const SphericalManifold<dim> boundary;
+          triangulation.set_all_manifold_ids_on_boundary(0);
+          triangulation.set_manifold (0, boundary);
+
+          const Point<dim> mesh_center;
+          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+               cell != triangulation.end(); ++cell)
+            if (mesh_center.distance (cell->center()) > cell->diameter()/10)
+              cell->set_all_manifold_ids (0);
+	  
+          triangulation.refine_global (1);
+@endcode
+
+After a few global refinement steps, this would lead to a mesh of the following
+kind:
+
+<img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-4-bad.png" alt="">
+
+This is not a good mesh: the central cell has been refined in such a way that
+the children located in the four corners of the original central cell
+<i>degenerate</i>: they all tend towards triangles as mesh refinement
+continues. This means that the Jacobian matrix of the transformation from
+reference cell to actual cell degenerates for these cells, and because
+all error estimates for finite element solutions contain the norm of the
+inverse of the Jacobian matrix, you will get very large errors on these
+cells and, in the limit as mesh refinement, a loss of convergence order because
+the cells in these corners become worse and worse under mesh refinement.
+
+So we need something smarter. To this end, consider the following solution
+originally developed by Konstantin Ladutenko. We will use the following code:
+@code
+          GridGenerator::hyper_ball (triangulation);
+
+          static const SphericalManifold<dim> boundary;
+          triangulation.set_all_manifold_ids_on_boundary(0);
+          triangulation.set_manifold (0, boundary);
+
+          const Point<dim> mesh_center;
+          const double core_radius  = 1.0/5.0,
+                       inner_radius = 1.0/3.0;
+
+          // Step 1: Shrink the inner cell
+          //
+          // We cannot get a circle out of the inner cell because of
+          // the degeneration problem mentioned above. Rather, shrink
+          // the inner cell to a core radius of 1/5 that stays
+          // sufficiently far away from the place where the
+          // coefficient will have a discontinuity and where we want
+          // to have cell interfaces that actually lie on a circle.
+          // We do this shrinking by just scaling the location of each
+          // of the vertices, given that the center of the circle is
+          // simply the origin of the coordinate system.
+          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+               cell != triangulation.end(); ++cell)
+            if (mesh_center.distance (cell->center()) < 1e-5)
+              {
+                for (unsigned int v=0;
+                     v < GeometryInfo<dim>::vertices_per_cell;
+                     ++v)
+                  cell->vertex(v) *= core_radius/mesh_center.distance (cell->vertex(v));
+              }
+
+          // Step 2: Refine all cells except the central one
+          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+               cell != triangulation.end(); ++cell)
+            if (mesh_center.distance (cell->center()) >= 1e-5)
+              cell->set_refine_flag ();
+          triangulation.execute_coarsening_and_refinement ();
+
+
+          // Step 3: Resize the inner children of the outer cells
+          //
+          // The previous step replaced each of the four outer cells
+          // by its four children, but the radial distance at which we
+          // have intersected is not what we want to later refinement
+          // steps. Consequently, move the vertices that were just
+          // created in radial direction to a place where we need
+          // them.
+          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+               cell != triangulation.end(); ++cell)
+            for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+              {
+                const double dist = mesh_center.distance (cell->vertex(v));
+                if (dist > core_radius*1.0001 && dist < 0.9999)
+                  cell->vertex(v) *= inner_radius/dist;
+              }
+
+          // Step 4: Apply curved manifold description
+          //
+          // As discussed above, we can not expect to subdivide the
+          // inner four cells (or their faces) onto concentric rings,
+          // but we can do so for all other cells that are located
+          // outside the inner radius. To this end, we loop over all
+          // cells and determine whether it is in this zone. If it
+          // isn't, then we set the manifold description of the cell
+          // and all of its bounding faces to the one that describes
+          // the spherical manifold already introduced above and that
+          // will be used for all further mesh refinement.
+          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+               cell != triangulation.end(); ++cell)
+            {
+              bool is_in_inner_circle = false;
+              for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+                if (mesh_center.distance (cell->vertex(v)) < inner_radius)
+                  {
+                    is_in_inner_circle = true;
+                    break;
+                  }
+
+              if (is_in_inner_circle == false)
+                cell->set_all_manifold_ids (0);
+            }
+@endcode
+
+This code then generates the following, much better sequence of meshes:
+
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-0.png" alt="">
+</td>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-1.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-2.png" alt="">
+</td>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-3.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-4.png" alt="">
+</td>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-5.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-6.png" alt="">
+</td>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-7.png" alt="">
+</td>
+</tr>
+</table>
+ 
+Creating good meshes, and in particular making them fit the geometry you
+want, is a complex topic in itself. You can find much more on this in
+step-49, step-53, and step-54, among other tutorial programs that cover
+the issue. Information on curved domains can also be found in the
+documentation module on @ref manifold "Manifold descriptions".
