@@ -114,10 +114,10 @@ public:
    * whether the exception mentioned above has been thrown.
    */
   virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const;
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                                     &p) const;
 
+  // for documentation, see the base classes
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
@@ -125,6 +125,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
 
+  // for documentation, see the base classes
   virtual
   void
   transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > > input,
@@ -132,6 +133,7 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase                  &internal,
              VectorSlice<std::vector<Tensor<2,spacedim> > >                           output) const;
 
+  // for documentation, see the base classes
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,

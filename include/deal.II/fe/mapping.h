@@ -907,6 +907,20 @@ public:
    * J(\mathbf x) \hat{\mathbf  u}(\mathbf x).
    * @f]
    * </ul>
+   *
+   * @param[in] input An array (or part of an array) of input objects that should
+   *   be mapped.
+   * @param[in] type The kind of mapping to be applied.
+   * @param[in] internal A pointer to an object of type Mapping::InternalDataBase
+   *   that contains information previously stored by the mapping. The object
+   *   pointed to was created by the get_data(), get_face_data(), or
+   *   get_subface_data() function, and will have been updated as part of a
+   *   call to fill_fe_values(), fill_fe_face_values(), or fill_fe_subface_values()
+   *   for the current cell, before calling the current function. In other words,
+   *   this object also represents with respect to which cell the transformation
+   *   should be applied to.
+   * @param[out] output An array (or part of an array) into which the transformed
+   *   objects should be placed.
    */
   virtual
   void
@@ -939,12 +953,27 @@ public:
    *                        J(\hat{\mathbf  x})^{-1}.
    * @f]
    * </ul>
+   *
    * @note It would have been more reasonable to make this transform a
    * template function with the rank in <code>DerivativeForm@<1, dim,
    * rank@></code>. Unfortunately C++ does not allow templatized virtual
    * functions. This is why we identify <code>DerivativeForm@<1, dim,
    * 1@></code> with a <code>Tensor@<1,dim@></code> when using
    * mapping_covariant() in the function transform() above this one.
+   *
+   * @param[in] input An array (or part of an array) of input objects that should
+   *   be mapped.
+   * @param[in] type The kind of mapping to be applied.
+   * @param[in] internal A pointer to an object of type Mapping::InternalDataBase
+   *   that contains information previously stored by the mapping. The object
+   *   pointed to was created by the get_data(), get_face_data(), or
+   *   get_subface_data() function, and will have been updated as part of a
+   *   call to fill_fe_values(), fill_fe_face_values(), or fill_fe_subface_values()
+   *   for the current cell, before calling the current function. In other words,
+   *   this object also represents with respect to which cell the transformation
+   *   should be applied to.
+   * @param[out] output An array (or part of an array) into which the transformed
+   *   objects should be placed.
    */
   virtual
   void
@@ -984,11 +1013,26 @@ public:
    * J(\hat{\mathbf  x})^{-1}.
    * @f]
    * </ul>
+   *
    * @todo The formulas for mapping_covariant_gradient,
    * mapping_contravariant_gradient and mapping_piola_gradient are only
    * true as stated for linear mappings. If, for example, the mapping is
    * bilinear (or has a higher order polynomial degree) then there is a
    * missing term associated with the derivative of $J$.
+   *
+   * @param[in] input An array (or part of an array) of input objects that should
+   *   be mapped.
+   * @param[in] type The kind of mapping to be applied.
+   * @param[in] internal A pointer to an object of type Mapping::InternalDataBase
+   *   that contains information previously stored by the mapping. The object
+   *   pointed to was created by the get_data(), get_face_data(), or
+   *   get_subface_data() function, and will have been updated as part of a
+   *   call to fill_fe_values(), fill_fe_face_values(), or fill_fe_subface_values()
+   *   for the current cell, before calling the current function. In other words,
+   *   this object also represents with respect to which cell the transformation
+   *   should be applied to.
+   * @param[out] output An array (or part of an array) into which the transformed
+   *   objects should be placed.
    */
   virtual
   void
@@ -1019,6 +1063,20 @@ public:
    *
    * In the case when dim=spacedim the previous formula reduces to
    * @f[J^{\dagger} = J^{-1}@f]
+   *
+   * @param[in] input An array (or part of an array) of input objects that should
+   *   be mapped.
+   * @param[in] type The kind of mapping to be applied.
+   * @param[in] internal A pointer to an object of type Mapping::InternalDataBase
+   *   that contains information previously stored by the mapping. The object
+   *   pointed to was created by the get_data(), get_face_data(), or
+   *   get_subface_data() function, and will have been updated as part of a
+   *   call to fill_fe_values(), fill_fe_face_values(), or fill_fe_subface_values()
+   *   for the current cell, before calling the current function. In other words,
+   *   this object also represents with respect to which cell the transformation
+   *   should be applied to.
+   * @param[out] output An array (or part of an array) into which the transformed
+   *   objects should be placed.
    */
   virtual
   void
@@ -1059,6 +1117,20 @@ public:
    * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
    * @f]
    * </ul>
+   *
+   * @param[in] input An array (or part of an array) of input objects that should
+   *   be mapped.
+   * @param[in] type The kind of mapping to be applied.
+   * @param[in] internal A pointer to an object of type Mapping::InternalDataBase
+   *   that contains information previously stored by the mapping. The object
+   *   pointed to was created by the get_data(), get_face_data(), or
+   *   get_subface_data() function, and will have been updated as part of a
+   *   call to fill_fe_values(), fill_fe_face_values(), or fill_fe_subface_values()
+   *   for the current cell, before calling the current function. In other words,
+   *   this object also represents with respect to which cell the transformation
+   *   should be applied to.
+   * @param[out] output An array (or part of an array) into which the transformed
+   *   objects should be placed.
    */
   virtual
   void
