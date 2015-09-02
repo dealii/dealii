@@ -146,7 +146,7 @@ public:
   /**
    * Read access to the <tt>index</tt>th coordinate.
    */
-  Number   operator () (const unsigned int index) const;
+  Number operator () (const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
@@ -159,9 +159,9 @@ public:
    */
 
   /**
-   * Add two point vectors.
+   * Add an offset given as Tensor<1,dim,Number> to a point.
    */
-  Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number> operator + (const Tensor<1,dim,Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -170,7 +170,7 @@ public:
    * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
    * rather than as a Point@<dim@>.
    */
-  Tensor<1,dim,Number>   operator - (const Point<dim,Number> &) const;
+  Tensor<1,dim,Number> operator - (const Point<dim,Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -178,12 +178,12 @@ public:
    * documentation of this class, the result is then naturally returned as a
    * Point@<dim@> object rather than as a Tensor@<1,dim@>.
    */
-  Point<dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number> operator - (const Tensor<1,dim,Number> &) const;
 
   /**
    * The opposite vector.
    */
-  Point<dim,Number>   operator - () const;
+  Point<dim,Number> operator - () const;
 
   /**
    * @}
@@ -196,24 +196,29 @@ public:
 
   /**
    * Multiply the current point by a factor.
+   *
+   * @relates EnableIfScalar
    */
-  Point<dim,Number>   operator * (const Number) const;
+  template <typename OtherNumber,
+            typename = typename EnableIfScalar<OtherNumber>::type>
+  Point<dim,Number> operator * (const OtherNumber) const;
 
   /**
    * Divide the current point by a factor.
    */
-  Point<dim,Number>   operator / (const Number) const;
+  template<typename OtherNumber>
+  Point<dim,Number> operator / (const OtherNumber) const;
 
   /**
    * Return the scalar product of the vectors representing two points.
    */
-  Number              operator * (const Tensor<1,dim,Number> &p) const;
+  Number operator * (const Tensor<1,dim,Number> &p) const;
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
    * square, or the square of the norm.
    */
-  Number              square () const;
+  Number square () const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
@@ -391,9 +396,10 @@ Point<dim,Number>::operator - () const
 
 
 template <int dim, typename Number>
+template<typename OtherNumber, typename>
 inline
 Point<dim,Number>
-Point<dim,Number>::operator * (const Number factor) const
+Point<dim,Number>::operator * (const OtherNumber factor) const
 {
   Point<dim,Number> tmp = *this;
   tmp *= factor;
@@ -407,8 +413,10 @@ inline
 Number
 Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 {
-  // simply pass down
-  return static_cast<Tensor<1,dim,Number> >(*this) * p;
+  Number res = Number();
+  for (unsigned int i=0; i<dim; ++i)
+    res += this->operator[](i) * p[i];
+  return res;
 }
 
 
@@ -419,7 +427,7 @@ Point<dim,Number>::square () const
 {
   Number q = Number();
   for (unsigned int i=0; i<dim; ++i)
-    q += this->values[i] * this->values[i];
+    q += numbers::NumberTraits<Number>::abs_square(this->values[i]);
   return q;
 }
 
@@ -443,8 +451,9 @@ Point<dim,Number>::distance (const Point<dim,Number> &p) const
 
 
 template <int dim, typename Number>
+template<typename OtherNumber>
 inline
-Point<dim,Number> Point<dim,Number>::operator / (const Number factor) const
+Point<dim,Number> Point<dim,Number>::operator / (const OtherNumber factor) const
 {
   Point<dim,Number> tmp = *this;
   tmp /= factor;
@@ -472,28 +481,19 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 
 /**
  * Global operator scaling a point vector by a scalar.
+ *
  * @relates Point
+ * @relates EnableIfScalar
  */
-template <int dim, typename Number>
+template <int dim,
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
-Point<dim,Number> operator * (const Number             factor,
+Point<dim,Number> operator * (const OtherNumber        factor,
                               const Point<dim,Number> &p)
 {
-  return p*factor;
-}
-
-
-
-/**
- * Global operator scaling a point vector by a scalar.
- * @relates Point
- */
-template <int dim>
-inline
-Point<dim,double> operator * (const double             factor,
-                              const Point<dim,double> &p)
-{
-  return p*factor;
+  return p * factor;
 }
 
 
