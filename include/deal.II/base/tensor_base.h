@@ -79,7 +79,7 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
  * as argument.
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, Matthias Maier, 2009, 2015
+ * @author Wolfgang Bangerth, 2009, Matthias Maier, 2015
  */
 template <int dim, typename Number>
 class Tensor<0,dim,Number>
@@ -115,6 +115,13 @@ public:
    * This typedef is used to represent the return type of norms.
    */
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
+  /**
+   * Declare an array type which can be used to initialize an object of this
+   * type statically. In case of a a tensor of rank 0 this is just a scalar
+   * number type
+   */
+  typedef Number array_type;
 
   /**
    * Constructor. Set to zero.
@@ -305,7 +312,7 @@ private:
  * as argument.
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 1998-2005
+ * @author Wolfgang Bangerth, 1998-2005, Matthias Maier, 2015
  */
 template <int dim,typename Number>
 class Tensor<1,dim,Number>
@@ -365,14 +372,14 @@ public:
   Tensor (const bool initialize = true);
 
   /**
-   * Copy constructor, where the data is copied from a C-style array.
-   */
-  Tensor (const array_type &initializer);
-
-  /**
    * Copy constructor.
    */
   Tensor (const Tensor<1,dim,Number> &initializer);
+
+  /**
+   * Copy constructor, where the data is copied from a C-style array.
+   */
+  Tensor (const array_type &initializer);
 
   /**
    * Copy constructor from tensors with different underlying scalar type. This
@@ -1492,7 +1499,6 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * <tt>sum_j src1[j] src2[j]</tt>.
  *
  * @relates Tensor
- * @author Guido Kanschat, 2000
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1522,7 +1528,6 @@ contract (const Tensor<1,dim,Number> &src1,
  * contraction.
  *
  * @relates Tensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
 inline

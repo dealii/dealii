@@ -81,7 +81,7 @@ public:
   /**
    * Publish the rank of this tensor to the outside world.
    */
-  static const unsigned int rank      = rank_;
+  static const unsigned int rank = rank_;
 
   /**
    * Number of independent components of a tensor of current rank. This is dim
@@ -112,17 +112,24 @@ public:
   typedef typename Tensor<rank_-1,dim,Number>::array_type array_type[dim];
 
   /**
-   * Constructor. Initialize all entries to zero.
+   * Constructor. Initialize all entries to zero if
+   * <tt>initialize==true</tt>; this is the default behaviour.
    */
-  Tensor ();
+  explicit
+  Tensor (const bool initialize = true);
 
   /**
-   * Copy constructor, where the data is copied from a C-style array.
+   * Copy constructor.
+   */
+  Tensor (const Tensor<rank_,dim,Number> &initializer);
+
+  /**
+   * Constructor, where the data is copied from a C-style array.
    */
   Tensor (const array_type &initializer);
 
   /**
-   * Copy constructor from tensors with different underlying scalar type. This
+   * Constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    */
@@ -130,14 +137,16 @@ public:
   Tensor (const Tensor<rank_,dim,OtherNumber> &initializer);
 
   /**
-   * Conversion operator from tensor of tensors.
+   * Constructor that converts from a "tensor of tensors".
    */
-  Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &initializer);
+  template <typename OtherNumber>
+  Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > &initializer);
 
   /**
    * Conversion operator to tensor of tensors.
    */
-  operator Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const;
+  template <typename OtherNumber>
+  operator Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > () const;
 
   /**
    * Read-Write access operator.
@@ -152,15 +161,15 @@ public:
   /**
    * Read access using TableIndices <tt>indices</tt>
    */
-  Number operator [](const TableIndices<rank_> &indices) const;
+  Number operator [] (const TableIndices<rank_> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
    */
-  Number &operator [](const TableIndices<rank_> &indices);
+  Number &operator [] (const TableIndices<rank_> &indices);
 
   /**
-   * Assignment operator.
+   * Copy assignment operator.
    */
   Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
 
@@ -177,39 +186,49 @@ public:
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
+   *
+   * @relates EnableIfScalar
    */
-  Tensor<rank_,dim,Number> &operator = (const Number d);
+  template <typename OtherNumber,
+            typename = typename EnableIfScalar<OtherNumber>::type>
+  Tensor<rank_,dim,Number> &operator = (const OtherNumber d);
 
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<rank_,dim,Number> &) const;
+  template <typename OtherNumber>
+  bool operator == (const Tensor<rank_,dim,OtherNumber> &) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<rank_,dim,Number> &) const;
+  template <typename OtherNumber>
+  bool operator != (const Tensor<rank_,dim,OtherNumber> &) const;
 
   /**
    * Add another tensor.
    */
-  Tensor<rank_,dim,Number> &operator += (const Tensor<rank_,dim,Number> &);
+  template <typename OtherNumber>
+  Tensor<rank_,dim,Number> &operator += (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
-  Tensor<rank_,dim,Number> &operator -= (const Tensor<rank_,dim,Number> &);
+  template <typename OtherNumber>
+  Tensor<rank_,dim,Number> &operator -= (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    */
-  Tensor<rank_,dim,Number> &operator *= (const Number factor);
+  template <typename OtherNumber>
+  Tensor<rank_,dim,Number> &operator *= (const OtherNumber factor);
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
    */
-  Tensor<rank_,dim,Number> &operator /= (const Number factor);
+  template <typename OtherNumber>
+  Tensor<rank_,dim,Number> &operator /= (const OtherNumber factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
@@ -238,8 +257,8 @@ public:
    * vector. As usual in C++, the rightmost index of the tensor marches
    * fastest.
    */
-  template <typename Number2>
-  void unroll (Vector<Number2> &result) const;
+  template <typename OtherNumber>
+  void unroll (Vector<OtherNumber> &result) const;
 
   /**
    * Returns an unrolled index in the range [0,dim^rank-1] for the element of
@@ -255,8 +274,6 @@ public:
    */
   static
   TableIndices<rank_> unrolled_to_component_indices(const unsigned int i);
-
-
 
   /**
    * Reset all values to zero.
@@ -303,8 +320,8 @@ private:
   /**
    * Help function for unroll.
    */
-  template <typename Number2>
-  void unroll_recursion(Vector<Number2> &result,
+  template <typename OtherNumber>
+  void unroll_recursion(Vector<OtherNumber> &result,
                         unsigned int    &start_index) const;
 
   // make the following class a
@@ -327,11 +344,24 @@ private:
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor ()
+Tensor<rank_,dim,Number>::Tensor (const bool initialize)
 {
-// default constructor. not specifying an initializer list calls
-// the default constructor of the subobjects, which initialize them
-// selves. therefore, the tensor is set to zero this way
+  if (initialize)
+    // need to create an object Number() to initialize to zero to avoid
+    // confusion with Tensor::operator=(scalar) when using something like
+    // Tensor<1,dim,Tensor<1,dim,Number> >.
+    for (unsigned int i=0; i!=dim; ++i)
+      subtensor[i] = Tensor<rank_-1,dim,Number>();
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
+{
+  for (unsigned int i=0; i!=dim; ++i)
+    subtensor[i] = initializer[i];
 }
 
 
@@ -341,26 +371,39 @@ inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
-    subtensor[i] = Tensor<rank_-1,dim,Number>(initializer[i]);
+    subtensor[i] = initializer[i];
 }
 
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,OtherNumber> &initializer)
+{
+  for (unsigned int i=0; i!=dim; ++i)
+    subtensor[i] = initializer[i];
+}
+
+
+
+template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number>::Tensor
-(const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in)
+(const Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
-    subtensor[i] = tensor_in[i];
+    subtensor[i] = initializer[i];
 }
 
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number>::operator
-Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const
+Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > () const
 {
   return Tensor<1,dim,Tensor<rank_-1,dim,Number> > (subtensor);
 }
@@ -448,45 +491,40 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
 
 
 template <int rank_, int dim, typename Number>
-template <typename OtherNumber>
-Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,OtherNumber> &t)
-{
-  *this = t;
-}
-
-
-
-template <int rank_, int dim, typename Number>
+template <typename OtherNumber, typename>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator = (const Number d)
+Tensor<rank_,dim,Number>::operator = (const OtherNumber d)
 {
-  Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
+  Assert (d == OtherNumber(), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
   for (unsigned int i=0; i<dim; ++i)
-    subtensor[i] = 0;
+    subtensor[i] = Number();
   return *this;
 }
 
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 bool
-Tensor<rank_,dim,Number>::operator == (const Tensor<rank_,dim,Number> &p) const
+Tensor<rank_,dim,Number>::operator == (const Tensor<rank_,dim,OtherNumber> &p) const
 {
   for (unsigned int i=0; i<dim; ++i)
-    if (subtensor[i] != p.subtensor[i]) return false;
+    if (subtensor[i] != p.subtensor[i])
+      return false;
   return true;
 }
 
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 bool
-Tensor<rank_,dim,Number>::operator != (const Tensor<rank_,dim,Number> &p) const
+Tensor<rank_,dim,Number>::operator != (const Tensor<rank_,dim,OtherNumber> &p) const
 {
   return !((*this) == p);
 }
@@ -494,9 +532,10 @@ Tensor<rank_,dim,Number>::operator != (const Tensor<rank_,dim,Number> &p) const
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,Number> &p)
+Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,OtherNumber> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] += p.subtensor[i];
@@ -506,9 +545,10 @@ Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,Number> &p)
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator -= (const Tensor<rank_,dim,Number> &p)
+Tensor<rank_,dim,Number>::operator -= (const Tensor<rank_,dim,OtherNumber> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] -= p.subtensor[i];
@@ -518,9 +558,10 @@ Tensor<rank_,dim,Number>::operator -= (const Tensor<rank_,dim,Number> &p)
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator *= (const Number s)
+Tensor<rank_,dim,Number>::operator *= (const OtherNumber s)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] *= s;
@@ -530,9 +571,10 @@ Tensor<rank_,dim,Number>::operator *= (const Number s)
 
 
 template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator /= (const Number s)
+Tensor<rank_,dim,Number>::operator /= (const OtherNumber s)
 {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] /= s;
@@ -581,10 +623,10 @@ Tensor<rank_,dim,Number>::norm_square () const
 
 
 template <int rank_, int dim, typename Number>
-template <typename Number2>
+template <typename OtherNumber>
 inline
 void
-Tensor<rank_, dim, Number>::unroll (Vector<Number2> &result) const
+Tensor<rank_, dim, Number>::unroll (Vector<OtherNumber> &result) const
 {
   AssertDimension (result.size(),(Utilities::fixed_power<rank_, unsigned int>(dim)));
 
@@ -595,10 +637,10 @@ Tensor<rank_, dim, Number>::unroll (Vector<Number2> &result) const
 
 
 template <int rank_, int dim, typename Number>
-template <typename Number2>
+template <typename OtherNumber>
 inline
 void
-Tensor<rank_, dim, Number>::unroll_recursion (Vector<Number2> &result,
+Tensor<rank_, dim, Number>::unroll_recursion (Vector<OtherNumber> &result,
                                               unsigned int    &index) const
 {
   for (unsigned int i=0; i<dim; ++i)
