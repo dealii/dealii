@@ -35,14 +35,15 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, int spacedim>
-MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int n_shape_functions)
+MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree,
+                                                    const unsigned int n_shape_functions)
   :
-  MappingQ1<dim,spacedim>::InternalData(n_shape_functions),
+  MappingQ1<dim,spacedim>::InternalData(polynomial_degree,
+                                        n_shape_functions),
   use_mapping_q1_on_current_cell(false),
-  mapping_q1_data(1 << dim)
-{
-  this->is_mapping_q1_data=false;
-}
+  mapping_q1_data(1,
+                  GeometryInfo<dim>::vertices_per_cell)
+{}
 
 
 
@@ -226,7 +227,7 @@ typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(degree, n_shape_functions);
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
   Threads::TaskGroup<> tasks;
@@ -261,7 +262,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(degree, n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -296,7 +297,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(degree, n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -617,7 +618,7 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
   const QGauss<dim> quadrature(degree+1);
   const unsigned int n_q_points=quadrature.size();
 
-  InternalData quadrature_data(n_shape_functions);
+  InternalData quadrature_data(degree, n_shape_functions);
   quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
   this->compute_shapes(quadrature.get_points(), quadrature_data);
 
@@ -1009,15 +1010,13 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
   Assert(q1_data!=0, ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
       // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
+      if (data->use_mapping_q1_on_current_cell)
+        q1_data = &data->mapping_q1_data;
     }
+
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
@@ -1041,15 +1040,13 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
   Assert(q1_data!=0, ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
       // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
+      if (data->use_mapping_q1_on_current_cell)
+        q1_data = &data->mapping_q1_data;
     }
+
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
@@ -1071,15 +1068,13 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
   Assert(q1_data!=0, ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
       // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
+      if (data->use_mapping_q1_on_current_cell)
+        q1_data = &data->mapping_q1_data;
     }
+
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
@@ -1103,15 +1098,13 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
   Assert(q1_data!=0, ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
       // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
+      if (data->use_mapping_q1_on_current_cell)
+        q1_data = &data->mapping_q1_data;
     }
+
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
@@ -1133,15 +1126,13 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
   Assert(q1_data!=0, ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
       // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
+      if (data->use_mapping_q1_on_current_cell)
+        q1_data = &data->mapping_q1_data;
     }
+
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);

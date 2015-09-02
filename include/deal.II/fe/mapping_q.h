@@ -238,7 +238,7 @@ private:
    * @{
    */
 
-protected:
+public:
 
   /**
    * Storage for internal data of this mapping. See Mapping::InternalDataBase
@@ -261,7 +261,8 @@ protected:
     /**
      * Constructor.
      */
-    InternalData (const unsigned int n_shape_functions);
+    InternalData (const unsigned int polynomial_degree,
+                  const unsigned int n_shape_functions);
 
 
     /**
@@ -283,6 +284,8 @@ protected:
      */
     typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
   };
+
+protected:
 
   // documentation can be found in Mapping::get_data()
   virtual

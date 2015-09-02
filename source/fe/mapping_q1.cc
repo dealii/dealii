@@ -26,6 +26,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 
 #include <cmath>
@@ -41,11 +42,16 @@ const unsigned int MappingQ1<dim,spacedim>::n_shape_functions;
 
 
 template<int dim, int spacedim>
-MappingQ1<dim,spacedim>::InternalData::InternalData (const unsigned int n_shape_functions)
+MappingQ1<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree,
+                                                     const unsigned int n_shape_functions)
   :
-  is_mapping_q1_data(true),
+  polynomial_degree (polynomial_degree),
   n_shape_functions (n_shape_functions)
-{}
+{
+  Assert (n_shape_functions ==
+          Utilities::fixed_power<dim>(polynomial_degree+1),
+          ExcInternalError());
+}
 
 
 
@@ -63,7 +69,7 @@ MappingQ1<dim,spacedim>::InternalData::memory_consumption () const
           MemoryConsumption::memory_consumption (mapping_support_points) +
           MemoryConsumption::memory_consumption (cell_of_current_support_points) +
           MemoryConsumption::memory_consumption (volume_elements) +
-          MemoryConsumption::memory_consumption (is_mapping_q1_data) +
+          MemoryConsumption::memory_consumption (polynomial_degree) +
           MemoryConsumption::memory_consumption (n_shape_functions));
 }
 
@@ -204,10 +210,9 @@ void
 MappingQ1<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
                                          InternalData &data) const
 {
-  // choose either the function implemented
-  // in this class, or whatever a virtual
-  // function call resolves to
-  if (data.is_mapping_q1_data)
+  // choose either the function implemented in this class, or whatever
+  // a virtual function call resolves to
+  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&data) == 0)
     MappingQ1<dim,spacedim>::compute_shapes_virtual(unit_points, data);
   else
     compute_shapes_virtual(unit_points, data);
@@ -745,7 +750,7 @@ typename MappingQ1<dim,spacedim>::InternalData *
 MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                    const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(1, n_shape_functions);
   data->initialize (requires_update_flags(update_flags), q, q.size());
   compute_shapes (q.get_points(), *data);
 
@@ -759,7 +764,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                         const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(1, n_shape_functions);
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
@@ -776,7 +781,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                            const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(1, n_shape_functions);
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());

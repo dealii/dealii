@@ -163,7 +163,8 @@ public:
     /**
      * Constructor. Pass the number of shape functions.
      */
-    InternalData(const unsigned int n_shape_functions);
+    InternalData(const unsigned int polynomial_degree,
+                 const unsigned int n_shape_functions);
 
     /**
      * Initialize the object's member variables related to cell data
@@ -303,12 +304,11 @@ public:
     std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
     /**
-     * Default value of this flag is @p true. If <tt>*this</tt> is an object
-     * of a derived class, this flag is set to @p false. (This is, for example,
-     * the case for MappingQ, which derives MappingQ::InternalData from the
-     * current MappingQ1::InternalData.)
+     * The polynomial degree of the mapping. Since the objects here
+     * are also used (with minor adjustments) by MappingQ, we need to
+     * store this.
      */
-    bool is_mapping_q1_data;
+    unsigned int polynomial_degree;
 
     /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply
@@ -466,8 +466,8 @@ protected:
    * Compute shape values and/or derivatives.
    *
    * Calls either the @p compute_shapes_virtual of this class or that of the
-   * derived class, depending on whether <tt>data.is_mapping_q1_data</tt>
-   * equals @p true or @p false.
+   * derived class, depending on whether <tt>data.polynomial_degree</tt>
+   * is one or is greater than that.
    */
   void compute_shapes (const std::vector<Point<dim> > &unit_points,
                        InternalData &data) const;
