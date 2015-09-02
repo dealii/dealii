@@ -856,6 +856,38 @@ SparsityPattern::print_gnuplot (std::ostream &out) const
   AssertThrow (out, ExcIO());
 }
 
+void
+SparsityPattern::print_svg (std::ostream &out) const
+{
+  unsigned int m = this->n_rows();
+  unsigned int n = this->n_cols();
+  out << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " << n+2
+      << " " << m+2 << " \">\n"
+      "<style type=\"text/css\" >\n"
+      "     <![CDATA[\n"
+      "      rect.pixel {\n"
+      "          fill:   #ff0000;\n"
+      "      }\n"
+      "    ]]>\n"
+      "  </style>\n\n"
+      "   <rect width=\"" << n+2 << "\" height=\"" << m+2 << "\" fill=\"rgb(128, 128, 128)\"/>\n"
+      "   <rect x=\"1\" y=\"1\" width=\"" << n << "\" height=\"" << m
+      << "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
+
+  SparsityPattern::iterator
+  it = this->begin(),
+  end = this->end();
+  for (; it!=end; ++it)
+    {
+      out << "  <rect class=\"pixel\" x=\"" << it->column()+1
+          << "\" y=\"" << it->row()+1
+          << "\" width=\".9\" height=\".9\"/>\n";
+    }
+  out << "</svg>" << std::endl;
+
+}
+
+
 
 
 SparsityPattern::size_type

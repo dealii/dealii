@@ -260,6 +260,12 @@ inconvenience this causes.
   <br>
   (Timo Heister, 2015/09/05)
 
+  <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
+  in a .svg file which can be opened in a web browser.
+  <br>
+  (Conrad Clevenger, 2015/09/03)
+  </li>
+  
   <li> Openmp SIMD support is now enabled for Clang version 3.6, or newer
   (or the equivalent XCode version). Further, openmp support is not any
   more falsely activated for very old clang versions.
