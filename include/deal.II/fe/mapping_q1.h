@@ -161,10 +161,10 @@ public:
   {
   public:
     /**
-     * Constructor. Pass the number of shape functions.
+     * Constructor. The argument denotes the polynomial degree of
+     * the mapping to which this object will correspond.
      */
-    InternalData(const unsigned int polynomial_degree,
-                 const unsigned int n_shape_functions);
+    InternalData(const unsigned int polynomial_degree);
 
     /**
      * Initialize the object's member variables related to cell data
@@ -315,8 +315,11 @@ public:
      * the number of vertices per cell. However, since also derived classes
      * use this class (e.g. the Mapping_Q() class), the number of shape
      * functions may also be different.
+     *
+     * In general, it is $(p+1)^\text{dim}$, where $p$ is the
+     * polynomial degree of the mapping.
      */
-    unsigned int n_shape_functions;
+    const unsigned int n_shape_functions;
 
     /**
      * Tensors of covariant transformation at each of the quadrature points.
@@ -471,12 +474,6 @@ protected:
    */
   void compute_shapes (const std::vector<Point<dim> > &unit_points,
                        InternalData &data) const;
-
-  /**
-   * Compute shape values and/or derivatives.
-   */
-  virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                                       InternalData &data) const;
 
   /**
    * Transforms a point @p p on the unit cell to the point @p p_real on the

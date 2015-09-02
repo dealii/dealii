@@ -35,14 +35,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, int spacedim>
-MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree,
-                                                    const unsigned int n_shape_functions)
+MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
-  MappingQ1<dim,spacedim>::InternalData(polynomial_degree,
-                                        n_shape_functions),
+  MappingQ1<dim,spacedim>::InternalData(polynomial_degree),
   use_mapping_q1_on_current_cell(false),
-  mapping_q1_data(1,
-                  GeometryInfo<dim>::vertices_per_cell)
+  mapping_q1_data(1)
 {}
 
 
@@ -141,11 +138,10 @@ MappingQ<dim,spacedim>::~MappingQ ()
 }
 
 
-
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                                                typename MappingQ1<dim,spacedim>::InternalData &data) const
+MappingQ<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
+                                        typename MappingQ1<dim,spacedim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
   std::vector<double> values;
@@ -227,7 +223,7 @@ typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData(degree, n_shape_functions);
+  InternalData *data = new InternalData(degree);
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
   Threads::TaskGroup<> tasks;
@@ -249,7 +245,7 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
   // TODO: parallelize this as well
   this->compute_shapes (quadrature.get_points(), *data);
   if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (quadrature.get_points(), data->mapping_q1_data);
+    this->MappingQ1<dim,spacedim>::compute_shapes (quadrature.get_points(), data->mapping_q1_data);
 
 
   return data;
@@ -262,7 +258,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(degree, n_shape_functions);
+  InternalData *data = new InternalData(degree);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -285,7 +281,7 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
   // TODO: parallelize this as well
   this->compute_shapes (q.get_points(), *data);
   if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (q.get_points(), data->mapping_q1_data);
+    this->MappingQ1<dim,spacedim>::compute_shapes (q.get_points(), data->mapping_q1_data);
 
   return data;
 }
@@ -297,7 +293,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(degree, n_shape_functions);
+  InternalData *data = new InternalData(degree);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -320,7 +316,7 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
   // TODO: parallelize this as well
   this->compute_shapes (q.get_points(), *data);
   if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (q.get_points(), data->mapping_q1_data);
+    this->MappingQ1<dim,spacedim>::compute_shapes (q.get_points(), data->mapping_q1_data);
 
 
   return data;
@@ -618,7 +614,7 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
   const QGauss<dim> quadrature(degree+1);
   const unsigned int n_q_points=quadrature.size();
 
-  InternalData quadrature_data(degree, n_shape_functions);
+  InternalData quadrature_data(degree);
   quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
   this->compute_shapes(quadrature.get_points(), quadrature_data);
 

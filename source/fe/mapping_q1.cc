@@ -42,16 +42,11 @@ const unsigned int MappingQ1<dim,spacedim>::n_shape_functions;
 
 
 template<int dim, int spacedim>
-MappingQ1<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree,
-                                                     const unsigned int n_shape_functions)
+MappingQ1<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
   polynomial_degree (polynomial_degree),
-  n_shape_functions (n_shape_functions)
-{
-  Assert (n_shape_functions ==
-          Utilities::fixed_power<dim>(polynomial_degree+1),
-          ExcInternalError());
-}
+  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1))
+{}
 
 
 
@@ -205,20 +200,6 @@ MappingQ1<dim,spacedim>::MappingQ1 ()
 
 
 
-template<int dim, int spacedim>
-void
-MappingQ1<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
-                                         InternalData &data) const
-{
-  // choose either the function implemented in this class, or whatever
-  // a virtual function call resolves to
-  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&data) == 0)
-    MappingQ1<dim,spacedim>::compute_shapes_virtual(unit_points, data);
-  else
-    compute_shapes_virtual(unit_points, data);
-}
-
-
 namespace internal
 {
   namespace MappingQ1
@@ -345,9 +326,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes_virtual (const unsigned int            n_shape_functions,
-                            const std::vector<Point<1> > &unit_points,
-                            typename dealii::MappingQ1<1,spacedim>::InternalData &data)
+    compute_shapes (const unsigned int            n_shape_functions,
+                    const std::vector<Point<1> > &unit_points,
+                    typename dealii::MappingQ1<1,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -410,9 +391,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes_virtual (const unsigned int            n_shape_functions,
-                            const std::vector<Point<2> > &unit_points,
-                            typename dealii::MappingQ1<2,spacedim>::InternalData &data)
+    compute_shapes (const unsigned int            n_shape_functions,
+                    const std::vector<Point<2> > &unit_points,
+                    typename dealii::MappingQ1<2,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -488,9 +469,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes_virtual (const unsigned int            n_shape_functions,
-                            const std::vector<Point<3> > &unit_points,
-                            typename dealii::MappingQ1<3,spacedim>::InternalData &data)
+    compute_shapes (const unsigned int            n_shape_functions,
+                    const std::vector<Point<3> > &unit_points,
+                    typename dealii::MappingQ1<3,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -674,13 +655,12 @@ namespace internal
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim, spacedim>::
-compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                        InternalData &data) const
+MappingQ1<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
+                                         InternalData &data) const
 {
   internal::MappingQ1::
-  compute_shapes_virtual<spacedim> (n_shape_functions,
-                                    unit_points, data);
+  compute_shapes<spacedim> (n_shape_functions,
+                            unit_points, data);
 }
 
 
@@ -750,7 +730,7 @@ typename MappingQ1<dim,spacedim>::InternalData *
 MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                    const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData(1, n_shape_functions);
+  InternalData *data = new InternalData(1);
   data->initialize (requires_update_flags(update_flags), q, q.size());
   compute_shapes (q.get_points(), *data);
 
@@ -764,7 +744,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                         const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(1, n_shape_functions);
+  InternalData *data = new InternalData(1);
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
@@ -781,7 +761,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                            const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(1, n_shape_functions);
+  InternalData *data = new InternalData(1);
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
@@ -2533,7 +2513,11 @@ transform_real_to_unit_cell_internal
 
   Point<dim> p_unit = initial_p_unit;
 
-  compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
+    this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+  else
+    dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+
   Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
   Tensor<1,spacedim> f = p_real-p;
 
@@ -2620,7 +2604,11 @@ transform_real_to_unit_cell_internal
 
           // shape values and derivatives
           // at new p_unit point
-          compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
+          if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
+            this->compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
+          else
+            dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
+
 
           // f(x)
           Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
@@ -2762,7 +2750,10 @@ transform_real_to_unit_cell_internal_codim1
   Tensor<2,dim1>  df;
 
   //Evaluate first and second derivatives
-  compute_shapes(std::vector<Point<dim1> > (1, p_unit), mdata);
+  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
+    this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+  else
+    dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
   for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
     {
       const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
@@ -2814,7 +2805,10 @@ transform_real_to_unit_cell_internal_codim1
             D2F[j][l].clear();
         }
 
-      compute_shapes(std::vector<Point<dim1> > (1, p_unit), mdata);
+      if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
+        this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+      else
+        dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
         {
           const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);

@@ -261,8 +261,7 @@ public:
     /**
      * Constructor.
      */
-    InternalData (const unsigned int polynomial_degree,
-                  const unsigned int n_shape_functions);
+    InternalData (const unsigned int polynomial_degree);
 
 
     /**
@@ -334,13 +333,11 @@ protected:
   /**
    * @}
    */
-
-  /**
-   * Compute shape values and/or derivatives.
-   */
-  virtual void
-  compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                          typename MappingQ1<dim,spacedim>::InternalData &data) const;
+public:
+  void
+  compute_shapes (const std::vector<Point<dim> > &unit_points,
+                  typename MappingQ1<dim,spacedim>::InternalData &data) const;
+protected:
 
   /**
    * This function is needed by the constructor of
