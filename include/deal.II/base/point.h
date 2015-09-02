@@ -408,7 +408,7 @@ Number
 Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 {
   // simply pass down
-  return Tensor<1,dim,Number>::operator * (p);
+  return static_cast<Tensor<1,dim,Number> >(*this) * p;
 }
 
 

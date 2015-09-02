@@ -323,7 +323,7 @@ public:
   /**
    * Publish the rank of this tensor to the outside world.
    */
-  static const unsigned int rank      = 1;
+  static const unsigned int rank = 1;
 
   /**
    * Number of independent components of a tensor of rank 1.
@@ -350,11 +350,11 @@ public:
   /**
    * Declare an array type which can be used to initialize statically an
    * object of this type.
-   *
-   * Avoid warning about zero-sized array for <tt>dim==0</tt> by choosing
-   * lunatic value that is likely to overflow memory limits.
    */
-  typedef Number array_type[(dim!=0) ? dim : 100000000];
+  // Avoid a bogus warning in case of dim==0, and always provide a type
+  // with positive array size. The constructor will take care that no
+  // Tensor with dim==0 will be constructed.
+  typedef Number array_type[(dim!=0) ? dim : 1];
 
   /**
    * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>;
@@ -379,7 +379,6 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  explicit
   Tensor (const Tensor<1,dim,OtherNumber> &initializer);
 
   /**
@@ -388,7 +387,7 @@ public:
    * Note that the derived <tt>Point</tt> class also provides access through
    * the <tt>()</tt> operator for backcompatibility.
    */
-  Number   operator [] (const unsigned int index) const;
+  Number operator [] (const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
@@ -401,15 +400,15 @@ public:
   /**
    * Read access using TableIndices <tt>indices</tt>
    */
-  Number operator [](const TableIndices<1> &indices) const;
+  Number operator [] (const TableIndices<1> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
    */
-  Number &operator [](const TableIndices<1> &indices);
+  Number &operator [] (const TableIndices<1> &indices);
 
   /**
-   * Assignment operator.
+   * Copy assignment operator.
    */
   Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &rhs);
 
@@ -427,60 +426,50 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  Tensor<1,dim,Number> &operator = (const Number d);
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator = (const OtherNumber d);
 
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<1,dim,Number> &rhs) const;
+  template <typename OtherNumber>
+  bool operator == (const Tensor<1,dim,OtherNumber> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<1,dim,Number> &rhs) const;
+  template <typename OtherNumber>
+  bool operator != (const Tensor<1,dim,OtherNumber> &rhs) const;
 
   /**
-   * Add another vector, i.e. move this point by the given offset.
+   * Add another vector to this vector.
    */
-  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &rhs);
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,OtherNumber> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &rhs);
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,OtherNumber> &rhs);
 
   /**
-   * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
+   * Scale the vector by <tt>factor</tt>, i.e., multiply all coordinates by
    * <tt>factor</tt>.
    */
-  Tensor<1,dim,Number> &operator *= (const Number factor);
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator *= (const OtherNumber factor);
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
    */
-  Tensor<1,dim,Number> &operator /= (const Number factor);
-
-  /**
-   * Returns the scalar product of two vectors.
-   */
-  Number                 operator * (const Tensor<1,dim,Number> &) const;
-
-  /**
-   * Add two tensors. If possible, use <tt>operator +=</tt> instead since this
-   * does not need to copy a point at least once.
-   */
-  Tensor<1,dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
-
-  /**
-   * Subtract two tensors. If possible, use <tt>operator +=</tt> instead since
-   * this does not need to copy a point at least once.
-   */
-  Tensor<1,dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator /= (const OtherNumber factor);
 
   /**
    * Tensor with inverted entries.
    */
-  Tensor<1,dim,Number>   operator - () const;
+  Tensor<1,dim,Number> operator - () const;
 
   /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
@@ -574,7 +563,7 @@ private:
    * element, because otherwise the compiler would choke.  We catch this case
    * in the constructor to disallow the creation of such an object.
    */
-  Number values[(dim!=0) ? (dim) : (dim+1)];
+  array_type values;
 
   /**
    * Help function for unroll. If we have detected an access control bug in
@@ -586,7 +575,6 @@ private:
   void unroll_recursion (Vector<Number2> &result,
                          unsigned int    &start_index) const;
 
-private:
   /**
    * Make the following classes friends to this class. In principle, it would
    * suffice if otherrank==2, but that is not possible in C++ at present.
@@ -912,6 +900,8 @@ operator / (const Tensor<0,dim,Number> &t,
 
 /**
  * Add two tensors of rank 0.
+ *
+ * @relates Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -925,6 +915,8 @@ operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
 
 /**
  * Subtract two tensors of rank 0.
+ *
+ * @relates Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -960,10 +952,8 @@ inline
 Tensor<1,dim,Number>::Tensor (const bool initialize)
 {
   if (initialize)
-    // need to create an object Number() to
-    // initialize to zero to avoid confusion with
-    // Tensor::operator=(scalar) when using
-    // something like
+    // need to create an object Number() to initialize to zero to avoid
+    // confusion with Tensor::operator=(scalar) when using something like
     // Tensor<1,dim,Tensor<1,dim,Number> >.
     for (unsigned int i=0; i!=dim; ++i)
       values[i] = Number();
@@ -1008,20 +998,15 @@ Tensor<1,dim,Number>::Tensor (const Tensor<1,dim,OtherNumber> &p)
 
 
 
+// At some places in the library, we have Point<0> for formal reasons
+// (e.g., we sometimes have Quadrature<dim-1> for faces, so we have
+// Quadrature<0> for dim=1, and then we have Point<0>). To avoid warnings
+// in the above function that the loop end check always fails, we
+// implement this function here
 template <>
 inline
 Tensor<1,0,double>::Tensor (const Tensor<1,0,double> &)
 {
-  // at some places in the library,
-  // we have Point<0> for formal
-  // reasons (e.g., we sometimes have
-  // Quadrature<dim-1> for faces, so
-  // we have Quadrature<0> for dim=1,
-  // and then we have Point<0>). To
-  // avoid warnings in the above
-  // function that the loop end check
-  // always fails, we implement this
-  // function here
 }
 
 
@@ -1044,6 +1029,8 @@ Number &Tensor<1,dim,Number>::operator [] (const unsigned int index)
   return values[index];
 }
 
+
+
 template <int dim, typename Number>
 inline
 Number Tensor<1,dim,Number>::operator [] (const TableIndices<1> &indices) const
@@ -1052,31 +1039,14 @@ Number Tensor<1,dim,Number>::operator [] (const TableIndices<1> &indices) const
   return values[indices[0]];
 }
 
+
+
 template <int dim, typename Number>
 inline
 Number &Tensor<1,dim,Number>::operator [] (const TableIndices<1> &indices)
 {
   Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
   return values[indices[0]];
-}
-
-
-
-template <>
-inline
-Tensor<1,0,double> &Tensor<1,0,double>::operator = (const Tensor<1,0,double> &)
-{
-  // at some places in the library,
-  // we have Point<0> for formal
-  // reasons (e.g., we sometimes have
-  // Quadrature<dim-1> for faces, so
-  // we have Quadrature<0> for dim=1,
-  // and then we have Point<0>). To
-  // avoid warnings in the above
-  // function that the loop end check
-  // always fails, we implement this
-  // function here
-  return *this;
 }
 
 
@@ -1089,6 +1059,20 @@ Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
 
+  return *this;
+}
+
+
+
+template <>
+inline
+Tensor<1,0,double> &Tensor<1,0,double>::operator = (const Tensor<1,0,double> &)
+{
+  // at some places in the library, we have Point<0> for formal reasons
+  // (e.g., we sometimes have Quadrature<dim-1> for faces, so we have
+  // Quadrature<0> for dim=1, and then we have Point<0>). To avoid warnings
+  // in the above function that the loop end check always fails, we
+  // implement this function here
   return *this;
 }
 
@@ -1109,14 +1093,15 @@ Tensor<1,dim,Number>::operator = (const Tensor<1,dim,OtherNumber> &p)
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator = (const Number d)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator = (const OtherNumber d)
 {
-  Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
+  Assert (d == OtherNumber(), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
   for (unsigned int i=0; i<dim; ++i)
-    values[i] = 0;
+    values[i] = Number();
 
   return *this;
 }
@@ -1124,8 +1109,9 @@ Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator = (const Number d)
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-bool Tensor<1,dim,Number>::operator == (const Tensor<1,dim,Number> &p) const
+bool Tensor<1,dim,Number>::operator == (const Tensor<1,dim,OtherNumber> &p) const
 {
   for (unsigned int i=0; i<dim; ++i)
     if (values[i] != p.values[i])
@@ -1136,6 +1122,7 @@ bool Tensor<1,dim,Number>::operator == (const Tensor<1,dim,Number> &p) const
 
 
 template <>
+template <>
 inline
 bool Tensor<1,0,double>::operator == (const Tensor<1,0,double> &) const
 {
@@ -1145,8 +1132,9 @@ bool Tensor<1,0,double>::operator == (const Tensor<1,0,double> &) const
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-bool Tensor<1,dim,Number>::operator != (const Tensor<1,dim,Number> &p) const
+bool Tensor<1,dim,Number>::operator != (const Tensor<1,dim,OtherNumber> &p) const
 {
   return !((*this) == p);
 }
@@ -1154,8 +1142,9 @@ bool Tensor<1,dim,Number>::operator != (const Tensor<1,dim,Number> &p) const
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator += (const Tensor<1,dim,Number> &p)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator += (const Tensor<1,dim,OtherNumber> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] += p.values[i];
@@ -1165,8 +1154,9 @@ Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator += (const Tensor<1,dim,Numb
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,Number> &p)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,OtherNumber> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] -= p.values[i];
@@ -1176,8 +1166,9 @@ Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,Numb
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator *= (const Number s)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator *= (const OtherNumber s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] *= s;
@@ -1187,64 +1178,13 @@ Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator *= (const Number s)
 
 
 template <int dim, typename Number>
+template <typename OtherNumber>
 inline
-Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator /= (const Number s)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator /= (const OtherNumber s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
   return *this;
-}
-
-
-
-template <int dim, typename Number>
-inline
-Number
-Tensor<1,dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
-{
-  // unroll by hand since this is a
-  // frequently called function and
-  // some compilers don't want to
-  // always unroll the loop in the
-  // general template
-  switch (dim)
-    {
-    case 1:
-      return (values[0] * p.values[0]);
-      break;
-    case 2:
-      return (values[0] * p.values[0] +
-              values[1] * p.values[1]);
-      break;
-    case 3:
-      return (values[0] * p.values[0] +
-              values[1] * p.values[1] +
-              values[2] * p.values[2]);
-      break;
-    default:
-      Number q = values[0] * p.values[0];
-      for (unsigned int i=1; i<dim; ++i)
-        q += values[i] * p.values[i];
-      return q;
-    }
-}
-
-
-
-template <int dim, typename Number>
-inline
-Tensor<1,dim,Number> Tensor<1,dim,Number>::operator + (const Tensor<1,dim,Number> &p) const
-{
-  return (Tensor<1,dim,Number>(*this) += p);
-}
-
-
-
-template <int dim, typename Number>
-inline
-Tensor<1,dim,Number> Tensor<1,dim,Number>::operator - (const Tensor<1,dim,Number> &p) const
-{
-  return (Tensor<1,dim,Number>(*this) -= p);
 }
 
 
@@ -1501,6 +1441,94 @@ operator / (const Tensor<rank,dim,Number> &t,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] / factor;
   return tt;
+}
+
+
+
+/**
+ * Addition of two tensors of general @tparam rank.
+ *
+ * @relates Tensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator+ (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> &q)
+{
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp (p);
+
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] += q[i];
+
+  return tmp;
+}
+
+
+
+/**
+ * Subtraction of two tensors of general @tparam rank.
+ *
+ * @relates Tensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> &q)
+{
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp (p);
+
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] -= q[i];
+
+  return tmp;
+}
+
+
+
+/**
+ * Contract a tensor of rank 1 with a tensor of rank 1. The result is
+ * <tt>sum_j src1[j] src2[j]</tt>.
+ *
+ * @relates Tensor
+ * @author Guido Kanschat, 2000
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+contract (const Tensor<1,dim,Number> &src1,
+          const Tensor<1,dim,OtherNumber> &src2)
+{
+  typename ProductType<Number,OtherNumber>::type res
+    = typename ProductType<Number,OtherNumber>::type();
+  for (unsigned int i=0; i<dim; ++i)
+    res += src1[i] * src2[i];
+
+  return res;
+}
+
+
+/**
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
+ *
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
+ *
+ * @relates Tensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+operator * (const Tensor<1,dim,Number> &src1,
+            const Tensor<1,dim,OtherNumber> &src2)
+{
+  return contract(src1, src2);
 }
 
 

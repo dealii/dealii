@@ -127,7 +127,6 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  explicit
   Tensor (const Tensor<rank_,dim,OtherNumber> &initializer);
 
   /**
@@ -211,18 +210,6 @@ public:
    * Scale the vector by <tt>1/factor</tt>.
    */
   Tensor<rank_,dim,Number> &operator /= (const Number factor);
-
-  /**
-   * Add two tensors. If possible, you should use <tt>operator +=</tt> instead
-   * since this does not need the creation of a temporary.
-   */
-  Tensor<rank_,dim,Number>   operator + (const Tensor<rank_,dim,Number> &) const;
-
-  /**
-   * Subtract two tensors. If possible, you should use <tt>operator -=</tt>
-   * instead since this does not need the creation of a temporary.
-   */
-  Tensor<rank_,dim,Number>   operator - (const Tensor<rank_,dim,Number> &) const;
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
@@ -557,36 +544,6 @@ Tensor<rank_,dim,Number>::operator /= (const Number s)
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>
-Tensor<rank_,dim,Number>::operator + (const Tensor<rank_,dim,Number> &t) const
-{
-  Tensor<rank_,dim,Number> tmp(*this);
-
-  for (unsigned int i=0; i<dim; ++i)
-    tmp.subtensor[i] += t.subtensor[i];
-
-  return tmp;
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline
-Tensor<rank_,dim,Number>
-Tensor<rank_,dim,Number>::operator - (const Tensor<rank_,dim,Number> &t) const
-{
-  Tensor<rank_,dim,Number> tmp(*this);
-
-  for (unsigned int i=0; i<dim; ++i)
-    tmp.subtensor[i] -= t.subtensor[i];
-
-  return tmp;
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline
-Tensor<rank_,dim,Number>
 Tensor<rank_,dim,Number>::operator - () const
 {
   Tensor<rank_,dim,Number> tmp;
@@ -754,52 +711,6 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
 }
 
 #endif // DOXYGEN
-
-
-/**
- * Contract a tensor of rank 1 with a tensor of rank 1. The result is
- * <tt>sum_j src1[j] src2[j]</tt>.
- *
- * @relates Tensor
- * @author Guido Kanschat, 2000
- */
-template <int dim, typename Number, typename OtherNumber>
-inline
-typename ProductType<Number,OtherNumber>::type
-contract (const Tensor<1,dim,Number> &src1,
-          const Tensor<1,dim,OtherNumber> &src2)
-{
-  typename ProductType<Number,OtherNumber>::type res = typename ProductType<Number,OtherNumber>::type();
-  for (unsigned int i=0; i<dim; ++i)
-    res += src1[i] * src2[i];
-
-  return res;
-}
-
-
-/**
- * Multiplication operator performing a contraction of the last index of the
- * first argument and the first index of the second argument. This function
- * therefore does the same as the corresponding <tt>contract</tt> function,
- * but returns the result as a return value, rather than writing it into the
- * reference given as the first argument to the <tt>contract</tt> function.
- *
- * Note that for the <tt>Tensor</tt> class, the multiplication operator only
- * performs a contraction over a single pair of indices. This is in contrast
- * to the multiplication operator for symmetric tensors, which does the double
- * contraction.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2005
- */
-template <int dim, typename Number, typename OtherNumber>
-inline
-typename ProductType<Number,OtherNumber>::type
-operator * (const Tensor<1,dim,Number> &src1,
-            const Tensor<1,dim,OtherNumber> &src2)
-{
-  return contract(src1, src2);
-}
 
 
 /**
