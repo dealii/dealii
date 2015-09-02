@@ -114,28 +114,32 @@ public:
    * whether the exception mentioned above has been thrown.
    */
   virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const;
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                                     &p) const;
 
-  virtual void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-             VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  virtual void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > >    input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
+  // for documentation, see the base classes
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+             const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
+             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
+
+  // for documentation, see the base classes
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > > input,
+             const MappingType                                                        type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                  &internal,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >                           output) const;
+
+  // for documentation, see the base classes
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the

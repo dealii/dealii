@@ -244,9 +244,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
@@ -259,9 +260,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
           correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
                                           mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(fe_data.untransformed_shape_hessians,
-                            output_data.shape_hessians[k],
-                            mapping_internal, mapping_covariant_gradient);
+          mapping.transform (fe_data.untransformed_shape_hessians,
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }
@@ -307,9 +309,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
           output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians)
         {
@@ -323,8 +326,12 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                                          ( fe_data.untransformed_shape_hessians, offset , quadrature.size()),
                                          mapping_data, output_data, quadrature.size(), k);
 
-          mapping.transform(make_slice(fe_data.untransformed_shape_hessians, offset, quadrature.size()),
-                            output_data.shape_hessians[k], mapping_internal, mapping_covariant_gradient);
+          mapping.transform (make_slice(fe_data.untransformed_shape_hessians,
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }
@@ -370,9 +377,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
           output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          output_data.shape_gradients[k],
-                          mapping_internal, mapping_covariant);
+        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
       if (flags & update_hessians)
         {
@@ -383,11 +391,20 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             }
 
           correct_untransformed_hessians(VectorSlice< std::vector<Tensor<2,dim> > >
-                                         ( fe_data.untransformed_shape_hessians, offset , quadrature.size()),
-                                         mapping_data, output_data, quadrature.size(), k);
+                                         (fe_data.untransformed_shape_hessians,
+                                          offset,
+                                          quadrature.size()),
+                                         mapping_data,
+                                         output_data,
+                                         quadrature.size(),
+                                         k);
 
-          mapping.transform(make_slice(fe_data.untransformed_shape_hessians, offset, quadrature.size()),
-                            output_data.shape_hessians[k], mapping_internal, mapping_covariant_gradient);
+          mapping.transform (make_slice(fe_data.untransformed_shape_hessians,
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
         }
     }
 }

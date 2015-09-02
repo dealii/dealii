@@ -328,8 +328,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
 
 
   if ( (flags & update_gradients) && mapping_type != mapping_none )
-    mapping.transform(mapping_data.jacobian_grads, fe_data.transformed_jacobian_grads,
-                      mapping_internal, mapping_covariant_gradient);
+    mapping.transform (mapping_data.jacobian_grads,
+                       mapping_covariant_gradient,
+                       mapping_internal,
+                       fe_data.transformed_jacobian_grads);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -361,8 +363,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             case mapping_covariant:
             case mapping_contravariant:
             {
-              mapping.transform(fe_data.shape_values[i],
-                                fe_data.transformed_shape_values, mapping_internal, mapping_type);
+              mapping.transform (fe_data.shape_values[i],
+                                 mapping_type,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_values);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -374,8 +378,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              mapping.transform(fe_data.shape_values[i], fe_data.transformed_shape_values,
-                                mapping_internal, mapping_piola);
+              mapping.transform (fe_data.shape_values[i],
+                                 mapping_piola,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_values);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
@@ -385,8 +391,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
 
             case mapping_nedelec:
             {
-              mapping.transform (fe_data.shape_values[i], fe_data.transformed_shape_values,
-                                 mapping_internal, mapping_covariant);
+              mapping.transform (fe_data.shape_values[i],
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_values);
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -414,8 +422,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             {
             case mapping_none:
             {
-              mapping.transform(fe_data.shape_grads[i], fe_data.transformed_shape_grads,
-                                mapping_internal, mapping_covariant);
+              mapping.transform (fe_data.shape_grads[i],
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_grads);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_gradients[first+d][k] = fe_data.transformed_shape_grads[k][d];
@@ -423,8 +433,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             }
             case mapping_covariant:
             {
-              mapping.transform(fe_data.shape_grads[i], fe_data.transformed_shape_grads,
-                                mapping_internal, mapping_covariant_gradient);
+              mapping.transform (fe_data.shape_grads[i],
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -440,8 +452,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             }
             case mapping_contravariant:
             {
-              mapping.transform(fe_data.shape_grads[i], fe_data.transformed_shape_grads,
-                                mapping_internal, mapping_contravariant_gradient);
+              mapping.transform(fe_data.shape_grads[i],
+                                mapping_contravariant_gradient,
+                                mapping_internal,
+                                fe_data.transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -461,8 +475,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
-              mapping.transform(fe_data.untransformed_shape_grads, fe_data.transformed_shape_grads,
-                                mapping_internal, mapping_piola_gradient);
+              mapping.transform (fe_data.untransformed_shape_grads,
+                                 mapping_piola_gradient,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -495,8 +511,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
 
-              mapping.transform (fe_data.untransformed_shape_grads,fe_data.transformed_shape_grads,
-                                 mapping_internal, mapping_covariant_gradient);
+              mapping.transform (fe_data.untransformed_shape_grads,
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_grads);
 
 
               for (unsigned int k=0; k<n_q_points; ++k)
@@ -585,10 +603,11 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
     get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
   if ( (flags & update_gradients) && mapping_type != mapping_none )
-    mapping.transform(mapping_data.jacobian_grads,
-                      VectorSlice< std::vector<Tensor<3,spacedim> > >
-                      (fe_data.transformed_jacobian_grads, offset, n_q_points),
-                      mapping_internal, mapping_covariant_gradient);
+    mapping.transform (mapping_data.jacobian_grads,
+                       mapping_covariant_gradient,
+                       mapping_internal,
+                       VectorSlice< std::vector<Tensor<3,spacedim> > >
+                       (fe_data.transformed_jacobian_grads, offset, n_q_points));
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -614,8 +633,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             {
               // Use auxiliary vector
               // for transformation
-              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                transformed_shape_values, mapping_internal, mapping_type);
+              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+                                 mapping_type,
+                                 mapping_internal,
+                                 transformed_shape_values);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -627,8 +648,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             case mapping_piola:
             {
 
-              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                transformed_shape_values, mapping_internal, mapping_piola);
+              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+                                 mapping_piola,
+                                 mapping_internal,
+                                 transformed_shape_values);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
@@ -639,7 +662,9 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             case mapping_nedelec:
             {
               mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
-                                 transformed_shape_values, mapping_internal, mapping_covariant);
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 transformed_shape_values);
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -663,8 +688,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             {
             case mapping_none:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_covariant);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 transformed_shape_grads);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_gradients[first+d][k] = transformed_shape_grads[k][d];
@@ -673,8 +700,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 
             case mapping_covariant:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_covariant_gradient);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -689,8 +718,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             }
             case mapping_contravariant:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_contravariant_gradient);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_contravariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -709,8 +740,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
-              mapping.transform(make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_piola_gradient);
+              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+                                 mapping_piola_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -745,7 +778,9 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
               mapping.transform (make_slice (fe_data.untransformed_shape_grads, offset, n_q_points),
-                                 transformed_shape_grads, mapping_internal, mapping_covariant_gradient);
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -829,10 +864,11 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
     get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
   if ( (flags & update_gradients) && mapping_type != mapping_none)
-    mapping.transform(mapping_data.jacobian_grads,
-                      VectorSlice< std::vector<Tensor<3,spacedim> > >
-                      (fe_data.transformed_jacobian_grads, offset, n_q_points),
-                      mapping_internal, mapping_covariant_gradient);
+    mapping.transform (mapping_data.jacobian_grads,
+                       mapping_covariant_gradient,
+                       mapping_internal,
+                       VectorSlice< std::vector<Tensor<3,spacedim> > >
+                       (fe_data.transformed_jacobian_grads, offset, n_q_points));
 
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -859,8 +895,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             {
               // Use auxiliary vector for
               // transformation
-              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                transformed_shape_values, mapping_internal, mapping_type);
+              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+                                 mapping_type,
+                                 mapping_internal,
+                                 transformed_shape_values);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -871,8 +909,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                transformed_shape_values, mapping_internal, mapping_piola);
+              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+                                 mapping_piola,
+                                 mapping_internal,
+                                 transformed_shape_values);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
@@ -882,7 +922,9 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             case mapping_nedelec:
             {
               mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
-                                 transformed_shape_values, mapping_internal, mapping_covariant);
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 transformed_shape_values);
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -903,8 +945,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             {
             case mapping_none:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_covariant);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_covariant,
+                                 mapping_internal,
+                                 transformed_shape_grads);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_gradients[first+d][k] = transformed_shape_grads[k][d];
@@ -913,8 +957,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
             case mapping_covariant:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_covariant_gradient);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -931,8 +977,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
             case mapping_contravariant:
             {
-              mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_contravariant_gradient);
+              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+                                 mapping_contravariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -953,8 +1001,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
-              mapping.transform(make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
-                                transformed_shape_grads, mapping_internal, mapping_piola_gradient);
+              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+                                 mapping_piola_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -987,7 +1037,9 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
               mapping.transform (make_slice (fe_data.untransformed_shape_grads, offset, n_q_points),
-                                 transformed_shape_grads, mapping_internal, mapping_covariant_gradient);
+                                 mapping_covariant_gradient,
+                                 mapping_internal,
+                                 transformed_shape_grads);
 
 
               for (unsigned int k=0; k<n_q_points; ++k)

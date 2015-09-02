@@ -995,11 +995,11 @@ add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterato
 
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ<dim,spacedim>::
+transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+           const MappingType                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
   // The data object may be just a MappingQ1::InternalData, so we have to test
@@ -1020,18 +1020,18 @@ MappingQ<dim,spacedim>::transform (
     }
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, output, *q1_data, mapping_type);
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
 
 
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ<dim,spacedim>::
+transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
+           const MappingType                                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
+           VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
   // The data object may be just a MappingQ1::InternalData, so we have to test
@@ -1052,16 +1052,16 @@ MappingQ<dim,spacedim>::transform (
     }
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, output, *q1_data, mapping_type);
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
 
 template<int dim, int spacedim>
-void MappingQ<dim,spacedim>::transform
-(const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
- VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
- const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- const MappingType mapping_type) const
+void MappingQ<dim,spacedim>::
+transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+           const MappingType                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
   // The data object may be just a MappingQ1::InternalData, so we have to test
@@ -1082,7 +1082,7 @@ void MappingQ<dim,spacedim>::transform
     }
   // Now, q1_data should have the right tensors in it and we call the base
   // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, output, *q1_data, mapping_type);
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
 

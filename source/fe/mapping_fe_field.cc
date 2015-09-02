@@ -1022,9 +1022,9 @@ namespace internal
                     ExcInternalError());
 
             mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d],
-                               data.aux[d],
+                               mapping_contravariant,
                                data,
-                               mapping_contravariant);
+                               data.aux[d]);
           }
 
         // if dim==spacedim, we can use the unit tangentials to compute the
@@ -1437,9 +1437,9 @@ namespace
   template<int dim, int spacedim, int rank, class VECTOR, class DH>
   void
   transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
-                   VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                   const MappingType mapping_type)
+                   const MappingType                                        mapping_type,
+                   const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+                   VectorSlice<std::vector<Tensor<rank,spacedim> > >        output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VECTOR,DH>::InternalData *>(&mapping_data) != 0),
@@ -1499,9 +1499,9 @@ namespace
   template<int dim, int spacedim, int rank, class VECTOR, class DH>
   void
   transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-                               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                               const MappingType mapping_type)
+                               const MappingType                                                             mapping_type,
+                               const typename Mapping<dim,spacedim>::InternalDataBase                       &mapping_data,
+                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                          output)
   {
 
     AssertDimension (input.size(), output.size());
@@ -1533,40 +1533,41 @@ namespace
 
 template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,VECTOR,DH>::transform (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingFEField<dim,spacedim,VECTOR,DH>::
+transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+           const MappingType                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
 
-  transform_fields<dim,spacedim,1,VECTOR,DH>(input, output, mapping_data, mapping_type);
+  transform_fields<dim,spacedim,1,VECTOR,DH>(input, mapping_type, mapping_data, output);
 }
 
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,VECTOR,DH>::transform (
-  const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingFEField<dim,spacedim,VECTOR,DH>::
+transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
+           const MappingType                                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
+           VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
 
-  transform_differential_forms<dim,spacedim,1,VECTOR,DH>(input, output, mapping_data, mapping_type);
-
+  transform_differential_forms<dim,spacedim,1,VECTOR,DH>(input, mapping_type, mapping_data, output);
 }
 
 
+
 template<int dim, int spacedim, class VECTOR, class DH>
-void MappingFEField<dim,spacedim,VECTOR,DH>::transform
-(const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
- VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
- const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- const MappingType) const
+void
+MappingFEField<dim,spacedim,VECTOR,DH>::
+transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+           const MappingType,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   (void)input;
   (void)output;
@@ -1579,11 +1580,12 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
-void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
-  const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+void
+MappingFEField<dim,spacedim,VECTOR,DH>::
+transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+           const MappingType                                                         mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                   &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const
 {
 
   AssertDimension (input.size(), output.size());
@@ -1618,18 +1620,22 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
               }
       return;
     }
+
     default:
       Assert(false, ExcNotImplemented());
     }
 
 }
 
+
+
 template<int dim, int spacedim, class VECTOR, class DH>
-void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
-  const VectorSlice<const std::vector< Tensor<3,dim> > > input,
-  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType /*mapping_type*/) const
+void
+MappingFEField<dim,spacedim,VECTOR,DH>::
+transform (const VectorSlice<const std::vector< Tensor<3,dim> > >  input,
+           const MappingType                                     /*mapping_type*/,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
 {
 
   (void)input;
@@ -1640,6 +1646,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
   AssertThrow(false, ExcNotImplemented());
 
 }
+
 
 
 template<int dim, int spacedim, class VECTOR, class DH>

@@ -1507,9 +1507,9 @@ namespace internal
                       ExcInternalError());
 
               mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d],
-                                 data.aux[d],
+                                 mapping_contravariant,
                                  data,
-                                 mapping_contravariant);
+                                 data.aux[d]);
             }
 
           // if dim==spacedim, we can use the unit tangentials to compute the
@@ -1758,9 +1758,9 @@ namespace
   template <int dim, int spacedim, int rank>
   void
   transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
-                   VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                   const MappingType mapping_type)
+                   const MappingType                                        mapping_type,
+                   const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+                   VectorSlice<std::vector<Tensor<rank,spacedim> > >        output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *>(&mapping_data) != 0),
@@ -1821,9 +1821,9 @@ namespace
   template <int dim, int spacedim, int rank>
   void
   transform_gradients(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
-                      VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
-                      const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                      const MappingType mapping_type)
+                      const MappingType                                        mapping_type,
+                      const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+                      VectorSlice<std::vector<Tensor<rank,spacedim> > >        output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *>(&mapping_data) != 0),
@@ -1901,10 +1901,10 @@ namespace
 
   template <int dim, int spacedim>
   void
-  transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > > input,
-                     VectorSlice<std::vector<Tensor<3,spacedim> > > output,
+  transform_hessians(const VectorSlice<const std::vector<Tensor<3,dim> > >   input,
+                     const MappingType                                       mapping_type,
                      const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                     const MappingType mapping_type)
+                     VectorSlice<std::vector<Tensor<3,spacedim> > >          output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *>(&mapping_data) != 0),
@@ -2019,12 +2019,12 @@ namespace
 
 
 
-  template <int dim, int spacedim, int rank>
+  template<int dim, int spacedim, int rank>
   void
-  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
-                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > > output,
-                               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                               const MappingType mapping_type)
+  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > > input,
+                               const MappingType                                                          mapping_type,
+                               const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
+                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                       output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *>(&mapping_data) != 0),
@@ -2054,48 +2054,48 @@ namespace
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<1, dim> > >  input,
-  VectorSlice<std::vector<Tensor<1, spacedim> > >         output,
-  const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
-  const MappingType                                       mapping_type) const
+MappingQ1<dim,spacedim>::
+transform (const VectorSlice<const std::vector<Tensor<1, dim> > >   input,
+           const MappingType                                        mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+           VectorSlice<std::vector<Tensor<1, spacedim> > >          output) const
 {
-  transform_fields(input, output, mapping_data, mapping_type);
+  transform_fields(input, mapping_type, mapping_data, output);
 }
 
 
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-  VectorSlice<std::vector<Tensor<2, spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ1<dim,spacedim>::
+transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
+           const MappingType                                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                 &mapping_data,
+           VectorSlice<std::vector<Tensor<2, spacedim> > >                         output) const
 {
-  transform_differential_forms(input, output, mapping_data, mapping_type);
+  transform_differential_forms(input, mapping_type, mapping_data, output);
 }
 
 
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<2, dim> > >    input,
-  VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ1<dim,spacedim>::
+transform (const VectorSlice<const std::vector<Tensor<2, dim> > >   input,
+           const MappingType                                        mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+           VectorSlice<std::vector<Tensor<2, spacedim> > >          output) const
 {
   switch (mapping_type)
     {
     case mapping_contravariant:
-      transform_fields(input, output, mapping_data, mapping_type);
+      transform_fields(input, mapping_type, mapping_data, output);
       return;
 
     case mapping_piola_gradient:
     case mapping_contravariant_gradient:
     case mapping_covariant_gradient:
-      transform_gradients(input, output, mapping_data, mapping_type);
+      transform_gradients(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
@@ -2106,11 +2106,11 @@ MappingQ1<dim,spacedim>::transform (
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ1<dim,spacedim>::
+transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+           const MappingType                                                         mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase                   &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const
 {
 
   AssertDimension (input.size(), output.size());
@@ -2155,11 +2155,11 @@ MappingQ1<dim,spacedim>::transform (
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::transform (
-  const VectorSlice<const std::vector< Tensor<3,dim> > > input,
-  VectorSlice<std::vector<Tensor<3,spacedim> > >             output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const MappingType mapping_type) const
+MappingQ1<dim,spacedim>::
+transform (const VectorSlice<const std::vector< Tensor<3,dim> > >   input,
+           const MappingType                                        mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+           VectorSlice<std::vector<Tensor<3,spacedim> > >           output) const
 {
 
   switch (mapping_type)
@@ -2167,7 +2167,7 @@ MappingQ1<dim,spacedim>::transform (
     case mapping_piola_hessian:
     case mapping_contravariant_hessian:
     case mapping_covariant_hessian:
-      transform_hessians(input, output, mapping_data, mapping_type);
+      transform_hessians(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
