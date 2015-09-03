@@ -2493,7 +2493,7 @@ MatrixFree<dim,Number>::cell_loop
                             const std::pair<unsigned int,
                             unsigned int> &)>
   function = std_cxx11::bind<void>(function_pointer,
-                                   std_cxx11::cref(*owning_class),
+                                   owning_class,
                                    std_cxx11::_1,
                                    std_cxx11::_2,
                                    std_cxx11::_3,
@@ -2525,7 +2525,7 @@ MatrixFree<dim,Number>::cell_loop
                             const std::pair<unsigned int,
                             unsigned int> &)>
   function = std_cxx11::bind<void>(function_pointer,
-                                   std_cxx11::ref(*owning_class),
+                                   owning_class,
                                    std_cxx11::_1,
                                    std_cxx11::_2,
                                    std_cxx11::_3,
