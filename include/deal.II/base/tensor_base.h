@@ -366,7 +366,7 @@ public:
    * times the number of independent components of each sub-tensor.
    */
   static const unsigned int
-  n_independent_components = Tensor<rank_-1,dim>::n_independent_components * dim;
+  n_independent_components = Tensor<rank_-1,dim>::n_independent_components *dim;
 
   /**
    * Declare a type that holds real-valued numbers with the same precision
@@ -394,7 +394,7 @@ public:
    * type statically.
    */
   typedef typename Tensor<rank_-1,dim,Number>::array_type
-    array_type[(dim != 0) ? dim : 1];
+  array_type[(dim != 0) ? dim : 1];
 
   /**
    * Constructor. Initialize all entries to zero if
@@ -436,12 +436,12 @@ public:
   /**
    * Read-Write access operator.
    */
-  value_type & operator [] (const unsigned int i);
+  value_type &operator [] (const unsigned int i);
 
   /**
    * Read-only access operator.
    */
-  const value_type & operator[](const unsigned int i) const;
+  const value_type &operator[](const unsigned int i) const;
 
   /**
    * Read access using TableIndices <tt>indices</tt>
@@ -852,11 +852,11 @@ namespace internal
     //   tensor[indices[0]][indices[1]]...[indices[rank_]]
     template<int rank, int dim, typename Number>
     static inline
-    Number & extract(Tensor<rank_,dim,Number> &t, const TableIndices<rank> &indices)
+    Number &extract(Tensor<rank_,dim,Number> &t, const TableIndices<rank> &indices)
     {
       Assert (indices[rank - rank_]<dim, ExcIndexRange (indices[rank - rank_], 0, dim));
       return TensorIndicesHelper<rank_ - 1>::template extract<rank, dim, Number>(
-          t[indices[rank - rank_]], indices);
+        t[indices[rank - rank_]], indices);
     }
   };
 
@@ -864,7 +864,7 @@ namespace internal
   {
     template<int rank, int dim, typename Number>
     static inline
-    Number & extract(Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
+    Number &extract(Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
     {
       Assert (indices[rank - 1]<dim, ExcIndexRange (indices[rank - 1], 0, dim));
       return t[indices[rank-1]];
@@ -1185,7 +1185,7 @@ Tensor<rank_, dim, Number>::unroll_recursion (Vector<OtherNumber> &result,
 {
   for (unsigned int i=0; i<dim; ++i)
     static_cast<Tensor<rank_ - 1, dim, Number> >(values[i]).
-      unroll_recursion(result, index);
+    unroll_recursion(result, index);
 }
 
 
@@ -1302,9 +1302,9 @@ struct ProductType<Tensor<rank,dim,T>,U>
  * @relates EnableIfScalar
  */
 template <int rank, int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
 operator * (const Tensor<rank,dim,Number> &t,
@@ -1327,9 +1327,9 @@ operator * (const Tensor<rank,dim,Number> &t,
  * @relates EnableIfScalar
  */
 template <int rank, int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
 operator * (const Number                        factor,
@@ -1349,9 +1349,9 @@ operator * (const Number                        factor,
  * @relates EnableIfScalar
  */
 template <int rank, int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
 operator / (const Tensor<rank,dim,Number> &t,

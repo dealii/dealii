@@ -128,9 +128,9 @@ std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
  * @relates EnableIfScalar
  */
 template <int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<0,dim,typename ProductType<OtherNumber, Number>::type>
 operator * (const OtherNumber           factor,
@@ -147,9 +147,9 @@ operator * (const OtherNumber           factor,
  * @relates EnableIfScalar
  */
 template <int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
 operator * (const Tensor<0,dim,Number> &t,
@@ -166,9 +166,9 @@ operator * (const Tensor<0,dim,Number> &t,
  * @relates EnableIfScalar
  */
 template <int dim,
-         typename Number,
-         typename OtherNumber,
-         typename = typename EnableIfScalar<OtherNumber>::type>
+          typename Number,
+          typename OtherNumber,
+          typename = typename EnableIfScalar<OtherNumber>::type>
 inline
 Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
 operator / (const Tensor<0,dim,Number> &t,
