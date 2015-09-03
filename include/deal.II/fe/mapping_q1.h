@@ -169,6 +169,10 @@ public:
     /**
      * Initialize the object's member variables related to cell data
      * based on the given arguments.
+     *
+     * The function also calls compute_shape_function_values() to
+     * actually set the member variables related to the values and
+     * derivatives of the mapping shape functions.
      */
     void
     initialize (const UpdateFlags      update_flags,
@@ -177,7 +181,8 @@ public:
 
     /**
      * Initialize the object's member variables related to cell and
-     * face data based on the given arguments.
+     * face data based on the given arguments. In order to initialize
+     * cell data, this function calls initialize().
      */
     void
     initialize_face (const UpdateFlags      update_flags,
@@ -190,8 +195,15 @@ public:
      *
      * Which values, derivatives, or higher order derivatives are
      * computed is determined by which of the member arrays have
-     * nonzero sizes. They is typically set to their appropriate sizes
-     * by the initialize() and initialize_face() functions.
+     * nonzero sizes. They are typically set to their appropriate
+     * sizes by the initialize() and initialize_face() functions,
+     * which indeed call this function internally. However, it is
+     * possible (and at times useful) to do the resizing by hand and
+     * then call this function directly. An example is in a Newton
+     * iteration where we update the location of a quadrature point
+     * (e.g., in MappingQ::transform_real_to_uni_cell()) and need to
+     * re-compute the mapping and its derivatives at this location,
+     * but have already sized all internal arrays correctly.
      */
     void compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
 

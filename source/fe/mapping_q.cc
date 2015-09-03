@@ -125,12 +125,6 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                                  quadrature.size())));
   tasks.join_all ();
 
-  // TODO: parallelize this as well
-  data->compute_shape_function_values (quadrature.get_points());
-  if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.compute_shape_function_values (quadrature.get_points());
-
-
   return data;
 }
 
@@ -161,11 +155,6 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                                  quadrature.size())));
   tasks.join_all ();
 
-  // TODO: parallelize this as well
-  data->compute_shape_function_values (q.get_points());
-  if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.compute_shape_function_values (q.get_points());
-
   return data;
 }
 
@@ -195,12 +184,6 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  std_cxx11::cref(q),
                                                  quadrature.size())));
   tasks.join_all ();
-
-  // TODO: parallelize this as well
-  data->compute_shape_function_values (q.get_points());
-  if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.compute_shape_function_values (q.get_points());
-
 
   return data;
 }

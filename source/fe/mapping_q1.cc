@@ -124,7 +124,11 @@ initialize (const UpdateFlags      update_flags,
   if (this->update_each &
       (update_jacobian_3rd_derivatives | update_jacobian_pushed_forward_3rd_derivatives) )
     shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
+
+  // now also fill the various fields with their correct values
+  compute_shape_function_values (q.get_points());
 }
+
 
 
 template <int dim, int spacedim>
@@ -843,7 +847,6 @@ MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(1);
   data->initialize (requires_update_flags(update_flags), q, q.size());
-  data->compute_shape_function_values (q.get_points());
 
   return data;
 }
@@ -859,7 +862,6 @@ MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
-  data->compute_shape_function_values (QProjector<dim>::project_to_all_faces(quadrature).get_points());
 
   return data;
 }
@@ -875,8 +877,6 @@ MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
-  data->compute_shape_function_values (QProjector<dim>::project_to_all_subfaces(quadrature).get_points());
-
 
   return data;
 }
