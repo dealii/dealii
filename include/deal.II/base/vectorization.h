@@ -47,10 +47,10 @@
 
 // forward declarations
 DEAL_II_NAMESPACE_OPEN
-
 template <typename Number> class VectorizedArray;
-
+template <typename T> struct EnableIfScalar;
 DEAL_II_NAMESPACE_CLOSE
+
 
 namespace std
 {
@@ -65,8 +65,18 @@ namespace std
 }
 
 
-
 DEAL_II_NAMESPACE_OPEN
+
+
+// Enable the EnableIfScalar type trait for VectorizedArray<Number> such
+// that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
+
+template<typename Number>
+struct EnableIfScalar<VectorizedArray<Number> >
+{
+  typedef VectorizedArray<typename EnableIfScalar<Number>::type> type;
+};
+
 
 /**
  * This generic class defines a unified interface to a vectorized data type.
