@@ -24,6 +24,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>
@@ -326,9 +328,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes (const unsigned int            n_shape_functions,
-                    const std::vector<Point<1> > &unit_points,
-                    typename dealii::MappingQ1<1,spacedim>::InternalData &data)
+    compute_shape_function_values (const unsigned int            n_shape_functions,
+                                   const std::vector<Point<1> > &unit_points,
+                                   typename dealii::MappingQ1<1,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -391,9 +393,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes (const unsigned int            n_shape_functions,
-                    const std::vector<Point<2> > &unit_points,
-                    typename dealii::MappingQ1<2,spacedim>::InternalData &data)
+    compute_shape_function_values (const unsigned int            n_shape_functions,
+                                   const std::vector<Point<2> > &unit_points,
+                                   typename dealii::MappingQ1<2,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -469,9 +471,9 @@ namespace internal
 
     template <int spacedim>
     void
-    compute_shapes (const unsigned int            n_shape_functions,
-                    const std::vector<Point<3> > &unit_points,
-                    typename dealii::MappingQ1<3,spacedim>::InternalData &data)
+    compute_shape_function_values (const unsigned int            n_shape_functions,
+                                   const std::vector<Point<3> > &unit_points,
+                                   typename dealii::MappingQ1<3,spacedim>::InternalData &data)
     {
       (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
@@ -653,14 +655,123 @@ namespace internal
 }
 
 
+namespace
+{
+  template <int dim>
+  std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree)
+  {
+    std::vector<unsigned int> dpo(dim+1, 1U);
+    for (unsigned int i=1; i<dpo.size(); ++i)
+      dpo[i]=dpo[i-1]*(degree-1);
+    return dpo;
+  }
+}
+
+
+
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
-                                         InternalData &data) const
+MappingQ1<dim,spacedim>::InternalData::
+compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
 {
-  internal::MappingQ1::
-  compute_shapes<spacedim> (n_shape_functions,
-                            unit_points, data);
+  // if the polynomial degree is one, then we can simplify code a bit
+  // by using hard-coded shape functions.
+  if ((polynomial_degree == 1)
+      &&
+      (dim == spacedim))
+    internal::MappingQ1::compute_shape_function_values<spacedim> (n_shape_functions,
+        unit_points, *this);
+  else
+    // otherwise ask an object that describes the polynomial space
+    {
+      const unsigned int n_points=unit_points.size();
+
+      // Construct the tensor product polynomials used as shape functions for the
+      // Qp mapping of cells at the boundary.
+      const QGaussLobatto<1> line_support_points (polynomial_degree + 1);
+      const TensorProductPolynomials<dim>
+      tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
+      Assert (n_shape_functions==tensor_pols.n(),
+              ExcInternalError());
+
+      // then also construct the mapping from lexicographic to the Qp shape function numbering
+      const std::vector<unsigned int>
+      renumber (FETools::
+                lexicographic_to_hierarchic_numbering (
+                  FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
+                                          polynomial_degree)));
+
+      std::vector<double> values;
+      std::vector<Tensor<1,dim> > grads;
+      if (shape_values.size()!=0)
+        {
+          Assert(shape_values.size()==n_shape_functions*n_points,
+                 ExcInternalError());
+          values.resize(n_shape_functions);
+        }
+      if (shape_derivatives.size()!=0)
+        {
+          Assert(shape_derivatives.size()==n_shape_functions*n_points,
+                 ExcInternalError());
+          grads.resize(n_shape_functions);
+        }
+
+      std::vector<Tensor<2,dim> > grad2;
+      if (shape_second_derivatives.size()!=0)
+        {
+          Assert(shape_second_derivatives.size()==n_shape_functions*n_points,
+                 ExcInternalError());
+          grad2.resize(n_shape_functions);
+        }
+
+      std::vector<Tensor<3,dim> > grad3;
+      if (shape_third_derivatives.size()!=0)
+        {
+          Assert(shape_third_derivatives.size()==n_shape_functions*n_points,
+                 ExcInternalError());
+          grad3.resize(n_shape_functions);
+        }
+
+      std::vector<Tensor<4,dim> > grad4;
+      if (shape_fourth_derivatives.size()!=0)
+        {
+          Assert(shape_fourth_derivatives.size()==n_shape_functions*n_points,
+                 ExcInternalError());
+          grad4.resize(n_shape_functions);
+        }
+
+
+      if (shape_values.size()!=0 ||
+          shape_derivatives.size()!=0 ||
+          shape_second_derivatives.size()!=0 ||
+          shape_third_derivatives.size()!=0 ||
+          shape_fourth_derivatives.size()!=0 )
+        for (unsigned int point=0; point<n_points; ++point)
+          {
+            tensor_pols.compute(unit_points[point], values, grads, grad2, grad3, grad4);
+
+            if (shape_values.size()!=0)
+              for (unsigned int i=0; i<n_shape_functions; ++i)
+                shape(point,renumber[i]) = values[i];
+
+            if (shape_derivatives.size()!=0)
+              for (unsigned int i=0; i<n_shape_functions; ++i)
+                derivative(point,renumber[i]) = grads[i];
+
+            if (shape_second_derivatives.size()!=0)
+              for (unsigned int i=0; i<n_shape_functions; ++i)
+                second_derivative(point,renumber[i]) = grad2[i];
+
+            if (shape_third_derivatives.size()!=0)
+              for (unsigned int i=0; i<n_shape_functions; ++i)
+                third_derivative(point,renumber[i]) = grad3[i];
+
+            if (shape_fourth_derivatives.size()!=0)
+              for (unsigned int i=0; i<n_shape_functions; ++i)
+                fourth_derivative(point,renumber[i]) = grad4[i];
+          }
+    }
 }
 
 
@@ -732,7 +843,7 @@ MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(1);
   data->initialize (requires_update_flags(update_flags), q, q.size());
-  compute_shapes (q.get_points(), *data);
+  data->compute_shape_function_values (q.get_points());
 
   return data;
 }
@@ -748,8 +859,7 @@ MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
-  compute_shapes (QProjector<dim>::project_to_all_faces(quadrature).get_points(),
-                  *data);
+  data->compute_shape_function_values (QProjector<dim>::project_to_all_faces(quadrature).get_points());
 
   return data;
 }
@@ -765,8 +875,7 @@ MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
   data->initialize_face (requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
-  compute_shapes (QProjector<dim>::project_to_all_subfaces(quadrature).get_points(),
-                  *data);
+  data->compute_shape_function_values (QProjector<dim>::project_to_all_subfaces(quadrature).get_points());
 
 
   return data;
@@ -2513,10 +2622,7 @@ transform_real_to_unit_cell_internal
 
   Point<dim> p_unit = initial_p_unit;
 
-  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
-    this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
-  else
-    dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+  mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
 
   Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
   Tensor<1,spacedim> f = p_real-p;
@@ -2604,11 +2710,7 @@ transform_real_to_unit_cell_internal
 
           // shape values and derivatives
           // at new p_unit point
-          if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
-            this->compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
-          else
-            dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit_trial), mdata);
-
+          mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
 
           // f(x)
           Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
@@ -2750,10 +2852,8 @@ transform_real_to_unit_cell_internal_codim1
   Tensor<2,dim1>  df;
 
   //Evaluate first and second derivatives
-  if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
-    this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
-  else
-    dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+  mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
   for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
     {
       const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
@@ -2805,10 +2905,8 @@ transform_real_to_unit_cell_internal_codim1
             D2F[j][l].clear();
         }
 
-      if (dynamic_cast<typename MappingQ<dim,spacedim>::InternalData *>(&mdata) == 0)
-        this->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
-      else
-        dynamic_cast<const MappingQ<dim,spacedim>*>(this)->compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
+      mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
         {
           const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);

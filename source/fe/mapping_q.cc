@@ -24,7 +24,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -55,22 +54,6 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
-namespace
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree)
-  {
-    std::vector<unsigned int> dpo(dim+1, 1U);
-    for (unsigned int i=1; i<dpo.size(); ++i)
-      dpo[i]=dpo[i-1]*(degree-1);
-    return dpo;
-  }
-}
-
-
-
-
 template<int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
                                   const bool use_mapping_q_on_all_cells)
@@ -81,23 +64,12 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
           ((dim==2) ?
            4+4*(degree-1) :
            8+12*(degree-1)+6*(degree-1)*(degree-1))),
-  tensor_pols(0),
   n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
-  renumber(FETools::
-           lexicographic_to_hierarchic_numbering (
-             FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
-                                     degree))),
   use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
                               || (dim != spacedim)),
   feq(degree),
   line_support_points(degree+1)
 {
-  // Construct the tensor product polynomials used as shape functions for the
-  // Qp mapping of cells at the boundary.
-  tensor_pols = new TensorProductPolynomials<dim>
-  (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
-  Assert (n_shape_functions==tensor_pols->n(),
-          ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
 
   // build laplace_on_quad_vector
@@ -118,102 +90,13 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   degree(mapping.degree),
   n_inner(mapping.n_inner),
   n_outer(mapping.n_outer),
-  tensor_pols(0),
   n_shape_functions(mapping.n_shape_functions),
-  renumber(mapping.renumber),
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
   feq(degree),
   line_support_points(degree+1)
 {
-  tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
   laplace_on_quad_vector=mapping.laplace_on_quad_vector;
   laplace_on_hex_vector=mapping.laplace_on_hex_vector;
-}
-
-
-template<int dim, int spacedim>
-MappingQ<dim,spacedim>::~MappingQ ()
-{
-  delete tensor_pols;
-}
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
-                                        typename MappingQ1<dim,spacedim>::InternalData &data) const
-{
-  const unsigned int n_points=unit_points.size();
-  std::vector<double> values;
-  std::vector<Tensor<1,dim> > grads;
-  if (data.shape_values.size()!=0)
-    {
-      Assert(data.shape_values.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      values.resize(n_shape_functions);
-    }
-  if (data.shape_derivatives.size()!=0)
-    {
-      Assert(data.shape_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grads.resize(n_shape_functions);
-    }
-
-//                                 // dummy variable of size 0
-  std::vector<Tensor<2,dim> > grad2;
-  if (data.shape_second_derivatives.size()!=0)
-    {
-      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad2.resize(n_shape_functions);
-    }
-
-  std::vector<Tensor<3,dim> > grad3;
-  if (data.shape_third_derivatives.size()!=0)
-    {
-      Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad3.resize(n_shape_functions);
-    }
-
-  std::vector<Tensor<4,dim> > grad4;
-  if (data.shape_fourth_derivatives.size()!=0)
-    {
-      Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad4.resize(n_shape_functions);
-    }
-
-
-  if (data.shape_values.size()!=0 ||
-      data.shape_derivatives.size()!=0 ||
-      data.shape_second_derivatives.size()!=0 ||
-      data.shape_third_derivatives.size()!=0 ||
-      data.shape_fourth_derivatives.size()!=0 )
-    for (unsigned int point=0; point<n_points; ++point)
-      {
-        tensor_pols->compute(unit_points[point], values, grads, grad2, grad3, grad4);
-
-        if (data.shape_values.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.shape(point,renumber[i]) = values[i];
-
-        if (data.shape_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.derivative(point,renumber[i]) = grads[i];
-
-        if (data.shape_second_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.second_derivative(point,renumber[i]) = grad2[i];
-
-        if (data.shape_third_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.third_derivative(point,renumber[i]) = grad3[i];
-
-        if (data.shape_fourth_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.fourth_derivative(point,renumber[i]) = grad4[i];
-      }
 }
 
 
@@ -243,9 +126,9 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
   tasks.join_all ();
 
   // TODO: parallelize this as well
-  this->compute_shapes (quadrature.get_points(), *data);
+  data->compute_shape_function_values (quadrature.get_points());
   if (!use_mapping_q_on_all_cells)
-    this->MappingQ1<dim,spacedim>::compute_shapes (quadrature.get_points(), data->mapping_q1_data);
+    data->mapping_q1_data.compute_shape_function_values (quadrature.get_points());
 
 
   return data;
@@ -279,9 +162,9 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
   tasks.join_all ();
 
   // TODO: parallelize this as well
-  this->compute_shapes (q.get_points(), *data);
+  data->compute_shape_function_values (q.get_points());
   if (!use_mapping_q_on_all_cells)
-    this->MappingQ1<dim,spacedim>::compute_shapes (q.get_points(), data->mapping_q1_data);
+    data->mapping_q1_data.compute_shape_function_values (q.get_points());
 
   return data;
 }
@@ -314,9 +197,9 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
   tasks.join_all ();
 
   // TODO: parallelize this as well
-  this->compute_shapes (q.get_points(), *data);
+  data->compute_shape_function_values (q.get_points());
   if (!use_mapping_q_on_all_cells)
-    this->MappingQ1<dim,spacedim>::compute_shapes (q.get_points(), data->mapping_q1_data);
+    data->mapping_q1_data.compute_shape_function_values (q.get_points());
 
 
   return data;
@@ -616,7 +499,7 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
 
   InternalData quadrature_data(degree);
   quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
-  this->compute_shapes(quadrature.get_points(), quadrature_data);
+  quadrature_data.compute_shape_function_values(quadrature.get_points());
 
   // Compute the stiffness matrix of the inner dofs
   FullMatrix<long double> S(n_inner);

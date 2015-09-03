@@ -185,6 +185,18 @@ public:
                      const unsigned int     n_original_q_points);
 
     /**
+     * Compute the values and/or derivatives of the shape functions
+     * used for the mapping.
+     *
+     * Which values, derivatives, or higher order derivatives are
+     * computed is determined by which of the member arrays have
+     * nonzero sizes. They is typically set to their appropriate sizes
+     * by the initialize() and initialize_face() functions.
+     */
+    void compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
+
+
+    /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
@@ -464,16 +476,6 @@ protected:
   typename QProjector<dim>::DataSetDescriptor
   DataSetDescriptor;
 
-
-  /**
-   * Compute shape values and/or derivatives.
-   *
-   * Calls either the @p compute_shapes_virtual of this class or that of the
-   * derived class, depending on whether <tt>data.polynomial_degree</tt>
-   * is one or is greater than that.
-   */
-  void compute_shapes (const std::vector<Point<dim> > &unit_points,
-                       InternalData &data) const;
 
   /**
    * Transforms a point @p p on the unit cell to the point @p p_real on the

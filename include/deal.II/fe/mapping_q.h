@@ -72,16 +72,9 @@ public:
             const bool use_mapping_q_on_all_cells = false);
 
   /**
-   * Copy constructor. Performs a deep copy, i.e. duplicates what #tensor_pols
-   * points to instead of simply copying the #tensor_pols pointer as done by a
-   * default copy constructor.
+   * Copy constructor.
    */
   MappingQ (const MappingQ<dim,spacedim> &mapping);
-
-  /**
-   * Destructor.
-   */
-  virtual ~MappingQ ();
 
   /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the
@@ -333,10 +326,7 @@ protected:
   /**
    * @}
    */
-public:
-  void
-  compute_shapes (const std::vector<Point<dim> > &unit_points,
-                  typename MappingQ1<dim,spacedim>::InternalData &data) const;
+
 protected:
 
   /**
@@ -461,12 +451,6 @@ protected:
    * Number of the Qp tensor product shape functions.
    */
   const unsigned int n_shape_functions;
-
-  /**
-   * Mapping from lexicographic to to the Qp shape function numbering. Its
-   * size is @p dofs_per_cell.
-   */
-  const std::vector<unsigned int> renumber;
 
   /**
    * If this flag is set @p true then @p MappingQ is used on all cells, not
