@@ -231,7 +231,7 @@ private:
    * @{
    */
 
-public:
+protected:
 
   /**
    * Storage for internal data of this mapping. See Mapping::InternalDataBase
