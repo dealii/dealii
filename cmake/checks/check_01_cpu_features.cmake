@@ -217,35 +217,41 @@ ENDIF()
 #
 # OpenMP 4.0 can be used for vectorization (supported by gcc-4.9.1 and
 # later). Only the vectorization instructions
-# are allowed, the threading must done through TBB.
+# are allowed, the threading must be done through TBB.
 #
 
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    # there is no openmp-simd support in Intel 13 and the flag got renamed in 15+
-    IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15")
-      CHECK_CXX_COMPILER_FLAG("-qopenmp-simd" DEAL_II_HAVE_OPENMP_SIMD)
-    ELSEIF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "14")
-      CHECK_CXX_COMPILER_FLAG("-openmp-simd" DEAL_II_HAVE_OPENMP_SIMD)
-    ENDIF()
-  ELSE()
-    CHECK_CXX_COMPILER_FLAG("-fopenmp-simd" DEAL_II_HAVE_OPENMP_SIMD)
+# Pick up the correct candidate keyword for the current compiler:
+SET(_keyword "")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15" )
+    SET(_keyword "qopenmp")
+  ELSEIF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "14" )
+    SET(_keyword "openmp")
   ENDIF()
+
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # clang-3.6.1 or newer, or XCode version 6.3, or newer.
+  IF( ( CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "3.6"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
+      OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "6.2")
+    SET(_keyword "openmp")
+  ENDIF()
+
+ELSE()
+  SET(_keyword "fopenmp")
+
 ENDIF()
 
+IF(NOT "${_keyword}" STREQUAL "")
+  CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
+ENDIF()
+
+SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 IF(DEAL_II_HAVE_OPENMP_SIMD)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "-${_keyword}-simd")
+  # Intel is special:
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15")
-      ADD_FLAGS(DEAL_II_CXX_FLAGS "-qopenmp-simd")
-      ADD_FLAGS(DEAL_II_LINKER_FLAGS "-qopenmp")
-    ELSE()
-      ADD_FLAGS(DEAL_II_CXX_FLAGS "-openmp-simd")
-      ADD_FLAGS(DEAL_II_LINKER_FLAGS "-openmp")
-    ENDIF()
-  ELSE()
-    ADD_FLAGS(DEAL_II_CXX_FLAGS "-fopenmp-simd")
+    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-${_keyword}")
   ENDIF()
   SET(DEAL_II_OPENMP_SIMD_PRAGMA "_Pragma(\"omp simd\")")
-ELSE()
-  SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 ENDIF()
