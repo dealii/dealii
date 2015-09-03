@@ -240,6 +240,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Openmp SIMD support is now enabled for Clang version 3.6, or newer
+  (or the equivalent XCode version). Further, openmp support is not any
+  more falsely activated for very old clang versions.
+  <br>
+  (Matthias Maier, 2015/09/03)
+  </li>
+
   <li> Improved: DoFTools::make_hanging_node_constraints() now supports
   hp-refinement cases when neither_element_dominates. To that end we look for
   a least face dominating FE inside FECollection.
@@ -260,7 +267,7 @@ inconvenience this causes.
   <br>
   (Denis Davydov, Wolfgang Bangerth, 2015/08/31)
   </li>
-  
+
   <li> New: step-6 now has an additional subsection in the
   "Possibilities for extensions" section that discusses how
   to create a better mesh.
