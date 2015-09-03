@@ -1,0 +1,18 @@
+# a blank line will break the continuation
+ 
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  set Function_1 = a, \
+
+                   b, \
+                   c
+
+  set Function_2 = d, e, \
+\
+\
+                   \
+                   f
+end
+
+
