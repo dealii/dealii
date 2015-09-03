@@ -442,17 +442,6 @@ protected:
   const unsigned int n_outer;
 
   /**
-   * Pointer to the @p dim-dimensional tensor product polynomials used as
-   * shape functions for the Qp mapping of cells at the boundary.
-   */
-  const TensorProductPolynomials<dim> *tensor_pols;
-
-  /**
-   * Number of the Qp tensor product shape functions.
-   */
-  const unsigned int n_shape_functions;
-
-  /**
    * If this flag is set @p true then @p MappingQ is used on all cells, not
    * only on boundary cells.
    */

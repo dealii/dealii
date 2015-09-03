@@ -64,13 +64,13 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
           ((dim==2) ?
            4+4*(degree-1) :
            8+12*(degree-1)+6*(degree-1)*(degree-1))),
-  n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
   use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
                               || (dim != spacedim)),
   feq(degree),
   line_support_points(degree+1)
 {
-  Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
+  Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
+         ExcInternalError());
 
   // build laplace_on_quad_vector
   if (degree>1)
@@ -90,7 +90,6 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   degree(mapping.degree),
   n_inner(mapping.n_inner),
   n_outer(mapping.n_outer),
-  n_shape_functions(mapping.n_shape_functions),
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
   feq(degree),
   line_support_points(degree+1)
@@ -481,7 +480,8 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
   const unsigned int n_q_points=quadrature.size();
 
   InternalData quadrature_data(degree);
-  quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
+  quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
+                                           n_q_points);
   quadrature_data.compute_shape_function_values(quadrature.get_points());
 
   // Compute the stiffness matrix of the inner dofs
@@ -880,7 +880,7 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
+  // class's transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
@@ -910,7 +910,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
+  // class's transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
@@ -938,7 +938,7 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
+  // class's transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
@@ -968,7 +968,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
+  // class's transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 
@@ -996,7 +996,7 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
+  // class's transform function
   MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
 }
 

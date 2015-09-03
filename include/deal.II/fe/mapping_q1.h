@@ -538,12 +538,6 @@ protected:
   virtual void compute_mapping_support_points(
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * Number of shape functions. Is simply the number of vertices per cell for
-   * the Q1 mapping.
-   */
-  static const unsigned int n_shape_functions = GeometryInfo<dim>::vertices_per_cell;
 };
 
 

@@ -17,6 +17,8 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
@@ -28,19 +30,12 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q1_eulerian.h>
 
 #include <cmath>
 #include <algorithm>
 
 
 DEAL_II_NAMESPACE_OPEN
-
-
-template <int dim, int spacedim>
-const unsigned int MappingQ1<dim,spacedim>::n_shape_functions;
-
 
 
 template<int dim, int spacedim>
