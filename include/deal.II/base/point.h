@@ -199,15 +199,16 @@ public:
    *
    * @relates EnableIfScalar
    */
-  template <typename OtherNumber,
-            typename = typename EnableIfScalar<OtherNumber>::type>
-  Point<dim,Number> operator * (const OtherNumber) const;
+  template <typename OtherNumber>
+  Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+  operator * (const OtherNumber) const;
 
   /**
    * Divide the current point by a factor.
    */
-  template<typename OtherNumber>
-  Point<dim,Number> operator / (const OtherNumber) const;
+  template <typename OtherNumber>
+  Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+  operator / (const OtherNumber) const;
 
   /**
    * Return the scalar product of the vectors representing two points.
@@ -396,13 +397,28 @@ Point<dim,Number>::operator - () const
 
 
 template <int dim, typename Number>
-template<typename OtherNumber, typename>
+template<typename OtherNumber>
 inline
-Point<dim,Number>
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 Point<dim,Number>::operator * (const OtherNumber factor) const
 {
-  Point<dim,Number> tmp = *this;
-  tmp *= factor;
+  Point<dim,typename ProductType<Number, OtherNumber>::type> tmp;
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] = this->operator[](i) * factor;
+  return tmp;
+}
+
+
+
+template <int dim, typename Number>
+template<typename OtherNumber>
+inline
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+Point<dim,Number>::operator / (const OtherNumber factor) const
+{
+  Point<dim,typename ProductType<Number, OtherNumber>::type> tmp;
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] = this->operator[](i) / factor;
   return tmp;
 }
 
@@ -451,18 +467,6 @@ Point<dim,Number>::distance (const Point<dim,Number> &p) const
 
 
 template <int dim, typename Number>
-template<typename OtherNumber>
-inline
-Point<dim,Number> Point<dim,Number>::operator / (const OtherNumber factor) const
-{
-  Point<dim,Number> tmp = *this;
-  tmp /= factor;
-  return tmp;
-}
-
-
-
-template <int dim, typename Number>
 template <class Archive>
 inline
 void
@@ -485,13 +489,11 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
  * @relates Point
  * @relates EnableIfScalar
  */
-template <int dim,
-          typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Point<dim,Number> operator * (const OtherNumber        factor,
-                              const Point<dim,Number> &p)
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const OtherNumber        factor,
+            const Point<dim,Number> &p)
 {
   return p * factor;
 }
