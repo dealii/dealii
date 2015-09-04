@@ -217,16 +217,22 @@ public:
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
-   * square, or the square of the norm.
+   * square, or the square of the norm. In case of a complex number type it
+   * is equivalent to the contraction of this point vector with a complex
+   * conjugate of itself.
+   *
+   * @note This function is equivalent to
+   * Tensor<rank,dim,Number>::norm_square() which returns the square of the
+   * Frobenius norm.
    */
-  Number square () const;
+  typename Tensor<1, dim, Number>::real_type square () const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
-  Number distance (const Point<dim,Number> &p) const;
+  typename Tensor<1, dim, Number>::real_type distance (const Point<dim,Number> &p) const;
 
   /**
    * @}
@@ -438,27 +444,24 @@ Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 
 template <int dim, typename Number>
 inline
-Number
+typename Tensor<1, dim, Number>::real_type
 Point<dim,Number>::square () const
 {
-  Number q = Number();
-  for (unsigned int i=0; i<dim; ++i)
-    q += numbers::NumberTraits<Number>::abs_square(this->values[i]);
-  return q;
+  return this->norm_square();
 }
 
 
 
 template <int dim, typename Number>
 inline
-Number
+typename Tensor<1, dim, Number>::real_type
 Point<dim,Number>::distance (const Point<dim,Number> &p) const
 {
   Number sum = Number();
   for (unsigned int i=0; i<dim; ++i)
     {
       const Number diff=this->values[i]-p(i);
-      sum += diff*diff;
+      sum += numbers::NumberTraits<Number>::abs_square (diff);
     }
 
   return std::sqrt(sum);
