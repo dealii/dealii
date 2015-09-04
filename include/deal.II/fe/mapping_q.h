@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/manifold.h>
 
@@ -56,8 +57,8 @@ class MappingQ : public MappingQ1<dim,spacedim>
 {
 public:
   /**
-   * Constructor.  @p p gives the degree of mapping polynomials on boundary
-   * cells.
+   * Constructor.  @p polynomial_degree denotes the polynomial degree
+   * of the polynomials that are used to map cells boundary.
    *
    * The second argument determines whether the higher order mapping should
    * also be used on interior cells. If its value is <code>false</code> (the
@@ -68,7 +69,7 @@ public:
    * would also like to use a higher order mapping in the interior. The
    * MappingQEulerian class is one such case.
    */
-  MappingQ (const unsigned int p,
+  MappingQ (const unsigned int polynomial_degree,
             const bool use_mapping_q_on_all_cells = false);
 
   /**
