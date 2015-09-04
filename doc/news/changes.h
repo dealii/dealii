@@ -114,6 +114,10 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: Allow continuation lines in ParameterHandler.
+  <br>
+  (Alberto Sartori, 2015/09/04)
+
   <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
   was computed incorrectly.
   <br>

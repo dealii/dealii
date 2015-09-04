@@ -1025,6 +1025,9 @@ namespace Patterns
  *
  * Comments starting with \# are skipped.
  *
+ * Continuation lines are allowed by means of the character <tt>\\</tt>,
+ * which must be the last character of the line.
+ *
  * We propose to use the following scheme to name entries: start the first
  * word with a capital letter and use lowercase letters further on. The same
  * applies to the possible entry values to the right of the <tt>=</tt> sign.

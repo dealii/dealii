@@ -1382,10 +1382,19 @@ bool ParameterHandler::read_input (const std::string &filename,
   try
     {
       std::string openname = search.find(filename);
-      std::ifstream input (openname.c_str());
-      AssertThrow(input, ExcIO());
+      std::ifstream file (openname.c_str());
+      AssertThrow(file, ExcIO());
 
-      return read_input (input, filename);
+      std::string str;
+      std::string file_contents;
+
+      while (std::getline(file, str))
+        {
+          file_contents += str;
+          file_contents.push_back('\n');
+        }
+
+      return read_input_from_string (file_contents.c_str());
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1409,7 +1418,40 @@ bool ParameterHandler::read_input_from_string (const char *s)
 {
   // create an istringstream representation and pass it off
   // to the other functions doing this work
-  std::istringstream in (s);
+
+  // concatenate the lines ending with "\"
+
+  std::istringstream file(s);
+  std::string str;
+  std::string file_contents;
+  bool is_concatenated(false);
+  while (std::getline(file, str))
+    {
+      // if this str must be concatenated with the previous one
+      // we strip the whitespaces
+      if (is_concatenated)
+        {
+          const std::size_t str_begin = str.find_first_not_of(" \t");
+          if (str_begin == std::string::npos)
+            str = ""; // no content
+          else
+            str.erase(0,str_begin); // trim whitespaces from left
+        }
+
+      if ((std::find(str.begin(),str.end(),'\\') != str.end()) && str.find_last_of('\\') == str.length()-1)
+        {
+          str.erase(str.length()-1); // remove '\'
+          file_contents += str;
+          is_concatenated = true; // next line must be concatenated = true
+        }
+      else
+        {
+          is_concatenated = false; // next line must be concatenated = false
+          file_contents += str;
+          file_contents.push_back('\n');
+        }
+    }
+  std::istringstream in (file_contents);
   return read_input (in, "input string");
 }
 
