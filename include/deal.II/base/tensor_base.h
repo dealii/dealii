@@ -258,17 +258,6 @@ public:
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version);
 
-  /**
-   * Only tensors with a positive dimension are implemented. This exception is
-   * thrown by the constructor if the template argument <tt>dim</tt> is zero
-   * or less.
-   *
-   * @ingroup Exceptions
-   */
-  DeclException1 (ExcDimTooSmall,
-                  int,
-                  << "dim must be positive, but was " << arg1);
-
 private:
   /**
    * Internal type declaration that is used to specialize the return type
@@ -586,17 +575,6 @@ public:
                   << arg1
                   << ", but this is not possible for tensors of the current type.");
 
-  /**
-   * Only tensors with a positive dimension are implemented. This exception is
-   * thrown by the constructor if the template argument <tt>dim</tt> is zero
-   * or less.
-   *
-   * @ingroup Exceptions
-   */
-  DeclException1 (ExcDimTooSmall,
-                  int,
-                  << "dim must be positive, but was " << arg1);
-
 private:
   /**
    * Internal type declaration that is used to specialize the return type
@@ -637,8 +615,6 @@ template <int dim,typename Number>
 inline
 Tensor<0,dim,Number>::Tensor ()
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
   value = value_type();
 }
 
@@ -647,8 +623,8 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
+  Assert(dim != 0 || p.value == Number(),
+         ExcMessage("Creation of a Tensor<0,0,Number> object with a non-zero scalar requested."));
   value = p.value;
 }
 
@@ -658,8 +634,8 @@ template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const OtherNumber initializer)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
+  Assert(dim != 0 || initializer == OtherNumber(),
+         ExcMessage("Creation of a Tensor<0,0,Number> object with a non-zero scalar requested."));
   value = initializer;
 }
 
@@ -669,8 +645,8 @@ template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
+  Assert(dim != 0 || p.value == OtherNumber(),
+         ExcMessage("Cannot return a non-zero scalar from a Tensor<0,0,Number> object."));
   value = p.value;
 }
 
@@ -679,6 +655,8 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number>::operator Number &()
 {
+  Assert(dim != 0 || value == Number(),
+         ExcMessage("Cannot return a non-zero scalar from a Tensor<0,0,Number> object."));
   return value;
 }
 
@@ -687,6 +665,8 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number>::operator const Number &() const
 {
+  Assert(dim != 0 || value == Number(),
+         ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
   return value;
 }
 
@@ -695,6 +675,8 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
 {
+  Assert(dim != 0 || p.value == Number(),
+         ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
   value = p.value;
   return *this;
 }
@@ -705,6 +687,8 @@ template <typename OtherNumber>
 inline
 Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
 {
+  Assert(dim != 0 || p.value == OtherNumber(),
+         ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
   value = p.value;
   return *this;
 }
@@ -715,6 +699,8 @@ template <typename OtherNumber>
 inline
 Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const OtherNumber d)
 {
+  Assert(dim != 0 || d == OtherNumber(),
+         ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
   value = d;
   return *this;
 }
@@ -886,8 +872,6 @@ template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
 }
@@ -897,8 +881,6 @@ template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
 }
