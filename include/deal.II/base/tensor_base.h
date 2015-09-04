@@ -247,18 +247,16 @@ public:
   void clear ();
 
   /**
-   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
-   * squares of all entries. For the present case of rank-1 tensors, this
-   * equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
+   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum
+   * of the absolute squares of all entries. For the present case of rank-1
+   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the
+   * vector.
    */
   real_type norm () const;
 
   /**
-   * Return the square of the Frobenius-norm of a tensor, i.e. the square root
-   * of the sum of squares of all entries.
-   *
-   * This function mainly exists because it makes computing the norm simpler
-   * recursively, but may also be useful in other contexts.
+   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
+   * the absolute squares of all entries.
    */
   real_type norm_square () const;
 
@@ -535,17 +533,16 @@ public:
   void clear ();
 
   /**
-   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
-   * squares of all entries.
+   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum
+   * of the absolute squares of all entries. For the present case of rank-1
+   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the
+   * vector.
    */
   real_type norm () const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
-   * squares of all entries.
-   *
-   * This function mainly exists because it makes computing the norm simpler
-   * recursively, but may also be useful in other contexts.
+   * the absolute squares of all entries.
    */
   real_type norm_square () const;
 

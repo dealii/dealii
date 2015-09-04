@@ -160,7 +160,7 @@ operator * (const Tensor<0,dim,Number> &t,
 
 
 /**
- * Division of a tensor of rank 0 with a scalar number.
+ * Division of a tensor of rank 0 by a scalar number.
  *
  * @relates Tensor<0,dim,Number>
  * @relates EnableIfScalar
