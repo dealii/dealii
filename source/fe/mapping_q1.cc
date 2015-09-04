@@ -182,8 +182,8 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
 {
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   vertices = this->get_vertices(cell);
-  a.resize(GeometryInfo<dim>::vertices_per_cell);
 
+  a.resize(GeometryInfo<dim>::vertices_per_cell);
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     a[i] = vertices[i];
 }

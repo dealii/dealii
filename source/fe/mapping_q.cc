@@ -37,8 +37,7 @@ template<int dim, int spacedim>
 MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
   MappingQ1<dim,spacedim>::InternalData(polynomial_degree),
-  use_mapping_q1_on_current_cell(false),
-  mapping_q1_data(1)
+  use_mapping_q1_on_current_cell(false)
 {}
 
 
@@ -116,14 +115,17 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(quadrature),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(quadrature),
-                                                 quadrature.size())));
-  tasks.join_all ();
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(quadrature),
+                                                   quadrature.size())));
+    }
 
+  tasks.join_all ();
   return data;
 }
 
@@ -146,14 +148,17 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(q),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(q),
-                                                 quadrature.size())));
-  tasks.join_all ();
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(q),
+                                                   quadrature.size())));
+    }
 
+  tasks.join_all ();
   return data;
 }
 
@@ -176,14 +181,17 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(q),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(q),
-                                                 quadrature.size())));
-  tasks.join_all ();
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(q),
+                                                   quadrature.size())));
+    }
 
+  tasks.join_all ();
   return data;
 }
 
@@ -214,7 +222,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const typename MappingQ1<dim,spacedim>::InternalData *
   p_data = (data.use_mapping_q1_on_current_cell
             ?
-            &data.mapping_q1_data
+            data.mapping_q1_data.get()
             :
             &data);
 
@@ -273,7 +281,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
-       &data.mapping_q1_data
+       data.mapping_q1_data.get()
        :
        &data);
   MappingQ1<dim,spacedim>::fill_fe_face_values(cell,
@@ -315,7 +323,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
-       &data.mapping_q1_data
+       data.mapping_q1_data.get()
        :
        &data);
   MappingQ1<dim,spacedim>::fill_fe_subface_values(cell,
@@ -876,7 +884,7 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
     {
       // If we only use the Q1-portion, we have to extract that data object
       if (data->use_mapping_q1_on_current_cell)
-        q1_data = &data->mapping_q1_data;
+        q1_data = data->mapping_q1_data.get();
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
@@ -906,7 +914,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
     {
       // If we only use the Q1-portion, we have to extract that data object
       if (data->use_mapping_q1_on_current_cell)
-        q1_data = &data->mapping_q1_data;
+        q1_data = data->mapping_q1_data.get();
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
@@ -934,7 +942,7 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
     {
       // If we only use the Q1-portion, we have to extract that data object
       if (data->use_mapping_q1_on_current_cell)
-        q1_data = &data->mapping_q1_data;
+        q1_data = data->mapping_q1_data.get();
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
@@ -964,7 +972,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
     {
       // If we only use the Q1-portion, we have to extract that data object
       if (data->use_mapping_q1_on_current_cell)
-        q1_data = &data->mapping_q1_data;
+        q1_data = data->mapping_q1_data.get();
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
@@ -992,7 +1000,7 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
     {
       // If we only use the Q1-portion, we have to extract that data object
       if (data->use_mapping_q1_on_current_cell)
-        q1_data = &data->mapping_q1_data;
+        q1_data = data->mapping_q1_data.get();
     }
 
   // Now, q1_data should have the right tensors in it and we call the base
@@ -1019,7 +1027,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   typename MappingQ1<dim,spacedim>::InternalData
   *p_data = (mdata->use_mapping_q1_on_current_cell ?
-             &mdata->mapping_q1_data :
+             mdata->mapping_q1_data.get() :
              &*mdata);
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);

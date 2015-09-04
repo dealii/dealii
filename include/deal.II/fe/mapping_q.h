@@ -47,10 +47,10 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  * the documentation of FiniteElement or the one of Triangulation.
  *
  * @note Since the boundary description is closely tied to the unit cell
- * support points, new boundary descriptions need to explicitly use the Gauss-
- * Lobatto points.
+ * support points, new boundary descriptions need to explicitly use the
+ * Gauss-Lobatto points.
  *
- * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001
+ * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001, Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim=dim>
 class MappingQ : public MappingQ1<dim,spacedim>
@@ -272,10 +272,10 @@ protected:
     mutable bool use_mapping_q1_on_current_cell;
 
     /**
-     * A structure to store the corresponding information for the pure
+     * A pointer to a structure to store the information for the pure
      * $Q_1$ mapping that is, by default, used on all interior cells.
      */
-    typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
+    std_cxx11::unique_ptr<typename MappingQ1<dim,spacedim>::InternalData> mapping_q1_data;
   };
 
 protected:
