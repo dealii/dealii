@@ -41,26 +41,12 @@ template <int rank_, int dim, typename Number>
 inline
 std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
 {
-  for (unsigned int i=0; i<dim-1; ++i)
-    out << p[i] << ' ';
-  out << p[dim-1];
-
-  return out;
-}
-
-
-/**
- * Output operator for tensors and dimension 1. This is implemented
- * specialized from the general template in order to avoid a compiler
- * warning that the loop is empty.
- *
- * @relates Tensor
- */
-template <int rank_>
-inline
-std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
-{
-  out << p[0];
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      out << p[i];
+      if (i != dim - 1)
+        out << ' ';
+    }
 
   return out;
 }
