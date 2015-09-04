@@ -13,8 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-// This file compiles the second half of the instantiations from error_estimator.cc
-// to get the memory consumption below 1.5gb with gcc.
+#include <deal.II/numerics/error_estimator.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 2
 #define SPLIT_INSTANTIATIONS_INDEX 1
-#include "error_estimator.cc"
+#include "error_estimator.inst"
+
+DEAL_II_NAMESPACE_CLOSE
