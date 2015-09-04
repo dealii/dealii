@@ -224,6 +224,12 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
     #
     IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       PUSH_CMAKE_REQUIRED("-pthread")
+      # 
+      # On Ubuntu 14.04, the code below won't run without the flag 
+      # -Wl,-no-as-needed. However, deal.II will work fine without 
+      # the flag.
+      #
+      PUSH_CMAKE_REQUIRED("-Wl,-no-as-needed")
       CHECK_CXX_SOURCE_RUNS(
         "
         #include <thread>
