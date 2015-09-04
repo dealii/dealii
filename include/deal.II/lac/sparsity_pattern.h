@@ -397,10 +397,11 @@ public:
   SparsityPattern (const SparsityPattern &);
 
   /**
-   * Initialize a rectangular matrix.
+   * Initialize a rectangular pattern of size <tt>m x n</tt>.
    *
-   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
-   * number of nonzero entries per row
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] max_per_row Maximum number of nonzero entries per row.
    */
   SparsityPattern (const size_type m,
                    const size_type n,
@@ -408,35 +409,36 @@ public:
 
 
   /**
-   * Initialize a rectangular matrix.
+   * Initialize a rectangular pattern of size <tt>m x n</tt>.
    *
-   * @arg m number of rows @arg n number of columns @arg row_lengths possible
-   * number of nonzero entries for each row.  This vector must have one entry
-   * for each row.
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] row_lengths Possible number of nonzero entries for each row. This
+   * vector must have one entry for each row.
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
                    const std::vector<unsigned int> &row_lengths);
 
   /**
-   * Initialize a quadratic matrix of dimension <tt>n</tt> with at most
+   * Initialize a quadratic pattern of dimension <tt>m</tt> with at most
    * <tt>max_per_row</tt> nonzero entries per row.
    *
    * This constructor automatically enables optimized storage of diagonal
    * elements. To avoid this, use the constructor taking row and column
    * numbers separately.
    */
-  SparsityPattern (const size_type n,
+  SparsityPattern (const size_type m,
                    const unsigned int max_per_row);
 
   /**
-   * Initialize a quadratic matrix.
+   * Initialize a quadratic pattern of size <tt>m x m</tt>.
    *
-   * @arg m number of rows and columns @arg row_lengths possible number of
-   * nonzero entries for each row.  This vector must have one entry for each
-   * row.
+   * @param[in] m The number of rows and columns.
+   * @param[in] row_lengths Maximum number of nonzero entries for each row. This
+   * vector must have one entry for each row.
    */
-  SparsityPattern (const size_type               m,
+  SparsityPattern (const size_type m,
                    const std::vector<unsigned int> &row_lengths);
 
   /**

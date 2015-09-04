@@ -103,7 +103,7 @@ SparsityPattern::SparsityPattern (const size_type m,
 
 
 
-SparsityPattern::SparsityPattern (const size_type n,
+SparsityPattern::SparsityPattern (const size_type m,
                                   const unsigned int max_per_row)
   :
   max_dim(0),
@@ -111,7 +111,7 @@ SparsityPattern::SparsityPattern (const size_type n,
   rowstart(0),
   colnums(0)
 {
-  reinit (n, n, max_per_row);
+  reinit (m, m, max_per_row);
 }
 
 
