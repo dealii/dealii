@@ -17,12 +17,6 @@
 #define dealii__tensor_base_h
 
 
-// single this file out from tensor.h, since we want to derive
-// Point<dim,Number> from Tensor<1,dim,Number>. However, the point class will
-// not need all the tensor stuff, so we don't want the whole tensor package to
-// be included every time we use a point.
-
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_indices.h>
@@ -115,14 +109,8 @@ public:
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
   /**
-   * The tensor type this object represents. In the special case of a
-   * tensor or rank 0 we strip the tensor class and just store the scalar
-   * object.
-   */
-  typedef Number tensor_type;
-
-  /**
-   * Type of stored objects. This is a Number for a rank 0 tensor.
+   * Type of objects encapsulated by this container and returned by
+   * operator[](). This is a scalar number type for a rank 0 tensor.
    */
   typedef Number value_type;
 
@@ -158,19 +146,22 @@ public:
   Tensor (const OtherNumber initializer);
 
   /**
-   * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
-   * operation.
-   */
-  operator Number () const;
-
-  /**
-   * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
-   * operation.
+   * Return a reference to the encapsulated Number object. Since rank-0
+   * tensors are scalars, this is a natural operation.
    *
    * This is the non-const conversion operator that returns a writable
    * reference.
    */
   operator Number &();
+
+  /**
+   * Return a reference to the encapsulated Number object. Since rank-0
+   * tensors are scalars, this is a natural operation.
+   *
+   * This is the const conversion operator that returns a read-only
+   * reference.
+   */
+  operator const Number &() const;
 
   /**
    * Copy assignment operator.
@@ -280,6 +271,12 @@ public:
 
 private:
   /**
+   * Internal type declaration that is used to specialize the return type
+   * of operator[]() for Tensor<1,dim,Number>
+   */
+  typedef Number tensor_type;
+
+  /**
    * The value of this scalar object.
    */
   Number value;
@@ -377,13 +374,9 @@ public:
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
   /**
-   * The tensor type this object represents.
-   */
-  typedef Tensor<rank_,dim,Number> tensor_type;
-
-  /**
-   * Type of stored objects (i.e., the object returned by operator[]()).
-   * This is a tensor of lower rank.
+   * Type of objects encapsulated by this container and returned by
+   * operator[](). This is a tensor of lower rank for a general tensor, and
+   * a scalar number type for Tensor<1,dim,Number>.
    */
   typedef typename Tensor<rank_-1,dim,Number>::tensor_type value_type;
 
@@ -606,9 +599,15 @@ public:
 
 private:
   /**
+   * Internal type declaration that is used to specialize the return type
+   * of operator[]() for Tensor<1,dim,Number>
+   */
+  typedef Tensor<rank_, dim, Number> tensor_type;
+
+  /**
    * Array of tensors holding the subelements.
    */
-  value_type values[(dim != 0) ? dim : 1];
+  Tensor<rank_-1, dim, Number> values[(dim != 0) ? dim : 1];
 
   /**
    * Help function for unroll.
@@ -678,7 +677,7 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number>::operator Number () const
+Tensor<0,dim,Number>::operator Number &()
 {
   return value;
 }
@@ -686,7 +685,7 @@ Tensor<0,dim,Number>::operator Number () const
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number>::operator Number &()
+Tensor<0,dim,Number>::operator const Number &() const
 {
   return value;
 }
@@ -1154,7 +1153,7 @@ Tensor<rank_,dim,Number>::norm_square () const
 {
   real_type s = 0;
   for (unsigned int i=0; i<dim; ++i)
-    s += static_cast<Tensor<rank_-1,dim,Number> >(values[i]).norm_square();
+    s += values[i].norm_square();
 
   return s;
 }
@@ -1181,8 +1180,7 @@ Tensor<rank_, dim, Number>::unroll_recursion (Vector<OtherNumber> &result,
                                               unsigned int        &index) const
 {
   for (unsigned int i=0; i<dim; ++i)
-    static_cast<Tensor<rank_ - 1, dim, Number> >(values[i]).
-    unroll_recursion(result, index);
+    values[i].unroll_recursion(result, index);
 }
 
 

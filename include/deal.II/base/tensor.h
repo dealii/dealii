@@ -81,40 +81,6 @@ std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 }
 
 
-/**
- * Output operator for tensors of rank 1. Print the elements consecutively,
- * with a space in between.
- *
- * @relates Tensor<1,dim,Number>
- */
-template <int dim, typename Number>
-inline
-std::ostream &operator << (std::ostream &out, const Tensor<1,dim,Number> &p)
-{
-  for (unsigned int i=0; i<dim-1; ++i)
-    out << p[i] << ' ';
-  out << p[dim-1];
-
-  return out;
-}
-
-
-/**
- * Output operator for tensors of rank 1 and dimension 1. This is implemented
- * specialized from the general template in order to avoid a compiler warning
- * that the loop is empty.
- *
- * @relates Tensor<1,dim,Number>
- */
-inline
-std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
-{
-  out << p[0];
-
-  return out;
-}
-
-
 //@}
 /**
  * @name Vector space operations on Tensor objects:
