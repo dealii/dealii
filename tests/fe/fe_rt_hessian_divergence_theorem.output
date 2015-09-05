@@ -1,0 +1,22 @@
+
+DEAL::FE=FE_RaviartThomas<2>(2)
+DEAL::Cell nodes:
+DEAL::0: (0.00 0.00)
+DEAL::1: (1.00 0.00)
+DEAL::2: (0.00 1.15)
+DEAL::3: (1.00 1.15)
+DEAL::OK: cell bulk and boundary integrals match...
+
+DEAL::FE=FE_RaviartThomas<3>(2)
+DEAL::Cell nodes:
+DEAL::0: (0.00 0.00 0.00)
+DEAL::1: (1.00 0.00 0.00)
+DEAL::2: (0.00 1.00 0.00)
+DEAL::3: (1.00 1.00 0.00)
+DEAL::4: (0.00 0.00 1.15)
+DEAL::5: (1.00 0.00 1.15)
+DEAL::6: (0.00 1.00 1.15)
+DEAL::7: (1.00 1.00 1.15)
+DEAL::OK: cell bulk and boundary integrals match...
+
+DEAL::done...

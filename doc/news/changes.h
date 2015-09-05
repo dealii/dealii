@@ -337,9 +337,8 @@ inconvenience this causes.
   (Jean-Paul Pelteret, Timo Heister,  Krzysztof Bzowski, 2015/08/12)
   </li>
 
-  <li> Improved: Some finite elements compute hessians analytically rather than
-  by finite differencing. Namely, these are finite elements that are subclasses
-  of FEPoly as well as FESystem with those as base elements.
+  <li> Improved: Finite elements now compute hessians analytically rather than
+  by finite differencing.
   <br>
   (Maien Hamed, 2015/08/01-2015/08/09)
   </li>

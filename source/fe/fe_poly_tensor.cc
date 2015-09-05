@@ -327,12 +327,6 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
     get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
 
-  if ( (flags & update_gradients) && mapping_type != mapping_none )
-    mapping.transform (mapping_data.jacobian_grads,
-                       mapping_covariant_gradient,
-                       mapping_internal,
-                       fe_data.transformed_jacobian_grads);
-
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = output_data.shape_function_to_row_table[i * this->n_components() +
@@ -442,7 +436,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     fe_data.transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                             * fe_data.transformed_jacobian_grads[k][n][d];
+                                                             * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -452,16 +446,18 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
             }
             case mapping_contravariant:
             {
-              mapping.transform(fe_data.shape_grads[i],
-                                mapping_contravariant_gradient,
-                                mapping_internal,
-                                fe_data.transformed_shape_grads);
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
+              mapping.transform (fe_data.untransformed_shape_grads,
+                                 mapping_contravariant_gradient,
+                                 mapping_internal,
+                                 fe_data.transformed_shape_grads);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     fe_data.transformed_shape_grads[k][d] += output_data.shape_values(first+n,k)
-                                                             * fe_data.transformed_jacobian_grads[k][d][n];
+                                                             * mapping_data.jacobian_pushed_forward_grads[k][d][n];
 
 
               for (unsigned int k=0; k<n_q_points; ++k)
@@ -484,9 +480,9 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     fe_data.transformed_shape_grads[k][d] += ( output_data.shape_values(first+n,k)
-                                                               * fe_data.transformed_jacobian_grads[k][d][n] )
+                                                               * mapping_data.jacobian_pushed_forward_grads[k][d][n] )
                                                              - ( output_data.shape_values(first+d,k)
-                                                                 * fe_data.transformed_jacobian_grads[k][n][n] );
+                                                                 * mapping_data.jacobian_pushed_forward_grads[k][n][n] );
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -516,12 +512,11 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
                                  mapping_internal,
                                  fe_data.transformed_shape_grads);
 
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     fe_data.transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                             * fe_data.transformed_jacobian_grads[k][n][d];
+                                                             * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -535,20 +530,217 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
               Assert(false, ExcNotImplemented());
             }
         }
-    }
 
-  // finally update second derivatives. again apply the same logic
-  // as above regarding when this has to happen
-  if (flags & update_hessians
-      &&
-      ((cell_similarity != CellSimilarity::translation)
-       ||
-       ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-        || (mapping_type == mapping_nedelec))))
-    this->compute_2nd (mapping, cell,
-                       typename QProjector<dim>::DataSetDescriptor().cell(),
-                       mapping_internal, fe_data,
-                       output_data);
+      // update hessians. apply the same logic as above
+      if (flags & update_hessians
+          &&
+          ((cell_similarity != CellSimilarity::translation)
+           ||
+           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+            || (mapping_type == mapping_nedelec))))
+
+        {
+
+          switch (mapping_type)
+            {
+            case mapping_none:
+            {
+
+              mapping.transform(fe_data.shape_grad_grads[i], mapping_covariant_gradient,
+                                mapping_internal, fe_data.transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    fe_data.transformed_shape_hessians[k][d] -= output_data.shape_gradients[first+d][k][n]
+                                                                * mapping_data.jacobian_pushed_forward_grads[k][n];
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_covariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
+
+              mapping.transform(fe_data.untransformed_shape_hessian_tensors,
+                                mapping_covariant_hessian, mapping_internal,
+                                fe_data.transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          fe_data.transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_contravariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
+
+              mapping.transform(fe_data.untransformed_shape_hessian_tensors, mapping_contravariant_hessian,
+                                mapping_internal, fe_data.transformed_shape_hessians
+                               );
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          fe_data.transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            fe_data.transformed_shape_hessians[k][d][i][j]
+                            -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                * output_data.shape_values(first+n,k))
+                               + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                  * output_data.shape_values(first+n,k));
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
+
+              mapping.transform(fe_data.untransformed_shape_hessian_tensors, mapping_piola_hessian,
+                                mapping_internal, fe_data.transformed_shape_hessians
+                               );
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          fe_data.transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+
+                          fe_data.transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+d,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][n][i][j])
+                             + (output_data.shape_gradients[first+d][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][j])
+                             + (output_data.shape_gradients[first+d][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][i]);
+
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            {
+                              fe_data.transformed_shape_hessians[k][d][i][j]
+                              -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+n,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+n,k));
+
+                              fe_data.transformed_shape_hessians[k][d][i][j]
+                              += (mapping_data.jacobian_pushed_forward_grads[k][n][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+d,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][n][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+d,k));
+                            }
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * fe_data.transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            case mapping_nedelec:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
+
+              mapping.transform(fe_data.untransformed_shape_hessian_tensors,
+                                mapping_covariant_hessian, mapping_internal,
+                                fe_data.transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          fe_data.transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * fe_data.transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            default:
+              Assert(false, ExcNotImplemented());
+            }
+        }
+    }
 }
 
 
@@ -602,13 +794,6 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
   else if (mapping_type == mapping_nedelec)
     get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
-  if ( (flags & update_gradients) && mapping_type != mapping_none )
-    mapping.transform (mapping_data.jacobian_grads,
-                       mapping_covariant_gradient,
-                       mapping_internal,
-                       VectorSlice< std::vector<Tensor<3,spacedim> > >
-                       (fe_data.transformed_jacobian_grads, offset, n_q_points));
-
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = output_data.shape_function_to_row_table[i * this->n_components() +
@@ -616,8 +801,6 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 
       if (flags & update_values)
         {
-          VectorSlice< std::vector<Tensor<1,spacedim> > >
-          transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
           switch (mapping_type)
             {
             case mapping_none:
@@ -631,6 +814,8 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             case mapping_covariant:
             case mapping_contravariant:
             {
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
               // Use auxiliary vector
               // for transformation
               mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
@@ -647,6 +832,8 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             case mapping_raviart_thomas:
             case mapping_piola:
             {
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
 
               mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
                                  mapping_piola,
@@ -661,6 +848,9 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 
             case mapping_nedelec:
             {
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
+
               mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
@@ -709,7 +899,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][n][d];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -718,7 +908,9 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             }
             case mapping_contravariant:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
+              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_contravariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -727,7 +919,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] += output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][d][n];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][d][n];
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -749,10 +941,10 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] += ( output_data.shape_values(first+n,k)
-                                                       * fe_data.transformed_jacobian_grads[k+offset][d][n] )
+                                                       * mapping_data.jacobian_pushed_forward_grads[k][d][n] )
                                                      -
                                                      ( output_data.shape_values(first+d,k)
-                                                       * fe_data.transformed_jacobian_grads[k+offset][n][n] );
+                                                       * mapping_data.jacobian_pushed_forward_grads[k][n][n] );
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -786,7 +978,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][n][d];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -800,11 +992,210 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
               Assert(false, ExcNotImplemented());
             }
         }
-    }
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
-                       output_data);
+      if (flags & update_hessians)
+
+        {
+
+          VectorSlice< std::vector<Tensor<3,spacedim> > > transformed_shape_hessians (fe_data.transformed_shape_hessians, offset, n_q_points);
+
+          switch (mapping_type)
+            {
+            case mapping_none:
+            {
+
+              mapping.transform(make_slice (fe_data.shape_grad_grads[i], offset, n_q_points),
+                                mapping_covariant_gradient, mapping_internal, transformed_shape_hessians
+                               );
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    transformed_shape_hessians[k][d] -= output_data.shape_gradients[first+d][k][n]
+                                                        *mapping_data.jacobian_pushed_forward_grads[k][n];
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_covariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_contravariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_contravariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            transformed_shape_hessians[k][d][i][j]
+                            -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                * output_data.shape_values(first+n,k))
+                               + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                  * output_data.shape_values(first+n,k));
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_piola_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+d,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][n][i][j])
+                             + (output_data.shape_gradients[first+d][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][j])
+                             + (output_data.shape_gradients[first+d][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][i]);
+
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            {
+                              transformed_shape_hessians[k][d][i][j]
+                              -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+n,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+n,k));
+
+                              transformed_shape_hessians[k][d][i][j]
+                              += (mapping_data.jacobian_pushed_forward_grads[k][n][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+d,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][n][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+d,k));
+                            }
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            case mapping_nedelec:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            default:
+              Assert(false, ExcNotImplemented());
+            }
+        }
+    }
 }
 
 
@@ -863,14 +1254,6 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
   else if (mapping_type == mapping_nedelec)
     get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
-  if ( (flags & update_gradients) && mapping_type != mapping_none)
-    mapping.transform (mapping_data.jacobian_grads,
-                       mapping_covariant_gradient,
-                       mapping_internal,
-                       VectorSlice< std::vector<Tensor<3,spacedim> > >
-                       (fe_data.transformed_jacobian_grads, offset, n_q_points));
-
-
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = output_data.shape_function_to_row_table[i * this->n_components() +
@@ -878,8 +1261,6 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
       if (flags & update_values)
         {
-          VectorSlice< std::vector<Tensor<1,spacedim> > >
-          transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
           switch (mapping_type)
             {
             case mapping_none:
@@ -893,6 +1274,9 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             case mapping_covariant:
             case mapping_contravariant:
             {
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
+
               // Use auxiliary vector for
               // transformation
               mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
@@ -909,10 +1293,11 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                 mapping_piola,
-                                 mapping_internal,
-                                 transformed_shape_values);
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
+
+              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
+                                mapping_piola, mapping_internal, transformed_shape_values);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
@@ -921,6 +1306,9 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             }
             case mapping_nedelec:
             {
+              VectorSlice< std::vector<Tensor<1,spacedim> > >
+              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
+
               mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
@@ -928,7 +1316,8 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  output_data.shape_values(first+d,k) = fe_data.sign_change[i] * transformed_shape_values[k][d];
+                  output_data.shape_values(first+d,k) =
+                    fe_data.sign_change[i] * transformed_shape_values[k][d];
 
               break;
             }
@@ -966,7 +1355,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][n][d];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -977,7 +1366,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
             case mapping_contravariant:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
+
+              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_contravariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -986,7 +1378,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] += output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][d][n];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][d][n];
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -1010,9 +1402,9 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] += ( output_data.shape_values(first+n,k)
-                                                       * fe_data.transformed_jacobian_grads[k+offset][d][n])
+                                                       * mapping_data.jacobian_pushed_forward_grads[k][d][n])
                                                      - ( output_data.shape_values(first+d,k)
-                                                         * fe_data.transformed_jacobian_grads[k+offset][n][n]);
+                                                         * mapping_data.jacobian_pushed_forward_grads[k][n][n]);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -1041,12 +1433,11 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                                  mapping_internal,
                                  transformed_shape_grads);
 
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
                   for (unsigned int n=0; n<spacedim; ++n)
                     transformed_shape_grads[k][d] -= output_data.shape_values(first+n,k)
-                                                     * fe_data.transformed_jacobian_grads[k+offset][n][d];
+                                                     * mapping_data.jacobian_pushed_forward_grads[k][n][d];
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -1060,13 +1451,210 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
               Assert(false, ExcNotImplemented());
             }
         }
+
+      if (flags & update_hessians)
+
+        {
+
+          VectorSlice< std::vector<Tensor<3,dim> > > transformed_shape_hessians (fe_data.transformed_shape_hessians, offset, n_q_points);
+
+          switch (mapping_type)
+            {
+            case mapping_none:
+            {
+
+              mapping.transform(make_slice (fe_data.shape_grad_grads[i], offset, n_q_points),
+                                mapping_covariant_gradient, mapping_internal,
+                                transformed_shape_hessians );
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    transformed_shape_hessians[k][d] -= output_data.shape_gradients[first+d][k][n]
+                                                        *mapping_data.jacobian_pushed_forward_grads[k][n];
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_covariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_contravariant:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_contravariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            transformed_shape_hessians[k][d][i][j]
+                            -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                * output_data.shape_values(first+n,k))
+                               + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                  * output_data.shape_values(first+n,k));
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+            case mapping_raviart_thomas:
+            case mapping_piola:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_piola_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          += (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][d][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][n][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][d][i][n])
+                             - (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j]);
+
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+d,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][n][i][j])
+                             + (output_data.shape_gradients[first+d][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][j])
+                             + (output_data.shape_gradients[first+d][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][n][i]);
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            {
+                              transformed_shape_hessians[k][d][i][j]
+                              -= (mapping_data.jacobian_pushed_forward_grads[k][d][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+n,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][d][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+n,k));
+
+                              transformed_shape_hessians[k][d][i][j]
+                              += (mapping_data.jacobian_pushed_forward_grads[k][n][i][m]
+                                  * mapping_data.jacobian_pushed_forward_grads[k][m][n][j]
+                                  * output_data.shape_values(first+d,k))
+                                 + (mapping_data.jacobian_pushed_forward_grads[k][n][m][j]
+                                    * mapping_data.jacobian_pushed_forward_grads[k][m][i][n]
+                                    * output_data.shape_values(first+d,k));
+                            }
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            case mapping_nedelec:
+            {
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
+
+              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<spacedim; ++d)
+                  for (unsigned int n=0; n<spacedim; ++n)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        {
+                          transformed_shape_hessians[k][d][i][j]
+                          -= (output_data.shape_values(first+n,k)
+                              * mapping_data.jacobian_pushed_forward_2nd_derivatives[k][n][d][i][j])
+                             + (output_data.shape_gradients[first+d][k][n]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][j])
+                             + (output_data.shape_gradients[first+n][k][i]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][d][j])
+                             + (output_data.shape_gradients[first+n][k][j]
+                                * mapping_data.jacobian_pushed_forward_grads[k][n][i][d]);
+                        }
+
+              for (unsigned int k=0; k<n_q_points; ++k)
+                for (unsigned int d=0; d<dim; ++d)
+                  output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
+
+              break;
+
+            }
+
+            default:
+              Assert(false, ExcNotImplemented());
+            }
+        }
     }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_internal, fe_data,
-                       output_data);
 }
-
 
 
 template <class POLY, int dim, int spacedim>
@@ -1092,6 +1680,19 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 
   switch (mapping_type)
     {
+    case mapping_none:
+    {
+      if (flags & update_values)
+        out |= update_values;
+
+      if (flags & update_gradients)
+        out |= update_gradients | update_values | update_jacobian_pushed_forward_grads;
+
+      if (flags & update_hessians)
+        out |= update_hessians |  update_values | update_gradients |
+               update_jacobian_pushed_forward_grads |
+               update_jacobian_pushed_forward_2nd_derivatives;
+    }
     case mapping_raviart_thomas:
     case mapping_piola:
     {
@@ -1099,11 +1700,14 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
         out |= update_values | update_piola;
 
       if (flags & update_gradients)
-        out |= update_gradients | update_values | update_piola | update_jacobian_grads |
+        out |= update_gradients | update_values | update_piola | update_jacobian_pushed_forward_grads |
                update_covariant_transformation | update_contravariant_transformation;
 
       if (flags & update_hessians)
-        out |= update_hessians | update_piola | update_covariant_transformation;
+        out |= update_hessians | update_piola | update_values | update_gradients |
+               update_jacobian_pushed_forward_grads |
+               update_jacobian_pushed_forward_2nd_derivatives |
+               update_covariant_transformation;
 
       break;
     }
@@ -1114,11 +1718,14 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
         out |= update_values | update_piola;
 
       if (flags & update_gradients)
-        out |= update_gradients | update_values | update_jacobian_grads |
+        out |= update_gradients | update_values | update_jacobian_pushed_forward_grads |
                update_covariant_transformation | update_contravariant_transformation;
 
       if (flags & update_hessians)
-        out |= update_hessians | update_covariant_transformation;
+        out |= update_hessians | update_piola | update_values | update_gradients |
+               update_jacobian_pushed_forward_grads |
+               update_jacobian_pushed_forward_2nd_derivatives |
+               update_covariant_transformation;
 
       break;
     }
@@ -1130,11 +1737,14 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
         out |= update_values | update_covariant_transformation;
 
       if (flags & update_gradients)
-        out |= update_gradients | update_values | update_jacobian_grads |
+        out |= update_gradients | update_values | update_jacobian_pushed_forward_grads |
                update_covariant_transformation;
 
       if (flags & update_hessians)
-        out |= update_hessians | update_covariant_transformation;
+        out |= update_hessians |  update_values | update_gradients |
+               update_jacobian_pushed_forward_grads |
+               update_jacobian_pushed_forward_2nd_derivatives |
+               update_covariant_transformation;
 
       break;
     }

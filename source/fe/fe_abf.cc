@@ -461,43 +461,6 @@ FE_ABF<dim>::get_dpo_vector (const unsigned int rt_order)
   return dpo;
 }
 
-
-
-template <int dim>
-UpdateFlags
-FE_ABF<dim>::update_once (const UpdateFlags) const
-{
-  // even the values have to be
-  // computed on the real cell, so
-  // nothing can be done in advance
-  return update_default;
-}
-
-
-
-template <int dim>
-UpdateFlags
-FE_ABF<dim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-
-
-  if (flags & update_values)
-    out |= update_values             | update_covariant_transformation
-           | update_piola
-           | update_JxW_values;
-  if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation
-           | update_piola      | update_jacobian_grads
-           | update_values       | update_JxW_values;
-  //TODO: Set update flags appropriately and figure out, how the second
-  // derivatives for the RT elements can be computed correctly.
-  if (flags & update_hessians)
-    out |= update_hessians | update_contravariant_transformation;
-
-  return out;
-}
-
 //---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
