@@ -1271,7 +1271,10 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
 
 
 
-// explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "error_estimator.inst"
 
 

@@ -54,6 +54,7 @@ SET(_src
   sparse_direct.cc
   sparse_ilu.cc
   sparse_matrix.cc
+  sparse_matrix_inst2.cc
   sparse_matrix_ez.cc
   sparse_mic.cc
   sparse_vanka.cc
@@ -65,6 +66,8 @@ SET(_src
   trilinos_block_vector.cc
   trilinos_parallel_block_vector.cc
   trilinos_precondition.cc
+  trilinos_precondition2.cc
+  trilinos_precondition3.cc
   trilinos_solver.cc
   trilinos_sparse_matrix.cc
   trilinos_sparsity_pattern.cc

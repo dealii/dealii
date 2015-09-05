@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+
 #include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 2
-#define SPLIT_INSTANTIATIONS_INDEX 0
+#define SPLIT_INSTANTIATIONS_INDEX 1
 #include "sparse_matrix.inst"
 
 DEAL_II_NAMESPACE_CLOSE

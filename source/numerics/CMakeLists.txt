@@ -26,6 +26,7 @@ SET(_src
   dof_output_operator.cc
   error_estimator_1d.cc
   error_estimator.cc
+  error_estimator_inst2.cc
   fe_field_function.cc
   histogram.cc
   matrix_tools.cc
