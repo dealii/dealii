@@ -1394,7 +1394,7 @@ bool ParameterHandler::read_input (const std::string &filename,
           file_contents.push_back('\n');
         }
 
-      return read_input_from_string (file_contents.c_str());
+      return ParameterHandler::read_input_from_string (file_contents.c_str());
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
