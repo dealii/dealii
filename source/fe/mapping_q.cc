@@ -82,22 +82,6 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 }
 
 
-template<int dim, int spacedim>
-MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
-  :
-  MappingQ1<dim,spacedim>(),
-  degree(mapping.degree),
-  n_inner(mapping.n_inner),
-  n_outer(mapping.n_outer),
-  use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
-  feq(degree),
-  line_support_points(degree+1)
-{
-  laplace_on_quad_vector=mapping.laplace_on_quad_vector;
-  laplace_on_hex_vector=mapping.laplace_on_hex_vector;
-}
-
-
 
 template<int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
@@ -874,8 +858,8 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
-	   != 0),
-	  ExcInternalError());
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
   // whether we should in fact work on the Q1 portion of it
@@ -899,8 +883,8 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
-	   != 0),
-	  ExcInternalError());
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
   // whether we should in fact work on the Q1 portion of it
@@ -922,8 +906,8 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
-	   != 0),
-	  ExcInternalError());
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
   // whether we should in fact work on the Q1 portion of it
@@ -947,8 +931,8 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
-	   != 0),
-	  ExcInternalError());
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
   // whether we should in fact work on the Q1 portion of it
@@ -970,8 +954,8 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
-	   != 0),
-	  ExcInternalError());
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
   // whether we should in fact work on the Q1 portion of it
@@ -1112,7 +1096,7 @@ template<int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingQ<dim,spacedim>::clone () const
 {
-  return new MappingQ<dim,spacedim>(*this);
+  return new MappingQ<dim,spacedim>(degree);
 }
 
 

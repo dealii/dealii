@@ -73,11 +73,6 @@ public:
             const bool use_mapping_q_on_all_cells = false);
 
   /**
-   * Copy constructor.
-   */
-  MappingQ (const MappingQ<dim,spacedim> &mapping);
-
-  /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.
    */
