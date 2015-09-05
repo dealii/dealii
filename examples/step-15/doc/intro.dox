@@ -112,7 +112,7 @@ Reducing this space to a finite dimensional space with basis $\left\{
 \varphi_{0},\dots , \varphi_{N-1}\right\}$, we can write the solution:
 
 @f[
-  \delta u^{n}=\sum_{j=0}^{N-1} U_{j} \varphi_{j}.
+  \delta u^{n}=\sum_{j=0}^{N-1} \delta U_{j} \varphi_{j}.
 @f]
 
 Using the basis functions as test functions and defining $a_{n}:=\frac{1}
@@ -121,7 +121,7 @@ Using the basis functions as test functions and defining $a_{n}:=\frac{1}
 @f[
   \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
   \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
-  \varphi_{j} \right) \right] \cdot U_{j}=\left( \nabla \varphi_{i} , a_{n}
+  \varphi_{j} \right) \right] \cdot \delta U_{j}=\left( \nabla \varphi_{i} , a_{n}
   \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1,
 @f]
 
