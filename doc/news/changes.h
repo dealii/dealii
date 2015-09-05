@@ -244,6 +244,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Memory consumption during compilation has been reduced by splitting
+  instantiation files. For this make_instantiations now supports additional
+  logic to split the the instantiations in .inst files into groups. This is
+  used in fe_values.cc, error_estimator.cc, and others.
+  <br>
+  (Timo Heister, 2015/09/05)
+
   <li> Openmp SIMD support is now enabled for Clang version 3.6, or newer
   (or the equivalent XCode version). Further, openmp support is not any
   more falsely activated for very old clang versions.
