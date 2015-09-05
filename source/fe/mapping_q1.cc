@@ -48,6 +48,14 @@ MappingQ1<dim,spacedim>::MappingQ1 ()
 
 
 
+template<int dim, int spacedim>
+MappingQ1<dim,spacedim>::MappingQ1 (const unsigned int p)
+  :
+  MappingQGeneric<dim,spacedim> (p)
+{}
+
+
+
 namespace internal
 {
   namespace MappingQ1
@@ -197,13 +205,14 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
-  // Use the get_data function to create an InternalData with data
-  // vectors of the right size and transformation shape values already
-  // computed at point p.
   const Quadrature<dim> point_quadrature(p);
 
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points | update_jacobians,
-                                                      point_quadrature));
+  //TODO: Use get_data() here once MappingQ is no longer derived from
+  //MappingQ1. this doesn't currently work because we here really need
+  //a Q1 InternalData, but MappingQGeneric produces one with the
+  //polynomial degree of the MappingQ
+  std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
+  mdata->initialize (this->requires_update_flags (update_quadrature_points | update_jacobians), point_quadrature, 1);
 
   // compute the mapping support
   // points
@@ -476,20 +485,18 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 // it shouldn't really make any difference...
 //      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
-      // Use the get_data function to
-      // create an InternalData with data
-      // vectors of the right size and
-      // transformation shape values and
-      // derivatives already computed at
-      // point initial_p_unit.
       const Quadrature<dim> point_quadrature(initial_p_unit);
 
       UpdateFlags update_flags = update_quadrature_points | update_jacobians;
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
-      std_cxx11::unique_ptr<InternalData> mdata(MappingQ1<dim,spacedim>::get_data(update_flags,
-                                                point_quadrature));
+      //TODO: Use get_data() here once MappingQ is no longer derived from
+      //MappingQ1. this doesn't currently work because we here really need
+      //a Q1 InternalData, but MappingQGeneric produces one with the
+      //polynomial degree of the MappingQ
+      std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
+      mdata->initialize (this->requires_update_flags (update_flags), point_quadrature, 1);
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
       // The support points have to be at

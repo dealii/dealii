@@ -98,14 +98,19 @@ public:
    */
   typedef typename MappingQGeneric<dim,spacedim>::InternalData InternalData;
 
-protected:
-
-
   /**
    * @}
    */
 
 protected:
+
+  /**
+   * Constructor. This constructor is for odd purposes: MappingQ is
+   * derived from this class (for historical reasons) and it needs a
+   * way to pass down the "true" polynomial degree of the mapping.
+   */
+  MappingQ1 (const unsigned int degree);
+
   /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
   template<int dim_>
   Point<dim_>

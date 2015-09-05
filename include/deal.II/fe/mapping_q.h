@@ -147,12 +147,6 @@ public:
              VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
 
   /**
-   * Return the degree of the mapping, i.e. the value which was passed to the
-   * constructor.
-   */
-  unsigned int get_degree () const;
-
-  /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */
@@ -420,12 +414,6 @@ protected:
   DeclException1 (ExcLaplaceVectorNotSet,
                   int,
                   << "laplace_vector not set for degree=" << arg1 << ".");
-
-  /**
-   * Degree @p p of the polynomials used as shape functions for the Qp mapping
-   * of cells at the boundary.
-   */
-  const unsigned int degree;
 
   /**
    * Number of inner mapping shape functions.

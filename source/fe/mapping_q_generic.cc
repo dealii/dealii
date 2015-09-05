@@ -777,6 +777,15 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
 
 
 template<int dim, int spacedim>
+unsigned int
+MappingQGeneric<dim,spacedim>::get_degree() const
+{
+  return polynomial_degree;
+}
+
+
+
+template<int dim, int spacedim>
 UpdateFlags
 MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {

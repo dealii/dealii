@@ -64,6 +64,12 @@ public:
   MappingQGeneric (const unsigned int polynomial_degree);
 
   /**
+   * Return the degree of the mapping, i.e. the value which was passed to the
+   * constructor.
+   */
+  unsigned int get_degree () const;
+
+  /**
    * Always returns @p true because MappingQ1 preserves vertex locations.
    */
   virtual
