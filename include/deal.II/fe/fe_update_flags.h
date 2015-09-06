@@ -111,32 +111,38 @@ enum UpdateFlags
    * the real cell.
    */
   update_hessians = 0x0004,
+  //! Third derivatives of shape functions
+  /**
+   * Compute the third derivatives of the shape functions in coordinates of
+   * the real cell
+   */
+  update_3rd_derivatives = 0x0008,
   //! Outer normal vector, not normalized
   /**
    * Vector product of tangential vectors, yielding a normal vector with a
    * length corresponding to the surface element; may be more efficient than
    * computing both.
    */
-  update_boundary_forms = 0x0008,
+  update_boundary_forms = 0x0010,
   //! Transformed quadrature points
   /**
    * Compute the quadrature points transformed into real cell coordinates.
    */
-  update_quadrature_points = 0x0010,
+  update_quadrature_points = 0x0020,
   //! Transformed quadrature weights
   /**
    * Compute the quadrature weights on the real cell, i.e. the weights of the
    * quadrature rule multiplied with the determinant of the Jacobian of the
    * transformation from reference to real cell.
    */
-  update_JxW_values = 0x0020,
+  update_JxW_values = 0x0040,
   //! Normal vectors
   /**
    * Compute the normal vectors, either for a face or for a cell of
    * codimension one. Setting this flag for any other object will raise an
    * error.
    */
-  update_normal_vectors = 0x0040,
+  update_normal_vectors = 0x0080,
   /**
    * @deprecated Use #update_normal_vectors instead.
    */
@@ -150,86 +156,86 @@ enum UpdateFlags
    * Compute the Jacobian of the transformation from the reference cell to the
    * real cell.
    */
-  update_jacobians = 0x0080,
+  update_jacobians = 0x0100,
   //! Gradient of volume element
   /**
    * Compute the derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_grads = 0x0100,
+  update_jacobian_grads = 0x0200,
   //! Volume element
   /**
    * Compute the inverse Jacobian of the transformation from the reference
    * cell to the real cell.
    */
-  update_inverse_jacobians = 0x0200,
+  update_inverse_jacobians = 0x0400,
   //! Covariant transformation
   /**
    * Compute all values the Mapping needs to perform a contravariant
    * transformation of vectors. For special mappings like MappingCartesian
    * this may be simpler than #update_inverse_jacobians.
    */
-  update_covariant_transformation = 0x0400,
+  update_covariant_transformation = 0x0800,
   //! Contravariant transformation
   /**
    * Compute all values the Mapping needs to perform a contravariant
    * transformation of vectors. For special mappings like MappingCartesian
    * this may be simpler than #update_jacobians.
    */
-  update_contravariant_transformation = 0x0800,
+  update_contravariant_transformation = 0x1000,
   //! Shape function values of transformation
   /**
    * Compute the shape function values of the transformation defined by the
    * Mapping.
    */
-  update_transformation_values = 0x1000,
+  update_transformation_values = 0x2000,
   //! Shape function gradients of transformation
   /**
    * Compute the shape function gradients of the transformation defined by the
    * Mapping.
    */
-  update_transformation_gradients = 0x2000,
+  update_transformation_gradients = 0x4000,
   //! Determinant of the Jacobian
   /**
    * Compute the volume element in each quadrature point.
    */
-  update_volume_elements = 0x4000,
+  update_volume_elements = 0x10000,
   /**
    * @deprecated This flag has no effect.
    */
-  update_support_points = 0x10000,
+  update_support_points = 0x20000,
   //! Jacobian at generalized support points
   /**
    * Update the Jacobian of the mapping in generalized support points.
    */
-  update_support_jacobians = 0x20000,
+  update_support_jacobians = 0x40000,
   //! inverse Jacobian at generalized support points
   /**
    * Update the inverse Jacobian of the mapping in generalized support points.
    */
-  update_support_inverse_jacobians = 0x40000,
+  update_support_inverse_jacobians = 0x80000,
   /**
    * Compute the derivatives of the Jacobian of the transformation pushed
    * forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_grads = 0x80000,
+  update_jacobian_pushed_forward_grads = 0x100000,
   /**
    * Compute the second derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_2nd_derivatives = 0x100000,
+  update_jacobian_2nd_derivatives = 0x200000,
   /**
    * Compute the second derivatives of the Jacobian of the transformation
    * pushed forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_2nd_derivatives = 0x200000,
+  update_jacobian_pushed_forward_2nd_derivatives = 0x400000,
   /**
    * Compute the third derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_3rd_derivatives = 0x400000,
+  update_jacobian_3rd_derivatives = 0x800000,
   /**
    * Compute the third derivatives of the Jacobian of the transformation
    * pushed forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_3rd_derivatives = 0x800000,
+  update_jacobian_pushed_forward_3rd_derivatives = 0x1000000,
   /**
    * @deprecated Update quadrature points
    */
@@ -259,6 +265,7 @@ STREAM &operator << (STREAM &s, UpdateFlags u)
   if (u & update_values)                                  s << "values|";
   if (u & update_gradients)                               s << "gradients|";
   if (u & update_hessians)                                s << "hessians|";
+  if (u & update_3rd_derivatives)                         s << "3rd_derivatives|";
   if (u & update_quadrature_points)                       s << "quadrature_points|";
   if (u & update_JxW_values)                              s << "JxW_values|";
   if (u & update_normal_vectors)                          s << "normal_vectors|";

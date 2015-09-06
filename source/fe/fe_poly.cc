@@ -63,19 +63,26 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
-            }
-
-          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
-                                          mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (fe_data.untransformed_shape_hessians,
+          mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<2; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
@@ -116,19 +123,26 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
-            }
-
-          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
-                                          mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (fe_data.untransformed_shape_hessians,
+          mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<3; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
@@ -170,19 +184,26 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
-            }
-
-          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
-                                          mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (fe_data.untransformed_shape_hessians,
+          mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<2; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
@@ -220,19 +241,26 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
-            }
-
-          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
-                                          mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (fe_data.untransformed_shape_hessians,
+          mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<3; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }

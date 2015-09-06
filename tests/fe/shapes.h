@@ -163,6 +163,9 @@ plot_face_shape_functions(
                               if (uflags & update_hessians)
                                 AssertThrow((fe.shape_hessian(i,k) == fe.shape_hessian_component(i,k,c)),
                                             ExcInternalError());
+                              if (uflags & update_3rd_derivatives)
+                                AssertThrow((fe.shape_3rd_derivative(i,k) == fe.shape_3rd_derivative_component(i,k,c)),
+                                            ExcInternalError());
                             }
                           else
                             {
@@ -174,6 +177,9 @@ plot_face_shape_functions(
                                              ExcInternalError());
                               if (uflags & update_hessians)
                                 AssertThrow ((fe.shape_hessian_component(i,k,c) == Tensor<2,dim>()),
+                                             ExcInternalError());
+                              if (uflags & update_3rd_derivatives)
+                                AssertThrow ((fe.shape_3rd_derivative_component(i,k,c) == Tensor<3,dim>()),
                                              ExcInternalError());
                             }
                         }
@@ -227,6 +233,12 @@ plot_face_shape_functions(
                                                           s2 = sub.shape_hessian_component(i,k,c);
                                       Assert (s1 == s2, ExcInternalError());
                                     }
+                                  if (uflags & update_3rd_derivatives)
+                                    {
+                                      const Tensor<3,dim> t1 = sub.shape_3rd_derivative(i,k),
+                                                          t2 = sub.shape_3rd_derivative_component(i,k,c);
+                                      Assert (t1 == t2, ExcInternalError());
+                                    }
                                 }
                               else
                                 {
@@ -238,6 +250,9 @@ plot_face_shape_functions(
                                             ExcInternalError());
                                   if (uflags & update_hessians)
                                     Assert ((sub.shape_hessian_component(i,k,c) == Tensor<2,dim>()),
+                                            ExcInternalError());
+                                  if (uflags & update_3rd_derivatives)
+                                    Assert ((sub.shape_3rd_derivative_component(i,k,c) == Tensor<3,dim>()),
                                             ExcInternalError());
                                 }
                             };

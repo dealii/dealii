@@ -1359,6 +1359,30 @@ namespace FEValuesViews
   template <int dim, int spacedim>
   template <class InputVector>
   void
+  Scalar<dim,spacedim>::
+  get_function_third_derivatives (const InputVector &fe_function,
+                                  std::vector<typename ProductType<third_derivative_type,typename InputVector::value_type>::type> &third_derivatives) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_3rd_derivatives,
+            typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
+    Assert (fe_values.present_cell.get() != 0,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (fe_function.size(),
+                     fe_values.present_cell->n_dofs_for_dof_handler());
+
+    // get function values of dofs on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_derivatives<3,dim,spacedim>
+    (dof_values, fe_values.finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
   Vector<dim,spacedim>::
   get_function_values (const InputVector &fe_function,
                        std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const
@@ -1524,6 +1548,29 @@ namespace FEValuesViews
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
     (dof_values, fe_values.finite_element_output.shape_hessians, shape_function_data, laplacians);
+  }
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim,spacedim>::
+  get_function_third_derivatives (const InputVector &fe_function,
+                                  std::vector<typename ProductType<third_derivative_type,typename InputVector::value_type>::type> &third_derivatives) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_3rd_derivatives,
+            typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
+    Assert (fe_values.present_cell.get() != 0,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (fe_function.size(),
+                     fe_values.present_cell->n_dofs_for_dof_handler());
+
+    // get function values of dofs on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_derivatives<3,dim,spacedim>
+    (dof_values, fe_values.finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
   }
 
 
@@ -2023,7 +2070,7 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::message_string
   = ("You have previously called the FEValues::reinit function with a\n"
      "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However,\n"
      "when you do this, you cannot call some functions in the FEValues\n"
-     "class, such as the get_function_values/gradients/hessians\n"
+     "class, such as the get_function_values/gradients/hessians/third_derivatives\n"
      "functions. If you need these functions, then you need to call\n"
      "FEValues::reinit with an iterator type that allows to extract\n"
      "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
@@ -2178,6 +2225,10 @@ namespace internal
       if (flags & update_hessians)
         this->shape_hessians.resize (n_nonzero_shape_components,
                                      std::vector<Tensor<2,spacedim> > (n_quadrature_points));
+
+      if (flags & update_3rd_derivatives)
+        this->shape_3rd_derivatives.resize (n_nonzero_shape_components,
+                                            std::vector<Tensor<3,spacedim> > (n_quadrature_points));
     }
 
 
@@ -2190,6 +2241,7 @@ namespace internal
       return (MemoryConsumption::memory_consumption (shape_values) +
               MemoryConsumption::memory_consumption (shape_gradients) +
               MemoryConsumption::memory_consumption (shape_hessians) +
+              MemoryConsumption::memory_consumption (shape_3rd_derivatives) +
               MemoryConsumption::memory_consumption (shape_function_to_row_table));
     }
   }
@@ -3183,6 +3235,126 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
                                        *fe, this->finite_element_output.shape_function_to_row_table,
                                        laplacians, quadrature_points_fastest,
                                        indices.size()/dofs_per_cell);
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEValuesBase<dim,spacedim>::
+get_function_third_derivatives (const InputVector                &fe_function,
+                                std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const
+{
+  typedef typename InputVector::value_type Number;
+  AssertDimension (fe->n_components(), 1);
+  Assert (this->update_flags & update_3rd_derivatives,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  Assert (present_cell.get() != 0,
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
+  AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
+
+  // get function values of dofs on this cell
+  Vector<Number> dof_values (dofs_per_cell);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_3rd_derivatives,
+                                    third_derivatives);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void FEValuesBase<dim,spacedim>::get_function_third_derivatives (
+  const InputVector &fe_function,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
+  std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const
+{
+  typedef typename InputVector::value_type Number;
+  Assert (this->update_flags & update_3rd_derivatives,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
+  AssertDimension (indices.size(), dofs_per_cell);
+  if (dofs_per_cell <= 100)
+    {
+      Number dof_values[100];
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        dof_values[i] = get_vector_element (fe_function, indices[i]);
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_3rd_derivatives,
+                                        third_derivatives);
+    }
+  else
+    {
+      Vector<Number> dof_values(dofs_per_cell);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        dof_values[i] = get_vector_element (fe_function, indices[i]);
+      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_3rd_derivatives,
+                                        third_derivatives);
+    }
+}
+
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEValuesBase<dim,spacedim>::
+get_function_third_derivatives (const InputVector                         &fe_function,
+                                std::vector<std::vector<Tensor<3,spacedim,typename InputVector::value_type> > > &third_derivatives,
+                                bool quadrature_points_fastest) const
+{
+  typedef typename InputVector::value_type Number;
+  Assert (this->update_flags & update_3rd_derivatives,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  Assert (present_cell.get() != 0,
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
+  AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
+
+  // get function values of dofs on this cell
+  Vector<Number> dof_values (dofs_per_cell);
+  present_cell->get_interpolated_dof_values(fe_function, dof_values);
+  VectorSlice<std::vector<std::vector<Tensor<3,spacedim,Number> > > > third(third_derivatives);
+  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_3rd_derivatives,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
+                                    third, quadrature_points_fastest);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void FEValuesBase<dim, spacedim>::get_function_third_derivatives (
+  const InputVector &fe_function,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
+  VectorSlice<std::vector<std::vector<Tensor<3,spacedim,typename InputVector::value_type> > > > third_derivatives,
+  bool quadrature_points_fastest) const
+{
+  typedef typename InputVector::value_type Number;
+  Assert (this->update_flags & update_3rd_derivatives,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  Assert (indices.size() % dofs_per_cell == 0,
+          ExcNotMultiple(indices.size(), dofs_per_cell));
+  if (indices.size() <= 100)
+    {
+      Number dof_values[100];
+      for (unsigned int i=0; i<indices.size(); ++i)
+        dof_values[i] = get_vector_element (fe_function, indices[i]);
+      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_3rd_derivatives,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
+                                        third_derivatives, quadrature_points_fastest,
+                                        indices.size()/dofs_per_cell);
+    }
+  else
+    {
+      Vector<Number> dof_values(indices.size());
+      for (unsigned int i=0; i<indices.size(); ++i)
+        dof_values[i] = get_vector_element (fe_function, indices[i]);
+      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_3rd_derivatives,
+                                        *fe, this->finite_element_output.shape_function_to_row_table,
+                                        third_derivatives, quadrature_points_fastest,
+                                        indices.size()/dofs_per_cell);
     }
 }
 

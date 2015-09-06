@@ -1233,6 +1233,11 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
                   output_data.shape_hessians[out_index+s][q] =
                     base_data.shape_hessians[in_index+s][q];
 
+              if (base_flags & update_3rd_derivatives)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  output_data.shape_3rd_derivatives[out_index+s][q] =
+                    base_data.shape_3rd_derivatives[in_index+s][q];
+
             }
         }
 }
@@ -1270,7 +1275,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
                           fe_data.update_flags);
 
 
-  if (flags & (update_values | update_gradients | update_hessians))
+  if (flags & (update_values | update_gradients
+               | update_hessians | update_3rd_derivatives ))
     {
       // let base elements update the necessary data
       Threads::TaskGroup<> task_group;
