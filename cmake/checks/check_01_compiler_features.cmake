@@ -32,6 +32,7 @@
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
 #   DEAL_II_DEPRECATED
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
+#   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
 #
 
 
@@ -335,4 +336,27 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA)
 RESET_CMAKE_REQUIRED()
+
+
+#
+# Use the 'gold' linker if possible, given that it's substantially faster.
+#
+# We have to try to link a full executable with -fuse-ld=gold to check
+# whether "ld.gold" is actually available. gcc has the bad habit of
+# accepting the flag without emitting an error.
+#
+# Wolfgang Bangerth, Matthias Maier, 2015
+#
+PUSH_CMAKE_REQUIRED("-Werror")
+PUSH_CMAKE_REQUIRED("-fuse-ld=gold")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main() { return 0; }
+  "
+  DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+RESET_CMAKE_REQUIRED()
+
+IF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+  ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
+ENDIF()
 
