@@ -419,6 +419,12 @@ public:
    */
   bool operator < (const TriaRawIterator &) const;
 
+  /**
+   * Another comparison operator, implementing with the same ordering as
+   * #operator<.
+   */
+  bool operator > (const TriaRawIterator &) const;
+
   /**@name Advancement of iterators*/
   /*@{*/
   /**
@@ -1013,6 +1019,17 @@ TriaRawIterator<Accessor>::operator < (const TriaRawIterator<Accessor> &other) c
 
   return ((**this) < (*other));
 }
+
+
+
+template <typename Accessor>
+inline
+bool
+TriaRawIterator<Accessor>::operator > (const TriaRawIterator<Accessor> &other) const
+{
+  return (other < *this);
+}
+
 
 
 template <typename Accessor>
