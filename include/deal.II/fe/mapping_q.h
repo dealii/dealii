@@ -69,7 +69,7 @@ public:
    * would also like to use a higher order mapping in the interior. The
    * MappingQEulerian class is one such case.
    *
-   * The value of @p use_mapping_q_on_all_cells is ignore if @p dim is not
+   * The value of @p use_mapping_q_on_all_cells is ignored if @p dim is not
    * equal to @p spacedim, i.e., if we are considering meshes on surfaces
    * embedded into higher dimensional spaces.
    */
