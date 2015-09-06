@@ -219,7 +219,8 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   //a Q1 InternalData, but MappingQGeneric produces one with the
   //polynomial degree of the MappingQ
   std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
-  mdata->initialize (this->requires_update_flags (update_quadrature_points | update_jacobians), point_quadrature, 1);
+  mdata->initialize (this->requires_update_flags (update_quadrature_points),
+                     point_quadrature, 1);
 
   // compute the mapping support
   // points
@@ -244,9 +245,8 @@ Point<spacedim>
 MappingQ1<dim,spacedim>::
 transform_unit_to_real_cell_internal (const InternalData &data) const
 {
-  const unsigned int n_mapping_points=data.mapping_support_points.size();
-  (void)n_mapping_points;
-  AssertDimension (data.shape_values.size(), n_mapping_points);
+  AssertDimension (data.shape_values.size(),
+                   data.mapping_support_points.size());
 
   // use now the InternalData to
   // compute the point in real space.
