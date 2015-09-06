@@ -1215,8 +1215,8 @@ namespace internal
                             for (unsigned int jr=0; jr<dim; ++jr)
                               for (unsigned int lr=0; lr<dim; ++lr)
                                 {
-                                  const unsigned int mr_start = (jr+lr == 0)? 1:0;
-                                  for (unsigned int mr=0; mr<mr_start; ++mr)
+                                  const unsigned int mr0 = (jr+lr == 0)? 1:0;
+                                  for (unsigned int mr=mr0; mr<dim; ++mr)
                                     jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
                                     += result[i][jr][lr][mr] *
                                        data.covariant[point][j][jr] *
@@ -1342,8 +1342,8 @@ namespace internal
                                 for (unsigned int lr=0; lr<dim; ++lr)
                                   for (unsigned int mr=0; mr<dim; ++mr)
                                     {
-                                      const unsigned int nr_start = (jr+lr+mr==0)? 1:0;
-                                      for (unsigned int nr=0; nr<nr_start; ++nr)
+                                      const unsigned int nr0 = (jr+lr+mr==0)? 1:0;
+                                      for (unsigned int nr=nr0; nr<dim; ++nr)
                                         jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
                                         += result[i][jr][lr][mr][nr] *
                                            data.covariant[point][j][jr] *
