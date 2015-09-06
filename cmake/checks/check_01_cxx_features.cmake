@@ -217,32 +217,13 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       "
       DEAL_II_HAVE_CXX11_SHARED_PTR)
 
-    #
-    # On some systems with gcc 4.5.0, we can compile the code
-    # below but it will throw an exception when run. So test
-    # that as well.
-    #
-    IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-      PUSH_CMAKE_REQUIRED("-pthread")
-      # 
-      # On Ubuntu 14.04, the code below won't run without the flag 
-      # -Wl,-no-as-needed. However, deal.II will work fine without 
-      # the flag.
-      #
-      PUSH_CMAKE_REQUIRED("-Wl,-no-as-needed")
-      CHECK_CXX_SOURCE_RUNS(
-        "
-        #include <thread>
-        void f(int){}
-        int main(){ std::thread t(f,1); t.join(); return 0; }
-        "
-        DEAL_II_HAVE_CXX11_THREAD)
-      RESET_CMAKE_REQUIRED()
-      PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-    ELSE()
-      # Just export it ;-)
-      SET(DEAL_II_HAVE_CXX11_THREAD TRUE CACHE BOOL "")
-    ENDIF()
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <thread>
+      void f(int){}
+      int main(){ std::thread t(f,1); t.join(); return 0; }
+      "
+      DEAL_II_HAVE_CXX11_THREAD)
 
     CHECK_CXX_SOURCE_COMPILES(
       "
