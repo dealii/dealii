@@ -859,7 +859,7 @@ MappingQGeneric<dim,spacedim>::get_data (const UpdateFlags update_flags,
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
 {
@@ -874,7 +874,7 @@ MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_fl
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
 {

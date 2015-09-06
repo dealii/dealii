@@ -29,6 +29,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int,int> class MappingQ;
+
+
 /*!@addtogroup mapping */
 /*@{*/
 
@@ -374,7 +377,6 @@ public:
     mutable std::vector<double> volume_elements;
   };
 
-protected:
 
   // documentation can be found in Mapping::requires_update_flags()
   virtual
@@ -389,13 +391,13 @@ protected:
 
   // documentation can be found in Mapping::get_face_data()
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const;
 
@@ -429,6 +431,7 @@ protected:
    * @}
    */
 
+protected:
 
   /**
    * The degree of the polynomials used as shape functions for the mapping
@@ -450,6 +453,12 @@ protected:
   void
   compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                   std::vector<Point<spacedim> > &a) const = 0;
+
+  /**
+   * Make MappingQ a friend since it needs to call the
+   * fill_fe_values() functions on its MappingQ1 sub-object.
+   */
+  template <int, int> friend class MappingQ;
 };
 
 

@@ -193,7 +193,7 @@ template<int dim, int spacedim>
 Mapping<dim, spacedim> *
 MappingC1<dim,spacedim>::clone () const
 {
-  return new MappingC1<dim,spacedim>(*this);
+  return new MappingC1<dim,spacedim>();
 }
 
 
