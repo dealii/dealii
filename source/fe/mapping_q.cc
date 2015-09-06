@@ -24,7 +24,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -35,14 +34,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, int spacedim>
-MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int n_shape_functions)
+MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
-  MappingQ1<dim,spacedim>::InternalData(n_shape_functions),
-  use_mapping_q1_on_current_cell(false),
-  mapping_q1_data(1 << dim)
-{
-  this->is_mapping_q1_data=false;
-}
+  MappingQ1<dim,spacedim>::InternalData(polynomial_degree),
+  use_mapping_q1_on_current_cell(false)
+{}
 
 
 
@@ -57,50 +53,23 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
-namespace
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree)
-  {
-    std::vector<unsigned int> dpo(dim+1, 1U);
-    for (unsigned int i=1; i<dpo.size(); ++i)
-      dpo[i]=dpo[i-1]*(degree-1);
-    return dpo;
-  }
-}
-
-
-
-
 template<int dim, int spacedim>
-MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
+MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                                   const bool use_mapping_q_on_all_cells)
   :
-  degree(p),
+  MappingQ1<dim,spacedim>(degree),
   n_inner(Utilities::fixed_power<dim>(degree-1)),
   n_outer((dim==1) ? 2 :
           ((dim==2) ?
            4+4*(degree-1) :
            8+12*(degree-1)+6*(degree-1)*(degree-1))),
-  tensor_pols(0),
-  n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
-  renumber(FETools::
-           lexicographic_to_hierarchic_numbering (
-             FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
-                                     degree))),
   use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
                               || (dim != spacedim)),
   feq(degree),
   line_support_points(degree+1)
 {
-  // Construct the tensor product polynomials used as shape functions for the
-  // Qp mapping of cells at the boundary.
-  tensor_pols = new TensorProductPolynomials<dim>
-  (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
-  Assert (n_shape_functions==tensor_pols->n(),
-          ExcInternalError());
-  Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
+  Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
+         ExcInternalError());
 
   // build laplace_on_quad_vector
   if (degree>1)
@@ -113,120 +82,13 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 }
 
 
-template<int dim, int spacedim>
-MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
-  :
-  MappingQ1<dim,spacedim>(),
-  degree(mapping.degree),
-  n_inner(mapping.n_inner),
-  n_outer(mapping.n_outer),
-  tensor_pols(0),
-  n_shape_functions(mapping.n_shape_functions),
-  renumber(mapping.renumber),
-  use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
-  feq(degree),
-  line_support_points(degree+1)
-{
-  tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
-  laplace_on_quad_vector=mapping.laplace_on_quad_vector;
-  laplace_on_hex_vector=mapping.laplace_on_hex_vector;
-}
-
-
-template<int dim, int spacedim>
-MappingQ<dim,spacedim>::~MappingQ ()
-{
-  delete tensor_pols;
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                                                typename MappingQ1<dim,spacedim>::InternalData &data) const
-{
-  const unsigned int n_points=unit_points.size();
-  std::vector<double> values;
-  std::vector<Tensor<1,dim> > grads;
-  if (data.shape_values.size()!=0)
-    {
-      Assert(data.shape_values.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      values.resize(n_shape_functions);
-    }
-  if (data.shape_derivatives.size()!=0)
-    {
-      Assert(data.shape_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grads.resize(n_shape_functions);
-    }
-
-//                                 // dummy variable of size 0
-  std::vector<Tensor<2,dim> > grad2;
-  if (data.shape_second_derivatives.size()!=0)
-    {
-      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad2.resize(n_shape_functions);
-    }
-
-  std::vector<Tensor<3,dim> > grad3;
-  if (data.shape_third_derivatives.size()!=0)
-    {
-      Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad3.resize(n_shape_functions);
-    }
-
-  std::vector<Tensor<4,dim> > grad4;
-  if (data.shape_fourth_derivatives.size()!=0)
-    {
-      Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
-             ExcInternalError());
-      grad4.resize(n_shape_functions);
-    }
-
-
-  if (data.shape_values.size()!=0 ||
-      data.shape_derivatives.size()!=0 ||
-      data.shape_second_derivatives.size()!=0 ||
-      data.shape_third_derivatives.size()!=0 ||
-      data.shape_fourth_derivatives.size()!=0 )
-    for (unsigned int point=0; point<n_points; ++point)
-      {
-        tensor_pols->compute(unit_points[point], values, grads, grad2, grad3, grad4);
-
-        if (data.shape_values.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.shape(point,renumber[i]) = values[i];
-
-        if (data.shape_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.derivative(point,renumber[i]) = grads[i];
-
-        if (data.shape_second_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.second_derivative(point,renumber[i]) = grad2[i];
-
-        if (data.shape_third_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.third_derivative(point,renumber[i]) = grad3[i];
-
-        if (data.shape_fourth_derivatives.size()!=0)
-          for (unsigned int i=0; i<n_shape_functions; ++i)
-            data.fourth_derivative(point,renumber[i]) = grad4[i];
-      }
-}
-
-
 
 template<int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(this->polynomial_degree);
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
   Threads::TaskGroup<> tasks;
@@ -237,20 +99,17 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(quadrature),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(quadrature),
-                                                 quadrature.size())));
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(quadrature),
+                                                   quadrature.size())));
+    }
+
   tasks.join_all ();
-
-  // TODO: parallelize this as well
-  this->compute_shapes (quadrature.get_points(), *data);
-  if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (quadrature.get_points(), data->mapping_q1_data);
-
-
   return data;
 }
 
@@ -261,7 +120,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(this->polynomial_degree);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -273,19 +132,17 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(q),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(q),
-                                                 quadrature.size())));
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(q),
+                                                   quadrature.size())));
+    }
+
   tasks.join_all ();
-
-  // TODO: parallelize this as well
-  this->compute_shapes (q.get_points(), *data);
-  if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (q.get_points(), data->mapping_q1_data);
-
   return data;
 }
 
@@ -296,7 +153,7 @@ typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(n_shape_functions);
+  InternalData *data = new InternalData(this->polynomial_degree);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
@@ -308,20 +165,17 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                std_cxx11::cref(q),
                                                quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    tasks += Threads::new_task (std_cxx11::function<void()>
-                                (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                 &data->mapping_q1_data,
-                                                 update_flags,
-                                                 std_cxx11::cref(q),
-                                                 quadrature.size())));
+    {
+      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
+      tasks += Threads::new_task (std_cxx11::function<void()>
+                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
+                                                   data->mapping_q1_data.get(),
+                                                   update_flags,
+                                                   std_cxx11::cref(q),
+                                                   quadrature.size())));
+    }
+
   tasks.join_all ();
-
-  // TODO: parallelize this as well
-  this->compute_shapes (q.get_points(), *data);
-  if (!use_mapping_q_on_all_cells)
-    this->compute_shapes (q.get_points(), data->mapping_q1_data);
-
-
   return data;
 }
 
@@ -352,7 +206,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const typename MappingQ1<dim,spacedim>::InternalData *
   p_data = (data.use_mapping_q1_on_current_cell
             ?
-            &data.mapping_q1_data
+            data.mapping_q1_data.get()
             :
             &data);
 
@@ -365,7 +219,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity updated_cell_similarity
     = ((data.use_mapping_q1_on_current_cell == false)
        &&
-       (get_degree() > 1)
+       (this->polynomial_degree > 1)
        ?
        CellSimilarity::invalid_next_cell
        :
@@ -411,7 +265,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
-       &data.mapping_q1_data
+       data.mapping_q1_data.get()
        :
        &data);
   MappingQ1<dim,spacedim>::fill_fe_face_values(cell,
@@ -453,7 +307,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
-       &data.mapping_q1_data
+       data.mapping_q1_data.get()
        :
        &data);
   MappingQ1<dim,spacedim>::fill_fe_subface_values(cell,
@@ -479,14 +333,14 @@ template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
 {
-  Assert(degree>1, ExcInternalError());
-  const unsigned int n_inner_2d=(degree-1)*(degree-1);
-  const unsigned int n_outer_2d=4+4*(degree-1);
+  Assert(this->polynomial_degree>1, ExcInternalError());
+  const unsigned int n_inner_2d=(this->polynomial_degree-1)*(this->polynomial_degree-1);
+  const unsigned int n_outer_2d=4+4*(this->polynomial_degree-1);
 
   // first check whether we have precomputed the values for some polynomial
   // degree; the sizes of arrays is n_inner_2d*n_outer_2d
   double const *loqv_ptr=0;
-  switch (degree)
+  switch (this->polynomial_degree)
     {
     // for degree==1, we shouldn't have to compute any support points, since
     // all of them are on the vertices
@@ -526,7 +380,7 @@ MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
         compute_laplace_vector(loqvs);
       else if (dim == 3)
         {
-          MappingQ<2,2> mapping_2d(this->degree);
+          MappingQ<2,2> mapping_2d(this->polynomial_degree);
           loqvs = mapping_2d.laplace_on_quad_vector;
         }
     }
@@ -535,7 +389,7 @@ MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
   // this
   for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
     Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
-                                     loqvs[unit_point].end(),0.)-1)<1e-13*this->degree,
+                                     loqvs[unit_point].end(),0.)-1)<1e-13*this->polynomial_degree,
            ExcInternalError());
 }
 
@@ -545,12 +399,12 @@ template <>
 void
 MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
 {
-  Assert(degree>1, ExcInternalError());
+  Assert(this->polynomial_degree>1, ExcInternalError());
 
   // first check whether we have precomputed the values for some polynomial
   // degree
   double const *lohv_ptr=0;
-  if (degree==2)
+  if (this->polynomial_degree==2)
     {
       static const double loqv2[26]
         = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
@@ -578,7 +432,7 @@ MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
   // this
   for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
     Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                     lohvs[unit_point].end(),0.) - 1)<1e-13*this->degree,
+                                     lohvs[unit_point].end(),0.) - 1)<1e-13*this->polynomial_degree,
            ExcInternalError());
 }
 
@@ -611,15 +465,16 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
 
   // for degree==1, we shouldn't have to compute any support points, since all
   // of them are on the vertices
-  Assert(degree>1, ExcInternalError());
+  Assert(this->polynomial_degree>1, ExcInternalError());
 
   // compute the shape gradients at the quadrature points on the unit cell
-  const QGauss<dim> quadrature(degree+1);
+  const QGauss<dim> quadrature(this->polynomial_degree+1);
   const unsigned int n_q_points=quadrature.size();
 
-  InternalData quadrature_data(n_shape_functions);
-  quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
-  this->compute_shapes(quadrature.get_points(), quadrature_data);
+  InternalData quadrature_data(this->polynomial_degree);
+  quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
+                                           n_q_points);
+  quadrature_data.compute_shape_function_values(quadrature.get_points());
 
   // Compute the stiffness matrix of the inner dofs
   FullMatrix<long double> S(n_inner);
@@ -677,10 +532,10 @@ MappingQ<dim,spacedim>::apply_laplace_vector(const Table<2,double> &lvs,
   // compute the quad laplace vector. this is mentioned in the constructor of
   // this class, although I don't understand the reason for not aborting there
   // any more [WB]
-  Assert(lvs.n_rows()!=0, ExcLaplaceVectorNotSet(degree));
+  Assert(lvs.n_rows()!=0, ExcLaplaceVectorNotSet(this->polynomial_degree));
 
   const unsigned int n_inner_apply=lvs.n_rows();
-  Assert(n_inner_apply==n_inner || n_inner_apply==(degree-1)*(degree-1),
+  Assert(n_inner_apply==n_inner || n_inner_apply==(this->polynomial_degree-1)*(this->polynomial_degree-1),
          ExcInternalError());
   const unsigned int n_outer_apply=lvs.n_cols();
   Assert(a.size()==n_outer_apply,
@@ -733,7 +588,7 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     a[i] = cell->vertex(i);
 
-  if (degree>1)
+  if (this->polynomial_degree>1)
     switch (dim)
       {
       case 1:
@@ -770,7 +625,7 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
                                                  std::vector<Point<spacedim> > &a) const
 {
   // if we only need the midpoint, then ask for it.
-  if (degree==2)
+  if (this->polynomial_degree==2)
     {
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
         {
@@ -790,7 +645,7 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
     // otherwise call the more complicated functions and ask for inner points
     // from the boundary description
     {
-      std::vector<Point<spacedim> > line_points (degree-1);
+      std::vector<Point<spacedim> > line_points (this->polynomial_degree-1);
       // loop over each of the lines, and if it is at the boundary, then first
       // get the boundary description and second compute the points on it
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
@@ -844,9 +699,9 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 
   static const StraightBoundary<3> straight_boundary;
   // used if face quad at boundary or entirely in the interior of the domain
-  std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
+  std::vector<Point<3> > quad_points ((this->polynomial_degree-1)*(this->polynomial_degree-1));
   // used if only one line of face quad is at boundary
-  std::vector<Point<3> > b(4*degree);
+  std::vector<Point<3> > b(4*this->polynomial_degree);
 
   // Used by the new Manifold interface. This vector collects the
   // vertices used to compute the intermediate points.
@@ -914,12 +769,12 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
               // call of function apply_laplace_vector increases size of b
               // about 1. There resize b for the case the mentioned function
               // was already called.
-              b.resize(4*degree);
+              b.resize(4*this->polynomial_degree);
 
               // b is of size 4*degree, make sure that this is the right size
-              Assert(b.size()==vertices_per_face+lines_per_face*(degree-1),
+              Assert(b.size()==vertices_per_face+lines_per_face*(this->polynomial_degree-1),
                      ExcDimensionMismatch(b.size(),
-                                          vertices_per_face+lines_per_face*(degree-1)));
+                                          vertices_per_face+lines_per_face*(this->polynomial_degree-1)));
 
               // sort the points into b. We used access from the cell (not
               // from the face) to fill b, so we can assume a standard face
@@ -929,19 +784,19 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
                 b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
 
               for (unsigned int i=0; i<lines_per_face; ++i)
-                for (unsigned int j=0; j<degree-1; ++j)
-                  b[vertices_per_face+i*(degree-1)+j]=
+                for (unsigned int j=0; j<this->polynomial_degree-1; ++j)
+                  b[vertices_per_face+i*(this->polynomial_degree-1)+j]=
                     a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
-                        face_no, i)*(degree-1)+j];
+                        face_no, i)*(this->polynomial_degree-1)+j];
 
               // Now b includes the support points on the quad and we can
               // apply the laplace vector
               apply_laplace_vector(laplace_on_quad_vector, b);
-              Assert(b.size()==4*degree+(degree-1)*(degree-1),
-                     ExcDimensionMismatch(b.size(), 4*degree+(degree-1)*(degree-1)));
+              Assert(b.size()==4*this->polynomial_degree+(this->polynomial_degree-1)*(this->polynomial_degree-1),
+                     ExcDimensionMismatch(b.size(), 4*this->polynomial_degree+(this->polynomial_degree-1)*(this->polynomial_degree-1)));
 
-              for (unsigned int i=0; i<(degree-1)*(degree-1); ++i)
-                a.push_back(b[4*degree+i]);
+              for (unsigned int i=0; i<(this->polynomial_degree-1)*(this->polynomial_degree-1); ++i)
+                a.push_back(b[4*this->polynomial_degree+i]);
             }
           else
             {
@@ -974,7 +829,7 @@ MappingQ<2,3>::
 add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
                         std::vector<Point<3> >                &a) const
 {
-  std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
+  std::vector<Point<3> > quad_points ((this->polynomial_degree-1)*(this->polynomial_degree-1));
   get_intermediate_points_on_object (cell->get_manifold(), cell, quad_points);
   for (unsigned int i=0; i<quad_points.size(); ++i)
     a.push_back(quad_points[i]);
@@ -1002,25 +857,18 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  // The data object may be just a MappingQ1::InternalData, so we have to test
-  // for this first.
-  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
-  Assert(q1_data!=0, ExcInternalError());
+  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
-    {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
-      // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
-    }
-  // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+  // whether we should in fact work on the Q1 portion of it
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
+    if (data->use_mapping_q1_on_current_cell)
+      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+
+  // otherwise just stick with what we already had
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1034,25 +882,18 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  // The data object may be just a MappingQ1::InternalData, so we have to test
-  // for this first.
-  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
-  Assert(q1_data!=0, ExcInternalError());
+  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
-    {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
-      // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
-    }
-  // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+  // whether we should in fact work on the Q1 portion of it
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
+    if (data->use_mapping_q1_on_current_cell)
+      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+
+  // otherwise just stick with what we already had
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1064,25 +905,18 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
            VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  // The data object may be just a MappingQ1::InternalData, so we have to test
-  // for this first.
-  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
-  Assert(q1_data!=0, ExcInternalError());
+  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
-    {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
-      // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
-    }
-  // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+  // whether we should in fact work on the Q1 portion of it
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
+    if (data->use_mapping_q1_on_current_cell)
+      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+
+  // otherwise just stick with what we already had
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1096,25 +930,18 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  // The data object may be just a MappingQ1::InternalData, so we have to test
-  // for this first.
-  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
-  Assert(q1_data!=0, ExcInternalError());
+  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
-    {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
-      // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
-    }
-  // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+  // whether we should in fact work on the Q1 portion of it
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
+    if (data->use_mapping_q1_on_current_cell)
+      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+
+  // otherwise just stick with what we already had
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1126,25 +953,18 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
            VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  // The data object may be just a MappingQ1::InternalData, so we have to test
-  // for this first.
-  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
-  Assert(q1_data!=0, ExcInternalError());
+  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
 
   // If it is a genuine MappingQ::InternalData, we have to test further
-  if (!q1_data->is_mapping_q1_data)
-    {
-      Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-              ExcInternalError());
-      const InternalData &data = static_cast<const InternalData &>(mapping_data);
-      // If we only use the Q1-portion, we have to extract that data object
-      if (data.use_mapping_q1_on_current_cell)
-        q1_data = &data.mapping_q1_data;
-    }
-  // Now, q1_data should have the right tensors in it and we call the base
-  // classes transform function
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, *q1_data, output);
+  // whether we should in fact work on the Q1 portion of it
+  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
+    if (data->use_mapping_q1_on_current_cell)
+      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+
+  // otherwise just stick with what we already had
+  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1166,7 +986,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   typename MappingQ1<dim,spacedim>::InternalData
   *p_data = (mdata->use_mapping_q1_on_current_cell ?
-             &mdata->mapping_q1_data :
+             mdata->mapping_q1_data.get() :
              &*mdata);
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);
@@ -1264,19 +1084,10 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 template<int dim, int spacedim>
-unsigned int
-MappingQ<dim,spacedim>::get_degree() const
-{
-  return degree;
-}
-
-
-
-template<int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingQ<dim,spacedim>::clone () const
 {
-  return new MappingQ<dim,spacedim>(*this);
+  return new MappingQ<dim,spacedim>(this->polynomial_degree);
 }
 
 
@@ -1297,7 +1108,7 @@ MappingQ<dim,spacedim>::get_intermediate_points (const Manifold<dim, spacedim> &
     {
       // If two points are passed, these are the two vertices, and
       // we can only compute degree-1 intermediate points.
-      AssertDimension(n, degree-1);
+      AssertDimension(n, this->polynomial_degree-1);
       for (unsigned int i=0; i<n; ++i)
         {
           const double x = line_support_points.point(i+1)[0];
@@ -1320,7 +1131,7 @@ MappingQ<dim,spacedim>::get_intermediate_points (const Manifold<dim, spacedim> &
       // If four points are passed, these are the two vertices, and
       // we can only compute (degree-1)*(degree-1) intermediate
       // points.
-      AssertDimension(m, degree-1);
+      AssertDimension(m, this->polynomial_degree-1);
 
       for (unsigned int i=0; i<m; ++i)
         {

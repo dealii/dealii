@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/manifold.h>
 
@@ -46,18 +47,18 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  * the documentation of FiniteElement or the one of Triangulation.
  *
  * @note Since the boundary description is closely tied to the unit cell
- * support points, new boundary descriptions need to explicitly use the Gauss-
- * Lobatto points.
+ * support points, new boundary descriptions need to explicitly use the
+ * Gauss-Lobatto points.
  *
- * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001
+ * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001, Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim=dim>
 class MappingQ : public MappingQ1<dim,spacedim>
 {
 public:
   /**
-   * Constructor.  @p p gives the degree of mapping polynomials on boundary
-   * cells.
+   * Constructor.  @p polynomial_degree denotes the polynomial degree
+   * of the polynomials that are used to map cells boundary.
    *
    * The second argument determines whether the higher order mapping should
    * also be used on interior cells. If its value is <code>false</code> (the
@@ -68,20 +69,8 @@ public:
    * would also like to use a higher order mapping in the interior. The
    * MappingQEulerian class is one such case.
    */
-  MappingQ (const unsigned int p,
+  MappingQ (const unsigned int polynomial_degree,
             const bool use_mapping_q_on_all_cells = false);
-
-  /**
-   * Copy constructor. Performs a deep copy, i.e. duplicates what #tensor_pols
-   * points to instead of simply copying the #tensor_pols pointer as done by a
-   * default copy constructor.
-   */
-  MappingQ (const MappingQ<dim,spacedim> &mapping);
-
-  /**
-   * Destructor.
-   */
-  virtual ~MappingQ ();
 
   /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the
@@ -156,12 +145,6 @@ public:
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
-
-  /**
-   * Return the degree of the mapping, i.e. the value which was passed to the
-   * constructor.
-   */
-  unsigned int get_degree () const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -261,7 +244,7 @@ protected:
     /**
      * Constructor.
      */
-    InternalData (const unsigned int n_shape_functions);
+    InternalData (const unsigned int polynomial_degree);
 
 
     /**
@@ -278,11 +261,13 @@ protected:
     mutable bool use_mapping_q1_on_current_cell;
 
     /**
-     * A structure to store the corresponding information for the pure
+     * A pointer to a structure to store the information for the pure
      * $Q_1$ mapping that is, by default, used on all interior cells.
      */
-    typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
+    std_cxx11::unique_ptr<typename MappingQ1<dim,spacedim>::InternalData> mapping_q1_data;
   };
+
+protected:
 
   // documentation can be found in Mapping::get_data()
   virtual
@@ -332,12 +317,7 @@ protected:
    * @}
    */
 
-  /**
-   * Compute shape values and/or derivatives.
-   */
-  virtual void
-  compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                          typename MappingQ1<dim,spacedim>::InternalData &data) const;
+protected:
 
   /**
    * This function is needed by the constructor of
@@ -436,12 +416,6 @@ protected:
                   << "laplace_vector not set for degree=" << arg1 << ".");
 
   /**
-   * Degree @p p of the polynomials used as shape functions for the Qp mapping
-   * of cells at the boundary.
-   */
-  const unsigned int degree;
-
-  /**
    * Number of inner mapping shape functions.
    */
   const unsigned int n_inner;
@@ -450,23 +424,6 @@ protected:
    * Number of mapping shape functions on the boundary.
    */
   const unsigned int n_outer;
-
-  /**
-   * Pointer to the @p dim-dimensional tensor product polynomials used as
-   * shape functions for the Qp mapping of cells at the boundary.
-   */
-  const TensorProductPolynomials<dim> *tensor_pols;
-
-  /**
-   * Number of the Qp tensor product shape functions.
-   */
-  const unsigned int n_shape_functions;
-
-  /**
-   * Mapping from lexicographic to to the Qp shape function numbering. Its
-   * size is @p dofs_per_cell.
-   */
-  const std::vector<unsigned int> renumber;
 
   /**
    * If this flag is set @p true then @p MappingQ is used on all cells, not
