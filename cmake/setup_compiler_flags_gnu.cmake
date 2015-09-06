@@ -55,6 +55,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
+# Use the 'gold' linker if possible, given that it's substantially faster.
+#
+ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
+
+#
 # Setup various warnings:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
