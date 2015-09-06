@@ -63,8 +63,17 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
           ((dim==2) ?
            4+4*(degree-1) :
            8+12*(degree-1)+6*(degree-1)*(degree-1))),
-  use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
-                              || (dim != spacedim)),
+
+  // see whether we want to use *this* mapping objects on *all* cells,
+  // or defer to an explicit Q1 mapping on interior cells. if
+  // degree==1, then we are already that Q1 mapping, so we don't need
+  // it; if dim!=spacedim, there is also no need for anything because
+  // we're most likely on a curved manifold
+  use_mapping_q_on_all_cells (degree==1
+                              ||
+                              use_mapping_q_on_all_cells
+                              ||
+                              (dim != spacedim)),
   feq(degree),
   q1_mapping (this->use_mapping_q_on_all_cells
               ?
@@ -1028,7 +1037,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   try
     {
       initial_p_unit
-        = MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
+        = StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, p);
     }
   catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
     {
