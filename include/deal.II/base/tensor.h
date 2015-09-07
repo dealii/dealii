@@ -1070,7 +1070,7 @@ inline
 typename Tensor<rank_,dim,Number>::real_type
 Tensor<rank_,dim,Number>::norm_square () const
 {
-  real_type s = 0;
+  real_type s = real_type();
   for (unsigned int i=0; i<dim; ++i)
     s += values[i].norm_square();
 
