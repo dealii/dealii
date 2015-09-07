@@ -822,11 +822,13 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor (const bool initialize)
+Tensor<rank_,dim,Number>::Tensor (const bool /*initialize*/)
 {
-  if (initialize)
-    for (unsigned int i=0; i!=dim; ++i)
-      values[i] = value_type();
+  // All members of the c-style array values are already default initialized
+  // and thus all values are already set to zero recursively.
+
+  // TODO: Think about using the default heap allocator to restore the old
+  // behavior.
 }
 
 
