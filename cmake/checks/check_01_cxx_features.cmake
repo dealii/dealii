@@ -217,6 +217,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       "
       DEAL_II_HAVE_CXX11_SHARED_PTR)
 
+    PUSH_CMAKE_REQUIRED("-pthread")
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <thread>
@@ -224,6 +225,8 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       int main(){ std::thread t(f,1); t.join(); return 0; }
       "
       DEAL_II_HAVE_CXX11_THREAD)
+    RESET_CMAKE_REQUIRED()
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     CHECK_CXX_SOURCE_COMPILES(
       "
