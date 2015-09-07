@@ -360,6 +360,8 @@ public:
    */
   typedef typename Tensor<rank_-1,dim,Number>::array_type
   array_type[(dim != 0) ? dim : 1];
+  // ... avoid a compiler warning in case of dim == 0 and ensure that the
+  // array always has positive size.
 
   /**
    * Constructor. Initialize all entries to zero if
@@ -567,6 +569,8 @@ private:
    * Array of tensors holding the subelements.
    */
   Tensor<rank_-1, dim, Number> values[(dim != 0) ? dim : 1];
+  // ... avoid a compiler warning in case of dim == 0 and ensure that the
+  // array always has positive size.
 
   /**
    * Help function for unroll.
@@ -631,6 +635,7 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number>::operator Number &()
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
 }
 
@@ -639,6 +644,7 @@ template <int dim, typename Number>
 inline
 Tensor<0,dim,Number>::operator const Number &() const
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
 }
 
@@ -733,6 +739,7 @@ inline
 typename Tensor<0,dim,Number>::real_type
 Tensor<0,dim,Number>::norm () const
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return numbers::NumberTraits<Number>::abs (value);
 }
 
@@ -742,6 +749,7 @@ inline
 typename Tensor<0,dim,Number>::real_type
 Tensor<0,dim,Number>::norm_square () const
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return numbers::NumberTraits<Number>::abs_square (value);
 }
 
@@ -753,6 +761,7 @@ void
 Tensor<0, dim, Number>::unroll_recursion (Vector<OtherNumber> &result,
                                           unsigned int        &index) const
 {
+  Assert(dim != 0, ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
   result[index] = value;
   ++index;
 }
@@ -875,6 +884,7 @@ inline
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   return values[i];
 }
@@ -885,6 +895,7 @@ inline
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   return values[i];
 }
@@ -895,6 +906,7 @@ inline
 Number
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
   return internal::TensorIndicesHelper<rank_>::extract(*this, indices);
 }
@@ -905,6 +917,7 @@ inline
 Number &
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
 {
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
   return internal::TensorIndicesHelper<rank_>::extract(*this, indices);
 }
