@@ -1363,6 +1363,22 @@ operator * (const Tensor<rank,dim,Number> &t,
 }
 
 
+#ifdef DEAL_II_GCC_COMPLEX_CONV_BUG
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<1,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Tensor<1,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  typedef typename ProductType<Number,OtherNumber>::type product_type;
+  Tensor<1,dim,product_type> tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = product_type(t[d]) * product_type(factor);
+  return tt;
+}
+#endif
+
+
 /**
  * Multiplication of a tensor of general rank with a scalar number from the
  * left. See the discussion with the operator with switched arguments for more
