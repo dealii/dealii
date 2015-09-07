@@ -177,11 +177,6 @@ public:
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
-   * Assignment operator.
-   */
-  Tensor<0,dim,Number> &operator = (const Number d);
-
-  /**
    * Test for equality of two tensors.
    */
   template<typename OtherNumber>
@@ -685,17 +680,6 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Other
   Assert(dim != 0 || p.value == OtherNumber(),
          ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
   value = p.value;
-  return *this;
-}
-
-
-template <int dim, typename Number>
-inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Number d)
-{
-  Assert(dim != 0 || d == OtherNumber(),
-         ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
-  value = d;
   return *this;
 }
 
