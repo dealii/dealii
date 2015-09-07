@@ -140,7 +140,7 @@ inline
 Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
 operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
 {
-  return static_cast<Number>(p) + static_cast<OtherNumber>(q);
+  return static_cast<const Number &>(p) + static_cast<const OtherNumber &>(q);
 }
 
 
@@ -154,7 +154,7 @@ inline
 Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
 operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
 {
-  return static_cast<Number>(p) - static_cast<OtherNumber>(q);
+  return static_cast<const Number &>(p) - static_cast<const OtherNumber &>(q);
 }
 
 
@@ -174,7 +174,7 @@ inline
 typename ProductType<Number, OtherNumber>::type
 operator* (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
 {
-  return static_cast<Number>(p) * static_cast<OtherNumber>(q);
+  return static_cast<const Number &>(p) * static_cast<const OtherNumber &>(q);
 }
 
 //@}
