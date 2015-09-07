@@ -32,7 +32,7 @@ template <int dim>
 void test_tensor ()
 {
   // a real tensor
-  Tensor<1,dim,double> t (false);
+  Tensor<1,dim,double> t;
 
   for (unsigned int i=0; i<dim; ++i)
     {

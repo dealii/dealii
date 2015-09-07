@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -185,7 +185,7 @@ operator () (const MatrixFree<dim,Number> &data,
       for (unsigned int q=0; q<n_q_points0; ++q)
         {
           fe_eval0.submit_value (values0[q], q);
-          Tensor<1,dim,VectorizedArray<Number> > submit (false);
+          Tensor<1,dim,VectorizedArray<Number> > submit;
           for (unsigned int d=0; d<dim; ++d)
             submit[d] = gradients0[q*dim+d];
           fe_eval0.submit_gradient (submit, q);
@@ -197,7 +197,7 @@ operator () (const MatrixFree<dim,Number> &data,
       for (unsigned int q=0; q<n_q_points1; ++q)
         {
           fe_eval1.submit_value (values1[q], q);
-          Tensor<1,dim,VectorizedArray<Number> > submit (false);
+          Tensor<1,dim,VectorizedArray<Number> > submit;
           for (unsigned int d=0; d<dim; ++d)
             submit[d] = gradients1[q*dim+d];
           fe_eval1.submit_gradient (submit, q);
@@ -209,7 +209,7 @@ operator () (const MatrixFree<dim,Number> &data,
       for (unsigned int q=0; q<n_q_points1; ++q)
         {
           fe_eval01.submit_value (values1[q], q);
-          Tensor<1,dim,VectorizedArray<Number> > submit (false);
+          Tensor<1,dim,VectorizedArray<Number> > submit;
           for (unsigned int d=0; d<dim; ++d)
             submit[d] = gradients1[q*dim+d];
           fe_eval01.submit_gradient (submit, q);

@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/tensor_base.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>

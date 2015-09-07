@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
+  longer have a constructor taking a boolean argument. Those were replaced
+  by a default constructor will always initialize underlying values with
+  zero.
+  <br>
+  (Matthias Maier, 2015/09/07)
+  </li>
+
   <li> Removed: The testsuite no longer supports compiler constraints of
   the form "<code>.compiler=[NAME]...</code>".
   <br>
@@ -126,6 +134,13 @@ inconvenience this causes.
   (Alberto Sartori, 2015/09/04)
   </li>
 
+  <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
+  up (a lot of unnecessary partial template specializations have been
+  removed). The specialization Tensor<1,dim,Number> has been removed.
+  <br>
+  (Matthias Maier, 2015/09/02)
+  </li>
+
   <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
   was computed incorrectly.
   <br>
@@ -139,7 +154,7 @@ inconvenience this causes.
   <br>
   (Matthias Maier, 2015/08/29)
   </li>
-  
+
   <li> New: A class BlockLinearOperator has been introduced that extends
   the LinearOperator concept to block structures. A BlockLinearOperator can
   be sliced back to a LinearOperator.
@@ -156,9 +171,12 @@ inconvenience this causes.
   - TensorFunction
 
   <br>
-  <em>Classes now supporting complex number types via header:</em>
+  <em>Classes with fixed interface that now fully support complex number
+  types (pure template classes without explicit instantiations in the
+  library):</em>
   - LinearOperator
   - PackagedOperation
+  - Tensor
   <br>
   (Matthias Maier, 2015/08/25 - XXX)
   </li>

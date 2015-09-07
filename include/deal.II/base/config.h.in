@@ -70,6 +70,7 @@
 #cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
 #cmakedefine DEAL_II_CONSTEXPR_BUG
 #cmakedefine DEAL_II_ICC_SFINAE_BUG
+#cmakedefine DEAL_II_GCC_COMPLEX_CONV_BUG
 
 
 /***********************************************************************

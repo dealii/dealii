@@ -436,6 +436,30 @@ struct ProductType<int,float>
   typedef float type;
 };
 
+template <>
+struct ProductType<double, unsigned int>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<unsigned int, double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,unsigned int>
+{
+  typedef float type;
+};
+
+template <>
+struct ProductType<unsigned int,float>
+{
+  typedef float type;
+};
+
 
 #endif
 
