@@ -520,14 +520,6 @@ public:
     virtual ~InternalDataBase ();
 
     /**
-     * Initialize some pointers used in the computation of second derivatives
-     * by finite differencing of gradients.
-     */
-    void initialize_2nd (const FiniteElement<dim,spacedim> *element,
-                         const Mapping<dim,spacedim>       &mapping,
-                         const Quadrature<dim>    &quadrature);
-
-    /**
      * Values updated by the constructor or by reinit.
      */
     UpdateFlags          update_flags;
@@ -2212,16 +2204,6 @@ protected:
    */
   TableIndices<2>
   interface_constraints_size () const;
-
-  /**
-   * Compute second derivatives by finite differences of gradients.
-   */
-  void compute_2nd (const Mapping<dim,spacedim>                                         &mapping,
-                    const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                    const unsigned int                                                   offset,
-                    const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                    const InternalDataBase                                              &fe_internal,
-                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &data) const;
 
   /**
    * Given the pattern of nonzero components for each shape function, compute
