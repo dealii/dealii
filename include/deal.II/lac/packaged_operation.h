@@ -836,11 +836,39 @@ constrained_rhs(const ConstraintMatrix &, const Matrix &, const Range &);
 /**
  * @relates LinearOperator
  *
- * Description... TODO!
+ * Let @p m be a system matrix, @p rhs a vector, and @p cm a constraint matrix.
+ *
+ * constrained_rhs returns the rhs associated to @p rhs of the constrained system
+ * induced by @p m and @p cm.
+ * In detail, a constrained problem can be expressed in this form:
+ * Ct * S * C * x = Ct * ( rhs + S * k)
+ * Where:
+ *  - C has the role of constraint matrix
+ *  - k is the vector representing constraints inhomogeneities.
+ *    (a generic contraint can be expressed as x = Cx + k)
+ *  - S is the system matrix
+ *  - rhs is the original right-hand-side
+ * This function returns a LinearOperator representing the vector
+ * Ct * ( rhs + S * k).
+ *
+ * @note Suppose we have n dof and m constraints. W.l.o.g. we can assume that it
+ * is possible to express n-m variables in terms of remainder variables
+ * (constrained variables).
+ * Therefore, $ x_i = C_{i,j} x_j + k_i $ for $j = 1, ..., n-m$
+ * and $i = 1, ..., n$.
+ * Notice that Ct * S * C  is a problem in ${\mathbb R}^{m-n}$, remainder
+ * variables are treated solving x = 0 in order to have a well-posed problem
+ * on ${\mathbb R}^n$.
+ * At the end a solution of the problem holding for constrained variables
+ * can be found applying the constraint equations. (This is equivalent to
+ * cm.distribute(x)).
+ *
+ * @see M. S. Shephard: Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process, 1985.
+ * For more details.
  *
  * @ingroup LAOperators
  */
-// template <typename Range> class PackagedOperation<Range>;
 template <typename Range,
           typename Domain,
           typename Matrix>

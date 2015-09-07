@@ -1122,16 +1122,38 @@ template <typename Range = Vector<double>,
 LinearOperator<Range, Domain>
 constraints_linear_operator(const ConstraintMatrix &, const Matrix &);
 
-template <typename Range = Vector<double>,
-          typename Domain = Range,
-          typename Matrix>
-LinearOperator<Range, Domain>
-constrained_linear_operator(const ConstraintMatrix &, const Matrix &);
-
 /**
  * @relates LinearOperator
  *
- * Description... TODO!
+ * constraints_linear_operator takes a constraint matrix @p cm and an exemplar
+ * matrix @p m (this matrix could be the system matrix).
+ * The result of this function is the LinearOperator associated to the constraint
+ * matrix.
+ * In detail, a constrained problem can be expressed in this form:
+ * Ct * S * C * x = Ct * ( rhs + S * k)
+ * Where:
+ *  - C has the role of constraint matrix
+ *  - k is the vector representing constraints inhomogeneities.
+ *    (a generic contraint can be expressed as x = Cx + k)
+ *  - S is the system matrix
+ *  - rhs is the original right-hand-side
+ * This function returns a LinearOperator representing the matrix C.
+ *
+ * @note Suppose we have n dof and m constraints. W.l.o.g. we can assume that it
+ * is possible to express n-m variables in terms of remainder variables
+ * (constrained variables).
+ * Therefore, $ x_i = C_{i,j} x_j + k_i $ for $j = 1, ..., n-m$
+ * and $i = 1, ..., n$.
+ * Notice that Ct * S * C  is a problem in ${\mathbb R}^{m-n}$, remainder
+ * variables are treated solving x = 0 in order to have a well-posed problem
+ * on ${\mathbb R}^n$.
+ * At the end a solution of the problem holding for constrained variables
+ * can be found applying the constraint equations. (This is equivalent to
+ * cm.distribute(x)).
+ *
+ * @see M. S. Shephard: Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process, 1985.
+ * For more details.
  *
  * @ingroup LAOperators
  */
@@ -1187,10 +1209,44 @@ constraints_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
   return return_op;
 }
 
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Matrix>
+LinearOperator<Range, Domain>
+constrained_linear_operator(const ConstraintMatrix &, const Matrix &);
+
 /**
  * @relates LinearOperator
  *
- * Description... TODO!
+ * Let @p m be a system matrix and assume we are interested in this problem
+ * constrained with a constraint matrix @p cm.
+ * This function returns the LinearOperator that replace the system matrix and
+ * is associated to this problem.
+ * In detail, a constrained problem can be expressed in this form:
+ * Ct * S * C * x = Ct * ( rhs + S * k)
+ * Where:
+ *  - C has the role of constraint matrix
+ *  - k is the vector representing constraints inhomogeneities.
+ *    (a generic constraint can be expressed as x = Cx + k)
+ *  - S is the system matrix
+ *  - rhs is the original right-hand-side
+ * This function returns a LinearOperator representing the matrix Ct * S * C.
+ *
+ * @note Suppose we have n dof and m constraints. W.l.o.g. we can assume that it
+ * is possible to express n-m variables in terms of remainder variables
+ * (constrained variables).
+ * Therefore, $ x_i = C_{i,j} x_j + k_i $ for $j = 1, ..., n-m$
+ * and $i = 1, ..., n$.
+ * Notice that Ct * S * C  is a problem in ${\mathbb R}^{m-n}$, remainder
+ * variables are treated solving x = 0 in order to have a well-posed problem
+ * on ${\mathbb R}^n$.
+ * At the end a solution of the problem holding for constrained variables
+ * can be found applying the constraint equations. (This is equivalent to
+ * cm.distribute(x)).
+ *
+ * @see M. S. Shephard: Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process, 1985.
+ * For more details.
  *
  * @ingroup LAOperators
  */
