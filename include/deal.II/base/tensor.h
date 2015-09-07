@@ -364,11 +364,9 @@ public:
   // array always has positive size.
 
   /**
-   * Constructor. Initialize all entries to zero if
-   * <tt>initialize==true</tt>; this is the default behaviour.
+   * Constructor. Initialize all entries to zero.
    */
-  explicit
-  Tensor (const bool initialize = true);
+  Tensor ();
 
   /**
    * Copy constructor.
@@ -822,13 +820,10 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor (const bool /*initialize*/)
+Tensor<rank_,dim,Number>::Tensor ()
 {
   // All members of the c-style array values are already default initialized
   // and thus all values are already set to zero recursively.
-
-  // TODO: Think about using the default heap allocator to restore the old
-  // behavior.
 }
 
 
@@ -1584,7 +1579,7 @@ Tensor<1,dim,Number>
 operator * (const Tensor<2,dim,Number> &src1,
             const Tensor<1,dim,Number> &src2)
 {
-  Tensor<1,dim,Number> dest (false);
+  Tensor<1,dim,Number> dest;
   for (unsigned int i=0; i<dim; ++i)
     {
       dest[i] = src1[i][0] * src2[0];
@@ -1638,7 +1633,7 @@ Tensor<1,dim,Number>
 operator * (const Tensor<1,dim,Number> &src1,
             const Tensor<2,dim,Number> &src2)
 {
-  Tensor<1,dim,Number> dest (false);
+  Tensor<1,dim,Number> dest;
   for (unsigned int i=0; i<dim; ++i)
     {
       dest[i] = src1[0] * src2[0][i];

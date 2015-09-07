@@ -96,13 +96,6 @@ public:
   Point ();
 
   /**
-   * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>
-   * (in which case it is equivalent to the default constructor) or leaves the
-   * elements uninitialized if <tt>initialize==false</tt>.
-   */
-  explicit Point (const bool initialize);
-
-  /**
    * Convert a tensor to a point.
    */
   explicit Point (const Tensor<1,dim,Number> &);
@@ -253,15 +246,6 @@ public:
 template <int dim, typename Number>
 inline
 Point<dim,Number>::Point ()
-{}
-
-
-
-template <int dim, typename Number>
-inline
-Point<dim,Number>::Point (const bool initialize)
-  :
-  Tensor<1,dim,Number>(initialize)
 {}
 
 

@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
+  longer have a constructor taking a boolean argument. Those were replaced
+  by a default constructor will always initialize underlying values with
+  zero.
+  <br>
+  (Matthias Maier, 2015/09/07)
+  </li>
+
   <li> Removed: The testsuite no longer supports compiler constraints of
   the form "<code>.compiler=[NAME]...</code>".
   <br>
@@ -146,7 +154,7 @@ inconvenience this causes.
   <br>
   (Matthias Maier, 2015/08/29)
   </li>
-  
+
   <li> New: A class BlockLinearOperator has been introduced that extends
   the LinearOperator concept to block structures. A BlockLinearOperator can
   be sliced back to a LinearOperator.
