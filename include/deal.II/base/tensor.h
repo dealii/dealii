@@ -1242,12 +1242,9 @@ std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
  * @relates Tensor<0,dim,Number>
  * @relates EnableIfScalar
  */
-template <int dim,
-          typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Tensor<0,dim,typename ProductType<OtherNumber, Number>::type>
+Tensor<0,dim,typename ProductType<typename EnableIfScalar<OtherNumber>::type, Number>::type>
 operator * (const OtherNumber           factor,
             const Tensor<0,dim,Number> &t)
 {
@@ -1261,12 +1258,9 @@ operator * (const OtherNumber           factor,
  * @relates Tensor<0,dim,Number>
  * @relates EnableIfScalar
  */
-template <int dim,
-          typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+Tensor<0,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator * (const Tensor<0,dim,Number> &t,
             const OtherNumber           factor)
 {
@@ -1280,12 +1274,9 @@ operator * (const Tensor<0,dim,Number> &t,
  * @relates Tensor<0,dim,Number>
  * @relates EnableIfScalar
  */
-template <int dim,
-          typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Tensor<0,dim,typename ProductType<Number, OtherNumber>::type>
+Tensor<0,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator / (const Tensor<0,dim,Number> &t,
             const OtherNumber           factor)
 {
