@@ -827,6 +827,48 @@ operator*(const PackagedOperation<Range> &comp,
   return return_comp;
 }
 
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Matrix>
+PackagedOperation<Range>
+constrained_rhs(const ConstraintMatrix &, const Matrix &, const Range &);
+
+/**
+ * @relates LinearOperator
+ *
+ * Description... TODO!
+ *
+ * @ingroup LAOperators
+ */
+// template <typename Range> class PackagedOperation<Range>;
+template <typename Range,
+          typename Domain,
+          typename Matrix>
+PackagedOperation<Range>
+constrained_rhs(const ConstraintMatrix &cm, const Matrix &m, const Range &rhs)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = [&m](Range &v, bool fast)
+  {
+    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(m, v, fast);
+  };
+
+  return_comp.apply = [&cm, &m, &rhs](Range &v)
+  {
+    const auto M = linear_operator<Range, Domain>(m);
+    const auto C  = constraints_linear_operator<Range, Domain, Matrix>(cm, m);
+    const auto Ct = transpose_operator<Domain, Range>(C);
+
+    for (auto i : v.locally_owned_elements())
+      v[i] =  -1 * cm.get_inhomogeneity(i);
+
+    v = Ct * ( rhs + M * v);
+  };
+
+  return return_comp;
+}
+
 //@}
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1116,6 +1116,98 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
   return return_op;
 }
 
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Matrix>
+LinearOperator<Range, Domain>
+constraints_linear_operator(const ConstraintMatrix &, const Matrix &);
+
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Matrix>
+LinearOperator<Range, Domain>
+constrained_linear_operator(const ConstraintMatrix &, const Matrix &);
+
+/**
+ * @relates LinearOperator
+ *
+ * Description... TODO!
+ *
+ * @ingroup LAOperators
+ */
+template <  typename Range,
+            typename Domain,
+            typename Matrix >
+LinearOperator<Range, Domain>
+constraints_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
+{
+  LinearOperator<Range, Domain> return_op = linear_operator<Range, Domain>(m);
+
+  return_op.vmult = [&cm](Range &v, const Domain &u)
+  {
+    for (auto i : v.locally_owned_elements())
+      {
+        if (cm.is_constrained(i))
+          {
+            v(i) = 0;
+            const std::vector< std::pair < types::global_dof_index, double > >
+            *entries = cm.get_constraint_entries (i);
+            for (types::global_dof_index j=0; j < entries->size(); ++j)
+              {
+                types::global_dof_index pos = (*entries)[j].first;
+                v(i) +=  u(pos) * (*entries)[j].second;
+              }
+          }
+        else
+          v(i) = u(i);
+      }
+  };
+
+  return_op.Tvmult = [&cm](Range &v, const Domain &u)
+  {
+    for (auto i : u.locally_owned_elements())
+      {
+        if (cm.is_constrained(i))
+          {
+            v(i)=0;
+            const std::vector< std::pair < types::global_dof_index, double > >
+            *entries = cm.get_constraint_entries (i);
+            for (types::global_dof_index j=0; j < entries->size(); ++j)
+              {
+                types::global_dof_index pos = (*entries)[j].first;
+                v(pos) += u(i) * (*entries)[j].second;
+              }
+          }
+        else
+          v(i)=u(i);
+
+      }
+  };
+
+  return return_op;
+}
+
+/**
+ * @relates LinearOperator
+ *
+ * Description... TODO!
+ *
+ * @ingroup LAOperators
+ */
+template <  typename Range,
+            typename Domain,
+            typename Matrix >
+LinearOperator<Range, Domain>
+constrained_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
+{
+  auto C  = constraints_linear_operator<Range, Domain, Matrix>(cm, m);
+  auto Ct = transpose_operator<Domain, Range>(C);
+  auto A  = linear_operator<Range, Domain>(m);
+
+  return Ct * A * C;
+}
+
+
 //@}
 
 DEAL_II_NAMESPACE_CLOSE
