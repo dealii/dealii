@@ -930,6 +930,15 @@ public:
   void print_gnuplot (std::ostream &out) const;
 
   /**
+   * Prints the sparsity of the matrix in a .svg file which can be opened in a web browser.
+   * The .svg file contains squares which correspond to the entries in the matrix. An entry
+   * in the matrix which contains a non-zero value corresponds with a red square while a
+   * zero-valued entry in the matrix correspond with a white square.
+   */
+  void print_svg (std::ostream &out) const;
+
+
+  /**
    * Write the data of this object to a stream for the purpose of
    * serialization
    */
