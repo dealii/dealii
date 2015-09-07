@@ -816,9 +816,6 @@ inline
 Tensor<rank_,dim,Number>::Tensor (const bool initialize)
 {
   if (initialize)
-    // need to create an object Number() to initialize to zero to avoid
-    // confusion with Tensor::operator=(scalar) when using something like
-    // Tensor<1,dim,Tensor<1,dim,Number> >.
     for (unsigned int i=0; i!=dim; ++i)
       values[i] = value_type();
 }
@@ -849,18 +846,6 @@ Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,OtherNumber> &initializ
 {
   for (unsigned int i=0; i!=dim; ++i)
     values[i] = initializer[i];
-}
-
-
-// At some places in the library, we have Point<0> for formal reasons
-// (e.g., we sometimes have Quadrature<dim-1> for faces, so we have
-// Quadrature<0> for dim=1, and then we have Point<0>). To avoid warnings
-// in the above function that the loop end check always fails, we
-// implement this function here
-template <>
-inline
-Tensor<1,0,double>::Tensor (const Tensor<1,0,double> &)
-{
 }
 
 
@@ -932,19 +917,6 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = t.values[i];
-  return *this;
-}
-
-
-// At some places in the library, we have Point<0> for formal reasons
-// (e.g., we sometimes have Quadrature<dim-1> for faces, so we have
-// Quadrature<0> for dim=1, and then we have Point<0>). To avoid warnings
-// in the above function that the loop end check always fails, we
-// implement this function here
-template <>
-inline
-Tensor<1,0,double> &Tensor<1,0,double>::operator = (const Tensor<1,0,double> &)
-{
   return *this;
 }
 
