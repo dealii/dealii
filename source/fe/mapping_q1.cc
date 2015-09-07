@@ -103,11 +103,12 @@ namespace internal
       const double c = (x0 - x1)*y - (x - x1)*y0 + (x - x0)*y1;
 
       const double discriminant = b*b - 4*a*c;
-      // fast exit if the point is not in the cell (this is the only case
-      // where the discriminant is negative)
+      // exit if the point is not in the cell (this is the only case where the
+      // discriminant is negative)
       if (discriminant < 0.0)
         {
-          return Point<2>(2, 2);
+          AssertThrow (false,
+                       (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
         }
 
       double eta1;
@@ -160,9 +161,15 @@ namespace internal
             }
           else // give up and try Newton iteration
             {
-              return Point<2>(2, 2);
+              AssertThrow (false,
+                           (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
             }
         }
+      // bogus return to placate compiler. It should not be possible to get
+      // here.
+      Assert(false, ExcInternalError());
+      return Point<2>(std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN());
     }
 
 
@@ -421,29 +428,33 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       //   algorithm is used.
       const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
       vertices = this->get_vertices(cell);
-      // These internal routines do not throw exceptions when the point does
-      // not lie in the cell because manually checking (see the tolerances
-      // before the return statements) is about 10% faster than a throw/catch.
-      Point<dim> point = internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
+      try
+        {
+          Point<dim> point = internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
 
-      if (dim == 1)
-        {
-          // formula not subject to any issues
-          return point;
-        }
-      else if (dim == 2)
-        {
-          // formula not guaranteed to work for points outside of the cell
-          const double eps = 1e-15;
-          if (-eps <= point(1) && point(1) <= 1 + eps &&
-              -eps <= point(0) && point(0) <= 1 + eps)
+          if (dim == 1)
             {
+              // formula not subject to any issues
               return point;
             }
+          else if (dim == 2)
+            {
+              // formula not guaranteed to work for points outside of the cell
+              const double eps = 1e-15;
+              if (-eps <= point(1) && point(1) <= 1 + eps &&
+                  -eps <= point(0) && point(0) <= 1 + eps)
+                {
+                  return point;
+                }
+            }
+          else
+            {
+              Assert(false, ExcInternalError());
+            }
         }
-      else
+      catch (const typename Mapping<spacedim,spacedim>::ExcTransformationFailed &)
         {
-          Assert(false, ExcInternalError());
+          // continue on to the standard Newton code
         }
     }
   // Find the initial value for the
