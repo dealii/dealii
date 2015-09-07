@@ -179,8 +179,7 @@ public:
   /**
    * Assignment operator.
    */
-  template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator = (const OtherNumber d);
+  Tensor<0,dim,Number> &operator = (const Number d);
 
   /**
    * Test for equality of two tensors.
@@ -451,12 +450,8 @@ public:
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
-   *
-   * @relates EnableIfScalar
    */
-  template <typename OtherNumber,
-            typename = typename EnableIfScalar<OtherNumber>::type>
-  Tensor<rank_,dim,Number> &operator = (const OtherNumber d);
+  Tensor<rank_,dim,Number> &operator = (const Number d);
 
   /**
    * Test for equality of two tensors.
@@ -695,9 +690,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Other
 
 
 template <int dim, typename Number>
-template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const OtherNumber d)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Number d)
 {
   Assert(dim != 0 || d == OtherNumber(),
          ExcMessage("Cannot assign a non-zero scalar to a Tensor<0,0,Number> object."));
@@ -1006,12 +1000,11 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
 
 
 template <int rank_, int dim, typename Number>
-template <typename OtherNumber, typename>
 inline
 Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator = (const OtherNumber d)
+Tensor<rank_,dim,Number>::operator = (const Number d)
 {
-  Assert (d == OtherNumber(), ExcMessage ("Only assignment with zero is allowed"));
+  Assert (d == Number(), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
   for (unsigned int i=0; i<dim; ++i)
@@ -1280,10 +1273,9 @@ struct ProductType<Tensor<rank,dim,T>,U>
  */
 template <int rank, int dim,
           typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+          typename OtherNumber>
 inline
-Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+Tensor<rank,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator * (const Tensor<rank,dim,Number> &t,
             const OtherNumber              factor)
 {
@@ -1305,10 +1297,9 @@ operator * (const Tensor<rank,dim,Number> &t,
  */
 template <int rank, int dim,
           typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+          typename OtherNumber>
 inline
-Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+Tensor<rank,dim,typename ProductType<typename EnableIfScalar<Number>::type, OtherNumber>::type>
 operator * (const Number                        factor,
             const Tensor<rank,dim,OtherNumber> &t)
 {
@@ -1327,10 +1318,9 @@ operator * (const Number                        factor,
  */
 template <int rank, int dim,
           typename Number,
-          typename OtherNumber,
-          typename = typename EnableIfScalar<OtherNumber>::type>
+          typename OtherNumber>
 inline
-Tensor<rank,dim,typename ProductType<Number, OtherNumber>::type>
+Tensor<rank,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator / (const Tensor<rank,dim,Number> &t,
             const OtherNumber              factor)
 {
