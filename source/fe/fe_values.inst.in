@@ -21,8 +21,6 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
-
     template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>;
     template class FEValues<deal_II_dimension,deal_II_space_dimension>;
     template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>::
@@ -41,22 +39,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template class Tensor<2, deal_II_dimension, deal_II_space_dimension>;
       \}
 #endif
-#endif
   }
 
 
 for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; lda : BOOL)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
-
     template void FEValues<deal_II_dimension,deal_II_space_dimension>::reinit(
     const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&);
     template void FEFaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
     const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&, unsigned int);
     template void FESubfaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
     const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&, unsigned int, unsigned int);
-#endif
 #endif
   }
 
@@ -65,7 +59,6 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II
 for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
@@ -130,7 +123,6 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
       ::get_function_divergences<dealii::VEC>
       (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
 #endif
-#endif
   }
 
 
@@ -138,7 +130,6 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
 for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
@@ -215,7 +206,6 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
        std::vector<std::vector<VEC::value_type> > &, bool) const;
 
 #endif
-#endif
   }
 
 
@@ -223,7 +213,6 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
         void FEValuesViews::Scalar<deal_II_dimension>::get_function_values<dealii::IndexSet>
         (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,double>::type> &) const;
@@ -336,7 +325,6 @@ for (deal_II_dimension : DIMENSIONS)
     (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
 
 #endif
-#endif
   }
 
 
@@ -345,7 +333,6 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
     void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
       (const IndexSet&, std::vector<IndexSet::value_type>&) const;
@@ -498,6 +485,4 @@ for (deal_II_dimension : DIMENSIONS)
        std::vector<std::vector<IndexSet::value_type> > &, bool) const;
 
 #endif
-#endif
-
   }

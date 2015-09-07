@@ -13,8 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-// This file compiles the third quarter of the instantiations from solution_transfer.cc
-// to reduce the compilation unit (and memory consumption)
 
-#define SPLIT_INSTANTIATIONS_INDEX 2
-#include "solution_transfer.cc"
+#include <deal.II/lac/sparse_matrix.templates.h>
+#include <deal.II/lac/block_vector.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#define SPLIT_INSTANTIATIONS_INDEX 1
+#include "sparse_matrix.inst"
+
+DEAL_II_NAMESPACE_CLOSE

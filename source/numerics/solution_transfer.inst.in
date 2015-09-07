@@ -15,16 +15,10 @@
 
 
 for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-  {
+{
 #if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
-
-#ifndef INSTANTIATE_HP_DH
     template class SolutionTransfer<deal_II_dimension, VEC, DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
-#else
     template class SolutionTransfer<deal_II_dimension, VEC, hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
-#endif
-#endif
 #endif
 }
 

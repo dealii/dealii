@@ -16,6 +16,5 @@
 // This file compiles the second half of the instantiations from fe_values.cc
 // to get the memory consumption below 1.5gb with gcc.
 
-#define FE_VALUES_INSTANTIATE_PART_TWO
-
+#define SPLIT_INSTANTIATIONS_INDEX 1
 #include "fe_values.cc"

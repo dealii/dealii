@@ -563,18 +563,11 @@ SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 }
 
 
-
 /*-------------- Explicit Instantiations -------------------------------*/
-#ifdef SOLUTION_TRANSFER_INSTANTIATE_PART_TWO
-#define DIM_A 3
-#define DIM_B 3
-#else
-#define DIM_A 1
-#define DIM_B 2
+#define SPLIT_INSTANTIATIONS_COUNT 4
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-
-// This file compiles the first quarter of the instantiations from solution_transfer.cc
-// to reduce the compilation unit (and memory consumption)
 #include "solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

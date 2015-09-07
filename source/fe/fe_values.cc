@@ -4051,12 +4051,9 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 
 
 /*------------------------------- Explicit Instantiations -------------*/
-#ifdef FE_VALUES_INSTANTIATE_PART_TWO
-#define DIM_A 3
-#define DIM_B 3
-#else
-#define DIM_A 1
-#define DIM_B 2
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
 #include "fe_values.inst"
 

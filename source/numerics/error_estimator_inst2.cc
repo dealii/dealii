@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,10 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-// This file compiles the fourth quarter of the instantiations from solution_transfer.cc
-// to reduce the compilation unit (and memory consumption)
+#include <deal.II/numerics/error_estimator.templates.h>
 
-#define INSTANTIATE_HP_DH
-#define SOLUTION_TRANSFER_INSTANTIATE_PART_TWO
+DEAL_II_NAMESPACE_OPEN
 
-#include "solution_transfer.cc"
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#define SPLIT_INSTANTIATIONS_INDEX 1
+#include "error_estimator.inst"
+
+DEAL_II_NAMESPACE_CLOSE
