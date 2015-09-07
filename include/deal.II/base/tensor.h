@@ -869,8 +869,8 @@ Tensor<rank_,dim,Number>::Tensor
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<rank_,dim,Number>::operator
-Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > () const
+Tensor<rank_,dim,Number>::
+operator Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > () const
 {
   return Tensor<1,dim,Tensor<rank_-1,dim,Number> > (values);
 }
