@@ -600,8 +600,8 @@ private:
 template <int dim,typename Number>
 inline
 Tensor<0,dim,Number>::Tensor ()
+  : value()
 {
-  value = value_type();
 }
 
 
