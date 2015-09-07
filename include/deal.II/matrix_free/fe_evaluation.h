@@ -3217,7 +3217,7 @@ FEEvaluationBase<dim,n_components_,Number>
 ::get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_cell);
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_dofs[comp][dof];
   return return_value;
@@ -3234,7 +3234,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_quad[comp][q_point];
   return return_value;
@@ -3252,7 +3252,7 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > grad_out (false);
+  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -3477,7 +3477,7 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hessian_out (false);
+  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hessian_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -3554,7 +3554,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
-  Tensor<1,n_components_,VectorizedArray<Number> > laplacian_out (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > laplacian_out;
   const Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hess_diag
     = get_hessian_diagonal(q_point);
   for (unsigned int comp=0; comp<n_components; ++comp)
@@ -3666,7 +3666,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->values_quad_submitted == true,
           internal::ExcAccessToUninitializedField());
 #endif
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; ++comp)
     return_value[comp] = this->values_quad[comp][0];
   const unsigned int n_q_points = this->data->n_q_points;
@@ -3808,7 +3808,7 @@ FEEvaluationAccess<dim,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,dim,VectorizedArray<Number> > grad_out (false);
+  Tensor<1,dim,VectorizedArray<Number> > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -4102,7 +4102,7 @@ FEEvaluationAccess<dim,dim,Number>
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl (false);
+  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl;
   switch (dim)
     {
     case 1:
@@ -4407,7 +4407,7 @@ FEEvaluationAccess<1,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,1,VectorizedArray<Number> > grad_out (false);
+  Tensor<1,1,VectorizedArray<Number> > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -6660,7 +6660,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   // value from that
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      Point<dim,VectorizedArray<Number> > point (false);
+      Point<dim,VectorizedArray<Number> > point;
       switch (dim)
         {
         case 1:
