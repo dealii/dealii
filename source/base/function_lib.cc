@@ -586,13 +586,13 @@ namespace Functions
   }
 
   template<int dim>
-  Tensor<2,dim>
+  SymmetricTensor<2,dim>
   CosineFunction<dim>::hessian (const Point<dim>   &p,
                                 const unsigned int) const
   {
     const double pi2 = M_PI_2*M_PI_2;
 
-    Tensor<2,dim> result;
+    SymmetricTensor<2,dim> result;
     switch (dim)
       {
       case 1:
@@ -605,8 +605,8 @@ namespace Functions
             const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
             result[0][0] = coco;
             result[1][1] = coco;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
             result[0][1] = sisi;
-            result[1][0] = sisi;
           }
         break;
       case 3:
@@ -620,12 +620,10 @@ namespace Functions
             result[0][0] = cococo;
             result[1][1] = cococo;
             result[2][2] = cococo;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
             result[0][1] = sisico;
-            result[1][0] = sisico;
             result[0][2] = sicosi;
-            result[2][0] = sicosi;
             result[1][2] = cosisi;
-            result[2][1] = cosisi;
           }
         break;
       default:
@@ -636,8 +634,8 @@ namespace Functions
 
   template<int dim>
   void
-  CosineFunction<dim>::hessian_list (const std::vector<Point<dim> > &points,
-                                     std::vector<Tensor<2,dim> >    &hessians,
+  CosineFunction<dim>::hessian_list (const std::vector<Point<dim> >       &points,
+                                     std::vector<SymmetricTensor<2,dim> > &hessians,
                                      const unsigned int) const
   {
     Assert (hessians.size() == points.size(),
@@ -660,8 +658,8 @@ namespace Functions
                 const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
                 hessians[i][0][0] = coco;
                 hessians[i][1][1] = coco;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
                 hessians[i][0][1] = sisi;
-                hessians[i][1][0] = sisi;
               }
             break;
           case 3:
@@ -675,12 +673,10 @@ namespace Functions
                 hessians[i][0][0] = cococo;
                 hessians[i][1][1] = cococo;
                 hessians[i][2][2] = cococo;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
                 hessians[i][0][1] = sisico;
-                hessians[i][1][0] = sisico;
                 hessians[i][0][2] = sicosi;
-                hessians[i][2][0] = sicosi;
                 hessians[i][1][2] = cosisi;
-                hessians[i][2][1] = cosisi;
               }
             break;
           default:

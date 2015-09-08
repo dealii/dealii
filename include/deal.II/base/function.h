@@ -22,6 +22,7 @@
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx11/function.h>
 
@@ -308,6 +309,34 @@ public:
    */
   virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
                                       std::vector<Vector<Number> >   &values) const;
+
+  /**
+   * Compute the Hessian of a given component at point <tt>p</tt>,
+   * that is the gradient of the gradient of the function.
+   */
+  virtual SymmetricTensor<2,dim,Number> hessian (const Point<dim>   &p,
+                                                 const unsigned int          component = 0) const;
+
+  /**
+   * Compute the Hessian of all components at point <tt>p</tt> and store
+   * them in <tt>values</tt>.
+   */
+  virtual void vector_hessian (const Point<dim>                           &p,
+                               std::vector<SymmetricTensor<2,dim,Number>> &values) const;
+
+  /**
+   * Compute the Hessian of one component at a set of points.
+   */
+  virtual void hessian_list (const std::vector<Point<dim> >              &points,
+                             std::vector<SymmetricTensor<2,dim,Number> > &values,
+                             const unsigned int                          component = 0) const;
+
+  /**
+   * Compute the Hessians of all components at a set of points.
+   */
+  virtual void vector_hessian_list (const std::vector<Point<dim> >                            &points,
+                                    std::vector<std::vector<SymmetricTensor<2,dim,Number> > > &values) const;
+
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.

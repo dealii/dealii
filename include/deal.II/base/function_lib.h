@@ -236,14 +236,14 @@ namespace Functions
     /**
      * Second derivatives at a single point.
      */
-    virtual Tensor<2,dim> hessian (const Point<dim>   &p,
-                                   const unsigned int  component = 0) const;
+    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
+                                            const unsigned int  component = 0) const;
 
     /**
      * Second derivatives at multiple points.
      */
     virtual void hessian_list (const std::vector<Point<dim> > &points,
-                               std::vector<Tensor<2,dim> >    &hessians,
+                               std::vector<SymmetricTensor<2,dim> >    &hessians,
                                const unsigned int              component = 0) const;
   };
 
