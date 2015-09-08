@@ -35,10 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-const double FiniteElement<dim,spacedim>::fd_step_length = 1.0e-6;
-
-
-template <int dim, int spacedim>
 FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
   update_flags(update_default),
   update_once(update_default),
@@ -50,17 +46,7 @@ FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
 
 template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
-{
-  for (unsigned int i=0; i<differences.size (); ++i)
-    if (differences[i] != 0)
-      {
-        // delete pointer and set it
-        // to zero to avoid
-        // inadvertent use
-        delete differences[i];
-        differences[i] = 0;
-      }
-}
+{}
 
 
 

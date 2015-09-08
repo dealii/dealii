@@ -565,15 +565,6 @@ public:
      */
     virtual std::size_t memory_consumption () const;
 
-    /**
-     * Storage for FEValues objects needed to approximate second derivatives.
-     *
-     * The ordering is <i>p+hx</i>, <i>p+hy</i>, <i>p+hz</i>, <i>p-hx</i>,
-     * <i>p-hy</i>, <i>p-hz</i>, where unused entries in lower dimensions are
-     * missing.
-     */
-    std::vector<FEValues<dim,spacedim>*> differences;
-
   private:
     /**
      * Initially set to true, but reset to false when clear_first_cell()
@@ -2183,13 +2174,6 @@ protected:
    * initialized in the constructor of this class.
    */
   const std::vector<unsigned int> n_nonzero_components_table;
-
-  /**
-   * Second derivatives of shapes functions are not computed analytically, but
-   * by finite differences of the gradients. This static variable denotes the
-   * step length to be used for that. It's value is set to 1e-6.
-   */
-  static const double fd_step_length;
 
   /**
    * Return the size of interface constraint matrices. Since this is needed in
