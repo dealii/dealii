@@ -75,11 +75,9 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                               ||
                               (dim != spacedim)),
   feq(degree),
-  q1_mapping (this->use_mapping_q_on_all_cells
-              ?
-              0
-              :
-              new MappingQ1<dim,spacedim>()),
+  // create a Q1 mapping for use on interior cells (if necessary)
+  // or to create a good initial guess in transform_real_to_unit_cell()
+  q1_mapping (new MappingQ1<dim,spacedim>()),
   line_support_points(degree+1)
 {
   Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
@@ -105,11 +103,9 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   n_outer(mapping.n_outer),
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
   feq(mapping.get_degree()),
-  q1_mapping (mapping.q1_mapping != 0
-              ?
-              dynamic_cast<MappingQ1<dim,spacedim>*>(mapping.q1_mapping->clone())
-              :
-              0),
+  // clone the Q1 mapping for use on interior cells (if necessary)
+  // or to create a good initial guess in transform_real_to_unit_cell()
+  q1_mapping (dynamic_cast<MappingQ1<dim,spacedim>*>(mapping.q1_mapping->clone())),
   line_support_points(mapping.line_support_points)
 {
   Assert(n_inner+n_outer==Utilities::fixed_power<dim>(this->polynomial_degree+1),
@@ -1001,19 +997,9 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   // mapping, then either use our own facilities or that of the Q1
   // mapping we store
   if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
-    {
-      const Quadrature<dim> point_quadrature(p);
-      std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points,
-                                                          point_quadrature));
-
-      compute_mapping_support_points(cell, mdata->mapping_support_points);
-
-      return this->transform_unit_to_real_cell_internal(*mdata);
-    }
+    return this->MappingQGeneric<dim,spacedim>::transform_unit_to_real_cell (cell, p);
   else
-    {
-      return q1_mapping->transform_unit_to_real_cell (cell, p);
-    }
+    return q1_mapping->transform_unit_to_real_cell (cell, p);
 }
 
 
@@ -1036,8 +1022,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   Point<dim> initial_p_unit;
   try
     {
-      initial_p_unit
-        = StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, p);
+      initial_p_unit = q1_mapping->transform_real_to_unit_cell(cell, p);
     }
   catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
     {

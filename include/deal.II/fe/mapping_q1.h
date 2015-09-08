@@ -71,12 +71,6 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  Point<spacedim>
-  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<dim>                                 &p) const;
-
-  // for documentation, see the Mapping base class
-  virtual
   Point<dim>
   transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<spacedim>                            &p) const;
@@ -145,25 +139,6 @@ protected:
   Point<dim>
   transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
                                              const Point<spacedim>                            &p) const;
-
-
-  /**
-   * Transforms a point @p p on the unit cell to the point @p p_real on the
-   * real cell @p cell and returns @p p_real.
-   *
-   * This function is called by @p transform_unit_to_real_cell and multiple
-   * times (through the Newton iteration) by @p
-   * transform_real_to_unit_cell_internal.
-   *
-   * Takes a reference to an @p InternalData that must already include the
-   * shape values at point @p p and the mapping support points of the cell.
-   *
-   * This @p InternalData argument avoids multiple computations of the shape
-   * values at point @p p and especially multiple computations of the mapping
-   * support points.
-   */
-  Point<spacedim>
-  transform_unit_to_real_cell_internal (const InternalData &mdata) const;
 
   /**
    * Transforms the point @p p on the real cell to the corresponding point on

@@ -786,6 +786,49 @@ MappingQGeneric<dim,spacedim>::get_degree() const
 
 
 template<int dim, int spacedim>
+Point<spacedim>
+MappingQGeneric<dim,spacedim>::
+transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                             const Point<dim> &p) const
+{
+  //TODO: This function is inefficient -- it might as well evaluate
+  //the shape functions directly, rather than first building the
+  //InternalData object and then working with it
+
+  const Quadrature<dim> point_quadrature(p);
+  std_cxx11::unique_ptr<InternalData> mdata (new InternalData(polynomial_degree));
+  mdata->initialize (this->requires_update_flags(update_quadrature_points),
+                     point_quadrature,
+                     1);
+
+  // compute the mapping support
+  // points
+  compute_mapping_support_points(cell, mdata->mapping_support_points);
+  return transform_unit_to_real_cell_internal(*mdata);
+}
+
+
+
+template<int dim, int spacedim>
+Point<spacedim>
+MappingQGeneric<dim,spacedim>::
+transform_unit_to_real_cell_internal (const InternalData &data) const
+{
+  AssertDimension (data.shape_values.size(),
+                   data.mapping_support_points.size());
+
+  // use now the InternalData to
+  // compute the point in real space.
+  Point<spacedim> p_real;
+  for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+    p_real += data.mapping_support_points[i] * data.shape(0,i);
+
+  return p_real;
+}
+
+
+
+template<int dim, int spacedim>
 UpdateFlags
 MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {

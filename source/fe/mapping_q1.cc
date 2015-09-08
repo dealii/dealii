@@ -205,60 +205,6 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
 
 
 
-
-template<int dim, int spacedim>
-Point<spacedim>
-MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Point<dim> &p) const
-{
-  const Quadrature<dim> point_quadrature(p);
-
-  //TODO: Use get_data() here once MappingQ is no longer derived from
-  //MappingQ1. this doesn't currently work because we here really need
-  //a Q1 InternalData, but MappingQGeneric produces one with the
-  //polynomial degree of the MappingQ
-  std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
-  mdata->initialize (this->requires_update_flags (update_quadrature_points),
-                     point_quadrature, 1);
-
-  // compute the mapping support
-  // points
-  compute_mapping_support_points(cell, mdata->mapping_support_points);
-
-  // Mapping support points can be
-  // bigger than necessary. If this
-  // is the case, force them to be
-  // Q1.
-  if (mdata->mapping_support_points.size() > mdata->shape_values.size())
-    mdata->mapping_support_points.resize
-    (GeometryInfo<dim>::vertices_per_cell);
-
-
-  return transform_unit_to_real_cell_internal(*mdata);
-}
-
-
-
-template<int dim, int spacedim>
-Point<spacedim>
-MappingQ1<dim,spacedim>::
-transform_unit_to_real_cell_internal (const InternalData &data) const
-{
-  AssertDimension (data.shape_values.size(),
-                   data.mapping_support_points.size());
-
-  // use now the InternalData to
-  // compute the point in real space.
-  Point<spacedim> p_real;
-  for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
-    p_real += data.mapping_support_points[i] * data.shape(0,i);
-
-  return p_real;
-}
-
-
-
 /* For an explanation of the  KA and Kb
    arrays see the comments in the declaration of
    transform_real_to_unit_cell_initial_guess */

@@ -450,9 +450,19 @@ protected:
   const FE_Q<dim> feq;
 
   /**
-   * Pointer to a Q1 mapping to be used on interior cells unless
+   * Pointer to a Q1 mapping. This mapping is used on interior cells unless
    * use_mapping_q_on_all_cells was set in the call to the
-   * constructor.
+   * constructor. The mapping is also used on any cell in the
+   * transform_real_to_unit_cell() to compute a cheap initial
+   * guess for the position of the point before we employ the
+   * more expensive Newton iteration using the full mapping.
+   *
+   * @note MappingQEulerian resets this pointer to an object of type
+   *   MappingQ1Eulerian to ensure that the Q1 mapping also knows
+   *   about the proper shifts and transformations of the Eulerian
+   *   displacements. This also means that we really need to store
+   *   our own Q1 mapping here, rather than simply resorting to
+   *   StaticMappingQ1::mapping.
    */
   std_cxx11::unique_ptr<const MappingQ1<dim,spacedim> > q1_mapping;
 
