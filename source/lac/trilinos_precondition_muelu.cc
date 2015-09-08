@@ -15,7 +15,8 @@
 
 #include <deal.II/lac/trilinos_precondition.h>
 
-#if defined(DEAL_II_WITH_TRILINOS) && DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#ifdef DEAL_II_WITH_TRILINOS
+#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
 
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
@@ -325,4 +326,5 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+#endif // DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
 #endif // DEAL_II_WITH_TRILINOS
