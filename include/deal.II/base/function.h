@@ -322,7 +322,7 @@ public:
    * them in <tt>values</tt>.
    */
   virtual void vector_hessian (const Point<dim>                           &p,
-                               std::vector<SymmetricTensor<2,dim,Number>> &values) const;
+                               std::vector<SymmetricTensor<2,dim,Number> > &values) const;
 
   /**
    * Compute the Hessian of one component at a set of points.
