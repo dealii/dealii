@@ -164,6 +164,13 @@ namespace FEValuesViews
     typedef dealii::Tensor<2,spacedim> hessian_type;
 
     /**
+     * A typedef for the type of third derivatives of the view this class
+     * represents. Here, for a scalar component of the finite element, the
+     * Third derivative is a <code>Tensor@<3,dim@></code>.
+     */
+    typedef dealii::Tensor<3,spacedim> third_derivative_type;
+
+    /**
      * A structure where for each shape function we pre-compute a bunch of
      * data that will make later accesses much cheaper.
      */
@@ -255,6 +262,20 @@ namespace FEValuesViews
              const unsigned int q_point) const;
 
     /**
+     * Return the tensor of rank 3 of all third derivatives of the vector
+     * component selected by this view, for the shape function and quadrature
+     * point selected by the arguments.
+     *
+     * @note The meaning of the arguments is as documented for the value()
+     * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_third_derivatives}
+     */
+    third_derivative_type
+    third_derivative (const unsigned int shape_function,
+                      const unsigned int q_point) const;
+
+    /**
      * Return the values of the selected scalar component of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -338,6 +359,29 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
                                   std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
+
+    /**
+     * Return the third derivatives of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEValues object was called.
+     *
+     * This function is the equivalent of the
+     * FEValuesBase::get_function_third_derivatives function but it only works
+     * on the selected scalar component.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the third derivatives of shape functions
+     * (i.e., @p third_derivative_type) times the type used to store the values
+     * of the unknowns $U_j$ of your finite element vector $U$ (represented by
+     * the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_third_derivatives}
+     */
+    template <class InputVector>
+    void get_function_third_derivatives (const InputVector &fe_function,
+                                         std::vector<typename ProductType<third_derivative_type,
+                                         typename InputVector::value_type>::type> &third_derivatives) const;
 
   private:
     /**
@@ -442,6 +486,13 @@ namespace FEValuesViews
      * finite element, the Hessian is a <code>Tensor@<3,dim@></code>.
      */
     typedef dealii::Tensor<3,spacedim>          hessian_type;
+
+    /**
+     * A typedef for the type of third derivatives of the view this class
+     * represents. Here, for a set of <code>dim</code> components of the
+     * finite element, the third derivative is a <code>Tensor@<4,dim@></code>.
+     */
+    typedef dealii::Tensor<4,spacedim>          third_derivative_type;
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -609,6 +660,20 @@ namespace FEValuesViews
              const unsigned int q_point) const;
 
     /**
+     * Return the tensor of rank 3 of all third derivatives of
+     * the vector components selected by this view, for the shape function and
+     * quadrature point selected by the arguments.
+     *
+     * @note The meaning of the arguments is as documented for the value()
+     * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+     */
+    third_derivative_type
+    third_derivative (const unsigned int shape_function,
+                      const unsigned int q_point) const;
+
+    /**
      * Return the values of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -764,6 +829,29 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
                                   std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
+
+    /**
+     * Return the third derivatives of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEValues object was called.
+     *
+     * This function is the equivalent of the
+     * FEValuesBase::get_function_third_derivatives function but it only works
+     * on the selected scalar component.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the third derivatives of shape functions
+     * (i.e., @p third_derivative_type) times the type used to store the values
+     * of the unknowns $U_j$ of your finite element vector $U$ (represented by
+     * the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_third_derivatives}
+     */
+    template <class InputVector>
+    void get_function_third_derivatives (const InputVector &fe_function,
+                                         std::vector<typename ProductType<third_derivative_type,
+                                         typename InputVector::value_type>::type> &third_derivatives) const;
 
   private:
     /**
@@ -1509,14 +1597,14 @@ public:
    * <tt>point_no</tt>th quadrature point with respect to real cell
    * coordinates. If you want to get the derivatives in one of the coordinate
    * directions, use the appropriate function of the Tensor class to extract
-   * one component. Since only a reference to the derivative values is
+   * one component. Since only a reference to the hessian values is
    * returned, there should be no major performance drawback.
    *
    * If the shape function is vector-valued, then this returns the only non-
    * zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * shape_hessian_component() function.
    *
    * The same holds for the arguments of this function as for the
    * shape_value() function.
@@ -1547,6 +1635,50 @@ public:
   shape_hessian_component (const unsigned int function_no,
                            const unsigned int point_no,
                            const unsigned int component) const;
+
+  /**
+   * Third derivatives of the <tt>function_no</tt>th shape function at the
+   * <tt>point_no</tt>th quadrature point with respect to real cell
+   * coordinates. If you want to get the 3rd derivatives in one of the coordinate
+   * directions, use the appropriate function of the Tensor class to extract
+   * one component. Since only a reference to the 3rd derivative values is
+   * returned, there should be no major performance drawback.
+   *
+   * If the shape function is vector-valued, then this returns the only non-
+   * zero component. If the shape function has more than one non-zero
+   * component (i.e. it is not primitive), then throw an exception of type
+   * ExcShapeFunctionNotPrimitive. In that case, use the
+   * shape_3rdderivative_component() function.
+   *
+   * The same holds for the arguments of this function as for the
+   * shape_value() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+   */
+  const Tensor<3,spacedim> &
+  shape_3rd_derivative (const unsigned int function_no,
+                        const unsigned int point_no) const;
+
+  /**
+   * Return one vector component of the third derivative of a shape function at a
+   * quadrature point. If the finite element is scalar, then only component
+   * zero is allowed and the return value equals that of the shape_3rdderivative()
+   * function. If the finite element is vector valued but all shape functions
+   * are primitive (i.e. they are non-zero in only one component), then the
+   * value returned by shape_3rdderivative() equals that of this function for
+   * exactly one component. This function is therefore only of greater
+   * interest if the shape function is not primitive, but then it is necessary
+   * since the other function cannot be used.
+   *
+   * The same holds for the arguments of this function as for the
+   * shape_value_component() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+   */
+  Tensor<3,spacedim>
+  shape_3rd_derivative_component (const unsigned int function_no,
+                                  const unsigned int point_no,
+                                  const unsigned int component) const;
 
   //@}
   /// @name Access to values of global finite element fields
@@ -1988,6 +2120,103 @@ public:
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<std::vector<typename InputVector::value_type> > &laplacians,
+    bool quadrature_points_fastest = false) const;
+  //@}
+
+  //@}
+  /// @name Access to third derivatives of global finite element fields
+  //@{
+
+  /**
+   * Compute the tensor of third derivatives of a finite element at the
+   * quadrature points of a cell. This function is the equivalent of the
+   * corresponding get_function_values() function (see there for more
+   * information) but evaluates the finite element field's third derivatives
+   * instead of its value.
+   *
+   * This function may only be used if the finite element in use is a scalar
+   * one, i.e. has only one vector component. There is a corresponding
+   * function of the same name for vector-valued finite elements.
+   *
+   * @param[in] fe_function A vector of values that describes (globally) the
+   * finite element function that this function should evaluate at the
+   * quadrature points of the current cell.
+   *
+   * @param[out] third_derivatives The third derivatives of the function
+   * specified by fe_function at the quadrature points of the current cell.
+   * The third derivatives are computed in real space (as opposed to on the
+   * unit cell).  The object is assumed to already have the correct size. The
+   * data type stored by this output vector must be what you get when you
+   * multiply the third derivatives of shape function times the type used to
+   * store the values of the unknowns $U_j$ of your finite element vector $U$
+   * (represented by the @p fe_function argument).
+   *
+   * @post <code>third_derivatives[q]</code> will contain the third derivatives
+   * of the field described by fe_function at the $q$th quadrature point.
+   * <code>third_derivatives[q][i][j][k]</code> represents the $(i,j,k)$th
+   * component of the 3rd order tensor of third derivatives at quadrature
+   * point $q$.
+   *
+   * @note The actual data type of the input vector may be either a
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
+   * Trilinos vector wrapper classes. It represents a global vector of DoF
+   * values associated with the DofHandler object with which this FEValues
+   * object was last initialized. Alternatively, if the vector argument is of
+   * type IndexSet, then the function is represented as one that is either
+   * zero or one, depending on whether a DoF index is in the set or not.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+   */
+  template <class InputVector>
+  void
+  get_function_third_derivatives (const InputVector &fe_function,
+                                  std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const;
+
+  /**
+   * This function does the same as the other get_function_third_derivatives(),
+   * but applied to multi-component (vector-valued) elements. The meaning of
+   * the arguments is as explained there.
+   *
+   * @post <code>third_derivatives[q]</code> is a vector of third derivatives
+   * of the field described by fe_function at the $q$th quadrature point. The
+   * size of the vector accessed by <code>third_derivatives[q]</code> equals
+   * the number of components of the finite element, i.e.
+   * <code>third_derivatives[q][c]</code> returns the third derivative of the
+   * $c$th vector component at the $q$th quadrature point.
+   * Consequently, <code>third_derivatives[q][c][i][j][k]</code> is
+   * the $(i,j,k)$th component of the tensor of third derivatives of the $c$th
+   * vector component of the vector field at quadrature point $q$ of the
+   * current cell.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+   */
+  template <class InputVector>
+  void
+  get_function_third_derivatives (const InputVector      &fe_function,
+                                  std::vector<std::vector<Tensor<3,spacedim,typename InputVector::value_type> > > &third_derivatives,
+                                  bool quadrature_points_fastest = false) const;
+
+  /**
+   * Access to the third derivatives of a function with more flexibility. See
+   * get_function_values() with corresponding arguments.
+   */
+  template <class InputVector>
+  void get_function_third_derivatives (
+    const InputVector &fe_function,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
+    std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const;
+
+  /**
+   * Access to the third derivatives of a function with more flexibility. See
+   * get_function_values() with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
+   */
+  template <class InputVector>
+  void get_function_third_derivatives (
+    const InputVector &fe_function,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
+    VectorSlice<std::vector<std::vector<Tensor<3,spacedim,typename InputVector::value_type> > > > third_derivatives,
     bool quadrature_points_fastest = false) const;
   //@}
 
@@ -2590,9 +2819,10 @@ public:
    * associated with this cell, you will not be able to call some functions of
    * this class if they need information about degrees of freedom. These
    * functions are, above all, the
-   * <tt>get_function_value/gradients/hessians/laplacians</tt> functions. If
-   * you want to call these functions, you have to call the @p reinit variants
-   * that take iterators into DoFHandler or other DoF handler type objects.
+   * <tt>get_function_value/gradients/hessians/laplacians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the
+   * @p reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
@@ -2797,9 +3027,10 @@ public:
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
    * freedom. These functions are, above all, the
-   * <tt>get_function_value/gradients/hessians</tt> functions. If you want to
-   * call these functions, you have to call the @p reinit variants that take
-   * iterators into DoFHandler or other DoF handler type objects.
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the
+   * @p reinit variants that take iterators into DoFHandler or other
+   * DoF handler type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                const unsigned int                                         face_no);
@@ -2907,9 +3138,10 @@ public:
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
    * freedom. These functions are, above all, the
-   * <tt>get_function_value/gradients/hessians</tt> functions. If you want to
-   * call these functions, you have to call the @p reinit variants that take
-   * iterators into DoFHandler or other DoF handler type objects.
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the
+   * @p reinit variants that take iterators into DoFHandler or other
+   * DoF handler type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                const unsigned int                    face_no,
@@ -3035,7 +3267,7 @@ namespace FEValuesViews
             typename FVB::ExcAccessToUninitializedField("update_hessians"));
 
     // an adaptation of the
-    // FEValuesBase::shape_grad_component
+    // FEValuesBase::shape_hessian_component
     // function except that here we know the
     // component as fixed and we have
     // pre-computed and cached a bunch of
@@ -3044,6 +3276,32 @@ namespace FEValuesViews
       return fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
       return hessian_type();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline
+  typename Scalar<dim,spacedim>::third_derivative_type
+  Scalar<dim,spacedim>::third_derivative (const unsigned int shape_function,
+                                          const unsigned int q_point) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_3rd_derivatives,
+            typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
+
+    // an adaptation of the
+    // FEValuesBase::shape_3rdderivative_component
+    // function except that here we know the
+    // component as fixed and we have
+    // pre-computed and cached a bunch of
+    // information. See the comments there.
+    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
+      return fe_values.finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index][q_point];
+    else
+      return third_derivative_type();
   }
 
 
@@ -3330,6 +3588,44 @@ namespace FEValuesViews
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
               = fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
+
+        return return_value;
+      }
+  }
+
+  template <int dim, int spacedim>
+  inline
+  typename Vector<dim,spacedim>::third_derivative_type
+  Vector<dim,spacedim>::third_derivative (const unsigned int shape_function,
+                                          const unsigned int q_point) const
+  {
+    // this function works like in
+    // the case above
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_3rd_derivatives,
+            typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
+
+    // same as for the scalar case except
+    // that we have one more index
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    if (snc == -2)
+      return third_derivative_type();
+    else if (snc != -1)
+      {
+        third_derivative_type return_value;
+        return_value[shape_function_data[shape_function].single_nonzero_component_index]
+          = fe_values.finite_element_output.shape_3rd_derivatives[snc][q_point];
+        return return_value;
+      }
+    else
+      {
+        third_derivative_type return_value;
+        for (unsigned int d=0; d<dim; ++d)
+          if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+            return_value[d]
+              = fe_values.finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3960,6 +4256,75 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   const unsigned int
   row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + component];
   return this->finite_element_output.shape_hessians[row][j];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const Tensor<3,spacedim> &
+FEValuesBase<dim,spacedim>::shape_3rd_derivative (const unsigned int i,
+                                                  const unsigned int j) const
+{
+  Assert (i < fe->dofs_per_cell,
+          ExcIndexRange (i, 0, fe->dofs_per_cell));
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  Assert (fe->is_primitive (i),
+          ExcShapeFunctionNotPrimitive(i));
+  Assert (i<this->finite_element_output.shape_3rd_derivatives.size(),
+          ExcIndexRange (i, 0, this->finite_element_output.shape_3rd_derivatives.size()));
+  Assert (j<this->finite_element_output.shape_3rd_derivatives[0].size(),
+          ExcIndexRange (j, 0, this->finite_element_output.shape_3rd_derivatives[0].size()));
+
+  // if the entire FE is primitive,
+  // then we can take a short-cut:
+  if (fe->is_primitive())
+    return this->finite_element_output.shape_3rd_derivatives[i][j];
+  else
+    {
+      // otherwise, use the mapping
+      // between shape function
+      // numbers and rows. note that
+      // by the assertions above, we
+      // know that this particular
+      // shape function is primitive,
+      // so we can call
+      // system_to_component_index
+      const unsigned int
+      row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + fe->system_to_component_index(i).first];
+      return this->finite_element_output.shape_3rd_derivatives[row][j];
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline
+Tensor<3,spacedim>
+FEValuesBase<dim,spacedim>::shape_3rd_derivative_component (const unsigned int i,
+                                                            const unsigned int j,
+                                                            const unsigned int component) const
+{
+  Assert (i < fe->dofs_per_cell,
+          ExcIndexRange (i, 0, fe->dofs_per_cell));
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_3rd_derivatives"));
+  Assert (component < fe->n_components(),
+          ExcIndexRange(component, 0, fe->n_components()));
+
+  // check whether the shape function
+  // is non-zero at all within
+  // this component:
+  if (fe->get_nonzero_components(i)[component] == false)
+    return Tensor<3,spacedim>();
+
+  // look up the right row in the
+  // table and take the data from
+  // there
+  const unsigned int
+  row = this->finite_element_output.shape_function_to_row_table[i * fe->n_components() + component];
+  return this->finite_element_output.shape_3rd_derivatives[row][j];
 }
 
 

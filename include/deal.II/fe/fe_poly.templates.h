@@ -202,7 +202,12 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
     out |= update_hessians | update_covariant_transformation
-           | update_gradients | update_jacobian_grads;
+           | update_gradients | update_jacobian_pushed_forward_grads;
+  if (flags & update_3rd_derivatives)
+    out |= update_3rd_derivatives | update_covariant_transformation
+           | update_hessians | update_gradients
+           | update_jacobian_pushed_forward_grads
+           | update_jacobian_pushed_forward_2nd_derivatives;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
 
@@ -251,19 +256,26 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
 
       if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i] = fe_data.shape_hessians[k][i];
-            }
-
-          correct_untransformed_hessians (fe_data.untransformed_shape_hessians,
-                                          mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (fe_data.untransformed_shape_hessians,
+          mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
@@ -316,22 +328,30 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 
       if (flags & update_hessians)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i+offset] = fe_data.shape_hessians[k][i+offset];
-            }
-
-          correct_untransformed_hessians(VectorSlice< std::vector<Tensor<2,dim> > >
-                                         ( fe_data.untransformed_shape_hessians, offset , quadrature.size()),
-                                         mapping_data, output_data, quadrature.size(), k);
-
-          mapping.transform (make_slice(fe_data.untransformed_shape_hessians,
+          mapping.transform (make_slice(fe_data.shape_hessians[k],
                                         offset,
                                         quadrature.size()),
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives)
+        {
+          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
@@ -384,47 +404,59 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
       if (flags & update_hessians)
         {
-          // compute the hessians in the unit cell (accounting for the Jacobian gradiant)
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            {
-              fe_data.untransformed_shape_hessians[i+offset] = fe_data.shape_hessians[k][i+offset];
-            }
-
-          correct_untransformed_hessians(VectorSlice< std::vector<Tensor<2,dim> > >
-                                         (fe_data.untransformed_shape_hessians,
-                                          offset,
-                                          quadrature.size()),
-                                         mapping_data,
-                                         output_data,
-                                         quadrature.size(),
-                                         k);
-
-          mapping.transform (make_slice(fe_data.untransformed_shape_hessians,
+          mapping.transform (make_slice(fe_data.shape_hessians[k],
                                         offset,
                                         quadrature.size()),
                              mapping_covariant_gradient,
                              mapping_internal,
                              output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives)
+        {
+          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
         }
     }
 }
 
-
 template <class POLY, int dim, int spacedim>
-void
+inline void
 FE_Poly<POLY,dim,spacedim>::
-correct_untransformed_hessians (VectorSlice< std::vector<Tensor<2, dim> > >                       uncorrected_shape_hessians,
-                                const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
-                                const internal::FEValues::FiniteElementRelatedData<dim,spacedim> &fevalues_data,
-                                const unsigned int                                                n_q_points,
-                                const unsigned int                                                dof) const
+correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
+                           const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+                           const unsigned int                                                n_q_points,
+                           const unsigned int                                                dof) const
 {
   for (unsigned int i=0; i<n_q_points; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int l=0; l<dim; ++l)
-        for (unsigned int n=0; n<spacedim; ++n)
-          uncorrected_shape_hessians[i][j][l] -= fevalues_data.shape_gradients[dof][i][n]
-                                                 * mapping_data.jacobian_grads[i][n][l][j];
+    for (unsigned int j=0; j<spacedim; ++j)
+      for (unsigned int k=0; k<spacedim; ++k)
+        for (unsigned int l=0; l<spacedim; ++l)
+          for (unsigned int m=0; m<spacedim; ++m)
+            {
+              output_data.shape_3rd_derivatives[dof][i][j][k][l] -=
+                (mapping_data.jacobian_pushed_forward_grads[i][m][j][l] *
+                 output_data.shape_hessians[dof][i][k][m])
+                + (mapping_data.jacobian_pushed_forward_grads[i][m][k][l] *
+                   output_data.shape_hessians[dof][i][j][m])
+                + (mapping_data.jacobian_pushed_forward_grads[i][m][j][k] *
+                   output_data.shape_hessians[dof][i][l][m])
+                + (mapping_data.jacobian_pushed_forward_2nd_derivatives[i][m][j][k][l] *
+                   output_data.shape_gradients[dof][i][m]);
+            }
+
 }
 
 namespace internal

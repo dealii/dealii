@@ -740,6 +740,17 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
               Assert(false, ExcNotImplemented());
             }
         }
+
+      // third derivatives are not implemented
+      if (flags & update_3rd_derivatives
+          &&
+          ((cell_similarity != CellSimilarity::translation)
+           ||
+           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+            || (mapping_type == mapping_nedelec))))
+        {
+          Assert(false, ExcNotImplemented())
+        }
     }
 }
 
@@ -1194,6 +1205,12 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             default:
               Assert(false, ExcNotImplemented());
             }
+        }
+
+      // third derivatives are not implemented
+      if (flags & update_3rd_derivatives)
+        {
+          Assert(false, ExcNotImplemented())
         }
     }
 }
@@ -1652,6 +1669,12 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             default:
               Assert(false, ExcNotImplemented());
             }
+        }
+
+      // third derivatives are not implemented
+      if (flags & update_3rd_derivatives)
+        {
+          Assert(false, ExcNotImplemented())
         }
     }
 }

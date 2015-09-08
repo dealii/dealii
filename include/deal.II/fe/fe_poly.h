@@ -258,16 +258,18 @@ protected:
                                       std::vector<Tensor<1,dim> > (n_q_points));
       }
 
-    // if second derivatives through
-    // finite differencing is required,
-    // then initialize some objects for
-    // that
     if (flags & update_hessians)
       {
         grad_grads.resize (this->dofs_per_cell);
         data->shape_hessians.resize (this->dofs_per_cell,
                                      std::vector<Tensor<2,dim> > (n_q_points));
-        data->untransformed_shape_hessians.resize (n_q_points);
+      }
+
+    if (flags & update_3rd_derivatives)
+      {
+        third_derivatives.resize (this->dofs_per_cell);
+        data->shape_3rd_derivatives.resize (this->dofs_per_cell,
+                                            std::vector<Tensor<3,dim> > (n_q_points));
       }
 
     // next already fill those fields
@@ -277,11 +279,14 @@ protected:
     // unit cell, and need to be
     // transformed when visiting an
     // actual cell
-    if (flags & (update_values | update_gradients | update_hessians))
+    if (flags & (update_values | update_gradients
+                 | update_hessians | update_3rd_derivatives) )
       for (unsigned int i=0; i<n_q_points; ++i)
         {
           poly_space.compute(quadrature.point(i),
-                             values, grads, grad_grads, third_derivatives, fourth_derivatives);
+                             values, grads, grad_grads,
+                             third_derivatives,
+                             fourth_derivatives);
 
           if (flags & update_values)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
@@ -294,6 +299,10 @@ protected:
           if (flags & update_hessians)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_hessians[k][i] = grad_grads[k];
+
+          if (flags & update_3rd_derivatives)
+            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+              data->shape_3rd_derivatives[k][i] = third_derivatives[k];
         }
     return data;
   }
@@ -420,29 +429,34 @@ protected:
     std::vector<std::vector<Tensor<2,dim> > > shape_hessians;
 
     /**
-     * Scratch array to store temporary values during hessian calculations in
-     * actual cells.
+     * Array with shape function third derivatives in quadrature points. There
+     * is one row for each shape function, containing values for each
+     * quadrature point.
+     *
+     * We store the third derivatives in the quadrature points on the unit
+     * cell. We then only have to apply the transformation when visiting an
+     * actual cell.
      */
-    mutable std::vector<Tensor<2,dim> > untransformed_shape_hessians;
+    std::vector<std::vector<Tensor<3,dim> > > shape_3rd_derivatives;
   };
 
   /**
-   * Correct the hessian in the reference cell by subtracting the term corresponding
-   * to the Jacobian gradient for one degree of freedom. The result being given by:
-   * @f[
-   * \frac{\partial^2 \phi_i}{\partial\hat{x}_J\partial\hat{x}_K}
-   * - \frac{\partial \phi_i}{\partial {x}_l}
-   * \left( \frac{\partial^2{x}_l}{\partial\hat{x}_J\partial\hat{x}_K} \right).
-   * @f]
-   * After this correction, the shape hessians are simply a mapping_covariant_gradient
-   * transformation.
+   * Correct the shape third derivatives by subtracting the terms corresponding
+   * to the Jacobian pushed forward gradient and second derivative.
+   *
+   * Before the correction, the third derivatives would be given by
+   * D_{ijkl} = \frac{d^3\phi_i}{d \hat x_J d \hat x_K d \hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1},
+   * where J_{iI}=\frac{d x_i}{d \hat x_I}. After the correction, the correct
+   * third derivative would be given by
+   * \frac{d^3\phi_i}{d x_j d x_k d x_l} = D_{ijkl} - H_{mjl} \frac{d^2 \phi_i}{d x_k d x_m}  - H_{mkl} \frac{d^2 \phi_i}{d x_j d x_m} - H_{mjk} \frac{d^2 \phi_i}{d x_l d x_m} - K_{mjkl} \frac{d \phi_i}{d x_m},
+   * where H_{ijk} = \frac{d^2 x_i}{d \hat x_J d \hat x_K} (J_{jJ})^{-1} (J_{kK})^{-1},
+   * and K_{ijkl} = \frac{d^3 x_i}{d \hat x_J d \hat x_K d \hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1}
    */
   void
-  correct_untransformed_hessians (VectorSlice< std::vector<Tensor<2, dim> > >                       uncorrected_shape_hessians,
-                                  const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
-                                  const internal::FEValues::FiniteElementRelatedData<dim,spacedim> &fevalues_data,
-                                  const unsigned int                                                n_q_points,
-                                  const unsigned int                                                dof) const;
+  correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
+                             const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+                             const unsigned int                                                n_q_points,
+                             const unsigned int                                                dof) const;
 
   /**
    * The polynomial space. Its type is given by the template parameter POLY.
