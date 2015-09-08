@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -471,8 +471,8 @@ namespace Step40
             if (dim==3)
               reps.push_back(2);
 
-            Point<dim> p1(true);
-            Point<dim> p2(true);
+            Point<dim> p1;
+            Point<dim> p2;
             for (unsigned int i=0; i<dim; ++i)
               p2(i)=1.0;
 

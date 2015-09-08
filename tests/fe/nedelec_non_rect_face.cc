@@ -215,7 +215,7 @@ namespace Maxwell
 
     // storage for computed sol:
     std::vector<Tensor<1,dim> > sol(n_q_points);
-    Tensor<1,dim> curlsol(n_q_points);
+    Tensor<1,dim> curlsol;
 
     double h_curl_norm=0.0;
 
@@ -319,13 +319,13 @@ namespace Maxwell
 
     //RHS storage:
     std::vector<Vector<double> > rhs_value_list(n_q_points, Vector<double>(fe.n_components()));
-    Tensor<1,dim> rhs_value_vector(dim);
+    Tensor<1,dim> rhs_value_vector;
 
     // Neumann storage
     std::vector<Vector<double> > neumann_value_list(n_face_q_points, Vector<double>(fe.n_components()));
     std::vector<Tensor<1,dim> > normal_vector_list(fe_face_values.get_all_normal_vectors());
-    Tensor<1,dim> neumann_value_vector(dim);
-    Tensor<1,dim> neumann_value(dim);
+    Tensor<1,dim> neumann_value_vector;
+    Tensor<1,dim> neumann_value;
     Tensor<1,dim> normal_vector;
 
     // loop over all cells:

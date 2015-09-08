@@ -803,6 +803,15 @@ namespace internal
       return TensorIndicesHelper<rank_ - 1>::template extract<rank, dim, Number>(
         t[indices[rank - rank_]], indices);
     }
+
+    template<int rank, int dim, typename Number>
+    static inline
+    const Number &extract(const Tensor<rank_,dim,Number> &t, const TableIndices<rank> &indices)
+    {
+      Assert (indices[rank - rank_]<dim, ExcIndexRange (indices[rank - rank_], 0, dim));
+      return TensorIndicesHelper<rank_ - 1>::template extract<rank, dim, Number>(
+        t[indices[rank - rank_]], indices);
+    }
   };
 
   template<> struct TensorIndicesHelper<1>
@@ -810,6 +819,14 @@ namespace internal
     template<int rank, int dim, typename Number>
     static inline
     Number &extract(Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
+    {
+      Assert (indices[rank - 1]<dim, ExcIndexRange (indices[rank - 1], 0, dim));
+      return t[indices[rank-1]];
+    }
+
+    template<int rank, int dim, typename Number>
+    static inline
+    const Number &extract(const Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
     {
       Assert (indices[rank - 1]<dim, ExcIndexRange (indices[rank - 1], 0, dim));
       return t[indices[rank-1]];
@@ -905,7 +922,7 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
-  return internal::TensorIndicesHelper<rank_>::extract(*this, indices);
+  return internal::TensorIndicesHelper<rank_>::template extract<rank_, dim, Number>(*this, indices);
 }
 
 
@@ -916,7 +933,7 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
-  return internal::TensorIndicesHelper<rank_>::extract(*this, indices);
+  return internal::TensorIndicesHelper<rank_>::template extract<rank_, dim, Number>(*this, indices);
 }
 
 
