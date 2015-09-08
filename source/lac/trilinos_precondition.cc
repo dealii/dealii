@@ -33,40 +33,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    int n_global_rows (const Epetra_RowMatrix &matrix)
-    {
-      return matrix.NumGlobalRows();
-    }
-
-    int global_length (const Epetra_MultiVector &vector)
-    {
-      return vector.GlobalLength();
-    }
-
-    int gid(const Epetra_Map &map, unsigned int i)
-    {
-      return map.GID(i);
-    }
-#else
-    long long int n_global_rows (const Epetra_RowMatrix &matrix)
-    {
-      return matrix.NumGlobalRows64();
-    }
-
-    long long int global_length (const Epetra_MultiVector &vector)
-    {
-      return vector.GlobalLength64();
-    }
-
-    long long int gid(const Epetra_Map &map, dealii::types::global_dof_index i)
-    {
-      return map.GID64(i);
-    }
-#endif
-  }
 
   PreconditionBase::PreconditionBase()
 #ifdef DEAL_II_WITH_MPI
