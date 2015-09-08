@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/trilinos_precondition.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
 
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
@@ -28,11 +28,9 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <ml_include.h>
 #  include <ml_MultiLevelPreconditioner.h>
 
-#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
 #  include <MueLu.hpp>
 #  include <MueLu_EpetraOperator.hpp>
 #  include <MueLu_MLParameterListInterpreter.hpp>
-#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
@@ -75,11 +73,6 @@ namespace TrilinosWrappers
   }
 
 
-
-
-
-#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-  /* -------------------------- PreconditionAMGMueLu --------------------- */
 
   PreconditionAMGMueLu::AdditionalData::
   AdditionalData (const bool                             elliptic,
@@ -327,9 +320,6 @@ namespace TrilinosWrappers
   template void PreconditionAMGMueLu::initialize (const ::dealii::SparseMatrix<float> &,
                                                   const AdditionalData &, const double,
                                                   const ::dealii::SparsityPattern *);
-#endif
-
-
 
 }
 
