@@ -22,8 +22,9 @@
 
 #ifdef DEAL_II_WITH_CXX11
 
-#include <functional>
 #include <array>
+#include <functional>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -169,11 +170,12 @@ public:
   LinearOperator (const LinearOperator<Range, Domain> &) = default;
 
   /**
-   * Templated copy constructor that creates a LinearOperator object from an
-   * object @p op for which the conversion function
+   * Templated copy constructor that creates a LinearOperator object from
+   * an object @p op for which the conversion function
    * <code>linear_operator</code> is defined.
    */
-  template<typename Op>
+  template<typename Op,
+           typename = typename std::enable_if<!std::is_base_of<LinearOperator<Range, Domain>, Op>::value>::type>
   LinearOperator (const Op &op)
   {
     *this = linear_operator<Range, Domain, Op>(op);
@@ -189,7 +191,8 @@ public:
    * Templated copy assignment operator for an object @p op for which the
    * conversion function <code>linear_operator</code> is defined.
    */
-  template <typename Op>
+  template <typename Op,
+            typename = typename std::enable_if<!std::is_base_of<LinearOperator<Range, Domain>, Op>::value>::type>
   LinearOperator<Range, Domain> &operator=(const Op &op)
   {
     *this = linear_operator<Range, Domain, Op>(op);
