@@ -233,6 +233,57 @@ void Function<dim, Number>::vector_laplacian_list (
 }
 
 
+template <int dim, typename Number>
+SymmetricTensor<2,dim,Number> Function<dim, Number>::hessian (const Point<dim> &,
+    const unsigned int) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return SymmetricTensor<2,dim,Number>();
+}
+
+
+template <int dim, typename Number>
+void Function<dim, Number>::vector_hessian (
+  const Point<dim> &p,
+  std::vector<SymmetricTensor<2,dim,Number> > &v) const
+{
+  AssertDimension(v.size(), this->n_components);
+  for (unsigned int i=0; i<this->n_components; ++i)
+    v[i] = hessian(p, i);
+}
+
+
+template <int dim, typename Number>
+void Function<dim, Number>::hessian_list (
+  const std::vector<Point<dim> >     &points,
+  std::vector<SymmetricTensor<2,dim,Number> > &hessians,
+  const unsigned int                  component) const
+{
+  Assert (hessians.size() == points.size(),
+          ExcDimensionMismatch(hessians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    hessians[i] = hessian(points[i], component);
+}
+
+
+template <int dim, typename Number>
+void Function<dim, Number>::vector_hessian_list (
+  const std::vector<Point<dim> >                   &points,
+  std::vector<std::vector<SymmetricTensor<2,dim,Number> > > &hessians) const
+{
+  Assert (hessians.size() == points.size(),
+          ExcDimensionMismatch(hessians.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    {
+      Assert (hessians[i].size() == n_components,
+              ExcDimensionMismatch(hessians[i].size(), n_components));
+      vector_hessian (points[i], hessians[i]);
+    }
+}
+
+
 
 template <int dim, typename Number>
 std::size_t

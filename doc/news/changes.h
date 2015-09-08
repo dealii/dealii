@@ -160,6 +160,7 @@ inconvenience this causes.
   be sliced back to a LinearOperator.
   <br>
   (Matthias Maier, 2015/08/27)
+  </li>
 
   <li> Improved: Support for complex number types throughout the library.
   Several parts of the library have been reorganized to support complex
@@ -271,12 +272,18 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Introduced Hessian-related functions to the Function class.
+  <br>
+  (Denis Davydov, 2015/09/08)
+  </li>
+
   <li> Memory consumption during compilation has been reduced by splitting
   instantiation files. For this make_instantiations now supports additional
   logic to split the the instantiations in .inst files into groups. This is
   used in fe_values.cc, error_estimator.cc, and others.
   <br>
   (Timo Heister, 2015/09/05)
+  </li>
 
   <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
   in a .svg file which can be opened in a web browser.
