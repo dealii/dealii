@@ -117,10 +117,14 @@ public:
    */
   Tensor ();
 
+#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<0,dim,Number> &initializer);
+  Tensor (const Tensor<0,dim,Number> &initializer) = default;
+  // always implicitly created, in case of C++11 we make this explicit (for
+  // the sake of documentation).
+#endif
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -154,10 +158,14 @@ public:
    */
   operator const Number &() const;
 
+#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy assignment operator.
    */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs) = default;
+  // always implicitly created, in case of C++11 we make this explicit (for
+  // the sake of documentation).
+#endif
 
   /**
    * Assignment from tensors with different underlying scalar type.
@@ -368,10 +376,14 @@ public:
    */
   Tensor ();
 
+#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<rank_,dim,Number> &initializer);
+  Tensor (const Tensor<rank_,dim,Number> &initializer) = default;
+  // always implicitly created, in case of C++11 we make this explicit (for
+  // the sake of documentation).
+#endif
 
   /**
    * Constructor, where the data is copied from a C-style array.
@@ -418,10 +430,14 @@ public:
    */
   Number &operator [] (const TableIndices<rank_> &indices);
 
+#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy assignment operator.
    */
-  Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
+  Tensor &operator = (const Tensor<rank_,dim,Number> &rhs) = default;
+  // always implicitly created, in case of C++11 we make this explicit (for
+  // the sake of documentation).
+#endif
 
   /**
    * Assignment operator from tensors with different underlying scalar type.
@@ -604,14 +620,6 @@ Tensor<0,dim,Number>::Tensor ()
 
 
 template <int dim, typename Number>
-inline
-Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-}
-
-
-template <int dim, typename Number>
 template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const OtherNumber initializer)
@@ -644,15 +652,6 @@ Tensor<0,dim,Number>::operator const Number &() const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
-}
-
-
-template <int dim, typename Number>
-inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-  return *this;
 }
 
 
@@ -846,15 +845,6 @@ Tensor<rank_,dim,Number>::Tensor ()
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = initializer[i];
-}
-
-
-template <int rank_, int dim, typename Number>
-inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
@@ -938,23 +928,16 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
 
 
 template <int rank_, int dim, typename Number>
-inline
-Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = t.values[i];
-  return *this;
-}
-
-
-template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline
 Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
 {
-  for (unsigned int i=0; i<dim; ++i)
+  // avoid a warning with icc that complains about an empty loop. Even in
+  // case of dim==0 we have an element available (as a workaround for
+  // another set of warnings about an empty c-style array *sigh).
+  // If dim==0, ust copy this bogus element:
+  for (unsigned int i = 0; i < (dim != 0 ? dim : 1); ++i)
     values[i] = t.values[i];
   return *this;
 }
