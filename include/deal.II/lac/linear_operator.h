@@ -1165,13 +1165,12 @@ constraints_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
 {
   LinearOperator<Range, Domain> return_op = linear_operator<Range, Domain>(m);
 
-  return_op.vmult = [&cm](Range &v, const Domain &u)
+  return_op.vmult_add = [&cm](Range &v, const Domain &u)
   {
     for (auto i : v.locally_owned_elements())
       {
         if (cm.is_constrained(i))
           {
-            v(i) = 0;
             const std::vector< std::pair < types::global_dof_index, double > >
             *entries = cm.get_constraint_entries (i);
             for (types::global_dof_index j=0; j < entries->size(); ++j)
@@ -1181,17 +1180,16 @@ constraints_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
               }
           }
         else
-          v(i) = u(i);
+          v(i) += u(i);
       }
   };
 
-  return_op.Tvmult = [&cm](Range &v, const Domain &u)
+  return_op.Tvmult_add = [&cm](Range &v, const Domain &u)
   {
     for (auto i : u.locally_owned_elements())
       {
         if (cm.is_constrained(i))
           {
-            v(i)=0;
             const std::vector< std::pair < types::global_dof_index, double > >
             *entries = cm.get_constraint_entries (i);
             for (types::global_dof_index j=0; j < entries->size(); ++j)
@@ -1201,9 +1199,21 @@ constraints_linear_operator(const ConstraintMatrix &cm, const Matrix &m)
               }
           }
         else
-          v(i)=u(i);
+          v(i)+=u(i);
 
       }
+  };
+
+  return_op.vmult = [&cm](Range &v, const Domain &u)
+  {
+    v = 0.;
+    vmult_add(v, u);
+  };
+
+  return_op.Tvmult = [&cm](Range &v, const Domain &u)
+  {
+    v = 0.;
+    Tvmult_add(v, u);
   };
 
   return return_op;
@@ -1232,17 +1242,14 @@ constrained_linear_operator(const ConstraintMatrix &, const Matrix &);
  *  - rhs is the original right-hand-side
  * This function returns a LinearOperator representing the matrix Ct * S * C.
  *
- * @note Suppose we have n dof and m constraints. W.l.o.g. we can assume that it
- * is possible to express n-m variables in terms of remainder variables
- * (constrained variables).
- * Therefore, $ x_i = C_{i,j} x_j + k_i $ for $j = 1, ..., n-m$
- * and $i = 1, ..., n$.
- * Notice that Ct * S * C  is a problem in ${\mathbb R}^{m-n}$, remainder
- * variables are treated solving x = 0 in order to have a well-posed problem
- * on ${\mathbb R}^n$.
- * At the end a solution of the problem holding for constrained variables
- * can be found applying the constraint equations. (This is equivalent to
- * cm.distribute(x)).
+ * @note Suppose to express the form of $C$, let us consider that it corresponds
+ * to a ConstraintMatrix object on $n$ degrees of freedom, of which $m\le n$ are
+ * constrained. Without loss of generality, let us assume that the first $m$ are
+ * the ones that are constrained, and have the form $x_i = \sum_{j=m+1}^n c_{ij}
+ * x_j + b_j$ for $i=1,\ldots, m$. Then the rest of the degrees of freedom could
+ * be written as $x_i=x_i$ for $i=m+1,\ldots, n$. The matrix $C$ is then that
+ * matrix that has entries $C_{ij}=c_{ij}$ for $1\le i \le m, m+1\le j\le n$,
+ * $c_{ii}=1$ for $m+1\le i \le n$, and $C_{ij}=0$ for all other elements.
  *
  * @see M. S. Shephard: Linear multipoint constraints applied via
  * transformation as part of a direct stiffness assembly process, 1985.
