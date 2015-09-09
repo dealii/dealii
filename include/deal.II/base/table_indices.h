@@ -154,7 +154,8 @@ TableIndices<N>::TableIndices(const unsigned int index0,
       Assert (index7 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
     case 8: // fallthrough
       Assert (index8 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    default: ;
+    default:
+      ;
     }
 
   // Always access "indices" with indices modulo N to avoid bogus compiler
