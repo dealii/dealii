@@ -116,7 +116,7 @@ protected:
 template <int N>
 TableIndices<N>::TableIndices()
 {
-  Assert (N != 0, ExcMessage("Cannot create a TableIndices object of size 0"));
+  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
 
   for (unsigned int i=0; i<N; ++i)
     indices[i] = 0;
@@ -134,13 +134,39 @@ TableIndices<N>::TableIndices(const unsigned int index0,
                               const unsigned int index7,
                               const unsigned int index8)
 {
-  Assert (N != 0, ExcMessage("Cannot create a TableIndices object of size 0"));
+  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
+
+  switch (N)
+    {
+    case 1: // fallthrough
+      Assert (index1 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 2: // fallthrough
+      Assert (index2 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 3: // fallthrough
+      Assert (index3 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 4: // fallthrough
+      Assert (index4 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 5: // fallthrough
+      Assert (index5 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 6: // fallthrough
+      Assert (index6 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 7: // fallthrough
+      Assert (index7 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 8: // fallthrough
+      Assert (index8 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    default: ;
+    }
 
   // Always access "indices" with indices modulo N to avoid bogus compiler
   // warnings (although such access is always in dead code...
   switch (N)
     {
-    case 9:
+    default:
+      // For TableIndices of size 10 or larger als default initialize the
+      // remaining indices to numbers::invalid_unsigned_int:
+      for (unsigned int i=0; i<N; ++i)
+        indices[i] = numbers::invalid_unsigned_int;
+    case 9: // fallthrough
       indices[8 % N] = index8;
     case 8: // fallthrough
       indices[7 % N] = index7;
@@ -160,11 +186,6 @@ TableIndices<N>::TableIndices(const unsigned int index0,
       indices[0 % N] = index0;
     }
 
-  // For TableIndices of size 10 or larger als default initialize the
-  // remaining indices to numbers::invalid_unsigned_int:
-  if (N > 9)
-    for (unsigned int i=0; i<N; ++i)
-      indices[i] = numbers::invalid_unsigned_int;
 }
 
 
