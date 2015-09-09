@@ -272,12 +272,19 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Introduced Hessian-related functions to the Function class.
+  <li>New: MappingQ1Eulerian was not instantiated for the various
+  Trilinos vector types. It is now instantiated for the same
+  vector types as MappingQEulerian is.
+  <br>
+  (Wolfgang Bangerth, 2015/09/08)
+  </li>
+
+  <li>New: Introduced Hessian-related functions to the Function class.
   <br>
   (Denis Davydov, 2015/09/08)
   </li>
 
-  <li> Memory consumption during compilation has been reduced by splitting
+  <li>New: Memory consumption during compilation has been reduced by splitting
   instantiation files. For this make_instantiations now supports additional
   logic to split the the instantiations in .inst files into groups. This is
   used in fe_values.cc, error_estimator.cc, and others.
