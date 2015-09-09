@@ -132,7 +132,10 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       {
         auto func();
       };
-      int main() {}
+      int main()
+      {
+        foo bar;
+      }
       "
       DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
 
