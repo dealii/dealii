@@ -272,6 +272,18 @@ inconvenience this causes.
 
 
 <ol>
+  <li>Cleanup: TableIndices<N> can now be used (constructed and accessed)
+  with N > 7.
+  <br>
+  (Matthias Maier, 2015/09/08)
+  </li>
+
+  <li>New: std::begin and std::end are now available within the std_cxx11
+  namespace through <base/std_cxx11/iterator.h>
+  <br>
+  (Matthias Maier, 2015/09/08)
+  </li>
+
   <li>New: MappingQ1Eulerian was not instantiated for the various
   Trilinos vector types. It is now instantiated for the same
   vector types as MappingQEulerian is.
@@ -297,7 +309,7 @@ inconvenience this causes.
   <br>
   (Conrad Clevenger, 2015/09/03)
   </li>
-  
+
   <li> Openmp SIMD support is now enabled for Clang version 3.6, or newer
   (or the equivalent XCode version). Further, openmp support is not any
   more falsely activated for very old clang versions.

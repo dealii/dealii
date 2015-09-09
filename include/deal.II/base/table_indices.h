@@ -19,29 +19,57 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx11/iterator.h>
 
+#include <algorithm>
 #include <ostream>
-
 
 
 DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Base class for an array of indices of fixed size used for the TableBase and
- * SymmetricTensor classes. Actually, this class serves a dual purpose, as it
- * not only stores indices into the TableBase class, but also the sizes of the
- * table in its various coordinates.
+ * A class representing a fixed size array of indices.
+ *
+ * It is used in tensorial objects like the TableBase and SymmetricTensor
+ * classes to represent a nested choice of indices.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
+ * @author Wolfgang Bangerth, Matthias Maier, 2002, 2015
  */
 template <int N>
-class TableIndicesBase
+class TableIndices
 {
 public:
+
   /**
-   * Access the value of the <tt>i</tt>th index.
+   * Default constructor. It sets all indices to zero.
+   */
+  TableIndices();
+
+  /**
+   * Convenience constructor that takes up to 9 arguments. It can be used
+   * to populate a TableIndices object upon creation, either completely, or
+   * partially.
+   *
+   * Index entries that are not set by this 1 - 9 arguments (either
+   * because they are omitted, or because @tparam N is larger than 9) are
+   * set to numbers::invalid_unsigned_int.
+   *
+   * Note that only the first @tparam N arguments are actually used.
+   */
+  TableIndices (const unsigned int index0,
+                const unsigned int index1 = numbers::invalid_unsigned_int,
+                const unsigned int index2 = numbers::invalid_unsigned_int,
+                const unsigned int index3 = numbers::invalid_unsigned_int,
+                const unsigned int index4 = numbers::invalid_unsigned_int,
+                const unsigned int index5 = numbers::invalid_unsigned_int,
+                const unsigned int index6 = numbers::invalid_unsigned_int,
+                const unsigned int index7 = numbers::invalid_unsigned_int,
+                const unsigned int index8 = numbers::invalid_unsigned_int);
+
+  /**
+   * Read-only access the value of the <tt>i</tt>th index.
    */
   unsigned int operator[] (const unsigned int i) const;
 
@@ -53,12 +81,12 @@ public:
   /**
    * Compare two index fields for equality.
    */
-  bool operator == (const TableIndicesBase<N> &other) const;
+  bool operator == (const TableIndices<N> &other) const;
 
   /**
    * Compare two index fields for inequality.
    */
-  bool operator != (const TableIndicesBase<N> &other) const;
+  bool operator != (const TableIndices<N> &other) const;
 
   /**
    * Sort the indices in ascending order. While this operation is not very
@@ -81,294 +109,101 @@ protected:
 };
 
 
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the general template, and has no implementation. There are a number
- * of specializations that are actually implemented (one for each used value
- * of <tt>N</tt>), which only differ in the way they implement their
- * constructors (they take <tt>N</tt> arguments, something that cannot be
- * represented by a general template). Actual storage of and access to data is
- * done by the TableIndicesBase base class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, 2002
- */
-template <int N>
-class TableIndices : public TableIndicesBase<N>
-{
-  /**
-   * Standard constructor, setting all indices to zero.
-   */
-  TableIndices();
-  /**
-   * The actual constructor, taking @p N arguments of type <tt>unsigned
-   * int</tt> to initialize the index object.
-   */
-  TableIndices(...);
-};
-
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a one-dimensional table, i.e. a vector. This
- * class only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by the
- * TableIndicesBase base class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, 2002
- */
-template <>
-class TableIndices<1> : public TableIndicesBase<1>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   */
-  TableIndices (const unsigned int index1);
-};
-
-//TODO: Remove the default arguments and trickery below and put all
-//the constructors into the class template
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a two-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, 2002
- */
-template <>
-class TableIndices<2> : public TableIndicesBase<2>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int);
-};
-
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a three-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, 2002
- */
-template <>
-class TableIndices<3> : public TableIndicesBase<3>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int);
-};
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a four-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <>
-class TableIndices<4> : public TableIndicesBase<4>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int,
-                const unsigned int index4 = numbers::invalid_unsigned_int);
-};
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a five-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <>
-class TableIndices<5> : public TableIndicesBase<5>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int,
-                const unsigned int index4 = numbers::invalid_unsigned_int,
-                const unsigned int index5 = numbers::invalid_unsigned_int);
-};
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a six-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <>
-class TableIndices<6> : public TableIndicesBase<6>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int,
-                const unsigned int index4 = numbers::invalid_unsigned_int,
-                const unsigned int index5 = numbers::invalid_unsigned_int,
-                const unsigned int index6 = numbers::invalid_unsigned_int);
-};
-
-
-/**
- * Array of indices of fixed size used for the TableBase class.
- *
- * This is the specialization for a seven-dimensional table. This class only
- * differs in the non-default constructors from the other specializations.
- * Actual storage of and access to data is done by the TableIndicesBase base
- * class of a specializations.
- *
- * @ingroup data
- * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
- */
-template <>
-class TableIndices<7> : public TableIndicesBase<7>
-{
-public:
-  /**
-   * Default constructor. Set all indices to zero.
-   */
-  TableIndices ();
-
-  /**
-   * Constructor. Set indices to the given values.
-   *
-   * The default values for the second and subsequent arguments are necessary
-   * for some neat template tricks in SymmetricTensor where we only want to
-   * set the first index and construct the subsequent ones later on, i.e. for
-   * the moment we don't care about the later indices.
-   */
-  TableIndices (const unsigned int index1,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int,
-                const unsigned int index4 = numbers::invalid_unsigned_int,
-                const unsigned int index5 = numbers::invalid_unsigned_int,
-                const unsigned int index6 = numbers::invalid_unsigned_int,
-                const unsigned int index7 = numbers::invalid_unsigned_int);
-};
-
 
 /* --------------------- Template and inline functions ---------------- */
 
 
 template <int N>
+TableIndices<N>::TableIndices()
+{
+  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
+
+  for (unsigned int i=0; i<N; ++i)
+    indices[i] = 0;
+}
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0,
+                              const unsigned int index1,
+                              const unsigned int index2,
+                              const unsigned int index3,
+                              const unsigned int index4,
+                              const unsigned int index5,
+                              const unsigned int index6,
+                              const unsigned int index7,
+                              const unsigned int index8)
+{
+  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
+
+  switch (N)
+    {
+    case 1: // fallthrough
+      Assert (index1 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 2: // fallthrough
+      Assert (index2 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 3: // fallthrough
+      Assert (index3 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 4: // fallthrough
+      Assert (index4 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 5: // fallthrough
+      Assert (index5 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 6: // fallthrough
+      Assert (index6 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 7: // fallthrough
+      Assert (index7 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    case 8: // fallthrough
+      Assert (index8 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+    default:
+      ;
+    }
+
+  // Always access "indices" with indices modulo N to avoid bogus compiler
+  // warnings (although such access is always in dead code...
+  switch (N)
+    {
+    default:
+      // For TableIndices of size 10 or larger als default initialize the
+      // remaining indices to numbers::invalid_unsigned_int:
+      for (unsigned int i=0; i<N; ++i)
+        indices[i] = numbers::invalid_unsigned_int;
+    case 9: // fallthrough
+      indices[8 % N] = index8;
+    case 8: // fallthrough
+      indices[7 % N] = index7;
+    case 7: // fallthrough
+      indices[6 % N] = index6;
+    case 6: // fallthrough
+      indices[5 % N] = index5;
+    case 5: // fallthrough
+      indices[4 % N] = index4;
+    case 4: // fallthrough
+      indices[3 % N] = index3;
+    case 3: // fallthrough
+      indices[2 % N] = index2;
+    case 2: // fallthrough
+      indices[1 % N] = index1;
+    case 1: // fallthrough
+      indices[0 % N] = index0;
+    }
+
+}
+
+
+template <int N>
 inline
 unsigned int
-TableIndicesBase<N>::operator [] (const unsigned int i) const
+TableIndices<N>::operator [] (const unsigned int i) const
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
 }
 
+
 template <int N>
 inline
 unsigned int &
-TableIndicesBase<N>::operator [] (const unsigned int i)
+TableIndices<N>::operator [] (const unsigned int i)
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
@@ -378,7 +213,7 @@ TableIndicesBase<N>::operator [] (const unsigned int i)
 template <int N>
 inline
 bool
-TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const
+TableIndices<N>::operator == (const TableIndices<N> &other) const
 {
   for (unsigned int i=0; i<N; ++i)
     if (indices[i] != other.indices[i])
@@ -387,247 +222,56 @@ TableIndicesBase<N>::operator == (const TableIndicesBase<N> &other) const
 }
 
 
-
 template <int N>
 inline
 bool
-TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const
+TableIndices<N>::operator != (const TableIndices<N> &other) const
 {
   return !(*this == other);
 }
 
+
+template <int N>
+inline
+void
+TableIndices<N>::sort ()
+{
+  std::sort(std_cxx11::begin(indices), std_cxx11::end(indices));
+}
 
 
 template <int N>
 template <class Archive>
 inline
 void
-TableIndicesBase<N>::serialize (Archive &ar, const unsigned int)
+TableIndices<N>::serialize (Archive &ar, const unsigned int)
 {
   ar &indices;
 }
 
 
-
-template <>
-inline
-void
-TableIndicesBase<1>::sort ()
-{}
-
-
-
-template <>
-inline
-void
-TableIndicesBase<2>::sort ()
-{
-  if (indices[1] < indices[0])
-    std::swap (indices[0], indices[1]);
-}
-
-
-
-template <>
-inline
-void
-TableIndicesBase<3>::sort ()
-{
-  // bubble sort for 3 elements
-  if (indices[1] < indices[0])
-    std::swap (indices[0], indices[1]);
-  if (indices[2] < indices[1])
-    std::swap (indices[1], indices[2]);
-  if (indices[1] < indices[0])
-    std::swap (indices[0], indices[1]);
-}
-
-
-
-
-inline
-TableIndices<1>::TableIndices ()
-{
-  this->indices[0] = 0;
-}
-
-
-
-inline
-TableIndices<1>::TableIndices (const unsigned int index1)
-{
-  this->indices[0] = index1;
-}
-
-
-
-inline
-TableIndices<2>::TableIndices ()
-{
-  this->indices[0] = this->indices[1] = 0;
-}
-
-
-
-inline
-TableIndices<2>::TableIndices (const unsigned int index1,
-                               const unsigned int index2)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-}
-
-
-
-inline
-TableIndices<3>::TableIndices ()
-{
-  this->indices[0] = this->indices[1] = this->indices[2] = 0;
-}
-
-
-
-inline
-TableIndices<3>::TableIndices (const unsigned int index1,
-                               const unsigned int index2,
-                               const unsigned int index3)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-  this->indices[2] = index3;
-}
-
-
-
-inline
-TableIndices<4>::TableIndices ()
-{
-  this->indices[0] = this->indices[1] = this->indices[2] = this->indices[3] = 0;
-}
-
-
-
-inline
-TableIndices<4>::TableIndices (const unsigned int index1,
-                               const unsigned int index2,
-                               const unsigned int index3,
-                               const unsigned int index4)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-  this->indices[2] = index3;
-  this->indices[3] = index4;
-}
-
-
-
-inline
-TableIndices<5>::TableIndices ()
-{
-  this->indices[0] = this->indices[1]
-                     = this->indices[2]
-                       = this->indices[3]
-                         = this->indices[4] = 0;
-}
-
-
-
-inline
-TableIndices<5>::TableIndices (const unsigned int index1,
-                               const unsigned int index2,
-                               const unsigned int index3,
-                               const unsigned int index4,
-                               const unsigned int index5)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-  this->indices[2] = index3;
-  this->indices[3] = index4;
-  this->indices[4] = index5;
-}
-
-
-
-inline
-TableIndices<6>::TableIndices ()
-{
-  this->indices[0] = this->indices[1] = this->indices[2]
-                                        = this->indices[3] = this->indices[4]
-                                                             = this->indices[5] = 0;
-}
-
-
-
-inline
-TableIndices<6>::TableIndices (const unsigned int index1,
-                               const unsigned int index2,
-                               const unsigned int index3,
-                               const unsigned int index4,
-                               const unsigned int index5,
-                               const unsigned int index6)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-  this->indices[2] = index3;
-  this->indices[3] = index4;
-  this->indices[4] = index5;
-  this->indices[5] = index6;
-}
-
-
-
-inline
-TableIndices<7>::TableIndices ()
-{
-  this->indices[0] = this->indices[1] = this->indices[2]
-                                        = this->indices[3] = this->indices[4]
-                                                             = this->indices[5] = this->indices[6] = 0;
-}
-
-
-
-inline
-TableIndices<7>::TableIndices (const unsigned int index1,
-                               const unsigned int index2,
-                               const unsigned int index3,
-                               const unsigned int index4,
-                               const unsigned int index5,
-                               const unsigned int index6,
-                               const unsigned int index7)
-{
-  this->indices[0] = index1;
-  this->indices[1] = index2;
-  this->indices[2] = index3;
-  this->indices[3] = index4;
-  this->indices[4] = index5;
-  this->indices[5] = index6;
-  this->indices[6] = index7;
-}
-
-
-
 /**
- * Output operator for indices; reports them in a list like this:
- * <code>[i1,i2,...]</code>.
+ * Output operator for TableIndices objects; reports them in a list like
+ * this: <code>[i1,i2,...]</code>.
+ *
+ * @relates TableIndices
  */
 template <int N>
 std::ostream &
-operator << (std::ostream &o,
+operator << (std::ostream &out,
              const TableIndices<N> &indices)
 {
-  o << '[';
+  out << '[';
   for (unsigned int i=0; i<N; ++i)
     {
-      o << indices[i];
+      out << indices[i];
       if (i+1 != N)
-        o << ',';
+        out << ',';
     }
-  o << ']';
+  out << ']';
 
-  return o;
+  return out;
 }
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE
