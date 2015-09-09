@@ -29,11 +29,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
 
-  SolverBase::AdditionalData::AdditionalData (const bool         output_solver_details,
-                                              const unsigned int gmres_restart_parameter)
+  SolverBase::AdditionalData::AdditionalData (const bool         output_solver_details_in,
+                                              const unsigned int gmres_restart_parameter_in,
+                                              const bool         scale_residual_in)
     :
-    output_solver_details (output_solver_details),
-    gmres_restart_parameter (gmres_restart_parameter)
+    output_solver_details (output_solver_details_in),
+    gmres_restart_parameter (gmres_restart_parameter_in),
+    scale_residual(scale_residual_in)
   {}
 
 
@@ -260,7 +262,8 @@ namespace TrilinosWrappers
     // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
                            AZ_all : AZ_none);
-    solver.SetAztecOption (AZ_conv, AZ_noscaled);
+    solver.SetAztecOption (AZ_conv, additional_data.scale_residual ?
+                           AZ_r0 : AZ_noscaled);
 
     // ... and then solve!
     ierr = solver.Iterate (solver_control.max_steps(),
