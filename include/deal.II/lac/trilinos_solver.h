@@ -90,8 +90,9 @@ namespace TrilinosWrappers
        * it is quite inelegant to set a specific option of one solver in the
        * base class for all solvers.
        */
-      AdditionalData (const bool         output_solver_details   = false,
-                      const unsigned int gmres_restart_parameter = 30);
+      AdditionalData (const bool         output_solver_details_in = false,
+                      const unsigned int gmres_restart_parameter_in = 30,
+                      const bool         scale_residual_in = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -103,6 +104,15 @@ namespace TrilinosWrappers
        * Restart parameter for GMRES solver.
        */
       const unsigned int gmres_restart_parameter;
+
+      /**
+       * Determines the residual expression used in convergence checks.
+       * If true, the residual provided in the SolverControl object is used
+       * as a scale factor of initial residual. If false, the residual provided
+       * in the SolverControl object is used as an absolute convergence criteria.
+       * This flag is set to false by default.
+       */
+      const bool scale_residual;
     };
 
     /**
