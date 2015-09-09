@@ -129,7 +129,7 @@ check (const unsigned int level,
   std::vector<Tensor<1,dim> > Du (quadrature.size());
   std::vector<Tensor<1,dim> > Df (quadrature.size());
   std::vector<Tensor<2,dim> > DDu (quadrature.size());
-  std::vector<Tensor<2,dim> > DDf (quadrature.size());
+  std::vector<SymmetricTensor<2,dim> > DDf (quadrature.size());
 
   for (cell = dof.begin_active(); cell != end; ++cell)
     {
