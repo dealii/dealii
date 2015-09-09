@@ -153,6 +153,10 @@ INCLUDE_FILE_PATTERNS  =
 # set a few variables that help us generate documentation for
 # things like the PETSc and Trilinos wrappers, even if they were
 # not configured
+#
+# in the case of DEAL_II_NAMESPACE_OPEN/CLOSE, just expand them
+# to nothing so that they don't show up in the documentation
+# at all.
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_USE_MT_POSIX=1 \
@@ -174,7 +178,9 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_WITH_TRILINOS =1 \
                          DEAL_II_WITH_UMFPACK=1 \
-                         DEAL_II_WITH_ZLIB=1
+                         DEAL_II_WITH_ZLIB=1 \
+			 DEAL_II_NAMESPACE_OPEN= \
+			 DEAL_II_NAMESPACE_CLOSE=
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclException0 \
