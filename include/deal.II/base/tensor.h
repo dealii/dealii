@@ -848,8 +848,8 @@ template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = initializer[i];
+  if (dim > 0)
+    std::copy (&initializer[0], &initializer[0]+dim, &values[0]);
 }
 
 
@@ -893,14 +893,69 @@ operator Tensor<1,dim,Tensor<rank_-1,dim,OtherNumber> > () const
 }
 
 
+
+namespace internal
+{
+  namespace TensorSubscriptor
+  {
+    namespace
+    {
+      template <typename ArrayElementType, int dim>
+      ArrayElementType &
+      subscript (ArrayElementType *values,
+                 const unsigned int i,
+                 dealii::internal::int2type<dim>)
+      {
+        Assert (i<dim, ExcIndexRange(i, 0, dim));
+        return values[i];
+      }
+
+
+      template <typename ArrayElementType, int dim>
+      const ArrayElementType &
+      subscript (const ArrayElementType *values,
+                 const unsigned int i,
+                 dealii::internal::int2type<dim>)
+      {
+        Assert (i<dim, ExcIndexRange(i, 0, dim));
+        return values[i];
+      }
+
+
+      template <typename ArrayElementType>
+      ArrayElementType &
+      subscript (ArrayElementType *,
+                 const unsigned int,
+                 dealii::internal::int2type<0>)
+      {
+        Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
+        static ArrayElementType t;
+        return t;
+      }
+
+
+      template <typename ArrayElementType>
+      const ArrayElementType &
+      subscript (const ArrayElementType *,
+                 const unsigned int,
+                 dealii::internal::int2type<0>)
+      {
+        Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
+        static ArrayElementType t;
+        return t;
+      }
+
+    }
+  }
+}
+
+
 template <int rank_, int dim, typename Number>
 inline
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
-  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-  Assert (i<dim, ExcIndexRange(i, 0, dim));
-  return values[i];
+  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
 }
 
 
@@ -909,9 +964,7 @@ inline
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
-  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-  Assert (i<dim, ExcIndexRange(i, 0, dim));
-  return values[i];
+  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
 }
 
 
@@ -942,8 +995,8 @@ inline
 Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = t.values[i];
+  if (dim > 0)
+    std::copy (&t.values[0], &t.values[0]+dim, &values[0]);
   return *this;
 }
 
@@ -954,8 +1007,8 @@ inline
 Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = t.values[i];
+  if (dim > 0)
+    std::copy (&t.values[0], &t.values[0]+dim, &values[0]);
   return *this;
 }
 
