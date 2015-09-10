@@ -206,7 +206,7 @@ void SeventhProblem<dim>::solve ()
   LA::MPI::Vector
   completely_distributed_solution (locally_owned_dofs, mpi_communicator);
   SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
-  TrilinosWrappers::SolverCG solver(solver_control, mpi_communicator);
+  TrilinosWrappers::SolverCG solver(solver_control);
   TrilinosWrappers::PreconditionAMG preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
   preconditioner.initialize(system_matrix, data);

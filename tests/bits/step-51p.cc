@@ -761,7 +761,7 @@ namespace Step51
                                   1e-12*system_rhs.l2_norm());
     std::ostringstream stream;
     deallog.attach(stream);
-    SolverBicgstab<> solver (solver_control, false);
+    SolverBicgstab<> solver (solver_control);
     solver.solve (system_matrix, solution, system_rhs,
                   PreconditionIdentity());
     deallog.attach(logfile);
