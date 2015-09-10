@@ -898,53 +898,26 @@ namespace internal
 {
   namespace TensorSubscriptor
   {
-    namespace
+    template <typename ArrayElementType, int dim>
+    ArrayElementType &
+    subscript (ArrayElementType *values,
+               const unsigned int i,
+               dealii::internal::int2type<dim>)
     {
-      template <typename ArrayElementType, int dim>
-      ArrayElementType &
-      subscript (ArrayElementType *values,
-                 const unsigned int i,
-                 dealii::internal::int2type<dim>)
-      {
-        Assert (i<dim, ExcIndexRange(i, 0, dim));
-        return values[i];
-      }
+      Assert (i<dim, ExcIndexRange(i, 0, dim));
+      return values[i];
+    }
 
 
-      template <typename ArrayElementType, int dim>
-      const ArrayElementType &
-      subscript (const ArrayElementType *values,
-                 const unsigned int i,
-                 dealii::internal::int2type<dim>)
-      {
-        Assert (i<dim, ExcIndexRange(i, 0, dim));
-        return values[i];
-      }
-
-
-      template <typename ArrayElementType>
-      ArrayElementType &
-      subscript (ArrayElementType *,
-                 const unsigned int,
-                 dealii::internal::int2type<0>)
-      {
-        Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
-        static ArrayElementType t;
-        return t;
-      }
-
-
-      template <typename ArrayElementType>
-      const ArrayElementType &
-      subscript (const ArrayElementType *,
-                 const unsigned int,
-                 dealii::internal::int2type<0>)
-      {
-        Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
-        static ArrayElementType t;
-        return t;
-      }
-
+    template <typename ArrayElementType>
+    ArrayElementType &
+    subscript (ArrayElementType *,
+               const unsigned int,
+               dealii::internal::int2type<0>)
+    {
+      Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
+      static ArrayElementType t;
+      return t;
     }
   }
 }
