@@ -122,6 +122,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: A python script (including instructions) for enabling pretty
+  printing with GDB is now available in
+  <tt>/contrib/utilities/dotgdbinit.py</tt>.
+  <br>
+  (Wolfgang Bangerth, David Wells, 2015/09/11)
+  </li>
+
   <li> Improved: When available, deal.II now uses the "gold" linker, a
   reimplementation of the traditional Unix "ld" linker that is substantially
   faster. This reduces build and, in particular, test turnaround times.
