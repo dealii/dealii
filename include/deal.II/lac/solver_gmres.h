@@ -184,6 +184,7 @@ public:
      * left, the residual of the stopping criterion to the default residual,
      * and re-orthogonalization only if necessary.
      */
+    explicit
     AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                     const bool right_preconditioning = false,
                     const bool use_default_residual = true,
@@ -421,6 +422,7 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
+    explicit
     AdditionalData(const unsigned int max_basis_size = 30,
                    const bool /*use_default_residual*/ = true)
       :

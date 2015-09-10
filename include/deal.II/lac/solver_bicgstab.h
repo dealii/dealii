@@ -90,10 +90,11 @@ public:
      * The default is to perform an exact residual computation and breakdown
      * parameter 1e-10.
      */
+    explicit
     AdditionalData(const bool   exact_residual = true,
-                   const double breakdown      = 1.e-10) :
-      exact_residual(exact_residual),
-      breakdown(breakdown)
+                   const double breakdown      = 1.e-10)
+      : exact_residual(exact_residual),
+        breakdown(breakdown)
     {}
     /**
      * Flag for exact computation of residual.

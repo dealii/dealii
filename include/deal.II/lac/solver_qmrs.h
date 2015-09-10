@@ -90,6 +90,7 @@ public:
      * The default is no exact residual computation and breakdown parameter
      * 1e-16.
      */
+    explicit
     AdditionalData(bool exact_residual = false,
                    double breakdown=1.e-16) :
       exact_residual(exact_residual),

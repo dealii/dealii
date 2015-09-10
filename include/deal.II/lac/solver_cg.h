@@ -141,6 +141,7 @@ public:
      * @deprecated Instead use: connect_coefficients_slot,
      * connect_condition_number_slot, and connect_eigenvalues_slot.
      */
+    explicit
     AdditionalData (const bool log_coefficients,
                     const bool compute_condition_number = false,
                     const bool compute_all_condition_numbers = false,
