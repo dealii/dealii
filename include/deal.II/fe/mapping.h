@@ -234,7 +234,7 @@ enum MappingType
  * \hat x_L}(J_{jJ})^{-1}(J_{kK})^{-1}(J_{lL})^{-1}$.
  * These pushed-forward versions can be used to compute the higher order derivatives of functions
  * defined on the reference cell with respect to the
- * real cell coordinates. for instance, the Jacobian derivative with respect to the real cell coordinates is
+ * real cell coordinates. For instance, the Jacobian derivative with respect to the real cell coordinates is
  * given by:
  *
  * @f[
@@ -255,7 +255,7 @@ enum MappingType
  *
  * @f[
  * \frac{\partial}{\partial x_l}\left[H_{ijk}(\hat{\mathbf  x})\right] = K_{ijkl}(\hat{\mathbf  x})
- * -H_{mjl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x})-H_{mkl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x}).
+ * -H_{mjl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x})-H_{mkl}(\hat{\mathbf  x})H_{imj}(\hat{\mathbf  x}).
  * @f]
  *
  * <h3>References</h3>
