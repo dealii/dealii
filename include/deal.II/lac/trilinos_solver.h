@@ -90,6 +90,7 @@ namespace TrilinosWrappers
        * it is quite inelegant to set a specific option of one solver in the
        * base class for all solvers.
        */
+      explicit
       AdditionalData (const bool         output_solver_details   = false,
                       const unsigned int gmres_restart_parameter = 30);
 
@@ -276,6 +277,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -321,6 +323,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -367,6 +370,7 @@ namespace TrilinosWrappers
        * Constructor. By default, set the number of temporary vectors to 30,
        * i.e. do a restart every 30 iterations.
        */
+      explicit
       AdditionalData (const bool         output_solver_details = false,
                       const unsigned int restart_parameter = 30);
 
@@ -419,6 +423,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -465,6 +470,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -519,6 +525,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false,
                       const std::string &solver_type = "Amesos_Klu");
 

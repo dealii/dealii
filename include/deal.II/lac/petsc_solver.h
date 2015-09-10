@@ -254,6 +254,7 @@ namespace PETScWrappers
       /**
        * Constructor. By default, set the damping parameter to one.
        */
+      explicit
       AdditionalData (const double omega = 1);
 
       /**

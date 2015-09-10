@@ -69,6 +69,7 @@ public:
     /**
      * Constructor. By default, set the damping parameter to one.
      */
+    explicit
     AdditionalData (const double omega                       = 1,
                     const bool   use_preconditioned_residual = false);
 
