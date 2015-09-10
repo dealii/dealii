@@ -278,6 +278,12 @@ inconvenience this causes.
   (Timo Heister, Lei Qiao, 2015/09/09)
   </li>
 
+  <li>New: Introduced third-order derivatives of the shape functions, which
+  can now be accessed through FEValues and FEValuesViews using similar interfaces
+  as shape_values, shape_derivatives and shape_hessians.
+  (Maien Hamed, 2015/09/08)
+  </li>
+
   <li>Cleanup: TableIndices<N> can now be used (constructed and accessed)
   with N > 7.
   <br>

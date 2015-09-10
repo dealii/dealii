@@ -215,6 +215,48 @@ enum MappingType
  * transformed is specified by their MappingType argument. See the documentation there
  * for possible choices.
  *
+ * <h4>Derivatives of the mapping</h4>
+ *
+ * Some applications require the derivatives of the mapping, of which the first order
+ * derivative is the mapping Jacobian, $J_{iJ}(\hat{\mathbf  x})=\frac{\partial x_i}{\partial \hat x_J}$,
+ * described above. Higher order derivatives of the mapping are similarly
+ * defined, for example the Jacobian derivative,
+ * $\hat H_{iJK}(\hat{\mathbf  x}) = \frac{\partial^2 x_i}{\partial \hat x_J \partial \hat x_K}$,
+ * and the Jacobian second derivative,
+ * $\hat K_{iJKL}(\hat{\mathbf  x}) = \frac{\partial^3 x_i}{\partial \hat x_J \partial
+ * \hat x_K \partial \hat x_L}$.
+ * It is also useful to define the "pushed-forward" versions of the higher order derivatives:
+ * the Jacobian pushed-forward
+ * derivative, $H_{ijk}(\hat{\mathbf  x}) = \frac{\partial^2 x_i}{\partial \hat x_J \partial
+ * \hat x_K}(J_{jJ})^{-1}(J_{kK})^{-1}$,
+ * and the Jacobian pushed-forward second derivative,
+ * $K_{ijkl}(\hat{\mathbf  x}) = \frac{\partial^3 x_i}{\partial \hat x_J \partial \hat x_K \partial
+ * \hat x_L}(J_{jJ})^{-1}(J_{kK})^{-1}(J_{lL})^{-1}$.
+ * These pushed-forward versions can be used to compute the higher order derivatives of functions
+ * defined on the reference cell with respect to the
+ * real cell coordinates. for instance, the Jacobian derivative with respect to the real cell coordinates is
+ * given by:
+ *
+ * @f[
+ * \frac{\partial}{\partial x_j}\left[J_{iJ}(\hat{\mathbf  x})\right] =
+ * H_{ikn}(\hat{\mathbf  x})J_{nJ}(\hat{\mathbf  x}),
+ * @f]
+ * and the derivative of the Jacobian inverse with respect to the real cell coordinates is similarly given by:
+ * @f[
+ * \frac{\partial}{\partial x_j}\left[\left(J_{iJ}(\hat{\mathbf  x})\right)^{-1}\right]
+ * = -H_{nik}(\hat{\mathbf  x})\left(J_{nJ}(\hat{\mathbf  x})\right)^{-1}.
+ * @f]
+ *
+ * In a similar fashion, higher order derivatives, with respect to the real cell coordinates, of functions
+ *  defined on the reference cell can
+ * be defined using the Jacobian pushed-forward higher-order derivatives.
+ * For example, the derivative, with respect to the real cell coordinates, of the Jacobian pushed-forward
+ * derivative is given by:
+ *
+ * @f[
+ * \frac{\partial}{\partial x_l}\left[H_{ijk}(\hat{\mathbf  x})\right] = K_{ijkl}(\hat{\mathbf  x})
+ * -H_{mjl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x})-H_{mkl}(\hat{\mathbf  x})H_{imk}(\hat{\mathbf  x}).
+ * @f]
  *
  * <h3>References</h3>
  *
