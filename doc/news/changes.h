@@ -272,6 +272,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li>Cleanup: Constructors of AdditionalData in various linear solvers are now marked
+  explicit. This avoid bugs with implicit conversions like the one fixed in step-40.
+  <br>
+  (Timo Heister, Lei Qiao, 2015/09/09)
+  </li>
+
   <li>Cleanup: TableIndices<N> can now be used (constructed and accessed)
   with N > 7.
   <br>
