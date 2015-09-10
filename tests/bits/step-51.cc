@@ -763,7 +763,7 @@ namespace Step51
     // sensitive
     std::ostringstream stream;
     deallog.attach(stream);
-    SolverBicgstab<> solver (solver_control, false);
+    SolverBicgstab<> solver (solver_control);
     solver.solve (system_matrix, solution, system_rhs,
                   PreconditionIdentity());
     deallog.attach(logfile);

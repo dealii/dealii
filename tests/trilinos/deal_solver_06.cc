@@ -96,7 +96,8 @@ int main(int argc, char **argv)
     u.compress (VectorOperation::insert);
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
-    SolverRichardson<TrilinosWrappers::Vector> solver(control,mem,0.1);
+    SolverRichardson<TrilinosWrappers::Vector>::AdditionalData data (/*omega=*/0.1);
+    SolverRichardson<TrilinosWrappers::Vector> solver(control, mem, data);
     PreconditionIdentity preconditioner;
     check_solve (solver, control, A,u,f, preconditioner);
   }

@@ -974,7 +974,7 @@ namespace Step51
   {
     SolverControl solver_control (system_matrix.m()*10,
                                   1e-11*system_rhs.l2_norm());
-    SolverBicgstab<> solver (solver_control, false);
+    SolverBicgstab<> solver (solver_control);
     solver.solve (system_matrix, solution, system_rhs,
                   PreconditionIdentity());
 
