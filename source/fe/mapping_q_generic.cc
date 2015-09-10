@@ -818,25 +818,6 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 template<int dim, int spacedim>
-Point<spacedim>
-MappingQGeneric<dim,spacedim>::
-transform_unit_to_real_cell_internal (const InternalData &data) const
-{
-  AssertDimension (data.shape_values.size(),
-                   data.mapping_support_points.size());
-
-  // use now the InternalData to
-  // compute the point in real space.
-  Point<spacedim> p_real;
-  for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
-    p_real += data.mapping_support_points[i] * data.shape(0,i);
-
-  return p_real;
-}
-
-
-
-template<int dim, int spacedim>
 UpdateFlags
 MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {

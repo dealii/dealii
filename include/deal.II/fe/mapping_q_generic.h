@@ -469,24 +469,6 @@ protected:
                                   std::vector<Point<spacedim> > &a) const = 0;
 
   /**
-   * Transforms a point @p p on the unit cell to the point @p p_real on the
-   * real cell @p cell and returns @p p_real.
-   *
-   * This function is called by @p transform_unit_to_real_cell and multiple
-   * times (through the Newton iteration) by @p
-   * transform_real_to_unit_cell_internal.
-   *
-   * Takes a reference to an @p InternalData that must already include the
-   * shape values at point @p p and the mapping support points of the cell.
-   *
-   * This @p InternalData argument avoids multiple computations of the shape
-   * values at point @p p and especially multiple computations of the mapping
-   * support points.
-   */
-  Point<spacedim>
-  transform_unit_to_real_cell_internal (const InternalData &mdata) const;
-
-  /**
    * Make MappingQ a friend since it needs to call the
    * fill_fe_values() functions on its MappingQ1 sub-object.
    */

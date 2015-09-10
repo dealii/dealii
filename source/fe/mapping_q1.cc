@@ -475,6 +475,40 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
+namespace
+{
+  /**
+   * Transforms a point @p p on the unit cell to the point @p p_real on the
+   * real cell @p cell and returns @p p_real.
+   *
+   * This function is called by @p transform_unit_to_real_cell and multiple
+   * times (through the Newton iteration) by @p
+   * transform_real_to_unit_cell_internal.
+   *
+   * Takes a reference to an @p InternalData that must already include the
+   * shape values at point @p p and the mapping support points of the cell.
+   *
+   * This @p InternalData argument avoids multiple computations of the shape
+   * values at point @p p and especially multiple computations of the mapping
+   * support points.
+   */
+  template<int dim, int spacedim>
+  Point<spacedim>
+  transform_unit_to_real_cell_internal (const typename MappingQ1<dim,spacedim>::InternalData &data)
+  {
+    AssertDimension (data.shape_values.size(),
+                     data.mapping_support_points.size());
+
+    // use now the InternalData to
+    // compute the point in real space.
+    Point<spacedim> p_real;
+    for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+      p_real += data.mapping_support_points[i] * data.shape(0,i);
+
+    return p_real;
+  }
+}
+
 
 template<int dim, int spacedim>
 Point<dim>
@@ -508,7 +542,7 @@ transform_real_to_unit_cell_internal
 
   mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
 
-  Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
+  Point<spacedim> p_real = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
   Tensor<1,spacedim> f = p_real-p;
 
   // early out if we already have our point
@@ -597,7 +631,7 @@ transform_real_to_unit_cell_internal
           mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
 
           // f(x)
-          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
+          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
           const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -753,7 +787,7 @@ transform_real_to_unit_cell_internal_codim1
     }
 
   p_minus_F = p;
-  p_minus_F -= transform_unit_to_real_cell_internal(mdata);
+  p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
 
 
   for (unsigned int j=0; j<dim1; ++j)
@@ -808,7 +842,7 @@ transform_real_to_unit_cell_internal_codim1
 //TODO: implement a line search here in much the same way as for
 // the corresponding function above that does so for codim==0.
       p_minus_F = p;
-      p_minus_F -= transform_unit_to_real_cell_internal(mdata);
+      p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
 
       for (unsigned int j=0; j<dim1; ++j)
         {
