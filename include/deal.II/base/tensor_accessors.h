@@ -73,6 +73,7 @@ namespace TensorAccessors
   {
     template <int index, int rank, typename T> class ReorderedIndexView;
     template <int position, int rank> struct ExtractHelper;
+    template <int no_contr, int rank_1, int rank_2, int dim> class Contract;
   }
 
 
@@ -224,6 +225,59 @@ namespace TensorAccessors
   extract(T &t, const ArrayType &indices)
   {
     return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(t, indices);
+  }
+
+
+  /**
+   * This function contracts two tensorial objects @p left and @p right and
+   * stores the result in @p result. The contraction is done over the
+   * _last_ @p no_contr indices of both tensorial objects:
+   *
+   * @f[
+   *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+   *   = \sum_{k_1,..,k_{\text{no_contr}}}
+   *     \text{left}_{i_1,..,i_{r1},k_1,..,k_{\text{no_contr}}}
+   *     \text{right}_{j_1,..,j_{r2},k_1,..,k_{\text{no_contr}}}
+   * @f]
+   *
+   * Calling this function is equivalent of writing the following low level
+   * code:
+   * @code
+   *   for(unsigned int i_0 = 0; i_0 < dim; ++i_0)
+   *     ...
+   *       for(unsigned int i_ = 0; i_ < dim; ++i_)
+   *         for(unsigned int j_0 = 0; j_0 < dim; ++j_0)
+   *           ...
+   *             for(unsigned int j_ = 0; j_ < dim; ++j_)
+   *               {
+   *                 result[i_0]..[i_][j_0]..[j_] = 0.;
+   *                 for(unsigned int k_0 = 0; k_0 < dim; ++k_0)
+   *                   ...
+   *                     for(unsigned int k_ = 0; k_ < dim; ++k_)
+   *                       result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
+   *               }
+   * @endcode
+   * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 = rank_1,
+   * and c = no_contr.
+   *
+   * @note The Types @p T1, @p T2, and @p T3 must have rank
+   * rank_1 + rank_2 - 2 * no_contr, rank_1, or rank_2, respectively.
+   * Obviously, no_contr must be less or equal than rank_1 and rank_2.
+   */
+  template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
+  void contract(T1 &result, const T2 &left, const T3 &right)
+  {
+#ifdef DEAL_II_WITH_CXX11
+    static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
+                                      "equal or greater than the number of "
+                                      "contractions");
+    static_assert(rank_2 >= no_contr, "The rank of the right tensor must be "
+                                      "equal or greater than the number of "
+                                      "contractions");
+#endif
+
+    internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>
+    (result, left, right);
   }
 
 
@@ -473,6 +527,124 @@ namespace TensorAccessors
       T &extract(T &t, const ArrayType &indices)
       {
         return t;
+      }
+    };
+
+
+    // -------------------------------------------------------------------------
+    // Implemenation of helper classes for contract
+    // -------------------------------------------------------------------------
+
+    // Straightforwad recursive pattern:
+    //
+    // As long as rank_1 > no_contr, assign indices from the left tensor to
+    // result. This builds up the first part of the nested outer loops:
+    //
+    // for(unsigned int i_0; i_0 < dim; ++i_0)
+    //   ...
+    //     for(i_; i_ < dim; ++i_)
+    //       [...]
+    //         result[i_0]..[i_] ... left[i_0]..[i_] ...
+
+    template <int no_contr, int rank_1, int rank_2, int dim>
+    class Contract
+    {
+    public:
+      template<typename T1, typename T2, typename T3>
+      inline static
+      void contract(T1 &result, const T2 &left, const T3 &right)
+      {
+        for (unsigned int i = 0; i < dim; ++i)
+          Contract<no_contr, rank_1 - 1, rank_2, dim>::
+          contract(result[i], left[i], right);
+      }
+    };
+
+    // If rank_1 == no_contr leave out the remaining no_contr indices for
+    // the contraction and assign indices from the right tensor to the
+    // result. This builds up the second part of the nested loops:
+    //
+    //  for(unsigned int i_0 = 0; i_0 < dim; ++i_0)
+    //    ...
+    //      for(unsigned int i_ = 0; i_ < dim; ++i_)
+    //        for(unsigned int j_0 = 0; j_0 < dim; ++j_0)
+    //          ...
+    //            for(unsigned int j_ = 0; j_ < dim; ++j_)
+    //             [...]
+    //               result[i_0]..[i_][j_0]..[j_] ... left[i_0]..[i_] ... right[j_0]..[j_]
+    //
+
+    template <int no_contr, int rank_2, int dim>
+    class Contract<no_contr, no_contr, rank_2, dim>
+    {
+    public:
+      template<typename T1, typename T2, typename T3>
+      inline static
+      void contract(T1 &result, const T2 &left, const T3 &right)
+      {
+        for (unsigned int i = 0; i < dim; ++i)
+          Contract<no_contr, no_contr, rank_2 - 1, dim>::
+          contract(result[i], left, right[i]);
+      }
+    };
+
+    // If rank_1 == rank_2 == no_contr we have built up all of the outer
+    // loop. Now, it is time to do the actual contraction:
+    //
+    // [...]
+    //   {
+    //     result[i_0]..[i_][j_0]..[j_] = 0.;
+    //     for(unsigned int k_0 = 0; k_0 < dim; ++k_0)
+    //       ...
+    //         for(unsigned int k_ = 0; k_ < dim; ++k_)
+    //           result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
+    //   }
+    //
+    //  Relay this summation to another helper class.
+
+    template <int no_contr, int dim>
+    class Contract<no_contr, no_contr, no_contr, dim>
+    {
+    public:
+      template<typename T1, typename T2, typename T3>
+      inline static
+      void contract(T1 &result, const T2 &left, const T3 &right)
+      {
+        result = Contract2<no_contr, dim>::template contract2<T1>(left, right);
+      }
+    };
+
+    // Straightforward recursion:
+    //
+    // Contract leftmost index and recurse one down.
+
+    template <int no_contr, int dim>
+    class Contract2
+    {
+    public:
+      template<typename T1, typename T2, typename T3>
+      inline static
+      T1 contract2(const T2 &left, const T3 &right)
+      {
+        T1 result = T1();
+        for (unsigned int i = 0; i < dim; ++i)
+          result += Contract2<no_contr - 1, dim>::template contract2<T1>(left[i], right[i]);
+        return result;
+      }
+    };
+
+    // A contraction of two objects of order 0 is just a scalar
+    // multiplication:
+
+    template <int dim>
+    class Contract2<0, dim>
+    {
+    public:
+      template<typename T1, typename T2, typename T3>
+      inline static
+      T1 contract2(const T2 &left, const T3 &right)
+      {
+        return left * right;
       }
     };
 
