@@ -122,6 +122,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li>New: A new namespace TensorAccessors is introduced that contains
+  generic algorithms for tensorial objects, i.e., objects that allow
+  repeated access via the index operator <code>operator[](unsigned int)</code>.
+  The methods in TensorAccessors is primarily meant to replace old internal
+  code in <code>tensor.h</code>, but it might also proof useful otherwise.
+  <br>
+  (Matthias Maier, 2015/09/11)
+  </li>
+
   <li> New: A python script (including instructions) for enabling pretty
   printing with GDB is now available in
   <tt>/contrib/utilities/dotgdbinit.py</tt>.
