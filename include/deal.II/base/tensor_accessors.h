@@ -74,6 +74,7 @@ namespace TensorAccessors
     template <int index, int rank, typename T> class ReorderedIndexView;
     template <int position, int rank> struct ExtractHelper;
     template <int no_contr, int rank_1, int rank_2, int dim> class Contract;
+    template <int rank_1, int rank_2, int dim> class Contract3;
   }
 
 
@@ -278,6 +279,41 @@ namespace TensorAccessors
 
     internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>
     (result, left, right);
+  }
+
+
+  /**
+   * Full contraction of three tensorial objects:
+   *
+   * @f[
+   *   \sum_{i_1,..,i_{r1},j_1,..,j_{r2}}
+   *   \text{left}_{i_1,..,i_{r1}}
+   *   \text{middle}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+   *   \text{right}_{j_1,..,j_{r2}}
+   * @f]
+   *
+   * Calling this function is equivalent of writing the following low level
+   * code:
+   * @code
+   *   T1 result = T1();
+   *   for(unsigned int i_0 = 0; i_0 < dim; ++i_0)
+   *     ...
+   *       for(unsigned int i_ = 0; i_ < dim; ++i_)
+   *         for(unsigned int j_0 = 0; j_0 < dim; ++j_0)
+   *           ...
+   *             for(unsigned int j_ = 0; j_ < dim; ++j_)
+   *               result += left[i_0]..[i_] * middle[i_0]..[i_][j_0]..[j_] * right[j_0]..[j_];
+   * @endcode
+   *
+   * @note The Types @p T2, @p T3, and @p T4 must have
+   * rank rank_1, rank_1 + rank_2, and rank_3, respectively. @p T1
+   * must be a scalar type.
+   */
+  template <int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3, typename T4>
+  T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+  {
+    return internal::Contract3<rank_1, rank_2, dim>::template contract3<T1, T2, T3, T4>
+    (left, middle, right);
   }
 
 
@@ -645,6 +681,77 @@ namespace TensorAccessors
       T1 contract2(const T2 &left, const T3 &right)
       {
         return left * right;
+      }
+    };
+
+
+    // -------------------------------------------------------------------------
+    // Implemenation of helper classes for contract3
+    // -------------------------------------------------------------------------
+
+    // Fully contract three tensorial objects
+    //
+    // As long as rank_1 > 0, recurse over left and middle:
+    //
+    // for(unsigned int i_0; i_0 < dim; ++i_0)
+    //   ...
+    //     for(i_; i_ < dim; ++i_)
+    //       [...]
+    //         left[i_0]..[i_] ... middle[i_0]..[i_] ... right
+
+    template <int rank_1, int rank_2, int dim>
+    class Contract3
+    {
+    public:
+      template<typename T1, typename T2, typename T3, typename T4>
+      static inline
+      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      {
+        T1 result = T1();
+        for (unsigned int i = 0; i < dim; ++i)
+          result += Contract3<rank_1 - 1, rank_2, dim>::template contract3<T1>(left[i], middle[i], right);
+        return result;
+      }
+    };
+
+    // If rank_1 ==0, continue to recurse over middle and right:
+    //
+    // for(unsigned int i_0; i_0 < dim; ++i_0)
+    //   ...
+    //     for(i_; i_ < dim; ++i_)
+    //       for(unsigned int j_0; j_0 < dim; ++j_0)
+    //         ...
+    //           for(j_; j_ < dim; ++j_)
+    //             [...]
+    //               left[i_0]..[i_] ... middle[i_0]..[i_][j_0]..[j_] ... right[j_0]..[j_]
+
+    template <int rank_2, int dim>
+    class Contract3<0, rank_2, dim>
+    {
+    public:
+      template<typename T1, typename T2, typename T3, typename T4>
+      static inline
+      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      {
+        T1 result = T1();
+        for (unsigned int i = 0; i < dim; ++i)
+          result += Contract3<0, rank_2 - 1, dim>::template contract3<T1>(left, middle[i], right[i]);
+        return result;
+      }
+    };
+
+    // Contraction of three tensorial objects of rank 0 is just a scalar
+    // multiplication.
+
+    template <int dim>
+    class Contract3<0, 0, dim>
+    {
+    public:
+      template<typename T1, typename T2, typename T3, typename T4>
+      static inline
+      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      {
+        return left * middle * right;
       }
     };
 
