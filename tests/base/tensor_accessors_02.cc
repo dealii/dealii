@@ -18,6 +18,9 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/table_indices.h>
 
+#ifdef DEAL_II_WITH_CXX11
+#include <array>
+#endif
 
 int main()
 {
