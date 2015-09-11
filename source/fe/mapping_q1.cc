@@ -205,60 +205,6 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
 
 
 
-
-template<int dim, int spacedim>
-Point<spacedim>
-MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Point<dim> &p) const
-{
-  const Quadrature<dim> point_quadrature(p);
-
-  //TODO: Use get_data() here once MappingQ is no longer derived from
-  //MappingQ1. this doesn't currently work because we here really need
-  //a Q1 InternalData, but MappingQGeneric produces one with the
-  //polynomial degree of the MappingQ
-  std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
-  mdata->initialize (this->requires_update_flags (update_quadrature_points | update_jacobians), point_quadrature, 1);
-
-  // compute the mapping support
-  // points
-  compute_mapping_support_points(cell, mdata->mapping_support_points);
-
-  // Mapping support points can be
-  // bigger than necessary. If this
-  // is the case, force them to be
-  // Q1.
-  if (mdata->mapping_support_points.size() > mdata->shape_values.size())
-    mdata->mapping_support_points.resize
-    (GeometryInfo<dim>::vertices_per_cell);
-
-
-  return transform_unit_to_real_cell_internal(*mdata);
-}
-
-
-
-template<int dim, int spacedim>
-Point<spacedim>
-MappingQ1<dim,spacedim>::
-transform_unit_to_real_cell_internal (const InternalData &data) const
-{
-  const unsigned int n_mapping_points=data.mapping_support_points.size();
-  (void)n_mapping_points;
-  AssertDimension (data.shape_values.size(), n_mapping_points);
-
-  // use now the InternalData to
-  // compute the point in real space.
-  Point<spacedim> p_real;
-  for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
-    p_real += data.mapping_support_points[i] * data.shape(0,i);
-
-  return p_real;
-}
-
-
-
 /* For an explanation of the  KA and Kb
    arrays see the comments in the declaration of
    transform_real_to_unit_cell_initial_guess */
@@ -529,6 +475,40 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
+namespace
+{
+  /**
+   * Transforms a point @p p on the unit cell to the point @p p_real on the
+   * real cell @p cell and returns @p p_real.
+   *
+   * This function is called by @p transform_unit_to_real_cell and multiple
+   * times (through the Newton iteration) by @p
+   * transform_real_to_unit_cell_internal.
+   *
+   * Takes a reference to an @p InternalData that must already include the
+   * shape values at point @p p and the mapping support points of the cell.
+   *
+   * This @p InternalData argument avoids multiple computations of the shape
+   * values at point @p p and especially multiple computations of the mapping
+   * support points.
+   */
+  template<int dim, int spacedim>
+  Point<spacedim>
+  transform_unit_to_real_cell_internal (const typename MappingQ1<dim,spacedim>::InternalData &data)
+  {
+    AssertDimension (data.shape_values.size(),
+                     data.mapping_support_points.size());
+
+    // use now the InternalData to
+    // compute the point in real space.
+    Point<spacedim> p_real;
+    for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+      p_real += data.mapping_support_points[i] * data.shape(0,i);
+
+    return p_real;
+  }
+}
+
 
 template<int dim, int spacedim>
 Point<dim>
@@ -562,7 +542,7 @@ transform_real_to_unit_cell_internal
 
   mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
 
-  Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
+  Point<spacedim> p_real = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
   Tensor<1,spacedim> f = p_real-p;
 
   // early out if we already have our point
@@ -651,7 +631,7 @@ transform_real_to_unit_cell_internal
           mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
 
           // f(x)
-          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
+          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
           const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -807,7 +787,7 @@ transform_real_to_unit_cell_internal_codim1
     }
 
   p_minus_F = p;
-  p_minus_F -= transform_unit_to_real_cell_internal(mdata);
+  p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
 
 
   for (unsigned int j=0; j<dim1; ++j)
@@ -862,7 +842,7 @@ transform_real_to_unit_cell_internal_codim1
 //TODO: implement a line search here in much the same way as for
 // the corresponding function above that does so for codim==0.
       p_minus_F = p;
-      p_minus_F -= transform_unit_to_real_cell_internal(mdata);
+      p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
 
       for (unsigned int j=0; j<dim1; ++j)
         {

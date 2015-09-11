@@ -62,15 +62,24 @@ public:
    *
    * The second argument determines whether the higher order mapping should
    * also be used on interior cells. If its value is <code>false</code> (the
-   * default), the a lower-order mapping is used in the interior. This is
+   * default), then a lower order mapping is used in the interior. This is
    * sufficient for most cases where higher order mappings are only used to
    * better approximate the boundary. In that case, cells bounded by straight
    * lines are acceptable in the interior. However, there are cases where one
    * would also like to use a higher order mapping in the interior. The
    * MappingQEulerian class is one such case.
+   *
+   * The value of @p use_mapping_q_on_all_cells is ignored if @p dim is not
+   * equal to @p spacedim, i.e., if we are considering meshes on surfaces
+   * embedded into higher dimensional spaces.
    */
   MappingQ (const unsigned int polynomial_degree,
             const bool use_mapping_q_on_all_cells = false);
+
+  /**
+   * Copy constructor.
+   */
+  MappingQ (const MappingQ<dim,spacedim> &mapping);
 
   /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the
@@ -277,13 +286,13 @@ protected:
 
   // documentation can be found in Mapping::get_face_data()
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const;
 
@@ -440,6 +449,22 @@ protected:
    */
   const FE_Q<dim> feq;
 
+  /**
+   * Pointer to a Q1 mapping. This mapping is used on interior cells unless
+   * use_mapping_q_on_all_cells was set in the call to the
+   * constructor. The mapping is also used on any cell in the
+   * transform_real_to_unit_cell() to compute a cheap initial
+   * guess for the position of the point before we employ the
+   * more expensive Newton iteration using the full mapping.
+   *
+   * @note MappingQEulerian resets this pointer to an object of type
+   *   MappingQ1Eulerian to ensure that the Q1 mapping also knows
+   *   about the proper shifts and transformations of the Eulerian
+   *   displacements. This also means that we really need to store
+   *   our own Q1 mapping here, rather than simply resorting to
+   *   StaticMappingQ1::mapping.
+   */
+  std_cxx11::unique_ptr<const MappingQ1<dim,spacedim> > q1_mapping;
 
   /*
    * The default line support points. These are used when computing

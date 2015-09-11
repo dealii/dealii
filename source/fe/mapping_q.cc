@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 template<int dim, int spacedim>
 MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
-  MappingQ1<dim,spacedim>::InternalData(polynomial_degree),
+  MappingQGeneric<dim,spacedim>::InternalData(polynomial_degree),
   use_mapping_q1_on_current_cell(false)
 {}
 
@@ -46,7 +46,7 @@ template<int dim, int spacedim>
 std::size_t
 MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 {
-  return (MappingQ1<dim,spacedim>::InternalData::memory_consumption () +
+  return (MappingQGeneric<dim,spacedim>::InternalData::memory_consumption () +
           MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
           MemoryConsumption::memory_consumption (mapping_q1_data));
 }
@@ -63,9 +63,21 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
           ((dim==2) ?
            4+4*(degree-1) :
            8+12*(degree-1)+6*(degree-1)*(degree-1))),
-  use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
-                              || (dim != spacedim)),
+
+  // see whether we want to use *this* mapping objects on *all* cells,
+  // or defer to an explicit Q1 mapping on interior cells. if
+  // degree==1, then we are already that Q1 mapping, so we don't need
+  // it; if dim!=spacedim, there is also no need for anything because
+  // we're most likely on a curved manifold
+  use_mapping_q_on_all_cells (degree==1
+                              ||
+                              use_mapping_q_on_all_cells
+                              ||
+                              (dim != spacedim)),
   feq(degree),
+  // create a Q1 mapping for use on interior cells (if necessary)
+  // or to create a good initial guess in transform_real_to_unit_cell()
+  q1_mapping (new MappingQ1<dim,spacedim>()),
   line_support_points(degree+1)
 {
   Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
@@ -84,6 +96,34 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
 
 
 template<int dim, int spacedim>
+MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
+  :
+  MappingQ1<dim,spacedim>(mapping.get_degree()),
+  n_inner(mapping.n_inner),
+  n_outer(mapping.n_outer),
+  use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
+  feq(mapping.get_degree()),
+  // clone the Q1 mapping for use on interior cells (if necessary)
+  // or to create a good initial guess in transform_real_to_unit_cell()
+  q1_mapping (dynamic_cast<MappingQ1<dim,spacedim>*>(mapping.q1_mapping->clone())),
+  line_support_points(mapping.line_support_points)
+{
+  Assert(n_inner+n_outer==Utilities::fixed_power<dim>(this->polynomial_degree+1),
+         ExcInternalError());
+
+  // build laplace_on_quad_vector
+  if (this->polynomial_degree>1)
+    {
+      if (dim >= 2)
+        set_laplace_on_quad_vector(laplace_on_quad_vector);
+      if (dim >= 3)
+        set_laplace_on_hex_vector(laplace_on_hex_vector);
+    }
+}
+
+
+
+template<int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
@@ -91,32 +131,24 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
   InternalData *data = new InternalData(this->polynomial_degree);
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
-  Threads::TaskGroup<> tasks;
-  tasks += Threads::new_task (std_cxx11::function<void()>
-                              (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
-                                               data,
-                                               update_flags,
-                                               std_cxx11::cref(quadrature),
-                                               quadrature.size())));
+  Threads::Task<>
+  task = Threads::new_task (std_cxx11::function<void()>
+                            (std_cxx11::bind(&MappingQGeneric<dim,spacedim>::InternalData::initialize,
+                                             data,
+                                             update_flags,
+                                             std_cxx11::cref(quadrature),
+                                             quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    {
-      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
-      tasks += Threads::new_task (std_cxx11::function<void()>
-                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize,
-                                                   data->mapping_q1_data.get(),
-                                                   update_flags,
-                                                   std_cxx11::cref(quadrature),
-                                                   quadrature.size())));
-    }
+    data->mapping_q1_data.reset (q1_mapping->get_data (update_flags, quadrature));
 
-  tasks.join_all ();
+  task.join ();
   return data;
 }
 
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
 {
@@ -124,32 +156,24 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
-  Threads::TaskGroup<> tasks;
-  tasks += Threads::new_task (std_cxx11::function<void()>
-                              (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                               data,
-                                               update_flags,
-                                               std_cxx11::cref(q),
-                                               quadrature.size())));
+  Threads::Task<>
+  task = Threads::new_task (std_cxx11::function<void()>
+                            (std_cxx11::bind(&MappingQGeneric<dim,spacedim>::InternalData::initialize_face,
+                                             data,
+                                             update_flags,
+                                             std_cxx11::cref(q),
+                                             quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    {
-      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
-      tasks += Threads::new_task (std_cxx11::function<void()>
-                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                   data->mapping_q1_data.get(),
-                                                   update_flags,
-                                                   std_cxx11::cref(q),
-                                                   quadrature.size())));
-    }
+    data->mapping_q1_data.reset (q1_mapping->get_face_data (update_flags, quadrature));
 
-  tasks.join_all ();
+  task.join ();
   return data;
 }
 
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
 {
@@ -157,25 +181,17 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   // fill the data of both the Q_p and the Q_1 objects in parallel
-  Threads::TaskGroup<> tasks;
-  tasks += Threads::new_task (std_cxx11::function<void()>
-                              (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                               data,
-                                               update_flags,
-                                               std_cxx11::cref(q),
-                                               quadrature.size())));
+  Threads::Task<>
+  task = Threads::new_task (std_cxx11::function<void()>
+                            (std_cxx11::bind(&MappingQGeneric<dim,spacedim>::InternalData::initialize_face,
+                                             data,
+                                             update_flags,
+                                             std_cxx11::cref(q),
+                                             quadrature.size())));
   if (!use_mapping_q_on_all_cells)
-    {
-      data->mapping_q1_data.reset (new typename MappingQ1<dim,spacedim>::InternalData(1));
-      tasks += Threads::new_task (std_cxx11::function<void()>
-                                  (std_cxx11::bind(&MappingQ1<dim,spacedim>::InternalData::initialize_face,
-                                                   data->mapping_q1_data.get(),
-                                                   update_flags,
-                                                   std_cxx11::cref(q),
-                                                   quadrature.size())));
-    }
+    data->mapping_q1_data.reset (q1_mapping->get_subface_data (update_flags, quadrature));
 
-  tasks.join_all ();
+  task.join ();
   return data;
 }
 
@@ -201,14 +217,6 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
                                           || cell->has_boundary_lines());
 
-  // depending on this result, use this or the other data object for the
-  // mapping.
-  const typename MappingQ1<dim,spacedim>::InternalData *
-  p_data = (data.use_mapping_q1_on_current_cell
-            ?
-            data.mapping_q1_data.get()
-            :
-            &data);
 
   // call the base class. we need to ensure that the flag indicating whether
   // we can use some similarity has to be modified - for a general MappingQ,
@@ -224,11 +232,21 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
        CellSimilarity::invalid_next_cell
        :
        cell_similarity);
-  MappingQ1<dim,spacedim>::fill_fe_values(cell,
-                                          updated_cell_similarity,
-                                          quadrature,
-                                          *p_data,
-                                          output_data);
+
+  // depending on the results above, decide whether the Q1 mapping or
+  // the Qp mapping needs to handle this cell
+  if (data.use_mapping_q1_on_current_cell)
+    q1_mapping->fill_fe_values (cell,
+                                updated_cell_similarity,
+                                quadrature,
+                                *data.mapping_q1_data,
+                                output_data);
+  else
+    MappingQGeneric<dim,spacedim>::fill_fe_values(cell,
+                                                  updated_cell_similarity,
+                                                  quadrature,
+                                                  data,
+                                                  output_data);
 
   return updated_cell_similarity;
 }
@@ -259,20 +277,20 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
                                           || cell->has_boundary_lines());
 
-  // depending on this result, use this or the other data object for the
-  // mapping and call the function in the base class with this
-  // data object to do the work
-  const typename MappingQ1<dim,spacedim>::InternalData *p_data
-    = (data.use_mapping_q1_on_current_cell
-       ?
-       data.mapping_q1_data.get()
-       :
-       &data);
-  MappingQ1<dim,spacedim>::fill_fe_face_values(cell,
-                                               face_no,
-                                               quadrature,
-                                               *p_data,
-                                               output_data);
+  // depending on the results above, decide whether the Q1 mapping or
+  // the Qp mapping needs to handle this cell
+  if (data.use_mapping_q1_on_current_cell)
+    q1_mapping->fill_fe_face_values (cell,
+                                     face_no,
+                                     quadrature,
+                                     *data.mapping_q1_data,
+                                     output_data);
+  else
+    MappingQGeneric<dim,spacedim>::fill_fe_face_values(cell,
+                                                       face_no,
+                                                       quadrature,
+                                                       data,
+                                                       output_data);
 }
 
 
@@ -301,21 +319,22 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
                                           || cell->has_boundary_lines());
 
-  // depending on this result, use this or the other data object for the
-  // mapping and call the function in the base class with this
-  // data object to do the work
-  const typename MappingQ1<dim,spacedim>::InternalData *p_data
-    = (data.use_mapping_q1_on_current_cell
-       ?
-       data.mapping_q1_data.get()
-       :
-       &data);
-  MappingQ1<dim,spacedim>::fill_fe_subface_values(cell,
-                                                  face_no,
-                                                  subface_no,
-                                                  quadrature,
-                                                  *p_data,
-                                                  output_data);
+  // depending on the results above, decide whether the Q1 mapping or
+  // the Qp mapping needs to handle this cell
+  if (data.use_mapping_q1_on_current_cell)
+    q1_mapping->fill_fe_subface_values (cell,
+                                        face_no,
+                                        subface_no,
+                                        quadrature,
+                                        *data.mapping_q1_data,
+                                        output_data);
+  else
+    MappingQGeneric<dim,spacedim>::fill_fe_subface_values(cell,
+                                                          face_no,
+                                                          subface_no,
+                                                          quadrature,
+                                                          data,
+                                                          output_data);
 }
 
 
@@ -857,7 +876,7 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
 
@@ -865,10 +884,10 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
   // whether we should in fact work on the Q1 portion of it
   if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     if (data->use_mapping_q1_on_current_cell)
-      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
 
   // otherwise just stick with what we already had
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -882,7 +901,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
 
@@ -890,10 +909,10 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
   // whether we should in fact work on the Q1 portion of it
   if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     if (data->use_mapping_q1_on_current_cell)
-      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
 
   // otherwise just stick with what we already had
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -905,7 +924,7 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
            VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
 
@@ -913,10 +932,10 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
   // whether we should in fact work on the Q1 portion of it
   if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     if (data->use_mapping_q1_on_current_cell)
-      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
 
   // otherwise just stick with what we already had
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -930,7 +949,7 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
 
@@ -938,10 +957,10 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
   // whether we should in fact work on the Q1 portion of it
   if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     if (data->use_mapping_q1_on_current_cell)
-      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
 
   // otherwise just stick with what we already had
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -953,7 +972,7 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
            VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
 
@@ -961,10 +980,10 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
   // whether we should in fact work on the Q1 portion of it
   if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
     if (data->use_mapping_q1_on_current_cell)
-      return MappingQ1<dim,spacedim>::transform (input, mapping_type, *data->mapping_q1_data, output);
+      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
 
   // otherwise just stick with what we already had
-  MappingQ1<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -974,29 +993,13 @@ MappingQ<dim,spacedim>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<dim>                                 &p) const
 {
-  // Use the get_data function to create an InternalData with data vectors of
-  // the right size and transformation shape values already computed at point
-  // p.
-  const Quadrature<dim> point_quadrature(p);
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points,
-                                                      point_quadrature));
-
-  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells ||
-                                            cell->has_boundary_lines());
-
-  typename MappingQ1<dim,spacedim>::InternalData
-  *p_data = (mdata->use_mapping_q1_on_current_cell ?
-             mdata->mapping_q1_data.get() :
-             &*mdata);
-
-  compute_mapping_support_points(cell, p_data->mapping_support_points);
-  // If this should be Q1, ignore all other support points.
-  if (p_data->shape_values.size()<p_data->mapping_support_points.size())
-    p_data->mapping_support_points.resize
-    (GeometryInfo<dim>::vertices_per_cell);
-
-
-  return this->transform_unit_to_real_cell_internal(*p_data);
+  // first see, whether we want to use a linear or a higher order
+  // mapping, then either use our own facilities or that of the Q1
+  // mapping we store
+  if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
+    return this->MappingQGeneric<dim,spacedim>::transform_unit_to_real_cell (cell, p);
+  else
+    return q1_mapping->transform_unit_to_real_cell (cell, p);
 }
 
 
@@ -1019,8 +1022,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   Point<dim> initial_p_unit;
   try
     {
-      initial_p_unit
-        = MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
+      initial_p_unit = q1_mapping->transform_real_to_unit_cell(cell, p);
     }
   catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
     {

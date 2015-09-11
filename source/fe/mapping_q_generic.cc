@@ -786,6 +786,38 @@ MappingQGeneric<dim,spacedim>::get_degree() const
 
 
 template<int dim, int spacedim>
+Point<spacedim>
+MappingQGeneric<dim,spacedim>::
+transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                             const Point<dim> &p) const
+{
+  // set up the polynomial space
+  const QGaussLobatto<1> line_support_points (polynomial_degree + 1);
+  const TensorProductPolynomials<dim>
+  tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
+  Assert (tensor_pols.n() == Utilities::fixed_power<dim>(polynomial_degree+1),
+          ExcInternalError());
+
+  // then also construct the mapping from lexicographic to the Qp shape function numbering
+  const std::vector<unsigned int>
+  renumber (FETools::
+            lexicographic_to_hierarchic_numbering (
+              FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
+                                      polynomial_degree)));
+
+  std::vector<Point<spacedim> > support_points (tensor_pols.n());
+  compute_mapping_support_points(cell, support_points);
+
+  Point<spacedim> mapped_point;
+  for (unsigned int i=0; i<tensor_pols.n(); ++i)
+    mapped_point += support_points[renumber[i]] * tensor_pols.compute_value (i, p);
+
+  return mapped_point;
+}
+
+
+
+template<int dim, int spacedim>
 UpdateFlags
 MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {
@@ -859,7 +891,7 @@ MappingQGeneric<dim,spacedim>::get_data (const UpdateFlags update_flags,
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
 {
@@ -874,7 +906,7 @@ MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_fl
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
 {

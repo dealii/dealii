@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_q_eulerian.h>
+#include <deal.II/fe/mapping_q1_eulerian.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,7 +47,13 @@ MappingQEulerian (const unsigned int degree,
   fe_values(euler_dof_handler.get_fe(),
             support_quadrature,
             update_values | update_q_points)
-{ }
+{
+  // reset the q1 mapping we use for interior cells (and previously
+  // set by the MappingQ constructor) to a MappingQ1Eulerian with the
+  // current vector
+  this->q1_mapping.reset (new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(euler_vector,
+                          euler_dof_handler));
+}
 
 
 
@@ -63,7 +70,13 @@ MappingQEulerian (const unsigned int degree,
   fe_values(euler_dof_handler.get_fe(),
             support_quadrature,
             update_values | update_q_points)
-{ }
+{
+  // reset the q1 mapping we use for interior cells (and previously
+  // set by the MappingQ constructor) to a MappingQ1Eulerian with the
+  // current vector
+  this->q1_mapping.reset (new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(euler_vector,
+                          euler_dof_handler));
+}
 
 
 
@@ -101,8 +114,8 @@ SupportQuadrature (const unsigned int map_degree)
   for (unsigned int i=1; i<dpo.size(); ++i)
     dpo[i]=dpo[i-1]*(map_degree-1);
 
-  FETools::lexicographic_to_hierarchic_numbering (
-    FiniteElementData<dim> (dpo, 1, map_degree), renumber);
+  FETools::lexicographic_to_hierarchic_numbering (FiniteElementData<dim> (dpo, 1, map_degree),
+                                                  renumber);
 
   // finally we assign the quadrature points in the required order.
   for (unsigned int q=0; q<n_q_points; ++q)
@@ -116,9 +129,8 @@ SupportQuadrature (const unsigned int map_degree)
 template <int dim, class EulerVectorType, int spacedim>
 void
 MappingQEulerian<dim, EulerVectorType, spacedim>::
-compute_mapping_support_points
-(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
- std::vector<Point<spacedim> > &a) const
+compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                std::vector<Point<spacedim> > &a) const
 {
 
   // first, basic assertion with respect to vector size,
@@ -153,7 +165,9 @@ compute_mapping_support_points
 
   Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );
 
-  std::vector<Vector<double> > shift_vector(n_support_pts,Vector<double>(n_components));
+  std::vector<Vector<typename EulerVectorType::value_type> >
+  shift_vector(n_support_pts,
+               Vector<typename EulerVectorType::value_type>(n_components));
 
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
