@@ -72,6 +72,7 @@ namespace TensorAccessors
   namespace internal
   {
     template <int index, int rank, typename T> class ReorderedIndexView;
+    template <int position, int rank> struct ExtractHelper;
   }
 
 
@@ -195,6 +196,34 @@ namespace TensorAccessors
 #endif
 
     return internal::ReorderedIndexView<index, rank, T>(t);
+  }
+
+
+  /**
+   * Return a reference (const or non-const) to a subobject of a tensorial
+   * object @p t of type @p T, as described by an array type @p ArrayType
+   * object @p indices. For example: @code
+   *   Tensor<5, dim> tensor;
+   *   TableIndices<5> indices (0, 1, 2, 3, 4);
+   *   TensorAccessors::extract(tensor, indices) = 42;
+   * @endcode
+   * This is equivalent to <code>tensor[0][1][2][3][4] = 42.</code>.
+   *
+   * @tparam T A tensorial object of rank @p rank. @p T must provide a
+   * local typedef <code>value_type</code> and an index operator
+   * <code>operator[]()</code> that returns a (const or non-const)
+   * reference of <code>value_type</code>. Further, its tensorial rank must
+   * be equal or greater than @p rank
+   *
+   * @tparam ArrayType An array like object, such as std::array, or
+   * dealii::TableIndices  that stores at least @p rank indices that can be
+   * accessed via operator[]().
+   */
+  template<int rank, typename T, typename ArrayType> typename
+  ReturnType<rank, T>::value_type &
+  extract(T &t, const ArrayType &indices)
+  {
+    return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(t, indices);
   }
 
 
@@ -410,6 +439,41 @@ namespace TensorAccessors
 
     private:
       const int i_;
+    };
+
+
+    // -------------------------------------------------------------------------
+    // Implemenation of helper classes for extract
+    // -------------------------------------------------------------------------
+
+    // Straightforward recursion implemented by specializing ExtractHelper
+    // for position == rank. We use the type trait ReturnType<rank, T> to
+    // have an idea what the final type will be.
+    template<int position, int rank>
+    struct ExtractHelper
+    {
+      template<typename T, typename ArrayType>
+      inline static
+      typename ReturnType<rank - position, T>::value_type &
+      extract(T &t, const ArrayType &indices)
+      {
+        return ExtractHelper<position + 1, rank>::
+               template extract<typename ValueType<T>::value_type, ArrayType>
+        (t[indices[position]], indices);
+      }
+    };
+
+    // For dimension == rank there is nothing to extract, just return the
+    // object.
+    template<int rank>
+    struct ExtractHelper<rank, rank>
+    {
+      template<typename T, typename ArrayType>
+      inline static
+      T &extract(T &t, const ArrayType &indices)
+      {
+        return t;
+      }
     };
 
     // -------------------------------------------------------------------------
