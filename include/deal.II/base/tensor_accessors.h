@@ -270,11 +270,11 @@ namespace TensorAccessors
   {
 #ifdef DEAL_II_WITH_CXX11
     static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
-                                      "equal or greater than the number of "
-                                      "contractions");
+                  "equal or greater than the number of "
+                  "contractions");
     static_assert(rank_2 >= no_contr, "The rank of the right tensor must be "
-                                      "equal or greater than the number of "
-                                      "contractions");
+                  "equal or greater than the number of "
+                  "contractions");
 #endif
 
     internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>
