@@ -34,6 +34,19 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number> class Point;
 template <int rank_, int dim, typename Number = double> class Tensor;
 
+#ifndef DOXYGEN
+// Overload invalid tensor types of negative rank that come up during
+// overload resolution of operator* and related contraction variants.
+template <int dim, typename Number>
+class Tensor<-2, dim, Number>
+{
+};
+
+template <int dim, typename Number>
+class Tensor<-1, dim, Number>
+{
+};
+#endif /* DOXYGEN */
 
 
 /**
@@ -1502,10 +1515,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * @relates ProductType
  */
 template <int rank_1, int rank_2, int dim,
-          typename Number, typename OtherNumber,
-          typename = typename std::enable_if<rank_1 != 0>::type,
-          typename = typename std::enable_if<rank_2 != 0>::type>
-
+          typename Number, typename OtherNumber>
 inline
 typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
 operator * (const Tensor<rank_1, dim, Number> &src1,
