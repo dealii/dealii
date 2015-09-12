@@ -1288,7 +1288,7 @@ Tensor<0,dim,typename ProductType<typename EnableIfScalar<OtherNumber>::type, Nu
 operator * (const OtherNumber           factor,
             const Tensor<0,dim,Number> &t)
 {
-  return factor * static_cast<Number>(t);
+  return factor * static_cast<const Number &>(t);
 }
 
 
@@ -1304,7 +1304,7 @@ Tensor<0,dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::
 operator * (const Tensor<0,dim,Number> &t,
             const OtherNumber           factor)
 {
-  return static_cast<Number>(t) * factor;
+  return static_cast<const Number &>(t) * factor;
 }
 
 
