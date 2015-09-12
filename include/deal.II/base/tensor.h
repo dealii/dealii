@@ -1237,7 +1237,7 @@ struct ProductType<Tensor<rank,dim,T>,U>
  * multiplies @p object with it.
  *
  * @relates Tensor<0,dim,Number>
- * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1257,7 +1257,7 @@ operator * (const Other                 object,
  * multiplies @p object with it.
  *
  * @relates Tensor<0,dim,Number>
- * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1277,10 +1277,11 @@ operator * (const Tensor<0,dim,Number> &t,
  * It returns an unwrapped number of product type.
  *
  * @relates Tensor<0,dim,Number>
+ * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
-typename ProductType<Number, OtherNumber>::type // FIXME: TEST!
+typename ProductType<Number, OtherNumber>::type
 operator * (const Tensor<0, dim, Number>      &src1,
             const Tensor<0, dim, OtherNumber> &src2)
 {
@@ -1294,6 +1295,7 @@ operator * (const Tensor<0, dim, Number>      &src1,
  *
  * @relates Tensor<0,dim,Number>
  * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1309,6 +1311,7 @@ operator / (const Tensor<0,dim,Number> &t,
  * Add two tensors of rank 0.
  *
  * @relates Tensor<0,dim,Number>
+ * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1323,6 +1326,7 @@ operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
  * Subtract two tensors of rank 0.
  *
  * @relates Tensor<0,dim,Number>
+ * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1338,11 +1342,12 @@ operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
  * right.
  *
  * Only multiplication with a scalar number type (i.e., a floating point
- * number, a complex floating point number, etc.), see the documentation of
- * EnableIfScalar for details.
+ * number, a complex floating point number, etc.) is allowed, see the
+ * documentation of EnableIfScalar for details.
  *
  * @relates Tensor
  * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1378,11 +1383,15 @@ operator * (const Tensor<1,dim,Number> &t,
 
 /**
  * Multiplication of a tensor of general rank with a scalar number from the
- * left. See the discussion with the operator with switched arguments for more
- * information about template arguments and the return type.
+ * left.
+ *
+ * Only multiplication with a scalar number type (i.e., a floating point
+ * number, a complex floating point number, etc.) is allowed, see the
+ * documentation of EnableIfScalar for details.
  *
  * @relates Tensor
  * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1404,6 +1413,7 @@ operator * (const Number                        factor,
  *
  * @relates Tensor
  * @relates EnableIfScalar
+ * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1425,6 +1435,7 @@ operator / (const Tensor<rank,dim,Number> &t,
  * Addition of two tensors of general @tparam rank.
  *
  * @relates Tensor
+ * @relates ProductType
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1444,6 +1455,7 @@ operator+ (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * Subtraction of two tensors of general @tparam rank.
  *
  * @relates Tensor
+ * @relates ProductType
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1475,18 +1487,19 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \sum_{k}
  *     \text{left}_{i_1,..,i_{r1}, k}
- *     \text{right}_{j_1,..,j_{r2}, k}
+ *     \text{right}_{k, j_1,..,j_{r2}}
  * @f]
  *
- * @note For the <tt>Tensor</tt> class, the multiplication operator only
- * performs a contraction over a single pair of indices. This is in
- * contrast to the multiplication operator for symmetric tensors, which
- * does the double contraction.
+ * @note For the Tensor class, the multiplication operator only performs a
+ * contraction over a single pair of indices. This is in contrast to the
+ * multiplication operator for SymmetricTensor, which does the double
+ * contraction.
  *
  * @note In case the contraction yields tensor of rank 0 the scalar
- * number is returned as an unwrapped number type
+ * number is returned as an unwrapped number type.
  *
  * @relates Tensor
+ * @relates ProductType
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber,
