@@ -127,4 +127,13 @@ int main()
     foo2 = TensorAccessors::reordered_index_view<2, 5>(t_ref);
     deallog << foo2[0][1][0][1][2] << std::endl;
   }
+
+  {
+    // Is it possible to call the simplest case (where we have to do
+    // absolutely nothing?
+
+    Tensor<1, 3, int> t;
+    TensorAccessors::internal::ReorderedIndexView<0, 1, Tensor<1, 3, int> > // auto ...
+    foo = TensorAccessors::reordered_index_view<0, 1>(t);
+  }
 }
