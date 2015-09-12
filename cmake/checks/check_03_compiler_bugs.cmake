@@ -423,18 +423,3 @@ IF(DEAL_II_WITH_CXX11)
   RESET_CMAKE_REQUIRED()
 ENDIF()
 
-
-#
-# GCC 4.8 (and possibly older) have a regression that prevents our "trick"
-# to allow multiplication of Tensor objects with std::complex<T> and
-# scalars U with different types T and U from working. In this case a
-# specialization is needed. See also base/product_type_02.cc and
-# base/product_type_03.cc
-#
-# - Matthias Maier, 2015
-#
-
-IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9" )
-  SET(DEAL_II_GCC_COMPLEX_CONV_BUG TRUE)
-ENDIF()
