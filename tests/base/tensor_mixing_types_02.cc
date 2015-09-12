@@ -36,11 +36,11 @@ int main ()
 
   deallog << f1 + d1 << std::endl;
   deallog << f1 - d1 << std::endl;
-  deallog << f1 * d1 << std::endl;
+  deallog << f1 *d1 << std::endl;
 
   deallog << d1 + c1 << std::endl;
   deallog << d1 - c1 << std::endl;
-  deallog << d1 * c1 << std::endl;
+  deallog << d1 *c1 << std::endl;
 
   deallog << (d1 * f_scalar) << std::endl;
   deallog << (d1 / f_scalar) << std::endl;
@@ -68,11 +68,11 @@ int main ()
 
   deallog << f2 + d2 << std::endl;
   deallog << f2 - d2 << std::endl;
-  deallog << f2 * d2 << std::endl;
+  deallog << f2 *d2 << std::endl;
 
   deallog << d2 + c2 << std::endl;
   deallog << d2 - c2 << std::endl;
-  deallog << d2 * c2 << std::endl;
+  deallog << d2 *c2 << std::endl;
 
   deallog << (d2 * f_scalar) << std::endl;
   deallog << (d2 / f_scalar) << std::endl;
@@ -100,11 +100,11 @@ int main ()
 
   deallog << f3 + d3 << std::endl;
   deallog << f3 - d3 << std::endl;
-  deallog << f3 * d3 << std::endl;
+  deallog << f3 *d3 << std::endl;
 
   deallog << d3 + c3 << std::endl;
   deallog << d3 - c3 << std::endl;
-  deallog << d3 * c3 << std::endl;
+  deallog << d3 *c3 << std::endl;
 
   deallog << (d3 * f_scalar) << std::endl;
   deallog << (d3 / f_scalar) << std::endl;

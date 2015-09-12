@@ -60,11 +60,11 @@ int main ()
 
     deallog << f + d << std::endl;
     deallog << f - d << std::endl;
-    deallog << f * d << std::endl;
+    deallog << f *d << std::endl;
 
     deallog << d + c << std::endl;
     deallog << d - c << std::endl;
-    deallog << d * c << std::endl;
+    deallog << d *c << std::endl;
 
     float f_scalar = 10.;
     deallog << (d * f_scalar) << std::endl;
@@ -88,11 +88,11 @@ int main ()
 
     deallog << f + d << std::endl;
     deallog << f - d << std::endl;
-    deallog << f * d << std::endl;
+    deallog << f *d << std::endl;
 
     deallog << d + c << std::endl;
     deallog << d - c << std::endl;
-    deallog << d * c << std::endl;
+    deallog << d *c << std::endl;
 
     float f_scalar = 10.;
     deallog << (d * f_scalar) << std::endl;
