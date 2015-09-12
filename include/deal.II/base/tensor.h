@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_indices.h>
+#include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
@@ -785,56 +786,6 @@ void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 /*-------------------- Inline functions: Tensor<rank,dim> --------------------*/
 
 
-namespace internal
-{
-  // TODO: Think about refactoring this into the TableIndices class as a
-  // general, polymorphic for extracting an item out of an object with
-  // nested identifiers.
-  template<int rank_> struct TensorIndicesHelper
-  {
-    // used for implementing Tensor<rank,dim>::operator[] with TableIndices
-    // tail recursive call to form up access to
-    //   tensor[indices[0]][indices[1]]...[indices[rank_]]
-    template<int rank, int dim, typename Number>
-    static inline
-    Number &extract(Tensor<rank_,dim,Number> &t, const TableIndices<rank> &indices)
-    {
-      Assert (indices[rank - rank_]<dim, ExcIndexRange (indices[rank - rank_], 0, dim));
-      return TensorIndicesHelper<rank_ - 1>::template extract<rank, dim, Number>(
-        t[indices[rank - rank_]], indices);
-    }
-
-    template<int rank, int dim, typename Number>
-    static inline
-    const Number &extract(const Tensor<rank_,dim,Number> &t, const TableIndices<rank> &indices)
-    {
-      Assert (indices[rank - rank_]<dim, ExcIndexRange (indices[rank - rank_], 0, dim));
-      return TensorIndicesHelper<rank_ - 1>::template extract<rank, dim, Number>(
-        t[indices[rank - rank_]], indices);
-    }
-  };
-
-  template<> struct TensorIndicesHelper<1>
-  {
-    template<int rank, int dim, typename Number>
-    static inline
-    Number &extract(Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
-    {
-      Assert (indices[rank - 1]<dim, ExcIndexRange (indices[rank - 1], 0, dim));
-      return t[indices[rank-1]];
-    }
-
-    template<int rank, int dim, typename Number>
-    static inline
-    const Number &extract(const Tensor<1,dim,Number> &t, const TableIndices<rank> &indices)
-    {
-      Assert (indices[rank - 1]<dim, ExcIndexRange (indices[rank - 1], 0, dim));
-      return t[indices[rank-1]];
-    }
-  };
-} /* internal */
-
-
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::Tensor ()
@@ -947,8 +898,8 @@ Number
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-  Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
-  return internal::TensorIndicesHelper<rank_>::template extract<rank_, dim, Number>(*this, indices);
+
+  return TensorAccessors::extract<rank_>(*this, indices);
 }
 
 
@@ -958,8 +909,8 @@ Number &
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-  Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
-  return internal::TensorIndicesHelper<rank_>::template extract<rank_, dim, Number>(*this, indices);
+
+  return TensorAccessors::extract<rank_>(*this, indices);
 }
 
 
