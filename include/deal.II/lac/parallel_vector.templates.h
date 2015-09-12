@@ -674,6 +674,28 @@ namespace parallel
 
 
     template <typename Number>
+    inline
+    bool
+    Vector<Number>::partitioners_are_compatible
+    (const Utilities::MPI::Partitioner &part) const
+    {
+      return partitioner->is_compatible (part);
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    Vector<Number>::partitioners_are_globally_compatible
+    (const Utilities::MPI::Partitioner &part) const
+    {
+      return partitioner->is_globally_compatible (part);
+    }
+
+
+
+    template <typename Number>
     std::size_t
     Vector<Number>::memory_consumption () const
     {

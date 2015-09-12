@@ -325,6 +325,40 @@ namespace Utilities
 
 
 
+    bool
+    Partitioner::is_compatible (const Partitioner &part) const
+    {
+      // if the partitioner points to the same memory location as the calling
+      // processor
+      if (&part == this)
+        return true;
+#ifdef DEAL_II_WITH_MPI
+      if (Utilities::MPI::job_supports_mpi())
+        {
+          int communicators_same = 0;
+          MPI_Comm_compare (part.communicator, communicator,
+                            &communicators_same);
+          if (!(communicators_same == MPI_IDENT ||
+                communicators_same == MPI_CONGRUENT))
+            return false;
+        }
+#endif
+      return (global_size == part.global_size &&
+              local_range_data == part.local_range_data &&
+              ghost_indices_data == part.ghost_indices_data);
+    }
+
+
+
+    bool
+    Partitioner::is_globally_compatible (const Partitioner &part) const
+    {
+      return Utilities::MPI::min(static_cast<int>(is_compatible(part)),
+                                 communicator) == 1;
+    }
+
+
+
     std::size_t
     Partitioner::memory_consumption() const
     {
