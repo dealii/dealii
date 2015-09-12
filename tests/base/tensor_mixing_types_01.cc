@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-
+// Test for mixed Number type operations of Tensor<0, dim, Number> and
+// Tensor<1, dim. Number> (addition, subtraction, contraction).
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
