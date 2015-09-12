@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <complex>
-
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -352,7 +352,7 @@ template <typename T, typename U>
 struct ProductType
 {
 #ifdef DEAL_II_WITH_CXX11
-  typedef decltype(T() * U()) type;
+  typedef decltype(std::declval<T>() * std::declval<U>()) type;
 #endif
 };
 
