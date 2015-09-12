@@ -484,10 +484,10 @@ namespace TensorAccessors
     // subsequently stored indices:
 
     template <int rank, typename S>
-    class StoreIndex : public S
+    class StoreIndex
     {
     public:
-      StoreIndex(S s, int i) : S(s), i_(i) {}
+      StoreIndex(S s, int i) : s_(s), i_(i) {}
 
       typedef StoreIndex<rank - 1, StoreIndex<rank, S> > value_type;
 
@@ -502,10 +502,11 @@ namespace TensorAccessors
       inline
       typename ReferenceType<return_type>::type apply(unsigned int j) const
       {
-        return S::apply(j)[i_];
+        return s_.apply(j)[i_];
       }
 
     private:
+      const S s_;
       const int i_;
     };
 
@@ -514,10 +515,10 @@ namespace TensorAccessors
     // information available to return the actual object.
 
     template <typename S>
-    class StoreIndex<1, S> : public S
+    class StoreIndex<1, S>
     {
     public:
-      StoreIndex(S s, int i) : S(s), i_(i) {}
+      StoreIndex(S s, int i) : s_(s), i_(i) {}
 
       typedef typename ValueType<typename S::return_type>::value_type return_type;
       typedef return_type value_type;
@@ -528,6 +529,7 @@ namespace TensorAccessors
       }
 
     private:
+      const S s_;
       const int i_;
     };
 
