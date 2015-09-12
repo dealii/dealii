@@ -53,6 +53,222 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
+namespace
+{
+  /**
+   * Compute the <tt>support_point_weights_on_quad(hex)</tt> arrays.
+   *
+   * Called by the <tt>compute_support_point_weights_on_quad(hex)</tt> functions if the
+   * data is not yet hardcoded.
+   *
+   * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
+   * refer to equation (8) of the `mapping' report.
+   */
+  template<int dim>
+  Table<2,double>
+  compute_laplace_vector(const unsigned int polynomial_degree)
+  {
+    Table<2,double> lvs;
+
+    Assert(lvs.n_rows()==0, ExcInternalError());
+    Assert(dim==2 || dim==3, ExcNotImplemented());
+
+    // for degree==1, we shouldn't have to compute any support points, since all
+    // of them are on the vertices
+    Assert(polynomial_degree>1, ExcInternalError());
+
+    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+    const unsigned int n_outer = (dim==1) ? 2 :
+                                 ((dim==2) ?
+                                  4+4*(polynomial_degree-1) :
+                                  8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
+
+
+    // compute the shape gradients at the quadrature points on the unit cell
+    const QGauss<dim> quadrature(polynomial_degree+1);
+    const unsigned int n_q_points=quadrature.size();
+
+    typename MappingQGeneric<dim>::InternalData quadrature_data(polynomial_degree);
+    quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
+                                             n_q_points);
+    quadrature_data.compute_shape_function_values(quadrature.get_points());
+
+    // Compute the stiffness matrix of the inner dofs
+    FullMatrix<long double> S(n_inner);
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<n_inner; ++i)
+        for (unsigned int j=0; j<n_inner; ++j)
+          {
+            long double res = 0.;
+            for (unsigned int l=0; l<dim; ++l)
+              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                     (long double)quadrature_data.derivative(point, n_outer+j)[l];
+
+            S(i,j) += res * (long double)quadrature.weight(point);
+          }
+
+    // Compute the components of T to be the product of gradients of inner and
+    // outer shape functions.
+    FullMatrix<long double> T(n_inner, n_outer);
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<n_inner; ++i)
+        for (unsigned int k=0; k<n_outer; ++k)
+          {
+            long double res = 0.;
+            for (unsigned int l=0; l<dim; ++l)
+              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                     (long double)quadrature_data.derivative(point, k)[l];
+
+            T(i,k) += res *(long double)quadrature.weight(point);
+          }
+
+    FullMatrix<long double> S_1(n_inner);
+    S_1.invert(S);
+
+    FullMatrix<long double> S_1_T(n_inner, n_outer);
+
+    // S:=S_1*T
+    S_1.mmult(S_1_T,T);
+
+    // Resize and initialize the lvs
+    lvs.reinit (n_inner, n_outer);
+    for (unsigned int i=0; i<n_inner; ++i)
+      for (unsigned int k=0; k<n_outer; ++k)
+        lvs(i,k) = -S_1_T(i,k);
+
+    return lvs;
+  }
+
+
+  /**
+   * This function is needed by the constructor of
+   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
+   *
+   * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
+   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
+   * computed.
+   *
+   * For the definition of the @p support_point_weights_on_quad please refer to
+   * equation (8) of the `mapping' report.
+   */
+  template<int dim>
+  Table<2,double>
+  compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
+  {
+    Table<2,double> loqvs;
+
+    // in 1d, there are no quads, so return an empty object
+    if (dim == 1)
+      return loqvs;
+
+    // we are asked to compute weights for interior support points, but
+    // there are no interior points if degree==1
+    if (polynomial_degree == 1)
+      return loqvs;
+
+    const unsigned int n_inner_2d=(polynomial_degree-1)*(polynomial_degree-1);
+    const unsigned int n_outer_2d=4+4*(polynomial_degree-1);
+
+    // first check whether we have precomputed the values for some polynomial
+    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+    if (polynomial_degree == 2)
+      {
+        // (checked these values against the output of compute_laplace_vector
+        // again, and found they're indeed right -- just in case someone wonders
+        // where they come from -- WB)
+        static const double loqv2[1*8]
+          = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
+        Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
+                n_inner_2d * n_outer_2d,
+                ExcInternalError());
+
+        // copy and return
+        loqvs.reinit(n_inner_2d, n_outer_2d);
+        for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
+          for (unsigned int k=0; k<n_outer_2d; ++k)
+            loqvs[unit_point][k] = loqv2[unit_point*n_outer_2d+k];
+      }
+    else
+      {
+        // not precomputed, then do so now
+        loqvs = compute_laplace_vector<2>(polynomial_degree);
+      }
+
+    // the sum of weights of the points at the outer rim should be one. check
+    // this
+    for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
+      Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
+                                       loqvs[unit_point].end(),0.)-1)<1e-13*polynomial_degree,
+             ExcInternalError());
+
+    return loqvs;
+  }
+
+
+
+  /**
+   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
+   *
+   * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
+   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
+   *
+   * For the definition of the @p support_point_weights_on_hex please refer to
+   * equation (8) of the `mapping' report.
+   */
+  template <int dim>
+  Table<2,double>
+  compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
+  {
+    Table<2,double> lohvs;
+
+    // in 1d and 2d, there are no hexes, so return an empty object
+    if (dim < 3)
+      return lohvs;
+
+    // we are asked to compute weights for interior support points, but
+    // there are no interior points if degree==1
+    if (polynomial_degree == 1)
+      return lohvs;
+
+    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+    const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
+
+    // first check whether we have precomputed the values for some polynomial
+    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+    if (polynomial_degree == 2)
+      {
+        static const double lohv2[26]
+          = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
+             7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
+             7/192., 7/192., 7/192., 7/192.,
+             1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
+            };
+
+        // copy and return
+        lohvs.reinit(n_inner, n_outer);
+        for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+          for (unsigned int k=0; k<n_outer; ++k)
+            lohvs[unit_point][k] = lohv2[unit_point*n_outer+k];
+      }
+    else
+      {
+        // not precomputed, then do so now
+        lohvs = compute_laplace_vector<dim>(polynomial_degree);
+      }
+
+    // the sum of weights of the points at the outer rim should be one. check
+    // this
+    for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+      Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
+                                       lohvs[unit_point].end(),0.) - 1)<1e-13*polynomial_degree,
+             ExcInternalError());
+
+    return lohvs;
+  }
+}
+
+
+
 template<int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                                   const bool use_mapping_q_on_all_cells)
@@ -83,14 +299,8 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
   Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
          ExcInternalError());
 
-  // build support_point_weights_on_quad
-  if (degree>1)
-    {
-      if (dim >= 2)
-        set_support_point_weights_on_quad(support_point_weights_on_quad);
-      if (dim >= 3)
-        set_support_point_weights_on_hex(support_point_weights_on_hex);
-    }
+  support_point_weights_on_quad = compute_support_point_weights_on_quad<dim>(this->polynomial_degree);
+  support_point_weights_on_hex = compute_support_point_weights_on_hex<dim>(this->polynomial_degree);
 }
 
 
@@ -111,14 +321,8 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   Assert(n_inner+n_outer==Utilities::fixed_power<dim>(this->polynomial_degree+1),
          ExcInternalError());
 
-  // build support_point_weights_on_quad
-  if (this->polynomial_degree>1)
-    {
-      if (dim >= 2)
-        set_support_point_weights_on_quad(support_point_weights_on_quad);
-      if (dim >= 3)
-        set_support_point_weights_on_hex(support_point_weights_on_hex);
-    }
+  support_point_weights_on_quad = compute_support_point_weights_on_quad<dim>(this->polynomial_degree);
+  support_point_weights_on_hex = compute_support_point_weights_on_hex<dim>(this->polynomial_degree);
 }
 
 
@@ -336,209 +540,6 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                                                           data,
                                                           output_data);
 }
-
-
-
-template <>
-void
-MappingQ<1>::set_support_point_weights_on_quad(Table<2,double> &) const
-{
-  Assert(false, ExcInternalError());
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::set_support_point_weights_on_quad(Table<2,double> &loqvs) const
-{
-  Assert(this->polynomial_degree>1, ExcInternalError());
-  const unsigned int n_inner_2d=(this->polynomial_degree-1)*(this->polynomial_degree-1);
-  const unsigned int n_outer_2d=4+4*(this->polynomial_degree-1);
-
-  // first check whether we have precomputed the values for some polynomial
-  // degree; the sizes of arrays is n_inner_2d*n_outer_2d
-  double const *loqv_ptr=0;
-  switch (this->polynomial_degree)
-    {
-    // for degree==1, we shouldn't have to compute any support points, since
-    // all of them are on the vertices
-
-    case 2:
-    {
-      // (checked these values against the output of compute_laplace_vector
-      // again, and found they're indeed right -- just in case someone wonders
-      // where they come from -- WB)
-      static const double loqv2[1*8]
-        = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
-      loqv_ptr=&loqv2[0];
-      Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
-              n_inner_2d * n_outer_2d,
-              ExcInternalError());
-
-      break;
-    }
-
-    // no other cases implemented, so simply fall through
-    default:
-      break;
-    }
-
-  if (loqv_ptr!=0)
-    {
-      // precomputed. copy values to the loqvs array
-      loqvs.reinit(n_inner_2d, n_outer_2d);
-      for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
-        for (unsigned int k=0; k<n_outer_2d; ++k)
-          loqvs[unit_point][k]=loqv_ptr[unit_point*n_outer_2d+k];
-    }
-  else
-    {
-      // not precomputed, then do so now
-      if (dim == 2)
-        compute_laplace_vector(loqvs);
-      else if (dim == 3)
-        {
-          MappingQ<2,2> mapping_2d(this->polynomial_degree);
-          loqvs = mapping_2d.support_point_weights_on_quad;
-        }
-    }
-
-  // the sum of weights of the points at the outer rim should be one. check
-  // this
-  for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
-    Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
-                                     loqvs[unit_point].end(),0.)-1)<1e-13*this->polynomial_degree,
-           ExcInternalError());
-}
-
-
-
-template <>
-void
-MappingQ<3>::set_support_point_weights_on_hex(Table<2,double> &lohvs) const
-{
-  Assert(this->polynomial_degree>1, ExcInternalError());
-
-  // first check whether we have precomputed the values for some polynomial
-  // degree
-  double const *lohv_ptr=0;
-  if (this->polynomial_degree==2)
-    {
-      static const double loqv2[26]
-        = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
-           7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
-           7/192., 7/192., 7/192., 7/192.,
-           1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
-          };
-
-      lohv_ptr=&loqv2[0];
-    }
-
-  if (lohv_ptr!=0)
-    {
-      // precomputed. copy values to the lohvs array
-      lohvs.reinit(n_inner, n_outer);
-      for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-        for (unsigned int k=0; k<n_outer; ++k)
-          lohvs[unit_point][k]=lohv_ptr[unit_point*n_outer+k];
-    }
-  else
-    // not precomputed, then do so now
-    compute_laplace_vector(lohvs);
-
-  // the sum of weights of the points at the outer rim should be one. check
-  // this
-  for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-    Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                     lohvs[unit_point].end(),0.) - 1)<1e-13*this->polynomial_degree,
-           ExcInternalError());
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::set_support_point_weights_on_hex(Table<2,double> &) const
-{
-  Assert(false, ExcInternalError());
-}
-
-
-
-template <>
-void
-MappingQ<1>::compute_laplace_vector(Table<2,double> &) const
-{
-  Assert(false, ExcInternalError());
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
-{
-  Assert(lvs.n_rows()==0, ExcInternalError());
-  Assert(dim==2 || dim==3, ExcNotImplemented());
-
-  // for degree==1, we shouldn't have to compute any support points, since all
-  // of them are on the vertices
-  Assert(this->polynomial_degree>1, ExcInternalError());
-
-  // compute the shape gradients at the quadrature points on the unit cell
-  const QGauss<dim> quadrature(this->polynomial_degree+1);
-  const unsigned int n_q_points=quadrature.size();
-
-  InternalData quadrature_data(this->polynomial_degree);
-  quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
-                                           n_q_points);
-  quadrature_data.compute_shape_function_values(quadrature.get_points());
-
-  // Compute the stiffness matrix of the inner dofs
-  FullMatrix<long double> S(n_inner);
-  for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<n_inner; ++i)
-      for (unsigned int j=0; j<n_inner; ++j)
-        {
-          long double res = 0.;
-          for (unsigned int l=0; l<dim; ++l)
-            res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                   (long double)quadrature_data.derivative(point, n_outer+j)[l];
-
-          S(i,j) += res * (long double)quadrature.weight(point);
-        }
-
-  // Compute the components of T to be the product of gradients of inner and
-  // outer shape functions.
-  FullMatrix<long double> T(n_inner, n_outer);
-  for (unsigned int point=0; point<n_q_points; ++point)
-    for (unsigned int i=0; i<n_inner; ++i)
-      for (unsigned int k=0; k<n_outer; ++k)
-        {
-          long double res = 0.;
-          for (unsigned int l=0; l<dim; ++l)
-            res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                   (long double)quadrature_data.derivative(point, k)[l];
-
-          T(i,k) += res *(long double)quadrature.weight(point);
-        }
-
-  FullMatrix<long double> S_1(n_inner);
-  S_1.invert(S);
-
-  FullMatrix<long double> S_1_T(n_inner, n_outer);
-
-  // S:=S_1*T
-  S_1.mmult(S_1_T,T);
-
-  // Resize and initialize the lvs
-  lvs.reinit (n_inner, n_outer);
-  for (unsigned int i=0; i<n_inner; ++i)
-    for (unsigned int k=0; k<n_outer; ++k)
-      lvs(i,k) = -S_1_T(i,k);
-}
-
 
 
 namespace

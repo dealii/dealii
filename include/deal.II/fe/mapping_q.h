@@ -267,47 +267,21 @@ protected:
 protected:
 
   /**
-   * This function is needed by the constructor of
-   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
-   *
-   * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
-   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
-   * computed.
-   *
-   * For the definition of the @p support_point_weights_on_quad please refer to
-   * equation (8) of the `mapping' report.
-   */
-  void
-  set_support_point_weights_on_quad(Table<2,double> &loqvs) const;
-
-  /**
-   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
-   *
-   * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
-   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
-   *
-   * For the definition of the @p support_point_weights_on_hex please refer to
-   * equation (8) of the `mapping' report.
-   */
-  void set_support_point_weights_on_hex(Table<2,double> &lohvs) const;
-
-  /**
-   * Compute the <tt>support_point_weights_on_quad(hex)_vector</tt>.
-   *
-   * Called by the <tt>set_support_point_weights_on_quad(hex)_vector</tt> functions if the
-   * data is not yet hardcoded.
-   *
-   * For the definition of the <tt>support_point_weights_on_quad(hex)_vector</tt> please
-   * refer to equation (8) of the `mapping' report.
-   */
-  void compute_laplace_vector(Table<2,double> &lvs) const;
-
-  /**
    * Compute the support points of the mapping. Interior support
    * points (ie. support points in quads for 2d, in hexes for 3d) are
    * computed using the solution of a Laplace equation with the
    * position of the outer support points as boundary values, in order
    * to make the transformation as smooth as possible.
+   *
+   * The function works its way from the vertices (which it takes from
+   * the given cell) via the support points on the line (for which it
+   * calls the add_line_support_points() function) and the support
+   * points on the quad faces (in 3d, for which it calls the
+   * add_quad_support_points() function). It then adds interior
+   * support points that are either computed by interpolation from the
+   * surrounding points using weights computed by solving a Laplace
+   * equation, or if dim<spacedim, it asks the underlying manifold for
+   * the locations of interior points.
    */
   virtual
   void
@@ -316,33 +290,42 @@ protected:
 
 
   /**
-  * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-  * located on bounding lines to the vector @p a. Points located on the line
-  * but not on vertices are not included.
-  *
-  * Needed by the @p compute_support_points_laplace function . For
-  * <tt>dim=1</tt> this function is empty.
-  *
-  * This function is made virtual in order to allow derived classes to choose
-  * shape function support points differently than the present class, which
-  * chooses the points as interpolation points on the boundary.
-  */
+   * For <tt>dim=2,3</tt>. Append the support points of all shape
+   * functions located on bounding lines of the given cell to the
+   * vector @p a. Points located on the vertices of a line are not
+   * included.
+   *
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> this function is empty. The function uses the
+   * underlying manifold object of the line (or, if none is set, of
+   * the cell) for the location of the requested points.
+   *
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
+   */
   virtual
   void
   add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                            std::vector<Point<spacedim> > &a) const;
 
   /**
-   * For <tt>dim=3</tt>. Append the support points of all shape functions
-   * located on bounding faces (quads in 3d) to the vector @p a. Points
-   * located on the quad but not on vertices are not included.
+   * For <tt>dim=3</tt>. Append the support points of all shape
+   * functions located on bounding faces (quads in 3d) of the given
+   * cell to the vector @p a. Points located on the vertices or lines
+   * of a quad are not included.
    *
-   * Needed by the @p compute_support_points_laplace function. For
-   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty.
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty. The
+   * function uses the underlying manifold object of the quad (or, if
+   * none is set, of the cell) for the location of the requested
+   * points.
    *
-   * This function is made virtual in order to allow derived classes to choose
-   * shape function support points differently than the present class, which
-   * chooses the points as interpolation points on the boundary.
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
    */
   virtual
   void
@@ -438,22 +421,6 @@ protected:
 };
 
 /*@}*/
-
-/* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DOXYGEN
-
-template <>
-void MappingQ<1>::set_support_point_weights_on_quad(Table<2,double> &) const;
-
-template <>
-void MappingQ<3>::set_support_point_weights_on_hex(Table<2,double> &lohvs) const;
-
-template <>
-void MappingQ<1>::compute_laplace_vector(Table<2,double> &) const;
-
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
