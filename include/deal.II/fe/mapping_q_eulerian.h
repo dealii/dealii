@@ -203,9 +203,10 @@ private:
   /**
    * Compute the positions of the support points in the current configuration
    */
-  virtual void compute_mapping_support_points(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
+  virtual
+  void
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                 std::vector<Point<spacedim> > &a) const;
 
 };
 

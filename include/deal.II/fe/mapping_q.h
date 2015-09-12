@@ -163,68 +163,6 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
 
-protected:
-
-  /**
-   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-   * located on bounding lines to the vector @p a. Points located on the line
-   * but not on vertices are not included.
-   *
-   * Needed by the @p compute_support_points_laplace function . For
-   * <tt>dim=1</tt> this function is empty.
-   *
-   * This function is made virtual in order to allow derived classes to choose
-   * shape function support points differently than the present class, which
-   * chooses the points as interpolation points on the boundary.
-   */
-  virtual void
-  add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                           std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * For <tt>dim=3</tt>. Append the support points of all shape functions
-   * located on bounding faces (quads in 3d) to the vector @p a. Points
-   * located on the quad but not on vertices are not included.
-   *
-   * Needed by the @p compute_support_points_laplace function. For
-   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty.
-   *
-   * This function is made virtual in order to allow derived classes to choose
-   * shape function support points differently than the present class, which
-   * chooses the points as interpolation points on the boundary.
-   */
-  virtual void
-  add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          std::vector<Point<spacedim> > &a) const;
-
-
-private:
-  /**
-   * Ask the manifold descriptor to return intermediate points on lines or
-   * faces. The function needs to return one or multiple points (depending on
-   * the number of elements in the output vector @p points that lie inside a
-   * line, quad or hex). Whether it is a line, quad or hex doesn't really
-   * matter to this function but it can be inferred from the number of input
-   * points in the @p surrounding_points vector.
-   */
-  void get_intermediate_points(const Manifold<dim, spacedim> &manifold,
-                               const std::vector<Point<spacedim> > &surrounding_points,
-                               std::vector<Point<spacedim> > &points) const;
-
-
-  /**
-   * Ask the manifold descriptor to return intermediate points on the object
-   * pointed to by the TriaIterator @p iter. This function tries to be
-   * backward compatible with respect to the differences between
-   * Boundary<dim,spacedim> and Manifold<dim,spacedim>, querying the first
-   * whenever the passed @p manifold can be upgraded to a
-   * Boundary<dim,spacedim>.
-   */
-  template <class TriaIterator>
-  void get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
-                                         const TriaIterator &iter,
-                                         std::vector<Point<spacedim> > &points) const;
-
   /**
    * @name Interface with FEValues
    * @{
@@ -329,93 +267,92 @@ protected:
 protected:
 
   /**
-   * This function is needed by the constructor of
-   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
+   * Compute the support points of the mapping. Interior support
+   * points (ie. support points in quads for 2d, in hexes for 3d) are
+   * computed using the solution of a Laplace equation with the
+   * position of the outer support points as boundary values, in order
+   * to make the transformation as smooth as possible.
    *
-   * For <tt>degree<4</tt> this function sets the @p laplace_on_quad_vector to
-   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
-   * computed.
-   *
-   * For the definition of the @p laplace_on_quad_vector please refer to
-   * equation (8) of the `mapping' report.
+   * The function works its way from the vertices (which it takes from
+   * the given cell) via the support points on the line (for which it
+   * calls the add_line_support_points() function) and the support
+   * points on the quad faces (in 3d, for which it calls the
+   * add_quad_support_points() function). It then adds interior
+   * support points that are either computed by interpolation from the
+   * surrounding points using weights computed by solving a Laplace
+   * equation, or if dim<spacedim, it asks the underlying manifold for
+   * the locations of interior points.
    */
+  virtual
   void
-  set_laplace_on_quad_vector(Table<2,double> &loqvs) const;
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                 std::vector<Point<spacedim> > &a) const;
+
 
   /**
-   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
+   * For <tt>dim=2,3</tt>. Append the support points of all shape
+   * functions located on bounding lines of the given cell to the
+   * vector @p a. Points located on the vertices of a line are not
+   * included.
    *
-   * For <tt>degree==2</tt> this function sets the @p laplace_on_hex_vector to
-   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> this function is empty. The function uses the
+   * underlying manifold object of the line (or, if none is set, of
+   * the cell) for the location of the requested points.
    *
-   * For the definition of the @p laplace_on_hex_vector please refer to
-   * equation (8) of the `mapping' report.
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
    */
-  void set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
+  virtual
+  void
+  add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                           std::vector<Point<spacedim> > &a) const;
 
   /**
-   * Computes the <tt>laplace_on_quad(hex)_vector</tt>.
+   * For <tt>dim=3</tt>. Append the support points of all shape
+   * functions located on bounding faces (quads in 3d) of the given
+   * cell to the vector @p a. Points located on the vertices or lines
+   * of a quad are not included.
    *
-   * Called by the <tt>set_laplace_on_quad(hex)_vector</tt> functions if the
-   * data is not yet hardcoded.
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty. The
+   * function uses the underlying manifold object of the quad (or, if
+   * none is set, of the cell) for the location of the requested
+   * points.
    *
-   * For the definition of the <tt>laplace_on_quad(hex)_vector</tt> please
-   * refer to equation (8) of the `mapping' report.
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
    */
-  void compute_laplace_vector(Table<2,double> &lvs) const;
+  virtual
+  void
+  add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                          std::vector<Point<spacedim> > &a) const;
 
   /**
-   * Takes a <tt>laplace_on_hex(quad)_vector</tt> and applies it to the vector
-   * @p a to compute the inner support points as a linear combination of the
-   * exterior points.
-   *
-   * The vector @p a initially contains the locations of the @p n_outer
-   * points, the @p n_inner computed inner points are appended.
-   *
-   * See equation (7) of the `mapping' report.
-   */
-  void apply_laplace_vector(const Table<2,double>   &lvs,
-                            std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * Computes the support points of the mapping.
-   */
-  virtual void compute_mapping_support_points(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * Computes all support points of the mapping shape functions. The inner
-   * support points (ie. support points in quads for 2d, in hexes for 3d) are
-   * computed using the solution of a Laplace equation with the position of
-   * the outer support points as boundary values, in order to make the
-   * transformation as smooth as possible.
-   */
-  void compute_support_points_laplace(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * Needed by the @p laplace_on_quad function (for <tt>dim==2</tt>). Filled
+   * Needed by the @p support_point_weights_on_quad function (for <tt>dim==2</tt>). Filled
    * by the constructor.
    *
-   * Sizes: laplace_on_quad_vector.size()= number of inner unit_support_points
-   * laplace_on_quad_vector[i].size()= number of outer unit_support_points,
+   * Sizes: support_point_weights_on_quad.size()= number of inner unit_support_points
+   * support_point_weights_on_quad[i].size()= number of outer unit_support_points,
    * i.e.  unit_support_points on the boundary of the quad
    *
    * For the definition of this vector see equation (8) of the `mapping'
    * report.
    */
-  Table<2,double> laplace_on_quad_vector;
+  Table<2,double> support_point_weights_on_quad;
 
   /**
-   * Needed by the @p laplace_on_hex function (for <tt>dim==3</tt>). Filled by
+   * Needed by the @p support_point_weights_on_hex function (for <tt>dim==3</tt>). Filled by
    * the constructor.
    *
    * For the definition of this vector see equation (8) of the `mapping'
    * report.
    */
-  Table<2,double> laplace_on_hex_vector;
+  Table<2,double> support_point_weights_on_hex;
 
   /**
    * Exception.
@@ -484,70 +421,6 @@ protected:
 };
 
 /*@}*/
-
-/* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DOXYGEN
-
-template <>
-void MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const;
-
-template <>
-void MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
-
-template <>
-void MappingQ<1>::compute_laplace_vector(Table<2,double> &) const;
-
-
-template<>
-void MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
-                                          std::vector<Point<3> >                &a) const;
-
-// ---- Templated functions ---- //
-template <int dim, int spacedim>
-template <class TriaIterator>
-void
-MappingQ<dim,spacedim>::get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
-                                                          const TriaIterator &iter,
-                                                          std::vector<Point<spacedim> > &points) const
-{
-  const unsigned int structdim = TriaIterator::AccessorType::structure_dimension;
-
-  // Try backward compatibility option.
-  if (const Boundary<dim,spacedim> *boundary
-      = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold))
-    // This is actually a boundary. Call old methods.
-    {
-      switch (structdim)
-        {
-        case 1:
-        {
-          const typename Triangulation<dim,spacedim>::line_iterator line = iter;
-          boundary->get_intermediate_points_on_line(line, points);
-          return;
-        }
-        case 2:
-        {
-          const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
-          boundary->get_intermediate_points_on_quad(quad, points);
-          return;
-        }
-        default:
-          Assert(false, ExcInternalError());
-          return;
-        }
-    }
-  else
-    {
-      std::vector<Point<spacedim> > sp(GeometryInfo<structdim>::vertices_per_cell);
-      for (unsigned int i=0; i<sp.size(); ++i)
-        sp[i] = iter->vertex(i);
-      get_intermediate_points(manifold, sp, points);
-    }
-}
-
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
