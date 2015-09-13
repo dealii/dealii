@@ -21,69 +21,63 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+template <typename T> struct EnableIfScalar;
+template <typename T, typename U> struct ProductType;
+
+#ifndef DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 /**
- * A namespace that contains overloads of <tt>operator*</tt> for complex
- * numbers. Those overloads allow mixed floating point type multiplication
- * between complex and real valued types.
+ * Provide an <tt>operator*</tt> that operates on mixed complex floating
+ * point types. Annoyingly, the standard library does not provide such an
+ * operator...
  *
- * Unfortunately, the standard library does not provide those function
- * overloads (neither C++98, C++11, C++14, nor C++17), so we provide a
- * namespace with them.
+ * @relates ProductType
  */
-namespace ComplexOverloads
+template <typename T, typename U>
+typename ProductType<std::complex<T>, std::complex<U> >::type
+inline
+operator*(const std::complex<T> &left, const std::complex<U> &right)
 {
-  /**
-   * Provide an <tt>operator*</tt> that operates on mixed complex floating
-   * point types. Annoyingly, the standard library does not provide such an
-   * operator...
-   *
-   * @relates ProductType
-   */
-  template <typename T, typename U>
-  typename ProductType<std::complex<T>, std::complex<U> >::type
-  inline
-  operator*(const std::complex<T> &left, const std::complex<U> &right)
-  {
-    typedef typename ProductType<std::complex<T>, std::complex<U> >::type result_type;
-    return static_cast<result_type>(left) * static_cast<result_type>(right);
-  }
+  typedef typename ProductType<std::complex<T>, std::complex<U> >::type result_type;
+  return static_cast<result_type>(left) * static_cast<result_type>(right);
+}
 
 
-  /**
-   * Provide an <tt>operator*</tt> for a scalar multiplication of a complex
-   * floating point type with a different real floating point type.
-   * Annoyingly, the standard library does not provide such an operator...
-   *
-   * @relates EnableIfScalar
-   * @relates ProductType
-   */
-  template <typename T, typename U>
-  typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
-  inline
-  operator*(const std::complex<T> &left, const U &right)
-  {
-    typedef typename ProductType<std::complex<T>, U>::type result_type;
-    return static_cast<result_type>(left) * static_cast<result_type>(right);
-  }
+/**
+ * Provide an <tt>operator*</tt> for a scalar multiplication of a complex
+ * floating point type with a different real floating point type.
+ * Annoyingly, the standard library does not provide such an operator...
+ *
+ * @relates EnableIfScalar
+ * @relates ProductType
+ */
+template <typename T, typename U>
+typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
+inline
+operator*(const std::complex<T> &left, const U &right)
+{
+  typedef typename ProductType<std::complex<T>, U>::type result_type;
+  return static_cast<result_type>(left) * static_cast<result_type>(right);
+}
 
 
-  /**
-   * Provide an <tt>operator*</tt> for a scalar multiplication of a real
-   * floating point type with a different complex floating point type.
-   * Annoyingly, the standard library does not provide such an operator...
-   *
-   * @relates EnableIfScalar
-   * @relates ProductType
-   */
-  template <typename T, typename U>
-  typename ProductType<typename EnableIfScalar<T>::type, std::complex<U> >::type
-  inline
-  operator*(const T &left, const std::complex<U> &right)
-  {
-    typedef typename ProductType<std::complex<T>, U>::type result_type;
-    return static_cast<result_type>(left) * static_cast<result_type>(right);
-  }
-} /* namespace ComplexOverloads */
+/**
+ * Provide an <tt>operator*</tt> for a scalar multiplication of a real
+ * floating point type with a different complex floating point type.
+ * Annoyingly, the standard library does not provide such an operator...
+ *
+ * @relates EnableIfScalar
+ * @relates ProductType
+ */
+template <typename T, typename U>
+typename ProductType<typename EnableIfScalar<T>::type, std::complex<U> >::type
+inline
+operator*(const T &left, const std::complex<U> &right)
+{
+  typedef typename ProductType<std::complex<T>, U>::type result_type;
+  return static_cast<result_type>(left) * static_cast<result_type>(right);
+}
+#endif /* DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS */
 
 DEAL_II_NAMESPACE_CLOSE
 

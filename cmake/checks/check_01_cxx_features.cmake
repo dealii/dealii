@@ -26,6 +26,7 @@
 #   DEAL_II_HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
 #   DEAL_II_HAVE_FP_EXCEPTIONS
+#   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
 
 
@@ -522,3 +523,28 @@ IF(DEAL_II_WITH_CXX11)
 ELSE()
   SET(DEAL_II_HAVE_FP_EXCEPTIONS FALSE)
 ENDIF()
+
+#
+# Check whether the standard library provides operator* overloads for mixed
+# floating point multiplication of complex and real valued numbers.
+#
+# - Matthias Maier, 2015
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <complex>
+
+  int main()
+  {
+    double() * std::complex<float>();
+    std::complex<float>() * double();
+    float() * std::complex<double>();
+    std::complex<double>() * float();
+    std::complex<double>() * std::complex<float>();
+    std::complex<float>() * std::complex<double>();
+
+    return 0;
+  }
+  "
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+

@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/complex_overloads.h>
 
 #include <complex>
 #include <utility>
@@ -460,13 +461,6 @@ struct ProductType<unsigned int,float>
   typedef float type;
 };
 
-
-#endif
-
-
-// Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
-// other than T. Consequently, even with C++11, we need the following
-// specializations:
 template <typename T>
 struct ProductType<std::complex<T>,std::complex<T> >
 {
@@ -504,6 +498,7 @@ struct ProductType<std::complex<T>,float>
   typedef std::complex<typename ProductType<T,float>::type> type;
 };
 
+#endif
 
 
 /**
@@ -596,9 +591,6 @@ template <typename T> struct EnableIfScalar<std::complex<T> >
 {
   typedef std::complex<T> type;
 };
-
-
-
 
 
 // --------------- inline functions -----------------

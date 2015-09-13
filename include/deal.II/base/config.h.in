@@ -112,6 +112,7 @@
 #cmakedefine DEAL_II_HAVE_UNDERSCORE_ISNAN
 #cmakedefine DEAL_II_HAVE_ISFINITE
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
+#cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 
 
 /***********************************************************************
