@@ -57,11 +57,6 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                                   const bool use_mapping_q_on_all_cells)
   :
   MappingQ1<dim,spacedim>(degree),
-  n_inner(Utilities::fixed_power<dim>(degree-1)),
-  n_outer((dim==1) ? 2 :
-          ((dim==2) ?
-           4+4*(degree-1) :
-           8+12*(degree-1)+6*(degree-1)*(degree-1))),
 
   // see whether we want to use *this* mapping objects on *all* cells,
   // or defer to an explicit Q1 mapping on interior cells. if
@@ -76,10 +71,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
   // create a Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
   q1_mapping (new MappingQ1<dim,spacedim>())
-{
-  Assert(n_inner+n_outer==Utilities::fixed_power<dim>(degree+1),
-         ExcInternalError());
-}
+{}
 
 
 
@@ -87,16 +79,11 @@ template<int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   :
   MappingQ1<dim,spacedim>(mapping.get_degree()),
-  n_inner(mapping.n_inner),
-  n_outer(mapping.n_outer),
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
   // clone the Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
   q1_mapping (dynamic_cast<MappingQ1<dim,spacedim>*>(mapping.q1_mapping->clone()))
-{
-  Assert(n_inner+n_outer==Utilities::fixed_power<dim>(this->polynomial_degree+1),
-         ExcInternalError());
-}
+{}
 
 
 

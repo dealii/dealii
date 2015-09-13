@@ -264,23 +264,6 @@ protected:
 protected:
 
   /**
-   * Exception.
-   */
-  DeclException1 (ExcLaplaceVectorNotSet,
-                  int,
-                  << "laplace_vector not set for degree=" << arg1 << ".");
-
-  /**
-   * Number of inner mapping shape functions.
-   */
-  const unsigned int n_inner;
-
-  /**
-   * Number of mapping shape functions on the boundary.
-   */
-  const unsigned int n_outer;
-
-  /**
    * If this flag is set @p true then @p MappingQ is used on all cells, not
    * only on boundary cells.
    */
