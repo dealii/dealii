@@ -153,6 +153,14 @@ namespace TrilinosWrappers
                          const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
+     * Return a reference to the underlaying Trilinos Epetra_Operator.
+     * So you can use the preconditioner with unwrapped Trilinos solver.
+     *
+     * Calling this function from an uninitialized object will cause an exception.
+     */
+    Epetra_Operator &trilinos_operator() const;
+
+    /**
      * Exception.
      */
     DeclException1 (ExcNonMatchingMaps,
@@ -1951,6 +1959,14 @@ namespace TrilinosWrappers
     const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
+  }
+
+  inline
+  Epetra_Operator &
+  PreconditionBase::trilinos_operator () const
+  {
+    AssertThrow (preconditioner, ExcMessage("Trying to dereference a null pointer."));
+    return (*preconditioner);
   }
 
 #endif
