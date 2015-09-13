@@ -525,7 +525,7 @@ namespace TensorAccessors
 
       inline return_type &operator[](unsigned int j) const
       {
-        return S::apply(j)[i_];
+        return s_.apply(j)[i_];
       }
 
     private:
