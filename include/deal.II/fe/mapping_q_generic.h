@@ -20,10 +20,12 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <cmath>
 
@@ -65,6 +67,11 @@ public:
    * to the real cell.
    */
   MappingQGeneric (const unsigned int polynomial_degree);
+
+  /**
+   * Copy constructor.
+   */
+  MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping);
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
@@ -453,6 +460,48 @@ protected:
    */
   const unsigned int polynomial_degree;
 
+  /*
+   * The default line support points. These are used when computing
+   * the location in real space of the support points on lines and
+   * quads, which are asked to the Manifold<dim,spacedim> class.
+   *
+   * The number of quadrature points depends on the degree of this
+   * class, and it matches the number of degrees of freedom of an
+   * FE_Q<1>(this->degree).
+   */
+  QGaussLobatto<1> line_support_points;
+
+  /**
+   * An FE_Q object which is only needed in 3D, since it knows how to reorder
+   * shape functions/DoFs on non-standard faces. This is used to reorder
+   * support points in the same way.
+   */
+  const std_cxx11::unique_ptr<FE_Q<dim> > fe_q;
+
+  /**
+   * A table of weights by which we multiply the locations of the
+   * support points on the perimeter of a quad to get the location of
+   * interior support points.
+   *
+   * Sizes: support_point_weights_on_quad.size()= number of inner unit_support_points
+   * support_point_weights_on_quad[i].size()= number of outer unit_support_points,
+   * i.e.  unit_support_points on the boundary of the quad
+   *
+   * For the definition of this vector see equation (8) of the `mapping'
+   * report.
+   */
+  Table<2,double> support_point_weights_on_quad;
+
+  /**
+   * A table of weights by which we multiply the locations of the
+   * support points on the perimeter of a hex to get the location of
+   * interior support points.
+   *
+   * For the definition of this vector see equation (8) of the `mapping'
+   * report.
+   */
+  Table<2,double> support_point_weights_on_hex;
+
   /**
    * An interface that derived classes have to implement and that
    * computes the locations of support points for the mapping. For
@@ -462,11 +511,72 @@ protected:
    * the support points from the geometry of the current cell but
    * instead evaluating an externally given displacement field in
    * addition to the geometry of the cell.
+   *
+   * The default implementation of this function is appropriate for
+   * most cases. It takes the locations of support points on the
+   * boundary of the cell from the underlying manifold. Interior
+   * support points (ie. support points in quads for 2d, in hexes for
+   * 3d) are then computed using the solution of a Laplace equation
+   * with the position of the outer support points as boundary values,
+   * in order to make the transformation as smooth as possible.
+   *
+   * The function works its way from the vertices (which it takes from
+   * the given cell) via the support points on the line (for which it
+   * calls the add_line_support_points() function) and the support
+   * points on the quad faces (in 3d, for which it calls the
+   * add_quad_support_points() function). It then adds interior
+   * support points that are either computed by interpolation from the
+   * surrounding points using weights computed by solving a Laplace
+   * equation, or if dim<spacedim, it asks the underlying manifold for
+   * the locations of interior points.
    */
   virtual
   void
   compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                  std::vector<Point<spacedim> > &a) const = 0;
+                                  std::vector<Point<spacedim> > &a) const;
+
+  /**
+   * For <tt>dim=2,3</tt>. Append the support points of all shape
+   * functions located on bounding lines of the given cell to the
+   * vector @p a. Points located on the vertices of a line are not
+   * included.
+   *
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> this function is empty. The function uses the
+   * underlying manifold object of the line (or, if none is set, of
+   * the cell) for the location of the requested points.
+   *
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
+   */
+  virtual
+  void
+  add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                           std::vector<Point<spacedim> > &a) const;
+
+  /**
+   * For <tt>dim=3</tt>. Append the support points of all shape
+   * functions located on bounding faces (quads in 3d) of the given
+   * cell to the vector @p a. Points located on the vertices or lines
+   * of a quad are not included.
+   *
+   * Needed by the @p compute_support_points() function. For
+   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty. The
+   * function uses the underlying manifold object of the quad (or, if
+   * none is set, of the cell) for the location of the requested
+   * points.
+   *
+   * This function is made virtual in order to allow derived classes
+   * to choose shape function support points differently than the
+   * present class, which chooses the points as interpolation points
+   * on the boundary.
+   */
+  virtual
+  void
+  add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                          std::vector<Point<spacedim> > &a) const;
 
   /**
    * Make MappingQ a friend since it needs to call the
