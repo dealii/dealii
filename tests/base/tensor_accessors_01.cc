@@ -41,8 +41,11 @@ int main()
     //               0  1  2  3  5  6  7  8  4
     deallog   << foo[0][1][2][0][2][0][1][2][1] << std::endl;
 
-    int &tmp =  foo[0][1][2][0][2][0][1][2][1];
-    tmp = 2 *    foo[0][1][2][0][2][0][1][2][1];
+    int temp = foo[0][1][2][0][2][0][1][2][1];
+    int &ref = foo[0][1][2][0][2][0][1][2][1];
+    ref = temp;
+
+    foo[0][1][2][0][2][0][1][2][1] =  temp + ref;
 
     deallog   <<   t[0][1][2][0][1][2][0][1][2] << std::endl;
   }
@@ -57,8 +60,8 @@ int main()
     //                     0  1  2  3  5  6  7  8  4
     deallog   << const_foo[0][1][2][0][2][0][1][2][1] << std::endl;
 
-    int &tmp =        foo[0][1][2][0][2][0][1][2][1];
-    tmp =              foo[0][1][2][0][2][0][1][2][1] / 2;
+    int &tmp =         foo[0][1][2][0][2][0][1][2][1];
+    tmp =        const_foo[0][1][2][0][2][0][1][2][1] / 2;
     deallog   << const_foo[0][1][2][0][2][0][1][2][1] << std::endl;
   }
 
@@ -126,5 +129,14 @@ int main()
     dealii::TensorAccessors::internal::ReorderedIndexView<2, 5, double const[3][3][3][3][3]> // auto ...
     foo2 = TensorAccessors::reordered_index_view<2, 5>(t_ref);
     deallog << foo2[0][1][0][1][2] << std::endl;
+  }
+
+  {
+    // Is it possible to call the simplest case (where we have to do
+    // absolutely nothing?
+
+    Tensor<1, 3, int> t;
+    TensorAccessors::internal::ReorderedIndexView<0, 1, Tensor<1, 3, int> > // auto ...
+    foo = TensorAccessors::reordered_index_view<0, 1>(t);
   }
 }

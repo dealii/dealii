@@ -355,25 +355,6 @@ namespace TensorAccessors
     };
 
 
-    /**
-     * An internally used type trait that strips StoreIndex<0, S> down to
-     * its actual return value. This is needed to end the recursion in
-     * StoreIndex as well as, to return something meaningful in case of a
-     * nested application of the index reordering classes.
-     */
-    template<typename T>
-    struct StripStoreIndex
-    {
-      typedef T type;
-    };
-
-    template <typename S>
-    struct StripStoreIndex<StoreIndex<0, S> >
-    {
-      typedef typename StripStoreIndex<typename S::return_type>::type type;
-    };
-
-
     // TODO: Is there a possibility ot just have the following block of
     // explanation on an internal page in doxygen? If, yes. Doxygen
     // wizards, your call!
@@ -422,8 +403,8 @@ namespace TensorAccessors
       typename ReferenceType<T>::type t_;
     };
 
-    // At some point we hit the condition index == 0, i.e., the first index
-    // should be reordered to the end.
+    // At some point we hit the condition index == 0 and rank > 1, i.e.,
+    // the first index should be reordered to the end.
     //
     // At this point we cannot be lazy any more and have to start storing
     // indices because we get them in the wrong order. The user supplies
@@ -439,12 +420,32 @@ namespace TensorAccessors
     public:
       ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t) {}
 
-      typedef internal::StoreIndex<rank - 1, internal::Identity<T> > value_type;
+      typedef StoreIndex<rank - 1, internal::Identity<T> > value_type;
 
       inline
       value_type operator[](unsigned int j) const
       {
-        return value_type(internal::Identity<T>(t_), j);
+        return value_type(Identity<T>(t_), j);
+      }
+
+    private:
+      typename ReferenceType<T>::type t_;
+    };
+
+    // Sometimes, we're lucky and don't have to do anything. In this case
+    // just return the original tensor.
+
+    template <typename T>
+    class ReorderedIndexView<0, 1, T>
+    {
+    public:
+      ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t) {}
+
+      typedef typename ReferenceType<typename ValueType<T>::value_type>::type value_type;
+
+      inline value_type operator[](unsigned int j) const
+      {
+        return t_[j];
       }
 
     private:
@@ -483,10 +484,10 @@ namespace TensorAccessors
     // subsequently stored indices:
 
     template <int rank, typename S>
-    class StoreIndex : private S
+    class StoreIndex
     {
     public:
-      StoreIndex(S s, int i) : S(s), i_(i) {}
+      StoreIndex(S s, int i) : s_(s), i_(i) {}
 
       typedef StoreIndex<rank - 1, StoreIndex<rank, S> > value_type;
 
@@ -501,33 +502,34 @@ namespace TensorAccessors
       inline
       typename ReferenceType<return_type>::type apply(unsigned int j) const
       {
+        return s_.apply(j)[i_];
+      }
+
+    private:
+      const S s_;
+      const int i_;
+    };
+
+    // We have to store indices until we hit rank == 1. Then, upon the next
+    // invocation of operator[](unsigned int j) we have all necessary
+    // information available to return the actual object.
+
+    template <typename S>
+    class StoreIndex<1, S>
+    {
+    public:
+      StoreIndex(S s, int i) : s_(s), i_(i) {}
+
+      typedef typename ValueType<typename S::return_type>::value_type return_type;
+      typedef return_type value_type;
+
+      inline return_type &operator[](unsigned int j) const
+      {
         return S::apply(j)[i_];
       }
 
     private:
-      const int i_;
-    };
-
-    // We can store indices until we hit rank == 0. Then, we have all
-    // necessary indices and it is time to ground the recursion. For this,
-    // StoreIndex is specialized for rank == 0. The specialization contains
-    // to conversion operators to reference type to access the underlying
-    // object. Just call apply(i_) on the StoreIndex object of rank 1:
-    template <typename S>
-    class StoreIndex<0, S> : private S
-    {
-    public:
-      StoreIndex(S s, int i) : S(s), i_(i) {}
-
-      // Strip nested StoreIndex<0, S2> objects and cast to tensor's value_type
-      typedef typename StripStoreIndex<typename S::return_type>::type value_type;
-
-      inline operator value_type &() const
-      {
-        return S::apply(i_);
-      }
-
-    private:
+      const S s_;
       const int i_;
     };
 
