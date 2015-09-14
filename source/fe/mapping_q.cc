@@ -518,11 +518,6 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
 
-      // If this is a q1 mapping, then only use the support points on the
-      // vertices.
-      if (mdata->shape_values.size() < mdata->mapping_support_points.size())
-        mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
-
       return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit, *mdata);
     }
   else
