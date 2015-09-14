@@ -205,9 +205,33 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
 
 
 
-/* For an explanation of the  KA and Kb
-   arrays see the comments in the declaration of
-   transform_real_to_unit_cell_initial_guess */
+/**
+ * Compute an initial guess to pass to the Newton method in
+ * transform_real_to_unit_cell.  For the initial guess we proceed in the
+ * following way:
+ * <ul>
+ * <li> find the least square dim-dimensional plane approximating the cell
+ * vertices, i.e. we find an affine map A x_hat + b from the reference cell
+ * to the real space.
+ * <li> Solve the equation A x_hat + b = p for x_hat
+ * <li> This x_hat is the initial solution used for the Newton Method.
+ * </ul>
+ *
+ * @note if dim<spacedim we first project p onto the plane.
+ *
+ * @note if dim==1 (for any spacedim) the initial guess is the exact
+ * solution and no Newton iteration is needed.
+ *
+ * Some details about how we compute the least square plane. We look
+ * for a spacedim x (dim + 1) matrix X such that X * M = Y where M is
+ * a (dim+1) x n_vertices matrix and Y a spacedim x n_vertices.  And:
+ * The i-th column of M is unit_vertex[i] and the last row all
+ * 1's. The i-th column of Y is real_vertex[i].  If we split X=[A|b],
+ * the least square approx is A x_hat+b Classically X = Y * (M^t (M
+ * M^t)^{-1}) Let K = M^t * (M M^t)^{-1} = [KA Kb] this can be
+ * precomputed, and that is exactly what we do.  Finally A = Y*KA and
+ * b = Y*Kb.
+ */
 namespace
 {
   template <int dim>
@@ -292,53 +316,51 @@ namespace
   Kb[GeometryInfo<3>::vertices_per_cell] =
   {0.500000,0.250000,0.250000,0.000000,0.250000,0.000000,0.000000,-0.250000};
 
-}
+  template<int dim, int spacedim>
+  Point<dim>
+  transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
+                                             const Point<spacedim>               &p)
+  {
+    Point<dim> p_unit;
 
+    FullMatrix<double>  KA(GeometryInfo<dim>::vertices_per_cell, dim);
+    Vector <double>  Kb(GeometryInfo<dim>::vertices_per_cell);
 
-template<int dim, int spacedim>
-Point<dim>
-MappingQ1<dim,spacedim>::
-transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
-                                           const Point<spacedim>               &p) const
-{
-  Point<dim> p_unit;
+    KA.fill( (double *)(TransformR2UInitialGuess<dim>::KA) );
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      Kb(i)=(TransformR2UInitialGuess<dim>::Kb)[i];
 
-  FullMatrix<double>  KA(GeometryInfo<dim>::vertices_per_cell, dim);
-  Vector <double>  Kb(GeometryInfo<dim>::vertices_per_cell);
+    FullMatrix<double> Y(spacedim, GeometryInfo<dim>::vertices_per_cell);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
+      for (unsigned int i=0; i<spacedim; ++i)
+        Y(i,v) = vertex[v][i];
 
-  KA.fill( (double *)(TransformR2UInitialGuess<dim>::KA) );
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    Kb(i)=(TransformR2UInitialGuess<dim>::Kb)[i];
+    FullMatrix<double> A(spacedim,dim);
+    Y.mmult(A,KA); // A = Y*KA
+    Vector< double > b(spacedim);
+    Y.vmult(b,Kb); // b = Y*Kb
 
-  FullMatrix<double> Y(spacedim, GeometryInfo<dim>::vertices_per_cell);
-  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
     for (unsigned int i=0; i<spacedim; ++i)
-      Y(i,v) = vertex[v][i];
+      b(i) -= p[i];
+    b*=-1;
 
-  FullMatrix<double> A(spacedim,dim);
-  Y.mmult(A,KA); // A = Y*KA
-  Vector< double > b(spacedim);
-  Y.vmult(b,Kb); // b = Y*Kb
+    Vector< double > dest(dim);
 
-  for (unsigned int i=0; i<spacedim; ++i)
-    b(i) -= p[i];
-  b*=-1;
+    FullMatrix<double> A_1(dim,spacedim);
+    if (dim<spacedim)
+      A_1.left_invert(A);
+    else
+      A_1.invert(A);
 
-  Vector< double > dest(dim);
+    A_1.vmult(dest,b); //A^{-1}*b
 
-  FullMatrix<double> A_1(dim,spacedim);
-  if (dim<spacedim)
-    A_1.left_invert(A);
-  else
-    A_1.invert(A);
+    for (unsigned int i=0; i<dim; ++i)
+      p_unit[i]=dest(i);
 
-  A_1.vmult(dest,b); //A^{-1}*b
-
-  for (unsigned int i=0; i<dim; ++i)
-    p_unit[i]=dest(i);
-
-  return p_unit;
+    return p_unit;
+  }
 }
+
 
 
 
@@ -403,45 +425,32 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
           // continue on to the standard Newton code
         }
     }
-  // Find the initial value for the
-  // Newton iteration by a normal projection
-  // to the least square plane determined by
-  // the vertices of the cell
+
+  // Find the initial value for the Newton iteration by a normal
+  // projection to the least square plane determined by the vertices
+  // of the cell
   std::vector<Point<spacedim> > a;
   compute_mapping_support_points (cell,a);
   Point<dim> initial_p_unit =
-    transform_real_to_unit_cell_initial_guess(a,p);
+    transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
 
-  // if dim==1 there is nothing
-  // else to do to the initial
-  // value, and it is the answer
+  // if dim==1 there is nothing else to do to the initial value, and
+  // it is the answer
   if (dim == 1)
     return initial_p_unit;
   else
     {
-      // use the full mapping. in case the
-      // function above should have given us
-      // something back that lies outside the
-      // unit cell (that might happen because
-      // either the function computing an
-      // initial guess gave us a poor initial
-      // guess or for the following reason:
-      // we call this function here in the Q1
-      // mapping to produce an initial guess
-      // for a higher order mapping, but
-      // we may have given a point 'p' that
-      // lies inside the cell with the higher
-      // order mapping, but outside the
-      // Q1-mapped reference cell), then
-      // project it back into the reference
-      // cell in hopes that this gives a
-      // better starting point to the
-      // following iteration
-//TODO: the following line was added in r25581 but it leads to
-// changes in the test results. investigate why this is so --
-// it shouldn't really make any difference...
-//      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-
+      // use the full mapping. in case the function above should have
+      // given us something back that lies outside the unit cell (that
+      // might happen because either the function computing an initial
+      // guess gave us a poor initial guess or for the following
+      // reason: we call this function here in the Q1 mapping to
+      // produce an initial guess for a higher order mapping, but we
+      // may have given a point 'p' that lies inside the cell with the
+      // higher order mapping, but outside the Q1-mapped reference
+      // cell), then project it back into the reference cell in hopes
+      // that this gives a better starting point to the following
+      // iteration
       const Quadrature<dim> point_quadrature(initial_p_unit);
 
       UpdateFlags update_flags = update_quadrature_points | update_jacobians;

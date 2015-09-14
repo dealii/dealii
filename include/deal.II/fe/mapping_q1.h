@@ -115,32 +115,6 @@ protected:
    InternalData        &mdata) const;
 
   /**
-   * Compute an initial guess to pass to the Newton method in
-   * transform_real_to_unit_cell.  For the initial guess we proceed in the
-   * following way:
-   * <ul>
-   * <li> find the least square dim-dimensional plane approximating the cell
-   * vertices, i.e. we find and affine map A x_hat + b from the reference cell
-   * to the real space.
-   * <li> Solve the equation A x_hat + b = p for x_hat
-   * <li> This x_hat is the initial solution used for the Newton Method.
-   * </ul>
-   * @note if dim<spacedim we first project p onto the plane. @note if dim==1
-   * (for any spacedim) the initial guess is the exact solution and no Newton
-   * iteration is needed.   Some details about how we compute the least square
-   * plane. We look for a  spacedim x (dim + 1) matrix  X such that  X * M = Y
-   * where M is a (dim+1) x n_vertices  matrix and Y a spacedim x n_vertices.
-   * And: The i-th column of M is unit_vertex[i] and the last row all 1's. The
-   * i-th column of Y is real_vertex[i].  If we split X=[A|b], the least
-   * square approx is A x_hat+b  Classically  X = Y * (M^t (M M^t)^{-1})  Let
-   * K = M^t * (M M^t)^{-1} = [KA Kb] this can be precomputed, and that is
-   * exactly what we do.  Finally A = Y*KA  and  b = Y*Kb.
-   */
-  Point<dim>
-  transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
-                                             const Point<spacedim>                            &p) const;
-
-  /**
    * Transforms the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    *
