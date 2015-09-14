@@ -423,7 +423,7 @@ namespace Step16
   // MeshWorker hides most of that from us, and thus the difference
   // between this function and the previous lies only in the setup of
   // the assembler and the different iterators in the loop.
-  // Also, fixing up the matrices in the end is a little more comlicated.
+  // Also, fixing up the matrices in the end is a little more complicated.
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid ()
   {
