@@ -557,7 +557,7 @@ namespace TensorAccessors
       }
     };
 
-    // For dimension == rank there is nothing to extract, just return the
+    // For position == rank there is nothing to extract, just return the
     // object.
     template<int rank>
     struct ExtractHelper<rank, rank>
