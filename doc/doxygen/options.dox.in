@@ -176,7 +176,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_SLEPC=1 \
                          DEAL_II_WITH_THREADS=1 \
                          DEAL_II_WITH_TRILINOS=1 \
-                         DEAL_II_WITH_TRILINOS =1 \
                          DEAL_II_WITH_UMFPACK=1 \
                          DEAL_II_WITH_ZLIB=1 \
 			 DEAL_II_NAMESPACE_OPEN= \
