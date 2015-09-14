@@ -461,6 +461,13 @@ struct ProductType<unsigned int,float>
   typedef float type;
 };
 
+#endif
+
+// Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
+// other than T (not even in C++11, or C++14). We provide our own overloads
+// in base/complex_overloads.h, but in order for them to work, we have to
+// manually specify all products we want to allow:
+
 template <typename T>
 struct ProductType<std::complex<T>,std::complex<T> >
 {
@@ -498,7 +505,6 @@ struct ProductType<std::complex<T>,float>
   typedef std::complex<typename ProductType<T,float>::type> type;
 };
 
-#endif
 
 
 /**
