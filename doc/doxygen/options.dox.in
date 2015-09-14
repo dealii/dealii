@@ -181,8 +181,8 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_WITH_UMFPACK=1 \
                          DEAL_II_WITH_ZLIB=1 \
-			 DEAL_II_NAMESPACE_OPEN= \
-			 DEAL_II_NAMESPACE_CLOSE=
+                         DEAL_II_NAMESPACE_OPEN= \
+                         DEAL_II_NAMESPACE_CLOSE=
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclException0 \
