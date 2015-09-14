@@ -38,6 +38,11 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
+  <br>
+  (Wolfgang Bangerth, 2015/09/13)
+  </li>
 
   <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
   longer have a constructor taking a boolean argument. Those were replaced

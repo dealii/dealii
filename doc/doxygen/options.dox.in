@@ -116,6 +116,9 @@ MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css
+LAYOUT_FILE            = @CMAKE_CURRENT_SOURCE_DIR@/DoxygenLayout.xml
+
+
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
