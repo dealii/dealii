@@ -37,13 +37,13 @@ namespace LinearAlgebra
   {
     if (new_alloc_size == 0)
       {
-        if (val != nullptr)
+        if (val != NULL)
           free(val);
-        val = nullptr;
+        val = NULL;
       }
     else
       {
-        if (val != nullptr)
+        if (val != NULL)
           free(val);
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);

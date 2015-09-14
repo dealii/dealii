@@ -1416,6 +1416,8 @@ inline
 unsigned int
 IndexSet::largest_range_index() const
 {
+  Assert(ranges.empty()==false, ExcMessage("IndexSet cannot be empty."));
+
   compress();
   std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
 

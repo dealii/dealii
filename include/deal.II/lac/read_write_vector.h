@@ -62,7 +62,7 @@ namespace LinearAlgebra
    * ReadWriteVector stores a subset of elements. It allows to access
    * individual elements to be read or written. However, it does not allow global
    * operations such as taking the norm. ReadWriteVector can be used to read and
-   * write elements in vector derived from VectorSpaceVector such as
+   * write elements in vectors derived from VectorSpaceVector such as
    * TrilinosWrappers::MPI::Vector and PETScWrappers::MPI::Vector.
    *
    * @author Bruno Turcksin, 2015.
@@ -104,13 +104,13 @@ namespace LinearAlgebra
      * Constructs a vector given the size, the stored elements have their index
      * in [0,size).
      */
-    ReadWriteVector (const size_type size);
+    explicit ReadWriteVector (const size_type size);
 
     /**
      * Constructs a vector whose stored elements indices are given by the
      * IndexSet @p locally_stored_indices.
      */
-    ReadWriteVector (const IndexSet &locally_stored_indices);
+    explicit ReadWriteVector (const IndexSet &locally_stored_indices);
 
     /**
      * Destructor.
@@ -141,7 +141,8 @@ namespace LinearAlgebra
                 const bool                      fast = false);
 
     /**
-     * Initializes the vector. The indices are specified by @p
+     * Initializes the vector. The indices are specified by
+     * @p locally_stored_indices.
      *
      * If the flag @p fast is set to false, the memory will be initialized
      * with zero, otherwise the memory will be untouched (and the user must
@@ -197,8 +198,8 @@ namespace LinearAlgebra
 #endif
 
     /**
-     * Sets all elements of the vector to the scalar @p s. This is operation is
-     * allowed if @p is equal to zero.
+     * Sets all elements of the vector to the scalar @p s. This operation is
+     * only allowed if @p s is equal to zero.
      */
     ReadWriteVector<Number> &operator = (const Number s);
 
@@ -276,10 +277,10 @@ namespace LinearAlgebra
     Number &operator [] (const size_type global_index);
 
     /**
-     * A collective get operation: instead of getting individual elements of
-     * a vector, this function allows to get a whole set of elements at
-     * once. The indices of the elements to be read are stated in the first
-     * argument, the corresponding values are returned in the second.
+     * Instead of getting individual elements of a vector, this function
+     * allows to get a whole set of elements at once. The indices of the
+     * elements to be read are stated in the first argument, the
+     * corresponding values are returned in the second.
      */
     template <typename Number2>
     void extract_subvector_to (const std::vector<size_type> &indices,
@@ -318,19 +319,19 @@ namespace LinearAlgebra
     //@{
 
     /**
-     * A collective add operation: This function adds a whole set of values
-     * stored in @p values to the vector components specified by @p indices.
+     * This function adds a whole set of values stored in @p values to the vector
+     * components specified by @p indices.
      */
     template <typename Number2>
     void add (const std::vector<size_type>  &indices,
-              const std::vector<Number2> &values);
+              const std::vector<Number2>    &values);
 
     /**
-     * This is a second collective add operation. As a difference, this
-     * function takes a ReadWriteVector of values.
+     * This function is similar to the previous one but takes a ReadWriteVector
+     * of values.
      */
     template <typename Number2>
-    void add (const std::vector<size_type> &indices,
+    void add (const std::vector<size_type>   &indices,
               const ReadWriteVector<Number2> &values);
 
     /**
@@ -382,7 +383,7 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    // TODO: Could we use VectorizedArray here for storage?
+    // TODO: use AlignedVector here for storage
     Number *val;
   };
 
@@ -397,7 +398,7 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
     :
-    val (nullptr)
+    val (NULL)
   {}
 
 
@@ -407,7 +408,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
     Subscriptor(),
-    val (nullptr)
+    val (NULL)
   {
     this->operator=(v);
   }
@@ -418,7 +419,7 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
     :
-    val (nullptr)
+    val (NULL)
   {
     reinit (size, false);
   }
@@ -429,7 +430,7 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
     :
-    val (nullptr)
+    val (NULL)
   {
     reinit (locally_stored_indices);
   }
@@ -699,7 +700,6 @@ namespace LinearAlgebra
  * exchanges the data of the two vectors.
  *
  * @relates Vector
- * @author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <typename Number>
 inline
