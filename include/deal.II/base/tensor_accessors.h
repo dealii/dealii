@@ -545,9 +545,11 @@ namespace TensorAccessors
     struct ExtractHelper
     {
       template<typename T, typename ArrayType>
-      inline static
+      inline
+      static
       typename ReturnType<rank - position, T>::value_type &
-      extract(T &t, const ArrayType &indices)
+      extract(T &t,
+              const ArrayType &indices)
       {
         return ExtractHelper<position + 1, rank>::
                template extract<typename ValueType<T>::value_type, ArrayType>
@@ -555,14 +557,16 @@ namespace TensorAccessors
       }
     };
 
-    // For dimension == rank there is nothing to extract, just return the
+    // For position == rank there is nothing to extract, just return the
     // object.
     template<int rank>
     struct ExtractHelper<rank, rank>
     {
       template<typename T, typename ArrayType>
-      inline static
-      T &extract(T &t, const ArrayType &indices)
+      inline
+      static
+      T &extract(T &t,
+                 const ArrayType &)
       {
         return t;
       }
