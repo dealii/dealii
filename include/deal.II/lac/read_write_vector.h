@@ -204,10 +204,17 @@ namespace LinearAlgebra
     ReadWriteVector<Number> &operator = (const Number s);
 
     /**
-     * Returns the size of the vector, equal to number of elements in
-     * the vector.
+     * Returns the size of the vector.
+     *
+     * Note that the result is not equal to the number of element stored locally.
+     * The latter information is returned by n_elements()
      */
-    size_type size () const;
+    size_type size() const;
+
+    /**
+     * Return the number of elements stored locally.
+     */
+    size_type n_elements() const;
 
     /**
      * Return the IndexSet that stores the indices of the elements stored.
@@ -218,8 +225,6 @@ namespace LinearAlgebra
      * Make the @p ReadWriteVector class a bit like the <tt>vector<></tt> class of
      * the C++ standard library by returning iterators to the start and end
      * of the <i>locally stored</i> elements of this vector.
-     *
-     * It holds that end() - begin() == size().
      */
     iterator begin ();
 
@@ -451,7 +456,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator= (const ReadWriteVector<Number> &in_vector)
   {
-    resize_val(in_vector.size());
+    resize_val(in_vector.n_elements());
     stored_elements = in_vector.get_stored_elements();
     std::copy(in_vector.begin(),in_vector.end(),begin());
 
@@ -466,7 +471,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator= (const ReadWriteVector<Number2> &in_vector)
   {
-    resize_val(in_vector.size());
+    resize_val(in_vector.n_elements());
     stored_elements = in_vector.get_stored_elements();
     std::copy(in_vector.begin(),in_vector.end(),begin());
 
@@ -478,7 +483,17 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   typename ReadWriteVector<Number>::size_type
-  ReadWriteVector<Number>::size () const
+  ReadWriteVector<Number>::size() const
+  {
+    return stored_elements.size();
+  }
+
+
+
+  template <typename Number>
+  inline
+  typename ReadWriteVector<Number>::size_type
+  ReadWriteVector<Number>::n_elements() const
   {
     return stored_elements.n_elements();
   }
@@ -520,7 +535,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end ()
   {
-    return &val[this->size()];
+    return &val[this->n_elements()];
   }
 
 
@@ -530,7 +545,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end () const
   {
-    return &val[this->size()];
+    return &val[this->n_elements()];
   }
 
 
@@ -609,7 +624,7 @@ namespace LinearAlgebra
   Number
   ReadWriteVector<Number>::local_element (const size_type local_index) const
   {
-    AssertIndexRange (local_index, this->size());
+    AssertIndexRange (local_index, this->n_elements());
 
     return val[local_index];
   }
@@ -621,7 +636,7 @@ namespace LinearAlgebra
   Number &
   ReadWriteVector<Number>::local_element (const size_type local_index)
   {
-    AssertIndexRange (local_index, this->size());
+    AssertIndexRange (local_index, this->n_elements());
 
     return val[local_index];
   }

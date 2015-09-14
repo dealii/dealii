@@ -58,7 +58,7 @@ namespace LinearAlgebra
                                    const bool      fast)
   {
     // check whether we need to reallocate
-    resize_val (size);
+    resize_val(size);
 
     stored_elements = complete_index_set(size);
 
@@ -75,7 +75,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit (const ReadWriteVector<Number2> &v,
                                    const bool             fast)
   {
-    resize_val (v.size());
+    resize_val(v.n_elements());
 
     stored_elements = v.get_stored_elements();
 
@@ -191,7 +191,7 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_MPI
     // Copy the off-processor elements if necessary
-    if (intersection_size != size())
+    if (intersection_size != n_elements())
       {
         Epetra_BlockMap source_map = trilinos_vec.trilinos_vector().Map();
         std::vector<size_type> off_proc_indices(readwrite_indices.size());
@@ -240,7 +240,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::memory_consumption () const
   {
     std::size_t memory = sizeof(*this);
-    memory += sizeof (Number) * static_cast<std::size_t>(this->size());
+    memory += sizeof (Number) * static_cast<std::size_t>(this->n_elements());
 
     memory += stored_elements.memory_consumption();
 
@@ -268,7 +268,7 @@ namespace LinearAlgebra
     out << "IndexSet: ";
     stored_elements.print(out);
     out << std::endl;
-    for (unsigned int i=0; i<this->size(); ++i)
+    for (unsigned int i=0; i<this->n_elements(); ++i)
       out << val[i] << std::endl;
     out << std::flush;
 

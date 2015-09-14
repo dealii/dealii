@@ -33,13 +33,13 @@ void test()
   is.add_range(10,15);
   LinearAlgebra::ReadWriteVector<double> double_vector(is);
   LinearAlgebra::ReadWriteVector<float> float_vector(float_size);
-  deallog << "double_size " << double_vector.size() <<std::endl;
-  deallog << "float_size " << float_vector.size() <<std::endl;
+  deallog << "double_size " << double_vector.n_elements() <<std::endl;
+  deallog << "float_size " << float_vector.n_elements() <<std::endl;
 
   double_vector = 0.;
-  for (unsigned int i=0; i<double_vector.size(); ++i)
+  for (unsigned int i=0; i<double_vector.n_elements(); ++i)
     double_vector.local_element(i) += i;
-  for (unsigned int i=0; i<float_vector.size(); ++i)
+  for (unsigned int i=0; i<float_vector.n_elements(); ++i)
     float_vector[i] = i;
 
   double_vector.print(deallog.get_file_stream());
@@ -51,7 +51,7 @@ void test()
   LinearAlgebra::ReadWriteVector<double> double_vector2(double_vector);
   double_vector2.print(deallog.get_file_stream());
 
-  for (unsigned int i=0; i<double_vector.size(); ++i)
+  for (unsigned int i=0; i<double_vector.n_elements(); ++i)
     double_vector2.local_element(i) += i;
   double_vector = double_vector2;
   double_vector.print(deallog.get_file_stream());
