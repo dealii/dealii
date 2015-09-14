@@ -76,8 +76,10 @@ int main()
 
     // via std::array
 
+    // via std::array:
 #ifdef DEAL_II_WITH_CXX11
-    deallog << TensorAccessors::extract<5>(foo, std::array<unsigned int, 5>({2, 1, 0, 2, 1})) << std::endl;
+    std::array<unsigned int, 5> temp {2, 1, 0, 2, 1};
+    deallog << TensorAccessors::extract<5>(foo, temp) << std::endl;
 #else
     deallog << 42. << std::endl;
 #endif
