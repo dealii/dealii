@@ -2109,9 +2109,9 @@ namespace Step33
       case Parameters::Solver::direct:
       {
         SolverControl solver_control (1,0);
-        TrilinosWrappers::SolverDirect direct (solver_control,
-                                               parameters.output ==
-                                               Parameters::Solver::verbose);
+        TrilinosWrappers::SolverDirect::AdditionalData data (
+          parameters.output == Parameters::Solver::verbose);
+        TrilinosWrappers::SolverDirect direct (solver_control, data);
 
         direct.solve (system_matrix, newton_update, right_hand_side);
 
