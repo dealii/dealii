@@ -53,7 +53,7 @@ degrees of freedom that are defined on the refined cells, but does not
 extend to that part of the domain that is not refined. While this
 guarantees that the overall effort grows as ${\cal O}(N)$ as necessary
 for optimal multigrid complexity, it leads to problems when defining
-where to smoothen and what boundary conditions to pose for the operators
+where to smooth and what boundary conditions to pose for the operators
 defined on individual levels if the level boundary is not an external
 boundary. These questions are discussed in detail in the article cited above.
 
