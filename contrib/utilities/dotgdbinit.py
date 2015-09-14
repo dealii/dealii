@@ -15,7 +15,11 @@
 
 #
 # Instructions: Place a copy of this file, renamed as ".gdbinit", in your home
-# directory to enable pretty-printing of various deal.II objects.
+# directory to enable pretty-printing of various deal.II objects. If you already
+# have a ".gdbinit" file or would like to manage multiple sets of pretty
+# printers, then see the directions included in the Documentation, in the
+# "Configuration for debugging via GDB" section in the "Information for users"
+# category.
 #
 # This has only been tested with GDB 7.7.1 and newer, but it should work with
 # slightly older versions of GDB (the Python interface was added in 7.0,

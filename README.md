@@ -35,6 +35,10 @@ The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
 doc/doxygen/tutorial/index.html or at http://www.dealii.org/.
 
+deal.II includes support for pretty-printing deal.II objects inside GDB. See
+`contrib/utilities/dotgdbinit.py` or the new documentation page (under
+'information for users') for instructions on how to set this up.
+
 License:
 --------
 
