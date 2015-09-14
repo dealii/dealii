@@ -45,11 +45,11 @@ cp contrib/utilities/dotgdbinit.py ~/.gdbinit</pre>
 
 <h2>Setting up GDB for deal.II and other sets of printers</h2>
 <p>
-  Configuring GDB to use multiple sets of pretty printers (i.e., sets of pretty
-  printers from <acronym>deal.II</acronym> as well as other projects) takes a
-  little more work. The recommended procedure is
+  Configuring GDB to use multiple sets of pretty-printers (i.e., sets of
+  pretty-printers from <acronym>deal.II</acronym> as well as other projects)
+  takes a little more work. The recommended procedure is
   <ol>
-    <li> Decide on a directory where you will place all of your pretty printing
+    <li> Decide on a directory where you will place all of your pretty-printing
       files. A good choice would be creating a new
       folder <code>.gdbscripts</code> in your home directory, and this is the
       choice assumed for the rest of this demonstration.
@@ -78,11 +78,11 @@ end</pre>
       <pre class="sample">
 import deal</pre>
       executes the code necessary to enable the <acronym>deal.II</acronym>
-      pretty printers (it loads the file created in the last step).
+      pretty-printers (it loads the file created in the last step).
   </ol>
-  Use a similar procedure on other pretty printing files (which should
-  also be located in <code>.gdbfiles/</code>) to set up any other pretty
-  printing code.
+  Use a similar procedure on other pretty-printing files (which should also be
+  located in <code>.gdbscripts/</code>) to set up any other pretty-printing
+  code.
 </p>
 <hr />
 <div class="right">
