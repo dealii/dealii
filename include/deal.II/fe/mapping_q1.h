@@ -106,26 +106,6 @@ protected:
   MappingQ1 (const unsigned int degree);
 
   /**
-   * Transforms the point @p p on the real cell to the corresponding point on
-   * the unit cell @p cell by a Newton iteration.
-   *
-   * Takes a reference to an @p InternalData that is assumed to be previously
-   * created by the @p get_data function with @p UpdateFlags including @p
-   * update_transformation_values and @p update_transformation_gradients and a
-   * one point Quadrature that includes the given initial guess for the
-   * transformation @p initial_p_unit.  Hence this function assumes that @p
-   * mdata already includes the transformation shape values and gradients
-   * computed at @p initial_p_unit.
-   *
-   * @p mdata will be changed by this function.
-   */
-  Point<dim>
-  transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                        const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit,
-                                        InternalData &mdata) const;
-
-  /**
    * Computes the support points of the mapping. For @p MappingQ1 these are
    * the vertices, as obtained by calling Mapping::get_vertices().
    *
