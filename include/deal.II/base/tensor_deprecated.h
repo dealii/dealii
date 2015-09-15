@@ -23,7 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//@}
 /**
  * @name Deprecated Tensor operations
  */
@@ -75,7 +74,25 @@ void outer_product (Tensor<1,dim,Number>       &dst,
                     const Tensor<1,dim,Number>  src1,
                     const Number                src2) DEAL_II_DEPRECATED;
 
+/**
+ * @deprecated Do not use this function, evaluate the value manually.
+ * @relates Tensor
+ */
+template <int rank, typename Number>
+inline
+Number determinant (const Tensor<rank,1,Number> &t) DEAL_II_DEPRECATED;
+
+
+/**
+ * @deprecated Do not use this function, evaluate the value manually.
+ * @relates Tensor
+ */
+template <typename Number>
+inline
+Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
+
 //@}
+
 
 #ifndef DOXYGEN
 
@@ -113,6 +130,20 @@ void outer_product (Tensor<1,dim,Number>       &dst,
 {
   for (unsigned int i=0; i<dim; ++i)
     dst[i] = src1[i] * src2;
+}
+
+template <int rank, typename Number>
+inline
+Number determinant (const Tensor<rank,1,Number> &t)
+{
+  return determinant(t[0]);
+}
+
+template <typename Number>
+inline
+Number determinant (const Tensor<1,1,Number> &t)
+{
+  return t[0];
 }
 
 #endif /* DOXYGEN */

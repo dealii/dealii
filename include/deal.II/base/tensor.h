@@ -2048,36 +2048,6 @@ scalar_product (const Tensor<2,dim,Number> &t1,
 }
 
 
-/**
- * Compute the determinant of a tensor of arbitrary rank and dimension one.
- * Since this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <int rank, typename Number>
-inline
-Number determinant (const Tensor<rank,1,Number> &t)
-{
-  return determinant(t[0]);
-}
-
-
-/**
- * Compute the determinant of a tensor of rank one and dimension one. Since
- * this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<1,1,Number> &t)
-{
-  return t[0];
-}
-
-
 //@}
 /**
  * @name Special operations on tensors of rank 1
@@ -2140,19 +2110,11 @@ cross_product (const Tensor<1,dim,Number> &src1,
 }
 
 
+//@}
 /**
- * Compute the determinant of a tensor of rank two and dimension one. Since
- * this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
+ * @name Special operations on tensors of rank 2
  */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,1,Number> &t)
-{
-  return t[0][0];
-}
+//@{
 
 
 /**
@@ -2197,8 +2159,7 @@ Number determinant (const Tensor<2,3,Number> &t)
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for all dimensions for
- * which no explicit specialization is available above.
+ * Compute the determinant of a tensor or rank 2.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2009
@@ -2207,14 +2168,8 @@ template <int dim, typename Number>
 inline
 Number determinant (const Tensor<2,dim,Number> &t)
 {
-  // compute the determinant using the
-  // Laplace expansion of the
-  // determinant. this may not be the most
-  // efficient algorithm, but it does for
-  // small n.
-  //
-  // for some algorithmic simplicity, we use
-  // the expansion along the last row
+  // Compute the determinant using the Laplace expansion of the
+  // determinant. We expand along the last row.
   Number det = 0;
 
   for (unsigned int k=0; k<dim; ++k)
@@ -2232,6 +2187,17 @@ Number determinant (const Tensor<2,dim,Number> &t)
 
   return std::pow (-1., static_cast<Number>(dim)) * det;
 }
+
+#ifndef DOXYGEN
+// Ground above recursion
+template <typename Number>
+inline
+Number determinant (const Tensor<2,1,Number> &t)
+{
+  return t[0][0];
+}
+#endif
+
 
 
 /**
@@ -2465,3 +2431,4 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/base/tensor_deprecated.h>
 
 #endif
+
