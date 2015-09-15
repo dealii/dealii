@@ -35,7 +35,7 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Push -pthread as well:
     ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
-    IF(CMAKE_C_COMPILER_WORKS)
+    IF(0)
 
       INCLUDE(CheckCSourceCompiles)
       CHECK_C_SOURCE_COMPILES("
