@@ -1820,10 +1820,7 @@ namespace internal
     Tensor<1,3>
     wedge_product (const Tensor<1,3> (&derivative)[2])
     {
-      Tensor<1,3> result;
-      cross_product (result, derivative[0], derivative[1]);
-
-      return result;
+      result cross_product (derivative[0], derivative[1]);
     }
 
 
