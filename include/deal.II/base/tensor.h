@@ -883,7 +883,11 @@ inline
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
-  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
+  // A fix for MSVC (prepending the 'dealii::')
+  // MSVC > C:\hpfem\agros2d\dealii\include\deal.II/base/tensor.h(886): error C2872: 'internal' : ambiguous symbol
+  // - could be 'dealii::internal'
+  // - or 'dealii::`anonymous-namespace'::internal'
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
 }
 
 
@@ -892,7 +896,8 @@ inline
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
-  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
+  // See a note in the body of Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
 }
 
 
