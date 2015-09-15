@@ -241,10 +241,10 @@ public:
   /**
    * Output of the matrix in user-defined format.
    */
-  template <class OUT>
-  void print (OUT &s,
-              const unsigned int  width=5,
-              const unsigned int  precision=2) const;
+  template <class OutputStream>
+  void print(OutputStream &s,
+             const unsigned int  width=5,
+             const unsigned int  precision=2) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -369,10 +369,10 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 
 
 template <typename number>
-template <class OUT>
+template <class OutputStream>
 void
 TridiagonalMatrix<number>::print (
-  OUT &s,
+  OutputStream &s,
   const unsigned int width,
   const unsigned int) const
 {
