@@ -50,6 +50,9 @@ inconvenience this causes.
   - The three argument variant of cross_product that returns the result by
     reference as first argument. Use the function that directly returns the
     result instead.
+  - The three argument variants of outer_product that return the result by
+    reference as first argument. Use the function that directly returns the
+    result instead.
   <br>
   (Matthias Maier, 2015/09/14 - XXX)
   </li>
@@ -137,6 +140,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
+  <br>
+  (Wolfgang Bangerth, 2015/09/13)
+  </li>
+
   <li>New: A new namespace TensorAccessors is introduced that contains
   generic algorithms for tensorial objects, i.e., objects that allow
   repeated access via the index operator <code>operator[](unsigned int)</code>.
@@ -303,12 +312,6 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Changed: All doxygen-generated pages now contain a link to the
-  tutorial in their top-level menus.
-  <br>
-  (Wolfgang Bangerth, 2015/09/13)
-  </li>
-
   <li>Cleanup: Constructors of AdditionalData in various linear solvers are now marked
   explicit. This avoid bugs with implicit conversions like the one fixed in step-40.
   <br>
