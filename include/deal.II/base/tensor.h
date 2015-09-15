@@ -2286,11 +2286,7 @@ invert (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Return the transpose of the given tensor. Since the compiler can perform
- * the return value optimization, and since the size of the return object is
- * known, it is acceptable to return the result by value, rather than by
- * reference as a parameter. Note that there are specializations of this
- * function for <tt>dim==1,2,3</tt>.
+ * Return the transpose of the given tensor.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -2300,7 +2296,7 @@ inline
 Tensor<2,dim,Number>
 transpose (const Tensor<2,dim,Number> &t)
 {
-  Number tt[dim][dim];
+  Tensor<2, dim, Number> tt;
   for (unsigned int i=0; i<dim; ++i)
     {
       tt[i][i] = t[i][i];
@@ -2310,64 +2306,8 @@ transpose (const Tensor<2,dim,Number> &t)
           tt[j][i] = t[i][j];
         };
     }
-  return Tensor<2,dim,Number>(tt);
+  return tt;
 }
-
-#ifndef DOXYGEN
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==1</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,1,Number>
-transpose (const Tensor<2,1,Number> &t)
-{
-  return t;
-}
-
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==2</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,2,Number>
-transpose (const Tensor<2,2,Number> &t)
-{
-  const Number x[2][2] = {{t[0][0], t[1][0]}, {t[0][1], t[1][1]}};
-  return Tensor<2,2,Number>(x);
-}
-
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==3</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,3,Number>
-transpose (const Tensor<2,3,Number> &t)
-{
-  const Number x[3][3] = {{t[0][0], t[1][0], t[2][0]},
-    {t[0][1], t[1][1], t[2][1]},
-    {t[0][2], t[1][2], t[2][2]}
-  };
-  return Tensor<2,3,Number>(x);
-}
-
-#endif // DOXYGEN
 
 
 /**
