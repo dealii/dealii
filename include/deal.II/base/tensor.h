@@ -1551,7 +1551,7 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
 {
   Number res = 0.;
   for (unsigned int i=0; i<dim; ++i)
-    res += contract(src1[i],src2[i]);
+    res += src1[i] * src2[i];
 
   return res;
 }

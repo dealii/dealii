@@ -606,9 +606,9 @@ transform_real_to_unit_cell_internal
         }
 
       // Solve  [f'(x)]d=f(x)
-      Tensor<1,spacedim> delta;
       Tensor<2,spacedim> df_inverse = invert(df);
-      contract (delta, df_inverse, static_cast<const Tensor<1,spacedim>&>(f));
+      Tensor<1, spacedim> delta =
+          df_inverse * static_cast<const Tensor<1, spacedim> &>(f);
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
       std::cout << "   delta=" << delta  << std::endl;
@@ -809,12 +809,7 @@ transform_real_to_unit_cell_internal_codim1
   while (f.norm()>eps && loop++<loop_limit)
     {
       // Solve  [df(x)]d=f(x)
-      Tensor<1,dim1> d;
-      Tensor<2,dim1> df_1;
-
-      df_1 = invert(df);
-      contract (d, df_1, static_cast<const Tensor<1,dim1>&>(f));
-      p_unit -= d;
+      p_unit -= invert(df) * static_cast<const Tensor<1,dim1>&>(f);
 
       for (unsigned int j=0; j<dim1; ++j)
         {
