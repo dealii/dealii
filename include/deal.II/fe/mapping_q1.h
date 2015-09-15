@@ -105,15 +105,6 @@ protected:
    */
   MappingQ1 (const unsigned int degree);
 
-  /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
-  template<int dim_>
-  Point<dim_>
-  transform_real_to_unit_cell_internal_codim1
-  (const typename Triangulation<dim_,dim_+1>::cell_iterator &cell,
-   const Point<dim_+1> &p,
-   const Point<dim_>         &initial_p_unit,
-   InternalData        &mdata) const;
-
   /**
    * Transforms the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.

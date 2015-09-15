@@ -487,34 +487,154 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 namespace
 {
   /**
-   * Transforms a point @p p on the unit cell to the point @p p_real on the
-   * real cell @p cell and returns @p p_real.
-   *
-   * This function is called by @p transform_unit_to_real_cell and multiple
-   * times (through the Newton iteration) by @p
-   * transform_real_to_unit_cell_internal.
-   *
-   * Takes a reference to an @p InternalData that must already include the
-   * shape values at point @p p and the mapping support points of the cell.
-   *
-   * This @p InternalData argument avoids multiple computations of the shape
-   * values at point @p p and especially multiple computations of the mapping
-   * support points.
+   * Using the relative weights of the shape functions evaluated at
+   * one point on the reference cell (and stored in data.shape_values
+   * and accessed via data.shape(0,i)) and the locations of mapping
+   * support points (stored in data.mapping_support_points), compute
+   * the mapped location of that point in real space.
    */
   template<int dim, int spacedim>
   Point<spacedim>
-  transform_unit_to_real_cell_internal (const typename MappingQ1<dim,spacedim>::InternalData &data)
+  compute_mapped_location_of_point (const typename MappingQ1<dim,spacedim>::InternalData &data)
   {
     AssertDimension (data.shape_values.size(),
                      data.mapping_support_points.size());
 
-    // use now the InternalData to
-    // compute the point in real space.
+    // use now the InternalData to compute the point in real space.
     Point<spacedim> p_real;
     for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
       p_real += data.mapping_support_points[i] * data.shape(0,i);
 
     return p_real;
+  }
+
+
+  template<int dim, int spacedim, int dim_>
+  Point<dim_>
+  transform_real_to_unit_cell_internal_codim1
+  (const typename Triangulation<dim_,dim_ + 1>::cell_iterator &cell,
+   const Point<dim_ + 1>                                      &p,
+   const Point<dim_ >                                         &initial_p_unit,
+   typename MappingQ1<dim,spacedim>::InternalData              &mdata)
+  {
+    const unsigned int spacedim1 = dim_+1;
+    const unsigned int dim1 = dim_;
+
+
+    const unsigned int n_shapes=mdata.shape_values.size();
+    (void)n_shapes;
+    Assert(n_shapes!=0, ExcInternalError());
+    Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
+    Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
+
+    std::vector<Point<spacedim1> > &points=mdata.mapping_support_points;
+    Assert(points.size()==n_shapes, ExcInternalError());
+
+    Point<spacedim1> p_minus_F;
+
+    Tensor<1,spacedim1>  DF[dim1];
+    Tensor<1,spacedim1>  D2F[dim1][dim1];
+
+    Point<dim1> p_unit = initial_p_unit;
+    Point<dim1> f;
+    Tensor<2,dim1>  df;
+
+    //Evaluate first and second derivatives
+    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+    for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+      {
+        const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
+        const Tensor<2,dim1>   &hessian_k  = mdata.second_derivative(0,k);
+        const Point<spacedim1> &point_k = points[k];
+
+        for (unsigned int j=0; j<dim1; ++j)
+          {
+            DF[j] += grad_phi_k[j] * point_k;
+            for (unsigned int l=0; l<dim1; ++l)
+              D2F[j][l] += hessian_k[j][l] * point_k;
+          }
+      }
+
+    p_minus_F = p;
+    p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+
+    for (unsigned int j=0; j<dim1; ++j)
+      f[j] = DF[j] * p_minus_F;
+
+    for (unsigned int j=0; j<dim1; ++j)
+      {
+        f[j] = DF[j] * p_minus_F;
+        for (unsigned int l=0; l<dim1; ++l)
+          df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+      }
+
+
+    const double eps = 1.e-12*cell->diameter();
+    const unsigned int loop_limit = 10;
+
+    unsigned int loop=0;
+
+    while (f.norm()>eps && loop++<loop_limit)
+      {
+        // Solve  [df(x)]d=f(x)
+        Tensor<1,dim1> d;
+        Tensor<2,dim1> df_1;
+
+        df_1 = invert(df);
+        contract (d, df_1, static_cast<const Tensor<1,dim1>&>(f));
+        p_unit -= d;
+
+        for (unsigned int j=0; j<dim1; ++j)
+          {
+            DF[j].clear();
+            for (unsigned int l=0; l<dim1; ++l)
+              D2F[j][l].clear();
+          }
+
+        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+          {
+            const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
+            const Tensor<2,dim1>   &hessian_k  = mdata.second_derivative(0,k);
+            const Point<spacedim1> &point_k = points[k];
+
+            for (unsigned int j=0; j<dim1; ++j)
+              {
+                DF[j] += grad_phi_k[j] * point_k;
+                for (unsigned int l=0; l<dim1; ++l)
+                  D2F[j][l] += hessian_k[j][l] * point_k;
+              }
+          }
+
+        //TODO: implement a line search here in much the same way as for
+        // the corresponding function above that does so for codim==0.
+        p_minus_F = p;
+        p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+        for (unsigned int j=0; j<dim1; ++j)
+          {
+            f[j] = DF[j] * p_minus_F;
+            for (unsigned int l=0; l<dim1; ++l)
+              df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+          }
+
+      }
+
+
+    // Here we check that in the last
+    // execution of while the first
+    // condition was already wrong,
+    // meaning the residual was below
+    // eps. Only if the first condition
+    // failed, loop will have been
+    // increased and tested, and thus
+    // have reached the limit.
+    AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+
+    return p_unit;
   }
 }
 
@@ -551,7 +671,7 @@ transform_real_to_unit_cell_internal
 
   mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
 
-  Point<spacedim> p_real = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
+  Point<spacedim> p_real = compute_mapped_location_of_point<dim,spacedim>(mdata);
   Tensor<1,spacedim> f = p_real-p;
 
   // early out if we already have our point
@@ -640,7 +760,7 @@ transform_real_to_unit_cell_internal
           mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
 
           // f(x)
-          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
+          Point<spacedim> p_real_trial = compute_mapped_location_of_point<dim,spacedim>(mdata);
           const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -710,8 +830,8 @@ transform_real_to_unit_cell_internal (const Triangulation<2,3>::cell_iterator &c
                                       InternalData   &mdata) const
 {
   return
-    transform_real_to_unit_cell_internal_codim1(cell, p, initial_p_unit,
-                                                mdata);
+    transform_real_to_unit_cell_internal_codim1<2,3>(cell, p, initial_p_unit,
+                                                     mdata);
 }
 
 
@@ -726,8 +846,8 @@ transform_real_to_unit_cell_internal (const Triangulation<1,2>::cell_iterator &c
                                       InternalData   &mdata) const
 {
   return
-    transform_real_to_unit_cell_internal_codim1(cell, p, initial_p_unit,
-                                                mdata);
+    transform_real_to_unit_cell_internal_codim1<1,2>(cell, p, initial_p_unit,
+                                                     mdata);
 }
 
 
@@ -743,133 +863,6 @@ transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &/
   return Point<1>();
 }
 
-
-
-
-template<int dim, int spacedim>
-template<int dim_>
-Point<dim_>
-MappingQ1<dim,spacedim>::
-transform_real_to_unit_cell_internal_codim1
-(const typename Triangulation<dim_,dim_ + 1>::cell_iterator &cell,
- const Point<dim_ + 1>                                      &p,
- const Point<dim_ >                                         &initial_p_unit,
- typename MappingQ1<dim,spacedim>::InternalData                      &mdata) const
-{
-  const unsigned int spacedim1 = dim_+1;
-  const unsigned int dim1 = dim_;
-
-
-  const unsigned int n_shapes=mdata.shape_values.size();
-  (void)n_shapes;
-  Assert(n_shapes!=0, ExcInternalError());
-  Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
-  Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
-
-  std::vector<Point<spacedim1> > &points=mdata.mapping_support_points;
-  Assert(points.size()==n_shapes, ExcInternalError());
-
-  Point<spacedim1> p_minus_F;
-
-  Tensor<1,spacedim1>  DF[dim1];
-  Tensor<1,spacedim1>  D2F[dim1][dim1];
-
-  Point<dim1> p_unit = initial_p_unit;
-  Point<dim1> f;
-  Tensor<2,dim1>  df;
-
-  //Evaluate first and second derivatives
-  mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-  for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-    {
-      const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
-      const Tensor<2,dim1>   &hessian_k  = mdata.second_derivative(0,k);
-      const Point<spacedim1> &point_k = points[k];
-
-      for (unsigned int j=0; j<dim1; ++j)
-        {
-          DF[j] += grad_phi_k[j] * point_k;
-          for (unsigned int l=0; l<dim1; ++l)
-            D2F[j][l] += hessian_k[j][l] * point_k;
-        }
-    }
-
-  p_minus_F = p;
-  p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
-
-
-  for (unsigned int j=0; j<dim1; ++j)
-    f[j] = DF[j] * p_minus_F;
-
-  for (unsigned int j=0; j<dim1; ++j)
-    {
-      f[j] = DF[j] * p_minus_F;
-      for (unsigned int l=0; l<dim1; ++l)
-        df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-    }
-
-
-  const double eps = 1.e-12*cell->diameter();
-  const unsigned int loop_limit = 10;
-
-  unsigned int loop=0;
-
-  while (f.norm()>eps && loop++<loop_limit)
-    {
-      // Solve  [df(x)]d=f(x)
-      p_unit -= invert(df) * static_cast<const Tensor<1,dim1>&>(f);
-
-      for (unsigned int j=0; j<dim1; ++j)
-        {
-          DF[j].clear();
-          for (unsigned int l=0; l<dim1; ++l)
-            D2F[j][l].clear();
-        }
-
-      mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-      for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-        {
-          const Tensor<1,dim1>   &grad_phi_k = mdata.derivative(0,k);
-          const Tensor<2,dim1>   &hessian_k  = mdata.second_derivative(0,k);
-          const Point<spacedim1> &point_k = points[k];
-
-          for (unsigned int j=0; j<dim1; ++j)
-            {
-              DF[j] += grad_phi_k[j] * point_k;
-              for (unsigned int l=0; l<dim1; ++l)
-                D2F[j][l] += hessian_k[j][l] * point_k;
-            }
-        }
-
-//TODO: implement a line search here in much the same way as for
-// the corresponding function above that does so for codim==0.
-      p_minus_F = p;
-      p_minus_F -= transform_unit_to_real_cell_internal<dim,spacedim>(mdata);
-
-      for (unsigned int j=0; j<dim1; ++j)
-        {
-          f[j] = DF[j] * p_minus_F;
-          for (unsigned int l=0; l<dim1; ++l)
-            df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-        }
-
-    }
-
-
-  // Here we check that in the last
-  // execution of while the first
-  // condition was already wrong,
-  // meaning the residual was below
-  // eps. Only if the first condition
-  // failed, loop will have been
-  // increased and tested, and thus
-  // have reached the limit.
-  AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-
-  return p_unit;
-}
 
 
 
