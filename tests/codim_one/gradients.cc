@@ -157,10 +157,8 @@ void test(std::string filename)
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
-          shape_directional_derivative[i]=
-            contract(
-              fe_values.shape_grad(i,0),
-              cell_tangentials[0]);
+          shape_directional_derivative[i] =
+            fe_values.shape_grad(i, 0) * cell_tangentials[0];
 
           // notice that the dof_index for
           // fe_dgq(0) is the same as that of

@@ -607,8 +607,8 @@ transform_real_to_unit_cell_internal
 
       // Solve  [f'(x)]d=f(x)
       Tensor<2,spacedim> df_inverse = invert(df);
-      Tensor<1, spacedim> delta =
-          df_inverse * static_cast<const Tensor<1, spacedim> &>(f);
+      const Tensor<1, spacedim> delta =
+        df_inverse * static_cast<const Tensor<1, spacedim> &>(f);
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
       std::cout << "   delta=" << delta  << std::endl;
