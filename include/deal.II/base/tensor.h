@@ -352,16 +352,6 @@ public:
   n_independent_components = Tensor<rank_-1,dim>::n_independent_components *dim;
 
   /**
-   * Declare a type that holds real-valued numbers with the same precision
-   * as the template argument to this class. For std::complex<number>, this
-   * corresponds to type number, and it is equal to Number for all other
-   * cases. See also the respective field in Vector<Number>.
-   *
-   * This typedef is used to represent the return type of norms.
-   */
-  typedef typename numbers::NumberTraits<Number>::real_type real_type;
-
-  /**
    * Type of objects encapsulated by this container and returned by
    * operator[](). This is a tensor of lower rank for a general tensor, and
    * a scalar number type for Tensor<1,dim,Number>.
@@ -515,13 +505,14 @@ public:
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the
    * vector.
    */
-  real_type norm () const;
+
+  typename numbers::NumberTraits<Number>::real_type norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
    * the absolute squares of all entries.
    */
-  real_type norm_square () const;
+  typename numbers::NumberTraits<Number>::real_type norm_square() const;
 
   /**
    * Fill a vector with all tensor elements.
@@ -1065,7 +1056,7 @@ Tensor<rank_,dim,Number>::operator - () const
 
 template <int rank_, int dim, typename Number>
 inline
-typename Tensor<rank_,dim,Number>::real_type
+typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_,dim,Number>::norm () const
 {
   return std::sqrt (norm_square());
@@ -1074,10 +1065,10 @@ Tensor<rank_,dim,Number>::norm () const
 
 template <int rank_, int dim, typename Number>
 inline
-typename Tensor<rank_,dim,Number>::real_type
+typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_,dim,Number>::norm_square () const
 {
-  real_type s = real_type();
+  typename numbers::NumberTraits<Number>::real_type s = typename numbers::NumberTraits<Number>::real_type();
   for (unsigned int i=0; i<dim; ++i)
     s += values[i].norm_square();
 
