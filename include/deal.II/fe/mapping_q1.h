@@ -143,37 +143,6 @@ protected:
 };
 
 
-#ifndef DOXYGEN
-// explicit specializations
-
-template<>
-Point<2>
-MappingQ1<2,3>::
-transform_real_to_unit_cell_internal
-(const Triangulation<2,3>::cell_iterator &cell,
- const Point<3> &p,
- const Point<2> &initial_p_unit,
- InternalData    &mdata) const;
-
-template<>
-Point<1>
-MappingQ1<1,2>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1,2>::cell_iterator &cell,
- const Point<2> &p,
- const Point<1> &initial_p_unit,
- InternalData    &mdata) const;
-
-template<>
-Point<1>
-MappingQ1<1,3>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1,3>::cell_iterator &cell,
- const Point<3> &p,
- const Point<1> &initial_p_unit,
- InternalData    &mdata) const;
-
-#endif
 
 /**
  * In order to avoid creation of static MappingQ1 objects at several places in
