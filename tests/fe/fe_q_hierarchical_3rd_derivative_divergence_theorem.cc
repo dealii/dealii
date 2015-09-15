@@ -113,9 +113,8 @@ void test (const Triangulation<dim> &tr,
                   for (unsigned int q=0; q<fe_face_values.n_quadrature_points; ++q)
                     {
                       Tensor<2,dim> hessian = fe_face_values[single_component].hessian (i,q);
-                      Tensor<3,dim> hessian_normal_outer_prod;
-
-                      outer_product(hessian_normal_outer_prod, hessian, fe_face_values.normal_vector(q));
+                      Tensor<3, dim> hessian_normal_outer_prod = outer_product(
+                                                                   hessian, fe_face_values.normal_vector(q));
                       boundary_integral += hessian_normal_outer_prod * fe_face_values.JxW(q);
                     }
                 }
