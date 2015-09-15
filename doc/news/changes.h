@@ -38,10 +38,20 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: All doxygen-generated pages now contain a link to the
-  tutorial in their top-level menus.
+  <li> Cleanup: The two argument variant of cross_product that returned the
+  result by reference as first argument has been removed. Use the function
+  that directly returns the result instead.
   <br>
-  (Wolfgang Bangerth, 2015/09/13)
+  (Matthias Maier, 2015/09/14)
+  </li>
+
+  <li> Cleanup: The following functions in tensor.h have been deprecated:
+  <br>
+  - The three argument variant of cross_product that returns the result by
+    reference as first argument. Use the function that directly returns the
+    result instead.
+  <br>
+  (Matthias Maier, 2015/09/14 - XXX)
   </li>
 
   <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
@@ -293,6 +303,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
+  <br>
+  (Wolfgang Bangerth, 2015/09/13)
+  </li>
+
   <li>Cleanup: Constructors of AdditionalData in various linear solvers are now marked
   explicit. This avoid bugs with implicit conversions like the one fixed in step-40.
   <br>
