@@ -883,7 +883,7 @@ inline
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
-  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
 }
 
 
@@ -892,7 +892,7 @@ inline
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
-  return internal::TensorSubscriptor::subscript(values, i, internal::int2type<dim>());
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
 }
 
 
