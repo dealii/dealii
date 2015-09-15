@@ -804,10 +804,9 @@ namespace internal
         for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
           for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
             {
-              Tensor<2,dim> tmp;
-              outer_product (tmp,
-                             GeometryInfo<dim>::d_linear_shape_function_gradient (xi, i),
-                             GeometryInfo<dim>::d_linear_shape_function_gradient (xi, j));
+              Tensor<2, dim> tmp = outer_product(
+                                     GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i),
+                                     GeometryInfo<dim>::d_linear_shape_function_gradient(xi, j));
               H_k += (object->vertex(i) * object->vertex(j)) * tmp;
             }
 
