@@ -2048,36 +2048,6 @@ scalar_product (const Tensor<2,dim,Number> &t1,
 }
 
 
-/**
- * Compute the determinant of a tensor of arbitrary rank and dimension one.
- * Since this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <int rank, typename Number>
-inline
-Number determinant (const Tensor<rank,1,Number> &t)
-{
-  return determinant(t[0]);
-}
-
-
-/**
- * Compute the determinant of a tensor of rank one and dimension one. Since
- * this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<1,1,Number> &t)
-{
-  return t[0];
-}
-
-
 //@}
 /**
  * @name Special operations on tensors of rank 1
@@ -2140,65 +2110,15 @@ cross_product (const Tensor<1,dim,Number> &src1,
 }
 
 
+//@}
 /**
- * Compute the determinant of a tensor of rank two and dimension one. Since
- * this is a number, the return value is, of course, the number itself.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
+ * @name Special operations on tensors of rank 2
  */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,1,Number> &t)
-{
-  return t[0][0];
-}
+//@{
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,2,Number> &t)
-{
-  return ((t[0][0] * t[1][1]) - (t[1][0] * t[0][1]));
-}
-
-
-/**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,3,Number> &t)
-{
-  // use exactly the same expression with the
-  // same order of operations as for the inverse
-  // to let the compiler use common
-  // subexpression elimination when using
-  // determinant and inverse in nearby code
-  const Number t4 = t[0][0]*t[1][1],
-               t6 = t[0][0]*t[1][2],
-               t8 = t[0][1]*t[1][0],
-               t00 = t[0][2]*t[1][0],
-               t01 = t[0][1]*t[2][0],
-               t04 = t[0][2]*t[2][0],
-               det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                      t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
-  return det;
-}
-
-
-/**
- * Compute the determinant of a tensor or rank 2, here for all dimensions for
- * which no explicit specialization is available above.
+ * Compute the determinant of a tensor or rank 2.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2009
@@ -2207,15 +2127,9 @@ template <int dim, typename Number>
 inline
 Number determinant (const Tensor<2,dim,Number> &t)
 {
-  // compute the determinant using the
-  // Laplace expansion of the
-  // determinant. this may not be the most
-  // efficient algorithm, but it does for
-  // small n.
-  //
-  // for some algorithmic simplicity, we use
-  // the expansion along the last row
-  Number det = 0;
+  // Compute the determinant using the Laplace expansion of the
+  // determinant. We expand along the last row.
+  Number det = Number();
 
   for (unsigned int k=0; k<dim; ++k)
     {
@@ -2224,14 +2138,23 @@ Number determinant (const Tensor<2,dim,Number> &t)
         for (unsigned int j=0; j<dim-1; ++j)
           minor[i][j] = t[i][j<k ? j : j+1];
 
-      const Number cofactor = std::pow (-1., static_cast<Number>(k+1)) *
-                              determinant (minor);
+      const Number cofactor = ((k % 2 == 0) ? -1. : 1.) * determinant(minor);
 
       det += t[dim-1][k] * cofactor;
     }
 
-  return std::pow (-1., static_cast<Number>(dim)) * det;
+  return ((dim % 2 == 0) ? 1. : -1.) * det;
 }
+
+#ifndef DOXYGEN
+// Ground above recursion
+template <typename Number>
+inline
+Number determinant (const Tensor<2,1,Number> &t)
+{
+  return t[0][0];
+}
+#endif
 
 
 /**
@@ -2320,11 +2243,7 @@ invert (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Return the transpose of the given tensor. Since the compiler can perform
- * the return value optimization, and since the size of the return object is
- * known, it is acceptable to return the result by value, rather than by
- * reference as a parameter. Note that there are specializations of this
- * function for <tt>dim==1,2,3</tt>.
+ * Return the transpose of the given tensor.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -2334,7 +2253,7 @@ inline
 Tensor<2,dim,Number>
 transpose (const Tensor<2,dim,Number> &t)
 {
-  Number tt[dim][dim];
+  Tensor<2, dim, Number> tt;
   for (unsigned int i=0; i<dim; ++i)
     {
       tt[i][i] = t[i][i];
@@ -2344,64 +2263,8 @@ transpose (const Tensor<2,dim,Number> &t)
           tt[j][i] = t[i][j];
         };
     }
-  return Tensor<2,dim,Number>(tt);
+  return tt;
 }
-
-#ifndef DOXYGEN
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==1</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,1,Number>
-transpose (const Tensor<2,1,Number> &t)
-{
-  return t;
-}
-
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==2</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,2,Number>
-transpose (const Tensor<2,2,Number> &t)
-{
-  const Number x[2][2] = {{t[0][0], t[1][0]}, {t[0][1], t[1][1]}};
-  return Tensor<2,2,Number>(x);
-}
-
-
-/**
- * Return the transpose of the given tensor. This is the specialization of the
- * general template for <tt>dim==3</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2002
- */
-template <typename Number>
-inline
-Tensor<2,3,Number>
-transpose (const Tensor<2,3,Number> &t)
-{
-  const Number x[3][3] = {{t[0][0], t[1][0], t[2][0]},
-    {t[0][1], t[1][1], t[2][1]},
-    {t[0][2], t[1][2], t[2][2]}
-  };
-  return Tensor<2,3,Number>(x);
-}
-
-#endif // DOXYGEN
 
 
 /**
@@ -2465,3 +2328,4 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/base/tensor_deprecated.h>
 
 #endif
+

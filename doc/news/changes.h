@@ -53,6 +53,7 @@ inconvenience this causes.
   - The three argument variants of outer_product that return the result by
     reference as first argument. Use the function that directly returns the
     result instead.
+  - determinant(dealii::Tensor<rank,1,Number>)
   <br>
   (Matthias Maier, 2015/09/14 - XXX)
   </li>
@@ -312,6 +313,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
+  <br>
+  (Wolfgang Bangerth, 2015/09/13)
+  </li>
+
   <li>Cleanup: Constructors of AdditionalData in various linear solvers are now marked
   explicit. This avoid bugs with implicit conversions like the one fixed in step-40.
   <br>
