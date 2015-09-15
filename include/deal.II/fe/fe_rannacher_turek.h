@@ -71,6 +71,13 @@ public:
   virtual void interpolate(
     std::vector<double> &local_dofs,
     const std::vector<double> &values) const;
+  virtual void interpolate(
+    std::vector<double> &local_dofs,
+    const std::vector<Vector<double> > &values,
+    unsigned int offset) const;
+  virtual void interpolate(
+    std::vector<double> &local_dofs,
+    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 private:
   /**
    * Degree of this element.
