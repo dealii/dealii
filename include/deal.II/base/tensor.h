@@ -2118,47 +2118,6 @@ cross_product (const Tensor<1,dim,Number> &src1,
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,2,Number> &t)
-{
-  return ((t[0][0] * t[1][1]) - (t[1][0] * t[0][1]));
-}
-
-
-/**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <typename Number>
-inline
-Number determinant (const Tensor<2,3,Number> &t)
-{
-  // use exactly the same expression with the
-  // same order of operations as for the inverse
-  // to let the compiler use common
-  // subexpression elimination when using
-  // determinant and inverse in nearby code
-  const Number t4 = t[0][0]*t[1][1],
-               t6 = t[0][0]*t[1][2],
-               t8 = t[0][1]*t[1][0],
-               t00 = t[0][2]*t[1][0],
-               t01 = t[0][1]*t[2][0],
-               t04 = t[0][2]*t[2][0],
-               det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                      t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
-  return det;
-}
-
-
-/**
  * Compute the determinant of a tensor or rank 2.
  *
  * @relates Tensor
@@ -2197,7 +2156,6 @@ Number determinant (const Tensor<2,1,Number> &t)
   return t[0][0];
 }
 #endif
-
 
 
 /**
