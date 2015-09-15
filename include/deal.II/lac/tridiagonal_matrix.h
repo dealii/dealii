@@ -243,8 +243,8 @@ public:
    */
   template <class OUT_>
   void print(OUT_ &s,
-              const unsigned int  width=5,
-              const unsigned int  precision=2) const;
+             const unsigned int  width=5,
+             const unsigned int  precision=2) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
