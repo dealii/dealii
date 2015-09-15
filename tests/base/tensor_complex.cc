@@ -77,7 +77,7 @@ int main ()
 
   deallog << "norm(t)=" << t.norm() << std::endl;
 
-  contract (tt,t,t);
+  tt = t * t;
 
   deallog << "tt=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)

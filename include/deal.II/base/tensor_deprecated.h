@@ -29,6 +29,33 @@ DEAL_II_NAMESPACE_OPEN
 //@{
 
 /**
+ * Single contraction for tensors: contract the last index of a tensor @p
+ * src1 of rank @p rank_1 with the first index of a tensor @p src2 of rank
+ * @p rank_2.
+ *
+ * @deprecated Use operator* instead. It denotes a single contraction.
+ * @relates Tensor
+ */
+template <int rank_1, int rank_2, int dim, typename Number>
+inline
+void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
+               const Tensor<rank_1 ,dim, Number>        &src1,
+               const Tensor<rank_2 ,dim, Number>        &src2) DEAL_II_DEPRECATED;
+
+/**
+ * Contract a tensor of rank 1 with a tensor of rank 1 and return the
+ * result.
+ *
+ * @deprecated Use operator* instead. It denotes a single contraction.
+ * @relates Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+contract (const Tensor<1,dim,Number> &src1,
+          const Tensor<1,dim,OtherNumber> &src2) DEAL_II_DEPRECATED;
+
+/**
  * The cross-product of 2 vectors in 3d.
  *
  * @deprecated Use the cross_product function that returns the value.
@@ -95,6 +122,31 @@ Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
 
 
 #ifndef DOXYGEN
+
+template <int rank_1, int rank_2, int dim, typename Number>
+inline
+void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
+               const Tensor<rank_1 ,dim, Number>        &src1,
+               const Tensor<rank_2 ,dim, Number>        &src2)
+{
+  TensorAccessors::internal::ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, Number> >
+  reordered = TensorAccessors::reordered_index_view<0, rank_2>(src2);
+  TensorAccessors::contract<1, rank_1, rank_2, dim>(dest, src1, reordered);
+}
+
+template <int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number,OtherNumber>::type
+contract (const Tensor<1,dim,Number> &src1,
+          const Tensor<1,dim,OtherNumber> &src2)
+{
+  typename ProductType<Number,OtherNumber>::type res
+    = typename ProductType<Number,OtherNumber>::type();
+  for (unsigned int i=0; i<dim; ++i)
+    res += src1[i] * src2[i];
+
+  return res;
+}
 
 template <int dim, typename Number>
 inline

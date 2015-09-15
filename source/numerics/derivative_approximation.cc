@@ -909,7 +909,7 @@ namespace DerivativeApproximation
       // compute Y^-1 g
       const Tensor<2,dim> Y_inverse = invert(Y);
 
-      contract (derivative, Y_inverse, projected_derivative);
+      derivative = Y_inverse * projected_derivative;
 
       // finally symmetrize the derivative
       DerivativeDescription::symmetrize (derivative);

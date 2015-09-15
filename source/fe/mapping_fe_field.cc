@@ -1785,8 +1785,8 @@ transform_real_to_unit_cell_internal
             df[j][l] = -DF[j] * DF[l];
         }
       // Solve  [f'(x)]d=f(x)
-      Tensor<1, dim> delta;
-      contract (delta, invert(df), static_cast<const Tensor<1,dim>&>(f));
+      const Tensor<1, dim> delta =
+        invert(df) * static_cast<const Tensor<1, dim> &>(f);
       // do a line search
       double step_length = 1;
       do

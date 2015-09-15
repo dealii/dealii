@@ -47,13 +47,16 @@ inconvenience this causes.
 
   <li> Cleanup: The following functions in tensor.h have been deprecated:
   <br>
-  - The three argument variant of cross_product that returns the result by
-    reference as first argument. Use the function that directly returns the
-    result instead.
-  - The three argument variants of outer_product that return the result by
-    reference as first argument. Use the function that directly returns the
-    result instead.
-  - determinant(dealii::Tensor<rank,1,Number>)
+  - The three argument variants of <code>contract</code> that return the
+    result by reference as first argument. Use <code>operator*</code>
+    instead.
+  - The three argument variant of <code>cross_product</code> that returns
+    the result by reference as first argument. Use the function that directly
+    returns the result instead.
+  - The three argument variants of <code>outer_product</code> that return
+    the result by reference as first argument. Use the function that directly
+    returns the result instead.
+  - <code>determinant(dealii::Tensor<rank,1,Number>)</code>
   <br>
   (Matthias Maier, 2015/09/14 - XXX)
   </li>
