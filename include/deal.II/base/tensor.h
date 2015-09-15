@@ -595,8 +595,6 @@ private:
 };
 
 
-
-#ifndef DOXYGEN
 /*---------------------- Inline functions: Tensor<0,dim> ---------------------*/
 
 
@@ -1162,8 +1160,6 @@ Tensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
   ar &values;
 }
-
-#endif /* DOXYGEN */
 
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
@@ -2014,15 +2010,17 @@ Number determinant (const Tensor<2,dim,Number> &t)
   return ((dim % 2 == 0) ? 1. : -1.) * det;
 }
 
-#ifndef DOXYGEN
-// Ground above recursion
+/**
+ * Specialization for dim==1.
+ *
+ * @relates Tensor
+ */
 template <typename Number>
 inline
 Number determinant (const Tensor<2,1,Number> &t)
 {
   return t[0][0];
 }
-#endif
 
 
 /**
