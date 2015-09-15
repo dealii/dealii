@@ -218,14 +218,14 @@ public:
    * Tensor<rank,dim,Number>::norm_square() which returns the square of the
    * Frobenius norm.
    */
-  typename Tensor<1, dim, Number>::real_type square () const;
+  typename numbers::NumberTraits<Number>::real_type square () const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
-  typename Tensor<1, dim, Number>::real_type distance (const Point<dim,Number> &p) const;
+  typename numbers::NumberTraits<Number>::real_type distance (const Point<dim,Number> &p) const;
 
   /**
    * @}
@@ -428,7 +428,7 @@ Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 
 template <int dim, typename Number>
 inline
-typename Tensor<1, dim, Number>::real_type
+typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::square () const
 {
   return this->norm_square();
@@ -438,7 +438,7 @@ Point<dim,Number>::square () const
 
 template <int dim, typename Number>
 inline
-typename Tensor<1, dim, Number>::real_type
+typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::distance (const Point<dim,Number> &p) const
 {
   Number sum = Number();
