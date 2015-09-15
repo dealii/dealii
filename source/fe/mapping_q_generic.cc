@@ -1501,10 +1501,11 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                         Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
 
                         if (dim==1)
-                          cross_product(output_data.normal_vectors[point],
-                                        -DX_t[0]);
+                          output_data.normal_vectors[point] =
+                            cross_product(-DX_t[0]);
                         else //dim == 2
-                          cross_product(output_data.normal_vectors[point],DX_t[0],DX_t[1]);
+                          output_data.normal_vectors[point] =
+                            cross_product(DX_t[0], DX_t[1]);
 
                         output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
 
@@ -1644,10 +1645,12 @@ namespace internal
                                                         -1 : +1);
                     break;
                   case 2:
-                    cross_product (output_data.boundary_forms[i], data.aux[0][i]);
+                    output_data.boundary_forms[i] =
+                      cross_product(data.aux[0][i]);
                     break;
                   case 3:
-                    cross_product (output_data.boundary_forms[i], data.aux[0][i], data.aux[1][i]);
+                    output_data.boundary_forms[i] =
+                      cross_product(data.aux[0][i], data.aux[1][i]);
                     break;
                   default:
                     Assert(false, ExcNotImplemented());
@@ -1675,16 +1678,17 @@ namespace internal
 
                   if (dim==2)
                     {
-                      Tensor<1,spacedim> cell_normal;
                       const DerivativeForm<1,spacedim,dim> DX_t =
                         data.contravariant[point].transpose();
-                      cross_product(cell_normal,DX_t[0],DX_t[1]);
+
+                      Tensor<1, spacedim> cell_normal =
+                        cross_product(DX_t[0], DX_t[1]);
                       cell_normal /= cell_normal.norm();
 
                       // then compute the face normal from the face tangent
                       // and the cell normal:
-                      cross_product (output_data.boundary_forms[point],
-                                     data.aux[0][point], cell_normal);
+                      output_data.boundary_forms[point] =
+                        cross_product(data.aux[0][point], cell_normal);
                     }
                 }
             }

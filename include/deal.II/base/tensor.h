@@ -2158,51 +2158,57 @@ Number determinant (const Tensor<1,1,Number> &t)
 
 
 /**
- * Cross-product in 2d. This is just a rotation by 90 degrees clockwise to
- * compute the outer normal from a tangential vector. This function is defined
- * for all space dimensions to allow for dimension independent programming
- * (e.g. within switches over the space dimension), but may only be called if
- * the actual dimension of the arguments is two (e.g. from the <tt>dim==2</tt>
- * case in the switch).
+ * Returns the cross-product in 2d. This is just a rotation by 90 degrees
+ * clockwise to compute the outer normal from a tangential vector. This
+ * function is defined for all space dimensions to allow for dimension
+ * independent programming (e.g. within switches over the space dimension),
+ * but may only be called if the actual dimension of the arguments is two
+ * (e.g. from the <tt>dim==2</tt> case in the switch).
  *
  * @relates Tensor
  * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number>
 inline
-void
-cross_product (Tensor<1,dim,Number>       &dst,
-               const Tensor<1,dim,Number> &src)
+Tensor<1,dim,Number>
+cross_product (const Tensor<1,dim,Number> &src)
 {
   Assert (dim==2, ExcInternalError());
 
-  dst[0] = src[1];
-  dst[1] = -src[0];
+  Tensor<1, dim, Number> result;
+
+  result[0] = src[1];
+  result[1] = -src[0];
+
+  return result;
 }
 
 
 /**
- * Cross-product of 2 vectors in 3d. This function is defined for all space
- * dimensions to allow for dimension independent programming (e.g. within
- * switches over the space dimension), but may only be called if the actual
- * dimension of the arguments is three (e.g. from the <tt>dim==3</tt> case in
- * the switch).
+ * Returns the cross-product of 2 vectors in 3d. This function is defined
+ * for all space dimensions to allow for dimension independent programming
+ * (e.g. within switches over the space dimension), but may only be called
+ * if the actual dimension of the arguments is three (e.g. from the
+ * <tt>dim==3</tt> case in the switch).
  *
  * @relates Tensor
  * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number>
 inline
-void
-cross_product (Tensor<1,dim,Number>       &dst,
-               const Tensor<1,dim,Number> &src1,
+Tensor<1,dim,Number>
+cross_product (const Tensor<1,dim,Number> &src1,
                const Tensor<1,dim,Number> &src2)
 {
   Assert (dim==3, ExcInternalError());
 
-  dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
-  dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
-  dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
+  Tensor<1, dim, Number> result;
+
+  result[0] = src1[1]*src2[2] - src1[2]*src2[1];
+  result[1] = src1[2]*src2[0] - src1[0]*src2[2];
+  result[2] = src1[0]*src2[1] - src1[1]*src2[0];
+
+  return result;
 }
 
 
@@ -2526,5 +2532,8 @@ linfty_norm (const Tensor<2,dim,Number> &t)
 //@}
 
 DEAL_II_NAMESPACE_CLOSE
+
+// include deprecated non-member functions operating on Tensor
+#include <deal.II/base/tensor_deprecated.h>
 
 #endif
