@@ -2129,7 +2129,7 @@ Number determinant (const Tensor<2,dim,Number> &t)
 {
   // Compute the determinant using the Laplace expansion of the
   // determinant. We expand along the last row.
-  Number det = 0;
+  Number det = Number();
 
   for (unsigned int k=0; k<dim; ++k)
     {
@@ -2138,13 +2138,12 @@ Number determinant (const Tensor<2,dim,Number> &t)
         for (unsigned int j=0; j<dim-1; ++j)
           minor[i][j] = t[i][j<k ? j : j+1];
 
-      const Number cofactor = std::pow (-1., static_cast<Number>(k+1)) *
-                              determinant (minor);
+      const Number cofactor = ((k % 2 == 0) ? -1. : 1.) * determinant(minor);
 
       det += t[dim-1][k] * cofactor;
     }
 
-  return std::pow (-1., static_cast<Number>(dim)) * det;
+  return ((dim % 2 == 0) ? 1. : -1.) * det;
 }
 
 #ifndef DOXYGEN
