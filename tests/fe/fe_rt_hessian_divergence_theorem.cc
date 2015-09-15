@@ -106,9 +106,8 @@ void test (const Triangulation<dim> &tr,
                   for (unsigned int q=0; q<fe_face_values.n_quadrature_points; ++q)
                     {
                       Tensor<1,dim> gradient = fe_face_values[single_component].gradient (i,q);
-                      Tensor<2,dim> gradient_normal_outer_prod;
-
-                      outer_product(gradient_normal_outer_prod, gradient, fe_face_values.normal_vector(q));
+                      Tensor<2, dim> gradient_normal_outer_prod = outer_product(
+                                                                    gradient, fe_face_values.normal_vector(q));
                       boundary_integral += gradient_normal_outer_prod * fe_face_values.JxW(q);
                     }
                 }

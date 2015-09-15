@@ -1506,6 +1506,30 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 }
 
 
+/**
+ * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
+ * tensor of rank $(\text{rank\_1} + \text{rank\_2})$:
+ * @f[
+ *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   = \text{left}_{i_1,..,i_{r1}}\,\text{right}_{j_1,..,j_{r2}.}
+ * @f]
+ *
+ * @relates Tensor
+ * @relates ProductType
+ */
+template <int rank_1, int rank_2, int dim,
+          typename Number, typename OtherNumber>
+inline
+Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>
+outer_product(const Tensor<rank_1, dim, Number> &src1,
+              const Tensor<rank_2, dim, OtherNumber> &src2)
+{
+  typename Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type result;
+  TensorAccessors::contract<0, rank_1, rank_2, dim>(result, src1, src2);
+  return result;
+}
+
+
 //@}
 /**
  * @name To be refactored
@@ -1997,102 +2021,6 @@ contract3 (const Tensor<2,dim,Number> &t1,
         for (unsigned int l=0; l<dim; ++l)
           s += t1[i][j] * t2[i][j][k][l] * t3[k][l];
   return s;
-}
-
-
-/**
- * Form the outer product of two tensors of rank 1 and 1, i.e. <tt>dst[i][j] =
- * src1[i] * src2[j]</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2000
- */
-template <int dim, typename Number>
-void outer_product (Tensor<2,dim,Number>       &dst,
-                    const Tensor<1,dim,Number> &src1,
-                    const Tensor<1,dim,Number> &src2)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      dst[i][j] = src1[i] * src2[j];
-}
-
-
-/**
- * Form the outer product of two tensors of rank 1 and 2, i.e.
- * <tt>dst[i][j][k] = src1[i] * src2[j][k]</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2000
- */
-template <int dim, typename Number>
-void outer_product (Tensor<3,dim,Number>       &dst,
-                    const Tensor<1,dim,Number> &src1,
-                    const Tensor<2,dim,Number> &src2)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        dst[i][j][k] = src1[i] * src2[j][k];
-}
-
-
-/**
- * Form the outer product of two tensors of rank 2 and 1, i.e.
- * <tt>dst[i][j][k] = src1[i][j] * src2[k]</tt>.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2000
- */
-template <int dim, typename Number>
-void outer_product (Tensor<3,dim,Number>       &dst,
-                    const Tensor<2,dim,Number> &src1,
-                    const Tensor<1,dim,Number> &src2)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        dst[i][j][k] = src1[i][j] * src2[k];
-}
-
-
-/**
- * Form the outer product of two tensors of rank 0 and 1, i.e. <tt>dst[i] =
- * src1 * src2[i]</tt>. Of course, this is only a scaling of <tt>src2</tt>,
- * but we consider this an outer product for completeness of these functions
- * and since this is sometimes needed when writing templates that depend on
- * the rank of a tensor, which may sometimes be zero (i.e. a scalar).
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2000
- */
-template <int dim, typename Number>
-void outer_product (Tensor<1,dim,Number>       &dst,
-                    const Number                src1,
-                    const Tensor<1,dim,Number> &src2)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    dst[i] = src1 * src2[i];
-}
-
-
-/**
- * Form the outer product of two tensors of rank 1 and 0, i.e. <tt>dst[i] =
- * src1[i] * src2</tt>. Of course, this is only a scaling of <tt>src1</tt>,
- * but we consider this an outer product for completeness of these functions
- * and since this is sometimes needed when writing templates that depend on
- * the rank of a tensor, which may sometimes be zero (i.e. a scalar).
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2000
- */
-template <int dim, typename Number>
-void outer_product (Tensor<1,dim,Number>       &dst,
-                    const Tensor<1,dim,Number>  src1,
-                    const Number         src2)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    dst[i] = src1[i] * src2;
 }
 
 

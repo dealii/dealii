@@ -29,7 +29,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 //@{
 
-
 /**
  * The cross-product of 2 vectors in 3d.
  *
@@ -43,9 +42,42 @@ cross_product (Tensor<1,dim,Number>       &dst,
                const Tensor<1,dim,Number> &src1,
                const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
 
+/**
+ * Form the outer product of two tensors.
+ *
+ * @deprecated Use the generic version that returns its result instead.
+ * @relates Tensor
+ */
+template <int rank_1, int rank_2, int dim, typename Number>
+void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
+                   const Tensor<rank_1, dim, Number>    &src1,
+                   const Tensor<rank_2, dim, Number>    &src2) DEAL_II_DEPRECATED;
+
+/**
+ * Multiply a Tensor<1,dim,Number> with a Number.
+ *
+ * @deprecated Use operator* instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+void outer_product (Tensor<1,dim,Number>       &dst,
+                    const Number                src1,
+                    const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
+
+/**
+ * Multiply a Tensor<1,dim,Number> with a Number.
+ *
+ * @deprecated Use operator* instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+void outer_product (Tensor<1,dim,Number>       &dst,
+                    const Tensor<1,dim,Number>  src1,
+                    const Number                src2) DEAL_II_DEPRECATED;
+
+//@}
 
 #ifndef DOXYGEN
-
 
 template <int dim, typename Number>
 inline
@@ -57,9 +89,33 @@ cross_product (Tensor<1,dim,Number>       &dst,
   dst = cross_product(src1, src2);
 }
 
-#endif /* DOXYGEN */
+template <int rank_1, int rank_2, int dim, typename Number>
+void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
+                   const Tensor<rank_1, dim, Number>    &src1,
+                   const Tensor<rank_2, dim, Number>    &src2)
+{
+  TensorAccessors::contract<0, rank_1, rank_2, dim>(dst, src1, src2);
+}
 
-//@}
+template <int dim, typename Number>
+void outer_product (Tensor<1,dim,Number>       &dst,
+                    const Number                src1,
+                    const Tensor<1,dim,Number> &src2)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    dst[i] = src1 * src2[i];
+}
+
+template <int dim, typename Number>
+void outer_product (Tensor<1,dim,Number>       &dst,
+                    const Tensor<1,dim,Number>  src1,
+                    const Number         src2)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    dst[i] = src1[i] * src2;
+}
+
+#endif /* DOXYGEN */
 
 DEAL_II_NAMESPACE_CLOSE
 

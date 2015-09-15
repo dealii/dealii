@@ -87,7 +87,7 @@ namespace DerivativeApproximation
        * Likewise declare the data type that holds the derivative projected to a
        * certain directions.
        */
-      typedef double        ProjectedDerivative;
+      typedef Tensor<0,dim> ProjectedDerivative;
 
       /**
        * Given an FEValues object initialized to a cell, and a solution vector,
@@ -891,11 +891,7 @@ namespace DerivativeApproximation
                this_midpoint_value);
           projected_finite_difference /= distance;
 
-          typename DerivativeDescription::Derivative projected_derivative_update;
-          outer_product (projected_derivative_update,
-                         y,
-                         projected_finite_difference);
-          projected_derivative += projected_derivative_update;
+          projected_derivative += outer_product(y, projected_finite_difference);
         };
 
       // can we determine an
