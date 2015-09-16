@@ -48,27 +48,34 @@ inconvenience this causes.
   (David Wells, 2015/09/16)
   </li>
 
-  <li> Cleanup: The two argument variant of cross_product that returned the
-  result by reference as first argument has been removed. Use the function
-  that directly returns the result instead.
+  <li> Cleanup: The two argument variant of cross_product() that returned
+  the result by reference as first argument has been removed. Use the
+  cross_product() function that directly returns the result instead.
+  Further, the exception
+  Tensor<rank,dim,Number>::ExcInvalidTensorContractionIndex
+  has been removed
   <br>
-  (Matthias Maier, 2015/09/14)
+  (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
   <li> Cleanup: The following functions in tensor.h have been deprecated:
   <br>
-  - The three argument variants of <code>contract</code> that return the
-    result by reference as first argument. Use <code>operator*</code>
-    instead.
-  - The three argument variant of <code>cross_product</code> that returns
-    the result by reference as first argument. Use the function that directly
-    returns the result instead.
+  - double_contract(). Use the generic contraction function
+    contract() instead.
+  - The four and five argument variants of contract() that return the
+    result by reference as first argument and take the contraction indices as
+    arguments. use the generic contraction function contract() instead.
+  - The three argument variants of contract() that return the result by
+    reference as first argument. Use <code>operator*</code> instead.
+  - The three argument variant of cross_product() that returns the result
+    by reference as first argument. Use the cross_product() function that
+    directly returns the result instead.
   - The three argument variants of <code>outer_product</code> that return
-    the result by reference as first argument. Use the function that directly
-    returns the result instead.
-  - <code>determinant(dealii::Tensor<rank,1,Number>)</code>
+    the result by reference as first argument. Use the function that
+    directly returns the result instead.
+  - determinant(dealii::Tensor<rank,1,Number>)
   <br>
-  (Matthias Maier, 2015/09/14 - XXX)
+  (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
   <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
