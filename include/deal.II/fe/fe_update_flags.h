@@ -199,10 +199,6 @@ enum UpdateFlags
    * Compute the volume element in each quadrature point.
    */
   update_volume_elements = 0x10000,
-  /**
-   * @deprecated This flag has no effect.
-   */
-  update_support_points = 0x20000,
   //! Jacobian at generalized support points
   /**
    * Update the Jacobian of the mapping in generalized support points.
@@ -276,7 +272,6 @@ STREAM &operator << (STREAM &s, UpdateFlags u)
   if (u & update_contravariant_transformation)            s << "contravariant_transformation|";
   if (u & update_transformation_values)                   s << "transformation_values|";
   if (u & update_transformation_gradients)                s << "transformation_gradients|";
-  if (u & update_support_points)                          s << "support_points|";
   if (u & update_support_jacobians)                       s << "support_jacobians|";
   if (u & update_support_inverse_jacobians)               s << "support_inverse_jacobians|";
   if (u & update_jacobian_pushed_forward_grads)           s << "jacobian_pushed_forward_grads|";
