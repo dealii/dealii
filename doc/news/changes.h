@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The <code>UpdateFlags</code> flag
+  <code>update_support_points</code> has been removed. This flag was deprecated
+  in 2013 and has not done anything in a long time (see the commit message for
+  more information).
+  <br>
+  (David Wells, 2015/09/16)
+  </li>
+
   <li> Cleanup: The two argument variant of cross_product that returned the
   result by reference as first argument has been removed. Use the function
   that directly returns the result instead.
