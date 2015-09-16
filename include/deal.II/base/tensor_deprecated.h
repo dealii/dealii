@@ -118,10 +118,6 @@ template <typename Number>
 inline
 Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
 
-//@}
-
-
-#ifndef DOXYGEN
 
 template <int rank_1, int rank_2, int dim, typename Number>
 inline
@@ -198,7 +194,7 @@ Number determinant (const Tensor<1,1,Number> &t)
   return t[0];
 }
 
-#endif /* DOXYGEN */
+//@}
 
 DEAL_II_NAMESPACE_CLOSE
 
