@@ -270,7 +270,7 @@ private:
   Number value;
 
   /**
-   * Help function for unroll.
+   * Internal helper function for unroll.
    */
   template <typename OtherNumber>
   void unroll_recursion(Vector<OtherNumber> &result,
@@ -576,7 +576,7 @@ private:
   // array always has positive size.
 
   /**
-   * Help function for unroll.
+   * Internal helper function for unroll.
    */
   template <typename OtherNumber>
   void unroll_recursion(Vector<OtherNumber> &result,
@@ -1449,7 +1449,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
 
 /**
  * The dot product (single contraction) for tensors: Return a tensor of
- * rank $(\text{rank\_1} + \text{rank\_2} - 2)$ that is the contraction of
+ * rank $(\text{rank_1} + \text{rank_2} - 2)$ that is the contraction of
  * the last index of a tensor @p src1 of rank @p rank_1 with the first
  * index of a tensor @p src2 of rank @p rank_2:
  * @f[
@@ -1488,7 +1488,7 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 /**
  * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
- * tensor of rank $(\text{rank\_1} + \text{rank\_2})$:
+ * tensor of rank $(\text{rank_1} + \text{rank_2})$:
  * @f[
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \text{left}_{i_1,..,i_{r1}}\,\text{right}_{j_1,..,j_{r2}.}
