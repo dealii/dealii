@@ -150,6 +150,11 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 
+  <li> New: implemented the gradient method for
+  InterpolatedTensorProductGridData
+  <br>
+  (Daniel Shapero, 2015/08/12)
+  </li>
 
 <ol>
   <li> Changed: All doxygen-generated pages now contain a link to the

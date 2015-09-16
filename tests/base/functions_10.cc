@@ -70,7 +70,7 @@ void check ()
   Functions::InterpolatedTensorProductGridData<dim> f(coordinates, data);
 
   // now choose a number of randomly chosen points inside the box and
-  // verify that the functions returned are correct
+  // verify that the function values and gradients returned are correct
   for (unsigned int i=0; i<10; ++i)
     {
       Point<dim> p;
@@ -85,7 +85,18 @@ void check ()
 
       AssertThrow (std::fabs (exact_value - f.value(p)) < 1e-12,
                    ExcInternalError());
-    }
+
+      Tensor<1,dim> exact_gradient;
+      for (unsigned int d=0; d<dim; ++d)
+        {
+          exact_gradient[d] = 1.0;
+          for (unsigned int k=0; k<dim; ++k)
+            exact_gradient[d] *= (k == d) ? 1.0 : p[k];
+        }
+
+      AssertThrow ((exact_gradient - f.gradient(p)).norm() < 1e-12,
+                   ExcInternalError());
+   }
 
   // now also verify that it computes values outside the box correctly, as
   // documented

@@ -2340,8 +2340,86 @@ namespace Functions
                 +
                 p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]+1])*p_unit[1]) * p_unit[2]);
     }
-  }
 
+
+    // Interpolate the gradient of a data value from a table where ix
+    // denotes the lower left endpoint of the interval to interpolate
+    // in, p_unit denotes the point in unit coordinates, and dx
+    // denotes the width of the interval in each dimension.
+    Tensor<1,1> gradient_interpolate (const Table<1,double> &data_values,
+                                      const TableIndices<1> &ix,
+                                      const Point<1>        &p_unit,
+                                      const Point<1>        &dx)
+    {
+      (void)p_unit;
+      Tensor<1,1> grad;
+      grad[0] = (data_values[ix[0]+1] - data_values[ix[0]]) / dx[0];
+      return grad;
+    }
+
+
+    Tensor<1,2> gradient_interpolate (const Table<2,double> &data_values,
+                                      const TableIndices<2> &ix,
+                                      const Point<2>        &p_unit,
+                                      const Point<2>        &dx)
+    {
+      Tensor<1,2> grad;
+      double
+        u00 = data_values[ix[0]][ix[1]],
+        u01 = data_values[ix[0]+1][ix[1]],
+        u10 = data_values[ix[0]][ix[1]+1],
+        u11 = data_values[ix[0]+1][ix[1]+1];
+
+      grad[0] = ((1-p_unit[1])*(u01-u00) + p_unit[1]*(u11-u10))/dx[0];
+      grad[1] = ((1-p_unit[0])*(u10-u00) + p_unit[0]*(u11-u01))/dx[1];
+      return grad;
+    }
+
+
+    Tensor<1,3> gradient_interpolate (const Table<3,double> &data_values,
+                                      const TableIndices<3> &ix,
+                                      const Point<3>        &p_unit,
+                                      const Point<3>        &dx)
+    {
+      Tensor<1,3> grad;
+      double
+        u000 = data_values[ix[0]][ix[1]][ix[2]],
+        u001 = data_values[ix[0]+1][ix[1]][ix[2]],
+        u010 = data_values[ix[0]][ix[1]+1][ix[2]],
+        u100 = data_values[ix[0]][ix[1]][ix[2]+1],
+        u011 = data_values[ix[0]+1][ix[1]+1][ix[2]],
+        u101 = data_values[ix[0]+1][ix[1]][ix[2]+1],
+        u110 = data_values[ix[0]][ix[1]+1][ix[2]+1],
+        u111 = data_values[ix[0]+1][ix[1]+1][ix[2]+1];
+
+      grad[0] = ((1-p_unit[2])
+                 *
+                 ((1-p_unit[1])*(u001-u000) + p_unit[1]*(u011-u010))
+                 +
+                 p_unit[2]
+                 *
+                 ((1-p_unit[1])*(u101-u100) + p_unit[1]*(u111-u110))
+                 )/dx[0];
+      grad[1] = ((1-p_unit[2])
+                 *
+                 ((1-p_unit[0])*(u010-u000) + p_unit[0]*(u011-u001))
+                 +
+                 p_unit[2]
+                 *
+                 ((1-p_unit[0])*(u110-u100) + p_unit[0]*(u111-u101))
+                 )/dx[1];
+      grad[2] = ((1-p_unit[1])
+                 *
+                 ((1-p_unit[0])*(u100-u000) + p_unit[0]*(u101-u001))
+                 +
+                 p_unit[1]
+                 *
+                 ((1-p_unit[0])*(u110-u010) + p_unit[0]*(u111-u011))
+                 )/dx[2];
+
+      return grad;
+    }
+  }
 
   template <int dim>
   InterpolatedTensorProductGridData<dim>::
@@ -2411,6 +2489,45 @@ namespace Functions
                             0.);
 
     return interpolate (data_values, ix, p_unit);
+  }
+
+
+
+  template <int dim>
+  Tensor<1, dim>
+  InterpolatedTensorProductGridData<dim>::gradient(const Point<dim> &p,
+                                                   const unsigned int component) const
+  {
+    (void)component;
+    Assert (component == 0,
+            ExcMessage ("This is a scalar function object, the component can only be zero."));
+
+    // find out where this data point lies
+    TableIndices<dim> ix;
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        ix[d] = (std::lower_bound (coordinate_values[d].begin(),
+                                   coordinate_values[d].end(),
+                                   p[d])
+                 - coordinate_values[d].begin());
+
+        if (ix[d] == coordinate_values[d].size())
+          ix[d] = coordinate_values[d].size()-2;
+        else if (ix[d] > 0)
+          --ix[d];
+      }
+
+    Point<dim> dx;
+    for (unsigned int d=0; d<dim; ++d)
+      dx[d] = coordinate_values[d][ix[d]+1]-coordinate_values[d][ix[d]];
+
+    Point<dim> p_unit;
+    for (unsigned int d=0; d<dim; ++d)
+      p_unit[d] = std::max(std::min((p[d]-coordinate_values[d][ix[d]]) / dx[d],
+                                    1.),
+                           0.0);
+
+    return gradient_interpolate(data_values, ix, p_unit, dx);
   }
 
 
