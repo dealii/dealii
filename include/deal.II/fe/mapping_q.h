@@ -50,7 +50,7 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001, Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim=dim>
-class MappingQ : public MappingQ1<dim,spacedim>
+class MappingQ : public MappingQGeneric<dim,spacedim>
 {
 public:
   /**

@@ -99,13 +99,6 @@ public:
 protected:
 
   /**
-   * Constructor. This constructor is for odd purposes: MappingQ is
-   * derived from this class (for historical reasons) and it needs a
-   * way to pass down the "true" polynomial degree of the mapping.
-   */
-  MappingQ1 (const unsigned int degree);
-
-  /**
    * Computes the support points of the mapping. For @p MappingQ1 these are
    * the vertices, as obtained by calling Mapping::get_vertices().
    *
