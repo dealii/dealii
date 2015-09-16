@@ -1237,7 +1237,6 @@ struct ProductType<Tensor<rank,dim,T>,U>
  * multiplies @p object with it.
  *
  * @relates Tensor<0,dim,Number>
- * @relates ProductType
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1257,7 +1256,6 @@ operator * (const Other                 object,
  * multiplies @p object with it.
  *
  * @relates Tensor<0,dim,Number>
- * @relates ProductType
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1277,7 +1275,6 @@ operator * (const Tensor<0,dim,Number> &t,
  * It returns an unwrapped number of product type.
  *
  * @relates Tensor<0,dim,Number>
- * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1294,8 +1291,6 @@ operator * (const Tensor<0, dim, Number>      &src1,
  * Division of a tensor of rank 0 by a scalar number.
  *
  * @relates Tensor<0,dim,Number>
- * @relates EnableIfScalar
- * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1311,7 +1306,6 @@ operator / (const Tensor<0,dim,Number> &t,
  * Add two tensors of rank 0.
  *
  * @relates Tensor<0,dim,Number>
- * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1326,7 +1320,6 @@ operator+ (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
  * Subtract two tensors of rank 0.
  *
  * @relates Tensor<0,dim,Number>
- * @relates ProductType
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1346,8 +1339,6 @@ operator- (const Tensor<0,dim,Number> &p, const Tensor<0,dim,OtherNumber> &q)
  * documentation of EnableIfScalar for details.
  *
  * @relates Tensor
- * @relates EnableIfScalar
- * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1374,8 +1365,6 @@ operator * (const Tensor<rank,dim,Number> &t,
  * documentation of EnableIfScalar for details.
  *
  * @relates Tensor
- * @relates EnableIfScalar
- * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1396,8 +1385,6 @@ operator * (const Number                        factor,
  * arguments and the return type.
  *
  * @relates Tensor
- * @relates EnableIfScalar
- * @relates ProductType
  */
 template <int rank, int dim,
           typename Number,
@@ -1419,7 +1406,6 @@ operator / (const Tensor<rank,dim,Number> &t,
  * Addition of two tensors of general @tparam rank.
  *
  * @relates Tensor
- * @relates ProductType
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1439,7 +1425,6 @@ operator+ (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * Subtraction of two tensors of general @tparam rank.
  *
  * @relates Tensor
- * @relates ProductType
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1483,7 +1468,6 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * number is returned as an unwrapped number type.
  *
  * @relates Tensor
- * @relates ProductType
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
@@ -1511,7 +1495,6 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * @f]
  *
  * @relates Tensor
- * @relates ProductType
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
