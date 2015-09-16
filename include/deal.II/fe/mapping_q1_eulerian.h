@@ -101,7 +101,10 @@ public:
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**
-   * Return the mapped vertices of the cell.
+   * Return the mapped vertices of the cell. For the current class, this function does
+   * not use the support points from the geometry of the current cell but
+   * instead evaluates an externally given displacement field in addition to
+   * the geometry of the cell.
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
@@ -145,6 +148,15 @@ protected:
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                   internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  /**
+   * Compute the support points of the mapping. For the current class, these are
+   * the vertices, as obtained by calling Mapping::get_vertices().
+   */
+  virtual
+  void
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                 std::vector<Point<spacedim> > &a) const;
 
   /**
    * Reference to the vector of shifts.

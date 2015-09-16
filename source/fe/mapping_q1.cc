@@ -181,22 +181,6 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
-void
-MappingQ1<dim,spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  std::vector<Point<spacedim> > &a) const
-{
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  vertices = this->get_vertices(cell);
-
-  a.resize(GeometryInfo<dim>::vertices_per_cell);
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a[i] = vertices[i];
-}
-
-
-
 /**
  * Compute an initial guess to pass to the Newton method in
  * transform_real_to_unit_cell.  For the initial guess we proceed in the
@@ -453,7 +437,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       //MappingQ1. this doesn't currently work because we here really need
       //a Q1 InternalData, but MappingQGeneric produces one with the
       //polynomial degree of the MappingQ
-      std_cxx11::unique_ptr<InternalData> mdata (new InternalData(1));
+      std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData>
+      mdata (new typename MappingQGeneric<dim,spacedim>::InternalData(1));
       mdata->initialize (this->requires_update_flags (update_flags), point_quadrature, 1);
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);

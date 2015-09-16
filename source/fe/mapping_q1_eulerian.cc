@@ -88,6 +88,24 @@ get_vertices
 
 
 
+template<int dim, class EulerVectorType, int spacedim>
+void
+MappingQ1Eulerian<dim,EulerVectorType,spacedim>::
+compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               std::vector<Point<spacedim> > &a) const
+{
+  const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  vertices = this->get_vertices(cell);
+
+  a.resize(GeometryInfo<dim>::vertices_per_cell);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    a[i] = vertices[i];
+}
+
+
+
+
+
 template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim,EulerVectorType,spacedim> *
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const

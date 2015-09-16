@@ -78,41 +78,6 @@ public:
   /**
    * @}
    */
-
-
-  /**
-   * @name Interface with FEValues
-   * @{
-   */
-
-public:
-  /**
-   * Use the InternalData class of the base class without modification
-   * and additions.
-   */
-  typedef typename MappingQGeneric<dim,spacedim>::InternalData InternalData;
-
-  /**
-   * @}
-   */
-
-protected:
-
-  /**
-   * Computes the support points of the mapping. For @p MappingQ1 these are
-   * the vertices, as obtained by calling Mapping::get_vertices().
-   *
-   * By default, that function just computes the locations of the vertices as
-   * reported by the Triangulation. However, other classes may override this
-   * function. In particular, the MappingQ1Eulerian class does exactly this by
-   * not computing the support points from the geometry of the current cell but
-   * instead evaluating an externally given displacement field in addition to
-   * the geometry of the cell.
-   */
-  virtual
-  void
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                 std::vector<Point<spacedim> > &a) const;
 };
 
 
