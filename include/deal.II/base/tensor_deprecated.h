@@ -75,6 +75,7 @@ cross_product (Tensor<1,dim,Number>       &dst,
  * @relates Tensor
  */
 template <int rank_1, int rank_2, int dim, typename Number>
+inline
 void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
                    const Tensor<rank_1, dim, Number>    &src1,
                    const Tensor<rank_2, dim, Number>    &src2) DEAL_II_DEPRECATED;
@@ -86,6 +87,7 @@ void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
  * @relates Tensor
  */
 template <int dim, typename Number>
+inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Number                src1,
                     const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
@@ -97,6 +99,7 @@ void outer_product (Tensor<1,dim,Number>       &dst,
  * @relates Tensor
  */
 template <int dim, typename Number>
+inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Tensor<1,dim,Number>  src1,
                     const Number                src2) DEAL_II_DEPRECATED;
@@ -118,6 +121,9 @@ template <typename Number>
 inline
 Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
 
+//@}
+
+/* ----------------------------- Definitions: ------------------------------- */
 
 template <int rank_1, int rank_2, int dim, typename Number>
 inline
@@ -155,6 +161,7 @@ cross_product (Tensor<1,dim,Number>       &dst,
 }
 
 template <int rank_1, int rank_2, int dim, typename Number>
+inline
 void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
                    const Tensor<rank_1, dim, Number>    &src1,
                    const Tensor<rank_2, dim, Number>    &src2)
@@ -163,6 +170,7 @@ void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
 }
 
 template <int dim, typename Number>
+inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Number                src1,
                     const Tensor<1,dim,Number> &src2)
@@ -172,6 +180,7 @@ void outer_product (Tensor<1,dim,Number>       &dst,
 }
 
 template <int dim, typename Number>
+inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Tensor<1,dim,Number>  src1,
                     const Number         src2)
@@ -193,8 +202,6 @@ Number determinant (const Tensor<1,1,Number> &t)
 {
   return t[0];
 }
-
-//@}
 
 DEAL_II_NAMESPACE_CLOSE
 

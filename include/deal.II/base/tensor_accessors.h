@@ -65,6 +65,8 @@ DEAL_II_NAMESPACE_OPEN
  * of such objects.
  *
  * @ingroup geomprimitives
+ *
+ * @author Matthias Maier, 2015
  */
 namespace TensorAccessors
 {
@@ -172,21 +174,13 @@ namespace TensorAccessors
    *
    * @tparam index The index to be shifted to the end. Indices are counted
    * from 0, thus the valid range is $0\le\text{index}<\text{rank}$.
-   * @tparam rank Rank of the tensorial object @param t
+   * @tparam rank Rank of the tensorial object @p t
    * @tparam T A tensorial object of rank @p rank. @p T must
    * provide a local typedef <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const)
-   * reference of <code>value_type</code>:
-   * @code
-   *   class T
-   *   {
-   *     typedef ... value_type
-   *     value_type & operator[](unsigned int);
-   *     const value_type & operator[](unsigned int) const;
-   *   };
-   * @endcode
+   * reference of <code>value_type</code>.
    *
-   * @relates ReorderedIndexView
+   * @author Matthias Maier, 2015
    */
   template <int index, int rank, typename T>
   internal::ReorderedIndexView<index, rank, T>
@@ -215,11 +209,13 @@ namespace TensorAccessors
    * local typedef <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const)
    * reference of <code>value_type</code>. Further, its tensorial rank must
-   * be equal or greater than @p rank
+   * be equal or greater than @p rank.
    *
    * @tparam ArrayType An array like object, such as std::array, or
    * dealii::TableIndices  that stores at least @p rank indices that can be
    * accessed via operator[]().
+   *
+   * @author Matthias Maier, 2015
    */
   template<int rank, typename T, typename ArrayType> typename
   ReturnType<rank, T>::value_type &
@@ -264,6 +260,8 @@ namespace TensorAccessors
    * @note The Types @p T1, @p T2, and @p T3 must have rank
    * rank_1 + rank_2 - 2 * no_contr, rank_1, or rank_2, respectively.
    * Obviously, no_contr must be less or equal than rank_1 and rank_2.
+   *
+   * @author Matthias Maier, 2015
    */
   template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
   void contract(T1 &result, const T2 &left, const T3 &right)
@@ -308,6 +306,8 @@ namespace TensorAccessors
    * @note The Types @p T2, @p T3, and @p T4 must have
    * rank rank_1, rank_1 + rank_2, and rank_3, respectively. @p T1
    * must be a scalar type.
+   *
+   * @author Matthias Maier, 2015
    */
   template <int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3, typename T4>
   T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
