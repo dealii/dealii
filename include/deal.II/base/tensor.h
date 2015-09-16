@@ -1509,9 +1509,9 @@ contract3 (const Tensor<rank_1, dim, T1> &left,
            const Tensor<rank_2, dim, T3> &right)
 {
   typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
-      return_type;
+  return_type;
   return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(
-      left, middle, right);
+           left, middle, right);
 }
 
 
