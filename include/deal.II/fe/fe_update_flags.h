@@ -199,16 +199,6 @@ enum UpdateFlags
    * Compute the volume element in each quadrature point.
    */
   update_volume_elements = 0x10000,
-  //! Jacobian at generalized support points
-  /**
-   * Update the Jacobian of the mapping in generalized support points.
-   */
-  update_support_jacobians = 0x40000,
-  //! inverse Jacobian at generalized support points
-  /**
-   * Update the inverse Jacobian of the mapping in generalized support points.
-   */
-  update_support_inverse_jacobians = 0x80000,
   /**
    * Compute the derivatives of the Jacobian of the transformation pushed
    * forward to the real cell coordinates.
@@ -272,8 +262,6 @@ STREAM &operator << (STREAM &s, UpdateFlags u)
   if (u & update_contravariant_transformation)            s << "contravariant_transformation|";
   if (u & update_transformation_values)                   s << "transformation_values|";
   if (u & update_transformation_gradients)                s << "transformation_gradients|";
-  if (u & update_support_jacobians)                       s << "support_jacobians|";
-  if (u & update_support_inverse_jacobians)               s << "support_inverse_jacobians|";
   if (u & update_jacobian_pushed_forward_grads)           s << "jacobian_pushed_forward_grads|";
   if (u & update_jacobian_2nd_derivatives)                s << "jacobian_2nd_derivatives|";
   if (u & update_jacobian_pushed_forward_2nd_derivatives) s << "jacobian_pushed_forward_2nd_derivatives|";
