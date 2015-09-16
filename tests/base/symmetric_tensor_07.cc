@@ -56,7 +56,8 @@ void test ()
       as[i][j] = aa[i][j] = (1. + (i+1)*(j+1));
 
   bs = ts * as;
-  double_contract (ba, ta, aa);
+  // contract indices 2 <-> 0, 3 <-> 1
+  ba = contract<2, 0, 3, 1>(ta, aa);
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)

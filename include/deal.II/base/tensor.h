@@ -1442,7 +1442,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
 
 //@}
 /**
- * @name Contraction operations on Tensors
+ * @name Contraction operations and the outer product for tensor objects
  */
 //@{
 
@@ -1468,6 +1468,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * number is returned as an unwrapped number type.
  *
  * @relates Tensor
+ * @author Matthias Maier, 2015
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
@@ -1487,7 +1488,32 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * Full contraction of three tensors: Return a scalar Number that is the
+ * The scalar product, or (generalized) Frobenius inner product of two
+ * tensors of equal rank: Return a scalar number that is the result of a
+ * full contraction of a tensor @p left and @p right:
+ * @f[
+ *   \sum_{i_1,..,i_{r}
+ *   \text{left}_{i_1,..,i_r}
+ *   \text{right}_{i_1,..,i_r}
+ * @f]
+ *
+ * @relates Tensor
+ * @author Matthias Maier, 2015
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+typename ProductType<Number, OtherNumber>::type
+scalar_product (const Tensor<rank, dim, Number> &left,
+                const Tensor<rank, dim, OtherNumber> &right)
+{
+  typename ProductType<Number, OtherNumber>::type result;
+  TensorAccessors::contract<rank, rank, rank, dim>(result, left, right);
+  return result;
+}
+
+
+/**
+ * Full contraction of three tensors: Return a scalar number that is the
  * result of a full contraction of a tensor @p left of rank @p rank_1, a
  * tensor @p middle of rank $(\text{rank_1}+\text{rank_2})$ and a tensor @p
  * right of rank @p rank_2:
@@ -1524,6 +1550,7 @@ contract3 (const Tensor<rank_1, dim, T1> &left,
  * @f]
  *
  * @relates Tensor
+ * @author Matthias Maier, 2015
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
@@ -1535,300 +1562,6 @@ outer_product(const Tensor<rank_1, dim, Number> &src1,
   typename Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type result;
   TensorAccessors::contract<0, rank_1, rank_2, dim>(result, src1, src2);
   return result;
-}
-
-
-//@}
-/**
- * @name To be refactored
- */
-//@{
-
-
-/**
- * Double contract two tensors of rank 2, thus computing the Frobenius inner
- * product <tt> sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
- *
- * @relates Tensor
- * @author Guido Kanschat, 2000
- */
-template <int dim, typename Number>
-inline
-Number double_contract (const Tensor<2, dim, Number> &src1,
-                        const Tensor<2, dim, Number> &src2)
-{
-  Number res = 0.;
-  for (unsigned int i=0; i<dim; ++i)
-    res += src1[i] * src2[i];
-
-  return res;
-}
-
-
-/**
- * Contract a tensor of rank 2 with a tensor of rank 2. The contraction is
- * performed over index <tt>index1</tt> of the first tensor, and
- * <tt>index2</tt> of the second tensor. Thus, if <tt>index1==2</tt>,
- * <tt>index2==1</tt>, the result is the usual contraction, but if for example
- * <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is <tt>dest[i][k] =
- * sum_j src1[j][i] src2[k][j]</tt>.
- *
- * Note that the number of the index is counted from 1 on, not from zero as
- * usual.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <int dim, typename Number>
-inline
-void contract (Tensor<2,dim,Number>       &dest,
-               const Tensor<2,dim,Number> &src1,   const unsigned int index1,
-               const Tensor<2,dim,Number> &src2,   const unsigned int index2)
-{
-  dest.clear ();
-
-  switch (index1)
-    {
-    case 1:
-      switch (index2)
-        {
-        case 1:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                dest[i][j] += src1[k][i] * src2[k][j];
-          break;
-        case 2:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                dest[i][j] += src1[k][i] * src2[j][k];
-          break;
-
-        default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
-        };
-      break;
-    case 2:
-      switch (index2)
-        {
-        case 1:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                dest[i][j] += src1[i][k] * src2[k][j];
-          break;
-        case 2:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                dest[i][j] += src1[i][k] * src2[j][k];
-          break;
-
-        default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
-        };
-      break;
-
-    default:
-      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
-    };
-}
-
-
-/**
- * Contract a tensor of rank 3 with a tensor of rank 1. The contraction is
- * performed over index <tt>index1</tt> of the first tensor.
- *
- * Note that the number of the index is counted from 1 on, not from zero as
- * usual.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 1998
- */
-template <int dim, typename Number>
-inline
-void contract (Tensor<2,dim,Number>       &dest,
-               const Tensor<3,dim,Number> &src1,   const unsigned int index1,
-               const Tensor<1,dim,Number> &src2)
-{
-  dest.clear ();
-
-  switch (index1)
-    {
-    case 1:
-      for (unsigned int i=0; i<dim; ++i)
-        for (unsigned int j=0; j<dim; ++j)
-          for (unsigned int k=0; k<dim; ++k)
-            dest[i][j] += src1[k][i][j] * src2[k];
-      break;
-
-    case 2:
-      for (unsigned int i=0; i<dim; ++i)
-        for (unsigned int j=0; j<dim; ++j)
-          for (unsigned int k=0; k<dim; ++k)
-            dest[i][j] += src1[i][k][j] * src2[k];
-      break;
-
-    case 3:
-      for (unsigned int i=0; i<dim; ++i)
-        for (unsigned int j=0; j<dim; ++j)
-          for (unsigned int k=0; k<dim; ++k)
-            dest[i][j] += src1[i][j][k] * src2[k];
-      break;
-
-    default:
-      Assert (false,
-              (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
-    };
-}
-
-
-/**
- * Contract a tensor of rank 3 with a tensor of rank 2. The contraction is
- * performed over index <tt>index1</tt> of the first tensor, and
- * <tt>index2</tt> of the second tensor. Thus, if <tt>index1==3</tt>,
- * <tt>index2==1</tt>, the result is the usual contraction, but if for example
- * <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
- * <tt>dest[i][j][k] = sum_l src1[l][i][j] src2[k][l]</tt>.
- *
- * Note that the number of the index is counted from 1 on, not from zero as
- * usual.
- *
- * @relates Tensor
- */
-template <int dim, typename Number>
-inline
-void contract (Tensor<3,dim,Number>       &dest,
-               const Tensor<3,dim,Number> &src1, const unsigned int index1,
-               const Tensor<2,dim,Number> &src2, const unsigned int index2)
-{
-  dest.clear ();
-
-  switch (index1)
-    {
-    case 1:
-      switch (index2)
-        {
-        case 1:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[l][i][j] * src2[l][k];
-          break;
-        case 2:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[l][i][j] * src2[k][l];
-          break;
-        default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
-        }
-
-      break;
-    case 2:
-      switch (index2)
-        {
-        case 1:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[i][l][j] * src2[l][k];
-          break;
-        case 2:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[i][l][j] * src2[k][l];
-          break;
-        default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
-        }
-
-      break;
-    case 3:
-      switch (index2)
-        {
-        case 1:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[i][j][l] * src2[l][k];
-          break;
-        case 2:
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              for (unsigned int k=0; k<dim; ++k)
-                for (unsigned int l=0; l<dim; ++l)
-                  dest[i][j][k] += src1[i][j][l] * src2[k][l];
-          break;
-        default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
-        }
-
-      break;
-    default:
-      Assert (false,
-              (typename Tensor<3,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
-    }
-}
-
-
-/**
- * Contract the last two indices of <tt>src1</tt> with the two indices
- * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector product
- * analog operation between tensors of rank 4 and rank 2.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2005
- */
-template <int dim, typename Number>
-inline
-void double_contract (Tensor<2,dim,Number>       &dest,
-                      const Tensor<4,dim,Number> &src1,
-                      const Tensor<2,dim,Number> &src2)
-{
-  dest.clear ();
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        for (unsigned int l=0; l<dim; ++l)
-          dest[i][j] += src1[i][j][k][l] * src2[k][l];
-}
-
-
-/**
- * Compute the scalar product $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two
- * tensors $a,b$ of rank 2. We don't use <code>operator*</code> for this
- * operation since the product between two tensors is usually assumed to be
- * the contraction over the last index of the first tensor and the first index
- * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
- *
- * @relates Tensor
- * @author Wolfgang Bangerth, 2008
- */
-template <int dim, typename Number>
-inline
-Number
-scalar_product (const Tensor<2,dim,Number> &t1,
-                const Tensor<2,dim,Number> &t2)
-{
-  Number s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      s += t1[i][j] * t2[i][j];
-  return s;
 }
 
 
@@ -2111,7 +1844,7 @@ linfty_norm (const Tensor<2,dim,Number> &t)
 DEAL_II_NAMESPACE_CLOSE
 
 // include deprecated non-member functions operating on Tensor
-#include <deal.II/base/tensor_deprecated.h>
+// #include <deal.II/base/tensor_deprecated.h>
 
 #endif
 

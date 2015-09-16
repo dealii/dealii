@@ -28,6 +28,88 @@ DEAL_II_NAMESPACE_OPEN
  */
 //@{
 
+
+/**
+ * Double contract two tensors of rank 2, thus computing the Frobenius inner
+ * product <tt>sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
+ *
+ * @deprecated Use the contract function that takes indices as template
+ *   arguments and returns its result instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+Number double_contract (const Tensor<2, dim, Number> &src1,
+                        const Tensor<2, dim, Number> &src2) DEAL_II_DEPRECATED;
+
+
+/**
+ * Contract the last two indices of <tt>src1</tt> with the two indices
+ * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector product
+ * analog operation between tensors of rank 4 and rank 2.
+ *
+ * @deprecated Use the contract function that takes indices as template
+ *   arguments and returns its result instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+void double_contract (Tensor<2,dim,Number>       &dest,
+                      const Tensor<4,dim,Number> &src1,
+                      const Tensor<2,dim,Number> &src2) DEAL_II_DEPRECATED;
+
+/**
+ * Contract a tensor of rank 2 with a tensor of rank 2. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor, and
+ * <tt>index2</tt> of the second tensor. Note that the number of the index
+ * is counted from 1 on, not from zero as usual.
+ *
+ * @deprecated Use the contract function that takes indices as template
+ *   arguments and returns its result instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+void contract (Tensor<2,dim,Number>       &dest,
+               const Tensor<2,dim,Number> &src1,
+               const unsigned int          index1,
+               const Tensor<2,dim,Number> &src2,
+               const unsigned int          index3) DEAL_II_DEPRECATED;
+
+/**
+ * Contract a tensor of rank 3 with a tensor of rank 1. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor. Note that the
+ * number of the index is counted from 1 on, not from zero as usual.
+ *
+ * @deprecated Use the contract function that takes indices as template
+ *   arguments and returns its result instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+void contract (Tensor<2,dim,Number>       &dest,
+               const Tensor<3,dim,Number> &src1,
+               const unsigned int          index1,
+               const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
+
+/**
+ * Contract a tensor of rank 3 with a tensor of rank 2. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor, and
+ * <tt>index2</tt> of the second tensor. Note that the number of the index
+ * is counted from 1 on, not from zero as usual.
+ *
+ * @deprecated Use the contract function that takes indices as template
+ *   arguments and returns its result instead.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+void contract (Tensor<3,dim,Number>       &dest,
+               const Tensor<3,dim,Number> &src1,
+               const unsigned int          index1,
+               const Tensor<2,dim,Number> &src2,
+               const unsigned int          index2) DEAL_II_DEPRECATED;
+
 /**
  * Single contraction for tensors: contract the last index of a tensor @p
  * src1 of rank @p rank_1 with the first index of a tensor @p src2 of rank
@@ -124,6 +206,212 @@ Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
 //@}
 
 /* ----------------------------- Definitions: ------------------------------- */
+
+template <int dim, typename Number>
+inline
+Number double_contract (const Tensor<2, dim, Number> &src1,
+                        const Tensor<2, dim, Number> &src2)
+{
+  Number res = 0.;
+  for (unsigned int i=0; i<dim; ++i)
+    res += src1[i] * src2[i];
+
+  return res;
+}
+
+template <int dim, typename Number>
+inline
+void double_contract (Tensor<2,dim,Number>       &dest,
+                      const Tensor<4,dim,Number> &src1,
+                      const Tensor<2,dim,Number> &src2)
+{
+  dest.clear ();
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+        for (unsigned int l=0; l<dim; ++l)
+          dest[i][j] += src1[i][j][k][l] * src2[k][l];
+}
+
+template <int dim, typename Number>
+inline
+void contract (Tensor<2,dim,Number>       &dest,
+               const Tensor<2,dim,Number> &src1,   const unsigned int index1,
+               const Tensor<2,dim,Number> &src2,   const unsigned int index2)
+{
+  dest.clear ();
+
+  switch (index1)
+    {
+    case 1:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[k][i] * src2[k][j];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[k][i] * src2[j][k];
+          break;
+
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+        };
+      break;
+    case 2:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[i][k] * src2[k][j];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                dest[i][j] += src1[i][k] * src2[j][k];
+          break;
+
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+        };
+      break;
+
+    default:
+      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+    };
+}
+
+template <int dim, typename Number>
+inline
+void contract (Tensor<2,dim,Number>       &dest,
+               const Tensor<3,dim,Number> &src1,   const unsigned int index1,
+               const Tensor<1,dim,Number> &src2)
+{
+  dest.clear ();
+
+  switch (index1)
+    {
+    case 1:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[k][i][j] * src2[k];
+      break;
+
+    case 2:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[i][k][j] * src2[k];
+      break;
+
+    case 3:
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            dest[i][j] += src1[i][j][k] * src2[k];
+      break;
+
+    default:
+      Assert (false,
+              (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+    };
+}
+
+template <int dim, typename Number>
+inline
+void contract (Tensor<3,dim,Number>       &dest,
+               const Tensor<3,dim,Number> &src1, const unsigned int index1,
+               const Tensor<2,dim,Number> &src2, const unsigned int index2)
+{
+  dest.clear ();
+
+  switch (index1)
+    {
+    case 1:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[l][i][j] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[l][i][j] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+        }
+
+      break;
+    case 2:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][l][j] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][l][j] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+        }
+
+      break;
+    case 3:
+      switch (index2)
+        {
+        case 1:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][j][l] * src2[l][k];
+          break;
+        case 2:
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int k=0; k<dim; ++k)
+                for (unsigned int l=0; l<dim; ++l)
+                  dest[i][j][k] += src1[i][j][l] * src2[k][l];
+          break;
+        default:
+          Assert (false,
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+        }
+
+      break;
+    default:
+      Assert (false,
+              (typename Tensor<3,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+    }
+}
 
 template <int rank_1, int rank_2, int dim, typename Number>
 inline
