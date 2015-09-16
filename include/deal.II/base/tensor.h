@@ -1487,6 +1487,35 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
+ * Full contraction of three tensors: Return a scalar Number that is the
+ * result of a full contraction of a tensor @p left of rank @p rank_1, a
+ * tensor @p middle of rank $(\text{rank_1}+\text{rank_2})$ and a tensor @p
+ * right of rank @p rank_2:
+ * @f[
+ *   \sum_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{left}_{i_1,..,i_{r1}}
+ *   \text{middle}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{right}_{j_1,..,j_{r2}}
+ * @f]
+ *
+ * @relates Tensor
+ * @author Matthias Maier, 2015
+ */
+template <int rank_1, int rank_2, int dim,
+          typename T1, typename T2, typename T3>
+typename ProductType<T1, typename ProductType<T2, T3>::type>::type
+contract3 (const Tensor<rank_1, dim, T1> &left,
+           const Tensor<rank_1 + rank_2, dim, T2> &middle,
+           const Tensor<rank_2, dim, T3> &right)
+{
+  typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
+  return_type;
+  return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(
+           left, middle, right);
+}
+
+
+/**
  * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
  * tensor of rank $(\text{rank_1} + \text{rank_2})$:
  * @f[
@@ -1776,98 +1805,6 @@ void double_contract (Tensor<2,dim,Number>       &dest,
       for (unsigned int k=0; k<dim; ++k)
         for (unsigned int l=0; l<dim; ++l)
           dest[i][j] += src1[i][j][k][l] * src2[k][l];
-}
-
-
-/**
- * Contract three tensors, corresponding to the matrix vector product
- * <i>u<sup>T</sup> A v</i>.
- *
- * @relates Tensor
- * @author Guido Kanschat, 2004
- */
-template <int dim, typename Number>
-inline
-Number contract3 (const Tensor<1,dim,Number> &u,
-                  const Tensor<2,dim,Number> &A,
-                  const Tensor<1,dim,Number> &v)
-{
-  Number result = 0.;
-
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      result += u[i] * A[i][j] * v[j];
-  return result;
-}
-
-
-/**
- * Compute the contraction of three tensors $s=\sum_{i,j,k}
- * a_{i}b_{ijk}c_{jk}$.
- *
- * @relates Tensor
- * @author Toby D. Young, 2011
- */
-template <int dim, typename Number>
-inline
-Number
-contract3 (const Tensor<1,dim,Number> &t1,
-           const Tensor<3,dim,Number> &t2,
-           const Tensor<2,dim,Number> &t3)
-{
-  Number s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        s += t1[i] * t2[i][j][k] * t3[j][k];
-  return s;
-}
-
-
-/**
- * Compute the contraction of three tensors $s=\sum_{i,j,k}
- * a_{ij}b_{ijk}c_{k}$.
- *
- * @relates Tensor
- * @author Toby D. Young, 2011
- */
-template <int dim, typename Number>
-inline
-Number
-contract3 (const Tensor<2,dim,Number> &t1,
-           const Tensor<3,dim,Number> &t2,
-           const Tensor<1,dim,Number> &t3)
-{
-  Number s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        s += t1[i][j] * t2[i][j][k] * t3[k];
-  return s;
-}
-
-
-/**
- * Compute the contraction of three tensors $s=\sum_{i,j,k,l}
- * a_{ij}b_{ijkl}c_{kl}$.
- *
- * @relates Tensor
- * @author Toby D. Young, 2011
- */
-template <int dim, typename Number>
-inline
-Number
-contract3 (const Tensor<2,dim,Number> &t1,
-           const Tensor<4,dim,Number> &t2,
-           const Tensor<2,dim,Number> &t3)
-{
-  Number s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        for (unsigned int l=0; l<dim; ++l)
-          s += t1[i][j] * t2[i][j][k][l] * t3[k][l];
-  return s;
 }
 
 
