@@ -1,33 +1,7 @@
 <h1>Results</h1>
 
 The program has, after having been run, produced two sparsity
-patterns. We can visualize them using <a
-href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
-programs; maybe not the easiest to use since it is command line driven, but
-also universally available on all Linux and other Unix-like systems):
-@code
-examples/\step-2> gnuplot
-
-        G N U P L O T
-        Version 3.7 patchlevel 3
-        last modified Thu Dec 12 13:00:00 GMT 2002
-        System: Linux 2.6.11.4-21.10-default
-
-        Copyright(C) 1986 - 1993, 1998 - 2002
-        Thomas Williams, Colin Kelley and many others
-
-        Type `help` to access the on-line reference manual
-        The gnuplot FAQ is available from
-        http://www.gnuplot.info/gnuplot-faq.html
-
-        Send comments and requests for help to <info-gnuplot@dartmouth.edu>
-        Send bugs, suggestions and mods to <bug-gnuplot@dartmouth.edu>
-
-
-Terminal type set to 'x11'
-gnuplot> set style data points
-gnuplot> plot "sparsity_pattern.1"
-@endcode
+patterns. We can visualize them by opening the <code>.svg</code> files in a web browser.
 
 The results then look like this (every point denotes an entry which
 might be nonzero; of course the fact whether the entry actually is
@@ -38,11 +12,11 @@ equation):
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-1.png" alt="">
+      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-2.png" alt="">
+      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt="">
     </td>
   </tr>
 </table>
@@ -76,3 +50,31 @@ i.e. the matrix clusters more around the diagonal.
 Another idea of experiments would be to try other renumbering
 strategies than Cuthill-McKee from the DoFRenumbering namespace and see how
 they affect the sparsity pattern.
+
+You can also visualize the output using <a
+href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
+programs; maybe not the easiest to use since it is command line driven, but
+also universally available on all Linux and other Unix-like systems) by changing from <code>print_svg()</code> to <code>print_gnuplot()</code> in <code>distribute_dofs()</code> and <code>renumber_dofs()</code>:
+@code
+examples/\step-2> gnuplot
+
+        G N U P L O T
+        Version 3.7 patchlevel 3
+        last modified Thu Dec 12 13:00:00 GMT 2002
+        System: Linux 2.6.11.4-21.10-default
+
+        Copyright(C) 1986 - 1993, 1998 - 2002
+        Thomas Williams, Colin Kelley and many others
+
+        Type `help` to access the on-line reference manual
+        The gnuplot FAQ is available from
+        http://www.gnuplot.info/gnuplot-faq.html
+
+        Send comments and requests for help to <info-gnuplot@dartmouth.edu>
+        Send bugs, suggestions and mods to <bug-gnuplot@dartmouth.edu>
+
+
+Terminal type set to 'x11'
+gnuplot> set style data points
+gnuplot> plot "sparsity_pattern.1"
+@endcode
