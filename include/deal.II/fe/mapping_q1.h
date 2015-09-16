@@ -62,7 +62,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  MappingQ1<dim,spacedim> *clone () const;
 
   /**
    * @name Mapping points between reference and real cells

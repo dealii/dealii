@@ -48,14 +48,6 @@ MappingQ1<dim,spacedim>::MappingQ1 ()
 
 
 
-template<int dim, int spacedim>
-MappingQ1<dim,spacedim>::MappingQ1 (const unsigned int p)
-  :
-  MappingQGeneric<dim,spacedim> (p)
-{}
-
-
-
 namespace internal
 {
   namespace MappingQ1
@@ -488,7 +480,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 template<int dim, int spacedim>
-Mapping<dim,spacedim> *
+MappingQ1<dim,spacedim> *
 MappingQ1<dim,spacedim>::clone () const
 {
   return new MappingQ1<dim,spacedim>(*this);

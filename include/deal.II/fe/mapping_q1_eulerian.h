@@ -113,7 +113,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  MappingQ1Eulerian<dim,VECTOR,spacedim> *clone () const;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general

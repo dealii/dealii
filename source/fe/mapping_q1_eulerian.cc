@@ -89,7 +89,7 @@ get_vertices
 
 
 template <int dim, class EulerVectorType, int spacedim>
-Mapping<dim,spacedim> *
+MappingQ1Eulerian<dim,EulerVectorType,spacedim> *
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
 {
   return new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(*this);
