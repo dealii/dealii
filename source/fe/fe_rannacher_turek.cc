@@ -16,6 +16,7 @@
 
 #include <deal.II/fe/fe_rannacher_turek.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/vector.h>
 #include <algorithm>
 
 #include <sstream>
@@ -62,7 +63,7 @@ std::string FE_RannacherTurek<dim>::get_name() const
   std::ostringstream namebuf;
   namebuf << "FE_RannacherTurek"
           << "<" << dim << ">"
-          << "(" << this->degree << ", " << this-n_face_support_points << ")";
+          << "(" << this->degree << ", " << this->n_face_support_points << ")";
   return namebuf.str();
 }
 
@@ -124,6 +125,46 @@ void FE_RannacherTurek<dim>::interpolate(
           ++value;
         }
     }
+}
+
+
+
+template <int dim>
+void FE_RannacherTurek<dim>::interpolate(
+  std::vector<double> &local_dofs,
+  const std::vector<Vector<double> > &values,
+  unsigned int offset) const
+{
+  AssertDimension(values.size(), this->generalized_support_points.size());
+  AssertDimension(local_dofs.size(), this->dofs_per_cell);
+
+  // extract component at offset and call scalar version of this function
+  std::vector<double> scalar_values(values.size());
+  for (unsigned int q = 0; q < values.size(); ++q)
+    {
+      scalar_values[q] = values[q][offset];
+    }
+  this->interpolate(local_dofs, scalar_values);
+}
+
+
+
+template <int dim>
+void FE_RannacherTurek<dim>::interpolate(
+  std::vector<double> &local_dofs,
+  const VectorSlice<const std::vector<std::vector<double> > > &values) const
+{
+  AssertDimension(values.size(), 1);
+  AssertDimension(values[0].size(), this->generalized_support_points.size());
+  AssertDimension(local_dofs.size(), this->dofs_per_cell);
+
+  // convert data structure to use scalar version of this function
+  std::vector<double> scalar_values(values[0].size());
+  for (unsigned int q = 0; q < values[0].size(); ++q)
+    {
+      scalar_values[q] = values[0][q];
+    }
+  this->interpolate(local_dofs, scalar_values);
 }
 
 
