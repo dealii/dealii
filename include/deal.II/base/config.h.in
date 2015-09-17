@@ -53,7 +53,7 @@
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
-#cmakedefine DEAL_II_ARPACK_WITH_PARPACK
+
 
 /***********************************************************************
  * Compiler bugs:
@@ -135,11 +135,16 @@
 
 
 /***********************************************************************
- * Thread support
+ * Feature configuration
  *
- * For documentation see cmake/configure/configure_1_threads.cmake
+ * For documentation see cmake/configure/configure_*.cmake and
+ * cmake/modules/Find*.cmake
  */
 
+/* cmake/moduels/FindARPACK.cmake */
+#cmakedefine DEAL_II_ARPACK_WITH_PARPACK
+
+/* cmake/configure/configure_1_threads.cmake */
 #cmakedefine DEAL_II_USE_MT_POSIX
 #cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
 
