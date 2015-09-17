@@ -296,6 +296,26 @@ void test ()
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       dealii::deallog << eigenvalues[i] << std::endl;
 
+    // make sure that we have eigenvectors and they are mass-orthonormal:
+    // a) (A*x_i-\lambda*B*x_i).L2() == 0
+    // b) x_i*B*y_i=\delta_{ij}
+    {
+      const double precision = 1e-7;
+      PETScWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
+      for (unsigned int i=0; i < eigenfunctions.size(); ++i)
+        {
+          mass_matrix.vmult(Bx,eigenfunctions[i]);
+
+          for (unsigned int j=0; j < eigenfunctions.size(); j++)
+            Assert( std::abs( eigenfunctions[j] * Bx - (i==j))< precision,
+                    ExcMessage(std::to_string(eigenfunctions[j] * Bx)));
+
+          stiffness_matrix.vmult(Ax,eigenfunctions[i]);
+          Ax.add(-1.0*std::real(lambda[i]),Bx);
+          Assert (Ax.l2_norm() < precision,
+                  ExcMessage(std::to_string(Ax.l2_norm())));
+        }
+    }
   }
 
 
