@@ -406,7 +406,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   // projection to the least square plane determined by the vertices
   // of the cell
   std::vector<Point<spacedim> > a;
-  compute_mapping_support_points (cell,a);
+  this->compute_mapping_support_points (cell,a);
   Point<dim> initial_p_unit =
     transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
 
@@ -437,7 +437,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       mdata (this->get_data(update_flags,
                             point_quadrature));
 
-      compute_mapping_support_points (cell, mdata->mapping_support_points);
+      this->compute_mapping_support_points (cell, mdata->mapping_support_points);
       Assert(mdata->mapping_support_points.size() ==
              GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
