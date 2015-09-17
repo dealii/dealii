@@ -358,6 +358,38 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
+    * Creates an hyper sphere.
+    * This function is declared to exist for dim=1, spacedim =2, and
+    * dim=2, spacedim =3.
+    *
+    * The following pictures are generated with:
+    * @code
+    * Triangulation<2,3>   triangulation;
+    *
+    * static SphericalManifold<2,3> surface_description;
+    *
+    * GridGenerator::hyper_sphere(triangulation);
+    *
+    * triangulation.set_all_manifold_ids(0);
+    * triangulation.set_manifold (0, surface_description);
+    * triangulation.refine_global(3);
+    * @endcode
+    *
+    * See the @ref manifold "documentation module on manifolds", for
+    * more detail.
+    *
+    * @image html sphere.png
+    * @image html sphere_section.png
+    *
+    * @note The triangulation needs to be void upon calling this function.
+    */
+
+  template <int dim, int spacedim>
+  void hyper_sphere (Triangulation<dim,spacedim> &tria,
+                     const Point<spacedim>   &center = Point<spacedim>(),
+                     const double        radius = 1.);
+
+  /**
    * This class produces a half hyper-ball around @p center, which contains
    * four elements in 2d and 6 in 3d. The cut plane is perpendicular to the
    * <i>x</i>-axis.
