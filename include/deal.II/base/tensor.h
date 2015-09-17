@@ -553,15 +553,6 @@ public:
   void serialize(Archive &ar, const unsigned int version);
 
   /**
-   * Exception.
-   */
-  DeclException1 (ExcInvalidTensorContractionIndex,
-                  int,
-                  << "You have requested contraction of tensors over index "
-                  << arg1
-                  << ", but this is not possible for tensors of the current type.");
-
-  /**
    * Internal type declaration that is used to specialize the return type
    * of operator[]() for Tensor<1,dim,Number>
    */

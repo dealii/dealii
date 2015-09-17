@@ -28,6 +28,17 @@ DEAL_II_NAMESPACE_OPEN
  */
 //@{
 
+/**
+ * Exception.
+ *
+ * @deprecated
+ */
+DeclException1 (ExcInvalidTensorContractionIndex,
+                int,
+                << "You have requested contraction of tensors over index "
+                << arg1
+                << ", but this is not possible for tensors of the current type.");
+
 
 /**
  * Double contract two tensors of rank 2, thus computing the Frobenius inner
@@ -260,8 +271,7 @@ void contract (Tensor<2,dim,Number>       &dest,
           break;
 
         default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+          Assert (false, (ExcInvalidTensorContractionIndex (index2)));
         };
       break;
     case 2:
@@ -281,13 +291,12 @@ void contract (Tensor<2,dim,Number>       &dest,
           break;
 
         default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+          Assert (false, (ExcInvalidTensorContractionIndex (index2)));
         };
       break;
 
     default:
-      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+      Assert (false, (ExcInvalidTensorContractionIndex (index1)));
     };
 }
 
@@ -323,8 +332,7 @@ void contract (Tensor<2,dim,Number>       &dest,
       break;
 
     default:
-      Assert (false,
-              (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+      Assert (false, (ExcInvalidTensorContractionIndex (index1)));
     };
 }
 
@@ -356,8 +364,7 @@ void contract (Tensor<3,dim,Number>       &dest,
                   dest[i][j][k] += src1[l][i][j] * src2[k][l];
           break;
         default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+          Assert (false, (ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
@@ -379,8 +386,7 @@ void contract (Tensor<3,dim,Number>       &dest,
                   dest[i][j][k] += src1[i][l][j] * src2[k][l];
           break;
         default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+          Assert (false, (ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
@@ -402,14 +408,12 @@ void contract (Tensor<3,dim,Number>       &dest,
                   dest[i][j][k] += src1[i][j][l] * src2[k][l];
           break;
         default:
-          Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
+          Assert (false, (ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
     default:
-      Assert (false,
-              (typename Tensor<3,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
+      Assert (false, (ExcInvalidTensorContractionIndex (index1)));
     }
 }
 
