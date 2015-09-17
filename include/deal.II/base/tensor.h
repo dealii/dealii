@@ -1515,12 +1515,11 @@ typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumb
 contract (const Tensor<rank_1, dim, Number> &src1,
           const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-#ifdef DEAL_II_WITH_CXX11
-  static_assert(0 <= index_1 && index_1 < rank_1,
-                "The specified index_1 must lie within the range [0,rank_1)");
-  static_assert(0 <= index_2 && index_2 < rank_2,
-                "The specified index_2 must lie within the range [0,rank_2)");
-#endif
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
 
@@ -1579,16 +1578,19 @@ typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumb
 contract (const Tensor<rank_1, dim, Number> &src1,
           const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-#ifdef DEAL_II_WITH_CXX11
-  static_assert(0 <= index_1 && index_1 < rank_1,
-                "The specified index_1 must lie within the range [0,rank_1)");
-  static_assert(0 <= index_3 && index_3 < rank_1,
-                "The specified index_3 must lie within the range [0,rank_1)");
-  static_assert(0 <= index_2 && index_2 < rank_2,
-                "The specified index_2 must lie within the range [0,rank_2)");
-  static_assert(0 <= index_4 && index_4 < rank_2,
-                "The specified index_4 must lie within the range [0,rank_2)");
-#endif
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_3 && index_3 < rank_1,
+         ExcMessage("The specified index_3 must lie within the range [0,rank_1)"));
+  Assert(index_1 != index_3,
+         ExcMessage("index_1 and index_3 must not be the same"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_4 && index_4 < rank_2,
+         ExcMessage("The specified index_4 must lie within the range [0,rank_2)"));
+  Assert(index_2 != index_4,
+         ExcMessage("index_2 and index_4 must not be the same"));
+
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
 
