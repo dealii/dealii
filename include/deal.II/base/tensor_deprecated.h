@@ -44,7 +44,7 @@ DeclException1 (ExcInvalidTensorContractionIndex,
  * Double contract two tensors of rank 2, thus computing the Frobenius inner
  * product <tt>sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
  *
- * @deprecated Use the contract function that takes indices as template
+ * @deprecated Use the double_contract function that takes indices as template
  *   arguments and returns its result instead.
  * @relates Tensor
  */
@@ -59,8 +59,8 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
  * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector product
  * analog operation between tensors of rank 4 and rank 2.
  *
- * @deprecated Use the contract function that takes indices as template
- *   arguments and returns its result instead.
+ * @deprecated Use the double_contract function that takes indices as
+ *   template arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>

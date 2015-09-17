@@ -1575,8 +1575,8 @@ template <int index_1, int index_2, int index_3, int index_4,
           typename Number, typename OtherNumber>
 inline
 typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
-contract (const Tensor<rank_1, dim, Number> &src1,
-          const Tensor<rank_2, dim, OtherNumber> &src2)
+double_contract (const Tensor<rank_1, dim, Number> &src1,
+                 const Tensor<rank_2, dim, OtherNumber> &src2)
 {
   Assert(0 <= index_1 && index_1 < rank_1,
          ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
