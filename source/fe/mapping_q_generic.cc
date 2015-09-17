@@ -25,11 +25,12 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <cmath>
 #include <algorithm>
@@ -767,11 +768,243 @@ compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
 }
 
 
+namespace
+{
+  /**
+   * Compute the <tt>support_point_weights_on_quad(hex)</tt> arrays.
+   *
+   * Called by the <tt>compute_support_point_weights_on_quad(hex)</tt> functions if the
+   * data is not yet hardcoded.
+   *
+   * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
+   * refer to equation (8) of the `mapping' report.
+   */
+  template<int dim>
+  Table<2,double>
+  compute_laplace_vector(const unsigned int polynomial_degree)
+  {
+    Table<2,double> lvs;
+
+    Assert(lvs.n_rows()==0, ExcInternalError());
+    Assert(dim==2 || dim==3, ExcNotImplemented());
+
+    // for degree==1, we shouldn't have to compute any support points, since all
+    // of them are on the vertices
+    Assert(polynomial_degree>1, ExcInternalError());
+
+    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+    const unsigned int n_outer = (dim==1) ? 2 :
+                                 ((dim==2) ?
+                                  4+4*(polynomial_degree-1) :
+                                  8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
+
+
+    // compute the shape gradients at the quadrature points on the unit cell
+    const QGauss<dim> quadrature(polynomial_degree+1);
+    const unsigned int n_q_points=quadrature.size();
+
+    typename MappingQGeneric<dim>::InternalData quadrature_data(polynomial_degree);
+    quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
+                                             n_q_points);
+    quadrature_data.compute_shape_function_values(quadrature.get_points());
+
+    // Compute the stiffness matrix of the inner dofs
+    FullMatrix<long double> S(n_inner);
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<n_inner; ++i)
+        for (unsigned int j=0; j<n_inner; ++j)
+          {
+            long double res = 0.;
+            for (unsigned int l=0; l<dim; ++l)
+              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                     (long double)quadrature_data.derivative(point, n_outer+j)[l];
+
+            S(i,j) += res * (long double)quadrature.weight(point);
+          }
+
+    // Compute the components of T to be the product of gradients of inner and
+    // outer shape functions.
+    FullMatrix<long double> T(n_inner, n_outer);
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<n_inner; ++i)
+        for (unsigned int k=0; k<n_outer; ++k)
+          {
+            long double res = 0.;
+            for (unsigned int l=0; l<dim; ++l)
+              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                     (long double)quadrature_data.derivative(point, k)[l];
+
+            T(i,k) += res *(long double)quadrature.weight(point);
+          }
+
+    FullMatrix<long double> S_1(n_inner);
+    S_1.invert(S);
+
+    FullMatrix<long double> S_1_T(n_inner, n_outer);
+
+    // S:=S_1*T
+    S_1.mmult(S_1_T,T);
+
+    // Resize and initialize the lvs
+    lvs.reinit (n_inner, n_outer);
+    for (unsigned int i=0; i<n_inner; ++i)
+      for (unsigned int k=0; k<n_outer; ++k)
+        lvs(i,k) = -S_1_T(i,k);
+
+    return lvs;
+  }
+
+
+  /**
+   * This function is needed by the constructor of
+   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
+   *
+   * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
+   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
+   * computed.
+   *
+   * For the definition of the @p support_point_weights_on_quad please refer to
+   * equation (8) of the `mapping' report.
+   */
+  template<int dim>
+  Table<2,double>
+  compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
+  {
+    Table<2,double> loqvs;
+
+    // in 1d, there are no quads, so return an empty object
+    if (dim == 1)
+      return loqvs;
+
+    // we are asked to compute weights for interior support points, but
+    // there are no interior points if degree==1
+    if (polynomial_degree == 1)
+      return loqvs;
+
+    const unsigned int n_inner_2d=(polynomial_degree-1)*(polynomial_degree-1);
+    const unsigned int n_outer_2d=4+4*(polynomial_degree-1);
+
+    // first check whether we have precomputed the values for some polynomial
+    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+    if (polynomial_degree == 2)
+      {
+        // (checked these values against the output of compute_laplace_vector
+        // again, and found they're indeed right -- just in case someone wonders
+        // where they come from -- WB)
+        static const double loqv2[1*8]
+          = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
+        Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
+                n_inner_2d * n_outer_2d,
+                ExcInternalError());
+
+        // copy and return
+        loqvs.reinit(n_inner_2d, n_outer_2d);
+        for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
+          for (unsigned int k=0; k<n_outer_2d; ++k)
+            loqvs[unit_point][k] = loqv2[unit_point*n_outer_2d+k];
+      }
+    else
+      {
+        // not precomputed, then do so now
+        loqvs = compute_laplace_vector<2>(polynomial_degree);
+      }
+
+    // the sum of weights of the points at the outer rim should be one. check
+    // this
+    for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
+      Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
+                                       loqvs[unit_point].end(),0.)-1)<1e-13*polynomial_degree,
+             ExcInternalError());
+
+    return loqvs;
+  }
+
+
+
+  /**
+   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
+   *
+   * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
+   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
+   *
+   * For the definition of the @p support_point_weights_on_hex please refer to
+   * equation (8) of the `mapping' report.
+   */
+  template <int dim>
+  Table<2,double>
+  compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
+  {
+    Table<2,double> lohvs;
+
+    // in 1d and 2d, there are no hexes, so return an empty object
+    if (dim < 3)
+      return lohvs;
+
+    // we are asked to compute weights for interior support points, but
+    // there are no interior points if degree==1
+    if (polynomial_degree == 1)
+      return lohvs;
+
+    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+    const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
+
+    // first check whether we have precomputed the values for some polynomial
+    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+    if (polynomial_degree == 2)
+      {
+        static const double lohv2[26]
+          = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
+             7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
+             7/192., 7/192., 7/192., 7/192.,
+             1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
+            };
+
+        // copy and return
+        lohvs.reinit(n_inner, n_outer);
+        for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+          for (unsigned int k=0; k<n_outer; ++k)
+            lohvs[unit_point][k] = lohv2[unit_point*n_outer+k];
+      }
+    else
+      {
+        // not precomputed, then do so now
+        lohvs = compute_laplace_vector<dim>(polynomial_degree);
+      }
+
+    // the sum of weights of the points at the outer rim should be one. check
+    // this
+    for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+      Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
+                                       lohvs[unit_point].end(),0.) - 1)<1e-13*polynomial_degree,
+             ExcInternalError());
+
+    return lohvs;
+  }
+}
+
+
+
 
 template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   :
-  polynomial_degree(p)
+  polynomial_degree(p),
+  line_support_points(this->polynomial_degree+1),
+  fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
+  support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
+  support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree))
+{}
+
+
+
+template<int dim, int spacedim>
+MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping)
+  :
+  polynomial_degree(mapping.polynomial_degree),
+  line_support_points(mapping.line_support_points),
+  fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : 0),
+  support_point_weights_on_quad (mapping.support_point_weights_on_quad),
+  support_point_weights_on_hex (mapping.support_point_weights_on_hex)
 {}
 
 
@@ -814,6 +1047,372 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   return mapped_point;
 }
+
+
+// In the code below, GCC tries to instantiate MappingQGeneric<3,4> when
+// seeing which of the overloaded versions of
+// do_transform_real_to_unit_cell_internal() to call. This leads to bad
+// error messages and, generally, nothing very good. Avoid this by ensuring
+// that this class exists, but does not have an inner InternalData
+// type, thereby ruling out the codim-1 version of the function
+// below when doing overload resolution.
+template <>
+class MappingQGeneric<3,4>
+{};
+
+namespace
+{
+  /**
+   * Using the relative weights of the shape functions evaluated at
+   * one point on the reference cell (and stored in data.shape_values
+   * and accessed via data.shape(0,i)) and the locations of mapping
+   * support points (stored in data.mapping_support_points), compute
+   * the mapped location of that point in real space.
+   */
+  template<int dim, int spacedim>
+  Point<spacedim>
+  compute_mapped_location_of_point (const typename MappingQGeneric<dim,spacedim>::InternalData &data)
+  {
+    AssertDimension (data.shape_values.size(),
+                     data.mapping_support_points.size());
+
+    // use now the InternalData to compute the point in real space.
+    Point<spacedim> p_real;
+    for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+      p_real += data.mapping_support_points[i] * data.shape(0,i);
+
+    return p_real;
+  }
+
+
+  /**
+   * Implementation of transform_real_to_unit_cell for dim==spacedim
+   */
+  template <int dim>
+  Point<dim>
+  do_transform_real_to_unit_cell_internal
+  (const typename Triangulation<dim,dim>::cell_iterator &cell,
+   const Point<dim>                                     &p,
+   const Point<dim>                                     &initial_p_unit,
+   typename MappingQGeneric<dim,dim>::InternalData      &mdata)
+  {
+    const unsigned int spacedim = dim;
+
+    const unsigned int n_shapes=mdata.shape_values.size();
+    (void)n_shapes;
+    Assert(n_shapes!=0, ExcInternalError());
+    AssertDimension (mdata.shape_derivatives.size(), n_shapes);
+
+    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
+    AssertDimension (points.size(), n_shapes);
+
+
+    // Newton iteration to solve
+    //    f(x)=p(x)-p=0
+    // where we are looking for 'x' and p(x) is the forward transformation
+    // from unit to real cell. We solve this using a Newton iteration
+    //    x_{n+1}=x_n-[f'(x)]^{-1}f(x)
+    // The start value is set to be the linear approximation to the cell
+
+    // The shape values and derivatives of the mapping at this point are
+    // previously computed.
+
+    Point<dim> p_unit = initial_p_unit;
+
+    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+    Point<spacedim> p_real = compute_mapped_location_of_point<dim,spacedim>(mdata);
+    Tensor<1,spacedim> f = p_real-p;
+
+    // early out if we already have our point
+    if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
+      return p_unit;
+
+    // we need to compare the position of the computed p(x) against the given
+    // point 'p'. We will terminate the iteration and return 'x' if they are
+    // less than eps apart. The question is how to choose eps -- or, put maybe
+    // more generally: in which norm we want these 'p' and 'p(x)' to be eps
+    // apart.
+    //
+    // the question is difficult since we may have to deal with very elongated
+    // cells where we may achieve 1e-12*h for the distance of these two points
+    // in the 'long' direction, but achieving this tolerance in the 'short'
+    // direction of the cell may not be possible
+    //
+    // what we do instead is then to terminate iterations if
+    //    \| p(x) - p \|_A < eps
+    // where the A-norm is somehow induced by the transformation of the cell.
+    // in particular, we want to measure distances relative to the sizes of
+    // the cell in its principal directions.
+    //
+    // to define what exactly A should be, note that to first order we have
+    // the following (assuming that x* is the solution of the problem, i.e.,
+    // p(x*)=p):
+    //    p(x) - p = p(x) - p(x*)
+    //             = -grad p(x) * (x*-x) + higher order terms
+    // This suggest to measure with a norm that corresponds to
+    //    A = {[grad p(x]^T [grad p(x)]}^{-1}
+    // because then
+    //    \| p(x) - p \|_A  \approx  \| x - x* \|
+    // Consequently, we will try to enforce that
+    //    \| p(x) - p \|_A  =  \| f \|  <=  eps
+    //
+    // Note that using this norm is a bit dangerous since the norm changes
+    // in every iteration (A isn't fixed by depends on xk). However, if the
+    // cell is not too deformed (it may be stretched, but not twisted) then
+    // the mapping is almost linear and A is indeed constant or nearly so.
+    const double eps = 1.e-11;
+    const unsigned int newton_iteration_limit = 20;
+
+    unsigned int newton_iteration = 0;
+    double last_f_weighted_norm;
+    do
+      {
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+        std::cout << "Newton iteration " << newton_iteration << std::endl;
+#endif
+
+        // f'(x)
+        Tensor<2,spacedim> df;
+        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+          {
+            const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
+            const Point<spacedim> &point=points[k];
+
+            for (unsigned int i=0; i<spacedim; ++i)
+              for (unsigned int j=0; j<dim; ++j)
+                df[i][j]+=point[i]*grad_transform[j];
+          }
+
+        // Solve  [f'(x)]d=f(x)
+        Tensor<2,spacedim> df_inverse = invert(df);
+        const Tensor<1,spacedim> delta = df_inverse * static_cast<const Tensor<1,spacedim>&>(f);
+
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+        std::cout << "   delta=" << delta  << std::endl;
+#endif
+
+        // do a line search
+        double step_length = 1;
+        do
+          {
+            // update of p_unit. The spacedim-th component of transformed point
+            // is simply ignored in codimension one case. When this component is
+            // not zero, then we are projecting the point to the surface or
+            // curve identified by the cell.
+            Point<dim> p_unit_trial = p_unit;
+            for (unsigned int i=0; i<dim; ++i)
+              p_unit_trial[i] -= step_length * delta[i];
+
+            // shape values and derivatives
+            // at new p_unit point
+            mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
+
+            // f(x)
+            Point<spacedim> p_real_trial = compute_mapped_location_of_point<dim,spacedim>(mdata);
+            const Tensor<1,spacedim> f_trial = p_real_trial-p;
+
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+            std::cout << "     step_length=" << step_length << std::endl
+                      << "       ||f ||   =" << f.norm() << std::endl
+                      << "       ||f*||   =" << f_trial.norm() << std::endl
+                      << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
+#endif
+
+            // see if we are making progress with the current step length
+            // and if not, reduce it by a factor of two and try again
+            //
+            // strictly speaking, we should probably use the same norm as we use
+            // for the outer algorithm. in practice, line search is just a
+            // crutch to find a "reasonable" step length, and so using the l2
+            // norm is probably just fine
+            if (f_trial.norm() < f.norm())
+              {
+                p_real = p_real_trial;
+                p_unit = p_unit_trial;
+                f = f_trial;
+                break;
+              }
+            else if (step_length > 0.05)
+              step_length /= 2;
+            else
+              AssertThrow (false,
+                           (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+          }
+        while (true);
+
+        ++newton_iteration;
+        if (newton_iteration > newton_iteration_limit)
+          AssertThrow (false,
+                       (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+        last_f_weighted_norm = (df_inverse * f).norm();
+      }
+    while (last_f_weighted_norm > eps);
+
+    return p_unit;
+  }
+
+
+
+  /**
+   * Implementation of transform_real_to_unit_cell for dim==spacedim-1
+   */
+  template <int dim>
+  Point<dim>
+  do_transform_real_to_unit_cell_internal
+  (const typename Triangulation<dim,dim+1>::cell_iterator &cell,
+   const Point<dim+1>                                       &p,
+   const Point<dim>                                         &initial_p_unit,
+   typename MappingQGeneric<dim,dim+1>::InternalData       &mdata)
+  {
+    const unsigned int spacedim = dim+1;
+
+    const unsigned int n_shapes=mdata.shape_values.size();
+    (void)n_shapes;
+    Assert(n_shapes!=0, ExcInternalError());
+    Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
+    Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
+
+    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
+    Assert(points.size()==n_shapes, ExcInternalError());
+
+    Point<spacedim> p_minus_F;
+
+    Tensor<1,spacedim>  DF[dim];
+    Tensor<1,spacedim>  D2F[dim][dim];
+
+    Point<dim> p_unit = initial_p_unit;
+    Point<dim> f;
+    Tensor<2,dim>  df;
+
+    // Evaluate first and second derivatives
+    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+    for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+      {
+        const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
+        const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
+        const Point<spacedim> &point_k = points[k];
+
+        for (unsigned int j=0; j<dim; ++j)
+          {
+            DF[j] += grad_phi_k[j] * point_k;
+            for (unsigned int l=0; l<dim; ++l)
+              D2F[j][l] += hessian_k[j][l] * point_k;
+          }
+      }
+
+    p_minus_F = p;
+    p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+
+    for (unsigned int j=0; j<dim; ++j)
+      f[j] = DF[j] * p_minus_F;
+
+    for (unsigned int j=0; j<dim; ++j)
+      {
+        f[j] = DF[j] * p_minus_F;
+        for (unsigned int l=0; l<dim; ++l)
+          df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+      }
+
+
+    const double eps = 1.e-12*cell->diameter();
+    const unsigned int loop_limit = 10;
+
+    unsigned int loop=0;
+
+    while (f.norm()>eps && loop++<loop_limit)
+      {
+        // Solve  [df(x)]d=f(x)
+        const Tensor<1,dim> d = invert(df) * static_cast<const Tensor<1,dim>&>(f);
+        p_unit -= d;
+
+        for (unsigned int j=0; j<dim; ++j)
+          {
+            DF[j].clear();
+            for (unsigned int l=0; l<dim; ++l)
+              D2F[j][l].clear();
+          }
+
+        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+          {
+            const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
+            const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
+            const Point<spacedim> &point_k = points[k];
+
+            for (unsigned int j=0; j<dim; ++j)
+              {
+                DF[j] += grad_phi_k[j] * point_k;
+                for (unsigned int l=0; l<dim; ++l)
+                  D2F[j][l] += hessian_k[j][l] * point_k;
+              }
+          }
+
+        //TODO: implement a line search here in much the same way as for
+        // the corresponding function above that does so for dim==spacedim
+        p_minus_F = p;
+        p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+        for (unsigned int j=0; j<dim; ++j)
+          {
+            f[j] = DF[j] * p_minus_F;
+            for (unsigned int l=0; l<dim; ++l)
+              df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+          }
+
+      }
+
+
+    // Here we check that in the last execution of while the first
+    // condition was already wrong, meaning the residual was below
+    // eps. Only if the first condition failed, loop will have been
+    // increased and tested, and thus have reached the limit.
+    AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+
+    return p_unit;
+  }
+
+
+
+
+
+  /**
+   * Implementation of transform_real_to_unit_cell for other values of
+   * dim, spacedim
+   */
+  Point<1>
+  do_transform_real_to_unit_cell_internal
+  (const typename Triangulation<1,3>::cell_iterator &,
+   const Point<3> &,
+   const Point<1> &,
+   MappingQGeneric<1,3>::InternalData &)
+  {
+    Assert (false, ExcNotImplemented());
+    return Point<1>();
+  }
+
+}
+
+
+
+template<int dim, int spacedim>
+Point<dim>
+MappingQGeneric<dim,spacedim>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+ const Point<spacedim>                            &p,
+ const Point<dim>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal (cell, p, initial_p_unit, mdata);
+}
+
+
 
 
 
@@ -2281,7 +2880,6 @@ transform (const VectorSlice<const std::vector< Tensor<3,dim> > >   input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            VectorSlice<std::vector<Tensor<3,spacedim> > >           output) const
 {
-
   switch (mapping_type)
     {
     case mapping_piola_hessian:
@@ -2292,7 +2890,454 @@ transform (const VectorSlice<const std::vector< Tensor<3,dim> > >   input,
     default:
       Assert(false, ExcNotImplemented());
     }
+}
 
+
+
+namespace
+{
+  /**
+   * Ask the manifold descriptor to return intermediate points on lines or
+   * faces. The function needs to return one or multiple points (depending on
+   * the number of elements in the output vector @p points that lie inside a
+   * line, quad or hex). Whether it is a line, quad or hex doesn't really
+   * matter to this function but it can be inferred from the number of input
+   * points in the @p surrounding_points vector.
+   */
+  template<int dim, int spacedim>
+  void
+  get_intermediate_points (const Manifold<dim, spacedim> &manifold,
+                           const QGaussLobatto<1>        &line_support_points,
+                           const std::vector<Point<spacedim> > &surrounding_points,
+                           std::vector<Point<spacedim> > &points)
+  {
+    Assert(surrounding_points.size() >= 2, ExcMessage("At least 2 surrounding points are required"));
+    const unsigned int n=points.size();
+    Assert(n>0, ExcMessage("You can't ask for 0 intermediate points."));
+    std::vector<double> w(surrounding_points.size());
+
+    switch (surrounding_points.size())
+      {
+      case 2:
+      {
+        // If two points are passed, these are the two vertices, and
+        // we can only compute degree-1 intermediate points.
+        for (unsigned int i=0; i<n; ++i)
+          {
+            const double x = line_support_points.point(i+1)[0];
+            w[1] = x;
+            w[0] = (1-x);
+            Quadrature<spacedim> quadrature(surrounding_points, w);
+            points[i] = manifold.get_new_point(quadrature);
+          }
+        break;
+      }
+
+      case 4:
+      {
+        Assert(spacedim >= 2, ExcImpossibleInDim(spacedim));
+        const unsigned m=
+          static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
+        // is n a square number
+        Assert(m*m==n, ExcInternalError());
+
+        // If four points are passed, these are the two vertices, and
+        // we can only compute (degree-1)*(degree-1) intermediate
+        // points.
+        for (unsigned int i=0; i<m; ++i)
+          {
+            const double y=line_support_points.point(1+i)[0];
+            for (unsigned int j=0; j<m; ++j)
+              {
+                const double x=line_support_points.point(1+j)[0];
+
+                w[0] = (1-x)*(1-y);
+                w[1] =     x*(1-y);
+                w[2] = (1-x)*y    ;
+                w[3] =     x*y    ;
+                Quadrature<spacedim> quadrature(surrounding_points, w);
+                points[i*m+j]=manifold.get_new_point(quadrature);
+              }
+          }
+        break;
+      }
+
+      case 8:
+        Assert(false, ExcNotImplemented());
+        break;
+      default:
+        Assert(false, ExcInternalError());
+        break;
+      }
+  }
+
+
+
+
+  /**
+   * Ask the manifold descriptor to return intermediate points on the object
+   * pointed to by the TriaIterator @p iter. This function tries to be
+   * backward compatible with respect to the differences between
+   * Boundary<dim,spacedim> and Manifold<dim,spacedim>, querying the first
+   * whenever the passed @p manifold can be upgraded to a
+   * Boundary<dim,spacedim>.
+   */
+  template <int dim, int spacedim, class TriaIterator>
+  void get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
+                                         const QGaussLobatto<1>        &line_support_points,
+                                         const TriaIterator &iter,
+                                         std::vector<Point<spacedim> > &points)
+  {
+    const unsigned int structdim = TriaIterator::AccessorType::structure_dimension;
+
+    // Try backward compatibility option.
+    if (const Boundary<dim,spacedim> *boundary
+        = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold))
+      // This is actually a boundary. Call old methods.
+      {
+        switch (structdim)
+          {
+          case 1:
+          {
+            const typename Triangulation<dim,spacedim>::line_iterator line = iter;
+            boundary->get_intermediate_points_on_line(line, points);
+            return;
+          }
+          case 2:
+          {
+            const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
+            boundary->get_intermediate_points_on_quad(quad, points);
+            return;
+          }
+          default:
+            Assert(false, ExcInternalError());
+            return;
+          }
+      }
+    else
+      {
+        std::vector<Point<spacedim> > sp(GeometryInfo<structdim>::vertices_per_cell);
+        for (unsigned int i=0; i<sp.size(); ++i)
+          sp[i] = iter->vertex(i);
+        get_intermediate_points(manifold, line_support_points, sp, points);
+      }
+  }
+
+
+  /**
+   * Take a <tt>support_point_weights_on_hex(quad)</tt> and apply it to the vector
+   * @p a to compute the inner support points as a linear combination of the
+   * exterior points.
+   *
+   * The vector @p a initially contains the locations of the @p n_outer
+   * points, the @p n_inner computed inner points are appended.
+   *
+   * See equation (7) of the `mapping' report.
+   */
+  template <int spacedim>
+  void add_weighted_interior_points(const Table<2,double>   &lvs,
+                                    std::vector<Point<spacedim> > &a)
+  {
+    const unsigned int n_inner_apply=lvs.n_rows();
+    const unsigned int n_outer_apply=lvs.n_cols();
+    Assert(a.size()==n_outer_apply,
+           ExcDimensionMismatch(a.size(), n_outer_apply));
+
+    // compute each inner point as linear combination of the outer points. the
+    // weights are given by the lvs entries, the outer points are the first
+    // (existing) elements of a
+    for (unsigned int unit_point=0; unit_point<n_inner_apply; ++unit_point)
+      {
+        Assert(lvs.n_cols()==n_outer_apply, ExcInternalError());
+        Point<spacedim> p;
+        for (unsigned int k=0; k<n_outer_apply; ++k)
+          p+=lvs[unit_point][k]*a[k];
+
+        a.push_back(p);
+      }
+  }
+}
+
+
+template <int dim, int spacedim>
+void
+MappingQGeneric<dim,spacedim>::
+add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                         std::vector<Point<spacedim> > &a) const
+{
+  // if we only need the midpoint, then ask for it.
+  if (this->polynomial_degree==2)
+    {
+      for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+        {
+          const typename Triangulation<dim,spacedim>::line_iterator line =
+            (dim == 1  ?
+             static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell) :
+             cell->line(line_no));
+
+          const Manifold<dim,spacedim> &manifold =
+            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+              ( dim < spacedim )
+              ?
+              cell->get_manifold()
+              :
+              line->get_manifold() );
+          a.push_back(manifold.get_new_point_on_line(line));
+        }
+    }
+  else
+    // otherwise call the more complicated functions and ask for inner points
+    // from the boundary description
+    {
+      std::vector<Point<spacedim> > line_points (this->polynomial_degree-1);
+      // loop over each of the lines, and if it is at the boundary, then first
+      // get the boundary description and second compute the points on it
+      for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+        {
+          const typename Triangulation<dim,spacedim>::line_iterator
+          line = (dim == 1
+                  ?
+                  static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell)
+                  :
+                  cell->line(line_no));
+
+          const Manifold<dim,spacedim> &manifold =
+            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+              ( dim < spacedim )
+              ?
+              cell->get_manifold() :
+              line->get_manifold() );
+
+          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
+
+          if (dim==3)
+            {
+              // in 3D, lines might be in wrong orientation. if so, reverse
+              // the vector
+              if (cell->line_orientation(line_no))
+                a.insert (a.end(), line_points.begin(), line_points.end());
+              else
+                a.insert (a.end(), line_points.rbegin(), line_points.rend());
+            }
+          else
+            // in 2D, lines always have the correct orientation. simply append
+            // all points
+            a.insert (a.end(), line_points.begin(), line_points.end());
+        }
+    }
+}
+
+
+
+template <>
+void
+MappingQGeneric<3,3>::
+add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
+                        std::vector<Point<3> >                &a) const
+{
+  const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
+                     vertices_per_face = GeometryInfo<3>::vertices_per_face,
+                     lines_per_face    = GeometryInfo<3>::lines_per_face,
+                     vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
+
+  static const StraightBoundary<3> straight_boundary;
+  // used if face quad at boundary or entirely in the interior of the domain
+  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+  // used if only one line of face quad is at boundary
+  std::vector<Point<3> > b(4*polynomial_degree);
+
+  // Used by the new Manifold interface. This vector collects the
+  // vertices used to compute the intermediate points.
+  std::vector<Point<3> > vertices(4);
+
+  // loop over all faces and collect points on them
+  for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
+    {
+      const Triangulation<3>::face_iterator face = cell->face(face_no);
+
+      // select the correct mappings for the present face
+      const bool face_orientation = cell->face_orientation(face_no),
+                 face_flip        = cell->face_flip       (face_no),
+                 face_rotation    = cell->face_rotation   (face_no);
+
+#ifdef DEBUG
+      // some sanity checks up front
+      for (unsigned int i=0; i<vertices_per_face; ++i)
+        Assert(face->vertex_index(i)==cell->vertex_index(
+                 GeometryInfo<3>::face_to_cell_vertices(face_no, i,
+                                                        face_orientation,
+                                                        face_flip,
+                                                        face_rotation)),
+               ExcInternalError());
+
+      // indices of the lines that bound a face are given by GeometryInfo<3>::
+      // face_to_cell_lines
+      for (unsigned int i=0; i<lines_per_face; ++i)
+        Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
+                                           face_no, i, face_orientation, face_flip, face_rotation)),
+               ExcInternalError());
+#endif
+
+      // if face at boundary, then ask boundary object to return intermediate
+      // points on it
+      if (face->at_boundary())
+        {
+          get_intermediate_points_on_object(face->get_manifold(), line_support_points, face, quad_points);
+
+          // in 3D, the orientation, flip and rotation of the face might not
+          // match what we expect here, namely the standard orientation. thus
+          // reorder points accordingly. since a Mapping uses the same shape
+          // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
+          for (unsigned int i=0; i<quad_points.size(); ++i)
+            a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
+                                    face_orientation,
+                                    face_flip,
+                                    face_rotation)]);
+        }
+      else
+        {
+          // face is not at boundary, but maybe some of its lines are. count
+          // them
+          unsigned int lines_at_boundary=0;
+          for (unsigned int i=0; i<lines_per_face; ++i)
+            if (face->line(i)->at_boundary())
+              ++lines_at_boundary;
+
+          Assert(lines_at_boundary<=lines_per_face, ExcInternalError());
+
+          // if at least one of the lines bounding this quad is at the
+          // boundary, then collect points separately
+          if (lines_at_boundary>0)
+            {
+              // call of function add_weighted_interior_points increases size of b
+              // about 1. There resize b for the case the mentioned function
+              // was already called.
+              b.resize(4*polynomial_degree);
+
+              // b is of size 4*degree, make sure that this is the right size
+              Assert(b.size()==vertices_per_face+lines_per_face*(polynomial_degree-1),
+                     ExcDimensionMismatch(b.size(),
+                                          vertices_per_face+lines_per_face*(polynomial_degree-1)));
+
+              // sort the points into b. We used access from the cell (not
+              // from the face) to fill b, so we can assume a standard face
+              // orientation. Doing so, the calculated points will be in
+              // standard orientation as well.
+              for (unsigned int i=0; i<vertices_per_face; ++i)
+                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
+
+              for (unsigned int i=0; i<lines_per_face; ++i)
+                for (unsigned int j=0; j<polynomial_degree-1; ++j)
+                  b[vertices_per_face+i*(polynomial_degree-1)+j]=
+                    a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
+                        face_no, i)*(polynomial_degree-1)+j];
+
+              // Now b includes the support points on the quad and we can
+              // apply the laplace vector
+              add_weighted_interior_points (support_point_weights_on_quad, b);
+              AssertDimension (b.size(),
+                               4*this->polynomial_degree +
+                               (this->polynomial_degree-1)*(this->polynomial_degree-1));
+
+              for (unsigned int i=0; i<(polynomial_degree-1)*(polynomial_degree-1); ++i)
+                a.push_back(b[4*polynomial_degree+i]);
+            }
+          else
+            {
+              // face is entirely in the interior. get intermediate
+              // points from the relevant manifold object.
+              vertices.resize(4);
+              for (unsigned int i=0; i<4; ++i)
+                vertices[i] = face->vertex(i);
+              get_intermediate_points (face->get_manifold(), line_support_points, vertices, quad_points);
+              // in 3D, the orientation, flip and rotation of the face might
+              // not match what we expect here, namely the standard
+              // orientation. thus reorder points accordingly. since a Mapping
+              // uses the same shape function as an FE_Q, we can ask a FE_Q to
+              // do the reordering for us.
+              for (unsigned int i=0; i<quad_points.size(); ++i)
+                a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
+                                        face_orientation,
+                                        face_flip,
+                                        face_rotation)]);
+            }
+        }
+    }
+}
+
+
+
+template <>
+void
+MappingQGeneric<2,3>::
+add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
+                        std::vector<Point<3> >                &a) const
+{
+  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+  get_intermediate_points_on_object (cell->get_manifold(), line_support_points,
+                                     cell, quad_points);
+  for (unsigned int i=0; i<quad_points.size(); ++i)
+    a.push_back(quad_points[i]);
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQGeneric<dim,spacedim>::
+add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &,
+                        std::vector<Point<spacedim> > &) const
+{
+  Assert (false, ExcInternalError());
+}
+
+
+
+template<int dim, int spacedim>
+void
+MappingQGeneric<dim,spacedim>::
+compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               std::vector<Point<spacedim> > &a) const
+{
+  // get the vertices first
+  a.resize(GeometryInfo<dim>::vertices_per_cell);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    a[i] = cell->vertex(i);
+
+  if (this->polynomial_degree>1)
+    switch (dim)
+      {
+      case 1:
+        add_line_support_points(cell, a);
+        break;
+      case 2:
+        // in 2d, add the points on the four bounding lines to the exterior
+        // (outer) points
+        add_line_support_points(cell, a);
+
+        // then get the support points on the quad if we are on a
+        // manifold, otherwise compute them from the points around it
+        if (dim != spacedim)
+          add_quad_support_points(cell, a);
+        else
+          add_weighted_interior_points (support_point_weights_on_quad, a);
+        break;
+
+      case 3:
+      {
+        // in 3d also add the points located on the boundary faces
+        add_line_support_points (cell, a);
+        add_quad_support_points (cell, a);
+
+        // then compute the interior points
+        add_weighted_interior_points (support_point_weights_on_hex, a);
+        break;
+      }
+
+      default:
+        Assert(false, ExcNotImplemented());
+        break;
+      }
 }
 
 
