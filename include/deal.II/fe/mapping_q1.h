@@ -34,8 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Mapping of the reference to cell to a general
- * quadrilateral/hexahedra by $d$-linear shape functions.
+ * Implementation of a $d$-linear mapping from the reference cell to a general
+ * quadrilateral/hexahedron.
  *
  * The mapping implemented by this class maps the reference (unit) cell
  * to a general grid cell with
@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * that simply falls back to the MappingQ1 class declared here.
  *
  * The shape functions for this mapping are the same as for the finite element FE_Q
- * of order 1. Therefore, coupling these two yields an isoparametric element.
+ * of polynomial degree 1. Therefore, coupling these two yields an isoparametric element.
  *
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005, Wolfgang Bangerth, 2015
  */
@@ -84,8 +84,9 @@ public:
 
 /**
  * In order to avoid creation of static MappingQ1 objects at several places in
- * the library (in particular in backward compatibility functions), we define
- * a static MappingQ1 objects once and for all places where it is needed.
+ * the library, we define a static MappingQ1 object once and for all, for use
+ * in places where a $Q_1$ mapping is required but do not want to create a new
+ * object of this type everytime we get there.
  */
 template <int dim, int spacedim=dim>
 struct StaticMappingQ1
