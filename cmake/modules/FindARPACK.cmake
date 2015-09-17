@@ -52,6 +52,25 @@ ELSE()
   SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
 ENDIF()
 
+IF(NOT DEAL_II_ARPACK_WITH_PARPACK)
+  #
+  # We have to avoid an unfortuante symbol clash with "libscalapack.so" -
+  # arpack happened to blindly copy a symbol name...
+  #   https://github.com/opencollab/arpack-ng/issues/18
+  #   https://github.com/opencollab/arpack-ng/pull/21
+  #
+  # Just disable parpack support if scalapack is present in Trilinos' or
+  # PETSc's link interface. This can be overridden by manually setting
+  # DEAL_II_ARPACK_WITH_PARPACK to true.
+  #
+  FOREACH(_libraries ${TRILINOS_LIBRARIES} ${PETSC_LIBRARIES})
+    IF("${_libraries}" MATCHES "scalapack")
+      SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
+
+
 IF(NOT PARPACK_LIBRARY MATCHES "-NOTFOUND")
   SET(ARPACK_WITH_PARPACK TRUE)
 ELSE()
