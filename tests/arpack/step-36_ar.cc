@@ -228,7 +228,7 @@ namespace Step36
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
-    // b) x_i*B*y_i=\delta_{ij}
+    // b) x_j*B*x_i=\delta_{ij}
     {
       Vector<double> Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
       for (unsigned int i=0; i < eigenfunctions.size(); ++i)
@@ -237,12 +237,18 @@ namespace Step36
 
           for (unsigned int j=0; j < eigenfunctions.size(); j++)
             Assert( std::abs( eigenfunctions[j] * Bx - (i==j))< 1e-8,
-                    ExcMessage(std::to_string(eigenfunctions[j] * Bx)));
+                    ExcMessage("Eigenvectors " +
+                               Utilities::int_to_string(i) +
+                               " and " +
+                               Utilities::int_to_string(j) +
+                               " are not orthonormal!"));
 
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
           Ax.add(-1.0*std::real(eigenvalues[i]),Bx);
           Assert (Ax.l2_norm() < 1e-8,
-                  ExcMessage(std::to_string(Ax.l2_norm())));
+                  ExcMessage("Returned vector " +
+                             Utilities::int_to_string(i) +
+                             " is not an eigenvector!"));
         }
     }
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)

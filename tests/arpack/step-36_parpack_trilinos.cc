@@ -292,7 +292,7 @@ void test ()
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
-    // b) x_i*B*y_i=\delta_{ij}
+    // b) x_j*B*x_i=\delta_{ij}
     {
       const double precision = 1e-7;
       TrilinosWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
@@ -302,12 +302,18 @@ void test ()
 
           for (unsigned int j=0; j < eigenfunctions.size(); j++)
             Assert( std::abs( eigenfunctions[j] * Bx - (i==j))< precision,
-                    ExcMessage(std::to_string(eigenfunctions[j] * Bx)));
+                    ExcMessage("Eigenvectors " +
+                               Utilities::int_to_string(i) +
+                               " and " +
+                               Utilities::int_to_string(j) +
+                               " are not orthonormal!"));
 
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
           Ax.add(-1.0*std::real(lambda[i]),Bx);
           Assert (Ax.l2_norm() < precision,
-                  ExcMessage(std::to_string(Ax.l2_norm())));
+                  ExcMessage("Returned vector " +
+                             Utilities::int_to_string(i) +
+                             " is not an eigenvector!"));
         }
     }
   }
