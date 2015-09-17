@@ -528,7 +528,7 @@ void ArpackSolver::solve (
       const unsigned int n_eigenvecs = eigenvectors.size();
       for (size_type i=0; i<n_eigenvecs; ++i)
         for (unsigned int j=0; j<n; ++j)
-          eigenvectors[i](j) = z[i*n+j];
+          eigenvectors[i](j) = v[i*n+j];
 
       delete[] workd;
 
