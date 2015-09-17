@@ -1455,7 +1455,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @note In case the contraction yields tensor of rank 0 the scalar
+ * @note In case the contraction yields a tensor of rank 0 the scalar
  * number is returned as an unwrapped number type.
  *
  * @relates Tensor
@@ -1501,7 +1501,7 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index_i}<\text{range_i}$.
  *
- * @note In case the contraction yields tensor of rank 0 the scalar
+ * @note In case the contraction yields a tensor of rank 0 the scalar
  * number is returned as an unwrapped number type.
  *
  * @relates Tensor
@@ -1564,7 +1564,7 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index_i}<\text{range_i}$.
  *
- * @note In case the contraction yields tensor of rank 0 the scalar
+ * @note In case the contraction yields a tensor of rank 0 the scalar
  * number is returned as an unwrapped number type.
  *
  * @relates Tensor
