@@ -38,10 +38,12 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Removed: The <code>UpdateFlags</code> flag
-  <code>update_support_points</code> has been removed. This flag was deprecated
-  in 2013 and has not done anything in a long time (see the commit message for
-  more information).
+  <li> Removed: The <code>UpdateFlags</code> flags
+  <code>update_support_points</code>, <code>update_support_jacobians</code>,
+  and <code>update_support_inverse_jacobians</code> have been removed.
+  <code>update_support_points</code> was deprecated in 2013 and has not done
+  anything in a long time (see the commit message for more information). The
+  other two appeared in 2007 and were never implemented.
   <br>
   (David Wells, 2015/09/16)
   </li>
