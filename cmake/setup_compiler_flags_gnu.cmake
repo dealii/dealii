@@ -64,6 +64,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 
 #
 # Disable Wlong-long that will trigger a lot of warnings when compiling
