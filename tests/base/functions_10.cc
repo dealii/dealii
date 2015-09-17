@@ -96,7 +96,7 @@ void check ()
 
       AssertThrow ((exact_gradient - f.gradient(p)).norm() < 1e-12,
                    ExcInternalError());
-   }
+    }
 
   // now also verify that it computes values outside the box correctly, as
   // documented
