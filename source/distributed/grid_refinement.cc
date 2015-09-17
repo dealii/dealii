@@ -258,22 +258,23 @@ namespace
      */
     template <typename number>
     number
-    master_compute_threshold (const Vector<number> &criteria,
-                              const std::pair<double,double> global_min_and_max,
-                              const unsigned int    n_target_cells,
-                              MPI_Comm              mpi_communicator)
+    compute_threshold (const Vector<number> &criteria,
+                       const std::pair<double,double> global_min_and_max,
+                       const unsigned int    n_target_cells,
+                       MPI_Comm              mpi_communicator)
     {
       double interesting_range[2] = { global_min_and_max.first,
                                       global_min_and_max.second
                                     };
       adjust_interesting_range (interesting_range);
 
+      const unsigned int master_mpi_rank = 0;
       unsigned int iteration = 0;
 
       do
         {
           MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
+                     master_mpi_rank, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
             return interesting_range[0];
@@ -281,8 +282,7 @@ namespace
           const double test_threshold
             = (interesting_range[0] > 0
                ?
-               std::sqrt(interesting_range[0] *
-                         interesting_range[1])
+               std::sqrt(interesting_range[0] * interesting_range[1])
                :
                (interesting_range[0] + interesting_range[1]) / 2);
 
@@ -299,7 +299,7 @@ namespace
 
           unsigned int total_count;
           MPI_Reduce (&my_count, &total_count, 1, MPI_UNSIGNED,
-                      MPI_SUM, 0, mpi_communicator);
+                      MPI_SUM, master_mpi_rank, mpi_communicator);
 
           // now adjust the range. if
           // we have to many cells, we
@@ -308,7 +308,10 @@ namespace
           // the lower half. if we have
           // hit the right number, then
           // set the range to the exact
-          // value
+          // value.
+          // slave nodes also update their own interesting_range, however
+          // their results are not significant since the values will be
+          // overwritten by MPI_Bcast from the master node in next loop.
           if (total_count > n_target_cells)
             interesting_range[0] = test_threshold;
           else if (total_count < n_target_cells)
@@ -334,53 +337,8 @@ namespace
       Assert (false, ExcInternalError());
       return -1;
     }
-
-
-    /**
-     * The corresponding function to
-     * the one above, to be run on the
-     * slaves.
-     */
-    template <typename number>
-    number
-    slave_compute_threshold (const Vector<number> &criteria,
-                             MPI_Comm              mpi_communicator)
-    {
-      do
-        {
-          double interesting_range[2] = { -1, -1 };
-          MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
-
-          if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
-
-          // count how many elements
-          // there are that are bigger
-          // than the following trial
-          // threshold
-          const double test_threshold
-            = (interesting_range[0] > 0
-               ?
-               std::exp((std::log(interesting_range[0]) +
-                         std::log(interesting_range[1])) / 2)
-               :
-               (interesting_range[0] + interesting_range[1]) / 2);
-          unsigned int
-          my_count = std::count_if (criteria.begin(),
-                                    criteria.end(),
-                                    std::bind2nd (std::greater<double>(),
-                                                  test_threshold));
-
-          MPI_Reduce (&my_count, 0, 1, MPI_UNSIGNED,
-                      MPI_SUM, 0, mpi_communicator);
-        }
-      while (true);
-
-      Assert (false, ExcInternalError());
-      return -1;
-    }
   }
+
 
 
 
@@ -593,70 +551,37 @@ namespace parallel
           = compute_global_min_and_max_at_root (locally_owned_indicators,
                                                 mpi_communicator);
 
-        // from here on designate a
-        // master and slaves
-        double top_threshold, bottom_threshold;
-        if (Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
-          {
-            // this is the master
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedNumber::
-                master_compute_threshold (locally_owned_indicators,
-                                          global_min_and_max,
-                                          static_cast<unsigned int>
-                                          (adjusted_fractions.first *
-                                           tria.n_global_active_cells()),
-                                          mpi_communicator);
 
-            // compute bottom
-            // threshold only if
-            // necessary. otherwise
-            // use a threshold lower
-            // than the smallest
-            // value we have locally
-            if (adjusted_fractions.second > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedNumber::
-                  master_compute_threshold (locally_owned_indicators,
-                                            global_min_and_max,
-                                            static_cast<unsigned int>
-                                            ((1-adjusted_fractions.second) *
-                                             tria.n_global_active_cells()),
-                                            mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
-          }
+        double top_threshold, bottom_threshold;
+        top_threshold =
+          RefineAndCoarsenFixedNumber::
+          compute_threshold (locally_owned_indicators,
+                             global_min_and_max,
+                             static_cast<unsigned int>
+                             (adjusted_fractions.first *
+                              tria.n_global_active_cells()),
+                             mpi_communicator);
+
+        // compute bottom
+        // threshold only if
+        // necessary. otherwise
+        // use a threshold lower
+        // than the smallest
+        // value we have locally
+        if (adjusted_fractions.second > 0)
+          bottom_threshold =
+            RefineAndCoarsenFixedNumber::
+            compute_threshold (locally_owned_indicators,
+                               global_min_and_max,
+                               static_cast<unsigned int>
+                               ((1-adjusted_fractions.second) *
+                                tria.n_global_active_cells()),
+                               mpi_communicator);
         else
           {
-            // this is a slave
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedNumber::
-                slave_compute_threshold (locally_owned_indicators,
-                                         mpi_communicator);
-            // compute bottom
-            // threshold only if
-            // necessary
-            if (adjusted_fractions.second > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedNumber::
-                  slave_compute_threshold (locally_owned_indicators,
-                                           mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
+            bottom_threshold = *std::min_element (criteria.begin(),
+                                                  criteria.end());
+            bottom_threshold -= std::fabs(bottom_threshold);
           }
 
         // now refine the mesh
