@@ -1488,6 +1488,147 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
+ * Generic contraction of a pair of indices of two tensors of arbitrary
+ * rank: Return a tensor of rank $(\text{rank_1} + \text{rank_2} - 2)$ that
+ * is the contraction of index @p index_1 of a tensor @p src1 of rank
+ * @p rank_1 with the index @p index_2 of a tensor @p src2 of rank @p rank_2:
+ * @f[
+ *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   = \sum_{k}
+ *     \text{left}_{i_1,..,k,..,i_{r1}}
+ *     \text{right}_{j_1,..,k,..,j_{r2}}
+ * @f]
+ *
+ * If for example the first index (<code>index_1==0</code>) of a tensor
+ * <code>t1</code> shall be contracted with the third index
+ * (<code>index_2==2</code>) of a tensor <code>t2</code>, the invocation of
+ * this function is
+ * @code
+ *   contract<0, 2>(t1, t2);
+ * @endcode
+ *
+ * @note The position of the index is counted from 0, i.e.,
+ * $0\le\text{index_i}<\text{range_i}$.
+ *
+ * @note In case the contraction yields tensor of rank 0 the scalar
+ * number is returned as an unwrapped number type.
+ *
+ * @relates Tensor
+ * @author Matthias Maier, 2015
+ */
+template <int index_1, int index_2,
+          int rank_1, int rank_2, int dim,
+          typename Number, typename OtherNumber>
+inline
+typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+contract (const Tensor<rank_1, dim, Number> &src1,
+          const Tensor<rank_2, dim, OtherNumber> &src2)
+{
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(0 <= index_1 && index_1 < rank_1,
+                "The specified index_1 must lie within the range [0,rank_1)");
+  static_assert(0 <= index_2 && index_2 < rank_2,
+                "The specified index_2 must lie within the range [0,rank_2)");
+#endif
+  using namespace TensorAccessors;
+  using namespace TensorAccessors::internal;
+
+  // Reorder index_1 to the end of src1:
+  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number> >
+  reord_01 = reordered_index_view<index_1, rank_1>(src1);
+
+  // Reorder index_2 to the end of src2:
+  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber> >
+  reord_02 = reordered_index_view<index_2, rank_2>(src2);
+
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+  result;
+  TensorAccessors::contract<1, rank_1, rank_2, dim>(result, reord_01, reord_02);
+  return result;
+}
+
+
+/**
+ * Generic contraction of two pairs of indices of two tensors of
+ * arbitrary rank: Return a tensor of rank
+ * $(\text{rank_1} + \text{rank_2} - 4)$ that is the contraction of index
+ * @p index_1 with index @p index_2, and index @p index_3 with index
+ * @p index_4 of a tensor @p src1 of rank @p rank_1 and a tensor @p src2 of
+ * rank @p rank_2:
+ * @f[
+ *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   = \sum_{k, l}
+ *     \text{left}_{i_1,..,k,..,l,..,i_{r1}}
+ *     \text{right}_{j_1,..,k,..,l..,j_{r2}}
+ * @f]
+ *
+ * If for example the first index (<code>index_1==0</code>) shall be
+ * contracted with the third index (<code>index_2==2</code>), and the
+ * second index (<code>index_3==1</code>) with the first index
+ * (<code>index_4==0</code>) the invocation of this function is
+ * this function is
+ * @code
+ *   contract<0, 2, 1, 0>(t1, t2);
+ * @endcode
+ *
+ * @note The position of the index is counted from 0, i.e.,
+ * $0\le\text{index_i}<\text{range_i}$.
+ *
+ * @note In case the contraction yields tensor of rank 0 the scalar
+ * number is returned as an unwrapped number type.
+ *
+ * @relates Tensor
+ * @author Matthias Maier, 2015
+ */
+template <int index_1, int index_2, int index_3, int index_4,
+          int rank_1, int rank_2, int dim,
+          typename Number, typename OtherNumber>
+inline
+typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+contract (const Tensor<rank_1, dim, Number> &src1,
+          const Tensor<rank_2, dim, OtherNumber> &src2)
+{
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(0 <= index_1 && index_1 < rank_1,
+                "The specified index_1 must lie within the range [0,rank_1)");
+  static_assert(0 <= index_3 && index_3 < rank_1,
+                "The specified index_3 must lie within the range [0,rank_1)");
+  static_assert(0 <= index_2 && index_2 < rank_2,
+                "The specified index_2 must lie within the range [0,rank_2)");
+  static_assert(0 <= index_4 && index_4 < rank_2,
+                "The specified index_4 must lie within the range [0,rank_2)");
+#endif
+  using namespace TensorAccessors;
+  using namespace TensorAccessors::internal;
+
+  // Reorder index_1 to the end of src1:
+  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number> >
+  reord_1 = TensorAccessors::reordered_index_view<index_1, rank_1>(src1);
+
+  // Reorder index_2 to the end of src2:
+  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber> >
+  reord_2 = TensorAccessors::reordered_index_view<index_2, rank_2>(src2);
+
+  // Now, reorder index_3 to the end of src1. We have to make sure to
+  // preserve the orginial ordering: index_1 has been removed. If
+  // index_3 > index_1, we have to use (index_3 - 1) instead:
+  ReorderedIndexView<(index_3 < index_1 ? index_3 : index_3 - 1), rank_1, ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number> > >
+  reord_3 = TensorAccessors::reordered_index_view<index_3 < index_1 ? index_3 : index_3 - 1, rank_1>(reord_1);
+
+  // Now, reorder index_4 to the end of src2. We have to make sure to
+  // preserve the orginial ordering: index_2 has been removed. If
+  // index_4 > index_2, we have to use (index_4 - 1) instead:
+  ReorderedIndexView<(index_4 < index_2 ? index_4 : index_4 - 1), rank_2, ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber> > >
+  reord_4 = TensorAccessors::reordered_index_view<index_4 < index_2 ? index_4 : index_4 - 1, rank_2>(reord_2);
+
+  typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+  result;
+  TensorAccessors::contract<2, rank_1, rank_2, dim>(result, reord_3, reord_4);
+  return result;
+}
+
+
+/**
  * The scalar product, or (generalized) Frobenius inner product of two
  * tensors of equal rank: Return a scalar number that is the result of a
  * full contraction of a tensor @p left and @p right:
@@ -1844,7 +1985,7 @@ linfty_norm (const Tensor<2,dim,Number> &t)
 DEAL_II_NAMESPACE_CLOSE
 
 // include deprecated non-member functions operating on Tensor
-// #include <deal.II/base/tensor_deprecated.h>
+#include <deal.II/base/tensor_deprecated.h>
 
 #endif
 
