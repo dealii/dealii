@@ -2365,10 +2365,10 @@ namespace Functions
     {
       Tensor<1,2> grad;
       double
-        u00 = data_values[ix[0]][ix[1]],
-        u01 = data_values[ix[0]+1][ix[1]],
-        u10 = data_values[ix[0]][ix[1]+1],
-        u11 = data_values[ix[0]+1][ix[1]+1];
+      u00 = data_values[ix[0]][ix[1]],
+      u01 = data_values[ix[0]+1][ix[1]],
+      u10 = data_values[ix[0]][ix[1]+1],
+      u11 = data_values[ix[0]+1][ix[1]+1];
 
       grad[0] = ((1-p_unit[1])*(u01-u00) + p_unit[1]*(u11-u10))/dx[0];
       grad[1] = ((1-p_unit[0])*(u10-u00) + p_unit[0]*(u11-u01))/dx[1];
@@ -2383,14 +2383,14 @@ namespace Functions
     {
       Tensor<1,3> grad;
       double
-        u000 = data_values[ix[0]][ix[1]][ix[2]],
-        u001 = data_values[ix[0]+1][ix[1]][ix[2]],
-        u010 = data_values[ix[0]][ix[1]+1][ix[2]],
-        u100 = data_values[ix[0]][ix[1]][ix[2]+1],
-        u011 = data_values[ix[0]+1][ix[1]+1][ix[2]],
-        u101 = data_values[ix[0]+1][ix[1]][ix[2]+1],
-        u110 = data_values[ix[0]][ix[1]+1][ix[2]+1],
-        u111 = data_values[ix[0]+1][ix[1]+1][ix[2]+1];
+      u000 = data_values[ix[0]][ix[1]][ix[2]],
+      u001 = data_values[ix[0]+1][ix[1]][ix[2]],
+      u010 = data_values[ix[0]][ix[1]+1][ix[2]],
+      u100 = data_values[ix[0]][ix[1]][ix[2]+1],
+      u011 = data_values[ix[0]+1][ix[1]+1][ix[2]],
+      u101 = data_values[ix[0]+1][ix[1]][ix[2]+1],
+      u110 = data_values[ix[0]][ix[1]+1][ix[2]+1],
+      u111 = data_values[ix[0]+1][ix[1]+1][ix[2]+1];
 
       grad[0] = ((1-p_unit[2])
                  *
@@ -2399,7 +2399,7 @@ namespace Functions
                  p_unit[2]
                  *
                  ((1-p_unit[1])*(u101-u100) + p_unit[1]*(u111-u110))
-                 )/dx[0];
+                )/dx[0];
       grad[1] = ((1-p_unit[2])
                  *
                  ((1-p_unit[0])*(u010-u000) + p_unit[0]*(u011-u001))
@@ -2407,7 +2407,7 @@ namespace Functions
                  p_unit[2]
                  *
                  ((1-p_unit[0])*(u110-u100) + p_unit[0]*(u111-u101))
-                 )/dx[1];
+                )/dx[1];
       grad[2] = ((1-p_unit[1])
                  *
                  ((1-p_unit[0])*(u100-u000) + p_unit[0]*(u101-u001))
@@ -2415,7 +2415,7 @@ namespace Functions
                  p_unit[1]
                  *
                  ((1-p_unit[0])*(u110-u010) + p_unit[0]*(u111-u011))
-                 )/dx[2];
+                )/dx[2];
 
       return grad;
     }
