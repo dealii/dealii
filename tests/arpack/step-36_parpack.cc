@@ -133,10 +133,8 @@ void test ()
   dealii::GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (global_mesh_refinement_steps);
 
-  // METIS:
+  // we do not use metis but rather partition by hand below.
   //dealii::GridTools::partition_triangulation (n_mpi_processes, triangulation);
-
-  // partition by hand
   {
     const double x0 = -1.0;
     const double x1 =  1.0;
