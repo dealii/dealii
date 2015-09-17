@@ -433,23 +433,14 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
-      //TODO: Use get_data() here once MappingQ is no longer derived from
-      //MappingQ1. this doesn't currently work because we here really need
-      //a Q1 InternalData, but MappingQGeneric produces one with the
-      //polynomial degree of the MappingQ
       std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData>
-      mdata (new typename MappingQGeneric<dim,spacedim>::InternalData(1));
-      mdata->initialize (this->requires_update_flags (update_flags), point_quadrature, 1);
+      mdata (this->get_data(update_flags,
+                            point_quadrature));
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
-      // The support points have to be at
-      // least as many as there are
-      // vertices.
-      Assert(mdata->mapping_support_points.size() >=
+      Assert(mdata->mapping_support_points.size() ==
              GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
-      // Ignore non vertex support points.
-      mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
       // perform the Newton iteration and
       // return the result. note that this
