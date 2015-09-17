@@ -57,7 +57,7 @@ void test ()
 
   bs = ts * as;
   // contract indices 2 <-> 0, 3 <-> 1
-  ba = contract<2, 0, 3, 1>(ta, aa);
+  ba = double_contract<2, 0, 3, 1>(ta, aa);
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)

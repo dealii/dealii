@@ -119,10 +119,10 @@ int main ()
   {
     Tensor<2, 3, int> result;
 
-    deallog << contract<2, 0, 3, 1>(rank4, rank2) << std::endl;
-    deallog << contract<3, 1, 2, 0>(rank4, rank2) << std::endl;
-    deallog << contract<0, 2, 1, 3>(rank2, rank4) << std::endl;
-    deallog << contract<1, 3, 0, 2>(rank2, rank4) << std::endl;
+    deallog << double_contract<2, 0, 3, 1>(rank4, rank2) << std::endl;
+    deallog << double_contract<3, 1, 2, 0>(rank4, rank2) << std::endl;
+    deallog << double_contract<0, 2, 1, 3>(rank2, rank4) << std::endl;
+    deallog << double_contract<1, 3, 0, 2>(rank2, rank4) << std::endl;
 
     double_contract(result, rank4, rank2);
     deallog << result << std::endl << std::endl;
