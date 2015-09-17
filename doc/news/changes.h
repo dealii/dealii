@@ -151,14 +151,12 @@ inconvenience this causes.
 
 <a name="general"></a>
 <h3>General</h3>
-
-  <li> New: implemented the gradient method for
-  InterpolatedTensorProductGridData
+<ol>
+  <li> New: PArpackSolver eigensolver interface class.
   <br>
-  (Daniel Shapero, 2015/08/12)
+  (Denis Davydov, 2015/09/17)
   </li>
 
-<ol>
   <li> Changed: All doxygen-generated pages now contain a link to the
   tutorial in their top-level menus.
   <br>
@@ -289,6 +287,13 @@ inconvenience this causes.
   <br>
   (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
   </li>
+
+  <li> New: implemented the gradient method for
+  InterpolatedTensorProductGridData
+  <br>
+  (Daniel Shapero, 2015/08/12)
+  </li>
+
 
   <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
   with vanishing mean values of jumps across faces.

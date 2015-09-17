@@ -20,10 +20,7 @@
 #
 #   ARPACK_LIBRARIES
 #   ARPACK_LINKER_FLAGS
-#
-
-#
-# TODO: ARPACK and mpi...
+#   ARPACK_WITH_PARPACK
 #
 
 SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
@@ -35,8 +32,56 @@ DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
+IF(DEAL_II_WITH_MPI)
+  #
+  # Sanity check: Only search the parpack library in the same directory as
+  # the arpack library...
+  #
+  GET_FILENAME_COMPONENT(_path "${ARPACK_LIBRARY}" PATH)
+  DEAL_II_FIND_LIBRARY(PARPACK_LIBRARY
+    NAMES parpack
+    HINTS ${_path}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+ELSE()
+  SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+ENDIF()
+
+IF(NOT DEAL_II_ARPACK_WITH_PARPACK)
+  #
+  # We have to avoid an unfortuante symbol clash with "libscalapack.so" -
+  # arpack happened to blindly copy a symbol name...
+  #   https://github.com/opencollab/arpack-ng/issues/18
+  #   https://github.com/opencollab/arpack-ng/pull/21
+  #
+  # Just disable parpack support if scalapack is present in Trilinos' or
+  # PETSc's link interface. This can be overridden by manually setting
+  # DEAL_II_ARPACK_WITH_PARPACK to true.
+  #
+  FOREACH(_libraries ${TRILINOS_LIBRARIES} ${PETSC_LIBRARIES})
+    IF("${_libraries}" MATCHES "scalapack")
+      SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
+
+
+IF(NOT PARPACK_LIBRARY MATCHES "-NOTFOUND")
+  SET(ARPACK_WITH_PARPACK TRUE)
+ELSE()
+  SET(ARPACK_WITH_PARPACK FALSE)
+ENDIF()
+
 DEAL_II_PACKAGE_HANDLE(ARPACK
-  LIBRARIES REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES
+  LIBRARIES
+    OPTIONAL PARPACK_LIBRARY
+    REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES
+    OPTIONAL MPI_C_LIBRARIES
   LINKER_FLAGS OPTIONAL LAPACK_LINKER_FLAGS
-  CLEAR ARPACK_LIBRARY
+  CLEAR ARPACK_LIBRARY PARPACK_LIBRARY
   )
