@@ -305,17 +305,6 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               std::vector<Point<spacedim> > &a) const
-{
-  MappingQGeneric<dim,spacedim>::compute_mapping_support_points (cell, a);
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::
 transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -513,8 +502,6 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
         update_flags |= update_jacobian_grads;
       std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                           point_quadrature));
-
-      mdata->use_mapping_q1_on_current_cell = false;
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
 

@@ -286,12 +286,6 @@ protected:
    */
   std_cxx11::unique_ptr<const MappingQ1<dim,spacedim> > q1_mapping;
 
-  //TODO: Remove again -- all the function does is bypass the inherited function from MappingQ1 and go back to the one in the MappingQGeneric base class
-  virtual
-  void
-  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                  std::vector<Point<spacedim> > &a) const;
-
   /**
    * Declare other MappingQ classes friends.
    */
