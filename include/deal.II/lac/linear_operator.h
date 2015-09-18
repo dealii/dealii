@@ -1155,6 +1155,7 @@ constraints_linear_operator(const ConstraintMatrix &, const Matrix &);
  * transformation as part of a direct stiffness assembly process, 1985.
  * For more details.
  *
+ * @relates ConstraintMatrix
  * @ingroup LAOperators
  */
 template <  typename Range,
@@ -1255,6 +1256,7 @@ constrained_linear_operator(const ConstraintMatrix &, const Matrix &);
  * transformation as part of a direct stiffness assembly process, 1985.
  * For more details.
  *
+ * @relates ConstraintMatrix
  * @ingroup LAOperators
  */
 template <  typename Range,
