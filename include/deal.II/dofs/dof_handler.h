@@ -1186,7 +1186,7 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=0, ExcNotInitialized());
+  Assert(selected_fe!=0, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
 }
 
