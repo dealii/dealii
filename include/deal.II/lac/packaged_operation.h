@@ -867,6 +867,7 @@ constrained_rhs(const ConstraintMatrix &, const Matrix &, const Range &);
  * transformation as part of a direct stiffness assembly process, 1985.
  * For more details.
  *
+ * @relates ConstraintMatrix
  * @ingroup LAOperators
  */
 template <typename Range,
