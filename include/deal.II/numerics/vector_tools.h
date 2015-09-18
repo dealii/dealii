@@ -323,7 +323,7 @@ namespace VectorTools
 {
   /**
    * Denote which norm/integral is to be computed by the
-   * integrate_difference() function of this class. The following
+   * integrate_difference() function of this namespace. The following
    * possibilities are implemented:
    */
   enum NormType
@@ -400,7 +400,7 @@ namespace VectorTools
    * The template argument <code>DH</code> may either be of type DoFHandler or
    * hp::DoFHandler.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    *
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
@@ -432,9 +432,9 @@ namespace VectorTools
    * continuous again.
    *
    * @note Instantiations for this template are provided for some vector types
-   * (see the general documentation of the class), but only the same vector
-   * for InVector and OutVector. Other combinations must be instantiated by
-   * hand.
+   * (see the general documentation of the namespace), but only the same
+   * vector for InVector and OutVector. Other combinations must be
+   * instantiated by hand.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void interpolate (const DoFHandler<dim,spacedim>    &dof_1,
@@ -585,7 +585,7 @@ namespace VectorTools
    * sure that the given quadrature formula is also sufficient for the
    * integration of the mass matrix.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    *
    * In 1d, the default value of the boundary quadrature formula is an invalid
    * object since integration on the boundary doesn't happen in 1d.
@@ -699,7 +699,7 @@ namespace VectorTools
    * Thus, the elements in the component mask corresponding to the components
    * of these non-primitive shape functions must be @p false.
    *
-   * See the general documentation of this class for more information.
+   * See the general documentation of this namespace for more information.
    */
   template <class DH>
   void
@@ -828,7 +828,7 @@ namespace VectorTools
    * Thus, the elements in the component mask corresponding to the components
    * of these non-primitive shape functions must be @p false.
    *
-   * See the general documentation of this class for more information.
+   * See the general documentation of this namespace for more information.
    *
    * @ingroup constraints
    */
@@ -1593,7 +1593,7 @@ namespace VectorTools
    * Create a right hand side vector. Prior content of the given @p rhs_vector
    * vector is deleted.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    */
   template <int dim, int spacedim>
   void create_right_hand_side (const Mapping<dim, spacedim>    &mapping,
@@ -1637,7 +1637,7 @@ namespace VectorTools
    * \delta(x-p) \phi_i(x) dx$. Prior content of the given @p rhs_vector
    * vector is deleted.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
@@ -1689,7 +1689,7 @@ namespace VectorTools
    *
    * Prior content of the given @p rhs_vector vector is deleted.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
@@ -1734,7 +1734,7 @@ namespace VectorTools
    * Create a right hand side vector from boundary forces. Prior content of
    * the given @p rhs_vector vector is deleted.
    *
-   * See the general documentation of this class for further information.
+   * See the general documentation of this namespace for further information.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -1853,7 +1853,7 @@ namespace VectorTools
    * than NormType::Lp_norm or NormType::W1p_norm is chosen.
    *
    *
-   * See the general documentation of this class for more information.
+   * See the general documentation of this namespace for more information.
    *
    * @note If the integration here happens over the cells of a
    * parallel::distribute::Triangulation object, then this function computes
@@ -1899,8 +1899,8 @@ namespace VectorTools
    * norm of the error.
    *
    * Instantiations for this template are provided for some vector types (see
-   * the general documentation of the class), but only for InVectors as in the
-   * documentation of the class, OutVector only Vector<double> and
+   * the general documentation of the namespace), but only for InVectors as in
+   * the documentation of the namespace, OutVector only Vector<double> and
    * Vector<float>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
