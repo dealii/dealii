@@ -249,9 +249,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::preserves_vertex_locations () const
 
 template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,VECTOR,DH>::compute_shapes_virtual (
-  const std::vector<Point<dim> > &unit_points,
-  typename MappingFEField<dim, spacedim>::InternalData &data) const
+MappingFEField<dim,spacedim,VECTOR,DH>::
+compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+                        typename MappingFEField<dim, spacedim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
 
@@ -1667,14 +1667,14 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   update_internal_dofs(cell, *mdata);
 
-  return this->transform_unit_to_real_cell_internal(*mdata);
+  return do_transform_unit_to_real_cell(*mdata);
 }
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
 Point<spacedim>
 MappingFEField<dim,spacedim,VECTOR,DH>::
-transform_unit_to_real_cell_internal (const InternalData &data) const
+do_transform_unit_to_real_cell (const InternalData &data) const
 {
   Point<spacedim> p_real;
 
@@ -1728,7 +1728,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   update_internal_dofs(cell, *mdata);
 
-  return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit, *mdata);
+  return do_transform_real_to_unit_cell(cell, p, initial_p_unit, *mdata);
 
 }
 
@@ -1736,7 +1736,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 template<int dim, int spacedim, class VECTOR, class DH>
 Point<dim>
 MappingFEField<dim,spacedim,VECTOR,DH>::
-transform_real_to_unit_cell_internal
+do_transform_real_to_unit_cell
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
  const Point<spacedim>                            &p,
  const Point<dim>                                 &initial_p_unit,
@@ -1760,7 +1760,7 @@ transform_real_to_unit_cell_internal
   Point<dim> p_unit = initial_p_unit;
   Point<dim> f;
   compute_shapes_virtual(std::vector<Point<dim> > (1, p_unit), mdata);
-  Point<spacedim> p_real(transform_unit_to_real_cell_internal(mdata));
+  Point<spacedim> p_real(do_transform_unit_to_real_cell(mdata));
   Tensor<1,spacedim> p_minus_F = p - p_real;
   const double eps = 1.e-12*cell->diameter();
   const unsigned int newton_iteration_limit = 20;
@@ -1807,7 +1807,7 @@ transform_real_to_unit_cell_internal
           // at new p_unit point
           compute_shapes_virtual(std::vector<Point<dim> > (1, p_unit_trial), mdata);
           // f(x)
-          Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
+          Point<spacedim> p_real_trial = do_transform_unit_to_real_cell(mdata);
           const Tensor<1,spacedim> f_trial = p - p_real_trial;
           // see if we are making progress with the current step length
           // and if not, reduce it by a factor of two and try again

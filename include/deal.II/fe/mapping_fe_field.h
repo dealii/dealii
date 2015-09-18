@@ -523,7 +523,7 @@ private:
    * support points.
    */
   Point<spacedim>
-  transform_unit_to_real_cell_internal (const InternalData &mdata) const;
+  do_transform_unit_to_real_cell (const InternalData &mdata) const;
 
 
   /**
@@ -541,10 +541,10 @@ private:
    * @p mdata will be changed by this function.
    */
   Point<dim>
-  transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                        const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit,
-                                        InternalData &mdata) const;
+  do_transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                  const Point<spacedim> &p,
+                                  const Point<dim> &initial_p_unit,
+                                  InternalData &mdata) const;
 
   /**
    * Update internal degrees of freedom.
@@ -553,7 +553,7 @@ private:
                             const typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   /**
-   * Reimplemented from Mapping. See the documentation of the base class for
+   * See the documentation of the base class for
    * detailed information.
    */
   virtual void
