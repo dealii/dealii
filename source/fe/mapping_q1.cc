@@ -407,15 +407,18 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   // of the cell
   std::vector<Point<spacedim> > a;
   this->compute_mapping_support_points (cell,a);
-  Point<dim> initial_p_unit =
-    transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+  Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
+         ExcInternalError());
 
   // if dim==1 there is nothing else to do to the initial value, and
   // it is the answer
   if (dim == 1)
-    return initial_p_unit;
+    return transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
   else
     {
+      const Point<dim> initial_p_unit =
+        transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+
       // use the full mapping. in case the function above should have
       // given us something back that lies outside the unit cell (that
       // might happen because either the function computing an initial
@@ -436,11 +439,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData>
       mdata (this->get_data(update_flags,
                             point_quadrature));
-
-      this->compute_mapping_support_points (cell, mdata->mapping_support_points);
-      Assert(mdata->mapping_support_points.size() ==
-             GeometryInfo<dim>::vertices_per_cell,
-             ExcInternalError());
+      mdata->mapping_support_points = a;
 
       // perform the Newton iteration and
       // return the result. note that this
