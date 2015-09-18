@@ -253,7 +253,7 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Dimensionality of the object that the thing represented by this accessopr
+   * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
@@ -1505,7 +1505,7 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Dimensionality of the object that the thing represented by this accessopr
+   * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
@@ -2176,10 +2176,10 @@ public:
    * refined: <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,
    * subface_no)==cell</tt>. In 3D, a coarser neighbor can still be refined.
    * In that case subface_no denotes the child index of the neighbors face
-   * that relates to our face: <tt>cell->neighbor(neighbor)->face(face_no)->ch
-   * ild(subface_no)==cell->face(neighbor)</tt>. This case in 3d and how it
-   * can happen is discussed in the introduction of the step-30 tutorial
-   * program.
+   * that relates to our face:
+   * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
+   * This case in 3d and how it can happen is discussed in the introduction of
+   * the step-30 tutorial program.
    *
    * This function is impossible for <tt>dim==1</tt>.
    */
@@ -2805,7 +2805,7 @@ CellAccessor<dim,spacedim>::id() const
   CellAccessor<dim,spacedim> ptr = *this;
   while (ptr.level()>0)
     {
-      // find the 'v'st child of our parent we are
+      // determine which child we are
       unsigned char v=-1;
       for (unsigned int c=0; c<ptr.parent()->n_children(); ++c)
         {

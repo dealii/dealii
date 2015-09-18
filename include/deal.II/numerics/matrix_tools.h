@@ -182,7 +182,7 @@ namespace TrilinosWrappers
  * 2). The size of the matrix is equal to the number of degrees of freedom
  * that have support on the boundary, i.e. it is <em>not</em> a matrix on all
  * degrees of freedom, but only a subset. (The $\phi_i$ in the formula are
- * this subsect of basis functions which have at least part of their support
+ * the subset of basis functions which have at least part of their support
  * on $\Gamma$.) In order to determine which shape functions are to be
  * considered, and in order to determine in which order, the function takes a
  * @p dof_to_boundary_mapping; this object maps global DoF numbers to a
