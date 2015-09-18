@@ -1082,6 +1082,102 @@ set (const internal::Triangulation::TriaObject<structdim> &object) const
 
 
 
+template <>
+TriaAccessor<0,1,1>
+TriaAccessor<1,1,1>::vertex_accessor (const unsigned int i) const
+{
+  // Silence a warning
+  (void) i;
+  return TriaAccessor<0,1,1>();
+}
+
+
+
+template <>
+TriaAccessor<0,1,2>
+TriaAccessor<1,1,2>::vertex_accessor (const unsigned int i) const
+{
+  // Silence a warning
+  (void) i;
+  return TriaAccessor<0,1,2>();
+}
+
+
+
+template <>
+TriaAccessor<0,1,3>
+TriaAccessor<1,1,3>::vertex_accessor (const unsigned int i) const
+{
+  // Silence a warning
+  (void) i;
+  return TriaAccessor<0,1,3>();
+}
+
+
+
+template <>
+TriaAccessor<0,2,2>
+TriaAccessor<1,2,2>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,2,2>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,2,3>
+TriaAccessor<1,2,3>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,2,3>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,3,3>
+TriaAccessor<1,3,3>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,3,3>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,2,2>
+TriaAccessor<2,2,2>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,2,2>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,2,3>
+TriaAccessor<2,2,3>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,2,3>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,3,3>
+TriaAccessor<2,3,3>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,3,3>(this->tria, vertex_index (i));
+}
+
+
+
+template <>
+TriaAccessor<0,3,3>
+TriaAccessor<3,3,3>::vertex_accessor (const unsigned int i) const
+{
+  return TriaAccessor<0,3,3>(this->tria, vertex_index (i));
+}
+
+
+
 template <int structdim, int dim, int spacedim>
 Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::
