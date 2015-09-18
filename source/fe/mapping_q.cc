@@ -495,17 +495,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       // a better starting point to the following iteration
       initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
-      const Quadrature<dim> point_quadrature(initial_p_unit);
-
-      UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-      if (spacedim>dim)
-        update_flags |= update_jacobian_grads;
-      std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                          point_quadrature));
-
-      compute_mapping_support_points (cell, mdata->mapping_support_points);
-
-      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit, *mdata);
+      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
     }
   else
     return initial_p_unit;

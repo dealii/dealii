@@ -546,14 +546,11 @@ protected:
    * transformation @p initial_p_unit.  Hence this function assumes that @p
    * mdata already includes the transformation shape values and gradients
    * computed at @p initial_p_unit.
-   *
-   * @p mdata will be changed by this function.
    */
   Point<dim>
   transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                         const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit,
-                                        InternalData &mdata) const;
+                                        const Point<dim> &initial_p_unit) const;
 
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape

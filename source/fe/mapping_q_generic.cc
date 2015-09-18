@@ -1409,26 +1409,23 @@ template<int dim, int spacedim>
 Point<dim>
 MappingQGeneric<dim,spacedim>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<dim,spacedim>::cell_iterator &/*cell*/,
- const Point<spacedim>                            &/*p*/,
- const Point<dim>                                 &/*initial_p_unit*/,
- InternalData                                     &/*mdata*/) const
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+ const Point<spacedim>                            &p,
+ const Point<dim>                                 &initial_p_unit) const
 {
-  // default implementation (should never be called)
-  Assert(false, ExcInternalError());
-  return Point<dim>();
-}
+  const Quadrature<dim> point_quadrature(initial_p_unit);
 
-template<>
-Point<1>
-MappingQGeneric<1, 1>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1, 1>::cell_iterator &cell,
- const Point<1>                            &p,
- const Point<1>                                 &initial_p_unit,
- InternalData                                     &mdata) const
-{
-  return do_transform_real_to_unit_cell_internal(cell, p, initial_p_unit, mdata);
+  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
+  if (spacedim>dim)
+    update_flags |= update_jacobian_grads;
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                      point_quadrature));
+
+  compute_mapping_support_points (cell, mdata->mapping_support_points);
+
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal (cell, p, initial_p_unit, *mdata);
 }
 
 template<>

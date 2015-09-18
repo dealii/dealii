@@ -430,23 +430,12 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       // cell), then project it back into the reference cell in hopes
       // that this gives a better starting point to the following
       // iteration
-      const Quadrature<dim> point_quadrature(initial_p_unit);
-
-      UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-      if (spacedim>dim)
-        update_flags |= update_jacobian_grads;
-
-      std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData>
-      mdata (this->get_data(update_flags,
-                            point_quadrature));
-      mdata->mapping_support_points = a;
 
       // perform the Newton iteration and
       // return the result. note that this
       // statement may throw an exception, which
       // we simply pass up to the caller
-      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit,
-                                                        *mdata);
+      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
     }
 }
 
