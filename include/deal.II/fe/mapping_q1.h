@@ -63,21 +63,6 @@ public:
   // for documentation, see the Mapping base class
   virtual
   MappingQ1<dim,spacedim> *clone () const;
-
-  /**
-   * @name Mapping points between reference and real cells
-   * @{
-   */
-
-  // for documentation, see the Mapping base class
-  virtual
-  Point<dim>
-  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<spacedim>                            &p) const;
-
-  /**
-   * @}
-   */
 };
 
 

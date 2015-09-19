@@ -96,6 +96,12 @@ public:
   transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<dim>                                 &p) const;
 
+  // for documentation, see the Mapping base class
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                            &p) const;
+
   /**
    * @}
    */
