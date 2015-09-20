@@ -125,7 +125,7 @@ extern "C" {
  * <code>pdsaupd</code> work and also how to set the parameters
  * appropriately please take a look into the PARPACK manual.
  *
- * @author Denis Davydov, 2014.
+ * @author Denis Davydov, 2015.
  */
 template <typename VECTOR>
 class PArpackSolver : public Subscriptor
