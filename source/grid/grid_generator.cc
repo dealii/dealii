@@ -4336,12 +4336,12 @@ namespace GridGenerator
 
   template void
   hyper_sphere< 1 ,  2 > (Triangulation< 1 ,   2> &,
-                          const Point<2>   &center = Point<2>(),
-                          const double        radius = 1.);
+                          const Point<2>   &center,
+                          const double        radius);
   template void
   hyper_sphere< 2 ,  3 > (Triangulation< 2 ,   3> &,
-                          const Point<3>   &center = Point<3>(),
-                          const double        radius = 1.);
+                          const Point<3>   &center,
+                          const double        radius);
 }
 #include "grid_generator.inst"
 
