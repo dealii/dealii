@@ -54,7 +54,7 @@ ENDIF()
 
 IF(NOT DEAL_II_ARPACK_WITH_PARPACK)
   #
-  # We have to avoid an unfortuante symbol clash with "libscalapack.so" -
+  # We have to avoid an unfortunate symbol clash with "libscalapack.so" -
   # arpack happened to blindly copy a symbol name...
   #   https://github.com/opencollab/arpack-ng/issues/18
   #   https://github.com/opencollab/arpack-ng/pull/21

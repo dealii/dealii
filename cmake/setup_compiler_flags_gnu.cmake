@@ -86,7 +86,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
   #
   # Clang verbosely warns about not supporting all our friend declarations
-  # (and consequently removing access control alltogether)
+  # (and consequently removing access control altogether)
   #
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 

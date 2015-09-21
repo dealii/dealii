@@ -29,7 +29,7 @@ if [ -z "$DEAL_II_BUNDLE" ]; then
 	    return=`/usr/bin/osascript <<EOF
 tell app "System Events"
     Activate
-    display dialog "This commands need to know where you installed the deal.II appliaction. If you moved it or renamed it, and you want to run this script from the command line, export the variable DEAL_II_BUNDLE to the correct path." buttons "OK" default button 1 with title "Location of deal.II changed." with icon 0
+    display dialog "This commands need to know where you installed the deal.II application. If you moved it or renamed it, and you want to run this script from the command line, export the variable DEAL_II_BUNDLE to the correct path." buttons "OK" default button 1 with title "Location of deal.II changed." with icon 0
 end tell
 EOF`
     exit 1

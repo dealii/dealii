@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Replace all occurences of "${flag}" with "${replacement}" in the string
+# Replace all occurrences of "${flag}" with "${replacement}" in the string
 # variable.
 #
 # Usage:

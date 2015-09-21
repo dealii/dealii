@@ -59,7 +59,7 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 #
-# Determine the last succesful stage of the test:
+# Determine the last successful stage of the test:
 # (Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED)
 #
 

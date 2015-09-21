@@ -42,7 +42,7 @@
 # well as compile definitions to use and against which deal.II library it
 # should be linked against.
 #
-# If the requested build type is not availabe (e.g. DEBUG request but
+# If the requested build type is not available (e.g. DEBUG request but
 # deal.II was compiled with release mode only), the other available will be
 # used instead.
 #
