@@ -631,7 +631,8 @@ public:
    * Pointer to the @p ith vertex bounding this object. Throw an exception if
    * <code>dim=1</code>.
    */
-  TriaAccessor<0,dim,spacedim> vertex_accessor (const unsigned int i) const;
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+  vertex_it (const unsigned int i) const;
 
   /**
    * Return the global index of i-th vertex of the current object. The
@@ -1479,7 +1480,7 @@ private:
  * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a triangulation
  * of quads, and 3 for a triangulation of hexes) that is embedded in a space of
  * dimensionality <code>spacedim</code> (for <code>spacedim==dim</code> the
- * triangulation represents a domain in $R^{dim}$, for
+ * triangulation represents a domain in ${\mathbb R}^\text{dim}$, for
  * <code>spacedim@>dim</code> the triangulation is of a manifold embedded in
  * a higher dimensional space).
  *
@@ -1524,13 +1525,13 @@ public:
 
   /**
    * Constructor. This constructor exists in order to maintain interface
-   * compatibility with the other accessor classes. However, it doesn't do
-   * anything useful here and so may not actually be called.
+   * compatibility with the other accessor classes. @p index can be used to set
+   * the global index of the vertex we point to.
    */
-  TriaAccessor (const Triangulation<dim,spacedim> *tria = NULL,
-                const int = 0,
-                const int = 0,
-                const AccessorData * = 0);
+  TriaAccessor (const Triangulation<dim,spacedim> *tria  = NULL,
+                const int                          level = 0,
+                const int                          index = 0,
+                const AccessorData                     * = 0);
 
   /**
    * Constructor. Should never be called and thus produces an error.

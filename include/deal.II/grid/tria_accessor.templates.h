@@ -1161,6 +1161,17 @@ TriaAccessor<structdim,dim,spacedim>::used () const
 
 
 template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+TriaAccessor<structdim,dim,spacedim>::vertex_it (const unsigned int i) const
+{
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+         (this->tria, 0, vertex_index (i));
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::
 vertex_index (const unsigned int corner) const
@@ -2134,11 +2145,9 @@ TriaAccessor (const Triangulation<dim,spacedim> *tria,
               const int index,
               const AccessorData *)
   :
-  tria (NULL),
-  global_vertex_index (numbers::invalid_unsigned_int)
-{
-  Assert(false, ExcImpossibleInDim(0));
-}
+  tria (tria),
+  global_vertex_index (index)
+{}
 
 
 
