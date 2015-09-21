@@ -3545,18 +3545,33 @@ namespace parallel
       parallel_forest->user_pointer = this;
 
       // enforce 2:1 hanging node condition
-      dealii::internal::p4est::functions<dim>::
-      balance (parallel_forest,
-               /* face and corner balance */
-               (dim == 2
-                ?
-                typename dealii::internal::p4est::types<dim>::
-                balance_type(P4EST_CONNECT_FULL)
-                :
-                typename dealii::internal::p4est::types<dim>::
-                balance_type(P8EST_CONNECT_FULL)),
-               /*init_callback=*/NULL);
-
+      if (this->smooth_grid &
+          dealii::Triangulation<dim, spacedim>::limit_level_difference_at_vertices)
+        {
+          dealii::internal::p4est::functions<dim>::
+          balance (parallel_forest,
+                   (dim == 2
+                    ?
+                    typename dealii::internal::p4est::types<dim>::
+                    balance_type(P4EST_CONNECT_FULL)
+                    :
+                    typename dealii::internal::p4est::types<dim>::
+                    balance_type(P8EST_CONNECT_FULL)),
+                   /*init_callback=*/NULL);
+        }
+      else
+        {
+          dealii::internal::p4est::functions<dim>::
+          balance (parallel_forest,
+                   (dim == 2
+                    ?
+                    typename dealii::internal::p4est::types<dim>::
+                    balance_type(P4EST_CONNECT_FACE)
+                    :
+                    typename dealii::internal::p4est::types<dim>::
+                    balance_type(P8EST_CONNECT_FACE)),
+                   /*init_callback=*/NULL);
+        }
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
