@@ -486,8 +486,14 @@ namespace TrilinosWrappers
             row_indices.resize (row_length, -1);
             {
               typename SparsityType::iterator p = sp.begin(row);
-              for (size_type col=0; p != sp.end(row); ++p, ++col)
-                row_indices[col] = p->column();
+              // avoid incrementing p over the end of the current row because
+              // it is slow for DynamicSparsityPattern in parallel
+              for (int col=0; col<row_length; )
+                {
+                  row_indices[col++] = p->column();
+                  if (col < row_length)
+                    ++p;
+                }
             }
             graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
                                                          &row_indices[0]);
@@ -502,8 +508,14 @@ namespace TrilinosWrappers
             row_indices.resize (row_length, -1);
             {
               typename SparsityType::iterator p = sp.begin(row);
-              for (size_type col=0; p != sp.end(row); ++p, ++col)
-                row_indices[col] = p->column();
+              // avoid incrementing p over the end of the current row because
+              // it is slow for DynamicSparsityPattern in parallel
+              for (int col=0; col<row_length; )
+                {
+                  row_indices[col++] = p->column();
+                  if (col < row_length)
+                    ++p;
+                }
             }
             graph->InsertGlobalIndices (1,
                                         reinterpret_cast<TrilinosWrappers::types::int_type *>(&row),

@@ -489,7 +489,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 #ifdef DEBUG
   if (!overlapping)
     {
-      const unsigned int n_global_elements
+      const size_type n_global_elements
         = Utilities::MPI::sum (n_elements(), communicator);
       Assert (n_global_elements == size(),
               ExcMessage ("You are trying to create an Epetra_Map object "

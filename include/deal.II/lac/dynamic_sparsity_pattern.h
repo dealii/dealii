@@ -69,7 +69,7 @@ namespace DynamicSparsityPatternIterators
      * Constructor.
      */
     Accessor (const DynamicSparsityPattern *sparsity_pattern,
-              const unsigned int row,
+              const size_type    row,
               const unsigned int index_within_row);
 
     /**
@@ -115,7 +115,7 @@ namespace DynamicSparsityPatternIterators
     /**
      * The row we currently point into.
      */
-    unsigned int current_row;
+    size_type current_row;
 
     /**
      * A pointer to the element within the current row that we currently point
@@ -177,7 +177,7 @@ namespace DynamicSparsityPatternIterators
      * the zeroth row).
      */
     Iterator (const DynamicSparsityPattern *sp,
-              const unsigned int row,
+              const size_type    row,
               const unsigned int index_within_row);
 
     /**
@@ -635,7 +635,7 @@ namespace DynamicSparsityPatternIterators
   inline
   Accessor::
   Accessor (const DynamicSparsityPattern *sparsity_pattern,
-            const unsigned int row,
+            const size_type    row,
             const unsigned int index_within_row)
     :
     sparsity_pattern(sparsity_pattern),
@@ -653,8 +653,7 @@ namespace DynamicSparsityPatternIterators
                :
                sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.end())
   {
-    Assert (current_row < sparsity_pattern->n_rows(),
-            ExcIndexRange (row, 0, sparsity_pattern->n_rows()));
+    AssertIndexRange(current_row, sparsity_pattern->n_rows());
     Assert ((sparsity_pattern->rowset.size()==0)
             ||
             sparsity_pattern->rowset.is_element(current_row),
@@ -662,18 +661,12 @@ namespace DynamicSparsityPatternIterators
                         "DynamicSparsityPattern's row that is not "
                         "actually stored by that sparsity pattern "
                         "based on the IndexSet argument to it."));
-    Assert (index_within_row <
-            ((sparsity_pattern->rowset.size()==0)
-             ?
-             sparsity_pattern->lines[current_row].entries.size()
-             :
-             sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.size()),
-            ExcIndexRange (index_within_row, 0,
-                           ((sparsity_pattern->rowset.size()==0)
-                            ?
-                            sparsity_pattern->lines[current_row].entries.size()
-                            :
-                            sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.size())));
+    AssertIndexRange(index_within_row,
+                     ((sparsity_pattern->rowset.size()==0)
+                      ?
+                      sparsity_pattern->lines[current_row].entries.size()
+                      :
+                      sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.size()));
   }
 
 
@@ -682,7 +675,7 @@ namespace DynamicSparsityPatternIterators
   Accessor (const DynamicSparsityPattern *sparsity_pattern)
     :
     sparsity_pattern(sparsity_pattern),
-    current_row(numbers::invalid_unsigned_int),
+    current_row(numbers::invalid_size_type),
     current_entry(),
     end_of_row()
   {}
@@ -739,7 +732,7 @@ namespace DynamicSparsityPatternIterators
     // current_entry field may not point to a deterministic location
     return (sparsity_pattern == other.sparsity_pattern &&
             current_row == other.current_row &&
-            ((current_row == numbers::invalid_unsigned_int)
+            ((current_row == numbers::invalid_size_type)
              || (current_entry == other.current_entry)));
   }
 
@@ -753,14 +746,14 @@ namespace DynamicSparsityPatternIterators
             ExcInternalError());
 
     // if *this is past-the-end, then it is less than no one
-    if (current_row == numbers::invalid_unsigned_int)
+    if (current_row == numbers::invalid_size_type)
       return (false);
     // now *this should be an valid value
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcInternalError());
 
     // if other is past-the-end
-    if (other.current_row == numbers::invalid_unsigned_int)
+    if (other.current_row == numbers::invalid_size_type)
       return (true);
     // now other should be an valid value
     Assert (other.current_row < sparsity_pattern->n_rows(),
@@ -805,7 +798,7 @@ namespace DynamicSparsityPatternIterators
 
   inline
   Iterator::Iterator (const DynamicSparsityPattern *sparsity_pattern,
-                      const unsigned int row,
+                      const size_type    row,
                       const unsigned int index_within_row)
     :
     accessor(sparsity_pattern, row, index_within_row)
@@ -1048,7 +1041,10 @@ DynamicSparsityPattern::begin (const size_type r) const
   // pattern
   //
   // note: row_length(row) returns zero if the row is not locally stored
-  unsigned int row = r;
+  //
+  // TODO: this is way too slow when used in parallel, so do not use it on
+  // non-owned rows
+  size_type row = r;
   while ((row<n_rows())
          &&
          (row_length(row)==0))

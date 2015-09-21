@@ -565,6 +565,29 @@ namespace TrilinosWrappers
 
 
 
+    // for the non-local graph, we need to circumvent the problem that some
+    // processors will not add into the non-local graph at all: We do not want
+    // to insert dummy elements on >5000 processors because that gets very
+    // slow. Thus, we set a flag in Epetra_CrsGraph that sets the correct
+    // flag. Since it is protected, we need to expose this information by
+    // deriving a class from Epetra_CrsGraph for the purpose of creating the
+    // data structure
+    class Epetra_CrsGraphMod : public Epetra_CrsGraph
+    {
+    public:
+      Epetra_CrsGraphMod (const Epetra_Map &row_map,
+                          const int        *n_entries_per_row)
+        :
+        Epetra_CrsGraph(Copy, row_map, n_entries_per_row, true)
+      {};
+
+      void SetIndicesAreGlobal()
+      {
+        this->Epetra_CrsGraph::SetIndicesAreGlobal(true);
+      }
+    };
+
+
     // specialization for DynamicSparsityPattern which can provide us with
     // more information about the non-locally owned rows
     template <>
@@ -636,28 +659,20 @@ namespace TrilinosWrappers
             }
         }
 
-      // make sure all processors create an off-processor matrix with at least
-      // one entry
-      if (have_ghost_rows == true && ghost_rows.empty() == true)
-        {
-          ghost_rows.push_back(0);
-          n_entries_per_ghost_row.push_back(1);
-        }
-
       Epetra_Map off_processor_map(-1, ghost_rows.size(),
                                    (ghost_rows.size()>0)?(&ghost_rows[0]):NULL,
                                    0, input_row_map.Comm());
 
-      std_cxx11::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
+      std_cxx11::shared_ptr<Epetra_CrsGraph> graph;
+      std_cxx11::shared_ptr<Epetra_CrsGraphMod> nonlocal_graph;
       if (input_row_map.Comm().NumProc() > 1)
         {
           graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
                                             (n_entries_per_row.size()>0)?(&n_entries_per_row[0]):NULL,
                                             exchange_data ? false : true));
           if (have_ghost_rows == true)
-            nonlocal_graph.reset (new Epetra_CrsGraph (Copy, off_processor_map,
-                                                       &n_entries_per_ghost_row[0],
-                                                       true));
+            nonlocal_graph.reset (new Epetra_CrsGraphMod (off_processor_map,
+                                                          &n_entries_per_ghost_row[0]));
         }
       else
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
@@ -676,11 +691,8 @@ namespace TrilinosWrappers
             continue;
 
           row_indices.resize (row_length, -1);
-          {
-            dealii::DynamicSparsityPattern::iterator p = sparsity_pattern.begin(global_row);
-            for (size_type col=0; p != sparsity_pattern.end(global_row); ++p, ++col)
-              row_indices[col] = p->column();
-          }
+          for (int col=0; col < row_length; ++col)
+            row_indices[col] = sparsity_pattern.column_number(global_row, col);
 
           if (input_row_map.MyGID(global_row))
             graph->InsertGlobalIndices (global_row, row_length, &row_indices[0]);
@@ -695,14 +707,11 @@ namespace TrilinosWrappers
       // finalize nonlocal graph and create nonlocal matrix
       if (nonlocal_graph.get() != 0)
         {
-          if (nonlocal_graph->IndicesAreGlobal() == false &&
-              nonlocal_graph->RowMap().NumMyElements() > 0)
-            {
-              // insert dummy element
-              TrilinosWrappers::types::int_type row =
-                nonlocal_graph->RowMap().MyGID(TrilinosWrappers::types::int_type(0));
-              nonlocal_graph->InsertGlobalIndices(row, 1, &row);
-            }
+          // must make sure the IndicesAreGlobal flag is set on all processors
+          // because some processors might not call InsertGlobalIndices (and
+          // we do not want to insert dummy indices on all processors for
+          // large-scale simulations due to the bad impact on performance)
+          nonlocal_graph->SetIndicesAreGlobal();
           Assert(nonlocal_graph->IndicesAreGlobal() == true,
                  ExcInternalError());
           nonlocal_graph->FillComplete(input_col_map, input_row_map);
