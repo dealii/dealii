@@ -20,7 +20,7 @@
 # configuration to determine paths, locations and names. Some linkage and
 # crosscompilation setup happens also in here.
 #
-# Definitions marked with *) can be overriden by defining them to cache
+# Definitions marked with *) can be overridden by defining them to cache
 # prior to the call of this file. This is done with the help of the
 # SET_IF_EMPTY macro.
 #

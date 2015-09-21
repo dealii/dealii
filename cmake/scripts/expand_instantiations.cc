@@ -31,7 +31,7 @@
 // make sense for the current configuration. For example, the list of VECTORS
 // is going to contain PETSc vectors if so configured.
 //
-// The second intput is read from the command line and consists of a sequence
+// The second input is read from the command line and consists of a sequence
 // of statements of the following form:
 // --------------------
 // for (u,v:VECTORS; z:SCALARS) { f(u, z, const v &); }

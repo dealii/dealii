@@ -180,7 +180,7 @@ IF(DEAL_II_STATIC_EXECUTABLE)
 ENDIF()
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
-  "Set the rpath of the library to the external link pathes on installation"
+  "Set the rpath of the library to the external link paths on installation"
   )
 MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 

@@ -33,7 +33,7 @@ namespace dealii
       double_steps    = 0.1;			// any click in the editor will increase or decrease the value about double_steps
       double_decimals = 14;			// number of decimals shown in the editor
 
-      int_steps = 1;				// step value for increasing or decrasing integers
+      int_steps = 1;				// step value for increasing or decreasing integers
     }
 
 

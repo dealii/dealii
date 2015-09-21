@@ -37,7 +37,7 @@ MACRO(REGISTER_FEATURE _feature)
     #   DEAL_II_LIBRARIES
     #   DEAL_II_LIBRARIES_DEBUG
     #   DEAL_II_LIBRARIES_RELEASE
-    # depending on the "optmized", "debug" or "general" keyword
+    # depending on the "optimized", "debug" or "general" keyword
     #
     SET(_toggle "general")
     FOREACH(_tmp ${${_feature}_LIBRARIES})

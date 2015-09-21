@@ -51,7 +51,7 @@ namespace dealii
         XMLParameterReader (QTreeWidget *tree_widget);
 				     /**
 				      * This function reads the parameters from @p device into the <tt>tree_widget</tt>.
-				      * We use the QXmlStreaReader class for this.
+				      * We use the QXmlStreamReader class for this.
 				      * There must be a start element
 				      * <code>&lt;ParameterHandler&gt;</code>
 				      * and an end element <code>&lt;/ParameterHandler&gt;</code>

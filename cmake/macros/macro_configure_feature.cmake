@@ -24,7 +24,7 @@
 #
 # FEATURE_${feature}_DEPENDS    (a variable)
 #    a variable which contains an optional list of other features
-#    this feature depends on (and which have to be enbled for this feature
+#    this feature depends on (and which have to be enabled for this feature
 #    to work.)
 #    Features must be given with short name, i.e. without DEAL_II_WITH_
 #
@@ -55,7 +55,7 @@
 #    external dependencies.
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro)
-#    which should print a meaningfull error message (with FATAL_ERROR) for
+#    which should print a meaningful error message (with FATAL_ERROR) for
 #    the case that no usable library was found.
 #    If not defined, a suitable default error message will be printed.
 #
