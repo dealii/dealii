@@ -182,7 +182,7 @@ namespace Utilities
        * of freedom for the individual processor on the ghost elements present
        * (second entry).
        */
-      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       ghost_targets() const;
 
       /**
@@ -191,7 +191,7 @@ namespace Utilities
        * structure as in an IndexSet, but tailored to be iterated over, and
        * some indices may be duplicates.
        */
-      const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       import_indices() const;
 
       /**
@@ -206,7 +206,7 @@ namespace Utilities
        * entry), i.e., locally owned indices that are ghosts on other
        * processors.
        */
-      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       import_targets() const;
 
       /**
@@ -306,7 +306,7 @@ namespace Utilities
        * Contains information which processors my ghost indices belong to and
        * how many those indices are
        */
-      std::vector<std::pair<unsigned int, types::global_dof_index> > ghost_targets_data;
+      std::vector<std::pair<unsigned int, unsigned int> > ghost_targets_data;
 
       /**
        * The set of (local) indices that we are importing during compress(),
@@ -314,7 +314,7 @@ namespace Utilities
        * structure as in an IndexSet, but tailored to be iterated over, and
        * some indices may be duplicates.
        */
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index> > import_indices_data;
+      std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
 
       /**
        * Caches the number of ghost indices. It would be expensive to compute
@@ -326,7 +326,7 @@ namespace Utilities
        * The set of processors and length of data field which send us their
        * ghost data
        */
-      std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_data;
+      std::vector<std::pair<unsigned int, unsigned int> > import_targets_data;
 
       /**
        * The ID of the current processor in the MPI network
@@ -466,7 +466,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::ghost_targets() const
     {
       return ghost_targets_data;
@@ -474,7 +474,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::import_indices() const
     {
       return import_indices_data;
@@ -492,7 +492,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::import_targets() const
     {
       return import_targets_data;

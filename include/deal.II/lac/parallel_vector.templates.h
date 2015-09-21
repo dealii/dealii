@@ -360,8 +360,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const size_type n_import_targets = part.import_targets().size();
-      const size_type n_ghost_targets  = part.ghost_targets().size();
+      const unsigned int n_import_targets = part.import_targets().size();
+      const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
@@ -376,7 +376,7 @@ namespace parallel
           // allocate import_data in case it is not set up yet
           if (import_data == 0)
             import_data = new Number[part.n_import_indices()];
-          for (size_type i=0; i<n_import_targets; i++)
+          for (unsigned int i=0; i<n_import_targets; i++)
             {
               MPI_Recv_init (&import_data[current_index_start],
                              part.import_targets()[i].second*sizeof(Number),
@@ -392,7 +392,7 @@ namespace parallel
 
           Assert (part.local_size() == vector_view.size(), ExcInternalError());
           current_index_start = part.local_size();
-          for (size_type i=0; i<n_ghost_targets; i++)
+          for (unsigned int i=0; i<n_ghost_targets; i++)
             {
               MPI_Send_init (&this->val[current_index_start],
                              part.ghost_targets()[i].second*sizeof(Number),
@@ -446,8 +446,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const size_type n_import_targets = part.import_targets().size();
-      const size_type n_ghost_targets  = part.ghost_targets().size();
+      const unsigned int n_import_targets = part.import_targets().size();
+      const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
       if (operation != dealii::VectorOperation::insert)
         AssertDimension (n_ghost_targets+n_import_targets,
@@ -462,7 +462,7 @@ namespace parallel
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
           Number *read_position = import_data;
-          std::vector<std::pair<size_type, size_type> >::const_iterator
+          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
           my_imports = part.import_indices().begin();
 
           // If the operation is no insertion, add the imported data to the
@@ -471,11 +471,11 @@ namespace parallel
           // the ones already present
           if (operation != dealii::VectorOperation::insert)
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (size_type j=my_imports->first; j<my_imports->second; j++)
+              for (unsigned int j=my_imports->first; j<my_imports->second; j++)
                 local_element(j) += *read_position++;
           else
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (size_type j=my_imports->first; j<my_imports->second;
+              for (unsigned int j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
                 Assert(*read_position == 0. ||
                        std::abs(local_element(j) - *read_position) <=
@@ -519,8 +519,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const size_type n_import_targets = part.import_targets().size();
-      const size_type n_ghost_targets = part.ghost_targets().size();
+      const unsigned int n_import_targets = part.import_targets().size();
+      const unsigned int n_ghost_targets = part.ghost_targets().size();
 
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
@@ -531,7 +531,7 @@ namespace parallel
                   ExcInternalError());
           size_type current_index_start = part.local_size();
           update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
-          for (size_type i=0; i<n_ghost_targets; i++)
+          for (unsigned int i=0; i<n_ghost_targets; i++)
             {
               // allow writing into ghost indices even though we are in a
               // const function
@@ -552,7 +552,7 @@ namespace parallel
           if (import_data == 0 && part.n_import_indices() > 0)
             import_data = new Number[part.n_import_indices()];
           current_index_start = 0;
-          for (size_type i=0; i<n_import_targets; i++)
+          for (unsigned int i=0; i<n_import_targets; i++)
             {
               MPI_Send_init (&import_data[current_index_start],
                              part.import_targets()[i].second*sizeof(Number),
@@ -571,10 +571,10 @@ namespace parallel
         {
           Assert (import_data != 0, ExcInternalError());
           Number *write_position = import_data;
-          std::vector<std::pair<size_type, size_type> >::const_iterator
+          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
           my_imports = part.import_indices().begin();
           for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-            for (size_type j=my_imports->first; j<my_imports->second; j++)
+            for (unsigned int j=my_imports->first; j<my_imports->second; j++)
               *write_position++ = local_element(j);
         }
 
