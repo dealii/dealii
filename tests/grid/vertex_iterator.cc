@@ -35,9 +35,19 @@ void test ()
   for (typename Triangulation<2>::active_cell_iterator
        cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      for (unsigned int i = 0; i<4; ++i)
-        deallog << cell->vertex_it(i)->center() <<std::endl;
+      for (unsigned int i=0; i<4; ++i)
+        deallog << cell->vertex_iterator(i)->center() <<std::endl;
+      deallog << std::endl;
     }
+
+  for (typename Triangulation<2>::active_cell_iterator
+       cell = tria.begin_active(); cell != tria.end(); ++cell)
+    for (unsigned int i=0; i<4; ++i)
+      {
+        for (unsigned int j=0; j<2; ++j)
+          deallog << cell->line(i)->vertex_iterator(j)->center() <<std::endl;
+        deallog << std::endl;
+      }
 }
 
 

@@ -632,7 +632,7 @@ public:
    * <code>dim=1</code>.
    */
   typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
-  vertex_it (const unsigned int i) const;
+  vertex_iterator (const unsigned int i) const;
 
   /**
    * Return the global index of i-th vertex of the current object. The

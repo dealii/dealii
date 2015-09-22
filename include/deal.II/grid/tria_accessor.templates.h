@@ -1163,7 +1163,7 @@ TriaAccessor<structdim,dim,spacedim>::used () const
 template <int structdim, int dim, int spacedim>
 inline
 typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
-TriaAccessor<structdim,dim,spacedim>::vertex_it (const unsigned int i) const
+TriaAccessor<structdim,dim,spacedim>::vertex_iterator (const unsigned int i) const
 {
   return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
          (this->tria, 0, vertex_index (i));
@@ -2267,10 +2267,8 @@ TriaAccessor<0, dim, spacedim>::operator != (const TriaAccessor &t) const
 template <int dim, int spacedim>
 inline
 unsigned int
-TriaAccessor<0, dim, spacedim>::vertex_index (const unsigned int i) const
+TriaAccessor<0, dim, spacedim>::vertex_index (const unsigned int) const
 {
-  Assert(i==0, ExcIndexRange(i, 0, 1));
-  (void)i;
   return global_vertex_index;
 }
 
@@ -2279,10 +2277,8 @@ TriaAccessor<0, dim, spacedim>::vertex_index (const unsigned int i) const
 template <int dim, int spacedim>
 inline
 Point<spacedim> &
-TriaAccessor<0, dim, spacedim>::vertex (const unsigned int i) const
+TriaAccessor<0, dim, spacedim>::vertex (const unsigned int) const
 {
-  Assert(i==0, ExcIndexRange(i, 0, 1));
-  (void)i;
   return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
 }
 
@@ -2343,9 +2339,8 @@ TriaAccessor<0, dim, spacedim>::diameter () const
 template <int dim, int spacedim>
 inline
 double
-TriaAccessor<0, dim, spacedim>::extent_in_direction (const unsigned int axis) const
+TriaAccessor<0, dim, spacedim>::extent_in_direction (const unsigned int) const
 {
-  (void) axis;
   return 0.;
 }
 
@@ -2354,12 +2349,9 @@ TriaAccessor<0, dim, spacedim>::extent_in_direction (const unsigned int axis) co
 template <int dim, int spacedim>
 inline
 Point<spacedim>
-TriaAccessor<0, dim, spacedim>::center (const bool respect_manifold,
-                                        const bool use_laplace_transformation) const
+TriaAccessor<0, dim, spacedim>::center (const bool,
+                                        const bool) const
 {
-  // Silence warning
-  (void) respect_manifold;
-  (void) use_laplace_transformation;
   return this->tria->vertices[global_vertex_index];
 }
 
