@@ -150,6 +150,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // for a cell and one of its children
   std::vector<types::global_dof_index> dof_indices_parent (dofs_per_cell);
   std::vector<types::global_dof_index> dof_indices_child (dofs_per_cell);
+  std::vector<types::global_dof_index> entries (dofs_per_cell);
 
   // for each level: first build the sparsity
   // pattern of the matrices and then build the
@@ -158,20 +159,38 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
+      // find the locally relevant level dofs for setting the writable rows of
+      // the sparsity pattern
+      IndexSet level_p1_relevant_dofs = mg_dof.locally_owned_mg_dofs(level+1);
+      std::vector<types::global_dof_index> relevant_dofs;
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+           cell != mg_dof.end(level); ++cell)
+        if (cell->has_children() &&
+            ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+              || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
+            ))
+          for (unsigned int child=0; child<cell->n_children(); ++child)
+            {
+              cell->child(child)->get_mg_dof_indices (dof_indices_child);
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                if (!level_p1_relevant_dofs.is_element(dof_indices_child[i]))
+                  relevant_dofs.push_back(dof_indices_child[i]);
+            }
+      std::sort(relevant_dofs.begin(), relevant_dofs.end());
+      level_p1_relevant_dofs.add_indices(relevant_dofs.begin(),
+                                         std::unique(relevant_dofs.begin(),
+                                                     relevant_dofs.end()));
 
-      // reset the dimension of the structure.
-      // note that for the number of entries
-      // per row, the number of parent dofs
-      // coupling to a child dof is
-      // necessary. this, of course, is the
-      // number of degrees of freedom per
+      // reset the dimension of the structure.  note that for the number of
+      // entries per row, the number of parent dofs coupling to a child dof is
+      // necessary. this, of course, is the number of degrees of freedom per
       // cell
-      // increment dofs_per_cell
-      // since a useless diagonal
-      // element will be stored
+      //
+      // increment dofs_per_cell since a useless diagonal element will be
+      // stored
       DynamicSparsityPattern dsp (sizes[level+1],
-                                  sizes[level]);
-      std::vector<types::global_dof_index> entries (dofs_per_cell);
+                                  sizes[level],
+                                  level_p1_relevant_dofs);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
@@ -316,13 +335,13 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
               if (global_mine && level_mine)
                 copy_indices[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::make_pair (global_dof_indices[i], level_dof_indices[i]));
               else if (level_mine)
                 copy_indices_from_me[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::make_pair (global_dof_indices[i], level_dof_indices[i]));
               else if (global_mine)
                 copy_indices_to_me[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::make_pair (global_dof_indices[i], level_dof_indices[i]));
               else
                 continue;
 
@@ -334,7 +353,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // If we are in debugging mode, we order the copy indices, so we get
   // more reliable output for regression texts
 #ifdef DEBUG
-  std::less<std::pair<types::global_dof_index, unsigned int> > compare;
+  std::less<std::pair<types::global_dof_index, types::global_dof_index> > compare;
   for (unsigned int level=0; level<copy_indices.size(); ++level)
     std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
   for (unsigned int level=0; level<copy_indices_from_me.size(); ++level)
