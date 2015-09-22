@@ -164,13 +164,13 @@ namespace Utilities
       // Allow non-zero start index for the vector. send this data to all
       // processors
       first_index[0] = local_range_data.first;
-      MPI_Bcast(&first_index[0], sizeof(types::global_dof_index), MPI_BYTE,
+      MPI_Bcast(&first_index[0], 1, DEAL_II_DOF_INDEX_MPI_TYPE,
                 0, communicator);
 
       // Get the end-of-local_range for all processors
-      MPI_Allgather(&local_range_data.second, sizeof(types::global_dof_index),
-                    MPI_BYTE, &first_index[1], sizeof(types::global_dof_index),
-                    MPI_BYTE, communicator);
+      MPI_Allgather(&local_range_data.second, 1,
+                    DEAL_II_DOF_INDEX_MPI_TYPE, &first_index[1], 1,
+                    DEAL_II_DOF_INDEX_MPI_TYPE, communicator);
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
@@ -267,8 +267,8 @@ namespace Utilities
         for (unsigned int i=0; i<import_targets_data.size(); i++)
           {
             MPI_Irecv (&expanded_import_indices[current_index_start],
-                       import_targets_data[i].second*sizeof(types::global_dof_index),
-                       MPI_BYTE,
+                       import_targets_data[i].second,
+                       DEAL_II_DOF_INDEX_MPI_TYPE,
                        import_targets_data[i].first, import_targets_data[i].first,
                        communicator, &import_requests[i]);
             current_index_start += import_targets_data[i].second;
@@ -280,8 +280,8 @@ namespace Utilities
         for (unsigned int i=0; i<n_ghost_targets; i++)
           {
             MPI_Send (&expanded_ghost_indices[current_index_start],
-                      ghost_targets_data[i].second*sizeof(types::global_dof_index),
-                      MPI_BYTE, ghost_targets_data[i].first, my_pid,
+                      ghost_targets_data[i].second, DEAL_II_DOF_INDEX_MPI_TYPE,
+                      ghost_targets_data[i].first, my_pid,
                       communicator);
             current_index_start += ghost_targets_data[i].second;
           }
