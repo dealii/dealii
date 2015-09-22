@@ -96,7 +96,7 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
   template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >::type>
     compute_active_cell_halo_layer (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-                                    const std_cxx11::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, 
+                                    const std_cxx11::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension,
                                                                                                                parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >::type&)> &);
 
   template
@@ -311,26 +311,22 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                                 const Tensor<1,deal_II_space_dimension> &,
                                                 const FullMatrix<double> &);
 
-    #if deal_II_dimension >= 2
+    template
+    void collect_periodic_faces<X> (const X &,
+                                    const types::boundary_id,
+                                    const types::boundary_id,
+                                    const int,
+                                    std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                    const Tensor<1,X::space_dimension> &,
+                                    const FullMatrix<double> &);
 
-      template
-      void collect_periodic_faces<X> (const X &,
-                                      const types::boundary_id,
-                                      const types::boundary_id,
-                                      const int,
-                                      std::vector<PeriodicFacePair<X::cell_iterator> > &,
-                                      const Tensor<1,X::space_dimension> &,
-                                      const FullMatrix<double> &);
-
-      template
-      void collect_periodic_faces<X> (const X &,
-                                      const types::boundary_id,
-                                      const int,
-                                      std::vector<PeriodicFacePair<X::cell_iterator> > &,
-                                      const Tensor<1,X::space_dimension> &,
-                                      const FullMatrix<double> &);
-
-    #endif
+    template
+    void collect_periodic_faces<X> (const X &,
+                                    const types::boundary_id,
+                                    const int,
+                                    std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                    const Tensor<1,X::space_dimension> &,
+                                    const FullMatrix<double> &);
 
   \}
 #endif
@@ -379,4 +375,3 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
 \}
 #endif
 }
-

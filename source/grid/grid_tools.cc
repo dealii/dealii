@@ -2662,7 +2662,7 @@ next_cell:
     static inline std::bitset<3> lookup (const MATCH_T &)
     {
       // The 1D case is trivial
-      return 4; // [true ,false,false]
+      return 1; // [true ,false,false]
     }
   };
 
