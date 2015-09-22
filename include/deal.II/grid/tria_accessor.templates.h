@@ -1161,6 +1161,17 @@ TriaAccessor<structdim,dim,spacedim>::used () const
 
 
 template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+TriaAccessor<structdim,dim,spacedim>::vertex_iterator (const unsigned int i) const
+{
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+         (this->tria, 0, vertex_index (i));
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::
 vertex_index (const unsigned int corner) const
@@ -2110,6 +2121,378 @@ is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o)
     }
   return is_translation;
 }
+
+
+/*------------------------ Functions: TriaAccessor<0,dim,spacedim> -----------------------*/
+
+template <int dim, int spacedim>
+inline
+TriaAccessor<0, dim, spacedim>::
+TriaAccessor (const Triangulation<dim, spacedim> *tria,
+              const unsigned int                  vertex_index)
+  :
+  tria (tria),
+  global_vertex_index (vertex_index)
+{}
+
+
+
+template <int dim, int spacedim>
+inline
+TriaAccessor<0, dim, spacedim>::
+TriaAccessor (const Triangulation<dim,spacedim> *tria,
+              const int level,
+              const int index,
+              const AccessorData *)
+  :
+  tria (tria),
+  global_vertex_index (index)
+{}
+
+
+
+template <int dim, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+TriaAccessor<0, dim, spacedim>::
+TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
+  :
+  tria (NULL),
+  global_vertex_index (numbers::invalid_unsigned_int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <int dim, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+TriaAccessor<0, dim, spacedim>::
+TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+  :
+  tria (NULL),
+  global_vertex_index (numbers::invalid_unsigned_int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <int dim, int spacedim>
+inline
+void
+TriaAccessor<0, dim, spacedim>::copy_from (const TriaAccessor &t)
+{
+  tria = t.tria;
+  global_vertex_index = t.global_vertex_index;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+IteratorState::IteratorStates
+TriaAccessor<0, dim, spacedim>::state ()
+{
+  return IteratorState::valid;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+int
+TriaAccessor<0, dim, spacedim>::level ()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+int
+TriaAccessor<0, dim, spacedim>::index () const
+{
+  return global_vertex_index;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+void
+TriaAccessor<0, dim, spacedim>::operator ++ () const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim, int spacedim>
+inline
+void
+TriaAccessor<0, dim, spacedim>::operator -- () const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool
+TriaAccessor<0, dim, spacedim>::operator == (const TriaAccessor &t) const
+{
+  const bool result = ((tria == t.tria)
+                       &&
+                       (global_vertex_index == t.global_vertex_index));
+
+  return result;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool
+TriaAccessor<0, dim, spacedim>::operator != (const TriaAccessor &t) const
+{
+  return !(*this==t);
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int
+TriaAccessor<0, dim, spacedim>::vertex_index (const unsigned int) const
+{
+  return global_vertex_index;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+Point<spacedim> &
+TriaAccessor<0, dim, spacedim>::vertex (const unsigned int) const
+{
+  return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
+}
+
+
+
+template <int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+TriaAccessor<0, dim, spacedim>::line (const unsigned int)
+{
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int
+TriaAccessor<0, dim, spacedim>::line_index (const unsigned int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+TriaAccessor<0, dim, spacedim>::quad (const unsigned int)
+{
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int
+TriaAccessor<0, dim, spacedim>::quad_index (const unsigned int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+double
+TriaAccessor<0, dim, spacedim>::diameter () const
+{
+  return 0.;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+double
+TriaAccessor<0, dim, spacedim>::extent_in_direction (const unsigned int) const
+{
+  return 0.;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+Point<spacedim>
+TriaAccessor<0, dim, spacedim>::center (const bool,
+                                        const bool) const
+{
+  return this->tria->vertices[global_vertex_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+double
+TriaAccessor<0, dim, spacedim>::measure () const
+{
+  return 0.;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::face_orientation (const unsigned int /*face*/)
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::face_flip (const unsigned int /*face*/)
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::face_rotation (const unsigned int /*face*/)
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::line_orientation (const unsigned int /*line*/)
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::has_children ()
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int TriaAccessor<0, dim, spacedim>::n_children()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int TriaAccessor<0, dim, spacedim>::number_of_children ()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int TriaAccessor<0, dim, spacedim>::max_refinement_depth ()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+TriaIterator<TriaAccessor<0,dim,spacedim> >
+TriaAccessor<0, dim, spacedim>::child (const unsigned int)
+{
+  return TriaIterator<TriaAccessor<0,dim,spacedim> >();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+TriaIterator<TriaAccessor<0,dim,spacedim> >
+TriaAccessor<0, dim, spacedim>::isotropic_child (const unsigned int)
+{
+  return TriaIterator<TriaAccessor<0,dim,spacedim> >();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+RefinementCase<0> TriaAccessor<0, dim, spacedim>::refinement_case ()
+{
+  return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
+}
+
+
+
+template <int dim, int spacedim>
+inline
+int TriaAccessor<0, dim, spacedim>::child_index (const unsigned int)
+{
+  return -1;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+int TriaAccessor<0, dim, spacedim>::isotropic_child_index (const unsigned int)
+{
+  return -1;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool TriaAccessor<0, dim, spacedim>::used () const
+{
+  return tria->vertex_used(global_vertex_index);
+}
+
 
 
 /*------------------------ Functions: TriaAccessor<0,1,spacedim> -----------------------*/

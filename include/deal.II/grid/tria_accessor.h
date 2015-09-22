@@ -628,6 +628,13 @@ public:
    */
 
   /**
+   * Pointer to the @p ith vertex bounding this object. Throw an exception if
+   * <code>dim=1</code>.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+  vertex_iterator (const unsigned int i) const;
+
+  /**
    * Return the global index of i-th vertex of the current object. The
    * convention regarding the numbering of vertices is laid down in the
    * documentation of the GeometryInfo class.
@@ -1468,19 +1475,350 @@ private:
 
 
 /**
- * Closure class to stop induction of classes. Should never be called and thus
- * produces an error when created.
+ * Specialization of <code>TriaAccessor<structdim, dim, spacedim></code>.
+ * This class represent vertices in a triangulation of dimensionality
+ * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a triangulation
+ * of quads, and 3 for a triangulation of hexes) that is embedded in a space of
+ * dimensionality <code>spacedim</code> (for <code>spacedim==dim</code> the
+ * triangulation represents a domain in ${\mathbb R}^\text{dim}$, for
+ * <code>spacedim@>dim</code> the triangulation is of a manifold embedded in
+ * a higher dimensional space).
  *
- * @ingroup grid
+ * @ingroup Accessors
+ * @author Bruno Turcksin, 2015
  */
 template<int dim, int spacedim>
 class TriaAccessor<0, dim, spacedim>
 {
-private:
+public:
   /**
-   * Constructor. Made private to make sure that this class can't be used.
+   * Dimension of the space the object represented by this accessor lives in.
+   * For example, if this accessor represents a quad that is part of a two-
+   * dimensional surface in four-dimensional space, then this value is four.
    */
-  TriaAccessor ();
+  static const unsigned int space_dimension = spacedim;
+
+  /**
+   * Dimensionality of the object that the thing represented by this accessopr
+   * is part of. For example, if this accessor represents a line that is part
+   * of a hexahedron, then this value will be three.
+   */
+  static const unsigned int dimension = dim;
+
+  /**
+   * Dimensionality of the current object represented by this accessor. For
+   * example, if it is line (irrespective of whether it is part of a quad or
+   * hex, and what dimension we are in), then this value equals 1.
+   */
+  static const unsigned int structure_dimension = 0;
+
+  /**
+   * Pointer to internal data.
+   */
+  typedef void AccessorData;
+
+  /**
+   * Constructor. The second argument is the global index of the vertex we point to.
+   */
+  TriaAccessor (const Triangulation<dim,spacedim> *tria,
+                const unsigned int    vertex_index);
+
+  /**
+   * Constructor. This constructor exists in order to maintain interface
+   * compatibility with the other accessor classes. @p index can be used to set
+   * the global index of the vertex we point to.
+   */
+  TriaAccessor (const Triangulation<dim,spacedim> *tria  = NULL,
+                const int                          level = 0,
+                const int                          index = 0,
+                const AccessorData                     * = 0);
+
+  /**
+   * Constructor. Should never be called and thus produces an error.
+   */
+  template <int structdim2, int dim2, int spacedim2>
+  TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
+
+  /**
+   * Constructor. Should never be called and thus produces an error.
+   */
+  template <int structdim2, int dim2, int spacedim2>
+  TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
+
+  /**
+   * Return the state of the iterator. Since an iterator to points can not be
+   * incremented or decremented, its state remains constant, and in particular
+   * equal to IteratorState::valid.
+   */
+  static IteratorState::IteratorStates state ();
+
+  /**
+   * Level of this object. Vertices have no level, so this function always
+   * returns zero.
+   */
+  static int level ();
+
+  /**
+   * Index of this object. Returns the global index of the vertex this object
+   * points to.
+   */
+  int index () const;
+
+  /**
+   * @name Advancement of iterators
+   */
+  /**
+   * @{
+   */
+  /**
+   * This operator advances the iterator to the next element. For points, this
+   * operation is not defined, so you can't iterate over point iterators.
+   */
+  void operator ++ () const;
+
+  /**
+   * This operator moves the iterator to the previous element. For points,
+   * this operation is not defined, so you can't iterate over point iterators.
+   */
+  void operator -- () const;
+  /**
+   * Compare for equality.
+   */
+  bool operator == (const TriaAccessor &) const;
+
+  /**
+   * Compare for inequality.
+   */
+  bool operator != (const TriaAccessor &) const;
+
+  /**
+   * @}
+   */
+
+
+  /**
+   * @name Accessing sub-objects
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Return the global index of i-th vertex of the current object. If @p i is
+   * zero, this returns the index of the current point to which this object
+   * refers. Otherwise, it throws an exception.
+   *
+   * Note that the returned value is only the index of the geometrical vertex.
+   * It has nothing to do with possible degrees of freedom associated with it.
+   * For this, see the @p DoFAccessor::vertex_dof_index functions.
+   *
+   * @note Despite the name, the index returned here is only global in the
+   * sense that it is specific to a particular Triangulation object or, in the
+   * case the triangulation is actually of type
+   * parallel::distributed::Triangulation, specific to that part of the
+   * distributed triangulation stored on the current processor.
+   */
+  unsigned int vertex_index (const unsigned int i = 0) const;
+
+  /**
+   * Return a reference to the @p ith vertex. If i is zero, this returns a
+   * reference to the current point to which this object refers. Otherwise, it
+   * throws an exception.
+   */
+  Point<spacedim> &vertex (const unsigned int i = 0) const;
+
+  /**
+   * Pointer to the @p ith line bounding this object. Will point to an invalid
+   * object.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  static line (const unsigned int);
+
+  /**
+   * Line index of the @p ith line bounding this object. Throws an exception.
+   */
+  static unsigned int line_index (const unsigned int i);
+
+  /**
+   * Pointer to the @p ith quad bounding this object.
+   */
+  static
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  quad (const unsigned int i);
+
+  /**
+   * Quad index of the @p ith quad bounding this object. Throws an excption.
+   */
+  static unsigned int quad_index (const unsigned int i);
+
+  /**
+   * @}
+   */
+
+
+  /**
+   * @name Geometric information about an object
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Diameter of the object. This function always returns zero.
+   */
+  double diameter () const;
+
+  /**
+   * Length of an object in the direction of the given axis, specified in the
+   * local coordinate system. See the documentation of GeometryInfo for the
+   * meaning and enumeration of the local axes.
+   *
+   * This function always returns zero.
+   */
+  double extent_in_direction (const unsigned int axis) const;
+
+  /**
+   * Return the center of this object, which of course coincides with the
+   * location of the vertex this object refers to. The parameters
+   * @p respect_manifold and @p use_laplace_transformation are not used. They
+   * are there to provide the same interface as
+   * <code>TriaAccessor<structdim,dim,spacedim></code>.
+   */
+  Point<spacedim> center (const bool respect_manifold=false,
+                          const bool use_laplace_transformation=false) const;
+
+  /**
+   * Compute the dim-dimensional measure of the object. For a dim-dimensional
+   * cell in dim-dimensional space, this equals its volume. On the other hand,
+   * for a 2d cell in 3d space, or if the current object pointed to is a 2d
+   * face of a 3d cell in 3d space, then the function computes the area the
+   * object occupies. For a one-dimensional object, return its length. For a
+   * zero-dimensional object, return zero.
+   */
+  double measure () const;
+  /**
+   * @}
+   */
+
+  /**
+   * @name Orientation of sub-objects
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_orientation (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_flip (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_rotation (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool line_orientation (const unsigned int line);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Accessing children
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Test whether the object has children. Always false.
+   */
+  static bool has_children ();
+
+  /**
+   * Return the number of immediate children of this object. This is always
+   * zero.
+   */
+  static unsigned int n_children();
+
+  /**
+   * Compute and return the number of active descendants of this objects.
+   * Always zero.
+   */
+  static unsigned int number_of_children ();
+
+  /**
+   * Return the number of times that this object is refined. Always 0.
+   */
+  static unsigned int max_refinement_depth ();
+
+  /**
+   * @brief Return an invalid object.
+   */
+  static
+  TriaIterator<TriaAccessor<0,dim,spacedim> >
+  child (const unsigned int);
+
+  /**
+   * @brief Return an invalid object.
+   */
+  static
+  TriaIterator<TriaAccessor<0,dim,spacedim> >
+  isotropic_child (const unsigned int);
+
+  /**
+   * Always return no refinement.
+   */
+  static
+  RefinementCase<0> refinement_case ();
+
+  /**
+   * @brief Returns -1
+   */
+  static
+  int child_index (const unsigned int i);
+
+  /**
+   * @brief Returns -1
+   */
+  static
+  int isotropic_child_index (const unsigned int i);
+  /**
+   * @}
+   */
+
+  /**
+   * Return whether the vertex pointed to here is used.
+   */
+  bool used () const;
+
+protected:
+  /**
+   * Copy operator. Since this is only called from iterators, do not return
+   * anything, since the iterator will return itself.
+   *
+   * This method is protected, since it is only to be called from the iterator
+   * class.
+   */
+  void copy_from (const TriaAccessor &);
+
+  /**
+   * Pointer to the triangulation we operate on.
+   */
+  const Triangulation<dim,spacedim> *tria;
+
+  /**
+   * The global vertex index of the vertex this object corresponds to.
+   */
+  unsigned int  global_vertex_index;
 };
 
 
@@ -1491,6 +1829,7 @@ private:
  * example, you can't iterate from one such point to the next. Point also
  * don't have children, and they don't have neighbors.
  *
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 2010
  */
 template <int spacedim>
@@ -1574,9 +1913,6 @@ public:
   /**
    * Copy operator. Since this is only called from iterators, do not return
    * anything, since the iterator will return itself.
-   *
-   * This method is protected, since it is only to be called from the iterator
-   * class.
    */
   void copy_from (const TriaAccessor &);
 
