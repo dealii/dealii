@@ -962,7 +962,7 @@ namespace parallel
       /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
-       * the have the same local size and the same ghost indices. They do not
+       * they have the same local size and the same ghost indices. They do not
        * necessarily need to be the same data field. This is a local operation
        * only, i.e., if only some processors decide that the partitioning is
        * not compatible, only these processors will return @p false, whereas
@@ -971,6 +971,21 @@ namespace parallel
       bool
       partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
 
+      /**
+       * Checks whether the given partitioner is compatible with the
+       * partitioner used for this vector. Two partitioners are compatible if
+       * they have the same local size and the same ghost indices. They do not
+       * necessarily need to be the same data field. As opposed to
+       * partitioners_are_compatible(), this method checks for compatibility
+       * among all processors and the method only returns @p true if the
+       * partitioner is the same on all processors.
+       *
+       * This method performs global communication, so make sure to use it
+       * only in a context where all processors call it the same number of
+       * times.
+       */
+      bool
+      partitioners_are_globally_compatible (const Utilities::MPI::Partitioner &part) const;
 
       /**
        * Prints the vector to the output stream @p out.
@@ -1309,13 +1324,18 @@ namespace parallel
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
-          size_type local_ranges_different_loc = (local_range() !=
-                                                  c.local_range());
-          if ((partitioner->n_mpi_processes() > 1 &&
-               Utilities::MPI::max(local_ranges_different_loc,
-                                   partitioner->get_communicator()) != 0)
+          // local ranges are also the same if both partitioners are empty
+          // (even if they happen to define the empty range as [0,0) or [c,c)
+          // for some c!=0 in a different way).
+          int local_ranges_are_identical =
+            (local_range() == c.local_range() ||
+             (local_range().second == local_range().first &&
+              c.local_range().second == c.local_range().first));
+          if ((c.partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::min(local_ranges_are_identical,
+                                   c.partitioner->get_communicator()) == 0)
               ||
-              local_ranges_different_loc)
+              !local_ranges_are_identical)
             reinit (c, true);
           else
             must_update_ghost_values |= vector_is_ghosted;
@@ -1334,6 +1354,8 @@ namespace parallel
 
       if (must_update_ghost_values)
         update_ghost_values();
+      else
+        zero_out_ghosts();
       return *this;
     }
 
@@ -2339,17 +2361,6 @@ namespace parallel
     Vector<Number>::get_mpi_communicator() const
     {
       return partitioner->get_communicator();
-    }
-
-
-
-    template <typename Number>
-    inline
-    bool
-    Vector<Number>::partitioners_are_compatible
-    (const Utilities::MPI::Partitioner &part) const
-    {
-      return partitioner->is_compatible (part);
     }
 
 #endif  // ifndef DOXYGEN

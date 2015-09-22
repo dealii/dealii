@@ -161,10 +161,16 @@ namespace Utilities
         }
 
       std::vector<types::global_dof_index> first_index (n_procs+1);
-      first_index[0] = 0;
-      MPI_Allgather(&local_range_data.second, sizeof(types::global_dof_index),
-                    MPI_BYTE, &first_index[1], sizeof(types::global_dof_index),
-                    MPI_BYTE, communicator);
+      // Allow non-zero start index for the vector. send this data to all
+      // processors
+      first_index[0] = local_range_data.first;
+      MPI_Bcast(&first_index[0], 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                0, communicator);
+
+      // Get the end-of-local_range for all processors
+      MPI_Allgather(&local_range_data.second, 1,
+                    DEAL_II_DOF_INDEX_MPI_TYPE, &first_index[1], 1,
+                    DEAL_II_DOF_INDEX_MPI_TYPE, communicator);
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
@@ -203,11 +209,11 @@ namespace Utilities
           // vector filled with push_back might actually be too long.
           unsigned int current_proc = 0;
           ghost_indices_data.fill_index_vector (expanded_ghost_indices);
-          unsigned int current_index = expanded_ghost_indices[0];
+          types::global_dof_index current_index = expanded_ghost_indices[0];
           while (current_index >= first_index[current_proc+1])
             current_proc++;
-          std::vector<std::pair<unsigned int,types::global_dof_index> > ghost_targets_temp
-          (1, std::pair<unsigned int, types::global_dof_index>(current_proc, 0));
+          std::vector<std::pair<unsigned int, unsigned int> > ghost_targets_temp
+          (1, std::pair<unsigned int, unsigned int>(current_proc, 0));
           n_ghost_targets++;
 
           for (unsigned int iterator=1; iterator<n_ghost_indices_data; ++iterator)
@@ -221,7 +227,7 @@ namespace Utilities
                   ghost_targets_temp[n_ghost_targets-1].second =
                     iterator - ghost_targets_temp[n_ghost_targets-1].second;
                   ghost_targets_temp.push_back(std::pair<unsigned int,
-                                               types::global_dof_index>(current_proc,iterator));
+                                               unsigned int>(current_proc,iterator));
                   n_ghost_targets++;
                 }
             }
@@ -240,14 +246,14 @@ namespace Utilities
                       MPI_INT, communicator);
 
         // allocate memory for import data
-        std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_temp;
+        std::vector<std::pair<unsigned int,unsigned int> > import_targets_temp;
         n_import_indices_data = 0;
         for (unsigned int i=0; i<n_procs; i++)
           if (receive_buffer[i] > 0)
             {
               n_import_indices_data += receive_buffer[i];
               import_targets_temp.push_back(std::pair<unsigned int,
-                                            types::global_dof_index> (i, receive_buffer[i]));
+                                            unsigned int> (i, receive_buffer[i]));
             }
         import_targets_data = import_targets_temp;
       }
@@ -261,8 +267,8 @@ namespace Utilities
         for (unsigned int i=0; i<import_targets_data.size(); i++)
           {
             MPI_Irecv (&expanded_import_indices[current_index_start],
-                       import_targets_data[i].second*sizeof(types::global_dof_index),
-                       MPI_BYTE,
+                       import_targets_data[i].second,
+                       DEAL_II_DOF_INDEX_MPI_TYPE,
                        import_targets_data[i].first, import_targets_data[i].first,
                        communicator, &import_requests[i]);
             current_index_start += import_targets_data[i].second;
@@ -274,8 +280,8 @@ namespace Utilities
         for (unsigned int i=0; i<n_ghost_targets; i++)
           {
             MPI_Send (&expanded_ghost_indices[current_index_start],
-                      ghost_targets_data[i].second*sizeof(types::global_dof_index),
-                      MPI_BYTE, ghost_targets_data[i].first, my_pid,
+                      ghost_targets_data[i].second, DEAL_II_DOF_INDEX_MPI_TYPE,
+                      ghost_targets_data[i].first, my_pid,
                       communicator);
             current_index_start += ghost_targets_data[i].second;
           }
@@ -289,7 +295,7 @@ namespace Utilities
         // contiguous indices in form of ranges
         {
           types::global_dof_index last_index = numbers::invalid_dof_index-1;
-          std::vector<std::pair<types::global_dof_index,types::global_dof_index> > compressed_import_indices;
+          std::vector<std::pair<unsigned int,unsigned int> > compressed_import_indices;
           for (unsigned int i=0; i<n_import_indices_data; i++)
             {
               Assert (expanded_import_indices[i] >= local_range_data.first &&
@@ -298,12 +304,14 @@ namespace Utilities
                                     local_range_data.second));
               types::global_dof_index new_index = (expanded_import_indices[i] -
                                                    local_range_data.first);
+              Assert(new_index<numbers::invalid_unsigned_int,
+                     ExcNotImplemented());
               if (new_index == last_index+1)
                 compressed_import_indices.back().second++;
               else
                 {
                   compressed_import_indices.push_back
-                  (std::pair<types::global_dof_index,types::global_dof_index>(new_index,new_index+1));
+                  (std::pair<unsigned int,unsigned int>(new_index,new_index+1));
                 }
               last_index = new_index;
             }
@@ -321,6 +329,40 @@ namespace Utilities
         }
       }
 #endif
+    }
+
+
+
+    bool
+    Partitioner::is_compatible (const Partitioner &part) const
+    {
+      // if the partitioner points to the same memory location as the calling
+      // processor
+      if (&part == this)
+        return true;
+#ifdef DEAL_II_WITH_MPI
+      if (Utilities::MPI::job_supports_mpi())
+        {
+          int communicators_same = 0;
+          MPI_Comm_compare (part.communicator, communicator,
+                            &communicators_same);
+          if (!(communicators_same == MPI_IDENT ||
+                communicators_same == MPI_CONGRUENT))
+            return false;
+        }
+#endif
+      return (global_size == part.global_size &&
+              local_range_data == part.local_range_data &&
+              ghost_indices_data == part.ghost_indices_data);
+    }
+
+
+
+    bool
+    Partitioner::is_globally_compatible (const Partitioner &part) const
+    {
+      return Utilities::MPI::min(static_cast<int>(is_compatible(part)),
+                                 communicator) == 1;
     }
 
 

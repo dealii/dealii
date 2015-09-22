@@ -182,7 +182,7 @@ namespace Utilities
        * of freedom for the individual processor on the ghost elements present
        * (second entry).
        */
-      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       ghost_targets() const;
 
       /**
@@ -191,7 +191,7 @@ namespace Utilities
        * structure as in an IndexSet, but tailored to be iterated over, and
        * some indices may be duplicates.
        */
-      const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       import_indices() const;
 
       /**
@@ -206,19 +206,34 @@ namespace Utilities
        * entry), i.e., locally owned indices that are ghosts on other
        * processors.
        */
-      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+      const std::vector<std::pair<unsigned int, unsigned int> > &
       import_targets() const;
 
       /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
-       * the have the same local size and the same ghost indices. They do not
+       * they have the same local size and the same ghost indices. They do not
        * necessarily need to be the same data field. This is a local operation
        * only, i.e., if only some processors decide that the partitioning is
        * not compatible, only these processors will return @p false, whereas
        * the other processors will return @p true.
        */
       bool is_compatible (const Partitioner &part) const;
+
+      /**
+       * Checks whether the given partitioner is compatible with the
+       * partitioner used for this vector. Two partitioners are compatible if
+       * they have the same local size and the same ghost indices. They do not
+       * necessarily need to be the same data field. As opposed to
+       * is_compatible(), this method checks for compatibility among all
+       * processors and the method only returns @p true if the partitioner is
+       * the same on all processors.
+       *
+       * This method performs global communication, so make sure to use it
+       * only in a context where all processors call it the same number of
+       * times.
+       */
+      bool is_globally_compatible (const Partitioner &part) const;
 
       /**
        * Returns the MPI ID of the calling processor. Cached to have simple
@@ -291,7 +306,7 @@ namespace Utilities
        * Contains information which processors my ghost indices belong to and
        * how many those indices are
        */
-      std::vector<std::pair<unsigned int, types::global_dof_index> > ghost_targets_data;
+      std::vector<std::pair<unsigned int, unsigned int> > ghost_targets_data;
 
       /**
        * The set of (local) indices that we are importing during compress(),
@@ -299,7 +314,7 @@ namespace Utilities
        * structure as in an IndexSet, but tailored to be iterated over, and
        * some indices may be duplicates.
        */
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index> > import_indices_data;
+      std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
 
       /**
        * Caches the number of ghost indices. It would be expensive to compute
@@ -311,7 +326,7 @@ namespace Utilities
        * The set of processors and length of data field which send us their
        * ghost data
        */
-      std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_data;
+      std::vector<std::pair<unsigned int, unsigned int> > import_targets_data;
 
       /**
        * The ID of the current processor in the MPI network
@@ -451,7 +466,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::ghost_targets() const
     {
       return ghost_targets_data;
@@ -459,7 +474,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::import_indices() const
     {
       return import_indices_data;
@@ -477,27 +492,12 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,types::global_dof_index> > &
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::import_targets() const
     {
       return import_targets_data;
     }
 
-
-
-    inline
-    bool
-    Partitioner::is_compatible (const Partitioner &part) const
-    {
-      // is the partitioner points to the same memory location as the calling
-      // processor
-      if (&part == this)
-        return true;
-      else
-        return (global_size == part.global_size &&
-                local_range_data == part.local_range_data &&
-                ghost_indices_data == part.ghost_indices_data);
-    }
 
 
     inline

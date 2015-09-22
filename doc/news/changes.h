@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Fixed: parallel::distributed::Vector is now fully functional for
+  indices larger than 4 billion.
+  <br>
+  (Martin Kronbichler, 2015/09/22)
+  </li>
+
   <li> New: PArpackSolver eigensolver interface class.
   <br>
   (Denis Davydov, 2015/09/17)
@@ -308,7 +314,7 @@ inconvenience this causes.
   (Patrick Esser, 2015/08/17)
   </li>
 
-  <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q 
+  <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q
   enriched by bubble functions.
   <br>
   (Daniel Arndt, 2015/08/12)
@@ -343,6 +349,21 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> Improved: The construction of the non-local graph for quick data
+  exchange of TrilinosWrappers::SparseMatrix became very slow for a few
+  thousand processors. This has been fixed.
+  <br>
+  (Martin Kronbichler, 2015/09/22)
+  </li>
+
+  <li> Improved: Initializing a TrilinosWrappers::SparseMatrix from a
+  DynamicSparsityPattern included some O(global_size) operations. These have
+  been replaced by operations only on the local range.
+  <br>
+  (Martin Kronbichler, 2015/09/22)
+  </li>
+
   <li> Changed: All doxygen-generated pages now contain a link to the
   tutorial in their top-level menus.
   <br>
