@@ -408,13 +408,17 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
     }
   else
     {
-      AssertIndexRange (level, tria.n_levels());
-      cell_level_index.reserve (tria.n_cells(level));
-      typename Triangulation<dim>::cell_iterator cell = tria.begin(level),
-                                                 end_cell = tria.end(level);
-      for ( ; cell != end_cell; ++cell)
-        cell_level_index.push_back (std::pair<unsigned int,unsigned int>
-                                    (cell->level(), cell->index()));
+      AssertIndexRange (level, tria.n_global_levels());
+      if (level < tria.n_levels())
+        {
+          cell_level_index.reserve (tria.n_cells(level));
+          typename Triangulation<dim>::cell_iterator cell = tria.begin(level),
+                                                     end_cell = tria.end(level);
+          for ( ; cell != end_cell; ++cell)
+            if (cell->level_subdomain_id() == my_pid)
+              cell_level_index.push_back (std::pair<unsigned int,unsigned int>
+                                          (cell->level(), cell->index()));
+        }
     }
 }
 

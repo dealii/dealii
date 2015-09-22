@@ -1440,12 +1440,23 @@ namespace internal
         if (level == numbers::invalid_unsigned_int)
           locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
         else
-          {
-            // TODO: not distributed yet
-            IndexSet new_set (dofh[j]->n_dofs(level));
-            new_set.add_range (0, dofh[j]->n_dofs(level));
-            locally_owned_set.push_back(new_set);
-          }
+          AssertThrow(false, ExcNotImplemented());
+      return locally_owned_set;
+    }
+
+    template <int dim, int spacedim>
+    inline
+    std::vector<IndexSet>
+    extract_locally_owned_index_sets (const std::vector<const ::dealii::DoFHandler<dim,spacedim> *> &dofh,
+                                      const unsigned int level)
+    {
+      std::vector<IndexSet> locally_owned_set;
+      locally_owned_set.reserve (dofh.size());
+      for (unsigned int j=0; j<dofh.size(); j++)
+        if (level == numbers::invalid_unsigned_int)
+          locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
+        else
+          locally_owned_set.push_back(dofh[j]->locally_owned_mg_dofs(level));
       return locally_owned_set;
     }
   }
