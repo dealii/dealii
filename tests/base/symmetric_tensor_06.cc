@@ -67,7 +67,7 @@ void test ()
             }
         bs[i][j] = tmp_ij;
       }
-  double_contract (ba, ta, aa);
+  ba = double_contract<2,0,3,1>(ta, aa);
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)

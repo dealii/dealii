@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check double_contract(Tensor<2,dim>,Tensor<2,dim>)
+// check scalar_product(Tensor<2,dim>,Tensor<2,dim>)
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
@@ -30,7 +30,7 @@ void test_constant()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       t[i][j] = 2.;
-  deallog << "Constant dim " << dim << '\t' << double_contract(t,t)
+  deallog << "Constant dim " << dim << '\t' << scalar_product(t,t)
           << " compare " << 4*dim *dim << std::endl;
 }
 
@@ -47,7 +47,7 @@ void test_equal()
         sum += (i+dim*j)*(i+dim*j);
       }
 
-  deallog << "Equal    dim " << dim << '\t' << double_contract(t,t)
+  deallog << "Equal    dim " << dim << '\t' << scalar_product(t,t)
           << " compare " << sum << std::endl;
 }
 
@@ -66,7 +66,7 @@ void test_unequal()
         sum += (i+dim*j)*(dim*i+j);
       }
 
-  deallog << "Unequal  dim " << dim << '\t' << double_contract(s,t)
+  deallog << "Unequal  dim " << dim << '\t' << scalar_product(s,t)
           << " compare " << sum << std::endl;
 }
 
