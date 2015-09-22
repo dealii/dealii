@@ -98,6 +98,10 @@ template <class VECTOR = Vector<double> >
 class SolverSelector : public Subscriptor
 {
 public:
+  /**
+   * A typedef for the underlying vector type
+   */
+  typedef VECTOR vector_type;
 
   /**
    * Constructor, filling in default values
