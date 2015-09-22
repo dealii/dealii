@@ -1433,12 +1433,30 @@ namespace internal
 
       template<class DH, bool level_dof_access>
       static
-      void set_mg_dof_indices (const dealii::DoFAccessor<3, DH,level_dof_access> &,
-                               const int,
-                               const std::vector<types::global_dof_index> &,
-                               const unsigned int)
+      void set_mg_dof_indices (const dealii::DoFAccessor<3, DH,level_dof_access> &accessor,
+                               const int level,
+                               const std::vector<types::global_dof_index> &dof_indices,
+                               const unsigned int fe_index)
       {
-        AssertThrow (false, ExcNotImplemented ()); //TODO[TH]: implement
+        const FiniteElement<DH::dimension, DH::space_dimension> &fe = accessor.get_dof_handler ().get_fe ()[fe_index];
+        std::vector<types::global_dof_index>::const_iterator next = dof_indices.begin ();
+
+        for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
+          for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+            accessor.set_mg_vertex_dof_index(level, vertex, dof, *next++, fe_index);
+
+        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell; ++line)
+          for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+            accessor.line(line)->set_mg_dof_index(level, dof, *next++);
+
+        for (unsigned int quad = 0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
+          for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+            accessor.quad(quad)->set_mg_dof_index(level, dof, *next++);
+
+        for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
+          accessor.set_mg_dof_index(level, dof, *next++);
+
+        Assert (next == dof_indices.end (), ExcInternalError ());
       }
 
     };
