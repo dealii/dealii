@@ -225,7 +225,7 @@ public:
   /**
    * This function returns the local index of the beginning of the largest range.
    */
-  unsigned int largest_range_index() const;
+  unsigned int largest_range_starting_index() const;
 
   /**
    * Compress the internal representation by merging individual elements with
@@ -1414,12 +1414,12 @@ IndexSet::n_intervals () const
 
 inline
 unsigned int
-IndexSet::largest_range_index() const
+IndexSet::largest_range_starting_index() const
 {
   Assert(ranges.empty()==false, ExcMessage("IndexSet cannot be empty."));
 
   compress();
-  std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
+  const std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
 
   return main_range->nth_index_in_set;
 }

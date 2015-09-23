@@ -78,6 +78,7 @@ void test()
         AssertThrow(readwrite.local_element(i)==comp[i],
                     ExcMessage("Element not copied correctly"));
     }
+  deallog << "OK" <<std::endl;
 }
 
 int main (int argc, char **argv)

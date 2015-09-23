@@ -59,11 +59,38 @@ namespace LinearAlgebra
    */
 
   /**
-   * ReadWriteVector stores a subset of elements. It allows to access
-   * individual elements to be read or written. However, it does not allow global
-   * operations such as taking the norm. ReadWriteVector can be used to read and
-   * write elements in vectors derived from VectorSpaceVector such as
-   * TrilinosWrappers::MPI::Vector and PETScWrappers::MPI::Vector.
+   * ReadWriteVector is intended to represent vectors in ${\mathbb R}^N$ for
+   * which it stores all or a subset of elements. The latter case in important
+   * in parallel computations, where $N$ may be so large that no processor can
+   * actually all elements of a solution vector, but where this is also not
+   * necessary: one typically only has to store the values of degrees of freedom
+   * that live on cells that are locally owned plus potentially those degrees of
+   * freedom that live on ghost cells.
+   *
+   * This class allows to access individual elements to be read or written.
+   * However, it does not allow global operations such as taking the norm.
+   * ReadWriteVector can be used to read and write elements in vectors derived
+   * from VectorSpaceVector such as TrilinosWrappers::MPI::Vector and
+   * PETScWrappers::MPI::Vector.
+   *
+   * <h3>Storing elements</h3>
+   * Most of the time, one will simply read from or write into a vector of the
+   * current class using the global numbers of these degrees of freedom. This is
+   * done using operator() or operator[] which call global_to_local() to transform
+   * the <i>global</i> index into a <i>local</i> one. In such cases, it is clear
+   * that one can only access elements of the vector that the current object
+   * indeed stores.
+   *
+   * However, it is also possible to access elements in the order in which they
+   * are stored by the current object. In other words, one is not interested in
+   * accessing elements with their <i>global</i> indices, but instead using an
+   * enumeration that only takes into account the elements that are actually
+   * stored. This is facilitated by the local_element() function. To this end,
+   * it is necessary to know <i>in which order</i> the current class stores its
+   * element. The elements of all the consecutive ranges are stored in ascending
+   * order of the first index of each range. The function
+   * largest_range_starting_index() of IndexSet can be used to get the first
+   * index of the largest range.
    *
    * @author Bruno Turcksin, 2015.
    */
@@ -204,20 +231,24 @@ namespace LinearAlgebra
     ReadWriteVector<Number> &operator = (const Number s);
 
     /**
-     * Returns the size of the vector.
-     *
-     * Note that the result is not equal to the number of element stored locally.
-     * The latter information is returned by n_elements()
+     * The value returned by this function denotes the dimension of the vector spaces
+     * that are modeled by objects of this kind. However, objects of the current
+     * class do not actually stores all elements of vectors of this space but
+     * may, in fact store only a subset. The number of elements stored is
+     * returned by n_elements() and is smaller or equal to the number returned
+     * by the current function.
      */
     size_type size() const;
 
     /**
-     * Return the number of elements stored locally.
+     * This function returns the number of elements stored. It is smaller or
+     * equal to the dimension of the vector space that is modeled by an object
+     * of this kind. This dimension is return by size().
      */
     size_type n_elements() const;
 
     /**
-     * Return the IndexSet that stores the indices of the elements stored.
+     * Return the IndexSet that represents the indices of the elements stored.
      */
     const IndexSet &get_stored_elements () const;
 
@@ -255,19 +286,22 @@ namespace LinearAlgebra
 
     /**
      * Read access to the data in the position corresponding to @p
-     * global_index.
+     * global_index. An exception is thrown if @p global_index is not stored by
+     * the current object.
      */
     Number operator () (const size_type global_index) const;
 
     /**
      * Read and write access to the data in the position corresponding to @p
-     * global_index.
+     * global_index. An exception is thrown if @p global_index is not stored by
+     * the current object.
      */
     Number &operator () (const size_type global_index);
 
     /**
      * Read access to the data in the position corresponding to @p
-     * global_index.
+     * global_index. An exception is thrown if @p global_index is not stored by
+     * the current object.
      *
      * This function does the same thing as operator().
      */
@@ -275,7 +309,8 @@ namespace LinearAlgebra
 
     /**
      * Read and write access to the data in the position corresponding to @p
-     * global_index.
+     * global_index. An exception is thrown if @p global_index is not stored by
+     * the current object.
      *
      * This function does the same thing as operator().
      */
@@ -301,16 +336,24 @@ namespace LinearAlgebra
                                OutputIterator           values_begin) const;
 
     /**
-     * Read access to the data field specified by @p local_index. The largest
-     * range of the IndexSet is the first one.
+     * Read access to the data field specified by @p local_index. When you
+     * access elements in the order in which they are stored, it is necessary
+     * that you know in which they are stored. In other words, you need to
+     * know the map between the global indices of the elements this class
+     * stores, and the local indices into the contiguous array of these global
+     * elements. For this, see the general documentation of this class.
      *
      * Performance: Direct array access (fast).
      */
     Number local_element (const size_type local_index) const;
 
     /**
-     * Read and write access to the data field specified by @p local_index. The
-     * largest range of the IndexSet is the first one.
+     * Read and write access to the data field specified by @p local_index. When
+     * you access elements in the order in which they are stored, it is necessary
+     * that you know in which they are stored. In other words, you need to
+     * know the map between the global indices of the elements this class
+     * stores, and the local indices into the contiguous array of these global
+     * elements. For this, see the general documentation of this class.
      *
      * Performance: Direct array access (fast).
      */
@@ -649,7 +692,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::operator= (const Number s)
   {
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
-    std::fill(begin(),end(),s);
+    std::fill(begin(),end(),Number());
 
     return *this;
   }
