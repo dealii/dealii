@@ -223,6 +223,11 @@ public:
   unsigned int n_intervals () const;
 
   /**
+   * This function returns the local index of the beginning of the largest range.
+   */
+  unsigned int largest_range_starting_index() const;
+
+  /**
    * Compress the internal representation by merging individual elements with
    * contiguous ranges, etc. This function does not have any external effect.
    */
@@ -266,14 +271,12 @@ public:
   IndexSet get_view (const size_type begin,
                      const size_type end) const;
 
-
   /**
    * Removes all elements contained in @p other from this set. In other words,
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
    */
   void subtract_set (const IndexSet &other);
-
 
   /**
    * Fills the given vector with all indices contained in this IndexSet.
@@ -1405,6 +1408,20 @@ IndexSet::n_intervals () const
 {
   compress ();
   return ranges.size();
+}
+
+
+
+inline
+unsigned int
+IndexSet::largest_range_starting_index() const
+{
+  Assert(ranges.empty()==false, ExcMessage("IndexSet cannot be empty."));
+
+  compress();
+  const std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
+
+  return main_range->nth_index_in_set;
 }
 
 

@@ -46,6 +46,7 @@ SET(_src
   precondition_block.cc
   precondition_block_ez.cc
   relaxation_block.cc
+  read_write_vector.cc
   slepc_solver.cc
   slepc_spectral_transformation.cc
   solver.cc
@@ -88,6 +89,7 @@ SET(_inst
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
+  read_write_vector.inst.in
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
