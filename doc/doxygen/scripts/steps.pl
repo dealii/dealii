@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2013 by the deal.II authors
+## Copyright (C) 2006 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,7 +18,8 @@ use strict;
 my $tutorial_file = shift;
 open TUTORIAL, "<$tutorial_file";
 
-# Print the first part of tutorial.h.in
+# Print the first part of tutorial.h.in up until the point where we
+# find the line with '@@MAP@@'
 while (my $line = <TUTORIAL>)
 {
   last if($line =~ m/\@\@MAP\@\@/);
@@ -57,7 +58,8 @@ digraph StepsMap
 EOT
     ;
 
-# print all nodes
+# Print all nodes of the graph by looping over the remaining
+# command line arguments denoting the tutorial programs
 
 my $step;
 foreach $step (@ARGV)
@@ -67,7 +69,7 @@ foreach $step (@ARGV)
 
     # read first line of tooltip file
     open TF, "$step/doc/tooltip"
-	or die "Can't open tooltip file $step/doc/tooltip";
+        or die "Can't open tooltip file $step/doc/tooltip";
     my $tooltip = <TF>;
     close TF;
     chop $tooltip;
@@ -77,7 +79,7 @@ foreach $step (@ARGV)
 
     # read first line of 'kind' file
     open KF, "$step/doc/kind"
-	or die "Can't open kind file $step/doc/kind";
+        or die "Can't open kind file $step/doc/kind";
     my $kind = <KF>;
     close KF;
     chop $kind;
@@ -88,7 +90,7 @@ foreach $step (@ARGV)
     print "];\n";
 }
 
-# Print all edges
+# Print all edges by going over the same list of tutorials again.
 # Keep sorted by second node on edge!
 
 my $step;
@@ -99,21 +101,21 @@ foreach $step (@ARGV)
 
     # read first line of dependency file
     open BF, "$step/doc/builds-on"
-	or die "Can't open builds-on file $step/doc/builds-on";
+        or die "Can't open builds-on file $step/doc/builds-on";
     my $buildson = <BF>;
     close BF;
     chop $buildson;
 
     my $source;
     foreach $source (split ' ', $buildson) {
-	$source =~ s/step-/Step/g;
-	print "$source -> Step$number\n";
+        $source =~ s/step-/Step/g;
+        print "$source -> Step$number\n";
     }
 }
 
 print "}\n";
 
-# Print the rest of tutorial.h.in
+# Then print the rest of tutorial.h.in
 while (my $line = <TUTORIAL>)
 {
   print $line;
