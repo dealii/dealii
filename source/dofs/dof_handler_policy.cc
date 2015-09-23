@@ -845,14 +845,108 @@ namespace internal
         template <int spacedim>
         static
         void
-        renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &,
-                          const IndexSet &,
-                          DoFHandler<3,spacedim> &,
-                          const unsigned int               ,
-                          const bool                       )
+        renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
+                          const IndexSet &indices,
+                          DoFHandler<3,spacedim> &dof_handler,
+                          const unsigned int level,
+                          const bool check_validity)
         {
-          // TODO
-          AssertThrow(false, ExcNotImplemented());
+          if (level>=dof_handler.get_tria().n_levels())
+            return;
+          for (typename std::vector<typename DoFHandler<3,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
+               i!=dof_handler.mg_vertex_dofs.end(); ++i)
+            // if the present vertex lives on
+            // the present level
+            if ((i->get_coarsest_level() <= level) &&
+                (i->get_finest_level() >= level))
+              for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                {
+                  dealii::types::global_dof_index idx =i->get_index (level, d);
+                  if (idx != DoFHandler<3>::invalid_dof_index)
+                    i->set_index (level, d,
+                                  ((indices.n_elements() == 0) ?
+                                   new_numbers[idx] :
+                                   new_numbers[indices.index_within_set(idx)]));
+
+                  if (check_validity)
+                    Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                }
+
+          if (dof_handler.get_fe().dofs_per_line > 0 ||
+              dof_handler.get_fe().dofs_per_quad > 0)
+            {
+              // save user flags as they will be modified
+              std::vector<bool> user_flags;
+              dof_handler.get_tria().save_user_flags(user_flags);
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).clear_user_flags ();
+
+              // flag all lines adjacent to cells of the current level, as
+              // those lines logically belong to the same level as the cell,
+              // at least for isotropic refinement
+              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
+                   cell != dof_handler.end(level); ++cell)
+                for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
+                  cell->line(line)->set_user_flag();
+
+              for (typename DoFHandler<3,spacedim>::cell_iterator cell = dof_handler.begin();
+                   cell != dof_handler.end(); ++cell)
+                for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+                  if (cell->line(l)->user_flag_set())
+                    {
+                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                        {
+                          dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
+                          if (idx != DoFHandler<3>::invalid_dof_index)
+                            cell->line(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
+                                                                        new_numbers[idx] :
+                                                                        new_numbers[indices.index_within_set(idx)]));
+                          if (check_validity)
+                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                        }
+                      cell->line(l)->clear_user_flag();
+                    }
+
+              // flag all quads adjacent to cells of the current level, as
+              // those quads logically belong to the same level as the cell,
+              // at least for isotropic refinement
+              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
+                   cell != dof_handler.end(level); ++cell)
+                for (unsigned int quad=0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
+                  cell->quad(quad)->set_user_flag();
+
+              for (typename DoFHandler<3,spacedim>::cell_iterator cell = dof_handler.begin();
+                   cell != dof_handler.end(); ++cell)
+                for (unsigned int l=0; l<GeometryInfo<3>::quads_per_cell; ++l)
+                  if (cell->quad(l)->user_flag_set())
+                    {
+                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
+                        {
+                          dealii::types::global_dof_index idx = cell->quad(l)->mg_dof_index(level, d);
+                          if (idx != DoFHandler<1>::invalid_dof_index)
+                            cell->quad(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
+                                                                        new_numbers[idx] :
+                                                                        new_numbers[indices.index_within_set(idx)]));
+                          if (check_validity)
+                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                        }
+                      cell->quad(l)->clear_user_flag();
+                    }
+
+              // finally, restore user flags
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).load_user_flags (user_flags);
+            }
+
+          for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
+               i!=dof_handler.mg_levels[level]->dof_object.dofs.end(); ++i)
+            {
+              if (*i != DoFHandler<3>::invalid_dof_index)
+                {
+                  Assert(*i<new_numbers.size(), ExcInternalError());
+                  *i = ((indices.n_elements() == 0) ?
+                        new_numbers[*i] :
+                        new_numbers[indices.index_within_set(*i)]);
+                }
+            }
         }
 
 

@@ -23,6 +23,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/parallel_vector.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -58,6 +59,21 @@ namespace internal
   };
 
 #ifdef DEAL_II_WITH_TRILINOS
+  template <typename Number>
+  struct MatrixSelector<parallel::distributed::Vector<Number> >
+  {
+    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
+    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DH &dh)
+    {
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+                    dh.locally_owned_mg_dofs(level),
+                    dsp, MPI_COMM_WORLD, true);
+    }
+
+  };
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
   {
@@ -256,7 +272,7 @@ private:
    * The data is organized as follows: one vector per level. Each element of
    * these vectors contains first the global index, then the level index.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices;
 
   /**
@@ -266,7 +282,7 @@ private:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices_to_me;
 
   /**
@@ -276,7 +292,7 @@ private:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices_from_me;
 
 

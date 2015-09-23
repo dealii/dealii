@@ -57,6 +57,8 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                     BlockVector<float>;
                     BlockVector<long double>;
 
+                    parallel::distributed::Vector<double>;
+
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                   }

@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: MGTransferPrebuilt can now be used with parallel::distributed::Vector
+  and TrilinosWrappers::SparseMatrix as a transfer matrix.
+  <br>
+  (Martin Kronbichler, 2015/09/22)
+  </li>
+
   <li> Fixed: parallel::distributed::Vector is now fully functional for
   indices larger than 4 billion.
   <br>
