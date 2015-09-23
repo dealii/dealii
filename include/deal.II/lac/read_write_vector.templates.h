@@ -145,7 +145,7 @@ namespace LinearAlgebra
     int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    const size_type vec_size = local_size();
+    const size_type vec_size = petsc_vec.local_size();
     internal::copy_petsc_vector (start_ptr, start_ptr + vec_size, begin());
 
     // restore the representation of the vector
