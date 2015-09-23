@@ -109,53 +109,61 @@ get_interpolated_dof_values (const InputVector &values,
               typename BaseClass::ExcVectorDoesNotMatch());
 
 
-      Vector<number> tmp1(dofs_per_cell);
-      Vector<number> tmp2(dofs_per_cell);
-
-      interpolated_values = 0;
-
-      // later on we will have to push the values interpolated from the child
-      // to the mother cell into the output vector. unfortunately, there are
-      // two types of elements: ones where you add up the contributions from
-      // the different child cells, and ones where you overwrite.
-      //
-      // an example for the first is piecewise constant (and discontinuous)
-      // elements, where we build the value on the coarse cell by averaging
-      // the values from the cell (i.e. by adding up a fraction of the values
-      // of their values)
-      //
-      // an example for the latter are the usual continuous elements. the
-      // value on a vertex of a coarse cell must there be the same,
-      // irrespective of the adjacent cell we are presently on. so we always
-      // overwrite. in fact, we must, since we cannot know in advance how many
-      // neighbors there will be, so there is no way to compute the average
-      // with fixed factors
-      //
-      // so we have to find out to which type this element belongs. the
-      // difficulty is: the finite element may be a composed one, so we can
-      // only hope to do this for each shape function individually. in fact,
-      // there are even weird finite elements (for example the Raviart-Thomas
-      // element) which have shape functions that are additive (interior ones)
-      // and others that are overwriting (face degrees of freedom that need to
-      // be continuous across the face).
-      for (unsigned int child=0; child<this->n_children(); ++child)
+      // see if the finite element we have on the current cell has any
+      // degrees of freedom to begin with; if not (e.g., when
+      // interpolating FE_Nothing), then simply skip all of the
+      // following since the output vector would be of size zero
+      // anyway (and in fact is of size zero, see the assertion above)
+      if (fe.dofs_per_cell > 0)
         {
-          // get the values from the present child, if necessary by
-          // interpolation itself either from its own children or
-          // by interpolating from the finite element on an active
-          // child to the finite element space requested here
-          this->child(child)->get_interpolated_dof_values (values,
-                                                           tmp1,
-                                                           fe_index);
-          // interpolate these to the mother cell
-          fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
+          Vector<number> tmp1(dofs_per_cell);
+          Vector<number> tmp2(dofs_per_cell);
 
-          // and add up or set them in the output vector
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (fe.restriction_is_additive(i))
-              interpolated_values(i) += tmp2(i);
-            else if (tmp2(i) != number())
-              interpolated_values(i) = tmp2(i);
+          interpolated_values = 0;
+
+          // later on we will have to push the values interpolated from the child
+          // to the mother cell into the output vector. unfortunately, there are
+          // two types of elements: ones where you add up the contributions from
+          // the different child cells, and ones where you overwrite.
+          //
+          // an example for the first is piecewise constant (and discontinuous)
+          // elements, where we build the value on the coarse cell by averaging
+          // the values from the cell (i.e. by adding up a fraction of the values
+          // of their values)
+          //
+          // an example for the latter are the usual continuous elements. the
+          // value on a vertex of a coarse cell must there be the same,
+          // irrespective of the adjacent cell we are presently on. so we always
+          // overwrite. in fact, we must, since we cannot know in advance how many
+          // neighbors there will be, so there is no way to compute the average
+          // with fixed factors
+          //
+          // so we have to find out to which type this element belongs. the
+          // difficulty is: the finite element may be a composed one, so we can
+          // only hope to do this for each shape function individually. in fact,
+          // there are even weird finite elements (for example the Raviart-Thomas
+          // element) which have shape functions that are additive (interior ones)
+          // and others that are overwriting (face degrees of freedom that need to
+          // be continuous across the face).
+          for (unsigned int child=0; child<this->n_children(); ++child)
+            {
+              // get the values from the present child, if necessary by
+              // interpolation itself either from its own children or
+              // by interpolating from the finite element on an active
+              // child to the finite element space requested here
+              this->child(child)->get_interpolated_dof_values (values,
+                                                               tmp1,
+                                                               fe_index);
+              // interpolate these to the mother cell
+              fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
+
+              // and add up or set them in the output vector
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                if (fe.restriction_is_additive(i))
+                  interpolated_values(i) += tmp2(i);
+                else if (tmp2(i) != number())
+                  interpolated_values(i) = tmp2(i);
+            }
         }
     }
 }
