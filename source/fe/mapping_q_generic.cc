@@ -259,8 +259,10 @@ namespace internal
           eta1 = -c/b;
           eta2 = -c/b;
         }
-      // special case #2: if c is very small:
-      else if (std::abs(c/b) < 1e-12)
+      // special case #2: if c is very small or the square root of the
+      // discriminant is nearly b.
+      else if (std::abs(c) < 1e-12*std::abs(b)
+               || std::abs(std::sqrt(discriminant) - b) <= 1e-14*std::abs(b))
         {
           eta1 = (-b - std::sqrt(discriminant)) / (2*a);
           eta2 = (-b + std::sqrt(discriminant)) / (2*a);
