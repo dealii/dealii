@@ -359,7 +359,7 @@ inconvenience this causes.
   <li> Fixed: hp::SolutionTransfer could get confused when dealing with
   FE_Nothing elements. This is now fixed.
   <br>
-  (Claire Br, Wolfgang Bangerth, 2015/09/23)
+  (Claire Bruna-Rosso, Wolfgang Bangerth, 2015/09/23)
   </li>
 
   <li> Improved: The construction of the non-local graph for quick data

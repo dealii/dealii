@@ -14,7 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// Test case by Claire Br. based on an earlier one written by K. Bzowski
+// Verify that we can run SolutionTransfer with FE_Nothing. This led
+// to an exception because at one point we try to multiply a vector by
+// an empty matrix (because FE_Nothing has no degrees of freedom)
+//
+// Test case by Claire Bruna-Rosso based on an earlier one written by
+// K. Bzowski
 
 
 #include "../tests.h"
