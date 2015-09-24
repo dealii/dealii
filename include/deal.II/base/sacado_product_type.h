@@ -72,58 +72,6 @@ struct EnableIfScalar<Sacado::Fad::DFad<T> >
   typedef Sacado::Fad::DFad<T> type;
 };
 
-
-/**
- * Provide an <tt>operator*</tt> for a scalar multiplication of a
- * sacado type with a different non-sacado type.
- *
- * @relates EnableIfScalar
- * @relates ProductType
- */
-
-template <typename T, typename U>
-typename ProductType<Sacado::Fad::DFad<T>, typename EnableIfScalar<U>::type>::type
-inline
-operator*(const Sacado::Fad::DFad<T> &left, const U &right)
-{
-  typedef typename ProductType<Sacado::Fad::DFad<T>, U>::type result_type;
-  return static_cast<result_type>(left) * static_cast<result_type>(right);
-}
-
-
-/**
- * Provide an <tt>operator*</tt> for a scalar multiplication of non-sacado type with a sacado type.
- *
- * @relates EnableIfScalar
- * @relates ProductType
- */
-
-template <typename T, typename U>
-typename ProductType<typename EnableIfScalar<T>::type, Sacado::Fad::DFad<U> >::type
-inline
-operator*(const T &left, const Sacado::Fad::DFad<U> &right)
-{
-  typedef typename ProductType<T, Sacado::Fad::DFad<U> >::type result_type;
-  return static_cast<result_type>(left) * static_cast<result_type>(right);
-}
-
-/**
- * Provide an <tt>operator*</tt> for a scalar multiplication of mixed
- * sacado types.
- *
- * @relates EnableIfScalar
- * @relates ProductType
- */
-
-template <typename T, typename U>
-typename ProductType<Sacado::Fad::DFad<T>, Sacado::Fad::DFad<U> >::type
-inline
-operator*(const Sacado::Fad::DFad<T> &left, const Sacado::Fad::DFad<U> &right)
-{
-  typedef typename ProductType<Sacado::Fad::DFad<T>, Sacado::Fad::DFad<U> >::type result_type;
-  return static_cast<result_type>(left) * static_cast<result_type>(right);
-}
-
 #endif // DEAL_II_WITH_TRILINOS
 
 DEAL_II_NAMESPACE_CLOSE

@@ -45,23 +45,32 @@ int main()
   deallog.threshold_double(1.e-10);
 
 
-  // check product of scalars
-  check<Sdouble,SSdouble,SSdouble>();
-  check<SSdouble,Sdouble,SSdouble>();
-
   // check product with Tensor<1,dim>
-  check<Tensor<1,2,Sdouble>,SSdouble,Tensor<1,2,SSdouble> >();
-  check<Tensor<1,2,SSdouble>,Sdouble,Tensor<1,2,SSdouble> >();
+  check<Tensor<1,2,Sdouble>,Tensor<1,2,Sdouble>,Sdouble >();
+  check<Tensor<1,2,SSdouble>,Tensor<1,2,SSdouble>,SSdouble  >();
 
-  check<SSdouble,Tensor<1,2,Sdouble>,Tensor<1,2,SSdouble> >();
-  check<Sdouble,Tensor<1,2,SSdouble>,Tensor<1,2,SSdouble> >();
+  Tensor<1,2,SSdouble> t1;
+  Tensor<1,2,SSdouble> t2;
+  SSdouble a(2,0,7.0);
+  SSdouble b(2,1,3.0);
+  SSdouble c;
+  a.val() = Sdouble(2,0,7.0);
+  b.val() = Sdouble(2,1,3.0);
 
-  // check product with Tensor<2,dim> (which is a different class)
-  check<Tensor<2,2,Sdouble>,SSdouble,Tensor<2,2,SSdouble> >();
-  check<Tensor<2,2,SSdouble>,Sdouble,Tensor<2,2,SSdouble> >();
+  for (unsigned int i=0; i<2; ++i)
+    {
+      t1[i] = 2.*a+i;
+      t2[i] = 3.*b-i;
+    }
+  const Tensor<1,2,SSdouble> t3=t2;
+  t1 *t2;
 
-  check<SSdouble,Tensor<2,2,Sdouble>,Tensor<2,2,SSdouble> >();
-  check<Sdouble,Tensor<2,2,SSdouble>,Tensor<2,2,SSdouble> >();
+  t2 += a*t1;
+
+  c = 0;
+  c += (a*b + 0.5*(t3*t3 + t1*t2))*0.3;
+
+
 
   deallog << "OK" << std::endl;
 }
