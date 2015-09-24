@@ -74,7 +74,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup Solvers Preconditioners
  *
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, 2004; extension for full compatibility
+ * with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class SparseDirectUMFPACK : public Subscriptor
 {
@@ -186,6 +187,18 @@ public:
                const BlockVector<double> &src) const;
 
   /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   */
+  size_type n () const;
+
+  /**
    * @}
    */
 
@@ -281,6 +294,16 @@ public:
                       "UMFPACK."));
 
 private:
+  /**
+   * The dimension of the range space.
+   */
+  size_type _m;
+
+  /**
+   * The dimension of the domain space.
+   */
+  size_type _n;
+
   /**
    * The UMFPACK routines allocate objects in which they store information
    * about symbolic and numeric values of the decomposition. The actual data

@@ -102,7 +102,8 @@ DEAL_II_NAMESPACE_OPEN
  * get_strengthen_diagonal() method.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU implementation
- * by Wolfgang Bangerth; unified interface: Ralf Hartmann, 2003
+ * by Wolfgang Bangerth; unified interface: Ralf Hartmann, 2003; extension for
+ * full compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
@@ -121,7 +122,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef typename SparseMatrix<number>::size_type size_type;
 
   /**
    * Destruction. Mark the destructor pure to ensure that this class isn't
@@ -216,6 +217,42 @@ public:
    * SparseMatrix::empty() function.
    */
   bool empty () const;
+
+  /**
+   * Return the dimension of the codomain (or range) space. It calls the
+   * inherited SparseMatrix::m() function. To remember: the matrix is
+   * of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. It calls the  inherited
+   * SparseMatrix::n() function. To remember: the matrix is of dimension
+   * $m \times n$.
+   */
+  size_type n () const;
+
+  /**
+   * Adding Matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i> with
+   * <i>M</i> being this matrix.
+   *
+   * Source and destination must not be the same vector.
+   *
+   */
+  template <class OutVector, class InVector>
+  void vmult_add (OutVector &dst,
+                  const InVector &src) const;
+
+  /**
+   * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
+   * <i>dst</i> with <i>M</i> being this matrix. This function does the same
+   * as vmult_add() but takes the transposed matrix.
+   *
+   * Source and destination must not be the same vector.
+   */
+  template <class OutVector, class InVector>
+  void Tvmult_add (OutVector &dst,
+                   const InVector &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -317,6 +354,52 @@ SparseLUDecomposition<number>::empty () const
 }
 
 
+template <typename number>
+inline typename SparseLUDecomposition<number>::size_type
+SparseLUDecomposition<number>::m () const
+{
+  return SparseMatrix<number>::m();
+}
+
+
+template <typename number>
+inline typename SparseLUDecomposition<number>::size_type
+SparseLUDecomposition<number>::n () const
+{
+  return SparseMatrix<number>::n();
+}
+
+// Note: This function is required for full compatibility with
+// the LinearOperator class. ::MatrixInterfaceWithVmultAdd
+// picks up the vmult_add function in the protected SparseMatrix
+// base class.
+template <typename number>
+template <class OutVector, class InVector>
+inline void
+SparseLUDecomposition<number>::vmult_add (OutVector &dst,
+                                          const InVector &src) const
+{
+  OutVector tmp;
+  tmp.reinit(dst);
+  this->vmult(tmp, src);
+  dst += tmp;
+}
+
+// Note: This function is required for full compatibility with
+// the LinearOperator class. ::MatrixInterfaceWithVmultAdd
+// picks up the vmult_add function in the protected SparseMatrix
+// base class.
+template <typename number>
+template <class OutVector, class InVector>
+inline void
+SparseLUDecomposition<number>::Tvmult_add (OutVector &dst,
+                                           const InVector &src) const
+{
+  OutVector tmp;
+  tmp.reinit(dst);
+  this->Tvmult(tmp, src);
+  dst += tmp;
+}
 
 //---------------------------------------------------------------------------
 

@@ -25,20 +25,29 @@ template void SparseMIC<double>::initialize<double> (const SparseMatrix<double> 
                                                      const AdditionalData &data);
 template void SparseMIC<double>::vmult<double> (Vector<double> &,
                                                 const Vector<double> &) const;
+template void SparseMIC<double>::Tvmult<double> (Vector<double> &,
+                                                 const Vector<double> &) const;
 template void SparseMIC<double>::initialize<float> (const SparseMatrix<float> &,
                                                     const AdditionalData &data);
 template void SparseMIC<double>::vmult<float> (Vector<float> &,
                                                const Vector<float> &) const;
+template void SparseMIC<double>::Tvmult<float> (Vector<float> &,
+                                                const Vector<float> &) const;
 
 template class SparseMIC<float>;
 template void SparseMIC<float>::initialize<double> (const SparseMatrix<double> &,
                                                     const AdditionalData &data);
 template void SparseMIC<float>::vmult<double> (Vector<double> &,
                                                const Vector<double> &) const;
+template void SparseMIC<float>::Tvmult<double> (Vector<double> &,
+                                                const Vector<double> &) const;
 template void SparseMIC<float>::initialize<float> (const SparseMatrix<float> &,
                                                    const AdditionalData &data);
 template void SparseMIC<float>::vmult<float> (Vector<float> &,
                                               const Vector<float> &) const;
+template void SparseMIC<float>::Tvmult<float> (Vector<float> &,
+                                               const Vector<float> &) const;
+
 
 
 DEAL_II_NAMESPACE_CLOSE

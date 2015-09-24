@@ -170,6 +170,17 @@ inconvenience this causes.
   (Timo Heister, 2015/09/30)
   </li>
 
+  <li> Improved: The interface to all deal.II type solvers and preconditioners have
+  been updated such that they function as expected with the LinearOperator class and
+  its associated functions (i.e. linear_operator, transpose_operator and
+  inverse_operator). These preconditioners can now be wrapped as a LinearOperator,
+  facilitating the construction of approximate matrix inverses such as in the
+  development of a block matrix preconditioner.
+  An example of this functionality can be found in tests/lac/linear_operator_08.cc .
+  <br>
+  (Jean-Paul Pelteret, 2015/09/24 - 2015/10/19)
+  </li>
+
   <li> New: MGTransferPrebuilt can now be used with parallel::distributed::Vector
   and TrilinosWrappers::SparseMatrix as a transfer matrix.
   <br>
@@ -370,6 +381,13 @@ inconvenience this causes.
   which sets the manifold_id for all parts of the boundary with a given boundary_id.
   <br>
   (Alberto Sartori, 2015/10/22)
+  </li>
+
+  <li> Fixed: The range vectors in the construction of an inverse_operator
+  is now reinitialised before solve calls. This ensures a consistent starting
+  point for the solver.
+  <br>
+  (Jean-Paul Pelteret, 2015/10/19)
   </li>
 
   <li> New: Ghost cells for the multigrid levels in
