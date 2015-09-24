@@ -40,7 +40,8 @@ DEAL_II_NAMESPACE_OPEN
  * by the condition $\text{rowsum}(A) = \text{rowsum}(B)$.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf Hartmann
- * 2003.
+ * 2003; extension for full compatibility with LinearOperator class: Jean-Paul
+ * Pelteret, 2015.
  */
 template <typename number>
 class SparseMIC : public SparseLUDecomposition<number>
@@ -106,6 +107,19 @@ public:
   template <typename somenumber>
   void vmult (Vector<somenumber>       &dst,
               const Vector<somenumber> &src) const;
+
+  /**
+   * Apply the transpose of the incomplete decomposition, i.e. do one forward-
+   * backward step $dst=(LU)^{-1}src$.
+   *
+   * Call @p initialize before calling this function.
+   *
+   * @note This function has not yet been implemented
+   *
+   */
+  template <typename somenumber>
+  void Tvmult (Vector<somenumber>       &dst,
+               const Vector<somenumber> &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this

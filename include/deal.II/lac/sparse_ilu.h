@@ -63,7 +63,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef typename SparseLUDecomposition<number>::size_type size_type;
 
   /**
    * Constructor. Does nothing.

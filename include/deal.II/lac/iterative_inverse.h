@@ -72,13 +72,19 @@ DEAL_II_NAMESPACE_OPEN
  * for further details.
  *
  * @ingroup Matrix2
- * @author Guido Kanschat
- * @date 2010
+ * @author Guido Kanschat; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret
+ * @date 2010, 2015
  */
 template <class VECTOR>
 class IterativeInverse : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef typename PointerMatrixBase<VECTOR>::size_type size_type;
+
   /**
    * Initialization function. Provide a matrix and preconditioner for the
    * solve in vmult().
@@ -97,12 +103,35 @@ public:
   void vmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
+   * Same as before, but uses the transpose of the matrix.
+   */
+  void Tvmult (VECTOR &dst, const VECTOR &src) const;
+
+  /**
    * Solve for right hand side <tt>src</tt>, but allow for the fact that the
    * vectors given to this function have different type from the vectors used
    * by the inner solver.
    */
   template <class VECTOR2>
   void vmult (VECTOR2 &dst, const VECTOR2 &src) const;
+
+  /**
+   * Same as before, but uses the transpose of the matrix.
+   */
+  template <class VECTOR2>
+  void Tvmult (VECTOR2 &dst, const VECTOR2 &src) const;
+
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   */
+  size_type n () const;
 
   /**
    * The solver, which allows selection of the actual solver as well as
@@ -158,6 +187,14 @@ IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
 
 
 template <class VECTOR>
+inline void
+IterativeInverse<VECTOR>::Tvmult (VECTOR &dst, const VECTOR &src) const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+
+template <class VECTOR>
 template <class VECTOR2>
 inline void
 IterativeInverse<VECTOR>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
@@ -171,6 +208,32 @@ IterativeInverse<VECTOR>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
   *rhs = src;
   solver.solve(*matrix, *sol, *rhs, *preconditioner);
   dst = *sol;
+}
+
+
+template <class VECTOR>
+template <class VECTOR2>
+inline void
+IterativeInverse<VECTOR>::Tvmult (VECTOR2 &dst, const VECTOR2 &src) const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+
+template <class VECTOR>
+inline typename IterativeInverse<VECTOR>::size_type
+IterativeInverse<VECTOR>::m () const
+{
+  Assert (matrix.get()!=0, ExcNotInitialized());
+  return matrix->m();
+}
+
+template <class VECTOR>
+inline typename IterativeInverse<VECTOR>::size_type
+IterativeInverse<VECTOR>::n () const
+{
+  Assert (matrix.get()!=0, ExcNotInitialized());
+  return matrix->n();
 }
 
 
