@@ -356,6 +356,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Added: DoFTools::locally_relevant_dofs_per_subdomain can be used
+  to extract an IndexSet of locally relevant DoFs for a Triangulation
+  partitioned using METIS or with a parallel::shared::Triangulation .
+  <br>
+  (Jean-Paul Pelteret, 2015/09/24)
+  </li>
+
   <li> Fixed: hp::SolutionTransfer could get confused when dealing with
   FE_Nothing elements. This is now fixed.
   <br>

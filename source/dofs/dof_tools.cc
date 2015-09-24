@@ -27,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -1121,6 +1122,60 @@ namespace DoFTools
       index_sets[i].compress ();
 
     return index_sets;
+  }
+
+  template <class DH>
+  std::vector<IndexSet>
+  locally_relevant_dofs_per_subdomain (const DH  &dof_handler)
+  {
+    // Collect all the locally owned DoFs
+    // Note: Even though the distribution of DoFs by the locally_owned_dofs_per_subdomain
+    // function is pseudo-random, we will collect all the DoFs on the subdomain
+    // and its layer cell. Therefore, the random nature of this function does
+    // not play a role in the extraction of the locally relevant DoFs
+    std::vector<IndexSet> dof_set = locally_owned_dofs_per_subdomain(dof_handler);
+    const dealii::types::subdomain_id n_subdomains = dof_set.size();
+
+    // Add the DoFs on the adjacent (equivalent ghost) cells to the IndexSet,
+    // cache them in a set. Need to check each DoF manually because we can't
+    // be sure that the DoF range of locally_owned_dofs is really contiguous.
+    for (dealii::types::subdomain_id subdomain_id = 0;
+         subdomain_id < n_subdomains; ++subdomain_id)
+      {
+        // Extract the layer of cells around this subdomain
+        std_cxx11::function<bool (const typename DH::active_cell_iterator &)> predicate
+          = IteratorFilters::SubdomainEqualTo(subdomain_id);
+        const std::vector<typename DH::active_cell_iterator>
+        active_halo_layer = GridTools::compute_active_cell_halo_layer (dof_handler,
+                            predicate);
+
+        // Extract DoFs associated with halo layer
+        std::vector<types::global_dof_index> local_dof_indices;
+        std::set<types::global_dof_index> subdomain_halo_global_dof_indices;
+        for (typename std::vector<typename DH::active_cell_iterator>::const_iterator
+             it_cell = active_halo_layer.begin(); it_cell!=active_halo_layer.end(); ++it_cell)
+          {
+            const typename DH::active_cell_iterator &cell = *it_cell;
+            Assert(cell->subdomain_id() != subdomain_id,
+                   ExcMessage("The subdomain ID of the halo cell should not match that of the vector entry."));
+
+            local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+            cell->get_dof_indices(local_dof_indices);
+
+            for (std::vector<types::global_dof_index>::iterator it=local_dof_indices.begin();
+                 it!=local_dof_indices.end();
+                 ++it)
+              if (!dof_set[subdomain_id].is_element(*it))
+                subdomain_halo_global_dof_indices.insert(*it);
+          }
+
+        dof_set[subdomain_id].add_indices(subdomain_halo_global_dof_indices.begin(),
+                                          subdomain_halo_global_dof_indices.end());
+
+        dof_set[subdomain_id].compress();
+      }
+
+    return dof_set;
   }
 
   template <class DH>
