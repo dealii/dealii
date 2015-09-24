@@ -1,10 +1,10 @@
 
-DEAL:cg::Starting value 1.00
-DEAL:cg::Convergence step 2 value 0
+DEAL:cg::Starting value 0.95
+DEAL:cg::Convergence step 1 value 0
 DEAL::Exact inverse:     0.84 0.20 0.26 0.20 0.18 0.03 0.05 0.10 0.03 0.06 
 DEAL::Check  vmult orig: 1.09 0.26 0.34 0.26 0.24 0.04 0.06 0.12 0.04 0.07 
 DEAL::Check Tvmult orig: 1.09 0.26 0.34 0.26 0.24 0.04 0.06 0.12 0.04 0.07 
-DEAL:cg::Starting value 1.00
+DEAL:cg::Starting value 0.95
 DEAL:cg::Failure step 8 value 0.00
 DEAL::Check  vmult diag: 0.82 0.26 0.33 0.21 0.15 0.02 0.03 0.09 0.03 0.07 
 DEAL::Check Tvmult diag: 0.82 0.26 0.33 0.21 0.15 0.02 0.03 0.09 0.03 0.07 
