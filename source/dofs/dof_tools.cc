@@ -1079,6 +1079,16 @@ namespace DoFTools
   std::vector<IndexSet>
   locally_owned_dofs_per_subdomain (const DH  &dof_handler)
   {
+    // If the Triangulation is distributed, the only thing we can usefully
+    // ask is for its locally owned subdomain
+    Assert ((dynamic_cast<const parallel::distributed::
+             Triangulation<DH::dimension,DH::space_dimension> *>
+             (&dof_handler.get_tria()) == 0),
+            ExcMessage ("For parallel::distributed::Triangulation objects and "
+                        "associated DoF handler objects, asking for any information "
+                        "related to a subdomain other than the locally owned one does "
+                        "not make sense."));
+
     //the following is a random process (flip of a coin), thus should be called once only.
     std::vector< dealii::types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
     dealii::DoFTools::get_subdomain_association (dof_handler, subdomain_association);
@@ -1128,6 +1138,16 @@ namespace DoFTools
   std::vector<IndexSet>
   locally_relevant_dofs_per_subdomain (const DH  &dof_handler)
   {
+    // If the Triangulation is distributed, the only thing we can usefully
+    // ask is for its locally owned subdomain
+    Assert ((dynamic_cast<const parallel::distributed::
+             Triangulation<DH::dimension,DH::space_dimension> *>
+             (&dof_handler.get_tria()) == 0),
+            ExcMessage ("For parallel::distributed::Triangulation objects and "
+                        "associated DoF handler objects, asking for any information "
+                        "related to a subdomain other than the locally owned one does "
+                        "not make sense."));
+
     // Collect all the locally owned DoFs
     // Note: Even though the distribution of DoFs by the locally_owned_dofs_per_subdomain
     // function is pseudo-random, we will collect all the DoFs on the subdomain
@@ -1165,8 +1185,7 @@ namespace DoFTools
             for (std::vector<types::global_dof_index>::iterator it=local_dof_indices.begin();
                  it!=local_dof_indices.end();
                  ++it)
-              if (!dof_set[subdomain_id].is_element(*it))
-                subdomain_halo_global_dof_indices.insert(*it);
+              subdomain_halo_global_dof_indices.insert(*it);
           }
 
         dof_set[subdomain_id].add_indices(subdomain_halo_global_dof_indices.begin(),
