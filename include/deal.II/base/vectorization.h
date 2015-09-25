@@ -577,17 +577,12 @@ private:
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
     // will leave all value and exponent bits unchanged but force the sign
-    // value to +. As opposed to AVX and SSE2, there is no andnot operation on
-    // double data types in AVX-512. Thus, need to separately work with
-    // 256-bit data fields.
-    __m256d mask = _mm256_set1_pd (-0.);
-    __m256d in[2];
-    in[0] = *(reinterpret_cast<__m256d *>(&data));
-    in[0] = _m256_andnot_pd(mask, in[0]);
-    in[1] = *(reinterpret_cast<__m256d *>(&data)+1);
-    in[1] = _m256_andnot_pd(mask, in[1]);
+    // value to +. Since there is no andnot for AVX512, we interpret the data
+    // as 64 bit integers and do the andnot on those types (note that andnot
+    // is a bitwise operation so the data type does not matter)
+    __m512d mask = _mm512_set1_pd (-0.);
     VectorizedArray res;
-    res.data = _mm512_loadu_pd(reinterpret_cast<double *>(&in[0]));
+    res.data = (__m512d)_mm512_andnot_epi64 ((__m512i)mask, (__m512i)data);
     return res;
   }
 
@@ -782,17 +777,12 @@ private:
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
     // will leave all value and exponent bits unchanged but force the sign
-    // value to +. As opposed to AVX and SSE, there is no andnot operation on
-    // double data types in AVX-512. Thus, need to separately work with
-    // 256-bit data fields.
-    __m256 mask = _mm256_set1_ps (-0.f);
-    __m256 in[2];
-    in[0] = *(reinterpret_cast<__m256 *>(&data));
-    in[0] = _m256_andnot_ps(mask, in[0]);
-    in[1] = *(reinterpret_cast<__m256 *>(&data)+1);
-    in[1] = _m256_andnot_ps(mask, in[1]);
+    // value to +. Since there is no andnot for AVX512, we interpret the data
+    // as 32 bit integers and do the andnot on those types (note that andnot
+    // is a bitwise operation so the data type does not matter)
+    __m512 mask = _mm512_set1_ps (-0.f);
     VectorizedArray res;
-    res.data = _mm512_loadu_ps(reinterpret_cast<float *>(&in[0]));
+    res.data = (__m512)_mm512_andnot_epi32 ((__m512i)mask, (__m512i)data);
     return res;
   }
 

@@ -186,7 +186,7 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       for (int i=1; i<n_vectors; ++i)
         ptr[i] = 0.0;
       const volatile double x = 2.25;
-      b = _mm512_set_pd(x, x, x, x, x, x, x, x);
+      b = _mm512_set1_pd(x);
       data[0] = _mm512_add_pd (a, b);
       data[1] = _mm512_mul_pd (b, data[0]);
       ptr = reinterpret_cast<double*>(&data[1]);
