@@ -1043,11 +1043,11 @@ namespace internal
                                                       -1 : +1);
                   break;
                 case 2:
-                  output_data.boundary_forms[i] = cross_product(data.aux[0][i]);
+                  output_data.boundary_forms[i] = cross_product_2d(data.aux[0][i]);
                   break;
                 case 3:
                   output_data.boundary_forms[i] =
-                    cross_product(data.aux[0][i], data.aux[1][i]);
+                    cross_product_3d(data.aux[0][i], data.aux[1][i]);
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
@@ -1080,13 +1080,13 @@ namespace internal
                       data.contravariant[point].transpose();
 
                     Tensor<1, spacedim> cell_normal =
-                      cross_product(DX_t[0], DX_t[1]);
+                      cross_product_3d(DX_t[0], DX_t[1]);
                     cell_normal /= cell_normal.norm();
 
                     // then compute the face normal from the face tangent
                     // and the cell normal:
                     output_data.boundary_forms[point] =
-                      cross_product(data.aux[0][point], cell_normal);
+                      cross_product_3d(data.aux[0][point], cell_normal);
                   }
 
               }
@@ -1293,10 +1293,10 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
                         if (dim==1)
                           output_data.normal_vectors[point] =
-                            cross_product(-DX_t[0]);
+                            cross_product_2d(-DX_t[0]);
                         else //dim == 2
                           output_data.normal_vectors[point] =
-                            cross_product(DX_t[0], DX_t[1]);
+                            cross_product_3d(DX_t[0], DX_t[1]);
 
                         output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
 

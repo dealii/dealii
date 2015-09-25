@@ -1720,7 +1720,7 @@ outer_product(const Tensor<rank_1, dim, Number> &src1,
 template <int dim, typename Number>
 inline
 Tensor<1,dim,Number>
-cross_product (const Tensor<1,dim,Number> &src)
+cross_product_2d (const Tensor<1,dim,Number> &src)
 {
   Assert (dim==2, ExcInternalError());
 
@@ -1746,8 +1746,8 @@ cross_product (const Tensor<1,dim,Number> &src)
 template <int dim, typename Number>
 inline
 Tensor<1,dim,Number>
-cross_product (const Tensor<1,dim,Number> &src1,
-               const Tensor<1,dim,Number> &src2)
+cross_product_3d (const Tensor<1,dim,Number> &src1,
+                  const Tensor<1,dim,Number> &src2)
 {
   Assert (dim==3, ExcInternalError());
 

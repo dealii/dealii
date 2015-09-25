@@ -491,7 +491,7 @@ namespace internal
     Tensor<1,2>
     normalized_alternating_product (const Tensor<1,2> (&basis_vectors)[1])
     {
-      Tensor<1,2> tmp = cross_product (basis_vectors[0]);
+      Tensor<1,2> tmp = cross_product_2d (basis_vectors[0]);
       return tmp/tmp.norm();
     }
 
@@ -512,7 +512,7 @@ namespace internal
     Tensor<1,3>
     normalized_alternating_product (const Tensor<1,3> (&basis_vectors)[2])
     {
-      Tensor<1,3> tmp = cross_product (basis_vectors[0], basis_vectors[1]);
+      Tensor<1,3> tmp = cross_product_3d (basis_vectors[0], basis_vectors[1]);
       return tmp/tmp.norm();
     }
 
@@ -698,7 +698,7 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 
       // then compute the normal by taking the cross product. since the
       // normal is not required to be normalized, no problem here
-      face_vertex_normals[vertex] = cross_product(tangents[0], tangents[1]);
+      face_vertex_normals[vertex] = cross_product_3d(tangents[0], tangents[1]);
     };
 }
 
