@@ -38,7 +38,7 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/distributed/tria.h>
-
+#include <deal.II/distributed/shared_tria.h>
 
 #include <algorithm>
 #include <numeric>
@@ -1144,6 +1144,25 @@ namespace DoFTools
     Assert(dof_handler.n_dofs() > 0,
            ExcMessage("Number of DoF is not positive. "
                       "This could happen when the function is called before NumberCache is written."));
+
+    // In case this function is executed with parallel::shared::Triangulation
+    // with artifical cells, we need to take "true" subdomain IDs (i.e. without
+    // artificial cells). Otherwise we are good to use subdomain_id as stored
+    // in cell->subdomain_id().
+    std::vector<types::subdomain_id> cell_owners (dof_handler.get_tria().n_active_cells());
+    if (const parallel::shared::Triangulation<DH::dimension, DH::space_dimension> *tr =
+          (dynamic_cast<const parallel::shared::Triangulation<DH::dimension, DH::space_dimension>*> (&dof_handler.get_tria ())))
+      {
+        cell_owners = tr->get_true_subdomain_ids_of_cells();
+      }
+    else
+      {
+        for (typename DH::active_cell_iterator cell = dof_handler.begin_active();
+             cell!= dof_handler.end(); cell++)
+          if (cell->is_locally_owned())
+            cell_owners[cell->active_cell_index()] = cell->subdomain_id();
+      }
+
     // preset all values by an invalid value
     std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
                  numbers::invalid_subdomain_id);
@@ -1162,11 +1181,7 @@ namespace DoFTools
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        Assert (cell->is_artificial() == false,
-                ExcMessage ("You can't call this function for meshes that "
-                            "have artificial cells."));
-
-        const types::subdomain_id subdomain_id = cell->subdomain_id();
+        const types::subdomain_id subdomain_id = cell_owners[cell->active_cell_index()];
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
         local_dof_indices.resize (dofs_per_cell);
         cell->get_dof_indices (local_dof_indices);

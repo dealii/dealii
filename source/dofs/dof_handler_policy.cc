@@ -1068,14 +1068,45 @@ namespace internal
       distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
                        NumberCache &number_cache) const
       {
+        // If the underlying shared::Tria allows artifical cells, we need to do
+        // some tricks here to make Sequential algorithms play nicely.
+        // Namely, we first restore original partition (without artificial cells)
+        // and then turn artificial cells on at the end of this function.
+        const parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
+        Assert(tr != 0, ExcInternalError());
+        typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+        cell = dof_handler.get_tria().begin_active(),
+        endc = dof_handler.get_tria().end();
+        std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
+        const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
+        if (tr->with_artificial_cells())
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            {
+              current_subdomain_ids[index] = cell->subdomain_id();
+              cell->set_subdomain_id(true_subdomain_ids[index]);
+            }
+
         Sequential<dim,spacedim>::distribute_dofs (dof_handler,number_cache);
         DoFRenumbering::subdomain_wise (dof_handler);
+        // dofrenumbering will reset subdomains, this is ugly but we need to do it again:
+        cell = tr->begin_active();
+        if (tr->with_artificial_cells())
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            cell->set_subdomain_id(true_subdomain_ids[index]);
+
         number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
         number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
         number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
         for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
         number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
+
+        // restore current subdomain ids
+        cell = tr->begin_active();
+        if (tr->with_artificial_cells())
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            cell->set_subdomain_id(current_subdomain_ids[index]);
       }
 
       template <int dim, int spacedim>
@@ -1105,6 +1136,23 @@ namespace internal
         (void)number_cache;
         Assert (false, ExcNotImplemented());
 #else
+        // Similar to distribute_dofs() we need to have a special treatment in
+        // case artificial cells are present.
+        const parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
+        Assert(tr != 0, ExcInternalError());
+        typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+        cell = dof_handler.get_tria().begin_active(),
+        endc = dof_handler.get_tria().end();
+        std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
+        const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
+        if (tr->with_artificial_cells())
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            {
+              current_subdomain_ids[index] = cell->subdomain_id();
+              cell->set_subdomain_id(true_subdomain_ids[index]);
+            }
+
         std::vector<types::global_dof_index> global_gathered_numbers (dof_handler.n_dofs (), 0);
         // as we call DoFRenumbering::subdomain_wise (dof_handler) from distribute_dofs(),
         // we need to support sequential-like input.
@@ -1117,9 +1165,6 @@ namespace internal
           {
             Assert(new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
                    ExcInternalError());
-            const parallel::shared::Triangulation<dim, spacedim> *tr =
-              (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
-            Assert(tr != 0, ExcInternalError());
             const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
             std::vector<types::global_dof_index> gathered_new_numbers (dof_handler.n_dofs (), 0);
             Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
@@ -1208,6 +1253,12 @@ namespace internal
 
         number_cache.n_locally_owned_dofs =
           number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria ().locally_owned_subdomain ()];
+
+        // restore artificial cells
+        cell = tr->begin_active();
+        if (tr->with_artificial_cells())
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            cell->set_subdomain_id(current_subdomain_ids[index]);
 #endif
       }
 
