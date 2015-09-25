@@ -148,10 +148,24 @@ typename ProductType<Number,OtherNumber>::type
 contract (const Tensor<1,dim,Number> &src1,
           const Tensor<1,dim,OtherNumber> &src2) DEAL_II_DEPRECATED;
 
+
+/**
+ * The cross-product of one vector in 2d. This is just a rotation by 90
+ * degrees.
+ *
+ * @deprecated Use the function cross_product_2d that returns the value.
+ * @relates Tensor
+ */
+template <int dim, typename Number>
+inline
+void
+cross_product (Tensor<1,dim,Number>       &dst,
+               const Tensor<1,dim,Number> &src) DEAL_II_DEPRECATED;
+
 /**
  * The cross-product of 2 vectors in 3d.
  *
- * @deprecated Use the cross_product function that returns the value.
+ * @deprecated Use the function cross_product_3d that returns the value.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -446,10 +460,19 @@ template <int dim, typename Number>
 inline
 void
 cross_product (Tensor<1,dim,Number>       &dst,
+               const Tensor<1,dim,Number> &src)
+{
+  dst = cross_product_2d(src);
+}
+
+template <int dim, typename Number>
+inline
+void
+cross_product (Tensor<1,dim,Number>       &dst,
                const Tensor<1,dim,Number> &src1,
                const Tensor<1,dim,Number> &src2)
 {
-  dst = cross_product(src1, src2);
+  dst = cross_product_3d(src1, src2);
 }
 
 template <int rank_1, int rank_2, int dim, typename Number>
