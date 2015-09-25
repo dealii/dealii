@@ -154,9 +154,9 @@ LaplaceKernelIntegration<dim>::term_S (const Tensor<1,3> &r,
                                        const Tensor<1,3> &n,
                                        const double &rn_c)
 {
-  Tensor<1, 3> ra1 = cross_product(r, a1);
-  Tensor<1, 3> ra2 = cross_product(r, a2);
-  Tensor<1, 3> a12 = cross_product(a1, a2);
+  Tensor<1, 3> ra1 = cross_product_3d(r, a1);
+  Tensor<1, 3> ra2 = cross_product_3d(r, a2);
+  Tensor<1, 3> a12 = cross_product_3d(a1, a2);
 
   double integral =
     -1./2./numbers::PI
@@ -176,9 +176,9 @@ LaplaceKernelIntegration<dim>::term_D (const Tensor<1,3> &r,
                                        const Tensor<1,3> &a1,
                                        const Tensor<1,3> &a2)
 {
-  Tensor<1, 3> ra1 = cross_product(r, a1);
-  Tensor<1, 3> ra2 = cross_product(r, a2);
-  Tensor<1, 3> a12 = cross_product(a1, a2);
+  Tensor<1, 3> ra1 = cross_product_3d(r, a1);
+  Tensor<1, 3> ra2 = cross_product_3d(r, a2);
+  Tensor<1, 3> a12 = cross_product_3d(a1, a2);
 
   double integral = 1./2./numbers::PI
                     *atan2( ra1*ra2, (r.norm()* (r*a12)));
