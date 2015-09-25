@@ -29,6 +29,7 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -78,6 +79,14 @@ namespace GridTools
       return tria;
     }
 
+    template<int dim, int spacedim>
+    const Triangulation<dim, spacedim> &
+    get_tria(const parallel::shared::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+
     template<int dim, template<int, int> class Container, int spacedim>
     const Triangulation<dim,spacedim> &
     get_tria(const Container<dim,spacedim> &container)
@@ -99,6 +108,14 @@ namespace GridTools
     {
       return tria;
     }
+
+    template<int dim, int spacedim>
+    Triangulation<dim, spacedim> &
+    get_tria(parallel::shared::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
 
     template<int dim, template<int, int> class Container, int spacedim>
     const Triangulation<dim,spacedim> &

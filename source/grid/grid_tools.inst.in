@@ -65,6 +65,23 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
   #endif
 }
 
+// now also instantiate these functions for parallel::shared::Triangulation
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace GridTools \{
+
+  template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension> >::type>
+    compute_active_cell_halo_layer (const parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+                                    const std_cxx11::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension,
+                                                                                                               parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension> >::type&)> &);
+  \}
+
+#endif
+}
+
 
 // now also instantiate these functions for parallel::distributed::Triangulation
 for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
