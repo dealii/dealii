@@ -2170,7 +2170,7 @@ inline
 typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::operator() (const size_type i) const
 {
-  const std::pair<size_type,size_type> local_index
+  const std::pair<unsigned int,size_type> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
@@ -2182,7 +2182,7 @@ inline
 typename BlockVectorBase<VectorType>::reference
 BlockVectorBase<VectorType>::operator() (const size_type i)
 {
-  const std::pair<size_type,size_type> local_index
+  const std::pair<unsigned int,size_type> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }

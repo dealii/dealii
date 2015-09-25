@@ -303,8 +303,8 @@ BlockIndices::global_to_local (const size_type i) const
   while (i < start_indices[block])
     --block;
 
-  return std::pair<size_type,size_type>(block,
-                                        i-start_indices[block]);
+  return std::pair<unsigned int,size_type>(block,
+                                           i-start_indices[block]);
 }
 
 
