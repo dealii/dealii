@@ -1707,7 +1707,7 @@ outer_product(const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * Returns the cross-product in 2d. This is just a rotation by 90 degrees
+ * Returns the cross product in 2d. This is just a rotation by 90 degrees
  * clockwise to compute the outer normal from a tangential vector. This
  * function is defined for all space dimensions to allow for dimension
  * independent programming (e.g. within switches over the space dimension),
@@ -1734,7 +1734,7 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
 
 
 /**
- * Returns the cross-product of 2 vectors in 3d. This function is defined
+ * Returns the cross product of 2 vectors in 3d. This function is defined
  * for all space dimensions to allow for dimension independent programming
  * (e.g. within switches over the space dimension), but may only be called
  * if the actual dimension of the arguments is three (e.g. from the

@@ -44,8 +44,8 @@ DeclException1 (ExcInvalidTensorContractionIndex,
  * Double contract two tensors of rank 2, thus computing the Frobenius inner
  * product <tt>sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
  *
- * @deprecated Use the double_contract function that takes indices as template
- *   arguments and returns its result instead.
+ * @deprecated Use the double_contract() function that takes indices as
+ *   template arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -59,7 +59,7 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
  * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector product
  * analog operation between tensors of rank 4 and rank 2.
  *
- * @deprecated Use the double_contract function that takes indices as
+ * @deprecated Use the double_contract() function that takes indices as
  *   template arguments and returns its result instead.
  * @relates Tensor
  */
@@ -75,7 +75,7 @@ void double_contract (Tensor<2,dim,Number>       &dest,
  * <tt>index2</tt> of the second tensor. Note that the number of the index
  * is counted from 1 on, not from zero as usual.
  *
- * @deprecated Use the contract function that takes indices as template
+ * @deprecated Use the contract() function that takes indices as template
  *   arguments and returns its result instead.
  * @relates Tensor
  */
@@ -92,7 +92,7 @@ void contract (Tensor<2,dim,Number>       &dest,
  * performed over index <tt>index1</tt> of the first tensor. Note that the
  * number of the index is counted from 1 on, not from zero as usual.
  *
- * @deprecated Use the contract function that takes indices as template
+ * @deprecated Use the contract() function that takes indices as template
  *   arguments and returns its result instead.
  * @relates Tensor
  */
@@ -109,7 +109,7 @@ void contract (Tensor<2,dim,Number>       &dest,
  * <tt>index2</tt> of the second tensor. Note that the number of the index
  * is counted from 1 on, not from zero as usual.
  *
- * @deprecated Use the contract function that takes indices as template
+ * @deprecated Use the contract() function that takes indices as template
  *   arguments and returns its result instead.
  * @relates Tensor
  */
@@ -150,10 +150,10 @@ contract (const Tensor<1,dim,Number> &src1,
 
 
 /**
- * The cross-product of one vector in 2d. This is just a rotation by 90
+ * The cross product of one vector in 2d. This is just a rotation by 90
  * degrees.
  *
- * @deprecated Use the function cross_product_2d that returns the value.
+ * @deprecated Use the function cross_product_2d() that returns the value.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -163,9 +163,9 @@ cross_product (Tensor<1,dim,Number>       &dst,
                const Tensor<1,dim,Number> &src) DEAL_II_DEPRECATED;
 
 /**
- * The cross-product of 2 vectors in 3d.
+ * The cross product of 2 vectors in 3d.
  *
- * @deprecated Use the function cross_product_3d that returns the value.
+ * @deprecated Use the function cross_product_3d() that returns the value.
  * @relates Tensor
  */
 template <int dim, typename Number>
