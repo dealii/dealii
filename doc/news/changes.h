@@ -50,10 +50,10 @@ inconvenience this causes.
 
   <li> Cleanup: The two argument variant of cross_product() that returned
   the result by reference as first argument has been removed. Use the
-  cross_product() function that directly returns the result instead.
-  Further, the exception
-  Tensor<rank,dim,Number>::ExcInvalidTensorContractionIndex
-  has been removed
+  function cross_product_2d(), or cross_product_3d(), that directly returns
+  the result instead. Further, the exception
+  Tensor<rank,dim,Number>::ExcInvalidTensorContractionIndex has been
+  removed
   <br>
   (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>

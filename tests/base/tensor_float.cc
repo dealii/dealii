@@ -80,17 +80,17 @@ int main ()
       e1[0] = 1.;
       e2[1] = 1.;
       e3[2] = 1.;
-      Tensor<1,3,float> result = cross_product(e1, e2);
+      Tensor<1,3,float> result = cross_product_3d(e1, e2);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1])
               << '\t' << static_cast<double>(result[2]) << std::endl;
 
-      result = cross_product(e2, e3);
+      result = cross_product_3d(e2, e3);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1]) << '\t'
               << static_cast<double>(result[2]) << std::endl;
 
-      result = cross_product(e3, e1);
+      result = cross_product_3d(e3, e1);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1])
               << '\t' << static_cast<double>(result[2]) << std::endl;

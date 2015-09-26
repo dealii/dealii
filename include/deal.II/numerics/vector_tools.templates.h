@@ -2875,8 +2875,8 @@ namespace VectorTools
 
           // now compute the
           // two normals
-          orthonormals[0] = cross_product (vector, tmp);
-          orthonormals[1] = cross_product (vector, orthonormals[0]);
+          orthonormals[0] = cross_product_3d (vector, tmp);
+          orthonormals[1] = cross_product_3d (vector, orthonormals[0]);
 
           break;
         }
@@ -4205,7 +4205,7 @@ namespace VectorTools
               // The RHS entries are:
               // \int_{edge} (tangential* boundary_value) * (tangential * edge_shape_function_i) dS.
               //
-              // In 2D, tangential*vector is equivalent to cross_product(normal, vector), so we use this instead.
+              // In 2D, tangential*vector is equivalent to cross_product_3d(normal, vector), so we use this instead.
               // This avoids possible issues with the computation of the tangent.
 
               // Store the normal at this quad point:
@@ -4395,22 +4395,22 @@ namespace VectorTools
                   const unsigned int cell_j = fe.face_to_cell_index (j_face_idx, face);
 
                   cross_product_j =
-                    cross_product(normal_vector,
-                                  fe_face_values[vec].value(cell_j, q_point));
+                    cross_product_3d(normal_vector,
+                                     fe_face_values[vec].value(cell_j, q_point));
 
                   for (unsigned int i = 0; i < associated_face_dofs; ++i)
                     {
                       const unsigned int i_face_idx = associated_face_dof_to_face_dof[i];
                       const unsigned int cell_i = fe.face_to_cell_index (i_face_idx, face);
                       cross_product_i =
-                        cross_product(normal_vector,
-                                      fe_face_values[vec].value(cell_i, q_point));
+                        cross_product_3d(normal_vector,
+                                         fe_face_values[vec].value(cell_i, q_point));
 
                       face_matrix(i, j) += fe_face_values.JxW(q_point) *
                                            cross_product_i * cross_product_j;
                     }
                   // compute rhs
-                  cross_product_rhs = cross_product(normal_vector, tmp);
+                  cross_product_rhs = cross_product_3d(normal_vector, tmp);
                   face_rhs(j) += fe_face_values.JxW(q_point) *
                                  cross_product_rhs * cross_product_j;
                 }
@@ -5719,7 +5719,7 @@ namespace VectorTools
                     // we get here only for dim==3, but at least one isn't
                     // quite smart enough to notice this and warns when
                     // compiling the function in 2d
-                    tangent = cross_product (normals[0], normals[dim-2]);
+                    tangent = cross_product_3d (normals[0], normals[dim-2]);
                     break;
                   default:
                     Assert (false, ExcNotImplemented());

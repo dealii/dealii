@@ -96,17 +96,17 @@ int main ()
       e1[0] = 1.;
       e2[1] = 1.;
       e3[2] = 1.;
-      Tensor<1,3,std::complex<double> > result = cross_product(e1, e2);
+      Tensor<1,3,std::complex<double> > result = cross_product_3d(e1, e2);
       deallog << '\t' << result[0]
               << '\t' << result[1]
               << '\t' << result[2] << std::endl;
 
-      result = cross_product(e2, e3);
+      result = cross_product_3d(e2, e3);
       deallog << '\t' << result[0]
               << '\t' << result[1] << '\t'
               << result[2] << std::endl;
 
-      result = cross_product(e3, e1);
+      result = cross_product_3d(e3, e1);
       deallog << '\t' << result[0]
               << '\t' << result[1]
               << '\t' << result[2] << std::endl;
