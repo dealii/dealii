@@ -22,6 +22,8 @@
 
 // parallel geometric multigrid. work in progress!
 
+#define DEBUG_RENUMBERING
+
 // As discussed in the introduction, most of
 // this program is copied almost verbatim
 // from step-6, which itself is only a slight
@@ -470,6 +472,7 @@ namespace Step50
     mg_dof_handler.distribute_mg_dofs (fe);
 
 
+#ifdef     DEBUG_RENUMBERING
     static unsigned int n=0;
     ++n;
     unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
@@ -600,7 +603,7 @@ namespace Step50
              }
          }
 
-
+#endif
 
 
 
@@ -639,7 +642,7 @@ namespace Step50
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
-    ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+    ConstantFunction<dim>                    homogeneous_dirichlet_bc (1.0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (mg_dof_handler,
                                               dirichlet_boundary,
@@ -794,7 +797,7 @@ namespace Step50
                                        fe_values.JxW(q_point));
 
                 cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-                                1.0 *
+                                10.0 *
                                 fe_values.JxW(q_point));
               }
 
@@ -872,7 +875,7 @@ namespace Step50
 
 
     // now communicate mg_constraint_dofs
-    if (true)
+    if (false)
     {
       for (unsigned int l=0;l<triangulation.n_global_levels(); ++l)
         {
@@ -1035,15 +1038,17 @@ namespace Step50
 		for (unsigned int n=0;n<reply_bdry.n_elements();++n)
 		  {
 		    types::global_dof_index idx = reply_bdry.nth_index_in_set(n);
-		    mg_constrained_dofs.boundary_indices[l].insert(idx);
+		    Assert(mg_constrained_dofs.boundary_indices[l].is_element(idx), ExcInternalError());
+		    
+		      //		    mg_constrained_dofs.boundary_indices[l].insert(idx);
 		  }
 		
-		
+		/*
                 std::cout << "L=" << l
 			  << " new " << mg_constrained_dofs.refinement_edge_indices[l].n_elements()-c1
 		  //<< " and " << mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements()-c2
 			  << " and " << mg_constrained_dofs.boundary_indices[l].size()-c3
-                    << std::endl;
+			  << std::endl;*/
 		if (mg_constrained_dofs.boundary_indices[l].size()>c3)
 		  std::cout << "HEY: boundary indices transfer did something!" << std::endl;
 		
@@ -1084,17 +1089,17 @@ namespace Step50
         DoFTools::extract_locally_relevant_mg_dofs (mg_dof_handler, dofset, level);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+        boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));
 
 
         boundary_constraints[level].close ();
-        check(boundary_constraints[level]);
+        //check(boundary_constraints[level]);
 
 
-        boundary_interface_constraints[level]
-        .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices (level));
+        //boundary_interface_constraints[level]
+        //.add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices (level));
         boundary_interface_constraints[level].close ();
-        check(boundary_interface_constraints[level]);
+        //check(boundary_interface_constraints[level]);
       }
 
     // Now that we're done with most of our preliminaries, let's start
@@ -1292,7 +1297,7 @@ namespace Step50
     // smoothers:
     typedef TrilinosWrappers::PreconditionJacobi Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
-    mg_smoother.initialize(mg_matrices);
+    mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
     //mg_smoother.set_symmetric(false);
 
@@ -1322,7 +1327,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
-    mg.set_debug(6);
+    //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
 
@@ -1331,13 +1336,28 @@ namespace Step50
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
+    if (false)//true)
+      {
+	static int round=0;
+	++round;
+	std::cout << " ********* start " << round << std::endl;
+	solution = 1.0;
+	
+	TrilinosWrappers::MPI::Vector temp = solution;
+	temp = 0.0;
+	preconditioner.vmult(temp, solution);
+	  
+	std::cout << " ********* end " << round << " " << temp.l2_norm() << " min=" << temp.minimal_value() << std::endl;
+      }
+    
+    
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
     SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
     SolverGMRES<vector_t>    cg (solver_control);
 
-    solution = 0;
+    //solution = 0;
 
     if (false)
       {
@@ -1389,6 +1409,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
+#ifdef     DEBUG_RENUMBERING
     static int n = 0;
     n++;
 
@@ -1413,9 +1434,11 @@ namespace Step50
               cell->set_refine_flag();
                 //std::cout << cell->id() << std::endl;
               }
-
+    triangulation.execute_coarsening_and_refinement ();
+    return;
       }
-    else
+#endif
+    
       {
 
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
@@ -1425,30 +1448,21 @@ namespace Step50
     temp_solution = solution;
 
     KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
-                                        QGauss<dim-1>(3),
+                                        QGauss<dim-1>(degree+1),
                                         typename FunctionMap<dim>::type(),
                                         temp_solution,
                                         estimated_error_per_cell);
-    if (false && n==2)
-      {
 
-        typename DoFHandler<dim>::active_cell_iterator
-                cell = mg_dof_handler.begin_active(),
-                endc = mg_dof_handler.end();
-                for (; cell!=endc; ++cell)
-                  if (cell->is_locally_owned() && id_to_string(cell->id())=="0_3:300")
-                    cell->set_refine_flag();
-
-      }
-    else
     parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction (triangulation,
                                        estimated_error_per_cell,
                                        0.3, 0.0);
 
+    
     triangulation.prepare_coarsening_and_refinement ();
 
 
+#ifdef     DEBUG_RENUMBERING
     if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)>1)
     {
       // write refine.n
@@ -1500,8 +1514,9 @@ namespace Step50
 	  f << ptr;
 	}
     }
+#endif
       }
-    
+      
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -1583,10 +1598,9 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<7; ++cycle)
+    for (unsigned int cycle=0; cycle<20; ++cycle)
       {
         deallog << "Cycle " << cycle << ':' << std::endl;
-        std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
@@ -1620,10 +1634,12 @@ namespace Step50
         unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
 
+	if (false)
+	  {
+	    
         static unsigned int n=0;
         ++n;
 
-        std::cout << "matrix:" << std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
         for (unsigned int lvl = 0;lvl<triangulation.n_global_levels();++lvl)
         for (unsigned int i=0; i<numprocs; ++i)
@@ -1638,20 +1654,10 @@ namespace Step50
             mg_interface_matrices[lvl].print(f);
           }
         MPI_Barrier(MPI_COMM_WORLD);
-
-        std::cout << "rhs:" << system_rhs.l2_norm() << std::endl;
+	  }
+	
+        deallog << "rhs: " << std::setprecision(15) << system_rhs.l2_norm() << std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        //system_rhs.print(std::cout);
-        MPI_Barrier(MPI_COMM_WORLD);
-
-
-
-
-
-
-
-
-
 
         solve ();
         output_results (cycle);
@@ -1660,16 +1666,21 @@ namespace Step50
 	TrilinosWrappers::MPI::Vector temp = solution;
 	system_matrix.residual(temp,solution,system_rhs);
 	constraints.set_zero(temp);
+
+	for (unsigned int i=0;i<solution.size();++i)
+	  if (solution.in_local_range(i) && solution[i]<0.8)
+	    std::cout << "WRONG solution at " << i
+		      << " is " << solution[i] << std::endl;
+	
 	deallog << "residual " << temp.l2_norm() << std::endl;
-    if (temp.l2_norm()>1e-5)
-    {
-        for (unsigned int i=0;i<temp.size();++i)
-            if (temp.in_local_range(i) && temp[i]>0.06)
+	if (temp.l2_norm()>1e-5)
+	  {
+	    for (unsigned int i=0;i<temp.size();++i)
+	      if (temp.in_local_range(i) && temp[i]>0.06)
                 std::cout << "RESIDUAL at " << i
                           << " is " << temp[i] << std::endl;
-
-    }
-	Assert(temp.l2_norm()<1e-5, ExcMessage("Error: residual is large for some reason!"));
+	    
+	  }
 
       }
   }
