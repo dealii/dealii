@@ -1386,7 +1386,7 @@ namespace
    */
   Point<1>
   do_transform_real_to_unit_cell_internal
-  (const typename Triangulation<1,3>::cell_iterator &,
+  (const Triangulation<1,3>::cell_iterator &,
    const Point<3> &,
    const Point<1> &,
    MappingQGeneric<1,3>::InternalData &)

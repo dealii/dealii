@@ -115,7 +115,7 @@ LogStream::test_mode(bool on)
   if (on)
     {
       double_threshold = 1.e-10;
-      float_threshold = 1.e-7;
+      float_threshold = 1.e-7f;
       offset = 1.e-7;
     }
   else

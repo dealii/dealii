@@ -1832,7 +1832,10 @@ namespace internal
               for (unsigned int e=d+1; e<dim; ++e, ++c)
                 if ((sorted_indices[0]==d) && (sorted_indices[1]==e))
                   return dim+c;
-            Assert (false, ExcNotImplemented());
+
+            // should never get here:
+            AssertThrow(false, ExcInternalError());
+            return 0;
           }
           }
       }
@@ -1931,6 +1934,10 @@ namespace internal
               for (unsigned int e=d+1; e<dim; ++e, ++c)
                 if (c==i)
                   return TableIndices<2>(d,e);
+
+            // should never get here:
+            AssertThrow(false, ExcInternalError());
+            return TableIndices<2>(0, 0);
           }
       }
 
