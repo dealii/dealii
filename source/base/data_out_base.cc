@@ -5426,7 +5426,7 @@ namespace DataOutBase
     Point<3> camera_direction_temp;
     Point<3> camera_horizontal_temp;
 
-    const float angle_factor = 3.14159265 / 180.;
+    const float angle_factor = 3.14159265f / 180.f;
 
     // (I) rotate the camera to the chosen polar angle
     camera_position_temp[1] = cos(angle_factor * flags.polar_angle) * camera_position[1] - sin(angle_factor * flags.polar_angle) * camera_position[2];
