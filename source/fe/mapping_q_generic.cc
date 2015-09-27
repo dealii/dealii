@@ -1260,7 +1260,7 @@ namespace
    */
   template <int dim>
   Point<dim>
-  do_transform_real_to_unit_cell_internal
+  do_transform_real_to_unit_cell_internal_codim1
   (const typename Triangulation<dim,dim+1>::cell_iterator &cell,
    const Point<dim+1>                                       &p,
    const Point<dim>                                         &initial_p_unit,
@@ -1399,20 +1399,85 @@ namespace
 
 
 
+// visual studio freaks out when trying to determine if
+// do_transform_real_to_unit_cell_internal with dim=3 and spacedim=4 is a good
+// candidate. So instead of letting the compiler pick the correct overload, we
+// use template specialization to make sure we pick up the right function to
+// call:
+
 template<int dim, int spacedim>
 Point<dim>
 MappingQGeneric<dim,spacedim>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
- const Point<spacedim>                            &p,
- const Point<dim>                                 &initial_p_unit,
- InternalData                                     &mdata) const
+(const typename Triangulation<dim,spacedim>::cell_iterator &/*cell*/,
+ const Point<spacedim>                            &/*p*/,
+ const Point<dim>                                 &/*initial_p_unit*/,
+ InternalData                                     &/*mdata*/) const
 {
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal (cell, p, initial_p_unit, mdata);
+  // default implementation (should never be called)
+  Assert(false, ExcInternalError());
+  return Point<dim>();
 }
 
+template<>
+Point<1>
+MappingQGeneric<1, 1>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<1, 1>::cell_iterator &cell,
+ const Point<1>                            &p,
+ const Point<1>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  return do_transform_real_to_unit_cell_internal(cell, p, initial_p_unit, mdata);
+}
+
+template<>
+Point<2>
+MappingQGeneric<2, 2>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<2, 2>::cell_iterator &cell,
+ const Point<2>                            &p,
+ const Point<2>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, mdata);
+}
+
+template<>
+Point<3>
+MappingQGeneric<3, 3>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<3, 3>::cell_iterator &cell,
+ const Point<3>                            &p,
+ const Point<3>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, mdata);
+}
+
+template<>
+Point<1>
+MappingQGeneric<1, 2>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<1, 2>::cell_iterator &cell,
+ const Point<2>                            &p,
+ const Point<1>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, mdata);
+}
+
+template<>
+Point<2>
+MappingQGeneric<2, 3>::
+transform_real_to_unit_cell_internal
+(const typename Triangulation<2, 3>::cell_iterator &cell,
+ const Point<3>                            &p,
+ const Point<2>                                 &initial_p_unit,
+ InternalData                                     &mdata) const
+{
+  return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, mdata);
+}
 
 
 
@@ -3133,7 +3198,7 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
 template <>
 void
 MappingQGeneric<3,3>::
-add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
+add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                         std::vector<Point<3> >                &a) const
 {
   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
