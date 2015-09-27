@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
+  ghost cells. Similarly ::level_ghost_owners() for level ghosts.
+  <br>
+  (Timo Heister, 2015/09/30)
+  </li>
+
   <li> New: FunctionParser now supports pow(a,b).
   <br>
   (Timo Heister, 2015/09/30)

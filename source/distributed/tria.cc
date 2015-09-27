@@ -2791,6 +2791,31 @@ namespace parallel
       return dealii::internal::p4est::functions<dim>::checksum (parallel_forest);
     }
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::
+    update_number_cache ()
+    {
+      parallel::Triangulation<dim,spacedim>::update_number_cache();
+
+      if (this->n_levels() == 0)
+        return;
+
+      if (settings & construct_multigrid_hierarchy)
+        {
+          // find level ghost owners
+          for (typename Triangulation<dim,spacedim>::cell_iterator
+               cell = this->begin();
+               cell != this->end();
+               ++cell)
+            if (cell->level_subdomain_id() != numbers::artificial_subdomain_id
+                && cell->level_subdomain_id() != this->locally_owned_subdomain())
+              this->number_cache.level_ghost_owners.insert(cell->level_subdomain_id());
+
+          Assert(this->number_cache.level_ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator), ExcInternalError());
+        }
+    }
+
 
     template <int dim, int spacedim>
     typename dealii::internal::p4est::types<dim>::tree *
