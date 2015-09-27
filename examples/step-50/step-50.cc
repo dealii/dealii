@@ -1025,7 +1025,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<20; ++cycle)
+    for (unsigned int cycle=0; cycle<15; ++cycle)
       {
         deallog << "Cycle " << cycle << ':' << std::endl;
 
