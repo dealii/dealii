@@ -692,6 +692,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::operator= (const Number s)
   {
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
+    (void)s;
+
     std::fill(begin(),end(),Number());
 
     return *this;
