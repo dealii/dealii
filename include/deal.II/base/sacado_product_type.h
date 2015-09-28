@@ -72,8 +72,8 @@ struct EnableIfScalar<Sacado::Fad::DFad<T> >
   typedef Sacado::Fad::DFad<T> type;
 };
 
-#endif // DEAL_II_WITH_TRILINOS
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_WITH_TRILINOS
 
 #endif
