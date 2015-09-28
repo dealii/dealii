@@ -280,6 +280,15 @@ DoFTools::locally_owned_dofs_per_subdomain<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &dof_handler);
 
 template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler);
+template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler);
+
+template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
@@ -381,6 +390,15 @@ DoFTools::locally_owned_dofs_per_subdomain<hp::DoFHandler<deal_II_dimension,deal
 (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler);
 
 template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler);
+template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler);
+
+template
 void
 DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
@@ -423,6 +441,15 @@ DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<1,3> >
 template
 std::vector<IndexSet>
 DoFTools::locally_owned_dofs_per_subdomain<hp::DoFHandler<1,3> >
+(const hp::DoFHandler<1,3> &dof_handler);
+
+template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<DoFHandler<1,3> >
+(const DoFHandler<1,3>     &dof_handler);
+template
+std::vector<IndexSet>
+DoFTools::locally_relevant_dofs_per_subdomain<hp::DoFHandler<1,3> >
 (const hp::DoFHandler<1,3> &dof_handler);
 
 template
