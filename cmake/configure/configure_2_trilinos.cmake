@@ -122,7 +122,8 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # unsigned int.
     #
     IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "deal.II was configured to use 32bit global indices but "
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
@@ -141,7 +142,8 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # unsigned long long int.
     #
     IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "deal.II was configured to use 64bit global indices but "
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "deal.II was configured to use 64bit global indices but "
         "Trilinos was not."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
@@ -178,6 +180,26 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
           )
         SET(${var} FALSE)
       ENDIF()
+    ENDIF()
+
+    #
+    # Newer Trilinos versions (12.0.1 or newer) require a matching C++11
+    # support. I.e., if Trilinos is configured with C++11 support, deal.II
+    # also has to be configured with C++11 support:
+    #
+    IF(TRILINOS_WITH_MANDATORY_CXX11 AND NOT DEAL_II_WITH_CXX11)
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "Trilinos was compiled with C++11 support, but C++11 support is "
+        "disabled (DEAL_II_WITH_CXX11=off)."
+        )
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+        "requires C++11 support, but C++11 support is disabled:\n"
+        "  DEAL_II_WITH_CXX11 = ${DEAL_II_WITH_CXX11}\n"
+        )
+      SET(${var} FALSE)
+
     ENDIF()
 
     CHECK_MPI_INTERFACE(TRILINOS ${var})
