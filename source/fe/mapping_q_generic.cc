@@ -1423,7 +1423,7 @@ template<>
 Point<1>
 MappingQGeneric<1, 1>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<1, 1>::cell_iterator &cell,
+(const Triangulation<1, 1>::cell_iterator &cell,
  const Point<1>                            &p,
  const Point<1>                                 &initial_p_unit,
  InternalData                                     &mdata) const
@@ -1435,7 +1435,7 @@ template<>
 Point<2>
 MappingQGeneric<2, 2>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<2, 2>::cell_iterator &cell,
+(const Triangulation<2, 2>::cell_iterator &cell,
  const Point<2>                            &p,
  const Point<2>                                 &initial_p_unit,
  InternalData                                     &mdata) const
@@ -1447,7 +1447,7 @@ template<>
 Point<3>
 MappingQGeneric<3, 3>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<3, 3>::cell_iterator &cell,
+(const Triangulation<3, 3>::cell_iterator &cell,
  const Point<3>                            &p,
  const Point<3>                                 &initial_p_unit,
  InternalData                                     &mdata) const
@@ -1459,7 +1459,7 @@ template<>
 Point<1>
 MappingQGeneric<1, 2>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<1, 2>::cell_iterator &cell,
+(const Triangulation<1, 2>::cell_iterator &cell,
  const Point<2>                            &p,
  const Point<1>                                 &initial_p_unit,
  InternalData                                     &mdata) const
@@ -1471,7 +1471,7 @@ template<>
 Point<2>
 MappingQGeneric<2, 3>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<2, 3>::cell_iterator &cell,
+(const Triangulation<2, 3>::cell_iterator &cell,
  const Point<3>                            &p,
  const Point<2>                                 &initial_p_unit,
  InternalData                                     &mdata) const
