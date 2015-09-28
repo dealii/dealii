@@ -25,6 +25,7 @@
 #   TRILINOS_VERSION_MAJOR
 #   TRILINOS_VERSION_MINOR
 #   TRILINOS_VERSION_SUBMINOR
+#   TRILINOS_WITH_MANDATORY_CXX11
 #   TRILINOS_WITH_MPI
 #   TRILINOS_SUPPORTS_CPP11
 #   TRILINOS_HAS_C99_TR1_WORKAROUND
@@ -76,7 +77,8 @@ IF(DEFINED Trilinos_VERSION)
 ENDIF()
 
 #
-# Look for the one include file that we'll query for further information:
+# Look for Epetra_config.h - we'll query it to determine MPI and 64bit
+# indices support:
 #
 DEAL_II_FIND_FILE(EPETRA_CONFIG_H Epetra_config.h
   HINTS ${Trilinos_INCLUDE_DIRS}
@@ -108,6 +110,28 @@ IF(EXISTS ${EPETRA_CONFIG_H})
     SET(TRILINOS_WITH_NO_64BITS_INDICES TRUE)
   ELSE()
     SET(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
+  ENDIF()
+ENDIF()
+
+#
+# Look for Sacado_config.h - we'll query it to determine C++11 support:
+#
+DEAL_II_FIND_FILE(SACADO_CONFIG_H Sacado_config.h
+  HINTS ${Trilinos_INCLUDE_DIRS}
+  NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
+  )
+
+SET(TRILINOS_WITH_MANDATORY_CXX11 FALSE)
+IF(EXISTS ${SACADO_CONFIG_H})
+  #
+  # Determine whether Trilinos was configured with C++11 support and
+  # enabling C++11 in deal.II is mandatory (Trilinos 12.0.1 and later).
+  #
+  FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
+    REGEX "#define HAVE_SACADO_CXX11")
+  IF(NOT "${SACADO_CXX11_STRING}" STREQUAL "")
+    SET(TRILINOS_WITH_MANDATORY_CXX11 TRUE)
   ENDIF()
 ENDIF()
 
