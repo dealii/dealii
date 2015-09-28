@@ -3606,7 +3606,7 @@ namespace parallel
     Triangulation<dim,spacedim>::repartition (const std::vector<unsigned int> &cell_weights)
     {
       AssertThrow(settings & no_automatic_repartitioning,
-                  ExcMessage("You need to set the 'no_automatic_repartition' flag in the "
+                  ExcMessage("You need to set the 'no_automatic_repartitioning' flag in the "
                              "constructor when creating this parallel::distributed::Triangulation "
                              "object if you want to call repartition() manually."));
 
