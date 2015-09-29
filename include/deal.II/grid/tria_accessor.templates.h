@@ -2141,7 +2141,7 @@ template <int dim, int spacedim>
 inline
 TriaAccessor<0, dim, spacedim>::
 TriaAccessor (const Triangulation<dim,spacedim> *tria,
-              const int level,
+              const int,
               const int index,
               const AccessorData *)
   :
