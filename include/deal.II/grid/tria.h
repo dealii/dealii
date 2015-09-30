@@ -1899,6 +1899,62 @@ public:
    * @{
    */
 
+
+  /**
+   * Used to inform functions in derived classes how the cell with the given
+   * cell_iterator is going to change. Note that this may me different than
+   * the refine_flag() and coarsen_flag() in the cell_iterator in parallel
+   * calculations because of refinement constraints that this machine does not
+   * see.
+   */
+  enum CellStatus
+  {
+    /**
+     * The cell will not be refined or coarsened and might or might not
+     * move to a different processor.
+     */
+    CELL_PERSIST,
+    /**
+     * The cell will be or was refined.
+     */
+    CELL_REFINE,
+    /**
+     * The children of this cell will be or were coarsened into this cell.
+     */
+    CELL_COARSEN,
+    /**
+     * Invalid status. Will not occur for the user.
+     */
+    CELL_INVALID
+  };
+
+  /**
+   * A structure used to accumulate the results of the cell_weights slot
+   * functions below. It takes an iterator range and returns the sum of values.
+   */
+  template<typename T>
+  struct sum
+  {
+    typedef T result_type;
+
+    template<typename InputIterator>
+    T operator()(InputIterator first, InputIterator last) const
+    {
+      // If there are no slots to call, just return the
+      // default-constructed value
+      if (first == last)
+        return T();
+
+      T sum = *first++;
+      while (first != last)
+        {
+          sum += *first++;
+        }
+
+      return sum;
+    }
+  };
+
   /**
    * A structure that has boost::signal objects for a number of actions that a
    * triangulation can do to itself. Please refer to the
@@ -1978,6 +2034,33 @@ public:
      * @p post_refinement_on_cell are not connected to this signal.
      */
     boost::signals2::signal<void ()> any_change;
+
+    /**
+     * This signal is triggered for each cell during every automatic or manual
+     * repartitioning. This signal is
+     * somewhat special in that it is only triggered for distributed parallel
+     * calculations and only if functions are connected to it. It is intended to
+     * allow a weighted repartitioning of the domain to balance the computational
+     * load across processes in a different way than balancing the number of cells.
+     * Any connected function is expected to take an iterator to a cell, and a
+     * CellStatus argument that indicates whether this cell is going to be refined,
+     * coarsened or left untouched (see the documentation of the CellStatus enum
+     * for more information). The function is expected to return an unsigned
+     * integer, which is interpreted as the additional computational load of this
+     * cell. If this cell is going to be coarsened, the signal is called for the
+     * parent cell and you need to provide the weight of the future parent
+     * cell. If this cell is going to be refined the function should return a
+     * weight, which will be equally assigned to every future child
+     * cell of the current cell. As a reference a value of 1000 is added for
+     * every cell to the total weight. This means a signal return value of 1000
+     * (resulting in a weight of 2000) means that it is twice as expensive for
+     * a process to handle this particular cell. If several functions are
+     * connected to this signal, their return values will be summed to calculate
+     * the final weight.
+     */
+    boost::signals2::signal<unsigned int (const cell_iterator &,
+                                          const CellStatus),
+                                                Triangulation<dim,spacedim>::sum<unsigned int> > cell_weight;
   };
 
   /**

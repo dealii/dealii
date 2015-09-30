@@ -16,7 +16,6 @@
 
 
 // just create a 16x16 coarse mesh, refine it once, and partition it
-//
 // like _03, but with a larger spread of weights
 
 #include "../tests.h"
@@ -33,6 +32,21 @@
 
 #include <fstream>
 
+template <int dim>
+unsigned int
+cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+            const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+{
+  const unsigned int cell_weight = (cell->center()[0] < 0.5
+                                    ||
+                                    cell->center()[1] < 0.5
+                                    ?
+                                    0
+                                    :
+                                    999 * 1000);
+
+  return cell_weight;
+}
 
 template<int dim>
 void test()
@@ -41,25 +55,15 @@ void test()
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               dealii::Triangulation<dim>::none,
-                                               parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                               dealii::Triangulation<dim>::none);
 
   GridGenerator::subdivided_hyper_cube(tr, 16);
-  tr.refine_global(1);
 
-  // repartition the mesh; attach different weights to all cells
-  std::vector<unsigned int> weights (tr.n_active_cells());
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tr.begin_active(); cell != tr.end(); ++cell)
-    weights[cell->active_cell_index()]
-      = (cell->center()[0] < 0.5
-         ||
-         cell->center()[1] < 0.5
-         ?
-         1
-         :
-         1000);
-  tr.repartition (weights);
+  tr.signals.cell_weight.connect(std::bind(&cell_weight<dim>,
+                                           std_cxx11::_1,
+                                           std_cxx11::_2));
+
+  tr.refine_global(1);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
@@ -75,13 +79,8 @@ void test()
        cell = tr.begin_active(); cell != tr.end(); ++cell)
     if (cell->is_locally_owned())
       integrated_weights[myid]
-      += (cell->center()[0] < 0.5
-          ||
-          cell->center()[1] < 0.5
-          ?
-          1
-          :
-          1000);
+      += 1000 + cell_weight<dim>(cell,parallel::distributed::Triangulation<dim>::CELL_PERSIST);
+
   Utilities::MPI::sum (integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
