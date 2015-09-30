@@ -26,6 +26,7 @@
 
 #include <bitset>
 #include <list>
+#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -628,6 +629,15 @@ namespace GridTools
   template <class Container>
   std::vector<typename Container::active_cell_iterator>
   compute_ghost_cell_halo_layer (const Container &container);
+
+
+  /**
+   * Return the adjacent cells of all the vertices. The vertices are ordered by
+   * their ID.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
+  vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
 
   /*@}*/

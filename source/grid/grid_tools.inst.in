@@ -234,6 +234,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     std::map<unsigned int,Point<deal_II_space_dimension> >
     get_all_vertices_at_boundary (const Triangulation<deal_II_dimension,deal_II_space_dimension> &tria);
 
+    template
+    std::vector<std::set<typename Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> >
+    vertex_to_cell_map(const Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
+
 #if deal_II_dimension == deal_II_space_dimension
 #  if deal_II_dimension > 1
     template
