@@ -12,7 +12,7 @@
 //
 // ---------------------------------------------------------------------
 
-
+// Test vertex_to_cell_map for 2D problem with mpi and hanging nodes.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
