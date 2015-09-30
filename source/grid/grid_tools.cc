@@ -1609,16 +1609,29 @@ next_cell:
     // Take care of hanging nodes
     cell = triangulation.begin_active();
     for (; cell!=endc; ++cell)
-      for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-        {
-          if ((cell->at_boundary(i)==false) && (cell->neighbor_level(i)<cell->level()))
-            {
-              typename Triangulation<dim,spacedim>::active_cell_iterator adjacent_cell =
-                cell->neighbor(i);
-              for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_face; ++j)
-                vertex_to_cell_map[cell->face(i)->vertex_index(j)].insert(adjacent_cell);
-            }
-        }
+      {
+        for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+          {
+            if ((cell->at_boundary(i)==false) && (cell->neighbor(i)->active()))
+              {
+                typename Triangulation<dim,spacedim>::active_cell_iterator adjacent_cell =
+                  cell->neighbor(i);
+                for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_face; ++j)
+                  vertex_to_cell_map[cell->face(i)->vertex_index(j)].insert(adjacent_cell);
+              }
+          }
+
+        // in 3d also loop over the edges
+        if (dim==3)
+          {
+            for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i)
+              if (cell->line(i)->has_children())
+                // the only place where this vertex could have been
+                // hiding is on the mid-edge point of the edge we
+                // are looking at
+                vertex_to_cell_map[cell->line(i)->child(0)->vertex_index(1)].insert(cell);
+          }
+      }
 
     return vertex_to_cell_map;
   }
