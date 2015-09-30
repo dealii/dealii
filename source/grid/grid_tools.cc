@@ -1611,7 +1611,7 @@ next_cell:
     for (; cell!=endc; ++cell)
       for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
         {
-          if ((cell->neighbor_level(i)>=0) && (cell->neighbor_level(i)<cell->level()))
+          if ((cell->at_boundary(i)==false) && (cell->neighbor_level(i)<cell->level()))
             {
               typename Triangulation<dim,spacedim>::active_cell_iterator adjacent_cell =
                 cell->neighbor(i);

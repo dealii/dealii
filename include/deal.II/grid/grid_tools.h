@@ -632,8 +632,12 @@ namespace GridTools
 
 
   /**
-   * Return the adjacent cells of all the vertices. The vertices are ordered by
-   * their ID.
+   * Return the adjacent cells of all the vertices. If a vertex is also a
+   * hanging node, the associated coarse cell is also returned. The vertices
+   * are ordered by the vertex index. This is the number returned by the
+   * function <code>cell-@>vertex_index()</code>. Notice that only the
+   * indices marked in the array returned by
+   * Triangulation<dim,spacedim>::get_used_vertices() are used.
    */
   template <int dim, int spacedim>
   std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
