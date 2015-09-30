@@ -159,6 +159,11 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: FunctionParser now supports pow(a,b).
+  <br>
+  (Timo Heister, 2015/09/30)
+  </li>
+
   <li> New: MGTransferPrebuilt can now be used with parallel::distributed::Vector
   and TrilinosWrappers::SparseMatrix as a transfer matrix.
   <br>

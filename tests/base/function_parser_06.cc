@@ -96,6 +96,7 @@ void test()
   eval("sqrt(0.5)",Point<2>(0,0), sqrt(0.5));
   eval("tan(0.5)",Point<2>(0,0), tan(0.5));
   eval("tanh(0.5)",Point<2>(0,0), tanh(0.5));
+  eval("pow (9.0, 0.5)",Point<2>(0,0), 3.0);
 
 
 }
