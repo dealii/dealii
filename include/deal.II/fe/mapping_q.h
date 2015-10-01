@@ -30,22 +30,49 @@ template <int dim, typename POLY> class TensorProductPolynomials;
 /*@{*/
 
 /**
- * Mapping class that uses Qp-mappings on boundary cells. The mapping shape
- * functions make use of tensor product polynomials with unit cell support
- * points equal to the points of the Gauss-Lobatto quadrature formula. These
- * points give a well-conditioned interpolation also for very high orders and
- * are therefore preferred over equidistant support points.
+ * A class that implements a polynomial mapping $Q_p$ of degree $p$ on cells
+ * at the boundary of the domain (or, if requested in the constructor,
+ * for all cells) and linear mappings for interior cells.
  *
- * For more details about Qp-mappings, see the `mapping' report at
- * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports' section
- * of `Documentation'.
+ * The class is in fact poorly named since (unless explicitly specified
+ * during the construction of the object, see below), it does not actually use
+ * mappings of degree $p$ <i>everywhere</i>, but only on cells at the
+ * boundary. This is in contrast to the MappingQGeneric class which indeed
+ * does use a polynomial mapping $Q_p$ of degree $p$ everywhere. The point
+ * of the current class is that in many situations, curved domains
+ * are only provided with information about how exactly edges at the
+ * boundary are shaped, but we do not know anything about internal
+ * edges. Thus, in the absence of other information, we can only assume
+ * that internal edges are straight lines, and in that case internal
+ * cells may as well be treated is bilinear quadrilaterals or trilinear
+ * hexahedra. (An example of how such meshes look is shown in step-1
+ * already, but it is also discussed in the "Results" section of step-6.)
+ * Because bi-/trilinear mappings are significantly cheaper to compute
+ * than higher order mappings, it is advantageous in such situations
+ * to use the higher order mapping only on cells at the boundary of the
+ * domain. This class implements exactly this behavior.
  *
- * For more information about the <tt>spacedim</tt> template parameter check
- * the documentation of FiniteElement or the one of Triangulation.
- *
- * @note Since the boundary description is closely tied to the unit cell
- * support points, new boundary descriptions need to explicitly use the
- * Gauss-Lobatto points.
+ * There are a number of special cases worth considering:
+ * - If you want to use a higher order mapping for all cells, you can
+ *   achieve this by setting the second argument to the constructor
+ *   to true. This only makes sense if you can actually provide
+ *   information about how interior edges and faces of the mesh
+ *   should be curved. This is typically done using by associating
+ *   a Manifold with interior cells and edges. A simple example of this
+ *   is discussed in the "Results" section of step-6; a full discussion
+ *   of manifolds is provided in step-53.
+ * - If you pass true as the second argument to this class, then it
+ *   is in fact completely equivalent to generating a
+ *   MappingQGeneric object right away.
+ * - This class is also entirely equivalent to MappingQGeneric if the
+ *   polynomial degree provided is one. This is because in that case,
+ *   no distinction between the mapping used on cells in the interior
+ *   and on the boundary of the domain can be made.
+ * - If you are working on meshes embedded in higher space dimensions,
+ *   i.e., if dim!=spacedim, then every cell is considered to be
+ *   at the boundary of the domain and consequently a higher order
+ *   mapping is used for all cells; again this class is then equivalent
+ *   to using MappingQGeneric right away.
  *
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001, Wolfgang Bangerth, 2015
  */
@@ -82,7 +109,8 @@ public:
    * Transforms the point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.
    */
-  virtual Point<spacedim>
+  virtual
+  Point<spacedim>
   transform_unit_to_real_cell (
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const Point<dim>                                 &p) const;
@@ -108,7 +136,8 @@ public:
    * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell) or
    * whether the exception mentioned above has been thrown.
    */
-  virtual Point<dim>
+  virtual
+  Point<dim>
   transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<spacedim>                                     &p) const;
 
