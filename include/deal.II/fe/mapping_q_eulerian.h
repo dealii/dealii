@@ -211,13 +211,13 @@ private:
   mutable Threads::Mutex fe_values_mutex;
 
   /**
-   * Compute the positions of the support points in the current configuration
+   * Compute the positions of the support points in the current configuration.
+   * See the documentation of MappingQGeneric::compute_mapping_support_points()
+   * for more information.
    */
   virtual
-  void
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                 std::vector<Point<spacedim> > &a) const;
-
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 };
 
 /*@}*/

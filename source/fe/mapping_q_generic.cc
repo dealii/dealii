@@ -1040,8 +1040,8 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
               FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
                                       polynomial_degree)));
 
-  std::vector<Point<spacedim> > support_points (tensor_pols.n());
-  this->compute_mapping_support_points(cell, support_points);
+  const std::vector<Point<spacedim> > support_points
+    = this->compute_mapping_support_points(cell);
 
   Point<spacedim> mapped_point;
   for (unsigned int i=0; i<tensor_pols.n(); ++i)
@@ -1438,7 +1438,7 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -1464,7 +1464,7 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -1490,7 +1490,7 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -1516,7 +1516,7 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -1542,7 +1542,7 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -1938,8 +1938,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       // Find the initial value for the Newton iteration by a normal
       // projection to the least square plane determined by the vertices
       // of the cell
-      std::vector<Point<spacedim> > a;
-      this->compute_mapping_support_points (cell,a);
+      const std::vector<Point<spacedim> > a
+        = this->compute_mapping_support_points (cell);
       Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
       initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
@@ -1955,8 +1955,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
           // we do this by first getting all support points, then
           // throwing away all but the vertices, and finally calling
           // the same function as above
-          std::vector<Point<spacedim> > a;
-          this->compute_mapping_support_points (cell,a);
+          std::vector<Point<spacedim> > a
+            = this->compute_mapping_support_points (cell);
           a.resize(GeometryInfo<dim>::vertices_per_cell);
           initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
         }
@@ -2588,7 +2588,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       ||
       (cell != data.cell_of_current_support_points))
     {
-      this->compute_mapping_support_points(cell, data.mapping_support_points);
+      data.mapping_support_points = this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
     }
 
@@ -2976,7 +2976,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       ||
       (cell != data.cell_of_current_support_points))
     {
-      this->compute_mapping_support_points(cell, data.mapping_support_points);
+      data.mapping_support_points = this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
     }
 
@@ -3021,7 +3021,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       ||
       (cell != data.cell_of_current_support_points))
     {
-      this->compute_mapping_support_points(cell, data.mapping_support_points);
+      data.mapping_support_points = this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
     }
 
@@ -3862,13 +3862,12 @@ add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterato
 
 
 template<int dim, int spacedim>
-void
+std::vector<Point<spacedim> >
 MappingQGeneric<dim,spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               std::vector<Point<spacedim> > &a) const
+compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
   // get the vertices first
-  a.resize(GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     a[i] = cell->vertex(i);
 
@@ -3906,6 +3905,8 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
         Assert(false, ExcNotImplemented());
         break;
       }
+
+  return a;
 }
 
 

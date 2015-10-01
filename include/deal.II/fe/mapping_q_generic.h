@@ -509,9 +509,12 @@ protected:
   Table<2,double> support_point_weights_on_hex;
 
   /**
-   * An interface that derived classes have to implement and that
-   * computes the locations of support points for the mapping. For
-   * example, for MappingQ1 these are the vertices. However, other
+   * Return the locations of support points for the mapping. For
+   * example, for $Q_1$ mappings these are the vertices, and for higher
+   * order polynomial mappings they are the vertices plus interior
+   * points on edges, faces, and the cell interior that are placed
+   * in consultation with the Manifold description of the domain and
+   * its boundary. However, other
    * classes may override this function differently. In particular,
    * the MappingQ1Eulerian class does exactly this by not computing
    * the support points from the geometry of the current cell but
@@ -537,9 +540,8 @@ protected:
    * the locations of interior points.
    */
   virtual
-  void
-  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                  std::vector<Point<spacedim> > &a) const;
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Transforms the point @p p on the real cell to the corresponding point on
