@@ -292,6 +292,8 @@ void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Po
     {
       dof_handler.distribute_dofs(fe);
 
+      std::cout << "Number of cells/dofs: " << dof_handler.get_tria().n_active_cells() << " " << dof_handler.n_dofs() << std::endl;
+
       ConstraintMatrix constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       constraints.close();
@@ -407,7 +409,7 @@ int main ()
 
   const static unsigned dim = 3;
   unsigned order = 1;
-  unsigned n_cycles = 3;
+  unsigned n_cycles = 2;
 
   deallog << "3d\nRectangular grid:\n";
 
