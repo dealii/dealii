@@ -445,60 +445,14 @@ MappingQ<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-  // first a Newton iteration based on a Q1 mapping to get a good starting
-  // point, the idea being that this is cheaper than trying to start with the
-  // real mapping and likely also more robust.
-  //
-  // that said, this doesn't always work: there are cases where the point is
-  // outside the cell and the inverse mapping doesn't converge. in that case,
-  // use the center point of the cell as a starting point if we are to go on
-  // using the full mapping, or just propagate up the exception if we had no
-  // intention of continuing with the full mapping
-  Point<dim> initial_p_unit;
-  try
-    {
-      initial_p_unit = q1_mapping->transform_real_to_unit_cell(cell, p);
-    }
-  catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
-    {
-      // mirror the conditions of the code below to determine if we need to
-      // use an arbitrary starting point or if we just need to rethrow the
-      // exception
-      if (cell->has_boundary_lines()
-          ||
-          use_mapping_q_on_all_cells
-          ||
-          (dim!=spacedim) )
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            initial_p_unit[d] = 0.5;
-        }
-      else
-        throw;
-    }
-
-  // then a Newton iteration based on the full MappingQ if we need this. note
-  // that for interior cells with dim==spacedim, the mapping used is in fact a
-  // Q1 mapping, so there is nothing we need to do unless the iteration above
-  // failed
   if (cell->has_boundary_lines()
       ||
       use_mapping_q_on_all_cells
       ||
       (dim!=spacedim) )
-    {
-      // use the full mapping. in case the function above should have given us
-      // something back that lies outside the unit cell (that might happen
-      // because we may have given a point 'p' that lies inside the cell with
-      // the higher order mapping, but outside the Q1-mapped reference cell),
-      // then project it back into the reference cell in hopes that this gives
-      // a better starting point to the following iteration
-      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-
-      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
-    }
+    return MappingQGeneric<dim,spacedim>::transform_real_to_unit_cell(cell, p);
   else
-    return initial_p_unit;
+    return q1_mapping->transform_real_to_unit_cell(cell, p);
 }
 
 

@@ -369,7 +369,7 @@ public:
    * equals the given point @p p.  If this is the case then this function
    * throws an exception of type Mapping::ExcTransformationFailed . Whether
    * the given point @p p lies outside the cell can therefore be determined by
-   * checking whether the return reference coordinates lie inside or outside
+   * checking whether the returned reference coordinates lie inside or outside
    * the reference cell (e.g., using GeometryInfo::is_inside_unit_cell()) or
    * whether the exception mentioned above has been thrown.
    *

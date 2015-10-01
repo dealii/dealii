@@ -31,6 +31,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <cmath>
 #include <algorithm>
@@ -1859,15 +1860,49 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
     }
 
 
-  // Find the initial value for the Newton iteration by a normal
-  // projection to the least square plane determined by the vertices
-  // of the cell
-  std::vector<Point<spacedim> > a;
-  compute_mapping_support_points (cell,a);
-  Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
-         ExcInternalError());
-  const Point<dim> initial_p_unit =
-    internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+  Point<dim> initial_p_unit;
+  if (polynomial_degree == 1)
+    {
+      // Find the initial value for the Newton iteration by a normal
+      // projection to the least square plane determined by the vertices
+      // of the cell
+      std::vector<Point<spacedim> > a;
+      compute_mapping_support_points (cell,a);
+      Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
+             ExcInternalError());
+      initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+    }
+  else
+    {
+      try
+        {
+          // Find the initial value for the Newton iteration by a normal
+          // projection to the least square plane determined by the vertices
+          // of the cell
+          //
+          // we do this by first getting all support points, then
+          // throwing away all but the vertices, and finally calling
+          // the same function as above
+          std::vector<Point<spacedim> > a;
+          compute_mapping_support_points (cell,a);
+          a.resize(GeometryInfo<dim>::vertices_per_cell);
+          initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+        }
+      catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
+        {
+          for (unsigned int d=0; d<dim; ++d)
+            initial_p_unit[d] = 0.5;
+        }
+
+      // in case the function above should have given us something
+      // back that lies outside the unit cell (that might happen
+      // because we may have given a point 'p' that lies inside the
+      // cell with the higher order mapping, but outside the Q1-mapped
+      // reference cell), then project it back into the reference cell
+      // in hopes that this gives a better starting point to the
+      // following iteration
+      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+    }
 
   // perform the Newton iteration and return the result. note that
   // this statement may throw an exception, which we simply pass up to

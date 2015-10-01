@@ -108,8 +108,7 @@ public:
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices
-  (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy

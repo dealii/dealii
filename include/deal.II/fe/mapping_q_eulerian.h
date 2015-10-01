@@ -117,6 +117,16 @@ public:
                     const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
 
   /**
+   * Return the mapped vertices of the cell. For the current class, this function does
+   * not use the support points from the geometry of the current cell but
+   * instead evaluates an externally given displacement field in addition to
+   * the geometry of the cell.
+   */
+  virtual
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+  /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */

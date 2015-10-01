@@ -127,12 +127,31 @@ SupportQuadrature (const unsigned int map_degree)
 // .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, class EulerVectorType, int spacedim>
+std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+MappingQEulerian<dim, EulerVectorType, spacedim>::
+get_vertices
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
+  // get the vertices as the first 2^dim mapping support points
+  std::vector<Point<spacedim> > a;
+  compute_mapping_support_points(cell, a);
+
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertex_locations;
+  std::copy (a.begin(),
+             a.begin()+GeometryInfo<dim>::vertices_per_cell,
+             vertex_locations.begin());
+
+  return vertex_locations;
+}
+
+
+
+template <int dim, class EulerVectorType, int spacedim>
 void
 MappingQEulerian<dim, EulerVectorType, spacedim>::
 compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                 std::vector<Point<spacedim> > &a) const
 {
-
   // first, basic assertion with respect to vector size,
 
   const types::global_dof_index n_dofs  = euler_dof_handler->n_dofs();
