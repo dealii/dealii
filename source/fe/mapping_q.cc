@@ -311,18 +311,17 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -336,18 +335,17 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -359,18 +357,17 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
            VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -384,18 +381,17 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -407,18 +403,17 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
            VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
