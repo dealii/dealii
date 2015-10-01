@@ -1041,7 +1041,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
                                       polynomial_degree)));
 
   std::vector<Point<spacedim> > support_points (tensor_pols.n());
-  compute_mapping_support_points(cell, support_points);
+  this->compute_mapping_support_points(cell, support_points);
 
   Point<spacedim> mapped_point;
   for (unsigned int i=0; i<tensor_pols.n(); ++i)
@@ -1410,10 +1410,26 @@ template<int dim, int spacedim>
 Point<dim>
 MappingQGeneric<dim,spacedim>::
 transform_real_to_unit_cell_internal
-(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
- const Point<spacedim>                            &p,
- const Point<dim>                                 &initial_p_unit) const
+(const typename Triangulation<dim,spacedim>::cell_iterator &,
+ const Point<spacedim> &,
+ const Point<dim> &) const
 {
+  // default implementation (should never be called)
+  Assert(false, ExcInternalError());
+  return Point<dim>();
+}
+
+template<>
+Point<1>
+MappingQGeneric<1,1>::
+transform_real_to_unit_cell_internal
+(const Triangulation<1,1>::cell_iterator &cell,
+ const Point<1>                            &p,
+ const Point<1>                                 &initial_p_unit) const
+{
+  const int dim = 1;
+  const int spacedim = 1;
+
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
@@ -1422,11 +1438,11 @@ transform_real_to_unit_cell_internal
   std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
                                                       point_quadrature));
 
-  compute_mapping_support_points (cell, mdata->mapping_support_points);
+  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal (cell, p, initial_p_unit, *mdata);
+  return do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template<>
@@ -1435,10 +1451,24 @@ MappingQGeneric<2, 2>::
 transform_real_to_unit_cell_internal
 (const Triangulation<2, 2>::cell_iterator &cell,
  const Point<2>                            &p,
- const Point<2>                                 &initial_p_unit,
- InternalData                                     &mdata) const
+ const Point<2>                                 &initial_p_unit) const
 {
-  return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, mdata);
+  const int dim = 2;
+  const int spacedim = 2;
+
+  const Quadrature<dim> point_quadrature(initial_p_unit);
+
+  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
+  if (spacedim>dim)
+    update_flags |= update_jacobian_grads;
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                      point_quadrature));
+
+  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
 }
 
 template<>
@@ -1447,10 +1477,24 @@ MappingQGeneric<3, 3>::
 transform_real_to_unit_cell_internal
 (const Triangulation<3, 3>::cell_iterator &cell,
  const Point<3>                            &p,
- const Point<3>                                 &initial_p_unit,
- InternalData                                     &mdata) const
+ const Point<3>                                 &initial_p_unit) const
 {
-  return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, mdata);
+  const int dim = 3;
+  const int spacedim = 3;
+
+  const Quadrature<dim> point_quadrature(initial_p_unit);
+
+  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
+  if (spacedim>dim)
+    update_flags |= update_jacobian_grads;
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                      point_quadrature));
+
+  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
 }
 
 template<>
@@ -1459,10 +1503,24 @@ MappingQGeneric<1, 2>::
 transform_real_to_unit_cell_internal
 (const Triangulation<1, 2>::cell_iterator &cell,
  const Point<2>                            &p,
- const Point<1>                                 &initial_p_unit,
- InternalData                                     &mdata) const
+ const Point<1>                                 &initial_p_unit) const
 {
-  return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, mdata);
+  const int dim = 1;
+  const int spacedim = 2;
+
+  const Quadrature<dim> point_quadrature(initial_p_unit);
+
+  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
+  if (spacedim>dim)
+    update_flags |= update_jacobian_grads;
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                      point_quadrature));
+
+  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template<>
@@ -1471,10 +1529,24 @@ MappingQGeneric<2, 3>::
 transform_real_to_unit_cell_internal
 (const Triangulation<2, 3>::cell_iterator &cell,
  const Point<3>                            &p,
- const Point<2>                                 &initial_p_unit,
- InternalData                                     &mdata) const
+ const Point<2>                                 &initial_p_unit) const
 {
-  return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, mdata);
+  const int dim = 2;
+  const int spacedim = 3;
+
+  const Quadrature<dim> point_quadrature(initial_p_unit);
+
+  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
+  if (spacedim>dim)
+    update_flags |= update_jacobian_grads;
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                      point_quadrature));
+
+  this->compute_mapping_support_points (cell, mdata->mapping_support_points);
+
+  // dispatch to the various specializations for spacedim=dim,
+  // spacedim=dim+1, etc
+  return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
 }
 
 
@@ -1867,7 +1939,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       // projection to the least square plane determined by the vertices
       // of the cell
       std::vector<Point<spacedim> > a;
-      compute_mapping_support_points (cell,a);
+      this->compute_mapping_support_points (cell,a);
       Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
              ExcInternalError());
       initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
@@ -1884,7 +1956,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
           // throwing away all but the vertices, and finally calling
           // the same function as above
           std::vector<Point<spacedim> > a;
-          compute_mapping_support_points (cell,a);
+          this->compute_mapping_support_points (cell,a);
           a.resize(GeometryInfo<dim>::vertices_per_cell);
           initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
         }
@@ -2516,7 +2588,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       ||
       (cell != data.cell_of_current_support_points))
     {
-      compute_mapping_support_points(cell, data.mapping_support_points);
+      this->compute_mapping_support_points(cell, data.mapping_support_points);
       data.cell_of_current_support_points = cell;
     }
 
@@ -2904,7 +2976,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       ||
       (cell != data.cell_of_current_support_points))
     {
-      compute_mapping_support_points(cell, data.mapping_support_points);
+      this->compute_mapping_support_points(cell, data.mapping_support_points);
       data.cell_of_current_support_points = cell;
     }
 
@@ -2949,7 +3021,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       ||
       (cell != data.cell_of_current_support_points))
     {
-      compute_mapping_support_points(cell, data.mapping_support_points);
+      this->compute_mapping_support_points(cell, data.mapping_support_points);
       data.cell_of_current_support_points = cell;
     }
 
