@@ -3206,25 +3206,32 @@ namespace
 
         for (unsigned int q=0; q<output.size(); ++q)
           for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              for (unsigned int k=0; k<spacedim; ++k)
+            {
+              double tmp1[dim][dim];
+              for (unsigned int J=0; J<dim; ++J)
+                for (unsigned int K=0; K<dim; ++K)
+                  {
+                    tmp1[J][K] = data.contravariant[q][i][0] * input[q][0][J][K];
+                    for (unsigned int I=1; I<dim; ++I)
+                      tmp1[J][K] += data.contravariant[q][i][I] * input[q][I][J][K];
+                  }
+              for (unsigned int j=0; j<spacedim; ++j)
                 {
-                  output[q][i][j][k] =    data.contravariant[q][i][0]
-                                          * data.covariant[q][j][0]
-                                          * data.covariant[q][k][0]
-                                          * input[q][0][0][0];
-                  for (unsigned int I=0; I<dim; ++I)
-                    for (unsigned int J=0; J<dim; ++J)
-                      {
-                        const unsigned int K0 = (0==(I+J))? 1 : 0;
-                        for (unsigned int K=K0; K<dim; ++K)
-                          output[q][i][j][k] +=    data.contravariant[q][i][I]
-                                                   * data.covariant[q][j][J]
-                                                   * data.covariant[q][k][K]
-                                                   * input[q][I][J][K];
-                      }
-
+                  double tmp2[dim];
+                  for (unsigned int K=0; K<dim; ++K)
+                    {
+                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                      for (unsigned int J=1; J<dim; ++J)
+                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                    }
+                  for (unsigned int k=0; k<spacedim; ++k)
+                    {
+                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                      for (unsigned int K=1; K<dim; ++K)
+                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                    }
                 }
+            }
         return;
       }
 
@@ -3235,25 +3242,32 @@ namespace
 
         for (unsigned int q=0; q<output.size(); ++q)
           for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              for (unsigned int k=0; k<spacedim; ++k)
+            {
+              double tmp1[dim][dim];
+              for (unsigned int J=0; J<dim; ++J)
+                for (unsigned int K=0; K<dim; ++K)
+                  {
+                    tmp1[J][K] = data.covariant[q][i][0] * input[q][0][J][K];
+                    for (unsigned int I=1; I<dim; ++I)
+                      tmp1[J][K] += data.covariant[q][i][I] * input[q][I][J][K];
+                  }
+              for (unsigned int j=0; j<spacedim; ++j)
                 {
-                  output[q][i][j][k] =    data.covariant[q][i][0]
-                                          * data.covariant[q][j][0]
-                                          * data.covariant[q][k][0]
-                                          * input[q][0][0][0];
-                  for (unsigned int I=0; I<dim; ++I)
-                    for (unsigned int J=0; J<dim; ++J)
-                      {
-                        const unsigned int K0 = (0==(I+J))? 1 : 0;
-                        for (unsigned int K=K0; K<dim; ++K)
-                          output[q][i][j][k] +=   data.covariant[q][i][I]
-                                                  * data.covariant[q][j][J]
-                                                  * data.covariant[q][k][K]
-                                                  * input[q][I][J][K];
-                      }
-
+                  double tmp2[dim];
+                  for (unsigned int K=0; K<dim; ++K)
+                    {
+                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                      for (unsigned int J=1; J<dim; ++J)
+                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                    }
+                  for (unsigned int k=0; k<spacedim; ++k)
+                    {
+                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                      for (unsigned int K=1; K<dim; ++K)
+                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                    }
                 }
+            }
 
         return;
       }
@@ -3269,27 +3283,35 @@ namespace
 
         for (unsigned int q=0; q<output.size(); ++q)
           for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              for (unsigned int k=0; k<spacedim; ++k)
+            {
+              double factor[dim];
+              for (unsigned int I=0; I<dim; ++I)
+                factor[I] = data.contravariant[q][i][I] / data.volume_elements[q];
+              double tmp1[dim][dim];
+              for (unsigned int J=0; J<dim; ++J)
+                for (unsigned int K=0; K<dim; ++K)
+                  {
+                    tmp1[J][K] = factor[0] * input[q][0][J][K];
+                    for (unsigned int I=1; I<dim; ++I)
+                      tmp1[J][K] += factor[I] * input[q][I][J][K];
+                  }
+              for (unsigned int j=0; j<spacedim; ++j)
                 {
-                  output[q][i][j][k] =    data.contravariant[q][i][0]
-                                          / data.volume_elements[q]
-                                          * data.covariant[q][j][0]
-                                          * data.covariant[q][k][0]
-                                          * input[q][0][0][0];
-                  for (unsigned int I=0; I<dim; ++I)
-                    for (unsigned int J=0; J<dim; ++J)
-                      {
-                        const unsigned int K0 = (0==(I+J))? 1 : 0;
-                        for (unsigned int K=K0; K<dim; ++K)
-                          output[q][i][j][k] +=    data.contravariant[q][i][I]
-                                                   / data.volume_elements[q]
-                                                   * data.covariant[q][j][J]
-                                                   * data.covariant[q][k][K]
-                                                   * input[q][I][J][K];
-                      }
-
+                  double tmp2[dim];
+                  for (unsigned int K=0; K<dim; ++K)
+                    {
+                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                      for (unsigned int J=1; J<dim; ++J)
+                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                    }
+                  for (unsigned int k=0; k<spacedim; ++k)
+                    {
+                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                      for (unsigned int K=1; K<dim; ++K)
+                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                    }
                 }
+            }
 
         return;
       }
@@ -3411,21 +3433,21 @@ transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim>
       for (unsigned int q=0; q<output.size(); ++q)
         for (unsigned int i=0; i<spacedim; ++i)
           for (unsigned int j=0; j<spacedim; ++j)
-            for (unsigned int k=0; k<spacedim; ++k)
-              {
-                output[q][i][j][k] = data.covariant[q][j][0]
-                                     * data.covariant[q][k][0]
-                                     * input[q][i][0][0];
-                for (unsigned int J=0; J<dim; ++J)
-                  {
-                    const unsigned int K0 = (0==J)? 1 : 0;
-                    for (unsigned int K=K0; K<dim; ++K)
-                      output[q][i][j][k] += data.covariant[q][j][J]
-                                            * data.covariant[q][k][K]
-                                            * input[q][i][J][K];
-                  }
-
-              }
+            {
+              double tmp[dim];
+              for (unsigned int K=0; K<dim; ++K)
+                {
+                  tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
+                  for (unsigned int J=1; J<dim; ++J)
+                    tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
+                }
+              for (unsigned int k=0; k<spacedim; ++k)
+                {
+                  output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
+                  for (unsigned int K=1; K<dim; ++K)
+                    output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
+                }
+            }
       return;
     }
 
