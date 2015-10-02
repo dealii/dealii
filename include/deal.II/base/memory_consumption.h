@@ -200,50 +200,6 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::vector<bool> &v);
 
   /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of <tt>int</tt>s.
-   */
-  inline
-  std::size_t memory_consumption (const std::vector<int> &v);
-
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of <tt>double</tt>s.
-   */
-  inline
-  std::size_t memory_consumption (const std::vector<double> &v);
-
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of <tt>float</tt>s.
-   */
-  inline
-  std::size_t memory_consumption (const std::vector<float> &v);
-
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of <tt>char</tt>s.
-   */
-  inline
-  std::size_t memory_consumption (const std::vector<char> &v);
-
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of <tt>unsigned char</tt>s.
-   */
-  inline
-  std::size_t memory_consumption (const std::vector<unsigned char> &v);
-
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of pointers.
-   */
-  template <typename T>
-  inline
-  std::size_t memory_consumption (const std::vector<T *> &v);
-
-
-  /**
    * Determine an estimate of the amount of memory in bytes consumed by a pair
    * of values.
    */
@@ -360,12 +316,21 @@ namespace MemoryConsumption
   template <typename T>
   std::size_t memory_consumption (const std::vector<T> &v)
   {
-    std::size_t mem = sizeof(std::vector<T>);
-    const unsigned int n = static_cast<unsigned int>(v.size());
-    for (unsigned int i=0; i<n; ++i)
-      mem += memory_consumption(v[i]);
-    mem += (v.capacity() - n)*sizeof(T);
-    return mem;
+    // shortcut for types that do not allocate memory themselves
+    if (std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value)
+      {
+        return v.capacity()*sizeof(T) + sizeof(v);
+      }
+    else
+      {
+        std::size_t mem = sizeof(std::vector<T>);
+        for (unsigned int i=0; i<v.size(); ++i)
+          {
+            mem += memory_consumption(v[i]);
+          }
+        mem += (v.capacity() - v.size())*sizeof(T);
+        return mem;
+      }
   }
 
 
@@ -385,61 +350,6 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::vector<bool> &v)
   {
     return v.capacity() / 8 + sizeof(v);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<int> &v)
-  {
-    return (v.capacity() * sizeof(int) +
-            sizeof(v));
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<double> &v)
-  {
-    return (v.capacity() * sizeof(double) +
-            sizeof(v));
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<float> &v)
-  {
-    return (v.capacity() * sizeof(float) +
-            sizeof(v));
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<char> &v)
-  {
-    return (v.capacity() * sizeof(char) +
-            sizeof(v));
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<unsigned char> &v)
-  {
-    return (v.capacity() * sizeof(unsigned char) +
-            sizeof(v));
-  }
-
-
-
-  template <typename T>
-  inline
-  std::size_t memory_consumption (const std::vector<T *> &v)
-  {
-    return (v.capacity() * sizeof(T *) +
-            sizeof(v));
   }
 
 
