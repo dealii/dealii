@@ -305,35 +305,23 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               std::vector<Point<spacedim> > &a) const
-{
-  MappingQGeneric<dim,spacedim>::compute_mapping_support_points (cell, a);
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::
 transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
            VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -347,18 +335,17 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -370,18 +357,17 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
            VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -395,18 +381,17 @@ transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim> 
            VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -418,18 +403,17 @@ transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
            VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *> (&mapping_data)
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
            != 0),
           ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
-  // If it is a genuine MappingQ::InternalData, we have to test further
-  // whether we should in fact work on the Q1 portion of it
-  if (const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data))
-    if (data->use_mapping_q1_on_current_cell)
-      return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-
-  // otherwise just stick with what we already had
-  MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    return q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    MappingQGeneric<dim,spacedim>::transform(input, mapping_type, mapping_data, output);
 }
 
 
@@ -456,72 +440,14 @@ MappingQ<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-  // first a Newton iteration based on a Q1 mapping to get a good starting
-  // point, the idea being that this is cheaper than trying to start with the
-  // real mapping and likely also more robust.
-  //
-  // that said, this doesn't always work: there are cases where the point is
-  // outside the cell and the inverse mapping doesn't converge. in that case,
-  // use the center point of the cell as a starting point if we are to go on
-  // using the full mapping, or just propagate up the exception if we had no
-  // intention of continuing with the full mapping
-  Point<dim> initial_p_unit;
-  try
-    {
-      initial_p_unit = q1_mapping->transform_real_to_unit_cell(cell, p);
-    }
-  catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
-    {
-      // mirror the conditions of the code below to determine if we need to
-      // use an arbitrary starting point or if we just need to rethrow the
-      // exception
-      if (cell->has_boundary_lines()
-          ||
-          use_mapping_q_on_all_cells
-          ||
-          (dim!=spacedim) )
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            initial_p_unit[d] = 0.5;
-        }
-      else
-        throw;
-    }
-
-  // then a Newton iteration based on the full MappingQ if we need this. note
-  // that for interior cells with dim==spacedim, the mapping used is in fact a
-  // Q1 mapping, so there is nothing we need to do unless the iteration above
-  // failed
   if (cell->has_boundary_lines()
       ||
       use_mapping_q_on_all_cells
       ||
       (dim!=spacedim) )
-    {
-      // use the full mapping. in case the function above should have given us
-      // something back that lies outside the unit cell (that might happen
-      // because we may have given a point 'p' that lies inside the cell with
-      // the higher order mapping, but outside the Q1-mapped reference cell),
-      // then project it back into the reference cell in hopes that this gives
-      // a better starting point to the following iteration
-      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-
-      const Quadrature<dim> point_quadrature(initial_p_unit);
-
-      UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-      if (spacedim>dim)
-        update_flags |= update_jacobian_grads;
-      std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                          point_quadrature));
-
-      mdata->use_mapping_q1_on_current_cell = false;
-
-      compute_mapping_support_points (cell, mdata->mapping_support_points);
-
-      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit, *mdata);
-    }
+    return MappingQGeneric<dim,spacedim>::transform_real_to_unit_cell(cell, p);
   else
-    return initial_p_unit;
+    return q1_mapping->transform_real_to_unit_cell(cell, p);
 }
 
 

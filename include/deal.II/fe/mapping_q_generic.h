@@ -39,20 +39,53 @@ template <int,int> class MappingQ;
 
 
 /**
- * A base class for all polynomial mappings. In particular, this class
- * provides the basis for the MappingQ1 and MappingQ classes that
- * implement (bi-, tri-)linear mappings and higher order mappings,
- * respectively.
+ * This class implements the functionality for polynomial mappings
+ * $Q_p$ of polynomial degree $p$ that will be used on all cells of
+ * the mesh. The MappingQ1 and MappingQ classes specialize this
+ * behavior slightly.
  *
+ * The class is poorly named. It should really have been called
+ * MappingQ because it consistently uses $Q_p$ mappings on all cells
+ * of a triangulation. However, the name MappingQ was already taken
+ * when we rewrote the entire class hierarchy for mappings. One might
+ * argue that one should always use MappingQGeneric over the existing
+ * class MappingQ (which, unless explicitly specified during the
+ * construction of the object, only uses mappings of degree $p$ <i>on
+ * cells at the boundary of the domain</i>). On the other hand, there
+ * are good reasons to use MappingQ in many situations: in many
+ * situations, curved domains are only provided with information about
+ * how exactly edges at the boundary are shaped, but we do not know
+ * anything about internal edges. Thus, in the absence of other
+ * information, we can only assume that internal edges are straight
+ * lines, and in that case internal cells may as well be treated is
+ * bilinear quadrilaterals or trilinear hexahedra. (An example of how
+ * such meshes look is shown in step-1 already, but it is also
+ * discussed in the "Results" section of step-6.)  Because
+ * bi-/trilinear mappings are significantly cheaper to compute than
+ * higher order mappings, it is advantageous in such situations to use
+ * the higher order mapping only on cells at the boundary of the
+ * domain -- i.e., the behavior of MappingQ. Of course,
+ * MappingQGeneric also uses bilinear mappings for interior cells as
+ * long as it has no knowledge about curvature of interior edges, but
+ * it implements this the expensive way: as a general $Q_p$ mapping
+ * where the mapping support points just <i>happen</i> to be arranged
+ * along linear or bilinear edges or faces.
  *
- * <h3>Implementation</h3>
- *
- * This class provides essentially the entire generic infrastructure
- * for polynomial mappings. What it requires to work from derived
- * classes is an implementation of the
- * compute_mapping_support_points() class that provides a list of
- * locations to which the support points of the mapping (e.g., the
- * vertices of the cell in the lowest order case) should be mapped.
+ * There are a number of special cases worth considering:
+ * - If you really want to use a higher order mapping for all cells,
+ *   you can do this using the current class, but this only makes
+ *   sense if you can actually provide information about how interior
+ *   edges and faces of the mesh should be curved. This is typically
+ *   done by associating a Manifold with interior cells and
+ *   edges. A simple example of this is discussed in the "Results"
+ *   section of step-6; a full discussion of manifolds is provided in
+ *   step-53.
+ * - If you are working on meshes that describe a (curved) manifold
+ *   embedded in higher space dimensions, i.e., if dim!=spacedim, then
+ *   every cell is at the boundary of the domain you will likely
+ *   already have attached a manifold object to all cells that can
+ *   then also be used by the mapping classes for higher order
+ *   mappings.
  *
  *
  * @author Wolfgang Bangerth, 2015
@@ -95,6 +128,12 @@ public:
   Point<spacedim>
   transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<dim>                                 &p) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                            &p) const;
 
   /**
    * @}
@@ -503,9 +542,12 @@ protected:
   Table<2,double> support_point_weights_on_hex;
 
   /**
-   * An interface that derived classes have to implement and that
-   * computes the locations of support points for the mapping. For
-   * example, for MappingQ1 these are the vertices. However, other
+   * Return the locations of support points for the mapping. For
+   * example, for $Q_1$ mappings these are the vertices, and for higher
+   * order polynomial mappings they are the vertices plus interior
+   * points on edges, faces, and the cell interior that are placed
+   * in consultation with the Manifold description of the domain and
+   * its boundary. However, other
    * classes may override this function differently. In particular,
    * the MappingQ1Eulerian class does exactly this by not computing
    * the support points from the geometry of the current cell but
@@ -531,29 +573,17 @@ protected:
    * the locations of interior points.
    */
   virtual
-  void
-  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                  std::vector<Point<spacedim> > &a) const;
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Transforms the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
-   *
-   * Takes a reference to an @p InternalData that is assumed to be previously
-   * created by the @p get_data function with @p UpdateFlags including @p
-   * update_transformation_values and @p update_transformation_gradients and a
-   * one point Quadrature that includes the given initial guess for the
-   * transformation @p initial_p_unit.  Hence this function assumes that @p
-   * mdata already includes the transformation shape values and gradients
-   * computed at @p initial_p_unit.
-   *
-   * @p mdata will be changed by this function.
    */
   Point<dim>
   transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                         const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit,
-                                        InternalData &mdata) const;
+                                        const Point<dim> &initial_p_unit) const;
 
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape

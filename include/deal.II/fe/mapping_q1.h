@@ -46,8 +46,13 @@ DEAL_II_NAMESPACE_OPEN
  * two variants, one that allows to pass a mapping argument explicitly and one
  * that simply falls back to the MappingQ1 class declared here.
  *
- * The shape functions for this mapping are the same as for the finite element FE_Q
- * of polynomial degree 1. Therefore, coupling these two yields an isoparametric element.
+ * The shape functions for this mapping are the same as for the finite
+ * element FE_Q of polynomial degree 1. Therefore, coupling these two
+ * yields an isoparametric element.
+ *
+ * @note This class is, in all reality, nothing more than a different
+ * name for calling MappingQGeneric with a polynomial degree of one as
+ * argument.
  *
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005, Wolfgang Bangerth, 2015
  */
@@ -63,21 +68,6 @@ public:
   // for documentation, see the Mapping base class
   virtual
   MappingQ1<dim,spacedim> *clone () const;
-
-  /**
-   * @name Mapping points between reference and real cells
-   * @{
-   */
-
-  // for documentation, see the Mapping base class
-  virtual
-  Point<dim>
-  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<spacedim>                            &p) const;
-
-  /**
-   * @}
-   */
 };
 
 

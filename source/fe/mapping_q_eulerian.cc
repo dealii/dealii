@@ -127,12 +127,29 @@ SupportQuadrature (const unsigned int map_degree)
 // .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, class EulerVectorType, int spacedim>
-void
+std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, EulerVectorType, spacedim>::
-compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                std::vector<Point<spacedim> > &a) const
+get_vertices
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
+  // get the vertices as the first 2^dim mapping support points
+  const std::vector<Point<spacedim> > a = compute_mapping_support_points(cell);
 
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertex_locations;
+  std::copy (a.begin(),
+             a.begin()+GeometryInfo<dim>::vertices_per_cell,
+             vertex_locations.begin());
+
+  return vertex_locations;
+}
+
+
+
+template <int dim, class EulerVectorType, int spacedim>
+std::vector<Point<spacedim> >
+MappingQEulerian<dim, EulerVectorType, spacedim>::
+compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
   // first, basic assertion with respect to vector size,
 
   const types::global_dof_index n_dofs  = euler_dof_handler->n_dofs();
@@ -178,13 +195,15 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
 
   // and finally compute the positions of the support points in the deformed
   // configuration.
-  a.resize(n_support_pts);
+  std::vector<Point<spacedim> > a(n_support_pts);
   for (unsigned int q=0; q<n_support_pts; ++q)
     {
       a[q] = fe_values.quadrature_point(q);
       for (unsigned int d=0; d<spacedim; ++d)
         a[q](d) += shift_vector[q](d);
     }
+
+  return a;
 }
 
 

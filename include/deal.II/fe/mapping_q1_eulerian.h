@@ -108,8 +108,7 @@ public:
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices
-  (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -152,11 +151,12 @@ protected:
   /**
    * Compute the support points of the mapping. For the current class, these are
    * the vertices, as obtained by calling Mapping::get_vertices().
+   * See the documentation of MappingQGeneric::compute_mapping_support_points()
+   * for more information.
    */
   virtual
-  void
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                 std::vector<Point<spacedim> > &a) const;
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Reference to the vector of shifts.
