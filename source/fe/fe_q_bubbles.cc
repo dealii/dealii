@@ -80,6 +80,7 @@ namespace FE_Q_Bubbles_Helper
           AssertThrow(false, ExcInternalError());
         }
 
+      Assert(q_fine.get() != NULL, ExcInternalError());
       const unsigned int nq = q_fine->size();
 
       // loop over all possible refinement cases
