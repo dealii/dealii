@@ -19,7 +19,12 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/std_cxx11/type_traits.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
+
+// unfortunately, boost::enable_if_c, not boost::enable_if, is equivalent to
+// std::enable_if
+#include <boost/utility/enable_if.hpp>
 
 #include <string>
 #include <complex>
@@ -45,11 +50,11 @@ template <typename T> class VectorizedArray;
  * are several modes of operation:
  *
  * <ol>
- * <li> The argument is a standard C++ data type, namely, <tt>bool</tt>,
- * <tt>float</tt>, <tt>double</tt> or any of the integer types. In that case,
- * memory_consumption() simple returns <tt>sizeof</tt> of its argument. The
+ * <li> If the argument is a fundamental C++ data type (such as <tt>bool</tt>,
+ * <tt>float</tt>, <tt>double</tt> or any of the integer types), then
+ * memory_consumption() just returns <tt>sizeof</tt> of its argument. The
  * library also provides an estimate for the amount of memory occupied by a
- * <tt>std::string</tt> this way.
+ * <tt>std::string</tt>.
  *
  * <li> For objects, which are neither standard types, nor vectors,
  * memory_consumption() will simply call the member function of same name. It
@@ -72,105 +77,42 @@ template <typename T> class VectorizedArray;
  * <h3>Extending this namespace</h3>
  *
  * The function in this namespace and the functionality provided by it relies
- * on the assumption that there is either a specialized function
+ * on the assumption that there is either a function
  * <tt>memory_consumption(T)</tt> in this namespace determining the amount of
- * memory used by objects of type <tt>T</tt>, or that the class <tt>T</tt> has
- * a  member function of that name. While the latter is true for almost all
+ * memory used by objects of type <tt>T</tt> or that the class <tt>T</tt> has
+ * a member function of that name. While the latter is true for almost all
  * classes in deal.II, we have only implemented the first kind of functions
- * for the most common data types, such as atomic types, strings, C++ vectors,
- * C-style arrays, and C++ pairs. These functions therefore do not cover, for
- * example, C++ maps, lists, etc. If you need such functions feel free to
- * implement them and send them to us for inclusion.
+ * for the most common data types, such as fundamental types, strings, C++
+ * vectors, C-style arrays, and C++ pairs. These functions therefore do not
+ * cover, for example, C++ maps, lists, etc. If you need such functions feel
+ * free to implement them and send them to us for inclusion.
  *
  * @ingroup memory
- * @author Wolfgang Bangerth, documentation updated by Guido Kanschat
- * @date 2000
+ * @author Wolfgang Bangerth, documentation updated by Guido Kanschat, David Wells
+ * @date 2000, 2015
  */
 namespace MemoryConsumption
 {
-
   /**
-   * This function is the generic interface for determining the memory used by
-   * an object. If no specialization for the type <tt>T</tt> is specified, it
-   * will call the member function <tt>t.memory_consumption()</tt>.
-   *
-   * The library provides specializations for all basic C++ data types. Every
-   * additional type needs to have a member function memory_consumption()
-   * callable for constant objects to be used in this framework.
+   * Calculate the memory consumption of a fundamental type. See
+   * EnableIfScalar for a discussion on how this restriction (SFINAE) is
+   * implemented.
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const T &t);
+  typename boost::enable_if_c<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  memory_consumption (const T &t);
 
   /**
-   * Determine the amount of memory in bytes consumed by a <tt>bool</tt>
-   * variable.
+   * Estimate the memory consumption of an object. If no further template
+   * specialization (past this one) is available for the type <tt>T</tt>, then
+   * this function returns the member function
+   * <tt>t.memory_consumption()</tt>'s value.
    */
+  template <typename T>
   inline
-  std::size_t memory_consumption (const bool);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>char</tt>
-   * variable.
-   */
-  inline
-  std::size_t memory_consumption (const char);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>short int</tt>
-   * variable.
-   */
-  inline
-  std::size_t memory_consumption (const short int);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>short unsigned
-   * int</tt> variable.
-   */
-  inline
-  std::size_t memory_consumption (const short unsigned int);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>int</tt>
-   * variable.
-   */
-  inline
-  std::size_t memory_consumption (const int);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>unsigned
-   * int</tt> variable.
-   */
-  inline
-  std::size_t memory_consumption (const unsigned int);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>unsigned long
-   * long int</tt> variable.
-   */
-  inline
-  std::size_t memory_consumption (const unsigned long long int);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>float</tt>
-   * variable.
-   */
-  inline
-  std::size_t memory_consumption (const float);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>double</tt>
-   * variable.
-   */
-  inline
-  std::size_t memory_consumption (const double);
-
-  /**
-   * Determine the amount of memory in bytes consumed by a <tt>long
-   * double</tt> variable.
-   */
-  inline
-  std::size_t memory_consumption (const long double);
+  typename boost::enable_if_c<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
+  memory_consumption (const T &t);
 
   /**
    * Determine the amount of memory consumed by a C-style string. The returned
@@ -364,90 +306,12 @@ namespace MemoryConsumption
 
 namespace MemoryConsumption
 {
+  template <typename T>
   inline
-  std::size_t memory_consumption (const bool)
+  typename boost::enable_if_c<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  memory_consumption(const T &)
   {
-    return sizeof(bool);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const char)
-  {
-    return sizeof(char);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const short int)
-  {
-    return sizeof(short int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const short unsigned int)
-  {
-    return sizeof(short unsigned int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const int)
-  {
-    return sizeof(int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const unsigned int)
-  {
-    return sizeof(unsigned int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const unsigned long int)
-  {
-    return sizeof(unsigned long int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const unsigned long long int)
-  {
-    return sizeof(unsigned long long int);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const float)
-  {
-    return sizeof(float);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const double)
-  {
-    return sizeof(double);
-  }
-
-
-
-  inline
-  std::size_t memory_consumption (const long double)
-  {
-    return sizeof(long double);
+    return sizeof(T);
   }
 
 
@@ -641,7 +505,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  std::size_t
+  typename boost::enable_if_c<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
   memory_consumption (const T &t)
   {
     return t.memory_consumption();
