@@ -300,15 +300,6 @@ namespace MemoryConsumption
   inline
   std::size_t memory_consumption (const std::vector<T *> &v);
 
-  /**
-   * Specialization of the determination of the memory consumption of a
-   * vector, here for a vector of strings. This function is not necessary from
-   * a strict C++ viewpoint, since it could be generated, but is necessary for
-   * compatibility with IBM's xlC 5.0 compiler, and doesn't harm for other
-   * compilers as well.
-   */
-  std::size_t memory_consumption (const std::vector<std::string> &v);
-
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a pair
