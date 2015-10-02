@@ -208,34 +208,18 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::pair<A,B> &p);
 
   /**
-   * Return the amount of memory used by a pointer.
+   * Calculate the memory consumption of a pointer.
    *
-   * @note This returns the size of the pointer, not of the object pointed to.
+   * @note This function is overloaded for C-style strings; see the
+   * documentation of that function for that case.
+   *
+   * @note This returns the size of the pointer, not the size of the object
+   * pointed to.
    */
-  template <typename T>
+  template<typename T>
   inline
-  std::size_t memory_consumption (const T *const);
-
-  /**
-   * Return the amount of memory used by a pointer.
-   *
-   * @note This returns the size of the pointer, not of the object pointed to.
-   */
-  template <typename T>
-  inline
-  std::size_t memory_consumption (T *const);
-
-  /**
-   * Return the amount of memory used by a void pointer.
-   *
-   * Note that we needed this function since <tt>void</tt> is no type and a
-   * <tt>void*</tt> is thus not caught by the general <tt>T*</tt> template
-   * function above.
-   *
-   * @note This returns the size of the pointer, not of the object pointed to.
-   */
-  inline
-  std::size_t memory_consumption (void *const);
+  std::size_t
+  memory_consumption (const T *const);
 
   /**
    * Return the amount of memory used by a shared pointer.
@@ -364,31 +348,12 @@ namespace MemoryConsumption
 
 
 
-  template <typename T>
+  template<typename T>
   inline
   std::size_t
-  memory_consumption (const T *const)
+  memory_consumption(const T *const)
   {
     return sizeof(T *);
-  }
-
-
-
-  template <typename T>
-  inline
-  std::size_t
-  memory_consumption (T *const)
-  {
-    return sizeof(T *);
-  }
-
-
-
-  inline
-  std::size_t
-  memory_consumption (void *const)
-  {
-    return sizeof(void *);
   }
 
 
