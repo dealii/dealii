@@ -57,7 +57,7 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  *   achieve this by setting the second argument to the constructor
  *   to true. This only makes sense if you can actually provide
  *   information about how interior edges and faces of the mesh
- *   should be curved. This is typically done using by associating
+ *   should be curved. This is typically done by associating
  *   a Manifold with interior cells and edges. A simple example of this
  *   is discussed in the "Results" section of step-6; a full discussion
  *   of manifolds is provided in step-53.
