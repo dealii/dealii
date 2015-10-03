@@ -3494,10 +3494,10 @@ namespace parallel
 
       // now do the work we're supposed to do when we are in charge
       refinement_in_progress = true;
-      this->prepare_coarsening_and_refinement ();
 
-      // make sure all flags are cleared on cells we don't own, since nothing
-      // good can come of that if they are still around
+      // Clean up all flags on cells we don't own before mesh smoothing,
+      // since we don't want to have any locally owned active cell get refined
+      // or coarsened just as a result of smoothing of ghost or artificial cells.
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
            cell = this->begin_active();
            cell != this->end(); ++cell)
@@ -3506,7 +3506,10 @@ namespace parallel
             cell->clear_refine_flag ();
             cell->clear_coarsen_flag ();
           }
-
+      this->prepare_coarsening_and_refinement ();
+      // If flags come out after mesh smoothing on ghost and artificial cells,
+      // we should keep them because they are resulted from smoothing of locally
+      // owned active cells. So no cleaning is needed here.
 
       // count how many cells will be refined and coarsened, and allocate that
       // much memory
