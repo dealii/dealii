@@ -468,13 +468,13 @@ category/test.with_64bit_indices=off.output
       Furthermore, a test can be restricted to be run only if specific
       versions of a feature are available. For example
 <pre>
-category/test.with_trilinos&gt;=11.14.1.output
+category/test.with_trilinos.geq.11.14.1.output
 </pre>
       will only be run if (a) trilinos is available, i.e.,
       <code>DEAL_II_WITH_TRILINOS=TRUE</code> and (b) if trilinos is at least
-      of version 11.14.1. Similarly, the operators
-      <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
-      <code>&gt;</code>= are supported.
+      of version 11.14.1. Supported operators are
+      <code>=</code>, <code>.le.;</code>, <code>.ge.</code>, <code>.leq.</code>,
+      <code>.geq.</code>.
     </p>
     <p>
       It is also possible to declare multiple constraints subsequently, e.g.
