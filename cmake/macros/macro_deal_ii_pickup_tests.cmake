@@ -158,8 +158,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # set _define_test to FALSE:
     #
 
+    SET(_op_regex "=|\\.geq\\.|\\.leq\\.|\\.ge\\.|\\.le\\.")
+
     STRING(REGEX MATCHALL
-      "with_([0-9]|[a-z]|_)*(=|>=|<=|>|<)(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)"
+      "with_([0-9]|[a-z]|_)*(${_op_regex})(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)"
       _matches ${_test}
       )
 
@@ -168,10 +170,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
       # Extract feature name, comparison operator, (a possible) boolean and
       # (a possible) version number from the feature constraint:
       #
-      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(>=|<=|=|>|<).*" "\\1" _feature ${_match})
+      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(${_op_regex}).*" "\\1" _feature ${_match})
       STRING(TOUPPER ${_feature} _feature)
-      STRING(REGEX MATCH "(>=|<=|=|>|<)" _operator ${_match})
-      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(>=|<=|=|>|<).*$" "\\3" _operator ${_match})
+      STRING(REGEX MATCH "(${_op_regex})" _operator ${_match})
+      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)(${_op_regex}).*$" "\\3" _operator ${_match})
       STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
       STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
 
@@ -213,13 +215,13 @@ Comparison operator \"=\" expected for boolean match.\n"
         IF( ( NOT ${DEAL_II_WITH_${_feature}} ) OR
             ( "${_operator}" STREQUAL "=" AND
               NOT "${DEAL_II_${_feature}_VERSION}" VERSION_EQUAL "${_version}" ) OR
-            ( "${_operator}" STREQUAL ">" AND
+            ( "${_operator}" STREQUAL ".ge." AND
               NOT "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) OR
-            ( "${_operator}" STREQUAL "<" AND
+            ( "${_operator}" STREQUAL ".le." AND
               NOT "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
-            ( "${_operator}" STREQUAL ">=" AND
+            ( "${_operator}" STREQUAL ".geq." AND
               "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
-            ( "${_operator}" STREQUAL "<=" AND
+            ( "${_operator}" STREQUAL ".leq." AND
               "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) )
           SET(_define_test FALSE)
         ENDIF()
