@@ -1105,8 +1105,6 @@ namespace DoFTools
    * @ref GlossComponentMask),
    * then this is equivalent to selecting <em>all</em> vector components
    * corresponding to this non-primitive base element.
-   *
-   * @note If the @p blocks argument is true,
    */
   template <int dim, int spacedim>
   void
