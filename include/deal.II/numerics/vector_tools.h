@@ -2308,7 +2308,7 @@ namespace VectorTools
    * Compute the mean value of one component of the solution.
    *
    * This function integrates the chosen component over the whole domain and
-   * returns the result, i.e. it computes $\int_\Omega [u_h(x)]_c \; dx$ where
+   * returns the result, i.e. it computes $\frac{1}{|\Omega|}\int_\Omega [u_h(x)]_c \; dx$ where
    * $c$ is the vector component and $u_h$ is the function representation of
    * the nodal vector given as fourth argument. The integral is evaluated
    * numerically using the quadrature formula given as third argument.
