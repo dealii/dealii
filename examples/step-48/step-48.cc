@@ -162,23 +162,22 @@ namespace Step48
   // The nonlinear function that we have to evaluate for the time stepping
   // routine includes the value of the function at the present time @p current
   // as well as the value at the previous time step @p old. Both values are
-  // passed to the operator in the collection of source vectors @p src, which
-  // is simply an STL vector of pointers to the actual solution vectors. This
-  // construct of collecting several source vectors into one is necessary as
-  // the cell loop in @p MatrixFree takes exactly one source and one
-  // destination vector, even if we happen to use many vectors like the two in
-  // this case. Note that the cell loop accepts any valid class for input and
-  // output, which does not only include vectors but general data
-  // types. However, only in case it encounters a
-  // parallel::distributed::Vector<Number> or an STL vector collecting these
-  // vectors, it calls functions that exchange data at the beginning and the
-  // end of the loop. In the loop over the cells, we first have to read in the
-  // values in the vectors related to the local values. Then, we evaluate the
-  // value and the gradient of the current solution vector and the values of
-  // the old vector at the quadrature points. Then, we combine the terms in
-  // the scheme in the loop over the quadrature points. Finally, we integrate
-  // the result against the test function and accumulate the result to the
-  // global solution vector @p dst.
+  // passed to the operator in the collection of source vectors @p src, which is
+  // simply a <tt>std::vector</tt> of pointers to the actual solution
+  // vectors. This construct of collecting several source vectors into one is
+  // necessary as the cell loop in @p MatrixFree takes exactly one source and
+  // one destination vector, even if we happen to use many vectors like the two
+  // in this case. Note that the cell loop accepts any valid class for input and
+  // output, which does not only include vectors but general data types.
+  // However, only in case it encounters a parallel::distributed::Vector<Number>
+  // or a <tt>std::vector</tt> collecting these vectors, it calls functions that
+  // exchange data at the beginning and the end of the loop. In the loop over
+  // the cells, we first have to read in the values in the vectors related to
+  // the local values. Then, we evaluate the value and the gradient of the
+  // current solution vector and the values of the old vector at the quadrature
+  // points. Then, we combine the terms in the scheme in the loop over the
+  // quadrature points. Finally, we integrate the result against the test
+  // function and accumulate the result to the global solution vector @p dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
   local_apply (const MatrixFree<dim>                      &data,
@@ -541,8 +540,8 @@ namespace Step48
     // artificial time.
 
     // We create an output of the initial value. Then we also need to collect
-    // the two starting solutions in an STL vector of pointers field and to
-    // set up an instance of the <code> SineGordonOperation class </code>
+    // the two starting solutions in a <tt>std::vector</tt> of pointers field
+    // and to set up an instance of the <code> SineGordonOperation class </code>
     // based on the finite element degree specified at the top of this file.
     VectorTools::interpolate (dof_handler,
                               ExactSolution<dim> (1, time),

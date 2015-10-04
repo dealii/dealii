@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__sparse_ilu_h
-#define __deal2__sparse_ilu_h
+#ifndef dealii__sparse_ilu_h
+#define dealii__sparse_ilu_h
 
 
 #include <deal.II/base/config.h>
@@ -162,4 +162,4 @@ public:
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_ilu_h
+#endif // dealii__sparse_ilu_h

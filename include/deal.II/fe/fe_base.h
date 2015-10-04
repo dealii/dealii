@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_base_h
-#define __deal2__fe_base_h
+#ifndef dealii__fe_base_h
+#define dealii__fe_base_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -232,7 +232,7 @@ public:
 
   /**
    * Number of degrees of freedom in a hexahedron; not including the degrees
-   * of freedom on the quadrilaterals, lines and vertices of the hecahedron.
+   * of freedom on the quadrilaterals, lines and vertices of the hexahedron.
    */
   const unsigned int dofs_per_hex;
 

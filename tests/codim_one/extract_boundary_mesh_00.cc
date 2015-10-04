@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,7 +104,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);
@@ -135,7 +135,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);
@@ -168,7 +168,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);
@@ -179,7 +179,7 @@ int main ()
 
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
-                                          boundary_ids);
+                                              boundary_ids);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";

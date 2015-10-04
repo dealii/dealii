@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1287,7 +1287,7 @@ namespace Step22
          cell != triangulation.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->center()[dim-1] == 0)
-          cell->face(f)->set_all_boundary_indicators(1);
+          cell->face(f)->set_all_boundary_ids(1);
 
 
     // We then apply an initial refinement

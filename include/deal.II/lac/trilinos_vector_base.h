@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_vector_base_h
-#define __deal2__trilinos_vector_base_h
+#ifndef dealii__trilinos_vector_base_h
+#define dealii__trilinos_vector_base_h
 
 
 #include <deal.II/base/config.h>
@@ -31,6 +31,7 @@
 #  include <utility>
 #  include <memory>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  define TrilinosScalar double
 #  include "Epetra_ConfigDefs.h"
 #  ifdef DEAL_II_WITH_MPI // only if MPI is installed
@@ -40,6 +41,7 @@
 #    include "Epetra_SerialComm.h"
 #  endif
 #  include "Epetra_FEVector.h"
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -199,7 +201,7 @@ namespace TrilinosWrappers
    *
    * The interface of this class is modeled after the existing Vector class in
    * deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since Trilinos only supports a single scalar type
+   * exchangeable. However, since Trilinos only supports a single scalar type
    * (double), it is not templated, and only works with that type.
    *
    * Note that Trilinos only guarantees that operations do what you expect if
@@ -285,8 +287,10 @@ namespace TrilinosWrappers
     /**
      * Returns the state of the vector, i.e., whether compress() has already
      * been called after an operation requiring data exchange.
+     *
+     * This function is deprecated.
      */
-    bool is_compressed () const;
+    bool is_compressed () const DEAL_II_DEPRECATED;
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -429,8 +433,20 @@ namespace TrilinosWrappers
 
     /**
      * Compute the minimal value of the elements of this vector.
+     *
+     * This function is deprecated use min() instead.
      */
-    TrilinosScalar minimal_value () const;
+    TrilinosScalar minimal_value () const DEAL_II_DEPRECATED;
+
+    /**
+     * Compute the minimal value of the elements of this vector.
+     */
+    TrilinosScalar min () const;
+
+    /**
+     * Compute the maximal value of the elements of this vector.
+     */
+    TrilinosScalar max () const;
 
     /**
      * $l_1$-norm of the vector.  The sum of the absolute values.
@@ -559,8 +575,10 @@ namespace TrilinosWrappers
      * returns 0 which might or might not be appropriate in a given situation.
      * If you rely on consistent results, use the access functions () or []
      * that throw an assertion in case a non-local element is used.
+     *
+     * This function is deprecated.
      */
-    TrilinosScalar el (const size_type index) const;
+    TrilinosScalar el (const size_type index) const DEAL_II_DEPRECATED;
 
     /**
      * Make the Vector class a bit like the <tt>vector<></tt> class of the C++
@@ -672,7 +690,7 @@ namespace TrilinosWrappers
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void add (const TrilinosScalar s);
+    void add (const TrilinosScalar s) DEAL_II_DEPRECATED;
 
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
@@ -719,16 +737,20 @@ namespace TrilinosWrappers
 
     /**
      * Scaling and multiple addition.
+     *
+     * This function is deprecated.
      */
     void sadd (const TrilinosScalar  s,
                const TrilinosScalar  a,
                const VectorBase     &V,
                const TrilinosScalar  b,
-               const VectorBase     &W);
+               const VectorBase     &W) DEAL_II_DEPRECATED;
 
     /**
      * Scaling and multiple addition.  <tt>*this = s*(*this) + a*V + b*W +
      * c*X</tt>.
+     *
+     * This function is deprecated.
      */
     void sadd (const TrilinosScalar  s,
                const TrilinosScalar  a,
@@ -736,7 +758,7 @@ namespace TrilinosWrappers
                const TrilinosScalar  b,
                const VectorBase     &W,
                const TrilinosScalar  c,
-               const VectorBase     &X);
+               const VectorBase     &X) DEAL_II_DEPRECATED;
 
     /**
      * Scale each element of this vector by the corresponding element in the
@@ -753,11 +775,13 @@ namespace TrilinosWrappers
 
     /**
      * Assignment <tt>*this = a*V + b*W</tt>.
+     *
+     * This function is deprecated.
      */
     void equ (const TrilinosScalar  a,
               const VectorBase     &V,
               const TrilinosScalar  b,
-              const VectorBase     &W);
+              const VectorBase     &W) DEAL_II_DEPRECATED;
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let
@@ -770,7 +794,7 @@ namespace TrilinosWrappers
      * attempt is made to catch such situations.
      */
     void ratio (const VectorBase &a,
-                const VectorBase &b);
+                const VectorBase &b) DEAL_II_DEPRECATED;
     //@}
 
 
@@ -800,8 +824,10 @@ namespace TrilinosWrappers
     /**
      * Output of vector in user-defined format in analogy to the
      * dealii::Vector class.
+     *
+     * This function is deprecated.
      */
-    void print (const char *format = 0) const;
+    void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
     /**
      * Print to a stream. @p precision denotes the desired precision with
@@ -841,11 +867,6 @@ namespace TrilinosWrappers
      */
     const MPI_Comm &get_mpi_communicator () const;
     //@}
-
-    /**
-     * Exception
-     */
-    DeclException0 (ExcGhostsPresent);
 
     /**
      * Exception
@@ -1464,11 +1485,33 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::minimal_value () const
   {
+    return min();
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::min () const
+  {
     TrilinosScalar min_value;
     const int ierr = vector->MinValue (&min_value);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     return min_value;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::max () const
+  {
+    TrilinosScalar max_value;
+    const int ierr = vector->MaxValue (&max_value);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    return max_value;
   }
 
 
@@ -1888,45 +1931,6 @@ namespace TrilinosWrappers
         last_action = Zero;
       }
 
-  }
-
-
-
-  inline
-  void
-  VectorBase::equ (const TrilinosScalar  a,
-                   const VectorBase     &v,
-                   const TrilinosScalar  b,
-                   const VectorBase     &w)
-  {
-    // if we have ghost values, do not allow
-    // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (v.local_size() == w.local_size(),
-            ExcDimensionMismatch (v.local_size(), w.local_size()));
-
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-
-    // If we don't have the same map, copy.
-    if (vector->Map().SameAs(v.vector->Map())==false)
-      {
-        sadd(0., a, v, b, w);
-      }
-    else
-      {
-        // Otherwise, just update. verify
-        // that *this does not only have
-        // the same map as v (the
-        // if-condition above) but also as
-        // w
-        Assert (vector->Map().SameAs(w.vector->Map()),
-                ExcDifferentParallelPartitioning());
-        int ierr = vector->Update(a, *v.vector, b, *w.vector, 0.0);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-        last_action = Zero;
-      }
   }
 
 

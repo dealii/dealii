@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__precondition_h
-#define __deal2__precondition_h
+#ifndef dealii__precondition_h
+#define dealii__precondition_h
 
 // This file contains simple preconditioners.
 
@@ -651,8 +651,9 @@ private:
  * matrices. This preconditioner is similar to a Jacobi preconditioner if the
  * degree variable is set to one, otherwise some higher order polynomial
  * corrections are used. This preconditioner needs access to the diagonal of
- * the matrix its acts on and needs a respective <tt>vmult</tt> implemention.
- * However, it does not need to explicitly know the matrix entries.
+ * the matrix it acts on and needs a respective <tt>vmult</tt>
+ * implementation. However, it does not need to explicitly know the matrix
+ * entries.
  *
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).
@@ -1398,6 +1399,17 @@ namespace internal
 
       const VECTOR &diagonal_vector;
     };
+
+    struct EigenvalueTracker
+    {
+    public:
+      void slot(const std::vector<double> &eigenvalues)
+      {
+        values = eigenvalues;
+      }
+
+      std::vector<double> values;
+    };
   }
 }
 
@@ -1459,27 +1471,29 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       Assert (additional_data.eig_cg_n_iterations > 2,
               ExcMessage ("Need to set at least two iterations to find eigenvalues."));
 
-      // attach stream to SolverCG, run it with log report for eigenvalues
-      std::ostream *old_stream = deallog.has_file() ? &deallog.get_file_stream() :
-                                 static_cast<std::ostream *>(0);
-      if (old_stream)
-        deallog.detach();
-
-      std::ostringstream log_msg;
-      deallog.attach(log_msg);
-
       // set a very strict tolerance to force at least two iterations
-      ReductionControl control (data.eig_cg_n_iterations, 1e-20, 1e-20);
+      ReductionControl control (data.eig_cg_n_iterations, 1e-35, 1e-10);
       GrowingVectorMemory<VECTOR> memory;
       VECTOR *rhs = memory.alloc();
       VECTOR *dummy = memory.alloc();
-      rhs->reinit(data.matrix_diagonal_inverse, true);
+      rhs->reinit(data.matrix_diagonal_inverse);
       dummy->reinit(data.matrix_diagonal_inverse);
-      *rhs = 1./std::sqrt(static_cast<double>(matrix.m()));
 
-      typename SolverCG<VECTOR>::AdditionalData cg_data;
-      cg_data.compute_eigenvalues = true;
-      SolverCG<VECTOR> solver (control, memory, cg_data);
+      // heuristically, a right hand side close to a constant has been shown
+      // to quickly reveal the largest eigenvalue. however, avoid to use the
+      // exact constant because that might be not in the range space of some
+      // matrices (purely Neumann matrices with constant mode filtered out by
+      // orthogonal projection in the matrix-vector product)
+      *rhs = 1./std::sqrt(static_cast<double>(matrix.m()));
+      if (rhs->locally_owned_elements().is_element(0))
+        (*rhs)(0) = 0.;
+      rhs->compress(VectorOperation::insert);
+
+      internal::PreconditionChebyshev::EigenvalueTracker eigenvalue_tracker;
+      SolverCG<VECTOR> solver (control, memory);
+      solver.connect_eigenvalues_slot(std_cxx11::bind(&internal::PreconditionChebyshev::EigenvalueTracker::slot,
+                                                      &eigenvalue_tracker,
+                                                      std_cxx11::_1));
       internal::PreconditionChebyshev::DiagonalPreconditioner<VECTOR>
       preconditioner(data.matrix_diagonal_inverse);
       try
@@ -1489,38 +1503,18 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       catch (SolverControl::NoConvergence &)
         {
         }
-      Assert(control.last_step() >= 2,
-             ExcMessage("Could not find eigenvalues"));
 
       memory.free(dummy);
       memory.free(rhs);
 
-      // read the log stream: grab the first and last eigenvalue
-      std::string cg_message = log_msg.str();
-      const std::size_t pos = cg_message.find("cg:: ");
-      if (pos != std::string::npos)
-        {
-          cg_message.erase(0, pos+5);
-          std::string first = cg_message;
-
-          if (cg_message.find_first_of(" ") != std::string::npos)
-            first.erase(cg_message.find_first_of(" "), std::string::npos);
-          std::istringstream(first)      >> min_eigenvalue;
-
-          if (cg_message.find_last_of(" ") != std::string::npos)
-            {
-              cg_message.erase(0, cg_message.find_last_of(" ")+1);
-              std::istringstream(cg_message) >> max_eigenvalue;
-            }
-          else max_eigenvalue = min_eigenvalue;
-        }
-      else
+      // read the eigenvalues from the attached eigenvalue tracker
+      if (eigenvalue_tracker.values.empty())
         min_eigenvalue = max_eigenvalue = 1;
-
-      // reset deal.II stream
-      deallog.detach();
-      if (old_stream)
-        deallog.attach(*old_stream);
+      else
+        {
+          min_eigenvalue = eigenvalue_tracker.values.front();
+          max_eigenvalue = eigenvalue_tracker.values.back();
+        }
 
       // include a safety factor since the CG method will in general not be
       // converged

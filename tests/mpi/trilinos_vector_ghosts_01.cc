@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,8 @@ void test()
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
                                              MPI_COMM_WORLD);
-  Assert (interpolated.has_ghost_elements() == false,
-          ExcInternalError());
+  AssertThrow (interpolated.has_ghost_elements() == false,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -66,12 +66,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -87,8 +82,4 @@ int main(int argc, char *argv[])
     }
   else
     test();
-
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
 }

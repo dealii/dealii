@@ -10,6 +10,6 @@ DEAL::METIS outputs:
 DEAL::3
 DEAL::0 0
 DEAL::1 1
-DEAL::2 3
-DEAL::3 4
+DEAL::2 4
+DEAL::3 3
 DEAL::

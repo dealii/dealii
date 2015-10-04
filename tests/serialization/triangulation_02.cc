@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,14 +58,14 @@ namespace dealii
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
-	    
-	    if (c1->face(f)->manifold_id() != c2->face(f)->manifold_id())
-	      return false;
+
+            if (c1->face(f)->manifold_id() != c2->face(f)->manifold_id())
+              return false;
 
             if (c1->face(f)->at_boundary())
               {
-                if (c1->face(f)->boundary_indicator() !=
-                    c2->face(f)->boundary_indicator())
+                if (c1->face(f)->boundary_id() !=
+                    c2->face(f)->boundary_id())
                   return false;
               }
             else
@@ -92,9 +92,17 @@ namespace dealii
 
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
-	
-	if (c1->manifold_id() != c2->manifold_id())
-	  return false;
+
+        if (c1->manifold_id() != c2->manifold_id())
+          return false;
+
+        if (c1->active() && c2->active())
+          if (c1->active_cell_index() != c2->active_cell_index())
+            return false;
+
+        if (c1->level()>0)
+          if (c1->parent_index() != c2->parent_index())
+            return false;
       }
 
     // also check the order of raw iterators as they contain
@@ -123,7 +131,7 @@ void do_boundary (Triangulation<dim,spacedim> &t1)
   for (; c1 != t1.end(); ++c1)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (c1->at_boundary(f))
-        c1->face(f)->set_boundary_indicator (42);
+        c1->face(f)->set_boundary_id (42);
 }
 
 

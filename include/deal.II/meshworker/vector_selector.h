@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,11 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mesh_worker_vector_selector_h
-#define __deal2__mesh_worker_vector_selector_h
+#ifndef dealii__mesh_worker_vector_selector_h
+#define dealii__mesh_worker_vector_selector_h
 
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
+#include <deal.II/algorithms/named_selection.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
@@ -52,7 +52,7 @@ namespace MeshWorker
      * arguments are the name of the vector and indicators, which information
      * is to be extracted from the vector. The name refers to an entry in a
      * AnyData object, which will be identified by initialize().  The three
-     * bool parameters indicate, whether values, greadients and Hessians of
+     * bool parameters indicate, whether values, gradients and Hessians of
      * the finite element function are to be computed on each cell or face.
      */
     void add(const std::string &name,
@@ -80,12 +80,6 @@ namespace MeshWorker
      * it must be called every time after the AnyData object has changed.
      */
     void initialize(const AnyData &);
-
-    /**
-     * @deprecated Use AnyData instead of NamedData.
-     */
-    template <class DATA>
-    void initialize(const NamedData<DATA> &);
 
     /**
      * Check whether any vector is selected.
@@ -144,12 +138,6 @@ namespace MeshWorker
     void print (STREAM &s, const AnyData &v) const;
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
-     */
-    template <class STREAM, typename DATA>
-    void print (STREAM &s, const NamedData<DATA> &v) const;
-
-    /**
      * Print the number of selections to the stream.
      */
     template <class STREAM>
@@ -184,7 +172,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template <int dim, int spacedim = dim>
+  template <int dim, int spacedim = dim, typename Number=double>
   class VectorDataBase :
     public VectorSelector
   {
@@ -212,6 +200,7 @@ namespace MeshWorker
      * Virtual, but empty destructor.
      */
     virtual ~VectorDataBase();
+
     /**
      * The only function added to VectorSelector is an abstract virtual
      * function implemented in the derived class template and called by
@@ -251,9 +240,9 @@ namespace MeshWorker
      * base element.
      */
     virtual void fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<Number> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -268,9 +257,9 @@ namespace MeshWorker
      * the active cells.
      */
     virtual void mg_fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<Number> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,
@@ -298,7 +287,7 @@ namespace MeshWorker
    */
   template <class VECTOR, int dim, int spacedim = dim>
   class VectorData :
-    public VectorDataBase<dim, spacedim>
+    public VectorDataBase<dim, spacedim,typename VECTOR::value_type>
   {
   public:
     /**
@@ -311,9 +300,9 @@ namespace MeshWorker
     VectorData(const VectorSelector &);
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
+     * Initialize with an object of named vectors.
      */
-    void initialize(const NamedData<VECTOR *> &);
+    void initialize(const AnyData &);
 
     /**
      * Initialize with a single vector and cache the indices in the
@@ -325,9 +314,9 @@ namespace MeshWorker
     void initialize(const VECTOR *, const std::string &name);
 
     virtual void fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -336,9 +325,9 @@ namespace MeshWorker
       const unsigned int size) const;
 
     virtual void mg_fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,
@@ -371,15 +360,16 @@ namespace MeshWorker
      * Constructor.
      */
     MGVectorData();
+
     /**
      * Constructor using a prefilled VectorSelector
      */
     MGVectorData(const VectorSelector &);
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
+     * Initialize with an object of named vectors
      */
-    void initialize(const NamedData<MGLevelObject<VECTOR>*> &);
+    void initialize(const AnyData &);
 
     /**
      * Initialize with a single vector and cache the indices in the
@@ -428,15 +418,6 @@ namespace MeshWorker
 
   inline void
   VectorSelector::initialize(const AnyData &src)
-  {
-    value_selection.initialize(src);
-    gradient_selection.initialize(src);
-    hessian_selection.initialize(src);
-  }
-
-  template <typename DATA>
-  inline void
-  VectorSelector::initialize(const NamedData<DATA> &src)
   {
     value_selection.initialize(src);
     gradient_selection.initialize(src);
@@ -529,23 +510,6 @@ namespace MeshWorker
   template <class STREAM, typename DATA>
   inline void
   VectorSelector::print(STREAM &s, const AnyData &v) const
-  {
-    s << "values:   ";
-    for (unsigned int i=0; i<n_values(); ++i)
-      s << " '" << v.name(value_selection(i)) << '\'';
-    s << std::endl << "gradients:";
-    for (unsigned int i=0; i<n_gradients(); ++i)
-      s << " '" << v.name(gradient_selection(i)) << '\'';
-    s << std::endl << "hessians: ";
-    for (unsigned int i=0; i<n_hessians(); ++i)
-      s << " '" << v.name(hessian_selection(i)) << '\'';
-    s << std::endl;
-  }
-
-
-  template <class STREAM, typename DATA>
-  inline void
-  VectorSelector::print(STREAM &s, const NamedData<DATA> &v) const
   {
     s << "values:   ";
     for (unsigned int i=0; i<n_values(); ++i)

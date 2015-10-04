@@ -119,7 +119,7 @@ void diff (Vector<double> &diff, const DoFHandler<dim> &dof,
 {
   diff.reinit (v);
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> mg_dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> mg_dof_indices(dofs_per_cell);
   const unsigned int n_comp = dof.get_fe().n_components();
   for (typename DoFHandler<dim>::cell_iterator
        cell= dof.begin(level);
@@ -248,10 +248,10 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &dof,
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
 
-  NamedData<MGLevelObject<Vector<double> >* > data;
-  data.add(&v, "mg_vector");
+  AnyData data;
+  data.add<MGLevelObject<Vector<double> >* >(&v, "mg_vector");
   info_box.cell_selector.add("mg_vector");
-  info_box.initialize(fe, mapping, data);
+  info_box.initialize(fe, mapping, data, v);
 
   MeshWorker::DoFInfo<dim> dof_info(dof);
 

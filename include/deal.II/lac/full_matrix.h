@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__full_matrix_h
-#define __deal2__full_matrix_h
+#ifndef dealii__full_matrix_h
+#define dealii__full_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -73,7 +73,8 @@ public:
   typedef unsigned int size_type;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 
@@ -144,7 +145,7 @@ public:
   };
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {
@@ -611,7 +612,7 @@ public:
 //@{
 
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   const_iterator begin () const;
 
@@ -621,7 +622,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    */
   const_iterator begin (const size_type r) const;
 

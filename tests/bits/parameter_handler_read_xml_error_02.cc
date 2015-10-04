@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ int main ()
   // read from XML
   std::ifstream in ("prm");
   bool result = prm.read_input_from_xml (in);
-  Assert (result == false, ExcInternalError());
+  AssertThrow (result == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 

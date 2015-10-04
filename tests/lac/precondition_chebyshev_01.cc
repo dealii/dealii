@@ -58,7 +58,7 @@ check()
 
   PreconditionChebyshev<FullMatrixModified,Vector<double> > prec;
   PreconditionChebyshev<FullMatrixModified,Vector<double> >::AdditionalData
-    data;
+  data;
   data.smoothing_range = 2 * size;
   data.degree = 3;
   prec.initialize(m, data);

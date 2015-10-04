@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_iterator_templates_h
-#define __deal2__tria_iterator_templates_h
+#ifndef dealii__tria_iterator_templates_h
+#define dealii__tria_iterator_templates_h
 
 
 #include <deal.II/base/config.h>
@@ -85,65 +85,22 @@ TriaRawIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
 }
 
 
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaRawIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
-
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
-
-// template <typename Accessor>
-// template <typename OtherAccessor>
-// inline
-// TriaRawIterator<Accessor> &
-// TriaRawIterator<Accessor>::operator = (const TriaActiveIterator<OtherAccessor> &i)
-// {
-//   accessor.copy_from (i.accessor);
-//   return *this;
-// }
-
 
 template <typename Accessor>
 inline
 bool
-TriaRawIterator<Accessor>::operator == (const TriaRawIterator<Accessor> &i) const
+TriaRawIterator<Accessor>::operator == (const TriaRawIterator<Accessor> &other) const
 {
-  return accessor == i.accessor;
+  return accessor == other.accessor;
 }
 
 
 template <typename Accessor>
 inline
 bool
-TriaRawIterator<Accessor>::operator != (const TriaRawIterator<Accessor> &i) const
+TriaRawIterator<Accessor>::operator != (const TriaRawIterator<Accessor> &other) const
 {
-  // Note that at times, there is a problem
-  // with egcs 1.1 that makes it choose
-  // the global STL operator != (which
-  // does only !(a==b)) over the member
-  // function one, which then results in an
-  // error because the operator == of
-  // the accessor class is
-  // not made public. Strange... don't know
-  // whose fault it is.
-  //
-  // Work around the problem this way:
-  return accessor.operator != (i.accessor);
+  return ! (*this == other);
 }
 
 
@@ -489,7 +446,7 @@ TriaActiveIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
   // do this like this, because:
   // if we write
   // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_chidlren() is called anyway, even if
+  // has_children() is called anyway, even if
   // state==IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
@@ -511,7 +468,7 @@ TriaActiveIterator<Accessor>::operator = (const TriaRawIterator<OtherAccessor> &
   // do this like this, because:
   // if we write
   // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_chidlren() is called anyway, even if
+  // has_children() is called anyway, even if
   // state==IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)

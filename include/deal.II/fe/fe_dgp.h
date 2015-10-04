@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_dgp_h
-#define __deal2__fe_dgp_h
+#ifndef dealii__fe_dgp_h
+#define dealii__fe_dgp_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/polynomial_space.h>
@@ -101,7 +101,7 @@ template <int dim, int spacedim> class MappingQ;
  * the expressions can be simplified to $t=y$ and
  * $\phi_1(x,y)=x,\phi_2(x,y)=y$. However, for all other cases, the functions
  * $\phi_1(x,y),\phi_2(x,y)$ are not linear any more, and neither is any
- * linear combincation of them. Consequently, the linear functions are not
+ * linear combination of them. Consequently, the linear functions are not
  * within the range of the mapped $P_1$ polynomials.
  *
  * <h3>Visualization of shape functions</h3> In 2d, the shape functions of

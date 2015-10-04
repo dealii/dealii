@@ -33,7 +33,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
 
@@ -57,16 +57,19 @@ using namespace dealii;
 //
 // Finally, the function outputs the mesh in encapsulated postscript (EPS)
 // format that can easily be visualized in the same way as was done in step-1.
-template<int dim>
-void mesh_info(const Triangulation<dim> &tria,
-               const std::string        &filename)
+template <int dim>
+void print_mesh_info(const Triangulation<dim> &tria,
+                     const std::string        &filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
             << " no. of cells: " << tria.n_active_cells() << std::endl;
 
-  // Next loop over all faces of all cells and find how often each boundary
-  // indicator is used:
+  // Next loop over all faces of all cells and find how often each
+  // boundary indicator is used (recall that if you access an element
+  // of a std::map object that doesn't exist, it is implicitly created
+  // and default initialized -- to zero, in the current case -- before
+  // we then increment it):
   {
     std::map<unsigned int, unsigned int> boundary_count;
     typename Triangulation<dim>::active_cell_iterator
@@ -77,7 +80,7 @@ void mesh_info(const Triangulation<dim> &tria,
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
-              boundary_count[cell->face(face)->boundary_indicator()]++;
+              boundary_count[cell->face(face)->boundary_id()]++;
           }
       }
 
@@ -118,8 +121,7 @@ void grid_1 ()
   std::ifstream f("untitled.msh");
   gridin.read_msh(f);
 
-  mesh_info(triangulation, "grid-1.eps");
-
+  print_mesh_info(triangulation, "grid-1.eps");
 }
 
 
@@ -144,7 +146,7 @@ void grid_2 ()
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations (tria1, tria2, triangulation);
 
-  mesh_info(triangulation, "grid-2.eps");
+  print_mesh_info(triangulation, "grid-2.eps");
 }
 
 
@@ -187,15 +189,21 @@ void grid_3 ()
         }
     }
 
-  // In the second step we will refine the mesh twice. To do this correctly,
-  // we have to associate a geometry object with the boundary of the hole;
-  // since the boundary of the hole has boundary indicator 1 (see the
-  // documentation of the function that generates the mesh), we need to create
-  // an object that describes a circle (i.e., a hyper ball) with appropriate
-  // center and radius and assign it to the triangulation. We can then refine
-  // twice:
-  const HyperBallBoundary<2> boundary_description(Point<2>(0,0), 0.25);
-  triangulation.set_boundary (1, boundary_description);
+  // In the second step we will refine the mesh twice. To do this
+  // correctly, we have to associate a geometry object with the
+  // boundary of the hole; since the boundary of the hole has boundary
+  // indicator 1 (see the documentation of the function that generates
+  // the mesh), we need to create an object that describes a spherical
+  // manifold (i.e., a hyper ball) with appropriate center and assign
+  // it to the triangulation. Notice that the function that generates
+  // the triangulation sets the boundary indicators of the inner mesh,
+  // but leaves unchanged the manifold indicator. We copy the boundary
+  // indicator to the manifold indicators in order for the object to
+  // be refined accordingly.
+  // We can then refine twice:
+  GridTools::copy_boundary_to_manifold_id(triangulation);
+  const SphericalManifold<2> boundary_description(Point<2>(0,0));
+  triangulation.set_manifold (1, boundary_description);
   triangulation.refine_global(2);
 
   // The mesh so generated is then passed to the function that generates
@@ -203,8 +211,8 @@ void grid_3 ()
   // no longer in use by the triangulation when it is destroyed (the boundary
   // object is destroyed first in this function since it was declared after
   // the triangulation).
-  mesh_info (triangulation, "grid-3.eps");
-  triangulation.set_boundary (1);
+  print_mesh_info (triangulation, "grid-3.eps");
+  triangulation.set_manifold (1);
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on
@@ -233,8 +241,7 @@ void grid_4()
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
   GridGenerator::extrude_triangulation (triangulation, 3, 2.0, out);
-  mesh_info(out, "grid-4.eps");
-
+  print_mesh_info(out, "grid-4.eps");
 }
 
 
@@ -269,7 +276,7 @@ void grid_5()
                                              Point<2>(10.0,1.0));
 
   GridTools::transform(&grid_5_transform, tria);
-  mesh_info(tria, "grid-5.eps");
+  print_mesh_info(tria, "grid-5.eps");
 }
 
 
@@ -309,7 +316,7 @@ void grid_6()
                                              Point<2>(1.0,1.0));
 
   GridTools::transform(Grid6Func(), tria);
-  mesh_info(tria, "grid-6.eps");
+  print_mesh_info(tria, "grid-6.eps");
 }
 
 
@@ -331,7 +338,7 @@ void grid_7()
                                              Point<2>(1.0,1.0));
 
   GridTools::distort_random (0.3, tria, true);
-  mesh_info(tria, "grid-7.eps");
+  print_mesh_info(tria, "grid-7.eps");
 }
 
 

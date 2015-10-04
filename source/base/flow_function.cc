@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -269,6 +269,7 @@ namespace Functions
     std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
+    (void)n;
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
     for (unsigned int d=0; d<dim+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
@@ -629,6 +630,7 @@ namespace Functions
     std::vector<std::vector<double> > &values) const
   {
     unsigned int n = points.size();
+    (void)n;
     Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
     for (unsigned int d=0; d<2+1; ++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));

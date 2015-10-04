@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__qprojector_h
-#define __deal2__qprojector_h
+#ifndef dealii__qprojector_h
+#define dealii__qprojector_h
 
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+
 /*!@addtogroup Quadrature */
 /*@{*/
 

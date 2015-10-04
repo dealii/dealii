@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__timer_h
-#define __deal2__timer_h
+#ifndef dealii__timer_h
+#define dealii__timer_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/conditional_ostream.h>
@@ -283,7 +283,7 @@ private:
  * and reports how much time we spent there. Moreover, the class measures the
  * total time spent from start to termination of the TimerOutput object. In
  * this case, we did a lot of other stuff, so that the time proportions of the
- * functions we measured are far away from 100 precent.
+ * functions we measured are far away from 100 percent.
  *
  *
  * <h3>Using scoped timers</h3>

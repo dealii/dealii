@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,13 +51,13 @@ void test()
 {
   Triangulation<2> tr;
   GridGenerator::hyper_cube(tr);
-  
+
   Point< 2 > p;
   p(0) = -0.1;
   p(1) = 0.5;
 
   MappingQ<2> mapping(1);
-  
+
   try
     {
       GridTools::find_active_cell_around_point (mapping, tr, p);

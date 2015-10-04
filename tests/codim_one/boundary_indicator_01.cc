@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,11 @@
 
 // for surfaces, we need some sort of mapping also for interior cells
 // and faces, but at the time of writing this, we can only set
-// boundary_indicators of faces and edges that are truly at the
+// boundary_ids of faces and edges that are truly at the
 // boundary of the domain. to work around this, we use the material_id
 // field that one can set on cells, and copy it also to the adjacent
 // faces. initially, however, we also copied the material_id to the
-// boundary_indicator of adjacent faces that truly were at the
+// boundary_id of adjacent faces that truly were at the
 // boundary of the domain, and which might have had something
 // purposefully set already
 //
@@ -74,7 +74,7 @@ int main ()
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->at_boundary(f))
             {
-              cell->face(f)->set_boundary_indicator(1);
+              cell->face(f)->set_boundary_id(1);
               done = true;
               break;
             }
@@ -88,10 +88,10 @@ int main ()
 
     // now extract a mesh of the 5
     // surface faces
-    std::set<types::boundary_id> boundary_indicators;
-    boundary_indicators.insert (0);
+    std::set<types::boundary_id> boundary_ids;
+    boundary_ids.insert (0);
     GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
-                                      boundary_indicators);
+                                          boundary_ids);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
 
@@ -107,7 +107,7 @@ int main ()
          cell != boundary_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim-1>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
-          cell->face(f)->set_boundary_indicator(1);
+          cell->face(f)->set_boundary_id(1);
 
     boundary_mesh.refine_global (2);
 

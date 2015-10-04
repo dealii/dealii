@@ -20,6 +20,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -142,7 +143,7 @@ void check_simple(const FiniteElement<dim> &fe)
 
 int main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
   deallog << std::setprecision(6);

@@ -14,10 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_functional_h
-#define __deal2__mesh_worker_functional_h
+#ifndef dealii__mesh_worker_functional_h
+#define dealii__mesh_worker_functional_h
 
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
@@ -114,11 +113,6 @@ namespace MeshWorker
        */
       void initialize(AnyData &results, bool separate_faces = true);
 
-      /**
-       * @deprecated
-       */
-      void initialize(NamedData<BlockVector<number>*> &results,
-                      bool separate_faces = true);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -219,22 +213,6 @@ namespace MeshWorker
       results = r;
       separate_faces = sep;
     }
-
-    template <typename number>
-    inline void
-    CellsAndFaces<number>::initialize(NamedData<BlockVector<number>*> &r, bool sep)
-    {
-      Assert(r.name(0) == "cells", AnyData::ExcNameMismatch(0, "cells"));
-      if (sep)
-        {
-          Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
-          AssertDimension(r(0)->n_blocks(),r(1)->n_blocks());
-        }
-
-      results = r;
-      separate_faces = sep;
-    }
-
 
     template <typename number>
     template <class DOFINFO>

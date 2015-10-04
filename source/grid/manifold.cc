@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -189,7 +189,7 @@ get_new_point_on_quad (const Triangulation<1,3>::quad_iterator &) const
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
-get_new_point_on_hex (const typename Triangulation<dim, spacedim>::hex_iterator &hex) const
+get_new_point_on_hex (const typename Triangulation<dim, spacedim>::hex_iterator &/*hex*/) const
 {
   Assert (false, ExcImpossibleInDim(dim));
   return Point<spacedim>();
@@ -269,7 +269,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
 template <int dim, int spacedim>
 Point<spacedim>
-FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spacedim> > &vertices,
+FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spacedim> > &/*vertices*/,
                                                   const Point<spacedim> &candidate) const
 {
   return candidate;

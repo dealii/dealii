@@ -32,9 +32,9 @@ void test ()
   {
     const char *p = "";
     deallog << Utilities::split_string_list (p).size()
-	    << std::endl;
+            << std::endl;
     deallog << Utilities::split_string_list (p, ' ').size()
-	    << std::endl;
+            << std::endl;
   }
 
   // also test a string that consists only of whitespace. this should
@@ -43,9 +43,9 @@ void test ()
   {
     const char *p = "  ";
     deallog << Utilities::split_string_list (p).size()
-	    << std::endl;
+            << std::endl;
     deallog << Utilities::split_string_list (p, ' ').size()
-	    << std::endl;
+            << std::endl;
   }
 }
 

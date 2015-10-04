@@ -23,7 +23,7 @@ SET(TARGET_SRC
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-FIND_PACKAGE(deal.II 8.3 QUIET
+FIND_PACKAGE(deal.II 8.4 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})
@@ -47,5 +47,6 @@ One or all of these are OFF in your installation but are required for this tutor
 ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
+SET(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2 *.vtu *.pvtu)
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()

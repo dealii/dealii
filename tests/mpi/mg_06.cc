@@ -19,11 +19,11 @@
 /*
 An error occurred in line <1858> of file </ssd/deal-trunk/deal.II/source/dofs/dof_handler_policy.cc> in function
     void dealii::internal::DoFHandler::Policy::{anonymous}::communicate_mg_dof_indices_on_marked_cells(const dealii::DoFHandler<dim, spacedim>&, const std::map<unsigned int, std::set<unsigned int> >&, const std::vector<unsigned int>&, const std::vector<unsigned int>&, unsigned int) [with int dim = 2, int spacedim = 2]
-The violated condition was: 
+The violated condition was:
     senders.find(status.MPI_SOURCE)!=senders.end()
 The name and call sequence of the exception was:
     ExcInternalError()
-Additional Information: 
+Additional Information:
 (none)
  */
 
@@ -93,61 +93,61 @@ void test()
   GridGenerator::hyper_cube_slit(tr,-1,1);
   tr.refine_global(2);
 
-  for (unsigned int ii=0;ii<15;++ii)
+  for (unsigned int ii=0; ii<15; ++ii)
     {
       deallog << "loop " << ii << std::endl;
-      
+
       typename Triangulation<dim>::active_cell_iterator
-        cell = tr.begin_active(),
-        endc = tr.end();
-      
+      cell = tr.begin_active(),
+      endc = tr.end();
+
       for (; cell!=endc; ++cell)
-	if (Testing::rand()%42==1)
-	  cell->set_refine_flag ();
-      
+        if (Testing::rand()%42==1)
+          cell->set_refine_flag ();
+
       tr.execute_coarsening_and_refinement ();
-      
+
       DoFHandler<dim> dofh(tr);
-      
-				       //output(tr);
-      
+
+      //output(tr);
+
       static const FE_Q<dim> fe(1);
       dofh.distribute_dofs (fe);
       dofh.distribute_mg_dofs (fe);
-      
+
       {
-	for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
-	  {
-	    typename DoFHandler<dim>::cell_iterator
-	      cell = dofh.begin(lvl),
-	      endc = dofh.end(lvl);
+        for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
+          {
+            typename DoFHandler<dim>::cell_iterator
+            cell = dofh.begin(lvl),
+            endc = dofh.end(lvl);
 
-	    for (; cell!=endc; ++cell)
-	      {
-		if (cell->level_subdomain_id()!=tr.locally_owned_subdomain())
-		  continue;
-		for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-		  {
-		    if (cell->at_boundary(f))
-		      continue;
+            for (; cell!=endc; ++cell)
+              {
+                if (cell->level_subdomain_id()!=tr.locally_owned_subdomain())
+                  continue;
+                for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+                  {
+                    if (cell->at_boundary(f))
+                      continue;
 
-						     //deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
-						     // is cell level-artificial?
-		    Assert(cell->neighbor(f)->level_subdomain_id()<100, ExcInternalError());
-		
-		    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
-		    cell->neighbor(f)->get_mg_dof_indices(dofs);
-		    for (unsigned int i=0;i<fe.n_dofs_per_cell();++i)
-		      {
-			Assert(dofs[i]!=numbers::invalid_dof_index, ExcInternalError());
-		      }
-		  
-		  }
-	      }
-	  }
+                    //deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
+                    // is cell level-artificial?
+                    Assert(cell->neighbor(f)->level_subdomain_id()<100, ExcInternalError());
+
+                    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
+                    cell->neighbor(f)->get_mg_dof_indices(dofs);
+                    for (unsigned int i=0; i<fe.n_dofs_per_cell(); ++i)
+                      {
+                        Assert(dofs[i]!=numbers::invalid_dof_index, ExcInternalError());
+                      }
+
+                  }
+              }
+          }
       }
     }
-  
+
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -155,7 +155,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
 
   deallog.push("2d");

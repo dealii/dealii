@@ -20,7 +20,7 @@
 466: --------------------------------------------------------
 466: An error occurred in line <306> of file </ssd/branch_port_the_testsuite/deal.II/source/numerics/data_out.cc> in function
 466:     void dealii::DataOut<dim, DH>::build_one_patch(const std::pair<typename dealii::DataOut_DoFData<DH, DH:: dimension, DH:: space_dimension>::cell_iterator, unsigned int>*, dealii::internal::DataOut::ParallelData<DH:: dimension, DH:: space_dimension>&, dealii::DataOutBase::Patch<DH:: dimension, DH:: space_dimension>&, dealii::DataOut<dim, DH>::CurvedCellRegion, std::vector<dealii::DataOutBase::Patch<DH:: dimension, DH:: space_dimension> >&) [with int dim = 2, DH = dealii::DoFHandler<2>, typename dealii::DataOut_DoFData<DH, DH:: dimension, DH:: space_dimension>::cell_iterator = dealii::TriaIterator<dealii::CellAccessor<2, 2> >]
-466: The violated condition was: 
+466: The violated condition was:
 466:     cell_and_index->second < patches.size()
 466: The name and call sequence of the exception was:
 466:     ExcInternalError()
@@ -42,46 +42,46 @@
 std::string output_file_name = "output";
 
 template<int dim>
-  class FilteredDataOut : public DataOut<dim>
+class FilteredDataOut : public DataOut<dim>
+{
+public:
+  FilteredDataOut (const unsigned int subdomain_id)
+    :
+    subdomain_id (subdomain_id)
+  {}
+
+  virtual typename DataOut<dim>::cell_iterator
+  first_cell ()
   {
-  public:
-    FilteredDataOut (const unsigned int subdomain_id)
-      :
-      subdomain_id (subdomain_id)
-    {}
+    typename DataOut<dim>::active_cell_iterator
+    cell = this->dofs->begin_active();
+    while ((cell != this->dofs->end()) &&
+           (cell->subdomain_id() != subdomain_id))
+      ++cell;
 
-    virtual typename DataOut<dim>::cell_iterator
-    first_cell ()
-    {
-      typename DataOut<dim>::active_cell_iterator
-      cell = this->dofs->begin_active();
-      while ((cell != this->dofs->end()) &&
-             (cell->subdomain_id() != subdomain_id))
-        ++cell;
+    return cell;
+  }
 
-      return cell;
-    }
+  virtual typename DataOut<dim>::cell_iterator
+  next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
+  {
+    if (old_cell != this->dofs->end())
+      {
+        const IteratorFilters::SubdomainEqualTo
+        predicate(subdomain_id);
 
-    virtual typename DataOut<dim>::cell_iterator
-    next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
-    {
-      if (old_cell != this->dofs->end())
-        {
-          const IteratorFilters::SubdomainEqualTo
-          predicate(subdomain_id);
+        return
+          ++(FilteredIterator
+             <typename DataOut<dim>::active_cell_iterator>
+             (predicate,old_cell));
+      }
+    else
+      return old_cell;
+  }
 
-          return
-            ++(FilteredIterator
-               <typename DataOut<dim>::active_cell_iterator>
-               (predicate,old_cell));
-        }
-      else
-        return old_cell;
-    }
-
-  private:
-    const unsigned int subdomain_id;
-  };
+private:
+  const unsigned int subdomain_id;
+};
 
 
 template <int dim>
@@ -93,7 +93,7 @@ check ()
   tria.refine_global (1);
 
   Vector<double> cell_data(4);
-  for (unsigned int i=0;i<4;++i)
+  for (unsigned int i=0; i<4; ++i)
     cell_data(i)=i*1.0;
 
   // this should skip the first cell
@@ -129,8 +129,8 @@ main(int argc, char **argv)
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   check<2>();
-  
+
   return 0;
 }

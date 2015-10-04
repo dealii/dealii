@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_reordering_h
-#define __deal2__grid_reordering_h
+#ifndef dealii__grid_reordering_h
+#define dealii__grid_reordering_h
 
 
 #include <deal.II/base/config.h>
@@ -292,7 +292,7 @@ DEAL_II_NAMESPACE_OPEN
  * From the examples above, it is obvious that if we encounter a cell that
  * cannot be added to the cells which have already been entered, we can not
  * usually point to a cell that is the culprit and that must be entered in a
- * different oreintation. Furthermore, even if we knew which cell, there might
+ * different orientation. Furthermore, even if we knew which cell, there might
  * be large number of cells that would then cease to fit into the grid and
  * which we would have to find a different orientation as well (in the second
  * example above, if we rotated cell 1, then we would have to rotate the cells
@@ -305,7 +305,7 @@ DEAL_II_NAMESPACE_OPEN
  * structure, where node N has as many children as there are possible
  * orientations of node N+1 (in two space dimensions, there are four
  * orientations in which each cell can be constructed from its four vertices;
- * for example, if the vertex indicaes are <tt>(0 1 2 3)</tt>, then the four
+ * for example, if the vertex indices are <tt>(0 1 2 3)</tt>, then the four
  * possibilities would be <tt>(0 1 2 3)</tt>, <tt>(1 2 3 0)</tt>, <tt>(2 3 0
  * 1)</tt>, and <tt>(3 0 1 2)</tt>). When adding one cell after the other, we
  * traverse this tree in a depth-first (pre-order) fashion. When we encounter
@@ -376,7 +376,7 @@ DEAL_II_NAMESPACE_OPEN
  * @endverbatim
  * First a cell is chosen ( (0,1,4,3) in this case). A single side of the cell
  * is oriented arbitrarily (3->4). This choice of orientation is then
- * propogated through the mesh, across sides and elements. (0->1), (6->7) and
+ * propagated through the mesh, across sides and elements. (0->1), (6->7) and
  * (9->10). The involves edge-hopping and face hopping, giving a path through
  * the mesh shown in dots.
  * @verbatim
@@ -501,7 +501,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The first such method is based on the observation that if we fail to insert
  * one cell with number N, then this may not be due to cell N-1 unless N-1 is
- * a direct neighbor of N. The reason is abvious: the chosen orientation of
+ * a direct neighbor of N. The reason is obvious: the chosen orientation of
  * cell M could only affect the possibilities to add cell N if either it were
  * a direct neighbor or if there were a sequence of cells that were added
  * after M and that connected cells M and N. Clearly, for M=N-1, the latter
@@ -575,7 +575,7 @@ DEAL_II_NAMESPACE_OPEN
  * been added already. This would be cell 0. However, we know that the
  * orientation of cell 0 can't be important, so we conclude that there is no
  * possible way to orient all the lines of the given cells such that they
- * satisfy the requirements if deal.II triangulations. We know that this can't
+ * satisfy the requirements of deal.II triangulations. We know that this can't
  * be, so it results in an exception be thrown.
  *
  * The bottom line of this example is that when we looked at all possible
@@ -646,9 +646,9 @@ public:
    * positive measure/volume. In the former case, all cells are inverted. It
    * does nothing in 1d.
    *
-   * The invertion of cells might also work when only a subset of all cells
+   * The inversion of cells might also work when only a subset of all cells
    * have negative volume. However, grids consisting of a mixture of negative
-   * and positiv oriented cells are very likely to be broken. Therefore, an
+   * and positively oriented cells are very likely to be broken. Therefore, an
    * exception is thrown, in case cells are not uniformly oriented.
    *
    * Note, that this function should be called before reorder_cells().

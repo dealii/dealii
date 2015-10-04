@@ -66,7 +66,7 @@
 <pre class="cmake">
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-FIND_PACKAGE(deal.II 8.0 REQUIRED
+FIND_PACKAGE(deal.II 8.3 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
@@ -87,16 +87,15 @@ DEAL_II_SETUP_TARGET(mycode)
 <p>
   Next, we find our deal.II installation with the help of the
   <code>FIND_PACKAGE</code> command. In this case requiring at least
-  version 8.0, which is the first version using CMake. The
-  <code>HINTS</code> are a list of directories where the install directory
-  of deal.II is likely to be found. First, the location possibly defined in
-  the CMake variable <code>DEAL_II_DIR</code> is considered. After that, we
-  check whether we are in a subdirectory (first and second level) of the
-  deal.II installation and otherwise use the environment variable
-  <code>DEAL_II_DIR</code>. If all of these hints fail the default system
-  locations <code>/usr/</code> and <code>/usr/local/</code> are considered.
-  The list after <code>HINTS</code> can be changed according to your
-  preferences.
+  version 8.3. The <code>HINTS</code> are a list of directories where the
+  install directory of deal.II is likely to be found. First, the location
+  possibly defined in the CMake variable <code>DEAL_II_DIR</code> is
+  considered. After that, we check whether we are in a subdirectory (first
+  and second level) of the deal.II installation and otherwise use the
+  environment variable <code>DEAL_II_DIR</code>. If all of these hints fail
+  the default system locations <code>/usr/</code> and
+  <code>/usr/local/</code> are considered. The list after
+  <code>HINTS</code> can be changed according to your preferences.
 </p>
 
 <p>
@@ -114,8 +113,9 @@ DEAL_II_SETUP_TARGET(mycode)
 <p>
   Finally, the last two lines define the executable that is to be produced
   and its source code. The <a href="#cmakeadvanced.setup_target">
-  <code>DEAL_II_SETUP_TARGET</code></a> macro will set up necessary
-  incllude directories, compile defintions and the link interface.
+  <code>DEAL_II_SETUP_TARGET</code></a> macro will set up necessary include
+  directories, compile flags, compile definitions, link flags and the link
+  interface.
 </p>
 
 <a name="cmakesimple.multiple"></a>
@@ -394,7 +394,7 @@ IF(NOT &lt;expression&gt;)
 ENDIF()
 </pre>
 
-<a name="cmakeadvanced.foreach"></a> 
+<a name="cmakeadvanced.foreach"></a>
 <p>Loops are implemented with the help of <code>WHILE</code> and
 <code>FOR</code> statements. The former takes the same
 <code>&lt;expression&gt;</code> as the <code>IF</code> statement:</p>
@@ -409,7 +409,7 @@ statement:
 <pre class="cmake">
 FOREACH(element ${list})
   ...
-ENDFOREACH
+ENDFOREACH()
 </pre>
 Note: It is also possible to specify the list directly:
 <pre class="cmake">
@@ -445,18 +445,51 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
 <a name="cmakeadvanced.setup_target"></a>
 <h3><code>DEAL_II_SETUP_TARGET</code> revisited</h3>
 <p>
-The <code>DEAL_II_SETUP_TARGET</code> macro is responsible for setting up a
-target to compile and link against deal.II. It will <i>append</i> the
-<code>INCLUDE_DIRECTORIES</code> property with the location of the deal.II
-include directories, and the compile definitions and linker flags property
-<code>COMPILE_DEFINITIONS</code> and <code>LINK_FLAGS</code> by their
-respective values (depending on build type and available debug and/or
-optimized flavor of the library).
+  The <code>DEAL_II_SETUP_TARGET</code> macro is responsible for setting up
+  a target to compile and link against deal.II. It will <i>append</i> the
+  <code>INCLUDE_DIRECTORIES</code> property with the location of the
+  deal.II include directories, and <i>append</i> the properties
+  <code>COMPILE_FLAGS</code>, <code>COMPILE_DEFINITIONS</code> and
+  <code>LINK_FLAGS</code> by their respective values from the deal.II
+  configuration (depending on build type and available debug and/or
+  optimized flavor of the library).
 </p>
 <p>
-Except in the case of an object library, the specified target will be set
-up to link against deal.II (and its transitive link interface) as well.
+  Except in the case of an object library, the specified target will also
+  be set up to link against deal.II (and its transitive link interface) as
+  well.
 </p>
+
+<p>
+  Optionally, the <code>DEAL_II_SETUP_TARGET</code> macro takes an
+  additional argument <code>DEBUG</code>, or <code>RELEASE</code>, after
+  the target name to explicitly state the library flavor the target should
+  be set up for. If the parameter is omitted, the correct choice is deduced
+  from the current build type (with <code>DEBUG</code> taking precedence in
+  case of <code>DebugRelease</code> as build type).
+</p>
+
+<p>
+  Note: The flags that are added with <code>DEAL_II_SETUP_TARGET</code> to
+  the target come last in the final link compiler invocation, or linker
+  invocation. This means they take precedence over all flags defined via
+  globally via <code>CMAKE_CXX_FLAGS</code>, etc., or as a directory
+  property. If you wish to modify flags or preprocessor definitions set up
+  with <code>DEAL_II_SETUP_TARGET</code> modify on of the following
+  variables (see the section about <a
+    href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a> for
+  details):
+<pre class="cmake">
+DEAL_II_CXX_FLAGS
+DEAL_II_CXX_FLAGS_DEBUG
+DEAL_II_CXX_FLAGS_RELEASE
+DEAL_II_LINKER_FLAGS
+DEAL_II_LINKER_FLAGS_DEBUG
+DEAL_II_LINKER_FLAGS_RELEASE
+DEAL_II_USER_DEFINITIONS
+DEAL_II_USER_DEFINITIONS_DEBUG
+DEAL_II_USER_DEFINITIONS_RELEASE
+</pre>
 
 
 <a name="cmakeadvanced.cached_variables"></a>
@@ -477,15 +510,24 @@ The macro will set an uninitialized <code>CMAKE_BUILD_TYPE</code> variable
 to <code>Debug</code> (or <code>Release</code> if the debug library is not
 available). If <code>CMAKE_BUILD_TYPE</code> is specified it will
 automatically be reset if the given value is unsupported by the deal.II
-installation.
+installation (i.e., if it is not equal to <code>Debug</code>,
+<code>Release</code>, or <code>DebugRelease</code>).
 </p>
 <p>
-Furthermore, this macro sets the C++ compiler and the compile flags to
-default values (the same values that were used to compile deal.II itself).
-These are <code>CMAKE_CXX_COMPILER</code> and <code>DEAL_II_CXX_FLAGS</code>,
-as well as - depending on the configuration -
-<code>DEAL_II_CXX_FLAGS_DEBUG</code>, or <code>DEAL_II_CXX_FLAGS_RELEASE</code>, or
-both.
+Furthermore, this macro sets the C++ compiler to the one used for compiling
+the deal.II library. The variables will <code>CMAKE_CXX_FLAGS</code>,
+<code>CMAKE_CXX_FLAGS_DEBUG</code>, and
+<code>CMAKE_CXX_FLAGS_RELEASE</code> will be initialized with the empty
+string.
+</p>
+
+<p>
+Note: If you wish to override the flags and definitions set by the
+<code>DEAL_II_SETUP_TARGET</code> macro you have to override the
+corresponding <code>DEAL_II_*</code> variable instead. See the
+documentation of <a
+href="#cmakeadvanced.setup_target"><code>DEAL_II_SETUP_TARGET</code></a>
+for further details.
 </p>
 
 <a name="cmakeadvanced.properties"></a>
@@ -637,34 +679,32 @@ $ cd step-1
 $ cmake .
 
 [...]
-
 ###
 #
-#  Successfully set up project  step-1  with  deal.II-8.0
+#  Project  step-1  set up with  deal.II-8.3  found at
 #      /usr
 #
-#  CMAKE_BUILD_TYPE:         Debug
+#  CMAKE_BUILD_TYPE:          Debug
 #
 #  You can now run
-#      $ make                - to compile and link the program
-#      $ make run            - to (compile, link and) run the program
+#       $ make                - to compile and link the program
+#       $ make run            - to (compile, link and) run the program
 #
-#      $ make debug          - to switch the build type to Debug
-#      $ make release        - to switch the build type to Release
+#       $ make debug          - to switch the build type to 'Debug'
+#       $ make release        - to switch the build type to 'Release'
 #
-#      $ make edit_cache     - to change (cached) configuration variables
-#                              and rerun the configure and generate phases of CMake
+#       $ make edit_cache     - to change (cached) configuration variables
+#                               and rerun the configure and generate phases of CMake
 #
-#      $ make strip_comments - strip the source files in this
-#                              directory off the documentation comments
-#      $ make clean          - to remove the generated executable as well as
-#                              all intermediate compilation files
-#      $ make runclean       - to remove all output generated by the program
-#      $ make distclean      - to clean the directory from _all_ generated
-#                              files (includes clean, runclean and the removal
-#                              of the generated build system)
-#
-#      $ make help           - to view this message again
+#       $ make strip_comments - to strip the source files in this
+#                               directory off the documentation comments
+#       $ make clean          - to remove the generated executable as well as
+#                               all intermediate compilation files
+#       $ make runclean       - to remove all output generated by the program
+#       $ make distclean      - to clean the directory from _all_ generated
+#                               files (includes clean, runclean and the removal
+#                               of the generated build system)
+#       $ make info           - to view this message again
 #
 #  Have a nice day!
 #
@@ -731,7 +771,6 @@ DEAL_II_BUILD_TYPES         - an all caps list of available configurations,
 #
 
 DEAL_II_PATH
-DEAL_II_CMAKE_MACROS_RELDIR
 DEAL_II_SHARE_RELDIR
 DEAL_II_DOCREADME_RELDIR
 DEAL_II_DOCHTML_RELDIR
@@ -761,6 +800,17 @@ DEAL_II_LINKER_FLAGS_RELEASE     - _additional_ link flags for release configura
 DEAL_II_USER_DEFINITIONS         - compile definitions for all configurations
 DEAL_II_USER_DEFINITIONS_DEBUG   - _additional_ compile definitions for debug configuration
 DEAL_II_USER_DEFINITIONS_RELEASE - _additional_ compile definitions for release configuration
+
+#
+# Information about MPI runtime for the mpi implementation used in the
+# deal.II library
+#
+
+DEAL_II_MPIEXEC
+DEAL_II_MPIEXEC_NUMPROC_FLAG
+DEAL_II_MPIEXEC_PREFLAGS
+DEAL_II_MPIEXEC_POSTFLAGS
+
 
 DEAL_II_STATIC_EXECUTABLE        - true if the link interface is set up to
                                    compile resulting executables statically
@@ -796,6 +846,7 @@ DEAL_II_WITH_ARPACK
 DEAL_II_WITH_BOOST
 DEAL_II_WITH_BZIP2
 DEAL_II_WITH_CXX11
+DEAL_II_WITH_CXX14
 DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
@@ -816,7 +867,7 @@ DEAL_II_WITH_ZLIB
 <h2>  <code>Make.global_options</code> </h2>
 
 <p>
-  Above CMake configuration file <code>deal.IIConfig.cmake</code> is also
+  The above CMake configuration file <code>deal.IIConfig.cmake</code> is also
   available as a Makefile includable file called
   <code>Make.global_options</code>. It resides under
   <code>share/deal.II/Make.global_options</code> in the build and install

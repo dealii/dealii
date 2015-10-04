@@ -21,7 +21,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO:[GK] deg+1 is wrong here and should bew fixed after FiniteElementData was cleaned up
+//TODO:[GK] deg+1 is wrong here and should be fixed after FiniteElementData was cleaned up
 
 template <class POLY, int dim, int spacedim>
 FE_DGVector<POLY,dim,spacedim>::FE_DGVector (

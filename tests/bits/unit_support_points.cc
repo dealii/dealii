@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,9 +34,9 @@ template <int dim>
 void check_cell1 (const FiniteElement<dim> &fe)
 {
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    Assert (fe.get_unit_support_points()[i] ==
-            fe.unit_support_point(i),
-            ExcInternalError());
+    AssertThrow (fe.get_unit_support_points()[i] ==
+                 fe.unit_support_point(i),
+                 ExcInternalError());
   deallog << "dim=" << dim << ", cell=ok" << std::endl;
 }
 
@@ -45,9 +45,9 @@ template <int dim>
 void check_face1 (const FiniteElement<dim> &fe)
 {
   for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-    Assert (fe.get_unit_face_support_points()[i] ==
-            fe.unit_face_support_point(i),
-            ExcInternalError());
+    AssertThrow (fe.get_unit_face_support_points()[i] ==
+                 fe.unit_face_support_point(i),
+                 ExcInternalError());
   deallog << "dim=" << dim << ", face=ok" << std::endl;
 }
 

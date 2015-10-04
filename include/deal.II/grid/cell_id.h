@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__cell_id_h
-#define __deal2__cell_id_h
+#ifndef dealii__cell_id_h
+#define dealii__cell_id_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
-#include <sstream>
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,14 +70,9 @@ public:
   {}
 
   /**
-   *
+   * Return a string representation of this CellId.
    */
-  std::string str() const
-  {
-    std::ostringstream ss;
-    ss << *this;
-    return ss.str();
-  }
+  std::string to_string() const;
 
   /**
    * compare two CellIds

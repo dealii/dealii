@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,11 +53,11 @@ void test (const unsigned int chunk_size)
           ||
           (i->row()==i->column()))
         {
-          Assert (std::fabs(i->value() - i->row()*i->column()) < 1e-14,
-                  ExcInternalError());
+          AssertThrow (std::fabs(i->value() - i->row()*i->column()) < 1e-14,
+                       ExcInternalError());
         }
       else
-        Assert (i->value() == 0, ExcInternalError());
+        AssertThrow (i->value() == 0, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

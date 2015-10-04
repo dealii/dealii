@@ -240,7 +240,7 @@ namespace internal
           // hp::DoFHandler<dim>::active_cell_iterator, we need to manually
           // select the correct finite element, so just hold a vector of
           // FEValues
-          std::vector<std_cxx11::shared_ptr<FEValues<dim> > >
+          std::vector<std_cxx11::shared_ptr<dealii::FEValues<dim> > >
           fe_values (current_data.quadrature.size());
           UpdateFlags update_flags_feval =
             (update_flags & update_inverse_jacobians ? update_jacobians : update_default) |
@@ -290,10 +290,10 @@ namespace internal
               const unsigned int n_q_points = current_data.n_q_points[fe_index];
               if (fe_values[fe_index].get() == 0)
                 fe_values[fe_index].reset
-                (new FEValues<dim> (mapping, dummy_fe,
-                                    current_data.quadrature[fe_index],
-                                    update_flags_feval));
-              FEValues<dim> &fe_val = *fe_values[fe_index];
+                (new dealii::FEValues<dim> (mapping, dummy_fe,
+                                            current_data.quadrature[fe_index],
+                                            update_flags_feval));
+              dealii::FEValues<dim> &fe_val = *fe_values[fe_index];
               data.resize (n_q_points);
 
               // if the fe index has changed from the previous cell, set the
@@ -608,7 +608,7 @@ namespace internal
                                                const unsigned int  my_q,
                                                CellType (&cell_t_prev)[n_vector_elements],
                                                CellType (&cell_t)[n_vector_elements],
-                                               FEValues<dim,dim> &fe_val,
+                                               dealii::FEValues<dim,dim> &fe_val,
                                                CellData          &data) const
     {
       const unsigned int n_q_points = fe_val.n_quadrature_points;

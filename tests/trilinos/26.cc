@@ -36,8 +36,8 @@ void test (TrilinosWrappers::Vector &v)
 
   const unsigned int sz = v.size();
   v = 2;
-  Assert (v.size() == sz, ExcInternalError());
-  Assert (v.l2_norm() == std::sqrt(4.*sz), ExcInternalError());
+  AssertThrow (v.size() == sz, ExcInternalError());
+  AssertThrow (v.l2_norm() == std::sqrt(4.*sz), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -51,7 +51,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

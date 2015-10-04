@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,7 @@ void test ()
 
   // set refine flag for the only cell we have, then do the refinement
   SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim> >
-    solution_trans(dof_handler);
+  solution_trans(dof_handler);
   dof_handler.begin_active()->set_refine_flag ();
   solution_trans.prepare_for_pure_refinement();
   triangulation.execute_coarsening_and_refinement ();
@@ -78,14 +78,14 @@ void test ()
 
   // distribute dofs and transfer solution there
   dof_handler.distribute_dofs (fe_collection);
-  
+
   Vector<double> new_solution(dof_handler.n_dofs());
   solution_trans.refine_interpolate(solution, new_solution);
 
   // we should now have only 1s in the new_solution vector
   for (unsigned int i=0; i<new_solution.size(); ++i)
-    Assert (new_solution[i] == 1, ExcInternalError());
-  
+    AssertThrow (new_solution[i] == 1, ExcInternalError());
+
   // we are good if we made it to here
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,38 +22,38 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::~VectorDataBase()
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::~VectorDataBase()
   {}
 
 
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::VectorDataBase(const VectorSelector &v)
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase(const VectorSelector &v)
     :
     VectorSelector(v)
   {}
 
 
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::VectorDataBase()
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase()
   {}
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::initialize(const AnyData &d)
+  VectorDataBase<dim, spacedim, Number>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::fill(
-    std::vector<std::vector<std::vector<double> > > &,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+  VectorDataBase<dim, spacedim, Number>::fill(
+    std::vector<std::vector<std::vector<Number> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &,
     const FEValuesBase<dim,spacedim> &,
     const std::vector<types::global_dof_index> &,
     const unsigned int,
@@ -65,12 +65,12 @@ namespace MeshWorker
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::mg_fill(
-    std::vector<std::vector<std::vector<double> > > &,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+  VectorDataBase<dim, spacedim, Number>::mg_fill(
+    std::vector<std::vector<std::vector<Number> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &,
     const FEValuesBase<dim,spacedim> &,
     const unsigned int,
     const std::vector<types::global_dof_index> &,
@@ -93,13 +93,13 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   VectorData<VECTOR, dim, spacedim>::VectorData(const VectorSelector &s)
     :
-    VectorDataBase<dim, spacedim>(s)
+    VectorDataBase<dim, spacedim, typename VECTOR::value_type>(s)
   {}
 
 
   template <class VECTOR, int dim, int spacedim>
   void
-  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR *> &d)
+  VectorData<VECTOR, dim, spacedim>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);
@@ -119,9 +119,9 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::fill(
-    std::vector<std::vector<std::vector<double> > > &values,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
     const FEValuesBase<dim,spacedim> &fe,
     const std::vector<types::global_dof_index> &index,
     const unsigned int component,
@@ -137,21 +137,21 @@ namespace MeshWorker
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->value_index(i));
-        VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<typename VECTOR::value_type> > > dst(values[i], component, n_comp);
         fe.get_function_values(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->gradient_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->hessian_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians(*src, make_slice(index, start, size), dst, true);
       }
   }
@@ -182,7 +182,7 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  MGVectorData<VECTOR, dim, spacedim>::initialize(const NamedData<MGLevelObject<VECTOR>*> &d)
+  MGVectorData<VECTOR, dim, spacedim>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);
@@ -203,9 +203,9 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::mg_fill(
-    std::vector<std::vector<std::vector<double> > > &values,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
     const FEValuesBase<dim,spacedim> &fe,
     const unsigned int level,
     const std::vector<types::global_dof_index> &index,
@@ -222,21 +222,21 @@ namespace MeshWorker
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<typename VECTOR::value_type> > > dst(values[i], component, n_comp);
         fe.get_function_values((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians((*src)[level], make_slice(index, start, size), dst, true);
       }
   }

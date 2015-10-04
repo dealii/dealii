@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,22 +14,19 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__aligned_vector_h
-#define __deal2__aligned_vector_h
+#ifndef dealii__aligned_vector_h
+#define dealii__aligned_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/type_traits.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/parallel.h>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
 #include <cstring>
-
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
-#include <emmintrin.h>
-#endif
 
 
 
@@ -538,16 +535,10 @@ AlignedVector<T>::reserve (const size_type size_alloc)
 
       const size_type size_actual_allocate = new_size * sizeof(T);
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
-
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
-      T *new_data = static_cast<T *>(_mm_malloc (size_actual_allocate, 64));
-#else
-      T *new_data = static_cast<T *>(malloc (size_actual_allocate));
-#endif
-      if (new_data == 0)
-        throw std::bad_alloc();
+      T *new_data;
+      Utilities::System::posix_memalign ((void **)&new_data, 64, size_actual_allocate);
 
       // copy data in case there was some content before and release the old
       // memory with the function corresponding to the one used for allocating
@@ -558,11 +549,7 @@ AlignedVector<T>::reserve (const size_type size_alloc)
         {
           dealii::internal::AlignedVectorMove<T>(new_data, new_data + old_size,
                                                  _data);
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
-          _mm_free(new_data);
-#else
           free(new_data);
-#endif
         }
     }
   else if (size_alloc == 0)
@@ -582,11 +569,7 @@ AlignedVector<T>::clear ()
         while (_end_data != _data)
           (--_end_data)->~T();
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
-      _mm_free(_data);
-#else
       free(_data);
-#endif
     }
   _data = 0;
   _end_data = 0;

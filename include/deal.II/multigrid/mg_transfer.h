@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_transfer_h
-#define __deal2__mg_transfer_h
+#ifndef dealii__mg_transfer_h
+#define dealii__mg_transfer_h
 
 #include <deal.II/base/config.h>
 
@@ -23,6 +23,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/parallel_vector.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -48,27 +49,43 @@ namespace internal
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, const DH &)
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DH &)
     {
-      sparsity.copy_from (csp);
+      sparsity.copy_from (dsp);
+      (void)level;
       matrix.reinit (sparsity);
     }
   };
 
 #ifdef DEAL_II_WITH_TRILINOS
+  template <typename Number>
+  struct MatrixSelector<parallel::distributed::Vector<Number> >
+  {
+    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
+    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DH &dh)
+    {
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+                    dh.locally_owned_mg_dofs(level),
+                    dsp, MPI_COMM_WORLD, true);
+    }
+
+  };
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DH &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
                     dh.locally_owned_mg_dofs(level),
-                    csp, MPI_COMM_WORLD, true);
+                    dsp, MPI_COMM_WORLD, true);
     }
 
   };
@@ -79,8 +96,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
+    template <class DSP, class DH>
+    static void reinit(Matrix &, Sparsity &, int /*level*/, const DSP &, DH &)
     {
     }
   };
@@ -255,7 +272,7 @@ private:
    * The data is organized as follows: one vector per level. Each element of
    * these vectors contains first the global index, then the level index.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices;
 
   /**
@@ -265,7 +282,7 @@ private:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices_global_mine;
 
   /**
@@ -275,7 +292,7 @@ private:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
   copy_indices_level_mine;
 
 

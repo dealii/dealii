@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,12 +106,12 @@ void test()
               ExcInternalError());
       for (unsigned int i=0;
            i<dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
-        Assert (dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
-                ExcInternalError());
-      Assert (std::accumulate (dof_handler.n_locally_owned_dofs_per_processor().begin(),
-                               dof_handler.n_locally_owned_dofs_per_processor().end(),
-                               0U) == N,
-              ExcInternalError());
+        AssertThrow (dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
+                     ExcInternalError());
+      AssertThrow (std::accumulate (dof_handler.n_locally_owned_dofs_per_processor().begin(),
+                                    dof_handler.n_locally_owned_dofs_per_processor().end(),
+                                    0U) == N,
+                   ExcInternalError());
 
       IndexSet all (N), really_all (N);
       // poor man's union operation
@@ -121,19 +121,19 @@ void test()
           if (dof_handler.locally_owned_dofs_per_processor()[i]
               .is_element(j))
             {
-              Assert (all.is_element(j) == false, ExcInternalError());
+              AssertThrow (all.is_element(j) == false, ExcInternalError());
               all.add_index (j);
             }
       really_all.add_range (0, N);
-      Assert (all == really_all,
-              ExcInternalError());
+      AssertThrow (all == really_all,
+                   ExcInternalError());
     }
 }
 
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)

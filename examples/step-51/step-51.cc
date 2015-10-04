@@ -31,7 +31,7 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -389,7 +389,7 @@ namespace Step51
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
     // element method.  We can enforce the boundary conditions in an analogous
-    // manner through the use of <code>ConstrainMatrix</code> constructs. In
+    // manner through the use of ConstraintMatrix constructs. In
     // addition, hanging nodes are handled in the same way as for
     // continuous finite elements: For the face elements which
     // only define degrees of freedom on the face, this process sets the
@@ -470,10 +470,10 @@ namespace Step51
     // to the number of dofs on a face, when copying this into the final
     // sparsity pattern.
     {
-      CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, csp,
+      DynamicSparsityPattern dsp (dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, dsp,
                                        constraints, false);
-      sparsity_pattern.copy_from(csp, fe.dofs_per_face);
+      sparsity_pattern.copy_from(dsp, fe.dofs_per_face);
     }
     system_matrix.reinit (sparsity_pattern);
   }
@@ -486,7 +486,7 @@ namespace Step51
   // and matrix that are written into the global matrix, whereas the
   // ScratchData contains all data that we need for the local assembly. There
   // is one variable worth noting here, namely the boolean variable @p
-  // trace_reconstruct. As mentioned in the introdution, we solve the HDG
+  // trace_reconstruct. As mentioned in the introduction, we solve the HDG
   // system in two steps. First, we create a linear system for the skeleton
   // system where we condense the local part into it via the Schur complement
   // $D-CA^{-1}B$. Then, we solve for the local part using the skeleton
@@ -810,7 +810,7 @@ namespace Step51
             const double JxW = scratch.fe_face_values.JxW(q);
             const Point<dim> quadrature_point =
               scratch.fe_face_values.quadrature_point(q);
-            const Point<dim> normal = scratch.fe_face_values.normal_vector(q);
+            const Tensor<1,dim> normal = scratch.fe_face_values.normal_vector(q);
             const Tensor<1,dim> convection
               = scratch.convection_velocity.value(quadrature_point);
 
@@ -882,7 +882,7 @@ namespace Step51
 
                 if (cell->face(face)->at_boundary()
                     &&
-                    (cell->face(face)->boundary_indicator() == 1))
+                    (cell->face(face)->boundary_id() == 1))
                   {
                     const double neumann_value =
                       - scratch.exact_solution.gradient (quadrature_point) * normal
@@ -974,7 +974,7 @@ namespace Step51
   {
     SolverControl solver_control (system_matrix.m()*10,
                                   1e-11*system_rhs.l2_norm());
-    SolverBicgstab<> solver (solver_control, false);
+    SolverBicgstab<> solver (solver_control);
     solver.solve (system_matrix, solution, system_rhs,
                   PreconditionIdentity());
 
@@ -1172,7 +1172,7 @@ namespace Step51
   // @sect4{HDG::output_results}
   // We have 3 sets of results that we would like to output:  the local solution,
   // the post-processed local solution, and the skeleton solution.  The former 2
-  // both 'live' on element volumes, wheras the latter lives on codimention-1 surfaces
+  // both 'live' on element volumes, whereas the latter lives on codimension-1 surfaces
   // of the triangulation.  Our @p output_results function writes all local solutions
   // to the same vtk file, even though they correspond to different <code>DoFHandler</code>
   // objects.  The graphical output for the skeleton variable is done through
@@ -1232,7 +1232,7 @@ namespace Step51
     face_out += ".vtk";
     std::ofstream face_output (face_out.c_str());
 
-// The <code>DataOutFaces</code> class works analagously to the <code>DataOut</code>
+// The <code>DataOutFaces</code> class works analogously to the <code>DataOut</code>
 // class when we have a <code>DoFHandler</code> that defines the solution on
 // the skeleton of the triangulation.  We treat it as such here, and the code is
 // similar to that above.
@@ -1323,7 +1323,7 @@ namespace Step51
           if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
               ||
               (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
-            cell->face(face)->set_boundary_indicator (1);
+            cell->face(face)->set_boundary_id (1);
   }
 
   // @sect4{HDG::run}
@@ -1377,7 +1377,7 @@ namespace Step51
 
 
 
-int main (int argc, char **argv)
+int main ()
 {
   const unsigned int dim = 2;
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -103,11 +103,6 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
   SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
-
-  #
-  # Disable a bunch of warnings when compiling with petsc:
-  #
-  ENABLE_IF_SUPPORTED(PETSC_CXX_FLAGS "-Wno-long-long")
 ENDMACRO()
 
 

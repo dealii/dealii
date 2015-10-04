@@ -24,18 +24,25 @@ if test ! -f contrib/utilities/astyle.rc ; then
   exit
 fi
 
+if test -z "`which astyle`" ; then
+  echo "*** No astyle program found."
+  echo "***"
+  echo "*** You can download astyle from http://astyle.sourceforge.net/"
+  echo "*** Note that you will need exactly version 2.04 (no newer or"
+  echo "*** older version will yield the correct indentation)."
+  exit
+fi
 
-# loop over all directories in which we may have source files;
-# collect a list of files and then spawn a parallel process to
-# indent all of them
+if test "`astyle --version 2>&1`" != "Artistic Style Version 2.04" ; then
+  echo "*** Found a version of astyle different than the required version 2.04."
+  exit
+fi
+
+
+
+# collect all header and source files and process them in batches of 50 files
+# with up to 10 in parallel
 echo "--- Indenting all deal.II header and source files"
-for dir in include/deal.II/* source/* examples ; do
-  files=`find $dir | egrep '\.(cc|h)$'` ;
-  if test -n "$files" ; then
-    (astyle --options=contrib/utilities/astyle.rc $files ) &
-  fi
-done
 
-# now wait for all of these processes to finish
-wait
+find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
 

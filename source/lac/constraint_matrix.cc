@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,9 +17,7 @@
 #include <deal.II/lac/constraint_matrix.templates.h>
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
@@ -724,174 +722,8 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          ExcNotQuadratic());
 
-  // store for each index whether it must be distributed or not. If entry
-  // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
-  // handles this index
-  std::vector<size_type> distribute(sparsity.n_rows(),
-                                    numbers::invalid_size_type);
-
-  for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
-
-  const size_type n_rows = sparsity.n_rows();
-  for (size_type row=0; row<n_rows; ++row)
-    {
-      if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over cols. note that as we proceed to
-        // distribute cols, the loop may get longer
-        for (size_type j=0; j<sparsity.row_length(row); ++j)
-          {
-            const size_type column = sparsity.column_number(row,j);
-
-            if (distribute[column] != numbers::invalid_size_type)
-              {
-                // distribute entry at regular row @p{row} and irregular
-                // column column. note that this changes the line we are
-                // presently working on: we add additional entries. if we
-                // add another entry at a column behind the present one, we
-                // will encounter it later on (but since it can't be
-                // further constrained, won't have to do anything about
-                // it). if we add it up front of the present column, we
-                // will find the present column later on again as it was
-                // shifted back (again nothing happens, in particular no
-                // endless loop, as when we encounter it the second time we
-                // won't be able to add more entries as they all already
-                // exist, but we do the same work more often than
-                // necessary, and the loop gets longer), so move the cursor
-                // one to the right in the case that we add an entry up
-                // front that did not exist before. check whether it
-                // existed before by tracking the length of this row
-                size_type old_rowlength = sparsity.row_length(row);
-                for (size_type q=0;
-                     q!=lines[distribute[column]].entries.size();
-                     ++q)
-                  {
-                    const size_type
-                    new_col = lines[distribute[column]].entries[q].first;
-
-                    sparsity.add (row, new_col);
-
-                    const size_type new_rowlength = sparsity.row_length(row);
-                    if ((new_col < column) && (old_rowlength != new_rowlength))
-                      ++j;
-                    old_rowlength = new_rowlength;
-                  };
-              };
-          }
-      else
-        // row must be distributed
-        for (size_type j=0; j<sparsity.row_length(row); ++j)
-          {
-            const size_type column = sparsity.column_number(row,j);
-
-            if (distribute[column] == numbers::invalid_size_type)
-              // distribute entry at irregular row @p{row} and regular
-              // column sparsity.colnums[j]
-              for (size_type q=0;
-                   q!=lines[distribute[row]].entries.size(); ++q)
-                sparsity.add (lines[distribute[row]].entries[q].first,
-                              column);
-            else
-              // distribute entry at irregular row @p{row} and irregular
-              // column sparsity.get_column_numbers()[j]
-              for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                for (size_type q=0;
-                     q!=lines[distribute[sparsity.column_number(row,j)]]
-                     .entries.size(); ++q)
-                  sparsity.add (lines[distribute[row]].entries[p].first,
-                                lines[distribute[sparsity.column_number(row,j)]]
-                                .entries[q].first);
-          };
-    };
-}
-
-
-
-void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          ExcNotQuadratic());
-
-  // store for each index whether it must be distributed or not. If entry
-  // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
-  // handles this index
-  std::vector<size_type> distribute(sparsity.n_rows(),
-                                    numbers::invalid_size_type);
-
-  for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
-
-  const size_type n_rows = sparsity.n_rows();
-  for (size_type row=0; row<n_rows; ++row)
-    {
-      if (distribute[row] == numbers::invalid_size_type)
-        {
-          // regular line. loop over cols. note that as we proceed to
-          // distribute cols, the loop may get longer
-          CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
-
-          for (; col_num != sparsity.row_end (row); ++col_num)
-            {
-              const size_type column = *col_num;
-
-              if (distribute[column] != numbers::invalid_size_type)
-                {
-                  // row
-                  for (size_type q=0;
-                       q!=lines[distribute[column]].entries.size();
-                       ++q)
-                    {
-                      const size_type
-                      new_col = lines[distribute[column]].entries[q].first;
-
-                      sparsity.add (row, new_col);
-                    }
-                }
-            }
-        }
-      else
-        // row must be distributed
-        {
-          CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
-
-          for (; col_num != sparsity.row_end (row); ++col_num)
-            {
-              const size_type column = *col_num;
-
-              if (distribute[column] == numbers::invalid_size_type)
-                // distribute entry at irregular row @p{row} and regular
-                // column sparsity.colnums[j]
-                for (size_type q=0;
-                     q!=lines[distribute[row]].entries.size(); ++q)
-                  sparsity.add (lines[distribute[row]].entries[q].first,
-                                column);
-              else
-                // distribute entry at irregular row @p{row} and irregular
-                // column sparsity.get_column_numbers()[j]
-                for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                  for (size_type q=0;
-                       q!=lines[distribute[column]]
-                       .entries.size(); ++q)
-                    sparsity.add (lines[distribute[row]].entries[p].first,
-                                  lines[distribute[column]]
-                                  .entries[q].first);
-            };
-        }
-    };
-}
-
-
-
-void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) const
+void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -1092,7 +924,8 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
+
+void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -1132,7 +965,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
         // the loop over cols may get longer.
         //
         // don't try to be clever here as in the algorithm for the
-        // CompressedSparsityPattern, as that would be much more
+        // DynamicSparsityPattern, as that would be much more
         // complicated here. after all, we know that compressed patterns
         // are inefficient...
         {
@@ -1141,7 +974,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
           // blocks in this blockrow and the corresponding row therein
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
-              const CompressedSparsityPattern &
+              const DynamicSparsityPattern &
               block_sparsity = sparsity.block(block_row, block_col);
 
               for (size_type j=0; j<block_sparsity.row_length(local_row); ++j)
@@ -1169,231 +1002,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
           // defined by the blocks
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
-              const CompressedSparsityPattern &
-              block_sparsity = sparsity.block(block_row,block_col);
-
-              for (size_type j=0; j<block_sparsity.row_length(local_row); ++j)
-                {
-                  const size_type global_col
-                    = index_mapping.local_to_global (block_col,
-                                                     block_sparsity.column_number(local_row,j));
-
-                  if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular row @p{row} and
-                    // regular column global_col.
-                    {
-                      for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
-                        sparsity.add (lines[distribute[row]].entries[q].first,
-                                      global_col);
-                    }
-                  else
-                    // distribute entry at irregular row @p{row} and
-                    // irregular column @p{global_col}
-                    {
-                      for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                        for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
-                          sparsity.add (lines[distribute[row]].entries[p].first,
-                                        lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
-        };
-    };
-}
-
-
-
-void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          ExcNotQuadratic());
-  Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-          ExcNotQuadratic());
-  Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
-          ExcNotQuadratic());
-
-  const BlockIndices &
-  index_mapping = sparsity.get_column_indices();
-
-  const size_type n_blocks = sparsity.n_block_rows();
-
-  // store for each index whether it must be distributed or not. If entry
-  // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
-  // handles this index
-  std::vector<size_type> distribute (sparsity.n_rows(),
-                                     numbers::invalid_size_type);
-
-  for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
-
-  const size_type n_rows = sparsity.n_rows();
-  for (size_type row=0; row<n_rows; ++row)
-    {
-      // get index of this row within the blocks
-      const std::pair<size_type,size_type>
-      block_index = index_mapping.global_to_local(row);
-      const size_type block_row = block_index.first;
-      const size_type local_row = block_index.second;
-
-      if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over all columns and see whether this column
-        // must be distributed. note that as we proceed to distribute cols,
-        // the loop over cols may get longer.
-        //
-        // don't try to be clever here as in the algorithm for the
-        // CompressedSparsityPattern, as that would be much more
-        // complicated here. after all, we know that compressed patterns
-        // are inefficient...
-        {
-
-          // to loop over all entries in this row, we have to loop over all
-          // blocks in this blockrow and the corresponding row therein
-          for (size_type block_col=0; block_col<n_blocks; ++block_col)
-            {
-              const CompressedSetSparsityPattern &
-              block_sparsity = sparsity.block(block_row, block_col);
-
-              for (CompressedSetSparsityPattern::row_iterator
-                   j = block_sparsity.row_begin(local_row);
-                   j != block_sparsity.row_end(local_row); ++j)
-                {
-                  const size_type global_col
-                    = index_mapping.local_to_global(block_col, *j);
-
-                  if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular row @p{row} and
-                    // irregular column global_col
-                    {
-                      for (size_type q=0;
-                           q!=lines[distribute[global_col]]
-                           .entries.size(); ++q)
-                        sparsity.add (row,
-                                      lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
-        }
-      else
-        {
-          // row must be distributed. split the whole row into the chunks
-          // defined by the blocks
-          for (size_type block_col=0; block_col<n_blocks; ++block_col)
-            {
-              const CompressedSetSparsityPattern &
-              block_sparsity = sparsity.block(block_row,block_col);
-
-              for (CompressedSetSparsityPattern::row_iterator
-                   j = block_sparsity.row_begin(local_row);
-                   j != block_sparsity.row_end(local_row); ++j)
-                {
-                  const size_type global_col
-                    = index_mapping.local_to_global (block_col, *j);
-
-                  if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular row @p{row} and
-                    // regular column global_col.
-                    {
-                      for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
-                        sparsity.add (lines[distribute[row]].entries[q].first,
-                                      global_col);
-                    }
-                  else
-                    // distribute entry at irregular row @p{row} and
-                    // irregular column @p{global_col}
-                    {
-                      for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
-                        for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
-                          sparsity.add (lines[distribute[row]].entries[p].first,
-                                        lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
-        };
-    };
-}
-
-
-
-void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          ExcNotQuadratic());
-  Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
-          ExcNotQuadratic());
-  Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
-          ExcNotQuadratic());
-
-  const BlockIndices &
-  index_mapping = sparsity.get_column_indices();
-
-  const size_type n_blocks = sparsity.n_block_rows();
-
-  // store for each index whether it must be distributed or not. If entry
-  // is numbers::invalid_unsigned_int, no distribution is necessary.
-  // otherwise, the number states which line in the constraint matrix
-  // handles this index
-  std::vector<size_type> distribute (sparsity.n_rows(),
-                                     numbers::invalid_size_type);
-
-  for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
-
-  const size_type n_rows = sparsity.n_rows();
-  for (size_type row=0; row<n_rows; ++row)
-    {
-      // get index of this row within the blocks
-      const std::pair<size_type,size_type>
-      block_index = index_mapping.global_to_local(row);
-      const size_type block_row = block_index.first;
-      const size_type local_row = block_index.second;
-
-      if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over all columns and see whether this column
-        // must be distributed. note that as we proceed to distribute cols,
-        // the loop over cols may get longer.
-        //
-        // don't try to be clever here as in the algorithm for the
-        // CompressedSparsityPattern, as that would be much more
-        // complicated here. after all, we know that compressed patterns
-        // are inefficient...
-        {
-
-          // to loop over all entries in this row, we have to loop over all
-          // blocks in this blockrow and the corresponding row therein
-          for (size_type block_col=0; block_col<n_blocks; ++block_col)
-            {
-              const CompressedSimpleSparsityPattern &
-              block_sparsity = sparsity.block(block_row, block_col);
-
-              for (size_type j=0; j<block_sparsity.row_length(local_row); ++j)
-                {
-                  const size_type global_col
-                    = index_mapping.local_to_global(block_col,
-                                                    block_sparsity.column_number(local_row,j));
-
-                  if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular row @p{row} and
-                    // irregular column global_col
-                    {
-                      for (size_type q=0;
-                           q!=lines[distribute[global_col]]
-                           .entries.size(); ++q)
-                        sparsity.add (row,
-                                      lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
-        }
-      else
-        {
-          // row must be distributed. split the whole row into the chunks
-          // defined by the blocks
-          for (size_type block_col=0; block_col<n_blocks; ++block_col)
-            {
-              const CompressedSimpleSparsityPattern &
+              const DynamicSparsityPattern &
               block_sparsity = sparsity.block(block_row,block_col);
 
               for (size_type j=0; j<block_sparsity.row_length(local_row); ++j)
@@ -1638,8 +1247,8 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 
 #define MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType) \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>        &, \
-                                                      const Vector<double>            &, \
+  distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<MatrixType::value_type>        &, \
+                                                      const Vector<VectorType::value_type>            &, \
                                                       const std::vector<ConstraintMatrix::size_type> &, \
                                                       MatrixType                      &, \
                                                       VectorType                      &, \
@@ -1647,17 +1256,17 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       internal::bool2type<false>) const
 #define MATRIX_FUNCTIONS(MatrixType) \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
-                                                          const Vector<double>            &, \
-                                                          const std::vector<ConstraintMatrix::size_type> &, \
-                                                          MatrixType                      &, \
-                                                          Vector<double>                  &, \
-                                                          bool                             , \
-                                                          internal::bool2type<false>) const
+  distribute_local_to_global<MatrixType,Vector<MatrixType::value_type> > (const FullMatrix<MatrixType::value_type>        &, \
+      const Vector<MatrixType::value_type>            &, \
+      const std::vector<ConstraintMatrix::size_type> &, \
+      MatrixType                      &, \
+      Vector<MatrixType::value_type>                  &, \
+      bool                             , \
+      internal::bool2type<false>) const
 #define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>        &, \
-                                                      const Vector<double>            &, \
+  distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<MatrixType::value_type>        &, \
+                                                      const Vector<VectorType::value_type>            &, \
                                                       const std::vector<ConstraintMatrix::size_type> &, \
                                                       MatrixType                      &, \
                                                       VectorType                      &, \
@@ -1665,32 +1274,29 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       internal::bool2type<true>) const
 #define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
-                                                          const Vector<double>            &, \
-                                                          const std::vector<ConstraintMatrix::size_type> &, \
-                                                          MatrixType                      &, \
-                                                          Vector<double>                  &, \
-                                                          bool                             , \
-                                                          internal::bool2type<true>) const
+  distribute_local_to_global<MatrixType,Vector<MatrixType::value_type> > (const FullMatrix<MatrixType::value_type>        &, \
+      const Vector<MatrixType::value_type>            &, \
+      const std::vector<ConstraintMatrix::size_type> &, \
+      MatrixType                      &, \
+      Vector<MatrixType::value_type>                  &, \
+      bool                             , \
+      internal::bool2type<true>) const
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>);
 MATRIX_FUNCTIONS(FullMatrix<double>);
 MATRIX_FUNCTIONS(FullMatrix<float>);
-MATRIX_VECTOR_FUNCTIONS(SparseMatrix<float>, Vector<float>);
+MATRIX_FUNCTIONS(FullMatrix<std::complex<double> >);
 
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
-BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<double>);
 
 MATRIX_FUNCTIONS(SparseMatrixEZ<double>);
 MATRIX_FUNCTIONS(SparseMatrixEZ<float>);
 MATRIX_FUNCTIONS(ChunkSparseMatrix<double>);
 MATRIX_FUNCTIONS(ChunkSparseMatrix<float>);
-MATRIX_VECTOR_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
-MATRIX_VECTOR_FUNCTIONS(ChunkSparseMatrix<float>, Vector<float>);
 
 // BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
 // BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
@@ -1744,13 +1350,9 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
       const Table<2,bool> &) const
 
 SPARSITY_FUNCTIONS(SparsityPattern);
-SPARSITY_FUNCTIONS(CompressedSparsityPattern);
-SPARSITY_FUNCTIONS(CompressedSetSparsityPattern);
-SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
+SPARSITY_FUNCTIONS(DynamicSparsityPattern);
 BLOCK_SPARSITY_FUNCTIONS(BlockSparsityPattern);
-BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSparsityPattern);
-BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSetSparsityPattern);
-BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
+BLOCK_SPARSITY_FUNCTIONS(BlockDynamicSparsityPattern);
 
 #ifdef DEAL_II_WITH_TRILINOS
 SPARSITY_FUNCTIONS(TrilinosWrappers::SparsityPattern);
@@ -1760,7 +1362,7 @@ BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 
 #define ONLY_MATRIX_FUNCTIONS(MatrixType) \
   template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\
-      const FullMatrix<double>        &, \
+      const FullMatrix<MatrixType::value_type>        &, \
       const std::vector<ConstraintMatrix::size_type> &, \
       const std::vector<ConstraintMatrix::size_type> &, \
       MatrixType                      &) const

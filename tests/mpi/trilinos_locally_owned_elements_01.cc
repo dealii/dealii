@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ void test()
 
   // create non-contiguous index set
   {
-    Assert(n_processes == 2, ExcNotImplemented());
+    AssertThrow(n_processes == 2, ExcNotImplemented());
     IndexSet index (10);
     for (unsigned int i=0; i<10; i+=2)
       index.add_range(i+myid, i+myid+1);
@@ -44,7 +44,7 @@ void test()
     TrilinosWrappers::MPI::Vector vec(index, MPI_COMM_WORLD);
 
     IndexSet index2 = vec.locally_owned_elements();
-    Assert (index == index2, ExcInternalError());
+    AssertThrow (index == index2, ExcInternalError());
   }
 
   // create contiguous index set
@@ -56,7 +56,7 @@ void test()
     TrilinosWrappers::MPI::Vector vec(index, MPI_COMM_WORLD);
 
     IndexSet index2 = vec.locally_owned_elements();
-    Assert (index == index2, ExcInternalError());
+    AssertThrow (index == index2, ExcInternalError());
   }
 
   if (myid == 0)
@@ -66,7 +66,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

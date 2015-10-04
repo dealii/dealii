@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__constraint_matrix_h
-#define __deal2__constraint_matrix_h
+#ifndef dealii__constraint_matrix_h
+#define dealii__constraint_matrix_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -32,25 +32,19 @@
 #include <utility>
 #include <complex>
 
-#include <boost/scoped_ptr.hpp>
-
 
 DEAL_II_NAMESPACE_OPEN
 
 template<int dim, class T> class Table;
 template <typename> class FullMatrix;
 class SparsityPattern;
-class CompressedSparsityPattern;
-class CompressedSetSparsityPattern;
-class CompressedSimpleSparsityPattern;
+class DynamicSparsityPattern;
 class BlockSparsityPattern;
-class BlockCompressedSparsityPattern;
-class BlockCompressedSetSparsityPattern;
-class BlockCompressedSimpleSparsityPattern;
+class BlockDynamicSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
-template <typename MatrixType> struct IsBlockMatrix;
+
 
 namespace internals
 {
@@ -185,12 +179,12 @@ public:
    * The IndexSet allows the ConstraintMatrix to save memory. Otherwise
    * internal data structures for all possible indices will be created.
    */
-  ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
+  explicit ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
   /**
    * Copy constructor
    */
-  ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
+  explicit ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
    * clear() the ConstraintMatrix object and supply an IndexSet with lines
@@ -315,7 +309,7 @@ public:
                     const std::vector<std::pair<size_type,double> > &col_val_pairs);
 
   /**
-   * Set an imhomogeneity to the constraint line <i>i</i>, according to the
+   * Set an inhomogeneity to the constraint line <i>i</i>, according to the
    * discussion in the general class description.
    *
    * @note the line needs to be added with one of the add_line() calls first.
@@ -326,7 +320,7 @@ public:
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
    * are usually filled in an arbitrary order and since we do not want to use
-   * associative constainers to store the lines, we need to sort the lines and
+   * associative constrainers to store the lines, we need to sort the lines and
    * within the lines the columns before usage of the matrix. This is done
    * through this function.
    *
@@ -448,7 +442,7 @@ public:
 
   /**
    * Returns <tt>true</tt> in case the dof is constrained and there is a non-
-   * trivial inhomogeneous valeus set to the dof.
+   * trivial inhomogeneous values set to the dof.
    */
   bool is_inhomogeneously_constrained (const size_type index) const;
 
@@ -547,60 +541,14 @@ public:
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
-   *
-   * Given the data structure used by CompressedSparsityPattern, this function
-   * becomes quadratic in the number of degrees of freedom for large problems
-   * and can dominate setting up linear systems when several hundred thousand
-   * or millions of unknowns are involved and for problems with many nonzero
-   * elements per row (for example for vector-valued problems or hp finite
-   * elements). In this case, it is advisable to use the
-   * CompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27",
-   * or to use the CompressedSimpleSparsityPattern class, see for example
-   * @ref step_31 "step-31".
    */
-  void condense (CompressedSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses compressed sparsity patterns, which
-   * are based on the std::set container.
-   */
-  void condense (CompressedSetSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses compressed sparsity patterns, which
-   * are based on the ''simple'' aproach.
-   */
-  void condense (CompressedSimpleSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses square compressed sparsity
-   * patterns.
-   *
-   * Given the data structure used by BlockCompressedSparsityPattern, this
-   * function becomes quadratic in the number of degrees of freedom for large
-   * problems and can dominate setting up linear systems when several hundred
-   * thousand or millions of unknowns are involved and for problems with many
-   * nonzero elements per row (for example for vector-valued problems or hp
-   * finite elements). In this case, it is advisable to use the
-   * BlockCompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27"
-   * and
-   * @ref step_31 "step-31".
-   */
-  void condense (BlockCompressedSparsityPattern &sparsity) const;
+  void condense (DynamicSparsityPattern &sparsity) const;
 
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
-  void condense (BlockCompressedSetSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses square compressed sparsity
-   * patterns.
-   */
-  void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
+  void condense (BlockDynamicSparsityPattern &sparsity) const;
 
   /**
    * Condense a given matrix, i.e., eliminate the rows and columns of the
@@ -719,6 +667,12 @@ public:
    * index at the same time. This needs to be made sure from the caller's
    * site. There is no locking mechanism inside this method to prevent data
    * races.
+   *
+   * @param[in] local_vector Vector of local contributions.
+   * @param[in] local_dof_indices Local degrees of freedom indices
+   *   corresponding to the vector of local contributions.
+   * @param[out]  global_vector The global vector to which all local
+   *   contributions will be added.
    */
   template <class InVector, class OutVector>
   void
@@ -769,12 +723,12 @@ public:
    * site. There is no locking mechanism inside this method to prevent data
    * races.
    */
-  template <typename VectorType>
+  template <typename VectorType, typename LocalType>
   void
-  distribute_local_to_global (const Vector<double>         &local_vector,
+  distribute_local_to_global (const Vector<LocalType>      &local_vector,
                               const std::vector<size_type> &local_dof_indices,
                               VectorType                   &global_vector,
-                              const FullMatrix<double>     &local_matrix) const;
+                              const FullMatrix<LocalType>  &local_matrix) const;
 
   /**
    * Enter a single value into a result vector, obeying constraints.
@@ -870,7 +824,7 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
                               const std::vector<size_type> &local_dof_indices,
                               MatrixType                   &global_matrix) const;
 
@@ -903,7 +857,7 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
                               const std::vector<size_type> &row_indices,
                               const std::vector<size_type> &col_indices,
                               MatrixType                   &global_matrix) const;
@@ -926,8 +880,8 @@ public:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>      &local_matrix,
-                              const Vector<double>          &local_vector,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                              const Vector<typename VectorType::value_type>     &local_vector,
                               const std::vector<size_type>  &local_dof_indices,
                               MatrixType                    &global_matrix,
                               VectorType                    &global_vector,
@@ -1041,13 +995,16 @@ public:
    */
 
   /**
-   * Re-distribute the elements of the vector in-place. The @p VectorType may
-   * be a Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
-   * Trilinos vector wrapper class, or any other type having the same
-   * interface.
+   * Given a vector, set all constrained degrees of freedom to values so that
+   * the constraints are satisfied. For example, if the current object stores
+   * the constraint $x_3=\frac 12 x_1 + \frac 12 x_2$, then this function will
+   * read the values of $x_1$ and $x_1$ from the given vector and set the
+   * element $x_3$ according to this constraints. Similarly, if the current
+   * object stores the constraint $x_42=208$, then this function will set the
+   * 42nd element of the given vector to 208.
    *
-   * @note If called with a TrilinosWrappers::MPI::Vector or
-   * PETScWrappers::MPI::Vector @p vec must not contain ghost elements.
+   * @note If this function is called with a parallel vector @p vec, then the
+   * vector must not contain ghost elements.
    */
   template <class VectorType>
   void distribute (VectorType &vec) const;
@@ -1135,6 +1092,19 @@ public:
    *
    * @ingroup Exceptions
    */
+  DeclException2 (ExcColumnNotStoredHere,
+                  size_type,
+                  size_type,
+                  << "The index set given to this constraint matrix indicates "
+                  << "constraints using degree of freedom " << arg2
+                  << " should not be stored by this object, but a constraint "
+                  << "for degree of freedom " << arg1 <<" uses it.");
+
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
   DeclException2 (ExcIncorrectConstraint,
                   int, int,
                   << "While distributing the constraint for DoF "
@@ -1211,7 +1181,7 @@ private:
    * entries takes place when calling the <tt>close()</tt> function.
    *
    * We could, instead of using a vector, use an associative array, like a map
-   * to store the lines. This, however, would mean a much more fractioned heap
+   * to store the lines. This, however, would mean a much more fragmented heap
    * since it allocates many small objects, and would additionally make usage
    * of this matrix much slower.
    */
@@ -1287,8 +1257,8 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                              const Vector<double>         &local_vector,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const Vector<typename VectorType::value_type>      &local_vector,
                               const std::vector<size_type> &local_dof_indices,
                               MatrixType                   &global_matrix,
                               VectorType                   &global_vector,
@@ -1301,8 +1271,8 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                              const Vector<double>         &local_vector,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const Vector<typename VectorType::value_type>      &local_vector,
                               const std::vector<size_type> &local_dof_indices,
                               MatrixType                   &global_matrix,
                               VectorType                   &global_vector,
@@ -1358,12 +1328,19 @@ private:
   /**
    * Internal helper function for distribute_local_to_global function.
    */
-  double
+  template <typename LocalType>
+  LocalType
   resolve_vector_entry (const size_type                       i,
                         const internals::GlobalRowsFromLocal &global_rows,
-                        const Vector<double>                 &local_vector,
+                        const Vector<LocalType>              &local_vector,
                         const std::vector<size_type>         &local_dof_indices,
-                        const FullMatrix<double>             &local_matrix) const;
+                        const FullMatrix<LocalType>          &local_matrix) const;
+
+  /**
+   * The assignment operator is not implemented for performance reasons. You
+   * can clear() or reinit() and merge() manually if needed.
+   */
+  ConstraintMatrix &operator= (const ConstraintMatrix &other);
 };
 
 
@@ -1446,6 +1423,8 @@ ConstraintMatrix::add_entry (const size_type line,
   // exists, since we don't want to enter it twice
   Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_size_type,
           ExcInternalError());
+  Assert (!local_lines.size() || local_lines.is_element(column),
+          ExcColumnNotStoredHere(line, column));
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
   for (ConstraintLine::Entries::const_iterator
@@ -1676,18 +1655,98 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 }
 
 
+template <typename MatrixType> class BlockMatrixBase;
+template <typename SparsityType> class BlockSparsityPatternBase;
+template <typename number>     class BlockSparseMatrixEZ;
+
+/**
+ * A class that can be used to determine whether a given type is a block
+ * matrix type or not. For example,
+ * @code
+ *   IsBlockMatrix<SparseMatrix<double> >::value
+ * @endcode
+ * has the value false, whereas
+ * @code
+ *   IsBlockMatrix<BlockSparseMatrix<double> >::value
+ * @endcode
+ * is true. This is sometimes useful in template contexts where we may want to
+ * do things differently depending on whether a template type denotes a
+ * regular or a block matrix type.
+ *
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
+ * @author Wolfgang Bangerth, 2009
+ */
+template <typename MatrixType>
+struct IsBlockMatrix
+{
+private:
+  struct yes_type
+  {
+    char c[1];
+  };
+  struct no_type
+  {
+    char c[2];
+  };
+
+  /**
+   * Overload returning true if the class is derived from BlockMatrixBase,
+   * which is what block matrices do (with the exception of
+   * BlockSparseMatrixEZ).
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
+
+  /**
+   * Overload returning true if the class is derived from
+   * BlockSparsityPatternBase, which is what block sparsity patterns do.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
+
+  /**
+   * Overload for BlockSparseMatrixEZ, which is the only block matrix not
+   * derived from BlockMatrixBase at the time of writing this class.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
+
+  /**
+   * Catch all for all other potential matrix types that are not block
+   * matrices.
+   */
+  static no_type check_for_block_matrix (...);
+
+public:
+  /**
+   * A statically computable value that indicates whether the template
+   * argument to this class is a block matrix (in fact whether the type is
+   * derived from BlockMatrixBase<T>).
+   */
+  static const bool value = (sizeof(check_for_block_matrix
+                                    ((MatrixType *)0))
+                             ==
+                             sizeof(yes_type));
+};
+
+
+// instantiation of the static member
+template <typename MatrixType>
+const bool IsBlockMatrix<MatrixType>::value;
+
 
 template <typename MatrixType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>     &local_matrix,
                             const std::vector<size_type> &local_dof_indices,
                             MatrixType                   &global_matrix) const
 {
   // create a dummy and hand on to the function actually implementing this
   // feature in the cm.templates.h file.
-  Vector<double> dummy(0);
+  Vector<typename MatrixType::value_type> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
                               global_matrix, dummy, false,
                               dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
@@ -1695,12 +1754,13 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
 
 
 
+
 template <typename MatrixType, typename VectorType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                            const Vector<double>         &local_vector,
+distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>     &local_matrix,
+                            const Vector<typename VectorType::value_type>         &local_vector,
                             const std::vector<size_type> &local_dof_indices,
                             MatrixType                   &global_matrix,
                             VectorType                   &global_vector,
@@ -1712,6 +1772,7 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
                               global_matrix, global_vector, use_inhomogeneities_for_rhs,
                               dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
+
 
 
 

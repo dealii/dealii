@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tridiagonal_matrix_h
-#define __deal2__tridiagonal_matrix_h
+#ifndef dealii__tridiagonal_matrix_h
+#define dealii__tridiagonal_matrix_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
@@ -57,7 +57,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * @name Constructors and initalization.
+   * @name Constructors and initialization.
    */
   /**
    * Constructor generating an empty matrix of dimension <tt>n</tt>.
@@ -241,10 +241,10 @@ public:
   /**
    * Output of the matrix in user-defined format.
    */
-  template <class OUT>
-  void print (OUT &s,
-              const unsigned int  width=5,
-              const unsigned int  precision=2) const;
+  template <class OutputStream>
+  void print(OutputStream &s,
+             const unsigned int  width=5,
+             const unsigned int  precision=2) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -369,10 +369,10 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 
 
 template <typename number>
-template <class OUT>
+template <class OutputStream>
 void
 TridiagonalMatrix<number>::print (
-  OUT &s,
+  OutputStream &s,
   const unsigned int width,
   const unsigned int) const
 {

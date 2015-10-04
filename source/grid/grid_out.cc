@@ -368,6 +368,7 @@ namespace GridOutFlags
     coloring(coloring),
     convert_level_number_to_height(convert_level_number_to_height),
     level_height_factor(0.3f),
+    cell_font_scaling(1.f),
     label_level_number(label_level_number),
     label_cell_index(label_cell_index),
     label_material_id(label_material_id),
@@ -845,7 +846,7 @@ void GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
           // Little trick to get -1
           // for the interior
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-            out << ' ' << (int)(signed char)cell->face(f)->boundary_indicator();
+            out << ' ' << (int)(signed char)cell->face(f)->boundary_id();
           out << '\n';
         }
       out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
@@ -1047,11 +1048,9 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  unsigned int cell_index=1;
-  for (cell=tria.begin_active();
-       cell!=endc; ++cell, ++cell_index)
+  for (cell=tria.begin_active(); cell!=endc; ++cell)
     {
-      out << cell_index << ' ' << elm_type << ' '
+      out << cell->active_cell_index()+1 << ' ' << elm_type << ' '
           << static_cast<unsigned int>(cell->material_id()) << ' '
           << cell->subdomain_id() << ' '
           << GeometryInfo<dim>::vertices_per_cell << ' ';
@@ -1066,10 +1065,11 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
   // write faces and lines with
   // non-zero boundary indicator
+  unsigned int next_index = tria.n_active_cells()+1;
   if (msh_flags.write_faces)
-    write_msh_faces (tria, cell_index, out);
+    write_msh_faces (tria, next_index, out);
   if (msh_flags.write_lines)
-    write_msh_lines (tria, cell_index, out);
+    write_msh_lines (tria, next_index, out);
 
   out << "$ENDELM" << std::endl;
 
@@ -1146,11 +1146,9 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  unsigned int cell_index=1;
-  for (cell=tria.begin_active();
-       cell!=endc; ++cell, ++cell_index)
+  for (cell=tria.begin_active();  cell!=endc; ++cell)
     {
-      out << cell_index << ' '
+      out << cell->active_cell_index()+1 << ' '
           << static_cast<unsigned int>(cell->material_id())
           << ' ';
       switch (dim)
@@ -1191,10 +1189,11 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
   // write faces and lines with
   // non-zero boundary indicator
+  unsigned int next_index = tria.n_active_cells()+1;
   if (ucd_flags.write_faces)
-    write_ucd_faces (tria, cell_index, out);
+    write_ucd_faces (tria, next_index, out);
   if (ucd_flags.write_lines)
-    write_ucd_lines (tria, cell_index, out);
+    write_ucd_lines (tria, next_index, out);
 
   // make sure everything now gets to
   // disk
@@ -1355,7 +1354,7 @@ void GridOut::write_xfig (
           {
             Triangulation<dim, spacedim>::face_iterator
             face = cell->face(face_reorder[f]);
-            const types::boundary_id bi = face->boundary_indicator();
+            const types::boundary_id bi = face->boundary_id();
             if (bi != numbers::internal_face_boundary_id)
               {
                 // Code for polyline
@@ -1407,7 +1406,8 @@ void GridOut::write_xfig (
 
 
 template <int dim, int spacedim>
-void GridOut::write_svg(const Triangulation<dim,spacedim> &tria, std::ostream &out) const
+void GridOut::write_svg (const Triangulation<dim,spacedim> &,
+                         std::ostream &/*out*/) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1425,11 +1425,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   unsigned int min_level, max_level;
 
-  // Svg files require an underlying drawing grid.
-  // We set the number of height elements of this
-  // grid to 4000 and adapt the number of width
-  // elements with respect to the bounding box of
-  // the given triangulation.
+  // Svg files require an underlying drawing grid. The size of this
+  // grid is provided in the parameters height and width. Each of them
+  // may be zero, such that it is computed from the other. Obviously,
+  // both of them zero does not produce reasonable output.
   unsigned int height = svg_flags.height;
   unsigned int width = svg_flags.width;
   Assert (height != 0 || width != 0, ExcMessage("You have to set at least one of width and height"));
@@ -1715,7 +1714,11 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int additional_width = 0;
   // font size for date, time, legend, and colorbar
   unsigned int font_size = static_cast<unsigned int>(.5 + (height/100.) * 1.75);
-  cell_label_font_size = static_cast<unsigned int>((int)(.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension)));
+  cell_label_font_size = static_cast<unsigned int>(.5 +
+                                                   (height * .15
+                                                    * svg_flags.cell_font_scaling
+                                                    * min_level_min_vertex_distance
+                                                    / std::min(x_dimension, y_dimension)));
 
   if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id ))
     {
@@ -1857,7 +1860,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       else x_offset = static_cast<unsigned int>(.5 + height * .025);
 
       out << " <text x=\"" << x_offset << "\" y=\"" << static_cast<unsigned int>(.5 + height * .0525) << '\"'
-          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:" << static_cast<unsigned int>(.5 + height * .045) << "\">"
+          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:" << static_cast<unsigned int>(.5 + height * .045) << "px\">"
           << "deal.II" << "</text>" << '\n';
 
       // out << " <text x=\"" << x_offset + static_cast<unsigned int>(.5 + height * .045 * 4.75) << "\" y=\"" << static_cast<unsigned int>(.5 + height * .0525) << '\"'
@@ -1992,11 +1995,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
               projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
 
+              const unsigned int font_size_this_cell = static_cast<unsigned int>(.5 + cell_label_font_size * pow(.5, (float)cell->level() - 4. + 3.5 * distance_factor));
+
               out << "  <text"
                   << " x=\"" << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
-                  << "\" y=\"" << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
-                  << "\" style=\"font-size:" << static_cast<unsigned int>(.5 + cell_label_font_size * pow(.5, (float)cell->level() - 4. + 3.5 * distance_factor))
-                  << "\">";
+                  << "\" y=\"" << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent) + 0.5 * font_size_this_cell)
+                  << "\" style=\"font-size:" << font_size_this_cell
+                  << "px\">";
 
               if (svg_flags.label_level_number)
                 {
@@ -2104,7 +2109,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       out << " <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 1.25)
           << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size)
           << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size
-          << "\">" << "cell label"
+          << "px\">" << "cell label"
           << "</text>" << '\n';
 
       if (svg_flags.label_level_number)
@@ -2112,7 +2117,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
               << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size)
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">" << "level_number";
+              << "px\">" << "level_number";
 
           if (svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
             out << ',';
@@ -2125,7 +2130,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
               << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">"
+              << "px\">"
               << "cell_index";
 
           if (svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
@@ -2139,7 +2144,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
               << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">"
+              << "px\">"
               << "material_id";
 
           if (svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
@@ -2153,7 +2158,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
               << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">"
+              << "px\">"
               << "subdomain_id";
 
           if (svg_flags.label_level_subdomain_id)
@@ -2167,7 +2172,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
               << "\" y=\""       << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">"
+              << "px\">"
               << "level_subdomain_id"
               << "</text>" << '\n';
         }
@@ -2178,7 +2183,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
     {
       out << "  <text x=\"" << width + additional_width
           << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + 10.75 * font_size)
-          << "\" style=\"text-anchor:start; font-size:" << font_size << "\">"
+          << "\" style=\"text-anchor:start; font-size:" << font_size << "px\">"
           << "azimuth: " << svg_flags.azimuth_angle << "°, polar: " << svg_flags.polar_angle << "°</text>" << '\n';
     }
 
@@ -2190,7 +2195,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       out << " <text x=\"" << width + additional_width
           << "\" y=\""     << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29.) - (font_size/1.25))
-          << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size << "\">";
+          << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size << "px\">";
 
       switch (svg_flags.coloring)
         {
@@ -2246,7 +2251,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
           out << "  <text x=\"" << width + additional_width + 1.5 * element_width
               << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (n-index-1 + .5) * element_height + static_cast<unsigned int>(.5 + font_size * .35) << "\""
-              << " style=\"text-anchor:start; font-size:" << static_cast<unsigned int>(.5 + font_size);
+              << " style=\"text-anchor:start; font-size:" << static_cast<unsigned int>(.5 + font_size) << "px";
 
           if (index == 0 || index == n-1) out << "; font-weight:bold";
 
@@ -2375,9 +2380,7 @@ void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
   endc=tria.end ();
 
   // No global indices in deal.II, so we make one up here.
-  unsigned int cell_global_index = 0;
-
-  for (; cell!=endc; ++cell, ++cell_global_index)
+  for (; cell!=endc; ++cell)
     {
       for (unsigned int i=0; i<dim; ++i)
         {
@@ -2386,7 +2389,7 @@ void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
           // else
           //   out << "\nfalse";
 
-          out << "\nlist " << axes[i] << cell_global_index << " ";
+          out << "\nlist " << axes[i] << cell->active_cell_index() << " ";
           for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
             out << cell->vertex(j)[i] << " ";
         }
@@ -2425,32 +2428,45 @@ namespace
    * A function that is able to convert each cell of a triangulation into
    * a patch that can then be output by the functions in DataOutBase.
    * This is made particularly simple because the patch only needs to
-   * contain geometry info -- we attach no data at all
+   * contain geometry info and additional properties of cells
    */
-  template <int dim, int spacedim>
-  std::vector<DataOutBase::Patch<dim,spacedim> >
-  triangulation_to_patches (const Triangulation<dim,spacedim> &triangulation)
+  template <int dim, int spacedim, typename ITERATOR, typename END>
+  void
+  generate_triangulation_patches (std::vector<DataOutBase::Patch<dim,spacedim> > &patches,
+                                  ITERATOR cell, END end)
   {
-    std::vector<DataOutBase::Patch<dim,spacedim> > patches;
-    patches.reserve (triangulation.n_active_cells());
-
     // convert each of the active cells into a patch
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell)
+    for (; cell != end; ++cell)
       {
         DataOutBase::Patch<dim,spacedim> patch;
         patch.n_subdivisions = 1;
+        patch.data.reinit (5,GeometryInfo<dim>::vertices_per_cell);
 
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-          patch.vertices[v] = cell->vertex(v);
-
-        // no data
-        patch.data.reinit (0,0);
-
+          {
+            patch.vertices[v] = cell->vertex(v);
+            patch.data(0,v) = cell->level();
+            patch.data(1,v) = static_cast<int>(cell->manifold_id());
+            patch.data(2,v) = cell->material_id();
+            if (!cell->has_children())
+              patch.data(3,v) = static_cast<int>(cell->subdomain_id());
+            else
+              patch.data(3,v) = -1;
+            patch.data(4,v) = static_cast<int>(cell->level_subdomain_id());
+          }
         patches.push_back (patch);
       }
+  }
 
-    return patches;
+  std::vector<std::string> triangulation_patch_data_names ()
+  {
+    std::vector<std::string> v(5);
+    v[0] = "level";
+    v[1] = "manifold";
+    v[2] = "material";
+    v[3] = "subdomain";
+    v[4] = "level_subdomain";
+    return v;
   }
 }
 
@@ -2466,8 +2482,11 @@ void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
   // and then have them output. since there is no data attached to
   // the geometry, we also do not have to provide any names, identifying
   // information, etc.
-  DataOutBase::write_vtk (triangulation_to_patches(tria),
-                          std::vector<std::string>(),
+  std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+  patches.reserve (tria.n_active_cells());
+  generate_triangulation_patches(patches, tria.begin_active(), tria.end());
+  DataOutBase::write_vtk (patches,
+                          triangulation_patch_data_names(),
                           std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
                           vtk_flags,
                           out);
@@ -2487,8 +2506,11 @@ void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
   // and then have them output. since there is no data attached to
   // the geometry, we also do not have to provide any names, identifying
   // information, etc.
-  DataOutBase::write_vtu (triangulation_to_patches(tria),
-                          std::vector<std::string>(),
+  std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+  patches.reserve (tria.n_active_cells());
+  generate_triangulation_patches(patches, tria.begin_active(), tria.end());
+  DataOutBase::write_vtu (patches,
+                          triangulation_patch_data_names(),
                           std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
                           vtu_flags,
                           out);
@@ -2550,7 +2572,7 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria)
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if ((face->at_boundary()) &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       n_faces++;
 
   return n_faces;
@@ -2579,7 +2601,7 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
@@ -2672,7 +2694,7 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if (face->at_boundary() &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       {
         out << index << ' ';
         switch (dim)
@@ -2686,9 +2708,9 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
           default:
             Assert (false, ExcNotImplemented());
           }
-        out << static_cast<unsigned int>(face->boundary_indicator())
+        out << static_cast<unsigned int>(face->boundary_id())
             << ' '
-            << static_cast<unsigned int>(face->boundary_indicator())
+            << static_cast<unsigned int>(face->boundary_id())
             << ' ' << GeometryInfo<dim>::vertices_per_face;
         // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
@@ -2724,14 +2746,14 @@ void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
           out << index << " 1 ";
-          out << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+          out << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << ' '
-              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << " 2 ";
           // note: vertex numbers are 1-base
           for (unsigned int vertex=0; vertex<2; ++vertex)
@@ -2826,10 +2848,10 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if (face->at_boundary() &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       {
         out << index << "  "
-            << static_cast<unsigned int>(face->boundary_indicator())
+            << static_cast<unsigned int>(face->boundary_id())
             << "  ";
         switch (dim)
           {
@@ -2876,12 +2898,12 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
           out << index << "  "
-              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << "  line    ";
           // note: vertex numbers in ucd format are 1-base
           for (unsigned int vertex=0; vertex<2; ++vertex)
@@ -2963,7 +2985,7 @@ namespace internal
               << cell->vertex(1)
               << ' ' << cell->level()
               << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
-              << '\n';
+              << "\n\n";
         }
 
       // make sure everything now gets to
@@ -3362,6 +3384,15 @@ namespace internal
     void write_eps (const dealii::Triangulation<1,2> &,
                     std::ostream &,
                     const Mapping<1,2> *,
+                    const GridOutFlags::Eps<2> &,
+                    const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+    void write_eps (const dealii::Triangulation<1,3> &,
+                    std::ostream &,
+                    const Mapping<1,3> *,
                     const GridOutFlags::Eps<2> &,
                     const GridOutFlags::Eps<3> &)
     {

@@ -79,7 +79,7 @@ FILTER_SOURCE_FILES    = YES
 # and that expands to specific text. For some more transformations, see
 # the scripts/filter perl script that is run over the header files before
 # doxygen sees it and that can expand more complex expressions.
-ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlagsEssay for more information."
+ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlags for more information."
 
 ALIASES += dealiiOperationIsMultithreaded="@note If deal.II is configured with threads, this operation will run multi-threaded by splitting the work into smaller chunks (assuming there is enough work to make this worthwhile)."
 
@@ -116,6 +116,9 @@ MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css
+LAYOUT_FILE            = @CMAKE_CURRENT_SOURCE_DIR@/DoxygenLayout.xml
+
+
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
@@ -153,19 +156,33 @@ INCLUDE_FILE_PATTERNS  =
 # set a few variables that help us generate documentation for
 # things like the PETSc and Trilinos wrappers, even if they were
 # not configured
+#
+# in the case of DEAL_II_NAMESPACE_OPEN/CLOSE, just expand them
+# to nothing so that they don't show up in the documentation
+# at all.
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
+                         DEAL_II_USE_MT_POSIX=1 \
+                         DEAL_II_WITH_ARPACK=1 \
+                         DEAL_II_WITH_BOOST=1 \
+                         DEAL_II_WITH_CXX11=1 \
+                         DEAL_II_WITH_CXX14=1 \
+                         DEAL_II_WITH_HDF5=1 \
+                         DEAL_II_WITH_LAPACK=1 \
+                         DEAL_II_WITH_METIS=1 \
+                         DEAL_II_WITH_MPI=1 \
+                         DEAL_II_WITH_MUPARSER=1 \
+                         DEAL_II_WITH_NETCDF=1 \
+                         DEAL_II_WITH_OPENCASCADE=1 \
+                         DEAL_II_WITH_P4EST=1 \
                          DEAL_II_WITH_PETSC=1 \
                          DEAL_II_WITH_SLEPC=1 \
-                         DEAL_II_WITH_TRILINOS=1 \
-                         DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_THREADS=1 \
-                         DEAL_II_USE_MT_POSIX=1 \
-			 DEAL_II_WITH_ARPACK=1 \
-			 DEAL_II_WITH_METIS=1 \
-			 DEAL_II_WITH_MUPARSER=1 \
-			 DEAL_II_WITH_P4EST=1 \
-			 DEAL_II_WITH_MPI=1
+                         DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_WITH_UMFPACK=1 \
+                         DEAL_II_WITH_ZLIB=1 \
+                         DEAL_II_NAMESPACE_OPEN= \
+                         DEAL_II_NAMESPACE_CLOSE=
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclException0 \

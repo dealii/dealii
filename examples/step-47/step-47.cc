@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2014 by the deal.II authors
+ * Copyright (C) 2011 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -24,7 +24,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -32,7 +32,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
@@ -259,12 +259,12 @@ namespace Step47
     constraints.close();
 
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
-    constraints.condense (c_sparsity);
+    constraints.condense (dsp);
 
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit (sparsity_pattern);
   }
@@ -455,8 +455,8 @@ namespace Step47
   template <int dim>
   std::pair<unsigned int, Quadrature<dim> >
   LaplaceProblem<dim>::compute_quadrature (const Quadrature<dim> &plain_quadrature,
-                                           const typename hp::DoFHandler<dim>::active_cell_iterator &cell,
-                                           const std::vector<double> &level_set_values                    )
+                                           const typename hp::DoFHandler<dim>::active_cell_iterator &/*cell*/,
+                                           const std::vector<double> &level_set_values)
   {
 
     unsigned int type = 0;
@@ -476,9 +476,14 @@ namespace Step47
     // ++++, ---- type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+ type
     // 3: +--+, ++--, +-+-, -++-, --++, -+-+
 
-    if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
-    else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
-    else type = 3;
+    if ( sign_ls[0]==sign_ls[1] &&
+         sign_ls[0]==sign_ls[2] &&
+         sign_ls[0]==sign_ls[3] )
+      type = 1;
+    else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 )
+      type = 2;
+    else
+      type = 3;
 
     unsigned int Pos = 100;
 
@@ -1061,8 +1066,9 @@ namespace Step47
             GridGenerator::hyper_ball (triangulation);
             //GridGenerator::hyper_cube (triangulation, -1, 1);
 
-            static const HyperBallBoundary<dim> boundary;
-            triangulation.set_boundary (0, boundary);
+            static const SphericalManifold<dim> boundary;
+            triangulation.set_all_manifold_ids_on_boundary(0);
+            triangulation.set_manifold (0, boundary);
 
             triangulation.refine_global (2);
           }

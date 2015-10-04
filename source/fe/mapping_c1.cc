@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,6 +39,7 @@ MappingC1<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
                                        std::vector<Point<1> > &) const
 {
   const unsigned int dim = 1;
+  (void)dim;
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
@@ -64,7 +65,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
           // first get the normal vectors at the two vertices of this line
           // from the boundary description
           const Boundary<dim> &boundary
-            = line->get_triangulation().get_boundary(line->boundary_indicator());
+            = line->get_triangulation().get_boundary(line->boundary_id());
 
           Boundary<dim>::FaceVertexNormals face_vertex_normals;
           boundary.get_normals_at_vertices (line, face_vertex_normals);
@@ -160,6 +161,7 @@ MappingC1<1>::add_quad_support_points (const Triangulation<1>::cell_iterator &,
                                        std::vector<Point<1> > &) const
 {
   const unsigned int dim = 1;
+  (void)dim;
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
@@ -171,6 +173,7 @@ MappingC1<2>::add_quad_support_points (const Triangulation<2>::cell_iterator &,
                                        std::vector<Point<2> > &) const
 {
   const unsigned int dim = 2;
+  (void)dim;
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
@@ -190,7 +193,7 @@ template<int dim, int spacedim>
 Mapping<dim, spacedim> *
 MappingC1<dim,spacedim>::clone () const
 {
-  return new MappingC1<dim,spacedim>(*this);
+  return new MappingC1<dim,spacedim>();
 }
 
 

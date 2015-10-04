@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__filtered_iterator_h
-#define __deal2__filtered_iterator_h
+#ifndef dealii__filtered_iterator_h
+#define dealii__filtered_iterator_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/grid/tria_iterator_base.h>
+
+#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -135,7 +137,7 @@ namespace IteratorFilters
    * Filter for iterators that evaluates to true if either the iterator is
    * past the end or the subdomain id of the object pointed to is equal to a
    * value given to the constructor, assuming that the iterator allows
-   * querying for a subdomain id).
+   * querying for a subdomain id.
    *
    * @ingroup Iterators
    */
@@ -189,8 +191,8 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if th level subdomain id of a
-   * cell is equal to the current processor id.
+   * Filter for iterators that evaluates to true if the level subdomain id of
+   * a cell is equal to the current processor id.
    *
    * @ingroup Iterators
    */
@@ -204,6 +206,99 @@ namespace IteratorFilters
     template <class Iterator>
     bool operator () (const Iterator &i) const;
   };
+
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for a material id.
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, 2015
+   *
+   * @ingroup Iterators
+   */
+  class MaterialIdEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the material id which iterators shall have to be
+     * evaluated to true and state if the iterator must be locally owned.
+     */
+    MaterialIdEqualTo (const types::material_id material_id,
+                       const bool only_locally_owned = false);
+
+    /**
+     * Constructor. Store a collection of material ids which iterators
+     * shall have to be evaluated to true and state if the iterator must be
+     * locally owned.
+     */
+    MaterialIdEqualTo (const std::set<types::material_id> material_ids,
+                       const bool only_locally_owned = false);
+
+    /**
+     * Evaluation operator. Returns true if the material id of the object
+     * pointed to is equal within the stored set of value allowable values
+     * and, if required, if the cell is locally owned.
+     */
+    template <class Iterator>
+    bool operator () (const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<types::material_id> material_ids;
+    /**
+     * Flag stating whether only locally owned cells must return true.
+     */
+    const bool only_locally_owned;
+  };
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for an active FE index.
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, 2015
+   *
+   * @ingroup Iterators
+   */
+  class ActiveFEIndexEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the active FE index which iterators shall have to be
+     * evaluated to true and state if the iterator must be locally owned.
+     */
+    ActiveFEIndexEqualTo (const unsigned int active_fe_index,
+                          const bool only_locally_owned = false);
+
+    /**
+     * Constructor. Store a collection of active FE indices which iterators
+     * shall have to be evaluated to true and state if the iterator must be
+     * locally owned.
+     */
+    ActiveFEIndexEqualTo (const std::set<unsigned int> active_fe_indices,
+                          const bool only_locally_owned = false);
+
+    /**
+     * Evaluation operator. Returns true if the active FE index of the object
+     * pointed to is equal within the stored set of value allowable values
+     * and, if required, if the cell is locally owned.
+     */
+    template <class Iterator>
+    bool operator () (const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<unsigned int> active_fe_indices;
+    /**
+     * Flag stating whether only locally owned cells must return true.
+     */
+    const bool only_locally_owned;
+  };
 }
 
 
@@ -216,7 +311,7 @@ namespace IteratorFilters
  * satisfies the predicate if operators ++ or -- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
- * objects without the need to explicitely write down the condition they have
+ * objects without the need to explicitly write down the condition they have
  * to satisfy in each loop iteration. This in particular is helpful if
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
@@ -1043,6 +1138,83 @@ namespace IteratorFilters
   {
     return (i->is_locally_owned_on_level());
   }
+
+
+
+// ---------------- IteratorFilters::MaterialIdEqualTo ---------
+  inline
+  MaterialIdEqualTo::MaterialIdEqualTo (const types::material_id material_id,
+                                        const bool only_locally_owned)
+    :
+    // Note: matrial_ids is a const member and has to be populated with a
+    // constructor. Unfortunately, C++98/03 does not allow the use of an
+    // initializer list. Therefore, treat material_id as an array of one
+    // element.
+    // This is well defined according to [expr.add].4 (ISO 14882).
+    material_ids (&material_id, &material_id+1),
+    only_locally_owned (only_locally_owned)
+  {}
+
+
+
+  inline
+  MaterialIdEqualTo::MaterialIdEqualTo (const std::set<types::material_id> material_ids,
+                                        const bool only_locally_owned)
+    :
+    material_ids (material_ids),
+    only_locally_owned (only_locally_owned)
+  {}
+
+
+
+  template <class Iterator>
+  inline
+  bool
+  MaterialIdEqualTo::operator () (const Iterator &i) const
+  {
+    return only_locally_owned == true ?
+           (material_ids.find(i->material_id()) != material_ids.end() && i->is_locally_owned()):
+           material_ids.find(i->material_id()) != material_ids.end();
+  }
+
+
+
+// ---------------- IteratorFilters::ActiveFEIndexEqualTo ---------
+  inline
+  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const unsigned int active_fe_index,
+                                              const bool only_locally_owned)
+    :
+    // Note: active_fe_indices is a const member and has to be populated
+    // with a constructor. Unfortunately, C++98/03 does not allow the use
+    // of an initializer list. Therefore, treat active_fe_index as an array
+    // of one element.
+    // This is well defined according to [expr.add].4 (ISO 14882).
+    active_fe_indices (&active_fe_index, &active_fe_index+1),
+    only_locally_owned (only_locally_owned)
+  {}
+
+
+
+  inline
+  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const std::set<unsigned int> active_fe_indices,
+                                              const bool only_locally_owned)
+    :
+    active_fe_indices (active_fe_indices),
+    only_locally_owned (only_locally_owned)
+  {}
+
+
+
+  template <class Iterator>
+  inline
+  bool
+  ActiveFEIndexEqualTo::operator () (const Iterator &i) const
+  {
+    return only_locally_owned == true ?
+           (active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end() && i->is_locally_owned()):
+           active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end();
+  }
+
 }
 
 

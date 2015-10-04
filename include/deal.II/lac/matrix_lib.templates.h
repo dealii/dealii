@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_lib_templates_h
-#define __deal2__matrix_lib_templates_h
+#ifndef dealii__matrix_lib_templates_h
+#define dealii__matrix_lib_templates_h
 
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/vector.h>

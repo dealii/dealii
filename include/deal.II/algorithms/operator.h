@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__operator_h
-#define __deal2__operator_h
+#ifndef dealii__operator_h
+#define dealii__operator_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/algorithms/any_data.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/base/event.h>
 
 #include <fstream>
@@ -131,36 +130,10 @@ namespace Algorithms
   {
   public:
     Operator();
-
-    /**
-     * Implementation of the function in the base class in order to do
-     * compatibility conversions between the old and the new interface.
-     */
-    virtual void operator() (AnyData &out, const AnyData &in);
-
-    /**
-     * @deprecated It is in particular this function which should not be used
-     * anymore.
-     *
-     * The actual operation, which is implemented in a derived class.
-     */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
-
-    /**
-     * Set this true to avoid compatibility warnings.
-     */
-    bool silent_compatibility;
-
-  private:
-    /**
-     * While we are providing compatibility functions to the old interface,
-     * this variable will ensure there is no endless loop.
-     */
-    bool compatibility_flag;
   };
 
   /**
-   * An unary operator base class, intended to output the vectors in NamedData
+   * An unary operator base class, intended to output the vectors in AnyData
    * in each step of an iteration.
    *
    * @author Guido Kanschat, 2010
@@ -184,17 +157,12 @@ namespace Algorithms
     /**
      * Set the current step.
      */
-    OutputOperator<VECTOR> &operator<< (unsigned int step);
-
+    void set_step(const unsigned int step);
     /**
      * Output all the vectors in AnyData.
      */
     virtual OutputOperator<VECTOR> &operator<< (const AnyData &vectors);
 
-    /**
-     * @deprecated Output all the vectors in NamedData.
-     */
-    OutputOperator<VECTOR> &operator<< (const NamedData<VECTOR *> &vectors);
   protected:
     unsigned int step;
   private:
@@ -202,14 +170,28 @@ namespace Algorithms
   };
 
   template <class VECTOR>
-  OutputOperator<VECTOR> &
-  OutputOperator<VECTOR>::operator<< (unsigned int s)
+  inline
+  void
+  OutputOperator<VECTOR>::set_step (const unsigned int s)
   {
     step = s;
-    return *this;
+  }
+
+
+  /**
+   * Set the step number in OutputOperator by shifting an integer value.
+   *
+   * @relates OutputOperator
+   */
+  template <class VECTOR>
+  inline
+  OutputOperator<VECTOR> &
+  operator<< (OutputOperator<VECTOR> &out, unsigned int step)
+  {
+    out.set_step(step);
+    return out;
   }
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

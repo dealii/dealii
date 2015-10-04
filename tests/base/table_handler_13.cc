@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,8 +51,19 @@ int main ()
   // now again fill row 4 partially
   table.add_value(keys[0], 1);
 
+  // now clear the partial row above
+  table.clear_current_row();
+
   // produce output. hope that row 4 is
   // completely padded
   table.write_text(deallog.get_file_stream(),
                    TableHandler::org_mode_table);
+
+  // now again fill row 4 partially
+  table.add_value(keys[0], 1);
+
+  // produce output. hope that we get 3 rows
+  table.write_text(deallog.get_file_stream(),
+                   TableHandler::org_mode_table);
+
 }

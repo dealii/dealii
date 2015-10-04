@@ -29,7 +29,7 @@
 typedef int size_type;
 
 template <typename Number>
-  struct Vectorization_add_v
+struct Vectorization_add_v
 {
   Number *val;
   Number *v_val;
@@ -37,8 +37,8 @@ template <typename Number>
   void operator() (const tbb::blocked_range<size_type> &range) const
   {
     if (dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
-      {	
-      DEAL_II_OPENMP_SIMD_PRAGMA
+      {
+        DEAL_II_OPENMP_SIMD_PRAGMA
         for (size_type i=range.begin(); i<range.end(); ++i)
           val[i] += v_val[i];
       }
@@ -47,7 +47,7 @@ template <typename Number>
         for (size_type i=range.begin(); i<range.end(); ++i)
           val[i] += v_val[i];
       }
-    
+
   }
 };
 
@@ -65,15 +65,15 @@ void check()
   Vectorization_add_v<long double> vector_add;
   vector_add.val = &d1[0];
   vector_add.v_val = &d2[0];
-  
+
   if (1)
     {
       //fails:
       tbb::parallel_for (tbb::blocked_range<size_type> (0,
-							N,
-							2),
-			 vector_add,
-			 tbb::auto_partitioner());
+                                                        N,
+                                                        2),
+                         vector_add,
+                         tbb::auto_partitioner());
     }
   else
     {

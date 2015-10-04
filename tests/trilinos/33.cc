@@ -39,8 +39,8 @@ void test (TrilinosWrappers::Vector &v)
   // then check the norm
   const double eps=typeid(TrilinosScalar)==typeid(double) ? 1e-14 : 1e-5;
   const double true_value=std::pow(sum, static_cast<TrilinosScalar> (1./3.));
-  Assert (std::fabs(v.lp_norm(3) - true_value) < eps*true_value,
-          ExcInternalError());
+  AssertThrow (std::fabs(v.lp_norm(3) - true_value) < eps*true_value,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -54,7 +54,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

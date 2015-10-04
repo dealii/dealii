@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,6 +21,7 @@ SET(_src
   fe_abf.cc
   fe_bdm.cc
   fe.cc
+  fe_bernstein.cc
   fe_data.cc
   fe_dgp.cc
   fe_dgp_monomial.cc
@@ -34,9 +35,11 @@ SET(_src
   fe_poly_tensor.cc
   fe_q_base.cc
   fe_q.cc
+  fe_q_bubbles.cc
   fe_q_dg0.cc
   fe_q_hierarchical.cc
   fe_q_iso_q1.cc
+  fe_rannacher_turek.cc
   fe_raviart_thomas.cc
   fe_raviart_thomas_nodal.cc
   fe_system.cc
@@ -48,6 +51,8 @@ SET(_src
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
+  mapping_fe_field.cc
+  mapping_q_generic.cc
   mapping_q1.cc
   mapping_q1_eulerian.cc
   mapping_q.cc
@@ -57,6 +62,7 @@ SET(_src
 SET(_inst
   fe_abf.inst.in
   fe_bdm.inst.in
+  fe_bernstein.inst.in
   fe_dgp.inst.in
   fe_dgp_monomial.inst.in
   fe_dgp_nonparametric.inst.in
@@ -69,10 +75,12 @@ SET(_inst
   fe_poly.inst.in
   fe_poly_tensor.inst.in
   fe_q_base.inst.in
+  fe_q_bubbles.inst.in
   fe_q_dg0.inst.in
   fe_q_hierarchical.inst.in
   fe_q.inst.in
   fe_q_iso_q1.inst.in
+  fe_rannacher_turek.inst.in
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
   fe_system.inst.in
@@ -87,6 +95,8 @@ SET(_inst
   mapping_c1.inst.in
   mapping_cartesian.inst.in
   mapping.inst.in
+  mapping_fe_field.inst.in
+  mapping_q_generic.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
   mapping_q_eulerian.inst.in

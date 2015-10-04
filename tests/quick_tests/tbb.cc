@@ -42,18 +42,18 @@ struct scratch_data
 
 struct copy_data
 {
-    int value;
+  int value;
 };
 
 
 void assemble(const std::vector<int>::iterator &it,
-	      scratch_data &scratch,
-	      copy_data &data)
+              scratch_data &scratch,
+              copy_data &data)
 {
   data.value = (*it);
 }
 
-void copy(int & value, const copy_data &data)
+void copy(int &value, const copy_data &data)
 {
   value += data.value;
 }
@@ -62,16 +62,16 @@ void test2()
 {
   const int maxi = 10000;
   std::vector<int> v(maxi);
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     v[i] = i+1;
   int result = 0;
   WorkStream::run(v.begin(),
-		  v.end(),
-		  &assemble,
-		  std_cxx11::bind(&copy,
-				  std_cxx11::ref(result),
-				  std_cxx11::_1),
-		  scratch_data(), copy_data());
+                  v.end(),
+                  &assemble,
+                  std_cxx11::bind(&copy,
+                                  std_cxx11::ref(result),
+                                  std_cxx11::_1),
+                  scratch_data(), copy_data());
   std::cout << "result: " << result << std::endl;
 
   if (result != maxi*(maxi+1)/2)

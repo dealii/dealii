@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,7 +112,7 @@ void make_mesh (Triangulation<dim> &tria)
       for (unsigned int d=0; d<dim; ++d)
         if (cell->center()(d) > 0)
           material |= (1<<d);
-      Assert (material < (1<<dim), ExcInternalError());
+      AssertThrow (material < (1<<dim), ExcInternalError());
 
       cell->set_material_id (material);
     }
@@ -187,8 +187,8 @@ check ()
         {
           deallog << i << ' ' << this_error(i) << std::endl;
 
-          Assert ((this_error(i)==0) || (error2(i)==0),
-                  ExcInternalError());
+          AssertThrow ((this_error(i)==0) || (error2(i)==0),
+                       ExcInternalError());
           if (this_error(i) != 0)
             error2(i) = this_error(i);
         }
@@ -196,7 +196,7 @@ check ()
 
   // now compare the results of the two
   // computations
-  Assert (error1 == error2, ExcInternalError());
+  AssertThrow (error1 == error2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

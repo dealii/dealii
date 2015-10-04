@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__pointer_matrix_h
-#define __deal2__pointer_matrix_h
+#ifndef dealii__pointer_matrix_h
+#define dealii__pointer_matrix_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
@@ -32,9 +32,8 @@ template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 template <typename number> class SparseMatrixEZ;
 template <typename number> class BlockSparseMatrixEZ;
-template <typename number> class BlockMatrixArray;
 template <typename number> class TridiagonalMatrix;
-
+template <typename number, typename BlockVectorType> class BlockMatrixArray;
 
 /*! @addtogroup Matrix2
  *@{
@@ -395,7 +394,7 @@ public:
    * Transposed matrix-vector product, actually the multiplication of the
    * vector representing this matrix with <tt>src(0)</tt>.
    *
-   * The dimension of <tt>drc</tt> is 1, while that of <tt>dst</tt> is the
+   * The dimension of <tt>src</tt> is 1, while that of <tt>dst</tt> is the
    * size of the vector representing this matrix.
    */
   virtual void Tvmult (Vector<number> &dst,
@@ -440,7 +439,7 @@ private:
  * should overload the function in order to save memory and time.
  *
  * The result is a PointerMatrixBase* pointing to <tt>matrix</tt>. The
- * <TT>VECTOR</tt> argument is a dummy just used to determine the template
+ * <tt>VECTOR</tt> argument is a dummy just used to determine the template
  * arguments.
  *
  * @relates PointerMatrixBase @relates PointerMatrixAux
@@ -549,11 +548,11 @@ new_pointer_matrix_base(const BlockSparseMatrixEZ<numberm> &matrix, const VECTOR
  *
  * @relates PointerMatrixBase @relates PointerMatrix
  */
-template <typename numberv, typename numberm>
-PointerMatrixBase<BlockVector<numberv> > *
-new_pointer_matrix_base(const BlockMatrixArray<numberm> &matrix, const BlockVector<numberv> &, const char *name = "PointerMatrix")
+template <typename numberv, typename numberm, typename BLOCK_VECTOR>
+PointerMatrixBase<BLOCK_VECTOR> *
+new_pointer_matrix_base(const BlockMatrixArray<numberm,BLOCK_VECTOR> &matrix, const BLOCK_VECTOR &, const char *name = "PointerMatrix")
 {
-  return new PointerMatrix<BlockMatrixArray<numberm>, BlockVector<numberv> >(&matrix, name);
+  return new PointerMatrix<BlockMatrixArray<numberm,BLOCK_VECTOR>, BlockVector<numberv> >(&matrix, name);
 }
 
 

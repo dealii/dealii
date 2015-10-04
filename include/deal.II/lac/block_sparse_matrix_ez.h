@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_ez_h
-#define __deal2__block_sparse_matrix_ez_h
+#ifndef dealii__block_sparse_matrix_ez_h
+#define dealii__block_sparse_matrix_ez_h
 
 
 //TODO: Derive BlockSparseMatrixEZ from BlockMatrixBase, like all the other block matrices as well; this would allow to instantiate a few functions with this template argument as well (in particular ConstraintMatrix::distribute_local_to_global)
@@ -63,7 +63,7 @@ public:
   BlockSparseMatrixEZ ();
 
   /**
-   * Constructor setting up an object with given unmber of block rows and
+   * Constructor setting up an object with given number of block rows and
    * columns. The blocks themselves still have zero dimension.
    */
   BlockSparseMatrixEZ (const unsigned int block_rows,
@@ -151,25 +151,35 @@ public:
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
-   * image space. It is the sum of rows of the rows of sub-matrices.
+   * codomain (or range) space. It is the sum of the number of rows over the
+   * sub-matrix blocks of this matrix.
+   *
+   * @deprecated Use m() instead.
    */
-  size_type n_rows () const;
+  size_type n_rows () const DEAL_II_DEPRECATED;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the range space. It is the sum of columns of the columns of sub-matrices.
+   * the domain space. It is the sum of the number of columns over the sub-
+   * matrix blocks of this matrix.
+   *
+   * @deprecated Use n() instead.
    */
-  size_type n_cols () const;
+  size_type n_cols () const DEAL_II_DEPRECATED;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return number of rows of this matrix, which equals the dimension of the
+   * codomain (or range) space. It is the sum of the number of rows over the
+   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
+   * times n().
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return number of columns of this matrix, which equals the dimension of
+   * the domain space. It is the sum of the number of columns over the sub-
+   * matrix blocks of this matrix. Recall that the matrix is of size m() times
+   * n().
    */
   size_type n () const;
 
@@ -330,7 +340,7 @@ inline
 typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::m () const
 {
-  return n_rows();
+  return row_indices.total_size();
 }
 
 
@@ -340,7 +350,7 @@ inline
 typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n () const
 {
-  return n_cols();
+  return column_indices.total_size();
 }
 
 
@@ -528,4 +538,4 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif //__deal2__block_sparse_matrix_ez_h
+#endif //dealii__block_sparse_matrix_ez_h

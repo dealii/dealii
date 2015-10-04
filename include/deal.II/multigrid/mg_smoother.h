@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_smoother_h
-#define __deal2__mg_smoother_h
+#ifndef dealii__mg_smoother_h
+#define dealii__mg_smoother_h
 
 
 #include <deal.II/base/config.h>
@@ -70,7 +70,7 @@ public:
   void set_symmetric (const bool);
 
   /**
-   * Switch on/off transposed smoothing. The effect is overriden by
+   * Switch on/off transposed smoothing. The effect is overridden by
    * set_symmetric().
    */
   void set_transpose (const bool);
@@ -213,16 +213,6 @@ namespace mg
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2> &matrices,
                      const MGLevelObject<DATA> &additional_data);
-    /**
-     * Initialize for matrix blocks. This function initializes the smoothing
-     * operator with the same smoother for each level.
-     *
-     * @p additional_data is an object of type @p RELAX::AdditionalData and is
-     * handed to the initialization function of the relaxation method.
-     */
-//     template <class MATRIX2>
-//     void initialize (const MGLevelObject<MatrixBlock<MATRIX2> >& matrices,
-//                   const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
     /**
      * Empty all vectors.
@@ -277,9 +267,6 @@ namespace mg
  * <tt>Vector<.></tt>, where the template arguments are all combinations of @p
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
- *
- * @note If '--enable-mgcompatibility' was used on configuring deal.II, this
- * class behaves like MGSmootherPrecondition.
  *
  * @author Guido Kanschat, 2003
  */

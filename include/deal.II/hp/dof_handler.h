@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_handler_h
-#define __deal2__hp_dof_handler_h
+#ifndef dealii__hp_dof_handler_h
+#define dealii__hp_dof_handler_h
 
 
 
@@ -527,14 +527,14 @@ namespace hp
      * function.
      */
     types::global_dof_index
-    n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+    n_boundary_dofs (const FunctionMap &boundary_ids) const;
 
     /**
      * Same function, but with different data type of the argument, which is
      * here simply a list of the boundary indicators under consideration.
      */
     types::global_dof_index
-    n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
+    n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const;
 
     /**
      * Return the number of degrees of freedom that belong to this process.
@@ -602,7 +602,7 @@ namespace hp
      * object.
      *
      * This function is made virtual, since a dof handler object might be
-     * accessed through a pointers to thisr base class, although the actual
+     * accessed through a pointers to this base class, although the actual
      * object might be a derived class.
      */
     virtual std::size_t memory_consumption () const;

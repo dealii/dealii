@@ -50,7 +50,6 @@ IF(POLICY CMP0037)
   CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
-
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -153,10 +152,7 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-#
-# Do not configure testsuite on Windows targets because posix shell and
-# commands like 'test', '> /dev/null', 'rm', etc. are not available
-#
+# Do not automatically include the testsuite subproject on Windows.
 IF(DEAL_II_HAVE_TESTS_DIRECTORY AND NOT DEAL_II_MSVC)
   ADD_SUBDIRECTORY(tests)
 ENDIF()

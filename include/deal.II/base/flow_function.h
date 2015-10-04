@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__flow_function_h
-#define __deal2__flow_function_h
+#ifndef dealii__flow_function_h
+#define dealii__flow_function_h
 
 
 #include <deal.II/base/config.h>
@@ -215,7 +215,7 @@ namespace Functions
   class StokesLSingularity : public FlowFunction<2>
   {
   public:
-    /// Constructor setting upsome data.
+    /// Constructor setting up some data.
     StokesLSingularity();
 
     virtual void vector_values (const std::vector<Point<2> > &points,

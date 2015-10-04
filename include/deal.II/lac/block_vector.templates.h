@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_vector_templates_h
-#define __deal2__block_vector_templates_h
+#ifndef dealii__block_vector_templates_h
+#define dealii__block_vector_templates_h
 
 
 #include <deal.II/base/config.h>
@@ -35,9 +35,9 @@ BlockVector<Number>::BlockVector (const unsigned int n_blocks,
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const std::vector<size_type> &n)
+BlockVector<Number>::BlockVector (const std::vector<size_type> &block_sizes)
 {
-  reinit (n, false);
+  reinit (block_sizes, false);
 }
 
 
@@ -59,6 +59,17 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i] = v.components[i];
 }
+
+
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+BlockVector<Number>::BlockVector (BlockVector<Number> &&v)
+  :
+  BlockVectorBase<Vector<Number> > ()
+{
+  swap(v);
+}
+#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -92,25 +103,25 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int n_bl,
-                                  const size_type    bl_sz,
+void BlockVector<Number>::reinit (const unsigned int n_blocks,
+                                  const size_type    block_size,
                                   const bool         fast)
 {
-  std::vector<size_type> n(n_bl, bl_sz);
-  reinit(n, fast);
+  std::vector<size_type> block_sizes(n_blocks, block_size);
+  reinit(block_sizes, fast);
 }
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const std::vector<size_type> &n,
+void BlockVector<Number>::reinit (const std::vector<size_type> &block_sizes,
                                   const bool                    fast)
 {
-  this->block_indices.reinit (n);
+  this->block_indices.reinit (block_sizes);
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
   for (size_type i=0; i<this->n_blocks(); ++i)
-    this->components[i].reinit(n[i], fast);
+    this->components[i].reinit(block_sizes[i], fast);
 }
 
 
@@ -151,9 +162,9 @@ BlockVector<Number>::~BlockVector ()
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
+BlockVector<Number>::operator= (const TrilinosWrappers::BlockVector &v)
 {
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 #endif
@@ -162,11 +173,8 @@ BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
 template <typename Number>
 void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
-  Assert (this->n_blocks() == v.n_blocks(),
-          ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+  std::swap(this->components, v.components);
 
-  for (size_type i=0; i<this->n_blocks(); ++i)
-    dealii::swap (this->components[i], v.components[i]);
   dealii::swap (this->block_indices, v.block_indices);
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,7 +98,7 @@ main ()
     {
       SparsityPattern::const_iterator p3=sp3.begin(row), p4=sp4.begin(row);
       for (; p3!=sp3.end(row); ++p3, ++p4)
-        Assert (p3->column() == p4->column(), ExcInternalError());
+        AssertThrow (p3->column() == p4->column(), ExcInternalError());
     };
 
 
@@ -115,15 +115,15 @@ main ()
       const SparsityPattern &
       sp = (loop==1 ? sp1 : (loop==2 ? sp2 : (loop==3 ? sp3 : sp4)));
       for (unsigned int i=0; i<sp.n_nonzero_elements(); ++i)
-        Assert (sp(sp.matrix_position(i).first,
-                   sp.matrix_position(i).second) == i,
-                ExcInternalError());
+        AssertThrow (sp(sp.matrix_position(i).first,
+                        sp.matrix_position(i).second) == i,
+                     ExcInternalError());
       for (types::global_dof_index row=0; row<sp.n_rows(); ++row)
         for (types::global_dof_index col=0; col<sp.n_cols(); ++col)
           if (sp(row,col) != SparsityPattern::invalid_entry)
-            Assert (sp.matrix_position(sp(row,col)) ==
-                    std::make_pair(row,col),
-                    ExcInternalError());
+            AssertThrow (sp.matrix_position(sp(row,col)) ==
+                         std::make_pair(row,col),
+                         ExcInternalError());
     };
 
 
@@ -155,7 +155,7 @@ main ()
     {
       SparsityPattern::const_iterator p3=sp3.begin(row), p5=sp5.begin(row);
       for (; p3!=sp3.end(row); ++p3, ++p5)
-        Assert (p3->column() == p5->column(), ExcInternalError());
+        AssertThrow (p3->column() == p5->column(), ExcInternalError());
     }
 }
 

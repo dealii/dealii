@@ -41,17 +41,17 @@ void test ()
   TrilinosWrappers::SparseMatrix::iterator k = A.begin(),
                                            j = ++A.begin();
 
-  Assert (k < j, ExcInternalError());
-  Assert (j > k, ExcInternalError());
+  AssertThrow (k < j, ExcInternalError());
+  AssertThrow (j > k, ExcInternalError());
 
-  Assert (!(j < k), ExcInternalError());
-  Assert (!(k > j), ExcInternalError());
+  AssertThrow (!(j < k), ExcInternalError());
+  AssertThrow (!(k > j), ExcInternalError());
 
-  Assert (k != j, ExcInternalError());
-  Assert (!(k == j), ExcInternalError());
+  AssertThrow (k != j, ExcInternalError());
+  AssertThrow (!(k == j), ExcInternalError());
 
-  Assert (k == k, ExcInternalError());
-  Assert (!(k != k), ExcInternalError());
+  AssertThrow (k == k, ExcInternalError());
+  AssertThrow (!(k != k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -65,7 +65,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   try
     {

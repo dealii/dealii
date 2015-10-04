@@ -96,34 +96,34 @@ void test ()
   if (my_id == 0)
     {
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
-	   p != A.end(0);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 0, ExcInternalError());
-	  if (p->column() == 0)
-	    AssertThrow (p->value() == 0.1, ExcInternalError())
-	  else if (p->column() == 2)
-	    AssertThrow (p->value() == 0.2, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
+           p != A.end(0);
+           ++p)
+        {
+          AssertThrow (p->row() == 0, ExcInternalError());
+          if (p->column() == 0)
+            AssertThrow (p->value() == 0.1, ExcInternalError())
+            else if (p->column() == 2)
+              AssertThrow (p->value() == 0.2, ExcInternalError())
+              else
+                // well, we didn't write here, so the only thing that
+                // should be in there is a zero
+                AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
     }
   else
     {
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
-	   p != A.end(2);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 2, ExcInternalError());
-	  if (p->column() == 3)
-	    AssertThrow (p->value() == 0.3, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
+           p != A.end(2);
+           ++p)
+        {
+          AssertThrow (p->row() == 2, ExcInternalError());
+          if (p->column() == 3)
+            AssertThrow (p->value() == 0.3, ExcInternalError())
+            else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
     }
 
   // now let each of the processors write something into the memory of
@@ -134,35 +134,35 @@ void test ()
     {
       A.set (2, 3, 42.);
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
-	   p != A.end(0);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 0, ExcInternalError());
-	  if (p->column() == 0)
-	    AssertThrow (p->value() == 0.1, ExcInternalError())
-	  else if (p->column() == 2)
-	    AssertThrow (p->value() == 0.2, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
+           p != A.end(0);
+           ++p)
+        {
+          AssertThrow (p->row() == 0, ExcInternalError());
+          if (p->column() == 0)
+            AssertThrow (p->value() == 0.1, ExcInternalError())
+            else if (p->column() == 2)
+              AssertThrow (p->value() == 0.2, ExcInternalError())
+              else
+                // well, we didn't write here, so the only thing that
+                // should be in there is a zero
+                AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
     }
   else
     {
       A.set (0, 0, 108.);
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
-	   p != A.end(2);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 2, ExcInternalError());
-	  if (p->column() == 3)
-	    AssertThrow (p->value() == 0.3, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
+           p != A.end(2);
+           ++p)
+        {
+          AssertThrow (p->row() == 2, ExcInternalError());
+          if (p->column() == 3)
+            AssertThrow (p->value() == 0.3, ExcInternalError())
+            else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
     }
 
   // then call compress() and ensure that we get the correct values
@@ -170,36 +170,36 @@ void test ()
   if (my_id == 0)
     {
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
-	   p != A.end(0);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 0, ExcInternalError());
-	  if (p->column() == 0)
-	    AssertThrow (p->value() == 108, ExcInternalError())
-	  else if (p->column() == 2)
-	    AssertThrow (p->value() == 0.2, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
+           p != A.end(0);
+           ++p)
+        {
+          AssertThrow (p->row() == 0, ExcInternalError());
+          if (p->column() == 0)
+            AssertThrow (p->value() == 108, ExcInternalError())
+            else if (p->column() == 2)
+              AssertThrow (p->value() == 0.2, ExcInternalError())
+              else
+                // well, we didn't write here, so the only thing that
+                // should be in there is a zero
+                AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
     }
   else
     {
       for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
-	   p != A.end(2);
-	   ++p)
-	{
-	  AssertThrow (p->row() == 2, ExcInternalError());
-	  if (p->column() == 3)
-	    AssertThrow (p->value() == 42, ExcInternalError())
-	  else
-	    // well, we didn't write here, so the only thing that
-	    // should be in there is a zero
-	    AssertThrow (p->value() == 0.0, ExcInternalError());
-	}
-    }  
-  
+           p != A.end(2);
+           ++p)
+        {
+          AssertThrow (p->row() == 2, ExcInternalError());
+          if (p->column() == 3)
+            AssertThrow (p->value() == 42, ExcInternalError())
+            else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow (p->value() == 0.0, ExcInternalError());
+        }
+    }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }
@@ -208,7 +208,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

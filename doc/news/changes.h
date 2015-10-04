@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 /**
-@page changes_after_8_2_1 Changes after Version 8.2.1
+@page changes_after_8_3 Changes after Version 8.3.0
 
 <p>
 This is the list of changes made after the release of deal.II version
-8.2.1. All entries are signed with the names of the authors.
+8.3.0. All entries are signed with the names of the authors.
 </p>
 
 
@@ -38,282 +38,118 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: The TrilinosWrappers::SparseMatrix::clear_row() function used
-  to call TrilinosWrappers::SparseMatrix::compress() before doing its work,
-  but this is neither efficient nor safe. You will now have to do this
-  yourself after assembling a matrix and before clearing rows.
+  <li> Removed: The <code>UpdateFlags</code> flags
+  <code>update_support_points</code>, <code>update_support_jacobians</code>,
+  and <code>update_support_inverse_jacobians</code> have been removed.
+  <code>update_support_points</code> was deprecated in 2013 and has not done
+  anything in a long time (see the commit message for more information). The
+  other two appeared in 2007 and were never implemented.
   <br>
-  The changes to the function above also affect the
-  MatrixTools::apply_boundary_values() variants that operate on Trilinos
-  matrices.
-  <br>
-  (Wolfgang Bangerth, 2015/03/09)
+  (David Wells, 2015/09/16)
   </li>
 
-  <li> Changed: Implicit conversion from Tensor@<1,dim@> to Point@<dim@> was
-  previously possible. This has now been prohibited (but you can still
-  do the conversion with an explicit cast) as such conversions are
-  likely incorrect uses of class Point (which should represent only
-  points in space, i.e., vectors anchored at the origin) whereas Tensor
-  should be used for vectors anchored elsewhere (such as normal vectors,
-  directions, differences between points, etc). The difference in
-  usage between Point and Tensor have now been clarified in the documentation
-  of class Point.
+  <li> Cleanup: The two argument variant of cross_product() that returned
+  the result by reference as first argument has been removed. Use the
+  function cross_product_2d(), or cross_product_3d(), that directly returns
+  the result instead. Further, the exception
+  Tensor<rank,dim,Number>::ExcInvalidTensorContractionIndex has been
+  removed
   <br>
-  (Wolfgang Bangerth, 2015/01/12)
+  (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
-  <li> Changed: The project configuration no longer exports
-  <code>[...]/include/deal.II</code>. Thus it is now mandatory to prefix
-  all includes of deal.II headers with <code>deal.II/</code>, i.e.
-  <code>#include &lt;deal.II/[...]&gt;</code>.
+  <li> Cleanup: The following functions in tensor.h have been deprecated:
   <br>
-  (Matthias Maier, 2015/01/19)
+  - double_contract(). Use the generic contraction function
+    contract() instead.
+  - The four and five argument variants of contract() that return the
+    result by reference as first argument and take the contraction indices as
+    arguments. use the generic contraction function contract() instead.
+  - The three argument variants of contract() that return the result by
+    reference as first argument. Use <code>operator*</code> instead.
+  - The three argument variant of cross_product() that returns the result
+    by reference as first argument. Use the cross_product() function that
+    directly returns the result instead.
+  - The three argument variants of <code>outer_product</code> that return
+    the result by reference as first argument. Use the function that
+    directly returns the result instead.
+  - determinant(dealii::Tensor<rank,1,Number>)
+  <br>
+  (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
-  <li> Changed: ParameterHandler::leave_subsection() no longer returns a bool
-  indicating if there was a subsection to leave. This never worked in the
-  first place, because an exception was thrown.
+  <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
+  longer have a constructor taking a boolean argument. Those were replaced
+  by a default constructor will always initialize underlying values with
+  zero.
   <br>
-  (Timo Heister, 2015/01/19)
+  (Matthias Maier, 2015/09/07)
   </li>
 
-  <li> Changed: Make.global_options was completely redesigned. It still
-  contains Makefile sourcable information, but they now closely mimic the
-  declarative style of deal.IIConfig.cmake. Thus, projects that still use
-  Makefiles that source Make.global_options have to be ported to the new
-  layout.
+  <li> Removed: The testsuite no longer supports compiler constraints of
+  the form "<code>.compiler=[NAME]...</code>".
   <br>
-  (Matthias Maier, 2015/01/13)
+  (Matthias Maier, 2015/08/21)
   </li>
 
-  <li> Removed: The Component compat_files was removed entirely. deal.II
-  now always configures and installs with a somewhat FSHS compliant
-  directory structure. Further, the ancient make_dependencies binary was
-  removed. Either migrate your project to CMake, or port your build system
-  to the new (incompatible) Make.global_options found at
-  <code>\${DEAL_II_SHARE_RELDIR}</code>.
+  <li> Changed: The parameter @p first_vector_components has been removed
+  from GridTools::collect_periodic_faces(). Instead,
+  DoFTools::make_periodicity_constraints() now accepts a parameter
+  @p first_vector_components in all (supported) variants.
   <br>
-  (Matthias Maier, 2015/01/13)
+  (Matthias Maier, 2015/08/21)
   </li>
 
-  <li> Changed: The two-argument call to the MPI_InitFinalize constructor
-  used to imply that the user wanted only one thread per MPI process. This
-  has been changed and now means that every processor core on the system is
-  used. If you run as many MPI processes as there are processor cores, then
-  this means one thread per MPI process, as before. On the other hand, if you
-  start fewer MPI processes than there are cores, then your program will now
-  be allowed to use more than one thread. You can get the old behavior by
-  setting the third (optional) argument to one.
+  <li> Changed: FEValues::normal_vector() for historical reasons returned a
+  value of type Point, though a normal vector is more adequately described
+  as a Tensor@<1,dim@>. Many similar cases were already clarified in deal.II
+  8.3. The current case has now also been changed: FEValues::normal_vector()
+  now returns a Tensor, rather than a Point.
   <br>
-  (Wolfgang Bangerth, 2015/01/14)
+  In a similar spirit, the FEValues::get_normal_vectors() function that
+  still returns a vector of Points has been deprecated and a new function,
+  FEValues::get_all_normal_vectors(), that returns a vector of tensors,
+  has been added. This was necessary since there is no way to change the
+  return type of the existing function in a backward compatible way. The
+  old function will be removed in the next version, and the new function
+  will then be renamed to the old name.
+  <br>
+  (Wolfgang Bangerth, 2015/08/20)
   </li>
 
-  <li> Removed: TrilinosWrappers::SparseMatrix copy constructor got removed
-  to be in line with PETSc and dealii::SparseMatrix. You can use reinit()
-  and copy_from().
+  <li> Changed: The mesh_converter program has been removed from the
+  contrib folder. The equivalent functionality can now be found in
+  the GridIn class.
   <br>
-  (Timo Heister, 2015/01/12)
+  (Jean-Paul Pelteret, 2015/08/12)
   </li>
 
-  <li> Removed: The following compatibility definitions were removed from
-  <code>include/deal.II/base/config.h.in</code> (replacement in brackets):
-  - DEAL_II_CAN_USE_CXX11 (new: DEAL_II_WITH_CXX11)
-  - DEAL_II_CAN_USE_CXX1X (new: DEAL_II_WITH_CXX11)
-  - DEAL_II_COMPILER_SUPPORTS_MPI (new: DEAL_II_WITH_MPI)
-  - DEAL_II_MAJOR (new: DEAL_II_VERSION_MAJOR)
-  - DEAL_II_MINOR (new: DEAL_II_VERSION_MINOR)
-  - DEAL_II_USE_ARPACK (new: DEAL_II_WITH_ARPACK)
-  - DEAL_II_USE_CXX11 (new: DEAL_II_WITH_CXX11)
-  - DEAL_II_USE_METIS (new: DEAL_II_WITH_METIS)
-  - DEAL_II_USE_MT (new: DEAL_II_WITH_THREADS)
-  - DEAL_II_USE_P4EST (new: DEAL_II_WITH_P4EST)
-  - DEAL_II_USE_PETSC (new: DEAL_II_WITH_PETSC)
-  - DEAL_II_USE_SLEPC (new: DEAL_II_WITH_SLEPC)
-  - DEAL_II_USE_TRILINOS (new: DEAL_II_WITH_TRILINOS)
+  <li> Changed: The signature of the FiniteElement::fill_fe_values(),
+  FiniteElement::fill_fe_face_values(), and FiniteElement::fill_fe_subface_values()
+  functions has been changed, in an effort to clarify which of these contain
+  input information and which contain output information for these functions.
+  The same has been done for the corresponding functions in the Mapping
+  class hierarchy. As part of a general overhaul, the FEValuesData class
+  has also been removed.
   <br>
-  (Matthias Maier, 2015/01/12)
+  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
   </li>
 
-  <li> Removed: The direct Mumps interface through
-  <code>SparseDirectMUMPS</code> has been removed. The MUMPS solver is
-  still available through the Trilinos or PETSc interfaces. Alternatively,
-  there is <code>SparseDirectUMFPACK</code>, which has a similar interface.
+  <li> Changed: The functions update_once() and update_each() in the
+  Mapping classes computed information that was, in essence, only of use
+  internally. No external piece of code actually needed to know which
+  pieces of information a mapping could compute once and which they needed
+  to compute on every cell. Consequently, these two functions have been
+  removed and have been replaced by Mapping::requires_update_flags().
   <br>
-  (Matthias Maier, 2015/01/11)
+  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
   </li>
 
-  <li> Removed: This release removes a number of functions that have long
-  been deprecated and that were previously already marked as
-  deprecated (i.e., they would have yielded warnings by the compiler whenever
-  you tried to use them). In almost all cases, there is a function with same
-  name but different argument list that should be used instead.
-  Specifically, the removed functions and classes are:
+  <li> Changed: The function DoFRenumbering::random() now produces different
+  numberings than it did before, but in return has now acquired the property
+  that its results are predictable and repeatable.
   <br>
-  <em>With headers in <code>deal.II/base/</code>:</em>
-  - ThreadManagement::spawn.
-  - Threads::ThreadCondition and Threads::ThreadMutex.
-  - DataOutBase::create_xdmf_entry with 3 arguments.
-  - DataOutBase::write_hdf5_parallel with 2 arguments.
-  - The versions of FunctionParser::initialize that took a
-    <code>use_degrees</code> or <code>constants</code> argument.
-    The implementation as it is now no longer supports either of
-    these two concepts (since we switched from the FunctionParser
-    library to the muparser library after the deal.II 8.1 release).
-  - GridOutFlags::XFig::level_color.
-  - class BlockList.
-  - The MPI support functions in namespace Utilities and Utilities::System.
-  - Deprecated members of namespace types.
-  - Namespace deal_II_numbers.
-  - MultithreadInfo::n_default_threads.
-  - Table::data.
-
-  <br>
-  <em>With headers in <code>deal.II/lac/</code>:</em>
-  - The deprecated constructors of SparseMIC,
-    SparseILU, and SparseLUDecomposition.
-  - SparseMIC::decompose and SparseILU::decompose.
-  - SparseMIC::reinit and SparseLUDecomposition::reinit.
-  - SparseILU::apply_decomposition.
-  - SparseLUDecomposition::decompose and SparseLUDecomposition::is_decomposed.
-  - The compress() functions without argument in the various vector
-    classes. You should use the versions with a VectorOperation
-    argument instead.
-  - Vector::scale.
-  - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
-    argument.
-  - SparsityPattern and ChunkSparsityPattern functions that take an
-    <code>optimize_diagonal</code> argument.
-  - SparsityPattern::partition.
-  - SparsityPattern::get_rowstart_indices and
-    SparsityPattern::get_column_numbers.
-  - The typedef CompressedBlockSparsityPattern.
-  - The deprecated constructors of SparsityPattern iterator classes.
-  - The deprecated variants of DoFTools::make_periodicity_constraints.
-  - BlockMatrixArray and BlockTrianglePreconditioner functions that
-    take an explicit VectorMemory object.
-  - The SolverSelector constructor that takes a VectorMemory argument.
-  - The version of parallel::distributed::Vector::compress_finish
-    function that takes a boolean as argument.
-  - The version of BlockVector::scale and
-    parallel::distributed::Vector::scale,
-    parallel::distributed::BlockVector::scale
-    function that takes a scalar as argument.
-  - PreconditionBlock::size.
-  - Classes PreconditionedMatrix and PreconditionLACSolver.
-  - PETScWrappers::VectorBase::update_ghost_values.
-  - PETScWrappers::MPI::Vector constructors and reinit variants.
-  - SparseMatrixIterators::Accessor and SparseMatrixIterators::Iterator
-    constructors.
-  - SparseMatrix::raw_entry and SparseMatrix::global_entry.
-  - The ConstraintMatrix functions that transform a matrix, vector, or
-    linear system into a smaller by not just setting the corresponding
-    rows and columns to zero, but actually shrinking the size of the
-    linear system.
-
-  <br>
-  <em>With headers in <code>deal.II/deal.II/</code>:</em>
-  - GridGenerator::laplace_transformation.
-  - The version of GridGenerator::parallelogram where the corners are given
-    as a rank-2 tensor rather than as an array of points.
-  - GridTools::create_union_triangulation.
-  - GridTools::extract_boundary_mesh.
-  - Triangulation::distort_random.
-  - Triangulation::clear_user_pointers.
-  - The refinement listener concept of the Triangulation class. This
-    approach to getting notified about what happens to triangulations
-    has been superseded by the signals defined by the triangulation
-    class.
-
-  <br>
-  <em>With headers in <code>deal.II/fe/</code>:</em>
-  - In FEValues and related classes, the functions that contain the
-    term <code>2nd_derivatives</code> were removed in favor of those
-    with names containing <code>hessian</code>. Similarly, functions
-    with names including <code>function_grads</code> were removed in
-    favor of those called <code>function_gradients</code>. Finally,
-    the <code>cell_normal_vector</code> functions were replaced by
-    <code>normal_vector</code> ones. In all cases, the new functions
-    have been around for a while.
-  - Mapping::transform_covariant and Mapping::transform_contravariant.
-
-  <br>
-  <em>With headers in <code>deal.II/dofs/</code>:</em>
-  - DoFRenumbering::downstream_dg.
-  - DoFTools::count_dofs_per_component.
-  - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
-
-  <br>
-  <em>With headers in <code>deal.II/multigrid/</code>:</em>
-  - The constructors of classes MGSmoother, MGSmootherRelaxation and
-    MGSmootherPrecondition that take a VectorMemory object.
-  - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
-  - MGConstrainedDoFs::non_refinement_edge_index
-  - MGConstrainedDoFs::at_refinement_edge_boundary
-  - MGTools::count_dofs_per_component.
-  - MGTools::apply_boundary_values.
-  - MGTools::extract_inner_interface_dofs.
-  - Class MGMatrix.
-  - Multigrid::vmult and friends.
-
-  <br>
-  <em>With headers in <code>deal.II/matrix_free/</code>:</em>
-  - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
-
-  <br>
-  <em>With headers in <code>deal.II/mesh_worker/</code>:</em>
-  - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
-
-  <br>
-  <em>With headers in <code>deal.II/algorithm/</code>:</em>
-  - Algorithms::ThetaTimestepping::operator().
-  - Algorithms::ThetaTimestepping::initialize.
-  - Algorithms::Newton::initialize.
-
-  <br>
-  <em>With headers in <code>deal.II/numerics/</code>:</em>
-  - TimeDependent::end_sweep (with an argument).
-  - PointValueHistory::mark_locations.
-  - The DataPostprocessor::compute_derived_quantities_scalar and
-    DataPostprocessor::compute_derived_quantities_vector functions without
-    evaluation points. If you have
-    data postprocessor classes implemented in your program that overload these
-    functions, you will have to change it in a way that they overload the
-    functions of same name but with the evaluation point argument instead.
-  <br>
-  This release also removes the deprecated class MGDoFHandler. The
-  functionality of this class had previously been incorporated into
-  the DoFHandler class. Unlike the changes above, if you were still
-  using this class, you will need to do the following changes to
-  your code:
-  - Where you called <code>mg_dof_handler.distribute_dofs()</code>
-    you now also need to explicitly call
-    <code>mg_dof_handler.distribute_mg_dofs()</code>.
-  - If you called <code>mg_dof_handler.begin(level)</code>, you
-    will now have to write this as
-    <code>mg_dof_handler.begin_mg(level)</code> to make clear that
-    you are not just interested in an iterator to a cell on a given
-    level, but in fact to a cell that can access the degrees of
-    freedom on a particular level of a multigrid hierarchy.
-  - The type previously referred to as
-    <code>MGDoFHandler::cell_iterator</code> now corresponds to
-    <code>MGDoFHandler::level_cell_iterator</code>.
-  - Where you previously called DoFRenumbering::component_wise
-    for the entire MGDoFHandler object, you now need to call
-    this function for the DoFHandler object, and then call the
-    same function with the <code>level</code> argument for each
-    of the levels of the triangulation individually.
-  <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/22)
-  </li>
-
-  <li> Removed: The config.h file no longer exports HAVE_* definitions.
-  Those are either entirely removed (for the blas/lapack symbols) or
-  renamed to DEAL_II_HAVE_*. This change is done in order to avoid clashes
-  with external projects also exporting HAVE_* definitions in their header
-  files.
-  <br>
-  (Matthias Maier, 2014/12/29)
+  (Wolfgang Bangerth, 2015/07/21)
   </li>
 </ol>
 
@@ -322,51 +158,203 @@ inconvenience this causes.
 
 <a name="general"></a>
 <h3>General</h3>
-
-
 <ol>
-  <li> Improved: We have traditionally had a large number of exceptions
-  that did not output any useful error message other than the name
-  of the exception class. This name was suggestive of the error that
-  had happened, but did not convey a sufficient amount of information
-  to what happened in many of the places where these kinds of exceptions
-  were used, nor what may have caused the exception, or how it could
-  be avoided. We have gone through many of these places and changed
-  the exception to be much more verbose in what they state about the
-  problem, its origin, and how it may be solved.
+  <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
+  ghost cells. Similarly ::level_ghost_owners() for level ghosts.
   <br>
-  (Wolfgang Bangerth, 2015/02/28-2015/03/31)
+  (Timo Heister, 2015/09/30)
   </li>
 
-  <li> Changed: We have traditionally used Point@<dim@> to represent points
-  in physical space, i.e., vectors that are anchored at the origin, whereas
-  for vectors anchored elsewhere (e.g., differences between points, normal
-  vectors, gradients, etc) we have used Tensor@<1,dim@>. This has now be
-  made more formal in the documentation but also in the return types of
-  <code>operator-()</code> for Point objects: The difference between two
-  points, <code>p1-p2</code> now returns a Tensor@<1,dim@>. On the other
-  hand, subtracting a Tensor@<1,dim@> object from a Point, <code>p-t</code>,
-  results in a Point@<dim@>.
+  <li> New: FunctionParser now supports pow(a,b).
   <br>
-  (Wolfgang Bangerth, 2015/02/05)
+  (Timo Heister, 2015/09/30)
   </li>
 
-  <li> New: Examples from 1 to 16 now use the Manifold interface
-  instead of the old Boundary interface to describe curved boundaries
-  and domains.
+  <li> New: MGTransferPrebuilt can now be used with parallel::distributed::Vector
+  and TrilinosWrappers::SparseMatrix as a transfer matrix.
   <br>
-  (Luca Heltai, 2015/01/15)
+  (Martin Kronbichler, 2015/09/22)
   </li>
 
-  <li> New: The build system now queries for git branch name and
-  revision sha1 (and automatically reconfigures if necessary). This
-  information is used to annotate summary.log and detailed.log with the
-  current revision sha1. Further, a header file <deal.II/base/revision.h>
-  is now available that exports the macros: DEAL_II_GIT_BRANCH,
-  DEAL_II_GIT_REVISION, DEAL_II_GIT_REVISION_SHORT.
+  <li> Fixed: parallel::distributed::Vector is now fully functional for
+  indices larger than 4 billion.
   <br>
-  (Matthias Maier, 2015/01/02)
+  (Martin Kronbichler, 2015/09/22)
   </li>
+
+  <li> New: PArpackSolver eigensolver interface class.
+  <br>
+  (Denis Davydov, 2015/09/17)
+  </li>
+
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
+  <br>
+  (Wolfgang Bangerth, 2015/09/13)
+  </li>
+
+  <li>New: A new namespace TensorAccessors is introduced that contains
+  generic algorithms for tensorial objects, i.e., objects that allow
+  repeated access via the index operator <code>operator[](unsigned int)</code>.
+  The methods in TensorAccessors is primarily meant to replace old internal
+  code in <code>tensor.h</code>, but it might also proof useful otherwise.
+  <br>
+  (Matthias Maier, 2015/09/11)
+  </li>
+
+  <li> New: A python script (including instructions) for enabling pretty
+  printing with GDB is now available in
+  <tt>/contrib/utilities/dotgdbinit.py</tt>.
+  <br>
+  (Wolfgang Bangerth, David Wells, 2015/09/11)
+  </li>
+
+  <li> Improved: When available, deal.II now uses the "gold" linker, a
+  reimplementation of the traditional Unix "ld" linker that is substantially
+  faster. This reduces build and, in particular, test turnaround times.
+  <br>
+  (Wolfgang Bangerth, Matthias Maier, 2015/09/06)
+  </li>
+
+  <li> Improved: Allow continuation lines in ParameterHandler.
+  <br>
+  (Alberto Sartori, 2015/09/04)
+  </li>
+
+  <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
+  up (a lot of unnecessary partial template specializations have been
+  removed). The specialization Tensor<1,dim,Number> has been removed.
+  <br>
+  (Matthias Maier, 2015/09/02)
+  </li>
+
+  <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
+  was computed incorrectly.
+  <br>
+  (Timo Heister, 2015/08/31)
+  </li>
+
+  <li> Improved: The testsuite now supports multiple comparison files.
+  Apart from the main comparison file that ends in
+  <code>[...].output</code> all files of the form
+  <code>[...].output.[string]</code> are considered for comparison.
+  <br>
+  (Matthias Maier, 2015/08/29)
+  </li>
+
+  <li> New: A class BlockLinearOperator has been introduced that extends
+  the LinearOperator concept to block structures. A BlockLinearOperator can
+  be sliced back to a LinearOperator.
+  <br>
+  (Matthias Maier, 2015/08/27)
+  </li>
+
+  <li> Improved: Support for complex number types throughout the library.
+  Several parts of the library have been reorganized to support complex
+  number types.
+  <br>
+  <em>Classes that are now instantiated for complex number types:</em>
+  - FunctionTime
+  - Function
+  - TensorFunction
+
+  <br>
+  <em>Classes with fixed interface that now fully support complex number
+  types (pure template classes without explicit instantiations in the
+  library):</em>
+  - LinearOperator
+  - PackagedOperation
+  - Tensor
+  <br>
+  (Matthias Maier, 2015/08/25 - XXX)
+  </li>
+
+  <li> Fixed: The testsuite now properly supports version constraints for
+  features. Those are annotated by
+  <code>.with_FEATURE(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>.
+  <br>
+  (Matthias Maier, 2015/08/25)
+  </li>
+
+  <li> Fixed: The GridIn class was not instantiated for the
+  <code>dim==1,spacedim==3</code> case. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/08/25)
+  </li>
+
+  <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
+  associated with vertices. This is now fixed.
+  <br>
+  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
+  </li>
+
+  <li> Improved: The interface and documentation for periodic boundary
+  conditions have been restructured. A
+  @ref GlossPeriodicConstraints "glossary entry" has been written.
+  <br>
+  (Daniel Arndt, Matthias Maier, 2015/08/01-2015/08/21)
+  </li>
+
+  <li> New: There is a new documentation module on
+  @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
+  <br>
+  (Wolfgang Bangerth, 2015/08/20)
+  </li>
+
+  <li> New: parallel::shared::Triangulation class which extends
+  Triangulation class to automatically partition triangulation when run
+  with MPI. Identical functionality between parallel::shared::Triangulation and
+  parallel::distributed::Triangulation is grouped in the parent class
+  parallel::Triangulation.
+  <br>
+  (Denis Davydov, 2015/08/14)
+  </li>
+
+  <li> New: The online documentation of all functions now includes
+  links to the file and line where that function is implemented. Both
+  are clickable to provide immediate access to the source code of a
+  function.
+  <br>
+  (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
+  </li>
+
+  <li> New: implemented the gradient method for
+  InterpolatedTensorProductGridData
+  <br>
+  (Daniel Shapero, 2015/08/12)
+  </li>
+
+
+  <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
+  with vanishing mean values of jumps across faces.
+  <br>
+  (Patrick Esser, 2015/08/17)
+  </li>
+
+  <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q
+  enriched by bubble functions.
+  <br>
+  (Daniel Arndt, 2015/08/12)
+  </li>
+
+  <li> New: The testsuite now runs in a mode in which we abort programs for
+  floating point exceptions due to divisions by zero or other invalid arithmetic.
+  <br>
+  (Wolfgang Bangerth, 2015/07/29)
+  </li>
+
+  <li> New: MultithreadInfo::set_thread_limit() can now be called more than
+  once and the environment variable DEAL_II_NUM_THREADS will be respected
+  even if user code never calls it.
+  <br>
+  (Timo Heister, 2015/07/26)
+  </li>
+
+  <li> New: IndexSet now implements iterators.
+  <br>
+  (Timo Heister, 2015/07/12)
+  </li>
+
 </ol>
 
 
@@ -375,244 +363,273 @@ inconvenience this causes.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+
+
 <ol>
-  <li> New: GridGenerator::create_triangulation_with_removed_cells() creates
-  a new mesh out of an existing one by dropping individual cells.
+
+  <li> Added: DoFTools::locally_relevant_dofs_per_subdomain can be used
+  to extract an IndexSet of locally relevant DoFs for a Triangulation
+  partitioned using METIS or with a parallel::shared::Triangulation .
   <br>
-  (Wolfgang Bangerth, 2015/03/13)
+  (Jean-Paul Pelteret, 2015/09/24)
   </li>
 
-  <li> New: Add MueLu preconditioner from Trilinos through the class
-  TrilinosWrappers::PreconditionAMGMueLu. This is a new algebraic
-  multigrid package. The input parameters are almost the same as the ones 
-  from ML so that the two preconditioners can be easily swapped.
+  <li> Fixed: hp::SolutionTransfer could get confused when dealing with
+  FE_Nothing elements. This is now fixed.
   <br>
-  (Bruno Turcksin, 2015/03/11)
+  (Claire Bruna-Rosso, Wolfgang Bangerth, 2015/09/23)
   </li>
 
-  <li> Fixed: Iterating over the elements of a TrilinosWrappers::SparseMatrix
-  object previously led to errors if the matrix was in fact stored in
-  parallel across multiple MPI processes. This is now fixed: rows not
-  stored locally on the processor where you run the iteration simply look
-  like they're empty.
+  <li> Improved: The construction of the non-local graph for quick data
+  exchange of TrilinosWrappers::SparseMatrix became very slow for a few
+  thousand processors. This has been fixed.
   <br>
-  (Wolfgang Bangerth, 2015/03/08)
+  (Martin Kronbichler, 2015/09/22)
   </li>
 
-  <li> New: There is now a new macro DeclExceptionMsg that allows to
-  declare an exception that does not take any run-time arguments
-  yet still allows to specify an error message.
+  <li> Improved: Initializing a TrilinosWrappers::SparseMatrix from a
+  DynamicSparsityPattern included some O(global_size) operations. These have
+  been replaced by operations only on the local range.
   <br>
-  (Wolfgang Bangerth, 2015/02/27)
+  (Martin Kronbichler, 2015/09/22)
   </li>
 
-  <li> New: There is now a class std_cxx11::unique_ptr that provides
-  the functionality of std::unique_ptr in C++11 mode, and that
-  provides an emulation for older compilers.
+  <li> Changed: All doxygen-generated pages now contain a link to the
+  tutorial in their top-level menus.
   <br>
-  (Wolfgang Bangerth, 2015/02/22)
+  (Wolfgang Bangerth, 2015/09/13)
   </li>
 
-  <li> New: IndexSet now has a local typedef IndexSet::value_type.
+  <li>Cleanup: Constructors of AdditionalData in various linear solvers are now marked
+  explicit. This avoid bugs with implicit conversions like the one fixed in step-40.
   <br>
-  (Wolfgang Bangerth, 2015/02/22)
+  (Timo Heister, Lei Qiao, 2015/09/09)
   </li>
 
-  <li> New: FE_TraceQ can now also be used in 1D.
-  <br>
-  (Martin Kronbichler, 2015/02/21)
+  <li>New: Introduced third-order derivatives of the shape functions, which
+  can now be accessed through FEValues and FEValuesViews using similar interfaces
+  as shape_values, shape_derivatives and shape_hessians.
+  (Maien Hamed, 2015/09/08)
   </li>
 
-  <li> New: FE_TraceQ now implements get_face_interpolation_matrix and
-  get_subface_interpolation_matrix, enabling
-  DoFTools::make_hanging_node_constraints on this element.
+  <li>Cleanup: TableIndices<N> can now be used (constructed and accessed)
+  with N > 7.
   <br>
-  (Anton Evgrafov, 2015/02/21)
+  (Matthias Maier, 2015/09/08)
   </li>
 
-  <li> Fixed: MappingQEulerian would previously not move interior points
-  in 1D for higher order mappings. This has been fixed by removing a few
-  specializations of MappingQ for 1D that are no longer necessary.
+  <li>New: std::begin and std::end are now available within the std_cxx11
+  namespace through <base/std_cxx11/iterator.h>
   <br>
-  (Martin Kronbichler, 2015/02/19)
+  (Matthias Maier, 2015/09/08)
   </li>
 
-  <li> Fixed: The implementation of the class GrowingVectorMemory has been
-  moved from source/lac/vector_memory.cc to the new file
-  include/deal.II/lac/vector_memory.templates.h. This allows users to
-  create instantiations of GrowingVectorMemory for their own vector classes
-  in case they intend to use them for the deal.II solvers.
+  <li>New: MappingQ1Eulerian was not instantiated for the various
+  Trilinos vector types. It is now instantiated for the same
+  vector types as MappingQEulerian is.
   <br>
-  (Martin Kronbichler, 2015/02/18)
+  (Wolfgang Bangerth, 2015/09/08)
   </li>
 
-  <li> Changed: All members of MultithreadInfo are now static so it is no
-  longer necessary to use the global instance multithread_info (now
-  deprecated) or create your own instance (which does not work correctly
-  anyway).
+  <li>New: Introduced Hessian-related functions to the Function class.
   <br>
-  (Timo Heister, 2015/02/13)
+  (Denis Davydov, 2015/09/08)
   </li>
 
-  <li> Fixed: There was a bug in the energy source term of step-33 whereby
-  the term was erroneously multiplied by the density. This is now fixed.
+  <li>New: Memory consumption during compilation has been reduced by splitting
+  instantiation files. For this make_instantiations now supports additional
+  logic to split the the instantiations in .inst files into groups. This is
+  used in fe_values.cc, error_estimator.cc, and others.
   <br>
-  (Praveen C, Lei Qiao, 2015/02/13)
+  (Timo Heister, 2015/09/05)
   </li>
 
-  <li> Changed: If you take the product of a Tensor and a scalar number,
-  you previously got a Tensor back that stored its elements in the same
-  data type as the original tensor. This leads to problems if you
-  multiply a <code>Tensor@<1,dim,double@></code> by a
-  <code>std::complex@<double@></code> because the result clearly needs
-  to store its elements as complex numbers, rather than as double
-  variables. This is now changed: The result of the product of a Tensor
-  and a scalar number is now a Tensor that stores its elements in a data
-  type appropriate for this product. The same approach is taken for the
-  SymmetricTensor class.
+  <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
+  in a .svg file which can be opened in a web browser.
   <br>
-  (Wolfgang Bangerth, 2015/02/11)
+  (Conrad Clevenger, 2015/09/03)
   </li>
 
-  <li> New: There is now a new class ProductType that can be used
-  to infer the type of the product of two objects. There is now also
-  a class EnableIfScalar that helps restrict some templates to only
-  cases where a type is a scalar.
+  <li> Openmp SIMD support is now enabled for Clang version 3.6, or newer
+  (or the equivalent XCode version). Further, openmp support is not any
+  more falsely activated for very old clang versions.
   <br>
-  (Wolfgang Bangerth, 2015/02/04)
+  (Matthias Maier, 2015/09/03)
   </li>
 
-  <li> New: The Tensor classes now have copy constructors and copy
-  operators that allow assignment from other tensors with different
-  underlying scalar types.
+  <li> Improved: DoFTools::make_hanging_node_constraints() now supports
+  hp-refinement cases when neither_element_dominates. To that end we look for
+  a least face dominating FE inside FECollection.
   <br>
-  (Denis Davydov, 2015/02/03)
+  (Denis Davydov, 2015/09/02)
   </li>
 
-  <li> New: Class hp::DoFHandler can now also be serialized.
+  <li> Changed: FEValues::transform() has been deprecated. The functionality
+  of this function is a (small) subset of what the Mapping classes
+  already provide.
   <br>
-  (Lukas Korous, 2015/01/31)
+  (Wolfgang Bangerth, 2015/09/02)
   </li>
 
-  <li> Bugfix: deal.II now correctly links against librt in case of bundled
-  boost being used.
+  <li> New: introduced hp::FECollection::find_least_face_dominating_fe(const std::set<unsigned int> &fes)
+  which aims to find the least dominating finite element w.r.t. those provided
+  as fe_indices in @p fes.
   <br>
-  (Matthias Maier, 2015/01/27)
+  (Denis Davydov, Wolfgang Bangerth, 2015/08/31)
   </li>
 
-  <li> New: A new macro <code>DEAL_II_QUERY_GIT_INFORMATION</code> is
-  provided to query user projects for git repository information simmilarly
-  to those exported by deal.II.
+  <li> New: step-6 now has an additional subsection in the
+  "Possibilities for extensions" section that discusses how
+  to create a better mesh.
   <br>
-  (Matthias Maier, 2015/01/21)
+  (Konstantin Ladutenko, Wolfgang Bangerth, 2015/08/31)
   </li>
 
-  <li> Fixed: FEFaceValues and FESubfaceValues did not fill the
-  jacobians and inverse jacobians if requested via the update flags.
-  This is now fixed.
+  <li> New: Introduce an option for FE_Nothing to dominate any other FE.
+  Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
+  we will force the traces of the two functions to be the same. Because the
+  FE_Nothing encodes a space that is zero everywhere, this means that the Q1
+  field will be forced to become zero at this interface.
   <br>
-  (Martin Kronbichler, 2015/01/23)
+  (Denis Davydov, 2015/08/31)
   </li>
 
-  <li> Fixed: ParameterHandler::read_input() now checks that
-  'subsection'/'end' are balanced in the input.
+  <li> New: Jacobian second and third derivatives are now computed by the mapping classes and can be
+  accessed through FEValues in much the same way as the Jacobian and Jacobian gradient.
   <br>
-  (Timo Heister, 2015/01/19)
+  (Maien Hamed, 2015/08/28-2015/08/31)
   </li>
 
-  <li> Fixed: In 3d, when you set the <code>colorize</code> flag of
-  GridGenerator::hyper_shell(), the faces of the domain were colored but
-  the edges were not. This was an oversight because to refine correctly,
-  the edges also have to have the appropriate boundary indicator set.
+  <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
+  that determine which cells form a layer around a specified subdomain. There is also a function
+  GridTools::compute_ghost_cell_halo_layer() that returns the smallest layer of ghost cells around
+  all locally relevant cells.
   <br>
-  (Wolfgang Bangerth, 2015/01/16)
+  (Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015/08/21)
   </li>
 
-  <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU 
-  on FreeBSD.
+  <li> Documentation: How to set up a testsuite in a user project is now
+  properly documented.
   <br>
-  (Bruno Turcksin, 2015/01/14)
+  (Matthias Maier, 2015/08/01 - 2015/08/20)
   </li>
 
-  <li> Improved: MPI collective operations such as MPI::sum, MPI::max now
-  check for job_supports_mpi() internally, which allows running them also
-  without a call to MPI_Init.
+  <li> Fixed: The computation of gradients in FE_PolyTensor and its derived classes (in particular in
+  FE_RaviartThomas and FE_Nedelec) forgot to account for terms that appear on non-affine
+  cells. Consequently, the computed gradients did not match the actual derivatives of the values
+  these elements report. This is now fixed.
   <br>
-  (Martin Kronbichler, 2015/01/13)
+  (Maien Hamed, 2015/08/18-2015/08/20)
   </li>
 
-  <li> Changed: The method job_supports_mpi() now resides in the namespace
-  Utilities::MPI instead of Utilities::System for consistency with other MPI
-  methods. The old method has been marked deprecated and will be removed in
-  a future version.
+  <li> Improved: Generalized conversion between Tensor<order+1,dim> and
+  DerivativeForm<order,dim,dim> to general order using converting constructor
+  and assignment operator.
   <br>
-  (Martin Kronbichler, 2015/01/13)
+  (Maien Hamed, 2015/08/01-2015/08/09)
   </li>
 
-  <li> Fixed: The update of ghost values in parallel::distributed::Vector when
-  calling the assignment operator is now active when one of the two vector had
-  its ghost values updated before or when the layout of the right hand side
-  vector is one-to-one, more consistent with parallel PETSc and Trilinos
-  vectors.
+  <li> Changed: The function Vector::add() that adds a scalar number to all
+  elements of a vector has been deprecated. The same is true for the
+  Vector::ratio() function, and for the corresponding functions in other
+  vector classes.
   <br>
-  (Martin Kronbichler, 2015/01/13)
+  (Wolfgang Bangerth, Bruno Turcksin, 2015/08/13)
   </li>
 
-  <li> New: PETScWrappers::MPI::SparseMatrix::reinit(other) copies
-  the layout of another matrix. TrilinosWrappers::SparseMatrix
-  operator= and copy constructor are now disabled. This brings
-  functionality between PETSc and Trilinos in line.
+  <li> New: Direct support for Abaqus mesh files has been added to the GridIn
+  class through the function GridIn::read_abaqus().
   <br>
-  (Timo Heister, 2015/01/12)
+  (Jean-Paul Pelteret, Timo Heister,  Krzysztof Bzowski, 2015/08/12)
   </li>
 
-  <li> New: Triangulation::set_all_manifold_ids() and
-  Triangulation::set_all_manifold_ids_on_boundaries()
-  set all manifold ids on every object or on every
-  boundary object respectively.
+  <li> Improved: Finite elements now compute hessians analytically rather than
+  by finite differencing.
   <br>
-  (Luca Heltai, 2015/01/12)
+  (Maien Hamed, 2015/08/01-2015/08/09)
   </li>
 
-  <li> New: GridTools::copy_boundary_to_manifold_id() and
-  GridTools::copy_material_to_manifold_id() copy
-  boundary_ids and material_ids to manifold_ids for
-  faces on the boundary and for cells respectively.
+  <li> New: There is now a function Mapping::project_real_point_to_unit_point_on_face()
+  that calls Mapping::transform_real_to_unit_cell() and then projects the
+  result to a provided face.
   <br>
-  (Luca Heltai, 2015/01/09)
+  (Jason Sheldon, 2015/08/11)
   </li>
 
-  <li> Fixed: Utilities::int_to_string() produced wrong results if
-  the number of digits specified was ten or greater.
+  <li> New: FEFaceValues and FESubfaceValues can now also compute
+  gradients of the Jacobian of the transformation from unit to real cell,
+  controlled by update_jacobian_grads.
   <br>
-  (David Wells, 2015/01/08)
+  (Martin Kronbichler, 2015/08/08)
   </li>
 
-  <li> Fixed: VectorTools::interpolate_to_different_mesh() was accidentally
-  only instantiated for dealii::Vector arguments, rather than all vector
-  classes. This is now fixed.
+  <li> New: There is now a function MemoryConsumption::memory_consumption()
+  for std_cxx11::unique_ptr arguments.
   <br>
-  (Benjamin Brands, Wolfgang Bangerth, 2014/12/29)
+  (Wolfgang Bangerth, 2015/08/07)
   </li>
 
-  <li> Fixed: Use CASROOT environment variable as additional hint for
-  opencasacade.
+  <li> Improved: CMake configuration: The DEAL_II_ADD_TEST now also
+  supports unit tests writing to stdout and stderr. Further, a second test
+  type consisting of an internal executable target, a configuration and a
+  comparison file is now supported.
   <br>
-  (Matthias Maier, 2014/12/29)
+  (Matthias Maier, 2015/08/03)
   </li>
 
-  <li> Fixed: Update the run_testsuite.cmake script to also pick up
-  muparser and opencascade configuration.
+  <li> New: VtkFlags now stores a parameter describing the compression level
+  zlib uses when writing compressed output. For small problems, the flag
+  ZlibCompressionLevel::best_speed can make the call to write_vtu many times
+  faster.
   <br>
-  (Matthias Maier, 2014/12/29)
+  (David Wells, 2015/08/03)
   </li>
 
-  <li> Fixed: Update several places in the documentation that were not
-  updated from functionparser to muparser. Add several forgotten
-  DEAL_II_WITH_* variables to certain places in the documentation.
+  <li> Improved: The conversion Epetra_Map -> IndexSet is now an O(1)
+  operation for contiguous index ranges, improving over the old O(N) behavior.
   <br>
-  (Matthias Maier, 2014/12/29)
+  (Martin Kronbichler, 2015/07/30)
   </li>
+
+  <li> Changed: The initialization methods of TrilinosWrappers::SparseMatrix,
+  TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::SparsityPattern, and
+  TrilinosWrappers::BlockSparsityPattern with Epetra_Map arguments have been
+  marked as deprecated. Use the functions with IndexSet argument instead.
+  <br>
+  (Martin Kronbichler, Luca Heltai, 2015/07/30)
+  </li>
+
+  <li> New: FESystem now does some work in parallel if your system
+  has multiple processors.
+  <br>
+  (Wolfgang Bangerth, 2015/07/19)
+  </li>
+
+  <li> Fixed: When using FESystem with base elements that require
+  information other than the determinant of the Jacobian (e.g.,
+  elements that require the Jacobian itself), then this information
+  was not passed down to FiniteElement::fill_fe_values of the
+  base element. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, Zhen Tao, 2015/07/17)
+  </li>
+
+  <li> New: The parallel::distributed::Triangulation can now be told to
+  partition the cells so that the sum of certain weights associated with each
+  cell, rather than the number of cells, is roughly constant between processors.
+  This is done by passing a vector of weights to the function that repartitions
+  the triangulation, parallel::distributed::Triangulation::repartition().
+  <br>
+  (Wolfgang Bangerth, 2015/07/14)
+  </li>
+
+  <li> New: DataOutBase::TecplotFlags now takes a third argument for solution
+  time which is useful to visualize transient data. If a user sets a non-negative
+  time, it will be saved into the tecplot file.
+  <br>
+  (Praveen Chandrashekar, 2015/08/30)
+  </li>
+
 </ol>
 
 */

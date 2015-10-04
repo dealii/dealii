@@ -31,7 +31,7 @@
 // make sense for the current configuration. For example, the list of VECTORS
 // is going to contain PETSc vectors if so configured.
 //
-// The second intput is read from the command line and consists of a sequence
+// The second input is read from the command line and consists of a sequence
 // of statements of the following form:
 // --------------------
 // for (u,v:VECTORS; z:SCALARS) { f(u, z, const v &); }
@@ -376,14 +376,31 @@ void substitute (const std::string &text,
            expansion = expansion_lists[pattern].begin();
            expansion != expansion_lists[pattern].end();
            ++expansion)
-        std::cout << substitute_tokens (text, name, *expansion)
-                  << std::endl;
+        {
+          // surround each block in the for loop with an if-def hack
+          // that allows us to split instantiation files into several
+          // chunks to be used in different .cc files (to reduce
+          // compiler memory usage).
+          // Just define SPLIT_INSTANTIATIONS_COUNT to a positive number (number of sections)
+          // to split the definitions into and SPLIT_INSTANTIATIONS_INDEX as a number
+          // between 0 and SPLIT_INSTANTIATIONS_COUNT-1 to get the instantiations of that
+          // particular chunk.
+          static unsigned int counter = 0;
+          std::cout << "#if !defined(SPLIT_INSTANTIATIONS_COUNT) || ("
+                    << counter++
+                    << " % SPLIT_INSTANTIATIONS_COUNT == SPLIT_INSTANTIATIONS_INDEX)" << std::endl;
+          std::cout << substitute_tokens (text, name, *expansion)
+                    << std::endl;
+          std::cout << "#endif" << std::endl;
+        }
+
     }
   else
     {
       std::cout << text
                 << std::endl;
     }
+
 }
 
 

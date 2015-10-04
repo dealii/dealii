@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,7 @@ void check ()
                         - third_invariant(S) * unit_symmetric_tensor<dim> ();
       deallog << R << std::endl;
 
-      Assert (R.norm() < 1e-10, ExcInternalError());
+      AssertThrow (R.norm() < 1e-10, ExcInternalError());
     }
 }
 

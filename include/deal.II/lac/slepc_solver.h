@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__slepc_solver_h
-#define __deal2__slepc_solver_h
+#ifndef dealii__slepc_solver_h
+#define dealii__slepc_solver_h
 
 #include <deal.II/base/config.h>
 
@@ -100,8 +100,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Toby D. Young 2008, 2009, 2010, 2011, 2013; and Rickard Armiento
  * 2008.
  *
- * @note Various tweaks and enhancments contributed by Eloy Romero and Jose E.
- * Roman 2009, 2010.
+ * @note Various tweaks and enhancements contributed by Eloy Romero and Jose
+ * E. Roman 2009, 2010.
  */
 namespace SLEPcWrappers
 {

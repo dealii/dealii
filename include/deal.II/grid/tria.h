@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_h
-#define __deal2__tria_h
+#ifndef dealii__tria_h
+#define dealii__tria_h
 
 
 #include <deal.II/base/config.h>
@@ -28,10 +28,13 @@
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_levels.h>
 
+// Ignore deprecation warnings for auto_ptr.
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <list>
@@ -121,7 +124,7 @@ struct CellData
   };
 
   /**
-   * Manifold identificator of this object. This identificator should be used
+   * Manifold identifier of this object. This identifier should be used
    * to identify the manifold to which this object belongs, and from which
    * this object will collect information on how to add points upon
    * refinement.
@@ -157,7 +160,7 @@ struct CellData
  * a common number describing the boundary condition to hold on this part of
  * the boundary. The triangulation creation function gives lines not in this
  * list either the boundary indicator zero (if on the boundary) or
- * numbers::internal_face_boundary_id (if in the interior). Explicitely giving
+ * numbers::internal_face_boundary_id (if in the interior). Explicitly giving
  * a line the indicator numbers::internal_face_boundary_id will result in an
  * error, as well as giving an interior line a boundary indicator.
  *
@@ -435,13 +438,12 @@ namespace internal
  * quite inconvenient if one attempted to operate on it directly, since data
  * is spread over quite a lot of arrays and other places. However, there are
  * ways powerful enough to work on these data structures without knowing their
- * exact relations. This is done through the concept of iterators (see the STL
- * documentation and TriaIterator). In order to make things as easy and
- * dimension independent as possible, use of class local typedefs is made, see
- * below.
+ * exact relations. deal.II uses class local typedefs (see below) to make
+ * things as easy and dimension independent as possible.
  *
- * The Triangulation class provides iterator which enable looping over all
- * cells without knowing the exact representation used to describe them. Their
+ * The Triangulation class provides iterators which enable looping over all
+ * cells without knowing the exact representation used to describe them. For
+ * more information see the documentation of <tt>TriaIterator</tt>. Their
  * names are typedefs imported from the Iterators class (thus making them
  * local types to this class) and are as follows:
  *
@@ -475,10 +477,11 @@ namespace internal
  * functions returning iterators. Take a look at the class doc to get an
  * overview.
  *
- * Usage of these iterators works mostly like with the STL iterators. Some
- * examples taken from the Triangulation source code follow (notice that in
- * the last two examples the template parameter @p spacedim has been omitted,
- * so it takes the default value <code>dim</code>).
+ * Usage of these iterators is similar to usage of standard container
+ * iterators. Some examples taken from the Triangulation source code follow
+ * (notice that in the last two examples the template parameter @p spacedim
+ * has been omitted, so it takes the default value <code>dim</code>).
+ *
  * <ul>
  * <li> <em>Counting the number of cells on a specific level</em>
  *    @code
@@ -492,7 +495,7 @@ namespace internal
  *        return n;
  *      };
  *    @endcode
- * Another way which uses the STL @p distance function would be to write
+ * Another way, which uses <tt>std::distance</tt>, would be to write
  *    @code
  *      template <int dim>
  *      int Triangulation<dim>::n_cells (const int level) const {
@@ -780,7 +783,7 @@ namespace internal
  * have boundary indicator zero while rightmost vertices have boundary
  * indicator one. In either case, the boundary indicator of a face can be
  * changed using a call of the kind
- * <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>.
+ * <code>cell-@>face(1)-@>set_boundary_id(42);</code>.
  *
  * @see
  * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -1045,7 +1048,7 @@ namespace internal
  * For technical reasons, writing and restoring a Triangulation object is not-
  * trivial. The primary reason is that unlike many other objects,
  * triangulations rely on many other objects to which they store pointers or
- * with which they interace; for example, triangulations store pointers to
+ * with which they interface; for example, triangulations store pointers to
  * objects describing boundaries and manifolds, and they have signals that
  * store pointers to other objects so they can be notified of changes in the
  * triangulation (see the section on signals in this introduction). As objects
@@ -1283,12 +1286,12 @@ public:
      * before calling execute_coarsening_and_refinement the first time. The
      * easiest way to achieve this is by calling global_refine(1) straight
      * after creation of the triangulation. It follows that active cells on
-     * level 1 may not be coarsenend.
+     * level 1 may not be coarsened.
      *
      * The main use of this flag is to ensure that each cell has at least one
      * neighbor in each coordinate direction (i.e. each cell has at least a
      * left or right, and at least an upper or lower neighbor in 2d). This is
-     * a necessary precondition for some algorihms that compute finite
+     * a necessary precondition for some algorithms that compute finite
      * differences between cells. The DerivativeApproximation class is one of
      * these algorithms that require that a triangulation is coarsest_level_1
      * unless all cells already have at least one neighbor in each coordinate
@@ -1382,7 +1385,7 @@ public:
     /**
      * This flag includes all the above ones and therefore combines all
      * smoothing algorithms implemented with the exception of anisotropic
-     * smoothening.
+     * smoothing.
      */
     maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
   };
@@ -1590,7 +1593,7 @@ public:
 
   /**
    * Assign a manifold object to a certain part of the the triangulation. If
-   * an object with manfifold number @p number is refined, this object is used
+   * an object with manifold number @p number is refined, this object is used
    * to find the location of new vertices (see the results section of step-49
    * for a more in-depth discussion of this, with examples).  It is also used
    * for non-linear (i.e.: non-Q1) transformations of cells to the unit cell
@@ -1683,7 +1686,14 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  std::vector<types::boundary_id> get_boundary_indicators() const;
+  std::vector<types::boundary_id> get_boundary_ids() const;
+
+  /**
+   * Deprecated spelling of get_boundary_ids().
+   *
+   * @deprecated Use get_boundary_ids() instead.
+   */
+  std::vector<types::boundary_id> get_boundary_indicators() const DEAL_II_DEPRECATED;
 
   /**
    * Returns a vector containing all manifold indicators assigned to the
@@ -3019,6 +3029,14 @@ private:
   void clear_despite_subscriptions ();
 
   /**
+   * For all cells, set the active cell indices so that active cells know the
+   * how many-th active cell they are, and all other cells have an invalid
+   * value. This function is called after mesh creation, refinement, and
+   * serialization.
+   */
+  void reset_active_cell_indices ();
+
+  /**
    * Refine all cells on all levels which were previously flagged for
    * refinement.
    *
@@ -3112,8 +3130,8 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_indicator)
-   * were not a pointer.
+   * this field (that can be modified by TriaAccessor::set_boundary_id) were
+   * not a pointer.
    */
   std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
 
@@ -3134,8 +3152,8 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_indicator)
-   * were not a pointer.
+   * this field (that can be modified by TriaAccessor::set_boundary_id) were
+   * not a pointer.
    */
   std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
 
@@ -3307,6 +3325,16 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
   ar &anisotropic_refinement;
   ar &number_cache;
+
+  // the levels do not serialize the active_cell_indices because
+  // they are easy enough to rebuild upon re-loading data. do
+  // this here. don't forget to first resize the fields appropriately
+  {
+    for (unsigned int l=0; l<levels.size(); ++l)
+      levels[l]->active_cell_indices.resize (levels[l]->refine_flags.size());
+    reset_active_cell_indices ();
+  }
+
 
   bool my_check_for_distorted_cells;
   ar &my_check_for_distorted_cells;

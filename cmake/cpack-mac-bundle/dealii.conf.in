@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 by the deal.II authors
+## Copyright (C) 2014 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library. It is a modified version
 ## of the file FEniCS terminal from the FEniCS project.
@@ -19,7 +19,7 @@ if [ -z "$DEAL_II_BUNDLE" ]; then
     cat << EOF
 *** Warning: I did not find the deal.II installation in $DEAL_II_BUNDLE.
     Could not set the environment to work with deal.II. Either reinstall
-    or set the environment vairiable DEAL_II_BUNDLE to the correct value.
+    or set the environment variable DEAL_II_BUNDLE to the correct value.
     Things may not work as you expect if you continue.
 EOF
     fi
@@ -35,7 +35,7 @@ export PATH=$DEAL_II_RESOURCES/bin:$PATH
 export DYLD_LIBRARY_PATH=$DEAL_II_RESOURCES/lib:$DYLD_LIBRARY_PATH
 export DEAL_II_DIR=$DEAL_II_RESOURCES
 
-# Do wathever the external library tells us to
+# Do whatever the external library tells us to
 if [ -f $DEAL_II_RESOURCES/opt/external.conf ]; then
     . $DEAL_II_RESOURCES/opt/external.conf
 fi

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__time_step_control_h
-#define __deal2__time_step_control_h
+#ifndef dealii__time_step_control_h
+#define dealii__time_step_control_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
@@ -139,8 +139,11 @@ namespace Algorithms
     /**
      * Set size of the first step. This may be overwritten by the time
      * stepping strategy.
+     *
+     * @param[in] step The size of the first step, which may be overwritten by
+     *   the time stepping strategy.
      */
-    void start_step (double);
+    void start_step (const double step);
 
     /**
      * Set size of the maximum step size.
@@ -249,7 +252,7 @@ namespace Algorithms
 
 
   inline void
-  TimestepControl::start_step (double t)
+  TimestepControl::start_step (const double t)
   {
     start_step_val = t;
   }

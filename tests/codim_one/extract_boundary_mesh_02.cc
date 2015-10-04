@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,7 @@ void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mes
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          Assert (diff.square() == 0, ExcInternalError());
+          AssertThrow (diff.square() == 0, ExcInternalError());
         }
     }
 }

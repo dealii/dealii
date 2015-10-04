@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_operators_h
-#define __deal2__matrix_free_operators_h
+#ifndef dealii__matrix_free_operators_h
+#define dealii__matrix_free_operators_h
 
 
 #include <deal.II/base/exceptions.h>

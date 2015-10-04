@@ -46,11 +46,11 @@ void test(std::ostream & /*out*/)
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   initlog();
 
   deallog.push("2-3");
-  test<2,3>(deallog.get_file_stream());  
+  test<2,3>(deallog.get_file_stream());
   deallog.pop();
 }

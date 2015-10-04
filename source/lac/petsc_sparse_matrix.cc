@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,7 @@
 
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/compressed_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#  include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -316,30 +315,21 @@ namespace PETScWrappers
   SparseMatrix::SparseMatrix (const SparsityPattern &,
                               const bool);
   template
-  SparseMatrix::SparseMatrix (const CompressedSparsityPattern &,
-                              const bool);
-  template
-  SparseMatrix::SparseMatrix (const CompressedSimpleSparsityPattern &,
+  SparseMatrix::SparseMatrix (const DynamicSparsityPattern &,
                               const bool);
 
   template void
   SparseMatrix::reinit (const SparsityPattern &,
                         const bool);
   template void
-  SparseMatrix::reinit (const CompressedSparsityPattern &,
-                        const bool);
-  template void
-  SparseMatrix::reinit (const CompressedSimpleSparsityPattern &,
+  SparseMatrix::reinit (const DynamicSparsityPattern &,
                         const bool);
 
   template void
   SparseMatrix::do_reinit (const SparsityPattern &,
                            const bool);
   template void
-  SparseMatrix::do_reinit (const CompressedSparsityPattern &,
-                           const bool);
-  template void
-  SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
+  SparseMatrix::do_reinit (const DynamicSparsityPattern &,
                            const bool);
 
   PetscScalar

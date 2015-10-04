@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__subscriptor_h
-#define __deal2__subscriptor_h
+#ifndef dealii__subscriptor_h
+#define dealii__subscriptor_h
 
 
 #include <deal.II/base/config.h>
@@ -119,19 +119,22 @@ public:
   DeclException3(ExcInUse,
                  int, char *, std::string &,
                  << "Object of class " << arg2
-                 << " is still used by " << arg1 << " other objects.\n"
-                 << "(Additional information: " << arg3 << ")\n"
-                 << "Note the entry in the Frequently Asked Questions of "
+                 << " is still used by " << arg1 << " other objects."
+                 << "\n\n"
+                 << "(Additional information: " << arg3 << ")\n\n"
+                 << "See the entry in the Frequently Asked Questions of "
                  << "deal.II (linked to from http://www.dealii.org/) for "
-                 << "more information on what this error means.");
+                 << "a lot more information on what this error means and "
+                 << "how to fix programs in which it happens.");
 
   /**
    * A subscriber with the identification string given to
    * Subscriptor::unsubscribe() did not subscribe to the object.
    */
   DeclException2(ExcNoSubscriber, char *, char *,
-                 << "No subscriber with identifier \"" << arg2
-                 << "\" did subscribe to this object of class " << arg1);
+                 << "No subscriber with identifier <" << arg2
+                 << "> subscribes to this object of class " << arg1
+                 << ". Consequently, it cannot be unsubscribed.");
   //@}
 
   /**
@@ -163,7 +166,7 @@ private:
   map_iterator;
 
   /**
-   * Store the number of objects which subscribed to this object. Initialally,
+   * Store the number of objects which subscribed to this object. Initially,
    * this number is zero, and upon destruction it shall be zero again (i.e.
    * all objects which subscribed should have unsubscribed again).
    *
@@ -174,9 +177,9 @@ private:
    * constant objects also.
    *
    * In multithreaded mode, this counter may be modified by different threads.
-   * We thus have to mark it <tt>volatile</tt>. However, this is counter-
-   * productive in non-MT mode since it may pessimize code. So use the macro
-   * defined above to selectively add volatility.
+   * We thus have to mark it <tt>volatile</tt>. However, this is
+   * counter-productive in non-MT mode since it may pessimize code. So use the macro
+   * defined in <tt>deal.II/base/config.h</tt> to selectively add volatility.
    */
   mutable DEAL_VOLATILE unsigned int counter;
 

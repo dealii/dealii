@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,8 +59,8 @@ void test ()
               for (unsigned int b=0; b<dim; ++b)
                 tmp += A[i][j][a][b] * B[a][b][k][l];
 
-            Assert (std::fabs(T[i][j][k][l] - tmp) < 1e-14*tmp,
-                    ExcInternalError());
+            AssertThrow (std::fabs(T[i][j][k][l] - tmp) < 1e-14*tmp,
+                         ExcInternalError());
           }
 }
 

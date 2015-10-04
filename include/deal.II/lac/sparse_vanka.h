@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_vanka_h
-#define __deal2__sparse_vanka_h
+#ifndef dealii__sparse_vanka_h
+#define dealii__sparse_vanka_h
 
 
 
@@ -41,19 +41,19 @@ template <typename number> class SparseBlockVanka;
 /**
  * Point-wise Vanka preconditioning. This class does Vanka preconditioning  on
  * a point-wise base. Vanka preconditioners are used for saddle point problems
- * like Stoke's problem or problems arising in optimization where Lagrange
- * multiplier occur and let Netwon's matrix have a zero block. With these
+ * like Stokes' problem or problems arising in optimization where Lagrange
+ * multipliers occur and the Newton method matrix has a zero block. With these
  * matrices the application of Jacobi or Gauss-Seidel methods is impossible,
  * because some diagonal elements are zero in the rows of the Lagrange
  * multiplier. The approach of Vanka is to solve a small (usually indefinite)
- * system of equations for each Langrange multiplie variable (we will also
+ * system of equations for each Langrange multiplier variable (we will also
  * call the pressure in Stokes' equation a Langrange multiplier since it can
  * be interpreted as such).
  *
  * Objects of this class are constructed by passing a vector of indices of the
  * degrees of freedom of the Lagrange multiplier. In the actual
  * preconditioning method, these rows are traversed in the order in which the
- * appear in the matrix. Since this is a Gau�-Seidel like procedure,
+ * appear in the matrix. Since this is a Gauß-Seidel like procedure,
  * remember to have a good ordering in advance (for transport dominated
  * problems, Cuthill-McKee algorithms are a good means for this, if points on
  * the inflow boundary are chosen as starting points for the renumbering).
@@ -91,23 +91,21 @@ template <typename number> class SparseBlockVanka;
  * parameter optimization. The Lagrange multiplier is the third component of
  * the finite element used. The system is solved by the GMRES method.
  * @code
- *                        // tag the Lagrange multiplier variable
+ *    // tag the Lagrange multiplier variable
  *    vector<bool> signature(3);
  *    signature[0] = signature[1] = false;
  *    signature[2] = true;
  *
- *                        // tag all dofs belonging to the
- *                        // Lagrange multiplier
+ *    // tag all dofs belonging to the Lagrange multiplier
  *    vector<bool> selected_dofs (dof.n_dofs(), false);
  *    DoFTools::extract_dofs(dof, signature, p_select);
- *                        // create the Vanka object
+ *    // create the Vanka object
  *    SparseVanka<double> vanka (global_matrix, selected_dofs);
  *
- *                        // create the solver
- *    SolverGMRES<PreconditionedSparseMatrix<double>,
- *                Vector<double> >    gmres(control,memory,504);
+ *    // create the solver
+ *    SolverGMRES<> gmres(control,memory,504);
  *
- *                        // solve
+ *    // solve
  *    gmres.solve (global_matrix, solution, right_hand_side,
  *                 vanka);
  * @endcode
@@ -420,7 +418,7 @@ class SparseBlockVanka : public SparseVanka<number>
 {
 public:
   /**
-   * Declate type for container size.
+   * Declare type for container size.
    */
   typedef types::global_dof_index size_type;
 

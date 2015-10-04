@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__time_dependent_h
-#define __deal2__time_dependent_h
+#ifndef dealii__time_dependent_h
+#define dealii__time_dependent_h
 
 
 /*----------------------------   time-dependent.h     ---------------------------*/
@@ -39,7 +39,7 @@ template <int dim, int spacedim> class Triangulation;
  * This class provides an abstract interface to time dependent problems in
  * that it addresses some of the most annoying aspects of this class of
  * problems: data management. These problems frequently need large amounts of
- * computer ressources, most notably computing time, main memory and disk
+ * computer resources, most notably computing time, main memory and disk
  * space. Main memory reduction is often the most pressing need, methods to
  * implement it are almost always quite messy, though, quickly leading to code
  * that stores and reloads data at places scattered all over the program, and
@@ -64,7 +64,7 @@ template <int dim, int spacedim> class Triangulation;
  * step objects on which we solve our problem subsequently. In order to do so,
  * we need knowledge of the data on zero or several previous timesteps (when
  * using single or multiple step methods, that is) and maybe also some data of
- * time steps ahead (for example the computational grid on these). Dependening
+ * time steps ahead (for example the computational grid on these). Depending
  * on the problem in question, a second loop over all timesteps may be done
  * solving a dual problem, where the loop may run forward (one dual problem
  * for each time step) or backward (using a global dual problem). Within one
@@ -1342,7 +1342,7 @@ public:
    * triangulation is deleted and the refinement history saved such that the
    * respective @p wake_up function can rebuild it. You should therefore call
    * this function from your overloaded version, preferably at the end so that
-   * your function can use the triangulation as long as ou need it.
+   * your function can use the triangulation as long as you need it.
    */
   virtual void sleep (const unsigned int);
 

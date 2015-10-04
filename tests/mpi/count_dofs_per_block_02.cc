@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,7 +71,7 @@ void test()
            cell != triangulation.end(); ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      Assert (index == triangulation.n_active_cells(), ExcInternalError());
+      AssertThrow (index == triangulation.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -90,9 +90,9 @@ void test()
       std::vector<types::global_dof_index> dofs_per_block (fe.n_components());
       DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
-      Assert (std::accumulate (dofs_per_block.begin(), dofs_per_block.end(), 0U)
-              == dof_handler.n_dofs(),
-              ExcInternalError());
+      AssertThrow (std::accumulate (dofs_per_block.begin(), dofs_per_block.end(), 0U)
+                   == dof_handler.n_dofs(),
+                   ExcInternalError());
 
       unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
       if (myid == 0)
@@ -108,7 +108,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)

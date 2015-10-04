@@ -18,3 +18,16 @@ SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
   OUTPUT_NAME expand_instantiations
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}
   )
+
+SET(_scripts
+  ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl
+  ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
+  )
+FILE(COPY ${_scripts}
+  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts
+  )
+INSTALL(FILES ${_scripts}
+  DESTINATION ${DEAL_II_SHARE_RELDIR}/scripts
+  COMPONENT library
+  )

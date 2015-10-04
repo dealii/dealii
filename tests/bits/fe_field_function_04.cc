@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,10 +86,12 @@ void test()
   fe_function.value_list (points, m);
 
   for (unsigned int i=0; i<m.size(); ++i)
-    Assert (std::fabs(m[i] - points[i].square())
-            <
-            1e-10 * std::fabs(m[i] + points[i].square()),
-            ExcInternalError());
+    AssertThrow (std::fabs(m[i] - points[i].square())
+                 <
+                 1e-10 * std::fabs(m[i] + points[i].square())
+                 ||
+                 std::fabs(m[i] + points[i].square()) < 1e-30,
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -105,4 +107,3 @@ int main ()
 
   return 0;
 }
-

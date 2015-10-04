@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_selector_h
-#define __deal2__solver_selector_h
+#ifndef dealii__solver_selector_h
+#define dealii__solver_selector_h
 
 
 #include <deal.II/base/config.h>
@@ -98,6 +98,10 @@ template <class VECTOR = Vector<double> >
 class SolverSelector : public Subscriptor
 {
 public:
+  /**
+   * A typedef for the underlying vector type
+   */
+  typedef VECTOR vector_type;
 
   /**
    * Constructor, filling in default values

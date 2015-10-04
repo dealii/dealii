@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mes
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          Assert (diff.square() == 0, ExcInternalError());
+          AssertThrow (diff.square() == 0, ExcInternalError());
         }
     }
 }
@@ -111,7 +111,7 @@ int main ()
          cell != volume_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
-          cell->face(f)->set_all_boundary_indicators (1);
+          cell->face(f)->set_all_boundary_ids (1);
     volume_mesh.set_boundary (1, boundary_description);
     volume_mesh.refine_global (1);
 

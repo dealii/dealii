@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2014 by the deal.II authors
+ * Copyright (C) 2006 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,6 +33,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -284,7 +285,7 @@ namespace Step25
   // and refines it several times. Also, all matrix and vector members of the
   // <code>SineGordonProblem</code> class are initialized to their appropriate
   // sizes once the degrees of freedom have been assembled. Like step-24, we
-  // use the <code>MatrixCreator</code> class to generate a mass matrix $M$
+  // use <code>MatrixCreator</code> functions to generate a mass matrix $M$
   // and a Laplace matrix $A$ and store them in the appropriate variables for
   // the remainder of the program's life.
   template <int dim>
@@ -306,11 +307,9 @@ namespace Step25
               << dof_handler.n_dofs()
               << std::endl;
 
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    sparsity_pattern.compress ();
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit  (sparsity_pattern);
     mass_matrix.reinit    (sparsity_pattern);

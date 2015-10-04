@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__polynomials_nedelec_h
-#define __deal2__polynomials_nedelec_h
+#ifndef dealii__polynomials_nedelec_h
+#define dealii__polynomials_nedelec_h
 
 
 #include <deal.II/base/config.h>
@@ -73,7 +73,11 @@ public:
    * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
    * in a loop over all tensor product polynomials.
    */
-  void compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values, std::vector<Tensor<2, dim> > &grads, std::vector<Tensor<3, dim> > &grad_grads) const;
+  void compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values,
+                std::vector<Tensor<2, dim> > &grads,
+                std::vector<Tensor<3,dim> > &grad_grads,
+                std::vector<Tensor<4,dim> > &third_derivatives,
+                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
    * Returns the number of Nédélec polynomials.
@@ -92,7 +96,7 @@ public:
   std::string name () const;
 
   /**
-   * Return the number of polynomials in the space <TT>N(degree)</tt> without
+   * Return the number of polynomials in the space <tt>N(degree)</tt> without
    * requiring to build an object of PolynomialsNedelec. This is required by
    * the FiniteElement classes.
    */

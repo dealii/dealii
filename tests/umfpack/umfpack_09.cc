@@ -113,8 +113,8 @@ void test ()
     for (SparseMatrix<double>::iterator p=xB.begin();
          p!=xB.end(); ++p)
       if (p->column() != p->row())
-        Assert (xB(p->row(),p->column()) != xB(p->column(),p->row()),
-                ExcInternalError());
+        AssertThrow (xB(p->row(),p->column()) != xB(p->column(),p->row()),
+                     ExcInternalError());
 
     // now copy stuff over
     for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end(); ++i)

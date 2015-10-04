@@ -89,8 +89,8 @@ namespace Step38
         typename DoFHandler<spacedim>::face_iterator>
         element_assignment =
           GridGenerator::extract_boundary_mesh(space_dof_handler,
-                                           contact_dof_handler,
-                                           boundary_ids);
+                                               contact_dof_handler,
+                                               boundary_ids);
 
     contact_dof_handler.distribute_dofs(boundary_fe);
 

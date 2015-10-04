@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,19 +28,19 @@
 #include <deal.II/base/function_parser.h>
 
 
-void eval(const std::string & exp, const Point<2> & p, double expected)
+void eval(const std::string &exp, const Point<2> &p, double expected)
 {
   std::string variables = "x,y";
   std::map<std::string,double> constants;
 
   FunctionParser<2> fp(1);
   fp.initialize(variables,
-		exp,
-		constants);
+                exp,
+                constants);
 
   double result = fp.value(p);
   deallog << "'" << exp << "' @ " << p << " is " << result
-	  << " ( expected " << expected << " )" << std::endl;
+          << " ( expected " << expected << " )" << std::endl;
   if (fabs(result-expected)>1e-10)
     deallog << "ERROR!" << std::endl;
 }
@@ -56,7 +56,7 @@ void test()
   eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(1.5,1.5), 1.5);
   eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(1.5,0.5), 0.0);
   eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(0.5,-2), 0.0);
-  
+
   eval("if   (x<1.0 & y<1.0,0,y)",Point<2>(1.5,-2.0), -2.0);
 
   double x,y;
@@ -67,7 +67,7 @@ void test()
   y=3.1;
   eval("atan2 (x,y)",Point<2>(x,y), atan2(x,y));
 
-  eval("if   (x==1.0,0,y)",Point<2>(1.0,-2.0), 0.0);  
+  eval("if   (x==1.0,0,y)",Point<2>(1.0,-2.0), 0.0);
   eval("if   (x==1.0,0,y)",Point<2>(1.1,-2.0), -2.0);
 
   eval("int (2.1)",Point<2>(1.1,-2.0), 2.0);
@@ -75,7 +75,7 @@ void test()
 
   eval("abs (-2.3)",Point<2>(0,0), 2.3);
   eval("acos (0.5)",Point<2>(0,0), acos(0.5));
-  eval("acosh (0.5)",Point<2>(0,0), acosh(0.5));
+  eval("acosh (1.5)",Point<2>(0,0), acosh(1.5));
   eval("asin (0.5)",Point<2>(0,0), asin(0.5));
   eval("asinh (0.5)",Point<2>(0,0), asinh(0.5));
   eval("atan (0.5)",Point<2>(0,0), atan(0.5));

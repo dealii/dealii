@@ -15,9 +15,12 @@
 
 #include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#define SPLIT_INSTANTIATIONS_INDEX 0
 #include "sparse_matrix.inst"
 
 DEAL_II_NAMESPACE_CLOSE

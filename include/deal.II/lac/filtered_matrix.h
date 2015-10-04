@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__filtered_matrix_h
-#define __deal2__filtered_matrix_h
+#ifndef dealii__filtered_matrix_h
+#define dealii__filtered_matrix_h
 
 
 
@@ -177,7 +177,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  * This class takes as template arguments a matrix and a vector class. The
  * former must provide @p vmult, @p vmult_add,  @p Tvmult, and @p residual
  * member function that operate on the vector type (the second template
- * argument). The latter template parameter must provide access to indivual
+ * argument). The latter template parameter must provide access to individual
  * elements through <tt>operator()</tt>, assignment through
  * <tt>operator=</tt>.
  *
@@ -252,7 +252,7 @@ public:
   };
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {
@@ -352,7 +352,7 @@ public:
 
   /**
    * Set the matrix to be used further on. You will probably also want to call
-   * the clear_constraints() function if constraits were previously added.
+   * the clear_constraints() function if constraints were previously added.
    *
    * @arg @p m: The matrix being used in multiplications.
    *
@@ -487,7 +487,7 @@ private:
    *
    * We expect this for instance in Newton's method, where the residual
    * already should be zero on constrained nodes. This is, because there is no
-   * testfunction in these nodes.
+   * test function in these nodes.
    */
   bool expect_constrained_source;
 

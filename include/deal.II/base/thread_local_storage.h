@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__thread_local_storage_h
-#define __deal2__thread_local_storage_h
+#ifndef dealii__thread_local_storage_h
+#define dealii__thread_local_storage_h
 
 
 #include <deal.II/base/config.h>
@@ -278,6 +278,6 @@ namespace Threads
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef __deal2__thread_local_storage_h
+// end of #ifndef dealii__thread_local_storage_h
 #endif
 //---------------------------------------------------------------------------

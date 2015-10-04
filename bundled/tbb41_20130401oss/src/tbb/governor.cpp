@@ -60,7 +60,12 @@ static __cilk_tbb_retcode (*watch_stack_handler)(struct __cilk_tbb_unwatch_thunk
 
 //! Table describing how to link the handlers.
 static const dynamic_link_descriptor CilkLinkTable[] = {
-    { "__cilkrts_watch_stack", (pointer_to_handler*)(void*)(&watch_stack_handler) }
+    { "__cilkrts_watch_stack", (pointer_to_handler*)(void*)(&watch_stack_handler)
+#if __TBB_WEAK_SYMBOLS_PRESENT
+    ,
+    NULL
+#endif
+    }
 };
 
 static atomic<do_once_state> cilkrts_load_state;

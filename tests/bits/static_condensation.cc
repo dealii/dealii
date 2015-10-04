@@ -388,7 +388,7 @@ void HelmholtzProblem<dim>::assemble_system (const bool do_reconstruct)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->face(face)->at_boundary()
             &&
-            (cell->face(face)->boundary_indicator() == 1))
+            (cell->face(face)->boundary_id() == 1))
           {
             x_fe_face_values.reinit (cell, face);
             const FEFaceValues<dim> &fe_face_values
@@ -627,7 +627,7 @@ void HelmholtzProblem<dim>::run ()
               if ((cell->face(face)->center()(0) == -1)
                   ||
                   (cell->face(face)->center()(1) == -1))
-                cell->face(face)->set_boundary_indicator (1);
+                cell->face(face)->set_boundary_id (1);
         }
       else
         refine_grid ();

@@ -26,18 +26,19 @@
 #include <deal.II/grid/grid_out.h>
 
 template<int dim, int spacedim>
-void print_info(Triangulation<dim,spacedim> &tria) {
+void print_info(Triangulation<dim,spacedim> &tria)
+{
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if(cell->face(f)->at_boundary()) 
-	  deallog << "face: " << cell->face(f)
-		  << ", boundary_id: " 
-		  << (int)cell->face(f)->boundary_indicator()
-		  << ", manifold_id: " 
-		  << (int)cell->face(f)->manifold_id() << std::endl;
+        if (cell->face(f)->at_boundary())
+          deallog << "face: " << cell->face(f)
+                  << ", boundary_id: "
+                  << (int)cell->face(f)->boundary_id()
+                  << ", manifold_id: "
+                  << (int)cell->face(f)->manifold_id() << std::endl;
     }
 }
 
@@ -62,7 +63,7 @@ void test()
 int main ()
 {
   initlog(true);
-  
+
   test<1,1>();
   test<1,2>();
   test<2,2>();

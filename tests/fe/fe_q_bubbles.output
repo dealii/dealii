@@ -1,0 +1,91 @@
+
+DEAL::
+DEAL::FE_Q_Bubbles<2>(1) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<2>(1) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(1) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(1) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(1) 2
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<2>(2) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<2>(2) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(2) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(2) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(2) 2
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<2>(3) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<2>(3) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(3) 0
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(3) 1
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::
+DEAL::
+DEAL::FE_Q_Bubbles<3>(3) 2
+DEAL::L2_error: 0
+DEAL::H1_error: 0
+DEAL::Linfty_error: 0
+DEAL::

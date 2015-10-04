@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__integrators_local_integrators_h
-#define __deal2__integrators_local_integrators_h
+#ifndef dealii__integrators_local_integrators_h
+#define dealii__integrators_local_integrators_h
 
 // This file only provides definition and documentation of the
 // namespace LocalIntegrators. There is no necessity to include it

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim> > &patches)
 
 // Do this only if the necessary headers were included
 
-#if defined(__deal2__quadrature_lib_h) && defined(__deal2__function_lib_h)
+#if defined(dealii__quadrature_lib_h) && defined(dealii__function_lib_h)
 
 template <int dim>
 void

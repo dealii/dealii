@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,7 @@ check_this (const FiniteElement<dim> &fe,
   FullMatrix<double> X (fe.dofs_per_cell,
                         q_rhs.size());
 
-  Assert (X.m() == X.n(), ExcInternalError());
+  AssertThrow (X.m() == X.n(), ExcInternalError());
 
   FETools::compute_projection_from_quadrature_points_matrix (fe,
                                                              q_rhs, q_rhs,
@@ -74,6 +74,6 @@ check_this (const FiniteElement<dim> &fe,
   for (unsigned int i=0; i<X.m(); ++i)
     X(i,i) -= 1;
 
-  Assert (X.frobenius_norm() < 1e-10, ExcInternalError());
+  AssertThrow (X.frobenius_norm() < 1e-10, ExcInternalError());
 }
 

@@ -120,7 +120,7 @@ std::vector<unsigned int>
 FE_TraceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   // This constructs FE_TraceQ in exactly the same way as FE_Q except for the
-  // interior degrees of freedom that are not present here (lnine in 1D, quad
+  // interior degrees of freedom that are not present here (line in 1D, quad
   // in 2D, hex in 3D).
   AssertThrow(deg>0,ExcMessage("FE_TraceQ needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim+1, 1U);
@@ -156,11 +156,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      // the FE_Nothing has no degrees of freedom and it is typically used in
-      // a context where we don't require any continuity along the interface
-      return FiniteElementDomination::no_requirements;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());

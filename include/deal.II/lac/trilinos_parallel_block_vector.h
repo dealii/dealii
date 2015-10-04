@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_parallel_block_vector_h
-#define __deal2__trilinos_parallel_block_vector_h
+#ifndef dealii__trilinos_parallel_block_vector_h
+#define dealii__trilinos_parallel_block_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -25,6 +25,8 @@
 #  include <deal.II/lac/block_indices.h>
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
+
+#  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -100,8 +102,10 @@ namespace TrilinosWrappers
        * Constructor. Generate a block vector with as many blocks as there are
        * entries in @p partitioning. Each Epetra_Map contains the layout of
        * the distribution of data among the MPI processes.
+       *
+       * This function is deprecated.
        */
-      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
+      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 
       /**
        * Constructor. Generate a block vector with as many blocks as there are
@@ -126,7 +130,18 @@ namespace TrilinosWrappers
        * Copy-Constructor. Set all the properties of the parallel vector to
        * those of the given argument and copy the elements.
        */
-      BlockVector (const BlockVector  &V);
+      BlockVector (const BlockVector  &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This constructor is only available if deal.II is configured
+       * with C++11 support.
+       */
+      BlockVector (BlockVector &&v);
+#endif
 
       /**
        * Creates a block vector consisting of <tt>num_blocks</tt> components,
@@ -144,20 +159,29 @@ namespace TrilinosWrappers
        * Copy operator: fill all components of the vector that are locally
        * stored with the given scalar value.
        */
-      BlockVector &
-      operator = (const value_type s);
+      BlockVector &operator= (const value_type s);
 
       /**
        * Copy operator for arguments of the same type.
        */
-      BlockVector &
-      operator = (const BlockVector &V);
+      BlockVector &operator= (const BlockVector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      BlockVector &operator= (BlockVector &&v);
+#endif
 
       /**
        * Copy operator for arguments of the localized Trilinos vector type.
        */
       BlockVector &
-      operator = (const ::dealii::TrilinosWrappers::BlockVector &V);
+      operator= (const ::dealii::TrilinosWrappers::BlockVector &v);
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -170,8 +194,7 @@ namespace TrilinosWrappers
        * accept only one possible number type in the deal.II vector.
        */
       template <typename Number>
-      BlockVector &
-      operator = (const ::dealii::BlockVector<Number> &V);
+      BlockVector &operator= (const ::dealii::BlockVector<Number> &v);
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -179,9 +202,11 @@ namespace TrilinosWrappers
        * distribution of the individual components described in the maps.
        *
        * If <tt>fast==false</tt>, the vector is filled with zeros.
+       *
+       * This function is deprecated.
        */
       void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
-                   const bool                     fast = false);
+                   const bool                     fast = false) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -268,8 +293,10 @@ namespace TrilinosWrappers
        * non-true values when used in <tt>debug</tt> mode, since it is quite
        * expensive to keep track of all operations that lead to the need for
        * compress().
+       *
+       * This function is deprecated.
        */
-      bool is_compressed () const;
+      bool is_compressed () const DEAL_II_DEPRECATED;
 
       /**
        * Returns if this Vector contains ghost elements.
@@ -329,14 +356,6 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (const std::vector<Epetra_Map> &parallel_partitioning)
-    {
-      reinit (parallel_partitioning, false);
-    }
-
-
-
-    inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const MPI_Comm              &communicator)
     {
@@ -379,26 +398,21 @@ namespace TrilinosWrappers
 
 
 
+#ifdef DEAL_II_WITH_CXX11
     inline
-    bool
-    BlockVector::is_compressed () const
+    BlockVector::BlockVector (BlockVector &&v)
     {
-      bool compressed = true;
-      for (unsigned int row=0; row<n_blocks(); ++row)
-        if (block(row).is_compressed() == false)
-          {
-            compressed = false;
-            break;
-          }
-
-      return compressed;
+      // initialize a minimal, valid object and swap
+      reinit (0);
+      swap(v);
     }
+#endif
 
 
 
     template <typename Number>
     BlockVector &
-    BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
+    BlockVector::operator= (const ::dealii::BlockVector<Number> &v)
     {
       if (n_blocks() != v.n_blocks())
         {
@@ -436,11 +450,9 @@ namespace TrilinosWrappers
     void
     BlockVector::swap (BlockVector &v)
     {
-      Assert (n_blocks() == v.n_blocks(),
-              ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+      std::swap(this->components, v.components);
 
-      for (unsigned int row=0; row<n_blocks(); ++row)
-        block(row).swap (v.block(row));
+      dealii::swap(this->block_indices, v.block_indices);
     }
 
 
@@ -460,11 +472,49 @@ namespace TrilinosWrappers
       u.swap (v);
     }
 
-  } /* end of namespace MPI */
+  } /* namespace MPI */
 
-}
+} /* namespace TrilinosWrappers */
 
 /*@}*/
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::MPI::BlockVector.
+     */
+    template<>
+    class ReinitHelper<TrilinosWrappers::MPI::BlockVector>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.range_partitioner(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.domain_partitioner(), fast);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
 
 DEAL_II_NAMESPACE_CLOSE
 

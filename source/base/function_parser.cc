@@ -20,7 +20,9 @@
 
 
 #ifdef DEAL_II_WITH_MUPARSER
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <muParser.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
 
 namespace fparser
@@ -163,6 +165,11 @@ namespace internal
   {
     return log(value);
   }
+
+  double mu_pow(double a, double b)
+  {
+    return std::pow(a, b);
+  }
 }
 
 
@@ -200,6 +207,7 @@ void FunctionParser<dim>:: init_muparser() const
       fp.get()[component].DefineFun("floor", internal::mu_floor, true);
       fp.get()[component].DefineFun("sec", internal::mu_sec, true);
       fp.get()[component].DefineFun("log", internal::mu_log, true);
+      fp.get()[component].DefineFun("pow", internal::mu_pow, true);
 
       try
         {
@@ -248,7 +256,8 @@ void FunctionParser<dim>:: init_muparser() const
             "cot",
             "csc",
             "floor",
-            "sec"
+            "sec",
+            "pow"
           };
           for (unsigned int f=0; f<sizeof(function_names)/sizeof(function_names[0]); ++f)
             {

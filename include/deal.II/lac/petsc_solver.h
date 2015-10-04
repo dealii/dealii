@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_solver_h
-#define __deal2__petsc_solver_h
+#ifndef dealii__petsc_solver_h
+#define dealii__petsc_solver_h
 
 
 #include <deal.II/base/config.h>
@@ -254,6 +254,7 @@ namespace PETScWrappers
       /**
        * Constructor. By default, set the damping parameter to one.
        */
+      explicit
       AdditionalData (const double omega = 1);
 
       /**
@@ -298,8 +299,8 @@ namespace PETScWrappers
 
 
   /**
-   * An implementation of the solver interface using the PETSc Chebychev
-   * solver.
+   * An implementation of the solver interface using the PETSc Chebyshev (or,
+   * prior version 3.3, Chebychev) solver.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, 2004

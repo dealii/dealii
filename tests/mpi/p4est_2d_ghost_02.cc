@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,8 +77,8 @@ void test()
             {
               if (cell->subdomain_id() != (unsigned int)myid)
                 {
-                  Assert (cell->is_ghost() || cell->is_artificial(),
-                          ExcInternalError());
+                  AssertThrow (cell->is_ghost() || cell->is_artificial(),
+                               ExcInternalError());
                   continue;
                 }
 
@@ -86,13 +86,13 @@ void test()
                 {
                   if (cell->at_boundary(n))
                     continue;
-                  Assert (cell->neighbor(n).state() == IteratorState::valid,
-                          ExcInternalError());
+                  AssertThrow (cell->neighbor(n).state() == IteratorState::valid,
+                               ExcInternalError());
 
-                  Assert( cell->neighbor(n)->level() == cell->level(),
-                          ExcInternalError());
+                  AssertThrow ( cell->neighbor(n)->level() == cell->level(),
+                                ExcInternalError());
 
-                  Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
+                  AssertThrow (!cell->neighbor(n)->has_children(), ExcInternalError() );
                 }
             }
 
@@ -102,9 +102,9 @@ void test()
                     << checksum
                     << std::endl;
 
-          Assert (tr.n_global_active_cells() ==
-                  static_cast<unsigned int>(std::pow (1.*GeometryInfo<dim>::max_children_per_cell, i+1)),
-                  ExcInternalError());
+          AssertThrow (tr.n_global_active_cells() ==
+                       static_cast<unsigned int>(std::pow (1.*GeometryInfo<dim>::max_children_per_cell, i+1)),
+                       ExcInternalError());
         }
     }
 
@@ -115,7 +115,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

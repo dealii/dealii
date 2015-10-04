@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,15 +32,15 @@
 void test ()
 {
   // test for an initialized mask
-  Assert (BlockMask(12,false).represents_n_blocks(12) == true,
-          ExcInternalError());
-  Assert (BlockMask(12,false).represents_n_blocks(13) == false,
-          ExcInternalError());
+  AssertThrow (BlockMask(12,false).represents_n_blocks(12) == true,
+               ExcInternalError());
+  AssertThrow (BlockMask(12,false).represents_n_blocks(13) == false,
+               ExcInternalError());
   // test for an empty mask
-  Assert (BlockMask().represents_n_blocks(12) == true,
-          ExcInternalError());
-  Assert (BlockMask().represents_n_blocks(13) == true,
-          ExcInternalError());
+  AssertThrow (BlockMask().represents_n_blocks(12) == true,
+               ExcInternalError());
+  AssertThrow (BlockMask().represents_n_blocks(13) == true,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

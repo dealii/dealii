@@ -184,9 +184,9 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 </pre>
       The same holds for all variables starting with <code>COMPONENT_</code>
       and all individual component names:
-      <code>DOCUMENTATION</code>, <code>EXAMPLES</code>,
-      <code>MESH_CONVERTER</code> and <code>PARAMETER_GUI</code> (which
-      will be expanded to the full <code>DEAL_II_COMPONENT_*</code> variable name).
+      <code>DOCUMENTATION</code>, <code>EXAMPLES</code>
+      and <code>PARAMETER_GUI</code> (which will be expanded to the 
+      full <code>DEAL_II_COMPONENT_*</code> variable name).
     </p>
 
 
@@ -208,29 +208,29 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 <pre class="cmake">
 ###
 #
-#  The following targets are available (invoke via $ make &lt;target&gt;):
+#  The following targets are available (invoke by $ make &lt;target&gt;):
 #
 #    all            - compile the library and all enabled components
 #    clean          - remove all generated files
 #    install        - install into CMAKE_INSTALL_PREFIX
-#    help           - print this help message in the toplevel directory,
-#                     otherwise print a list of targets (in subdirectories)
+#
+#    info           - print this help message
+#    help           - print a list of valid top level targets
 #
 #    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - rerun the configure and generate phases of CMake
 #
+#    compat_files   - build and install component 'compat_files'
 #    documentation  - build and install component 'documentation'
 #    examples       - build and install component 'examples'
 #    library        - build and install component 'library'
-#    mesh_converter - build and install component 'mesh_converter'
 #    parameter_gui  - build and install component 'parameter_gui'
+#    package        - build binary package
 #
 #    test           - run a minimal set of tests
 #
-#    setup_tests    - set up the testsuite subprojects
-#    regen_tests    - rerun configure stage in every testsuite subprojects
-#    clean_tests    - run the 'clean' target in every testsuite subproject
+#    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
 #
 ###
@@ -265,7 +265,6 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 #  Component configuration:
 #      ( DEAL_II_COMPONENT_DOCUMENTATION = OFF )
 #        DEAL_II_COMPONENT_EXAMPLES
-#        DEAL_II_COMPONENT_MESH_CONVERTER
 #      ( DEAL_II_COMPONENT_PARAMETER_GUI = OFF )
 #
 #  Detailed information (compiler flags, feature configuration) can be found in detailed.log
@@ -284,7 +283,7 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 <pre class="cmake">
 #        DEAL_II_WITH_BOOST set up with external dependencies
 #            BOOST_VERSION = 1.52.0
-#            BOOST_DIR = 
+#            BOOST_DIR =
 #            Boost_INCLUDE_DIRS = /usr/include
 #            Boost_LIBRARIES = /usr/lib64/libboost_serialization-mt.so;/usr/lib64/libboost_system-mt.so;
 # [...]
@@ -403,7 +402,6 @@ $ cmake -GNinja [...]
 documentation  - builds and installs the 'documentation' component
 examples       - builds and installs the 'examples' component
 library        - builds and installs the 'library' component
-mesh_converter - builds and installs the 'mesh_converter' component
 parameter_gui  - builds and installs the 'parameter_gui' component
 </pre>
 
@@ -426,13 +424,32 @@ parameter_gui  - builds and installs the 'parameter_gui' component
     <h3>Feature configuration</h3>
 
     <p>
-      <acronym>deal.II</acronym> provides (optional) interfaces to quite
-      a number of external libraries. All of these are represented by
-      <code>cmake</code> variables that are set to <code>ON</code> if
-      an external package is found or to <code>OFF</code> otherwise. By
-      explicitly setting it to off either on the command line or using
-      <code>ccmake</code>, you can prevent <acronym>deal.II</acronym>
-      from using this external package, even if it is found.
+      <acronym>deal.II</acronym> provides (optional) interfaces to quite a
+      number of external libraries as well as multiple versions
+      of <code>C++</code>. All of these options are represented
+      by <code>cmake</code> variables that may be set to either <code>ON</code>
+      or <code>OFF</code>.
+
+      By default, <acronym>deal.II</acronym>'s <code>CMake</code> build scripts
+      will attempt to find the newest <code>C++</code> version available by
+      checking which language version flags work with the detected compiler. For
+      example: if <code>CMake</code> detects <code>GCC 5.1</code> or <code>Clang
+      3.6</code>, <acronym>deal.II</acronym> will be compiled
+      in <code>C++14</code> mode unless either <code>C++14</code>
+      or <code>C++11</code> is explicitly disabled. Another example:
+      if <code>DEAL_II_WITH_CXX11=ON</code> is passed to <code>CMake</code>,
+      then <acronym>deal.II</acronym> will check if the compiler supports enough
+      parts of the <code>C++11</code> <em>and</em>
+      <code>C++14</code> language standards. <code>CMake</code> will not fail in
+      this example just because the compiler does not support
+      <code>C++14</code>, but <code>CMake</code> <em>will</em> fail if the
+      compiler does not support enough of <code>C++11</code>.
+
+      The remaining flags are set to <code>ON</code> if an external package is
+      found or to <code>OFF</code> otherwise. By explicitly setting it to off
+      either on the command line or using <code>ccmake</code>, you can
+      prevent <acronym>deal.II</acronym> from using an external package, even if
+      it is found.
     </p>
 
     <p>
@@ -444,6 +461,7 @@ DEAL_II_WITH_ARPACK
 DEAL_II_WITH_BOOST
 DEAL_II_WITH_BZIP2
 DEAL_II_WITH_CXX11
+DEAL_II_WITH_CXX14
 DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
@@ -475,6 +493,15 @@ DEAL_II_WITH_ZLIB
       more dependencies to external or 'bundled' (i.e. bundled with
       <acronym>deal.II</acronym> and residing under <code>bundled/</code>)
       libraries.
+    </p>
+
+    <p>
+      Additionally, the variable
+<pre class="cmake">
+DEAL_II_CXX_VERSION_FLAG
+</pre>
+      may be set to specify the <code>C++</code> language version flag passed to
+      the compiler.
     </p>
 
     <p>
@@ -727,17 +754,6 @@ cmake -DLAPACK_FOUND=true \
 
 	<li>
           <p>
-            <code>DEAL_II_COMPONENT_MESH_CONVERTER</code> (default
-            <code>ON</code>):
-          </p>
-          <p>
-            Enable configuration and installation of the
-            <code>mesh_converter</code> binary. This adds a component
-            <code>mesh_converter</code> to the build system.
-	  </p>
-
-	<li>
-          <p>
             <code>DEAL_II_COMPONENT_PARAMETER_GUI</code> (default
             <code>OFF</code>):
           </p>
@@ -872,15 +888,15 @@ cmake -DDEAL_II_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
           (but before the corresponding cached variables).
 
 	<li>
-	  Disable the configuration completely by setting
-	  <code>DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS</code> to
-	  <code>OFF</code>.  Beware of the fact that certain features
+	  Disable the configuration completely by adding the flag
+	  <code>-D DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF</code>.
+	  Beware of the fact that certain features
 	  may still pull in necessary compiler flags.
 
         <li>
           You can setup additional debug compiler flags to provide test
-          coverage information by setting
-          <code>DEAL_II_SETUP_COVERAGE</code> to <code>ON</code>.
+          coverage information by adding the flag
+          <code>-D DEAL_II_SETUP_COVERAGE=ON</code>.
       </ol>
     </p>
 
@@ -905,9 +921,9 @@ ${CMAKE_INSTALL_PREFIX}/
     lib${LIB_SUFFIX}/cmake/deal.II
     share/deal.II/
     share/deal.II/cmake/macros
-    share/doc/deal.II/
-    share/doc/deal.II/html
-    share/doc/deal.II/examples
+    ./
+    doc
+    examples
 </pre>
       </ul>
     </p>
@@ -921,7 +937,6 @@ DEAL_II_INCLUDE_RELDIR
 DEAL_II_LIBRARY_RELDIR
 DEAL_II_PROJECT_CONFIG_RELDIR
 DEAL_II_SHARE_RELDIR
-DEAL_II_CMAKE_MACROS_RELDIR
 DEAL_II_DOCREADME_RELDIR
 DEAL_II_DOCHTML_RELDIR
 DEAL_II_EXAMPLES_RELDIR

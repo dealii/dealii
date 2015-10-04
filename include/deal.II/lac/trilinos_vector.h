@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_vector_h
-#define __deal2__trilinos_vector_h
+#ifndef dealii__trilinos_vector_h
+#define dealii__trilinos_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -29,8 +29,10 @@
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/trilinos_vector_base.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include "Epetra_Map.h"
 #  include "Epetra_LocalMap.h"
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -52,6 +54,7 @@ namespace TrilinosWrappers
     // define a helper function that queries the global ID of local ID of
     // an Epetra_BlockMap object  by calling either the 32- or 64-bit
     // function necessary.
+    inline
     int gid(const Epetra_BlockMap &map, int i)
     {
       return map.GID(i);
@@ -60,6 +63,7 @@ namespace TrilinosWrappers
     // define a helper function that queries the global ID of local ID of
     // an Epetra_BlockMap object  by calling either the 32- or 64-bit
     // function necessary.
+    inline
     long long int gid(const Epetra_BlockMap &map, int i)
     {
       return map.GID64(i);
@@ -110,7 +114,7 @@ namespace TrilinosWrappers
      * the collective MPI functions and wait for all the other processes to
      * join in on this. Since the other processes don't call this function,
      * you will either get a time-out on the first process, or, worse, by the
-     * time the next a callto a Trilinos function generates an MPI message on
+     * time the next a call to a Trilinos function generates an MPI message on
      * the other processes, you will get a cryptic message that only a subset
      * of processes attempted a communication. These bugs can be very hard to
      * figure out, unless you are well-acquainted with the communication model
@@ -267,7 +271,7 @@ namespace TrilinosWrappers
       static const bool supports_distributed_data = true;
 
       /**
-       * @name Basic constructors and initalization.
+       * @name Basic constructors and initialization.
        */
       //@{
       /**
@@ -280,7 +284,18 @@ namespace TrilinosWrappers
       /**
        * Copy constructor using the given vector.
        */
-      Vector (const Vector &V);
+      Vector (const Vector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This constructor is only available if deal.II is configured
+       * with C++11 support.
+       */
+      Vector (Vector &&v);
+#endif
 
       /**
        * Destructor.
@@ -322,15 +337,25 @@ namespace TrilinosWrappers
        * function to make the example given in the discussion about making the
        * constructor explicit work.
        */
-      Vector &operator = (const TrilinosScalar s);
+      Vector &operator= (const TrilinosScalar s);
 
       /**
        * Copy the given vector. Resize the present vector if necessary. In
        * this case, also the Epetra_Map that designs the parallel partitioning
        * is taken from the input vector.
        */
-      Vector &
-      operator = (const Vector &V);
+      Vector &operator= (const Vector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      Vector &operator= (Vector &&v);
+#endif
 
       /**
        * Copy operator from a given localized vector (present on all
@@ -339,8 +364,7 @@ namespace TrilinosWrappers
        * object) already is of the same size as the right hand side vector.
        * Otherwise, an exception will be thrown.
        */
-      Vector &
-      operator = (const ::dealii::TrilinosWrappers::Vector &V);
+      Vector &operator= (const ::dealii::TrilinosWrappers::Vector &v);
 
       /**
        * Another copy function. This one takes a deal.II vector and copies it
@@ -351,8 +375,7 @@ namespace TrilinosWrappers
        * the reinit(const Epetra_Map &input_map) function.
        */
       template <typename Number>
-      Vector &
-      operator = (const ::dealii::Vector<Number> &v);
+      Vector &operator= (const ::dealii::Vector<Number> &v);
 
       /**
        * This reinit function is meant to be used for parallel calculations
@@ -390,10 +413,12 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      explicit Vector (const Epetra_Map &parallel_partitioning);
+      explicit Vector (const Epetra_Map &parallel_partitioning)  DEAL_II_DEPRECATED;
 
       /**
        * Copy constructor from the TrilinosWrappers vector class. Since a
@@ -406,11 +431,13 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const Epetra_Map &parallel_partitioning,
-              const VectorBase &v);
+              const VectorBase &v) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize from a deal.II vector. The Epetra_Map specifies the
@@ -421,12 +448,14 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename number>
       void reinit (const Epetra_Map             &parallel_partitioner,
-                   const dealii::Vector<number> &v);
+                   const dealii::Vector<number> &v) DEAL_II_DEPRECATED;
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -437,11 +466,13 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const Epetra_Map &parallel_partitioning,
-                   const bool        fast = false);
+                   const bool        fast = false) DEAL_II_DEPRECATED;
 
       /**
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
@@ -452,12 +483,14 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
-              const dealii::Vector<Number> &v);
+              const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
 //@}
       /**
        * @name Initialization with an IndexSet
@@ -645,9 +678,9 @@ namespace TrilinosWrappers
 
     inline
     Vector &
-    Vector::operator = (const TrilinosScalar s)
+    Vector::operator= (const TrilinosScalar s)
     {
-      VectorBase::operator = (s);
+      VectorBase::operator= (s);
 
       return *this;
     }
@@ -655,7 +688,7 @@ namespace TrilinosWrappers
 
     template <typename Number>
     Vector &
-    Vector::operator = (const ::dealii::Vector<Number> &v)
+    Vector::operator= (const ::dealii::Vector<Number> &v)
     {
       if (size() != v.size())
         {
@@ -674,7 +707,7 @@ namespace TrilinosWrappers
     }
 
 
-#endif
+#endif /* DOXYGEN */
 
   } /* end of namespace MPI */
 
@@ -686,6 +719,8 @@ namespace TrilinosWrappers
    * the possibly parallel Vector class to a local vector on each processor,
    * in order to be able to access all elements in the vector or to apply
    * certain deal.II functions.
+   *
+   * This class is deprecated, use TrilinosWrappers::MPI::Vector instead.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Vectors
@@ -716,12 +751,12 @@ namespace TrilinosWrappers
      * function <tt>reinit()</tt> will have to give the vector the correct
      * size.
      */
-    Vector ();
+    Vector () DEAL_II_DEPRECATED;
 
     /**
      * This constructor takes as input the number of elements in the vector.
      */
-    explicit Vector (const size_type n);
+    explicit Vector (const size_type n) DEAL_II_DEPRECATED;
 
     /**
      * This constructor takes as input the number of elements in the vector.
@@ -732,7 +767,7 @@ namespace TrilinosWrappers
      * ignored, the only thing that matters is the size of the index space
      * described by this argument.
      */
-    explicit Vector (const Epetra_Map &partitioning);
+    explicit Vector (const Epetra_Map &partitioning) DEAL_II_DEPRECATED;
 
     /**
      * This constructor takes as input the number of elements in the vector.
@@ -744,20 +779,20 @@ namespace TrilinosWrappers
      * size of the index space described by this argument.
      */
     explicit Vector (const IndexSet &partitioning,
-                     const MPI_Comm &communicator = MPI_COMM_WORLD);
+                     const MPI_Comm &communicator = MPI_COMM_WORLD) DEAL_II_DEPRECATED;
 
     /**
      * This constructor takes a (possibly parallel) Trilinos Vector and
      * generates a localized version of the whole content on each processor.
      */
-    explicit Vector (const VectorBase &V);
+    explicit Vector (const VectorBase &V) DEAL_II_DEPRECATED;
 
     /**
      * Copy-constructor from deal.II vectors. Sets the dimension to that of
      * the given vector, and copies all elements.
      */
     template <typename Number>
-    explicit Vector (const dealii::Vector<Number> &v);
+    explicit Vector (const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
 
     /**
      * Reinit function that resizes the vector to the size specified by
@@ -813,28 +848,25 @@ namespace TrilinosWrappers
      * to make the example given in the discussion about making the
      * constructor explicit work.
      */
-    Vector &operator = (const TrilinosScalar s);
+    Vector &operator= (const TrilinosScalar s);
 
     /**
      * Sets the left hand argument to the (parallel) Trilinos Vector.
      * Equivalent to the @p reinit function.
      */
-    Vector &
-    operator = (const MPI::Vector &V);
+    Vector &operator= (const MPI::Vector &v);
 
     /**
      * Sets the left hand argument to the deal.II vector.
      */
     template <typename Number>
-    Vector &
-    operator = (const ::dealii::Vector<Number> &V);
+    Vector &operator= (const ::dealii::Vector<Number> &v);
 
     /**
      * Copy operator. Copies both the dimension and the content in the right
      * hand argument.
      */
-    Vector &
-    operator = (const Vector &V);
+    Vector &operator= (const Vector &v);
 
     /**
      * This function does nothing but is there for compatibility with the @p
@@ -884,9 +916,9 @@ namespace TrilinosWrappers
 
   inline
   Vector &
-  Vector::operator = (const TrilinosScalar s)
+  Vector::operator= (const TrilinosScalar s)
   {
-    VectorBase::operator = (s);
+    VectorBase::operator= (s);
 
     return *this;
   }
@@ -895,7 +927,7 @@ namespace TrilinosWrappers
 
   template <typename Number>
   Vector &
-  Vector::operator = (const ::dealii::Vector<Number> &v)
+  Vector::operator= (const ::dealii::Vector<Number> &v)
   {
     if (size() != v.size())
       {
@@ -931,11 +963,74 @@ namespace TrilinosWrappers
 
 #endif
 
-
-}
-
+} /* namespace TrilinosWrappers */
 
 /*@}*/
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::MPI::Vector.
+     */
+    template<>
+    class ReinitHelper<TrilinosWrappers::MPI::Vector>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                TrilinosWrappers::MPI::Vector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                TrilinosWrappers::MPI::Vector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator(), fast);
+      }
+    };
+
+    /**
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::Vector.
+     */
+    template<>
+    class ReinitHelper<TrilinosWrappers::Vector>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                TrilinosWrappers::Vector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                TrilinosWrappers::Vector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator(), fast);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
 
 DEAL_II_NAMESPACE_CLOSE
 

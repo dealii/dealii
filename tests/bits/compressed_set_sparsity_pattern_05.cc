@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,9 +38,9 @@ void test ()
   for (unsigned int i=0; i<N; ++i)
     {
       unsigned int index = 0;
-      for (CompressedSetSparsityPattern::row_iterator
-           j = csp.row_begin(i); j != csp.row_end(i); ++j, ++index)
-        deallog << i << ' ' << index << ' ' << *j
+      for (CompressedSetSparsityPattern::iterator
+           j = csp.begin(i); j != csp.end(i); ++j, ++index)
+        deallog << i << ' ' << index << ' ' << j->column()
                 << std::endl;
     }
 }

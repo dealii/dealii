@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,8 @@ void test()
     = GridTools::get_locally_owned_vertices (tr);
   for (unsigned int v=0; v<tr.n_vertices(); ++v)
     if ((moved_locally_owned_vertices[v] == true)
-	&&
-	(tr.get_vertices()[v][0] < 1./3))
+        &&
+        (tr.get_vertices()[v][0] < 1./3))
       moved_locally_owned_vertices[v] = false;
 
   // now do the move
@@ -63,15 +63,15 @@ void test()
   for (unsigned int v=0; v<tr.n_vertices(); ++v)
     if (moved_locally_owned_vertices[v] == true)
       {
-	// maybe not the most elegant way to do it, but it works for the purpose
-	// of the test...
-	const_cast<Point<dim>&>(tr.get_vertices()[v]) += shift;
-	++n_vertices_moved;
+        // maybe not the most elegant way to do it, but it works for the purpose
+        // of the test...
+        const_cast<Point<dim>&>(tr.get_vertices()[v]) += shift;
+        ++n_vertices_moved;
       }
-  Assert (Utilities::MPI::sum (n_vertices_moved, MPI_COMM_WORLD)
-	  ==
-	  (dim==2 ? 15 : 75),
-	  ExcInternalError());
+  AssertThrow (Utilities::MPI::sum (n_vertices_moved, MPI_COMM_WORLD)
+               ==
+               (dim==2 ? 15 : 75),
+               ExcInternalError());
 
   tr.communicate_locally_moved_vertices (moved_locally_owned_vertices);
 
@@ -89,13 +89,13 @@ void test()
     {
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
         {
-	  deallog << "Partition " << i << std::endl;
-	  
+          deallog << "Partition " << i << std::endl;
+
           cat_file((std::string("communicate_moved_vertices_02.dat.") + Utilities::int_to_string(i)).c_str());
         }
     }
-  
-  
+
+
   if (myid == 0)
     deallog << "OK" << std::endl;
 }
@@ -103,7 +103,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
 
   deallog.push("2d");

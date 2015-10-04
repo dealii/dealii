@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ void test ()
 
   deallog << (index_set.is_contiguous() ? "true" : "false")
           << std::endl;
-  Assert (index_set.is_contiguous() == false, ExcInternalError());
+  AssertThrow (index_set.is_contiguous() == false, ExcInternalError());
 
   for (unsigned int i=0; i<index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")

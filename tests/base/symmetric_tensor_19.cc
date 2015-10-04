@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,10 +44,10 @@ void check (const SymmetricTensor<4,dim> &A)
                     << B[i][j][k][l] << ' '
                     << T_left[i][j][k][l] << std::endl;
 
-            Assert (std::fabs(T_left[i][j][k][l] -
-                              identity_tensor<dim>()[i][j][k][l])
-                    < 1e-10,
-                    ExcInternalError());
+            AssertThrow (std::fabs(T_left[i][j][k][l] -
+                                   identity_tensor<dim>()[i][j][k][l])
+                         < 1e-10,
+                         ExcInternalError());
           }
 
   // check left inverse
@@ -63,10 +63,10 @@ void check (const SymmetricTensor<4,dim> &A)
                     << B[i][j][k][l] << ' '
                     << T_right[i][j][k][l] << std::endl;
 
-            Assert (std::fabs(T_right[i][j][k][l] -
-                              identity_tensor<dim>()[i][j][k][l])
-                    < 1e-10,
-                    ExcInternalError());
+            AssertThrow (std::fabs(T_right[i][j][k][l] -
+                                   identity_tensor<dim>()[i][j][k][l])
+                         < 1e-10,
+                         ExcInternalError());
           }
 }
 

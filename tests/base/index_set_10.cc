@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,8 @@ void test ()
     {
       deallog << index_set.nth_index_in_set(i)
               << std::endl;
-      Assert (index_set.index_within_set(index_set.nth_index_in_set(i)) == i,
-              ExcInternalError());
+      AssertThrow (index_set.index_within_set(index_set.nth_index_in_set(i)) == i,
+                   ExcInternalError());
     }
   deallog << "OK" << std::endl;
 

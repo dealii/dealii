@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,8 +33,8 @@ void test (const unsigned int chunk_size)
 
   ChunkSparseMatrix<double> m(sp);
 
-  Assert (m.m() == 5, ExcInternalError());
-  Assert (m.n() == 5, ExcInternalError());
+  AssertThrow (m.m() == 5, ExcInternalError());
+  AssertThrow (m.n() == 5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

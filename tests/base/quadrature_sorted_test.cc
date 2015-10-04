@@ -178,23 +178,28 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 
 template <int dim>
 void
-check_quadratures (const std::vector<Quadrature<dim>*>& quadratures) {
-  for(unsigned int i=0; i<quadratures.size(); ++i) {
-    Quadrature<dim> &quad = *quadratures[i];
-    bool check = true;
-    for(unsigned int q=1; q<quad.size(); ++q)
-      if(quad.weight(q) < quad.weight(q-1)) {
-	check = false;
-	break;
-      }
-    if(check == false) {
-      deallog << "Something went wrong. The qudrature is not properly sorted." << std::endl;
-      for(unsigned int q=1; q<quad.size(); ++q) {
-	deallog << "q(" << q << "): " << quad.point(q)
-		<< ", w(" << q << "): " << quad.weight(q) << std::endl;
-      }
+check_quadratures (const std::vector<Quadrature<dim>*> &quadratures)
+{
+  for (unsigned int i=0; i<quadratures.size(); ++i)
+    {
+      Quadrature<dim> &quad = *quadratures[i];
+      bool check = true;
+      for (unsigned int q=1; q<quad.size(); ++q)
+        if (quad.weight(q) < quad.weight(q-1))
+          {
+            check = false;
+            break;
+          }
+      if (check == false)
+        {
+          deallog << "Something went wrong. The qudrature is not properly sorted." << std::endl;
+          for (unsigned int q=1; q<quad.size(); ++q)
+            {
+              deallog << "q(" << q << "): " << quad.point(q)
+                      << ", w(" << q << "): " << quad.weight(q) << std::endl;
+            }
+        }
     }
-  }
 }
 
 int main()

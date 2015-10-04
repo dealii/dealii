@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__logstream_h
-#define __deal2__logstream_h
+#ifndef dealii__logstream_h
+#define dealii__logstream_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -114,7 +114,7 @@ class LogStream : public Subscriptor
 {
 public:
   /**
-   * A subclass allowing for the safe generation and removal of prefices.
+   * A subclass allowing for the safe generation and removal of prefixes.
    *
    * Somewhere at the beginning of a block, create one of these objects, and
    * it will appear as a prefix in LogStream output like @p deallog. At the
@@ -260,7 +260,7 @@ public:
   /**
    * Maximum number of levels to be written to the log file. The functionality
    * is the same as <tt>depth_console</tt>, nevertheless, this function should
-   * be used with care, since it may spoile the value of a log file.
+   * be used with care, since it may spoil the value of a log file.
    *
    * The previous value of this parameter is returned.
    */
@@ -332,7 +332,7 @@ public:
 
   /**
    * set the precision for the underlying stream and returns the previous
-   * stream precision. This fuction mimics
+   * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
   std::streamsize precision (const std::streamsize prec);
@@ -340,7 +340,7 @@ public:
 
   /**
    * set the width for the underlying stream and returns the previous stream
-   * width. This fuction mimics
+   * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
   std::streamsize width (const std::streamsize wide);
@@ -348,7 +348,7 @@ public:
 
   /**
    * set the flags for the underlying stream and returns the previous stream
-   * flags. This fuction mimics
+   * flags. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
    */
   std::ios::fmtflags flags(const std::ios::fmtflags f);
@@ -390,11 +390,9 @@ public:
 
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined exactly
-   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
-   * type with a certain number of elements?), this is only an estimate.
-   * however often quite close to the true value.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 
@@ -531,7 +529,7 @@ private:
 
   /**
    * Internal wrapper around "thread local" outstreams. This private function
-   * will return the correct internal ostringstream buffer for operater<<.
+   * will return the correct internal ostringstream buffer for operator<<.
    */
   std::ostringstream &get_stream();
 
@@ -596,11 +594,10 @@ LogStream::operator<< (const double t)
 {
   std::ostringstream &stream = get_stream();
 
+  // drop small numbers or skew them away from zero.
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
-  // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
-  // can't be said for any other number
-  if (! (t<=0) && !(t>=0))
+  if (! numbers::is_finite(t))
     stream << t;
   else if (std::fabs(t) < double_threshold)
     stream << '0';

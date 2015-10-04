@@ -29,19 +29,20 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -430,10 +431,8 @@ namespace Step18
     // timestep:
     void update_quadrature_point_history ();
 
-    // After the member functions, here are the member variables. The first
-    // ones have all been discussed in more detail in previous example
-    // programs:
-    Triangulation<dim>   triangulation;
+    // This is the new shared Triangulation:
+    parallel::shared::Triangulation<dim>   triangulation;
 
     FESystem<dim>        fe;
 
@@ -495,7 +494,7 @@ namespace Step18
 
     PETScWrappers::MPI::Vector       system_rhs;
 
-    PETScWrappers::Vector            incremental_displacement;
+    Vector<double>                   incremental_displacement;
 
     // The next block of variables is then related to the time dependent
     // nature of the problem: they denote the length of the time interval
@@ -524,10 +523,9 @@ namespace Step18
     // freedom that are stored on the processor with that particular number:
     std::vector<types::global_dof_index> local_dofs_per_process;
 
-    // Next, how many degrees of freedom the present processor stores. This
-    // is, of course, an abbreviation to
-    // <code>local_dofs_per_process[this_mpi_process]</code>.
-    types::global_dof_index n_local_dofs;
+    // We are storing the locally owned and the locally relevant indices:
+    IndexSet locally_owned_dofs;
+    IndexSet locally_relevant_dofs;
 
     // In the same direction, also cache how many cells the present processor
     // owns. Note that the cells that belong to a processor are not
@@ -752,6 +750,7 @@ namespace Step18
   template <int dim>
   TopLevel<dim>::TopLevel ()
     :
+    triangulation(MPI_COMM_WORLD),
     fe (FE_Q<dim>(1), dim),
     dof_handler (triangulation),
     quadrature_formula (2),
@@ -823,72 +822,38 @@ namespace Step18
             const Point<dim> face_center = cell->face(f)->center();
 
             if (face_center[2] == 0)
-              cell->face(f)->set_boundary_indicator (0);
+              cell->face(f)->set_boundary_id (0);
             else if (face_center[2] == 3)
-              cell->face(f)->set_boundary_indicator (1);
+              cell->face(f)->set_boundary_id (1);
             else if (std::sqrt(face_center[0]*face_center[0] +
                                face_center[1]*face_center[1])
                      <
                      (inner_radius + outer_radius) / 2)
-              cell->face(f)->set_boundary_indicator (2);
+              cell->face(f)->set_boundary_id (2);
             else
-              cell->face(f)->set_boundary_indicator (3);
+              cell->face(f)->set_boundary_id (3);
           }
 
-    // In order to make sure that new vertices are placed correctly on mesh
-    // refinement, we have to associate objects describing those parts of the
-    // boundary that do not consist of straight parts. Corresponding to the
-    // cylinder shell generator function used above, there are classes that
-    // can be used to describe the geometry of cylinders. We need to use
-    // different objects for the inner and outer parts of the cylinder, with
-    // different radii; the second argument to the constructor indicates the
-    // axis around which the cylinder revolves -- in this case the
-    // z-axis. Note that the boundary objects need to live as long as the
-    // triangulation does; we can achieve this by making the objects static,
-    // which means that they live as long as the program runs:
-    static const CylinderBoundary<dim> inner_cylinder (inner_radius, 2);
-    static const CylinderBoundary<dim> outer_cylinder (outer_radius, 2);
-    // We then attach these two objects to the triangulation, and make them
-    // correspond to boundary indicators 2 and 3:
-    triangulation.set_boundary (2, inner_cylinder);
-    triangulation.set_boundary (3, outer_cylinder);
+    // In order to make sure that new vertices are placed correctly on
+    // mesh refinement, we have to associate objects describing those
+    // parts of the boundary that do not consist of straight
+    // parts. Corresponding to the cylinder shell generator function
+    // used above, there are classes that can be used to describe the
+    // geometry of cylinders. The library implements both boundary
+    // classes as well as manifold classes, where also the interior
+    // part of mesh is refined according to the geometrical
+    // description. For this example, we use a single cylindrical
+    // manifold both for the interior part and for the boundary
+    // parts. Note that the manifold object need to live as long as
+    // the triangulation does; we can achieve this by making the
+    // objects static, which means that they live as long as the
+    // program runs:
+    static const CylindricalManifold<dim> cylindrical_manifold (2);
 
-    // There's one more thing we have to take care of (we should have done so
-    // above already, but for didactic reasons it was more appropriate to
-    // handle it after discussing boundary objects). %Boundary indicators in
-    // deal.II, for mostly historic reasons, serve a dual purpose: they
-    // describe the type of a boundary for other places in a program where
-    // different boundary conditions are implemented; and they describe which
-    // boundary object (as the ones associated above) should be queried when
-    // new boundary points need to be placed upon mesh refinement. In the
-    // prefix to this function, we have discussed the boundary condition
-    // issue, and the boundary geometry issue was mentioned just above. But
-    // there is a case where we have to be careful with geometry: what happens
-    // if a cell is refined that has two faces with different boundary
-    // indicators? For example one at the edges of the cylinder? In that case,
-    // the library wouldn't know where to put new points in the middle of
-    // edges (one of the twelve lines of a hexahedron). In fact, the library
-    // doesn't even care about the boundary indicator of adjacent faces when
-    // refining edges: it considers the boundary indicators associated with
-    // the edges themselves. So what do we want to happen with the edges of
-    // the cylinder shell: they sit on both faces with boundary indicators 2
-    // or 3 (inner or outer shell) and 0 or 1 (for which no boundary objects
-    // have been specified, and for which the library therefore assumes
-    // straight lines). Obviously, we want these lines to follow the curved
-    // shells, so we have to assign all edges along faces with boundary
-    // indicators 2 or 3 these same boundary indicators to make sure they are
-    // refined using the appropriate geometry objects. This is easily done:
-    for (typename Triangulation<dim>::active_face_iterator
-         face=triangulation.begin_active_face();
-         face!=triangulation.end_face(); ++face)
-      if (face->at_boundary())
-        if ((face->boundary_indicator() == 2)
-            ||
-            (face->boundary_indicator() == 3))
-          for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
-               ++edge)
-            face->line(edge)
-            ->set_boundary_indicator (face->boundary_indicator());
+    // We tell the triangulation to reset all its manifold indicators
+    // to 0, and then attach the cylindrical manifold to it:
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_manifold (0, cylindrical_manifold);
 
     // Once all this is done, we can refine the mesh once globally:
     triangulation.refine_global (1);
@@ -896,10 +861,7 @@ namespace Step18
 
     // As the final step, we need to set up a clean state of the data that we
     // store in the quadrature points on all cells that are treated on the
-    // present processor. To do so, we also have to know which processors are
-    // ours in the first place. This is done in the following two function
-    // calls:
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
+    // present processor.
     setup_quadrature_point_history ();
   }
 
@@ -923,25 +885,17 @@ namespace Step18
   void TopLevel<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
-    DoFRenumbering::subdomain_wise (dof_handler);
+    locally_owned_dofs = dof_handler.locally_owned_dofs();
+    DoFTools::extract_locally_relevant_dofs (dof_handler,locally_relevant_dofs);
 
     // The next thing is to store some information for later use on how many
     // cells or degrees of freedom the present processor, or any of the
     // processors has to work on. First the cells local to this processor...
     n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
-                                                           this_mpi_process);
+                                                           triangulation.locally_owned_subdomain ());
 
-    // ...and then a list of numbers of how many degrees of freedom each
-    // processor has to handle:
-    local_dofs_per_process.resize (n_mpi_processes);
-    for (unsigned int i=0; i<n_mpi_processes; ++i)
-      local_dofs_per_process[i]
-        = DoFTools::count_dofs_with_subdomain_association (dof_handler, i);
-
-    // Finally, make it easier to denote how many degrees of freedom the
-    // present process has to deal with, by introducing an abbreviation:
-    n_local_dofs = local_dofs_per_process[this_mpi_process];
+    local_dofs_per_process = dof_handler.n_locally_owned_dofs_per_processor();
 
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
@@ -966,11 +920,14 @@ namespace Step18
     // going to work with, and make sure that the condensation of hanging node
     // constraints add the necessary additional entries in the sparsity
     // pattern:
-    CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                                dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    hanging_node_constraints.condense (sparsity_pattern);
-    // Note that we have used the <code>CompressedSparsityPattern</code> class
+    DynamicSparsityPattern sparsity_pattern (locally_relevant_dofs);
+    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+                                     hanging_node_constraints, /*keep constrained dofs*/ false);
+    SparsityTools::distribute_sparsity_pattern (sparsity_pattern,
+                                                local_dofs_per_process,
+                                                mpi_communicator,
+                                                locally_relevant_dofs);
+    // Note that we have used the <code>DynamicSparsityPattern</code> class
     // here that was already introduced in step-11, rather than the
     // <code>SparsityPattern</code> class that we have used in all other
     // cases. The reason for this is that for the latter class to work we have
@@ -989,12 +946,13 @@ namespace Step18
     // too much memory can lead to out-of-memory situations.
     //
     // In order to avoid this, we resort to the
-    // <code>CompressedSparsityPattern</code> class that is slower but does
+    // <code>DynamicSparsityPattern</code> class that is slower but does
     // not require any up-front estimate on the number of nonzero entries per
     // row. It therefore only ever allocates as much memory as it needs at any
     // given time, and we can build it even for large 3d problems.
     //
-    // It is also worth noting that the sparsity pattern we construct is
+    // It is also worth noting that due to the specifics of parallel::shared::Triangulation,
+    // the sparsity pattern we construct is
     // global, i.e. comprises all degrees of freedom whether they will be
     // owned by the processor we are on or another one (in case this program
     // is run in %parallel via MPI). This of course is not optimal -- it
@@ -1011,11 +969,10 @@ namespace Step18
     //
     // With this data structure, we can then go to the PETSc sparse matrix and
     // tell it to preallocate all the entries we will later want to write to:
-    system_matrix.reinit (mpi_communicator,
+    system_matrix.reinit (locally_owned_dofs,
+                          locally_owned_dofs,
                           sparsity_pattern,
-                          local_dofs_per_process,
-                          local_dofs_per_process,
-                          this_mpi_process);
+                          mpi_communicator);
     // After this point, no further explicit knowledge of the sparsity pattern
     // is required any more and we can let the <code>sparsity_pattern</code>
     // variable go out of scope without any problem.
@@ -1025,7 +982,7 @@ namespace Step18
     // remember that the solution vector is a local one, unlike the right hand
     // side that is a distributed %parallel one and therefore needs to know
     // the MPI communicator over which it is supposed to transmit messages:
-    system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
+    system_rhs.reinit(locally_owned_dofs,mpi_communicator);
     incremental_displacement.reinit (dof_handler.n_dofs());
   }
 
@@ -1072,7 +1029,7 @@ namespace Step18
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           cell_matrix = 0;
           cell_rhs = 0;
@@ -1206,8 +1163,7 @@ namespace Step18
                                  boundary_values,
                                  fe.component_mask(z_component));
 
-    PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
-                                    n_local_dofs);
+    PETScWrappers::MPI::Vector tmp (locally_owned_dofs,mpi_communicator);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix, tmp,
                                         system_rhs, false);
@@ -1259,9 +1215,7 @@ namespace Step18
   unsigned int TopLevel<dim>::solve_linear_problem ()
   {
     PETScWrappers::MPI::Vector
-    distributed_incremental_displacement (mpi_communicator,
-                                          dof_handler.n_dofs(),
-                                          n_local_dofs);
+    distributed_incremental_displacement (locally_owned_dofs,mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
 
     SolverControl           solver_control (dof_handler.n_dofs(),
@@ -1291,87 +1245,12 @@ namespace Step18
   // 0 will write the record files the reference all the .vtu files.
   //
   // The crucial part of this function is to give the <code>DataOut</code>
-  // class a way to only work on the cells that the present process owns. This
-  // class is already well-equipped for that: it has two virtual functions
-  // <code>first_cell</code> and <code>next_cell</code> that return the first
-  // cell to be worked on, and given one cell return the next cell to be
-  // worked on. By default, these functions return the first active cell
-  // (i.e. the first one that has no children) and the next active cell. What
-  // we have to do here is derive a class from <code>DataOut</code> that
-  // overloads these two functions to only iterate over those cells with the
-  // right subdomain indicator.
-  //
-  // We do this at the beginning of this function. The <code>first_cell</code>
-  // function just starts with the first active cell, and then iterates to the
-  // next cells while the cell presently under consideration does not yet have
-  // the correct subdomain id. The only thing that needs to be taken care of
-  // is that we don't try to keep iterating when we have hit the end iterator.
-  //
-  // The <code>next_cell</code> function could be implemented in a similar
-  // way. However, we use this occasion as a pretext to introduce one more
-  // thing that the library offers: filtered iterators. These are wrappers for
-  // the iterator classes that just skip all cells (or faces, lines, etc) that
-  // do not satisfy a certain predicate (a predicate in computer-lingo is a
-  // function that when applied to a data element either returns true or
-  // false). In the present case, the predicate is that the cell has to have a
-  // certain subdomain id, and the library already has this predicate built
-  // in. If the cell iterator is not the end iterator, what we then have to do
-  // is to initialize such a filtered iterator with the present cell and the
-  // predicate, and then increase the iterator exactly once. While the more
-  // conventional loop would probably not have been much longer, this is
-  // definitely the more elegant way -- and then, these example programs also
-  // serve the purpose of introducing what is available in deal.II.
-  template<int dim>
-  class FilteredDataOut : public DataOut<dim>
-  {
-  public:
-    FilteredDataOut (const unsigned int subdomain_id)
-      :
-      subdomain_id (subdomain_id)
-    {}
-
-    virtual typename DataOut<dim>::cell_iterator
-    first_cell ()
-    {
-      typename DataOut<dim>::active_cell_iterator
-      cell = this->dofs->begin_active();
-      while ((cell != this->dofs->end()) &&
-             (cell->subdomain_id() != subdomain_id))
-        ++cell;
-
-      return cell;
-    }
-
-    virtual typename DataOut<dim>::cell_iterator
-    next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
-    {
-      if (old_cell != this->dofs->end())
-        {
-          const IteratorFilters::SubdomainEqualTo
-          predicate(subdomain_id);
-
-          return
-            ++(FilteredIterator
-               <typename DataOut<dim>::active_cell_iterator>
-               (predicate,old_cell));
-        }
-      else
-        return old_cell;
-    }
-
-  private:
-    const unsigned int subdomain_id;
-  };
-
-
+  // class a way to only work on the cells that the present process owns.
 
   template <int dim>
   void TopLevel<dim>::output_results () const
   {
-    // With this newly defined class, declare an object that is going to
-    // generate the graphical output and attach the dof handler with it from
-    // which to get the solution vector:
-    FilteredDataOut<dim> data_out(this_mpi_process);
+    DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
 
     // Then, just as in step-17, define the names of solution variables (which
@@ -1423,8 +1302,7 @@ namespace Step18
       cell = triangulation.begin_active(),
       endc = triangulation.end();
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
-        // ... and pick those that are relevant to us:
-        if (cell->subdomain_id() == this_mpi_process)
+        if (cell->is_locally_owned() )
           {
             // On these cells, add up the stresses over all quadrature
             // points...
@@ -1652,9 +1530,8 @@ namespace Step18
 
     // Then set up a global vector into which we merge the local indicators
     // from each of the %parallel processes:
-    const unsigned int n_local_cells
-      = GridTools::count_cells_with_subdomain_association (triangulation,
-                                                           this_mpi_process);
+    const unsigned int n_local_cells = triangulation.n_locally_owned_active_cells ();
+
     PETScWrappers::MPI::Vector
     distributed_error_per_cell (mpi_communicator,
                                 triangulation.n_active_cells(),
@@ -1675,7 +1552,6 @@ namespace Step18
 
     // Finally, set up quadrature point data again on the new mesh, and only
     // on those cells that we have determined to be ours:
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
     setup_quadrature_point_history ();
   }
 
@@ -1826,7 +1702,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         ++our_cells;
 
     triangulation.clear_user_data();
@@ -1859,7 +1735,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           cell->set_user_pointer (&quadrature_point_history[history_index]);
           history_index += quadrature_formula.size();
@@ -1944,7 +1820,7 @@ namespace Step18
     for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
-      if (cell->subdomain_id() == this_mpi_process)
+      if (cell->is_locally_owned() )
         {
           // Next, get a pointer to the quadrature point history data local to
           // the present cell, and, as a defensive measure, make sure that

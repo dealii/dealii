@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -118,12 +118,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # Trilinos has to be configured with 32bit indices if deal.II uses unsigned int.
+    # Trilinos has to be configured with 32bit indices if deal.II uses
+    # unsigned int.
     #
     IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "deal.II was configured to use 32bit global indices but "
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
-        ) 
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
@@ -136,11 +138,12 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # Trilinos has to be configured with 64bit indices if deal.II uses unsigned long
-    # long int.
+    # Trilinos has to be configured with 64bit indices if deal.II uses
+    # unsigned long long int.
     #
     IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "deal.II was configured to use 64bit global indices but "
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "deal.II was configured to use 64bit global indices but "
         "Trilinos was not."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
@@ -179,6 +182,26 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDIF()
 
+    #
+    # Newer Trilinos versions (12.0.1 or newer) require a matching C++11
+    # support. I.e., if Trilinos is configured with C++11 support, deal.II
+    # also has to be configured with C++11 support:
+    #
+    IF(TRILINOS_WITH_MANDATORY_CXX11 AND NOT DEAL_II_WITH_CXX11)
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "Trilinos was compiled with C++11 support, but C++11 support is "
+        "disabled (DEAL_II_WITH_CXX11=off)."
+        )
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+        "requires C++11 support, but C++11 support is disabled:\n"
+        "  DEAL_II_WITH_CXX11 = ${DEAL_II_WITH_CXX11}\n"
+        )
+      SET(${var} FALSE)
+
+    ENDIF()
+
     CHECK_MPI_INTERFACE(TRILINOS ${var})
   ENDIF()
 ENDMACRO()
@@ -191,13 +214,6 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-
-  #
-  # Disable a bunch of warnings caused by Trilinos headers:
-  #
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
 ENDMACRO()
 
 

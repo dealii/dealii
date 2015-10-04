@@ -58,6 +58,7 @@
 // preconditioner classes that implement interfaces to the respective Trilinos
 // classes. In particular, we will need interfaces to the matrix and vector
 // classes based on Trilinos as well as Trilinos preconditioners:
+#include <deal.II/base/index_set.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -378,8 +379,8 @@ namespace Step31
         PreconditionerMp>         &Mpinv,
         const PreconditionerA                         &Apreconditioner);
 
-      void vmult (TrilinosWrappers::BlockVector       &dst,
-                  const TrilinosWrappers::BlockVector &src) const;
+      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
+                  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
@@ -387,11 +388,20 @@ namespace Step31
             PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
 
-      mutable TrilinosWrappers::Vector tmp;
+      mutable TrilinosWrappers::MPI::Vector tmp;
     };
 
 
 
+    // When using a TrilinosWrappers::MPI::Vector or a
+    // TrilinosWrappers::MPI::BlockVector, the Vector is initialized using an
+    // IndexSet. IndexSet is used not only to resize the
+    // TrilinosWrappers::MPI::Vector but it also associates an index in the
+    // TrilinosWrappers::MPI::Vector with a degree of freedom (see step-40 for
+    // a more detailed explanation). The function complete_index_set() creates
+    // an IndexSet where every valid index is part of the set. Note that this
+    // program can only be run sequentially and will throw an exception if used
+    // in parallel.
     template <class PreconditionerA, class PreconditionerMp>
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
     BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
@@ -402,7 +412,7 @@ namespace Step31
       stokes_matrix           (&S),
       m_inverse               (&Mpinv),
       a_preconditioner        (Apreconditioner),
-      tmp                     (stokes_matrix->block(1,1).m())
+      tmp                     (complete_index_set(stokes_matrix->block(1,1).m()))
     {}
 
 
@@ -424,8 +434,8 @@ namespace Step31
     template <class PreconditionerA, class PreconditionerMp>
     void
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    vmult (TrilinosWrappers::BlockVector       &dst,
-           const TrilinosWrappers::BlockVector &src) const
+    vmult (TrilinosWrappers::MPI::BlockVector       &dst,
+           const TrilinosWrappers::MPI::BlockVector &src) const
     {
       a_preconditioner.vmult (dst.block(0), src.block(0));
       stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
@@ -502,13 +512,13 @@ namespace Step31
     DoFHandler<dim>                     stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
-    std::vector<types::global_dof_index> stokes_block_sizes;
+    std::vector<IndexSet>               stokes_partitioning;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::BlockVector       stokes_solution;
-    TrilinosWrappers::BlockVector       old_stokes_solution;
-    TrilinosWrappers::BlockVector       stokes_rhs;
+    TrilinosWrappers::MPI::BlockVector  stokes_solution;
+    TrilinosWrappers::MPI::BlockVector  old_stokes_solution;
+    TrilinosWrappers::MPI::BlockVector  stokes_rhs;
 
 
     const unsigned int                  temperature_degree;
@@ -520,10 +530,10 @@ namespace Step31
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
 
-    TrilinosWrappers::Vector            temperature_solution;
-    TrilinosWrappers::Vector            old_temperature_solution;
-    TrilinosWrappers::Vector            old_old_temperature_solution;
-    TrilinosWrappers::Vector            temperature_rhs;
+    TrilinosWrappers::MPI::Vector       temperature_solution;
+    TrilinosWrappers::MPI::Vector       old_temperature_solution;
+    TrilinosWrappers::MPI::Vector       old_old_temperature_solution;
+    TrilinosWrappers::MPI::Vector       temperature_rhs;
 
 
     double                              time_step;
@@ -919,16 +929,13 @@ namespace Step31
     // The next step is to create the sparsity pattern for the Stokes and
     // temperature system matrices as well as the preconditioner matrix from
     // which we build the Stokes preconditioner. As in step-22, we choose to
-    // create the pattern not as in the first few tutorial programs, but by
-    // using the blocked version of CompressedSimpleSparsityPattern.  The
-    // reason for doing this is mainly memory, that is, the SparsityPattern
-    // class would consume too much memory when used in three spatial
-    // dimensions as we intend to do for this program.
+    // create the pattern by
+    // using the blocked version of DynamicSparsityPattern.
     //
     // So, we first release the memory stored in the matrices, then set up an
-    // object of type BlockCompressedSimpleSparsityPattern consisting of
+    // object of type BlockDynamicSparsityPattern consisting of
     // $2\times 2$ blocks (for the Stokes system matrix and preconditioner) or
-    // CompressedSimpleSparsityPattern (for the temperature part). We then
+    // DynamicSparsityPattern (for the temperature part). We then
     // fill these objects with the nonzero pattern, taking into account that
     // for the Stokes system matrix, there are no entries in the
     // pressure-pressure block (but all velocity vector components couple with
@@ -955,20 +962,20 @@ namespace Step31
     // Trilinos matrices store the sparsity pattern internally, there is no
     // need to keep the sparsity pattern around after the initialization of
     // the matrix.
-    stokes_block_sizes.resize (2);
-    stokes_block_sizes[0] = n_u;
-    stokes_block_sizes[1] = n_p;
+    stokes_partitioning.resize (2);
+    stokes_partitioning[0] = complete_index_set (n_u);
+    stokes_partitioning[1] = complete_index_set (n_p);
     {
       stokes_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -979,10 +986,10 @@ namespace Step31
           else
             coupling[c][d] = DoFTools::none;
 
-      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, dsp,
                                        stokes_constraints, false);
 
-      stokes_matrix.reinit (csp);
+      stokes_matrix.reinit (dsp);
     }
 
     {
@@ -990,14 +997,14 @@ namespace Step31
       Mp_preconditioner.reset ();
       stokes_preconditioner_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
       for (unsigned int c=0; c<dim+1; ++c)
@@ -1007,10 +1014,10 @@ namespace Step31
           else
             coupling[c][d] = DoFTools::none;
 
-      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, dsp,
                                        stokes_constraints, false);
 
-      stokes_preconditioner_matrix.reinit (csp);
+      stokes_preconditioner_matrix.reinit (dsp);
     }
 
     // The creation of the temperature matrix (or, rather, matrices, since we
@@ -1030,11 +1037,11 @@ namespace Step31
       temperature_stiffness_matrix.clear ();
       temperature_matrix.clear ();
 
-      CompressedSimpleSparsityPattern csp (n_T, n_T);
-      DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
+      DynamicSparsityPattern dsp (n_T, n_T);
+      DoFTools::make_sparsity_pattern (temperature_dof_handler, dsp,
                                        temperature_constraints, false);
 
-      temperature_matrix.reinit (csp);
+      temperature_matrix.reinit (dsp);
       temperature_mass_matrix.reinit (temperature_matrix);
       temperature_stiffness_matrix.reinit (temperature_matrix);
     }
@@ -1043,15 +1050,16 @@ namespace Step31
     // and $\mathbf u^{n-2}$, as well as for the temperatures $T^{n}$,
     // $T^{n-1}$ and $T^{n-2}$ (required for time stepping) and all the system
     // right hand sides to their correct sizes and block structure:
-    stokes_solution.reinit (stokes_block_sizes);
-    old_stokes_solution.reinit (stokes_block_sizes);
-    stokes_rhs.reinit (stokes_block_sizes);
+    IndexSet temperature_partitioning = complete_index_set (n_T);
+    stokes_solution.reinit (stokes_partitioning, MPI_COMM_WORLD);
+    old_stokes_solution.reinit (stokes_partitioning, MPI_COMM_WORLD);
+    stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
 
-    temperature_solution.reinit (temperature_dof_handler.n_dofs());
-    old_temperature_solution.reinit (temperature_dof_handler.n_dofs());
-    old_old_temperature_solution.reinit (temperature_dof_handler.n_dofs());
+    temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
+    old_temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
+    old_old_temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
 
-    temperature_rhs.reinit (temperature_dof_handler.n_dofs());
+    temperature_rhs.reinit (temperature_partitioning, MPI_COMM_WORLD);
   }
 
 
@@ -1796,9 +1804,9 @@ namespace Step31
       SolverControl solver_control (stokes_matrix.m(),
                                     1e-6*stokes_rhs.l2_norm());
 
-      SolverGMRES<TrilinosWrappers::BlockVector>
+      SolverGMRES<TrilinosWrappers::MPI::BlockVector>
       gmres (solver_control,
-             SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+             SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
       for (unsigned int i=0; i<stokes_solution.size(); ++i)
         if (stokes_constraints.is_constrained(i))
@@ -1867,7 +1875,7 @@ namespace Step31
     // preconditioner (IC) as we also use for preconditioning the pressure
     // mass matrix solver. As a solver, we choose the conjugate gradient
     // method CG. As before, we tell the solver to use Trilinos vectors via
-    // the template argument <code>TrilinosWrappers::Vector</code>.  Finally,
+    // the template argument <code>TrilinosWrappers::MPI::Vector</code>.  Finally,
     // we solve, distribute the hanging node constraints and write out the
     // number of iterations.
     assemble_temperature_system (maximal_velocity);
@@ -1875,7 +1883,7 @@ namespace Step31
 
       SolverControl solver_control (temperature_matrix.m(),
                                     1e-8*temperature_rhs.l2_norm());
-      SolverCG<TrilinosWrappers::Vector> cg (solver_control);
+      SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
 
       TrilinosWrappers::PreconditionIC preconditioner;
       preconditioner.initialize (temperature_matrix);
@@ -2036,14 +2044,14 @@ namespace Step31
     // and temperature DoFHandler objects, by attaching them to the old dof
     // handlers. With this at place, we can prepare the triangulation and the
     // data vectors for refinement (in this order).
-    std::vector<TrilinosWrappers::Vector> x_temperature (2);
+    std::vector<TrilinosWrappers::MPI::Vector> x_temperature (2);
     x_temperature[0] = temperature_solution;
     x_temperature[1] = old_temperature_solution;
-    TrilinosWrappers::BlockVector x_stokes = stokes_solution;
+    TrilinosWrappers::MPI::BlockVector x_stokes = stokes_solution;
 
-    SolutionTransfer<dim,TrilinosWrappers::Vector>
+    SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
     temperature_trans(temperature_dof_handler);
-    SolutionTransfer<dim,TrilinosWrappers::BlockVector>
+    SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector>
     stokes_trans(stokes_dof_handler);
 
     triangulation.prepare_coarsening_and_refinement();
@@ -2065,7 +2073,7 @@ namespace Step31
     triangulation.execute_coarsening_and_refinement ();
     setup_dofs ();
 
-    std::vector<TrilinosWrappers::Vector> tmp (2);
+    std::vector<TrilinosWrappers::MPI::Vector> tmp (2);
     tmp[0].reinit (temperature_solution);
     tmp[1].reinit (temperature_solution);
     temperature_trans.interpolate(x_temperature, tmp);
@@ -2204,6 +2212,10 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use ./step-31"));
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,21 +48,18 @@ void test()
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     boundary_dofs.write (deallog.get_file_stream());
 
-  // the result of
-  // extract_boundary_dofs is
-  // supposed to be a subset of the
-  // locally relevant dofs, so test
-  // this
+  // the result of extract_boundary_dofs is supposed to be a subset of the
+  // locally relevant dofs, so test this
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   boundary_dofs.subtract_set (relevant_set);
-  Assert (boundary_dofs.n_elements() == 0,
-          ExcInternalError());
+  AssertThrow (boundary_dofs.n_elements() == 0,
+               ExcInternalError());
 }
 
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

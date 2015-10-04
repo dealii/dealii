@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__multigrid_templates_h
-#define __deal2__multigrid_templates_h
+#ifndef dealii__multigrid_templates_h
+#define dealii__multigrid_templates_h
 #include <deal.II/multigrid/multigrid.h>
 
 #include <deal.II/base/logstream.h>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_coarse_h
-#define __deal2__mg_coarse_h
+#ifndef dealii__mg_coarse_h
+#define dealii__mg_coarse_h
 
 
 #include <deal.II/lac/full_matrix.h>

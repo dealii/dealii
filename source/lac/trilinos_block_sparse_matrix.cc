@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,6 +94,7 @@ namespace TrilinosWrappers
                                   block_sparsity_pattern.n_block_cols()));
 
     const size_type n_block_rows = parallel_partitioning.size();
+    (void)n_block_rows;
 
     Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
             ExcDimensionMismatch (n_block_rows,
@@ -379,6 +380,38 @@ namespace TrilinosWrappers
 
 
 
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::domain_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> domain_partitioner;
+    for (size_type c = 0; c < this->n_block_cols(); ++c)
+      domain_partitioner.push_back(this->sub_objects[0][c]->domain_partitioner());
+
+    return domain_partitioner;
+  }
+
+
+
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::range_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> range_partitioner;
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      range_partitioner.push_back(this->sub_objects[r][0]->range_partitioner());
+
+    return range_partitioner;
+  }
+
+
+
+
+
 
 
   // -------------------- explicit instantiations -----------------------
@@ -386,12 +419,7 @@ namespace TrilinosWrappers
   template void
   BlockSparseMatrix::reinit (const dealii::BlockSparsityPattern &);
   template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSparsityPattern &);
-  template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSetSparsityPattern &);
-  template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSimpleSparsityPattern &);
-
+  BlockSparseMatrix::reinit (const dealii::BlockDynamicSparsityPattern &);
 
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
@@ -399,20 +427,12 @@ namespace TrilinosWrappers
                              const bool);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSparsityPattern &,
-                             const bool);
-  template void
-  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSetSparsityPattern &,
-                             const bool);
-  template void
-  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSimpleSparsityPattern &,
+                             const dealii::BlockDynamicSparsityPattern &,
                              const bool);
 
   template void
   BlockSparseMatrix::reinit (const std::vector<IndexSet> &,
-                             const dealii::BlockCompressedSimpleSparsityPattern &,
+                             const dealii::BlockDynamicSparsityPattern &,
                              const MPI_Comm &,
                              const bool);
 

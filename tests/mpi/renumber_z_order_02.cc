@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,6 @@
 // the number of processors. We do this by constructing a vector where each
 // element depends on the location and the index. We output the l2_norm() of
 // that vector and hope the output is that same.
-// This test fails right now, because p4est gets the coarse cells in a different
-// order.
 
 
 #include "../tests.h"
@@ -44,7 +42,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <fstream>
-#include <boost/concept_check.hpp>
 
 
 template<int dim>
@@ -128,7 +125,7 @@ void test()
 
 int main (int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

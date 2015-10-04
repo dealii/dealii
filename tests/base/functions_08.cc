@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ void check1 ()
   VectorFunctionFromTensorFunction<dim>
   object (x, 1, dim+2);
 
-  Assert (object.n_components == dim+2, ExcInternalError());
+  AssertThrow (object.n_components == dim+2, ExcInternalError());
 
   for (unsigned int i=0; i<10; ++i)
     {
@@ -50,21 +50,21 @@ void check1 ()
 
       for (unsigned int c=0; c<dim+2; ++c)
         if (c==0 || c==dim+1)
-          Assert (object.value(p,c) == 0,
-                  ExcInternalError())
+          AssertThrow (object.value(p,c) == 0,
+                       ExcInternalError())
           else
-            Assert (object.value(p,c) == p[c-1],
-                    ExcInternalError());
+            AssertThrow (object.value(p,c) == p[c-1],
+                         ExcInternalError());
 
       Vector<double> v(dim+2);
       object.vector_value (p, v);
       for (unsigned int c=0; c<dim+2; ++c)
         if (c==0 || c==dim+1)
-          Assert (v(c) == 0,
-                  ExcInternalError())
+          AssertThrow (v(c) == 0,
+                       ExcInternalError())
           else
-            Assert (v(c) == p[c-1],
-                    ExcInternalError());
+            AssertThrow (v(c) == p[c-1],
+                         ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

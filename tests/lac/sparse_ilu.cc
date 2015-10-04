@@ -89,10 +89,10 @@ int main()
             };
           ilu_pattern.compress();
 
-	  SparseILU<double>::AdditionalData data;
-	  data.use_this_sparsity = &ilu_pattern;
+          SparseILU<double>::AdditionalData data;
+          data.use_this_sparsity = &ilu_pattern;
           SparseILU<double> ilu;
-	  ilu.initialize (A, data);
+          ilu.initialize (A, data);
 
           // now for three test vectors v
           // determine norm of

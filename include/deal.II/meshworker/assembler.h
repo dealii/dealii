@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,10 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_assembler_h
-#define __deal2__mesh_worker_assembler_h
+#ifndef dealii__mesh_worker_assembler_h
+#define dealii__mesh_worker_assembler_h
 
-#include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_vector.h>
@@ -25,6 +24,7 @@
 #include <deal.II/meshworker/functional.h>
 #include <deal.II/meshworker/simple.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/algorithms/any_data.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -111,7 +111,7 @@ namespace MeshWorker
        * Copy the BlockInfo and the matrix pointers into local variables.
        */
       void initialize(const BlockInfo *block_info,
-                      NamedData<VECTOR *> &residuals);
+                      AnyData &residuals);
       /**
        * Initialize the constraints.
        */
@@ -148,10 +148,9 @@ namespace MeshWorker
                     const std::vector<types::global_dof_index> &dof);
 
       /**
-       * The global matrices, stored as a vector of pointers.
+       * The global vectors, stored as an AnyData container of pointers.
        */
-      NamedData<SmartPointer<VECTOR,
-                ResidualLocalBlocksToGlobalBlocks<VECTOR> > > residuals;
+      AnyData residuals;
 
       /**
        * A pointer to the object containing the block structure.
@@ -497,7 +496,7 @@ namespace MeshWorker
     template <class VECTOR>
     inline void
     ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(const BlockInfo *b,
-                                                          NamedData<VECTOR *> &m)
+                                                          AnyData &m)
     {
       block_info = b;
       residuals = m;

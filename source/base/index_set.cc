@@ -28,18 +28,72 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+// the 64-bit path uses a few different names, so put that into a separate
+// implementation
+
+#ifdef DEAL_II_WITH_64BIT_INDICES
+
+IndexSet::IndexSet (const Epetra_Map &map)
+  :
+  is_compressed (true),
+  index_space_size (map.NumGlobalElements64()),
+  largest_range (numbers::invalid_unsigned_int)
+{
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map.LinearMap())
+    add_range(size_type(map.MinMyGID64()), size_type(map.MaxMyGID64()+1));
+  else
+    {
+      const size_type n_indices = map.NumMyElements();
+      size_type *indices = (size_type *)map.MyGlobalElements64();
+      add_indices(indices, indices+n_indices);
+    }
+  compress();
+}
+
+#else
+
+// this is the standard 32-bit implementation
+
+IndexSet::IndexSet (const Epetra_Map &map)
+  :
+  is_compressed (true),
+  index_space_size (map.NumGlobalElements()),
+  largest_range (numbers::invalid_unsigned_int)
+{
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map.LinearMap())
+    add_range(size_type(map.MinMyGID()), size_type(map.MaxMyGID()+1));
+  else
+    {
+      const size_type n_indices = map.NumMyElements();
+      unsigned int *indices = (unsigned int *)map.MyGlobalElements();
+      add_indices(indices, indices+n_indices);
+    }
+  compress();
+}
+
+#endif
+
+#endif // ifdef DEAL_II_WITH_TRILINOS
+
+
+
 void
-IndexSet::add_range (const types::global_dof_index begin,
-                     const types::global_dof_index end)
+IndexSet::add_range (const size_type begin,
+                     const size_type end)
 {
   Assert ((begin < index_space_size)
           ||
           ((begin == index_space_size) && (end == index_space_size)),
-          ExcIndexRangeType<types::global_dof_index> (begin, 0, index_space_size));
+          ExcIndexRangeType<size_type> (begin, 0, index_space_size));
   Assert (end <= index_space_size,
-          ExcIndexRangeType<types::global_dof_index> (end, 0, index_space_size+1));
+          ExcIndexRangeType<size_type> (end, 0, index_space_size+1));
   Assert (begin <= end,
-          ExcIndexRangeType<types::global_dof_index> (begin, 0, end));
+          ExcIndexRangeType<size_type> (begin, 0, end));
 
   if (begin != end)
     {
@@ -75,8 +129,8 @@ IndexSet::do_compress () const
       next = i;
       ++next;
 
-      types::global_dof_index first_index = i->begin;
-      types::global_dof_index last_index  = i->end;
+      size_type first_index = i->begin;
+      size_type last_index  = i->end;
 
       // see if we can merge any of the following ranges
       while (next != ranges.end() &&
@@ -99,7 +153,7 @@ IndexSet::do_compress () const
     }
 
   // now compute indices within set and the range with most elements
-  types::global_dof_index next_index = 0, largest_range_size = 0;
+  size_type next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator i = ranges.begin();  i != ranges.end();
        ++i)
     {
@@ -178,8 +232,8 @@ IndexSet::operator & (const IndexSet &is) const
 
 
 IndexSet
-IndexSet::get_view (const types::global_dof_index begin,
-                    const types::global_dof_index end) const
+IndexSet::get_view (const size_type begin,
+                    const size_type end) const
 {
   Assert (begin <= end,
           ExcMessage ("End index needs to be larger or equal to begin index!"));
@@ -354,7 +408,7 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  types::global_dof_index s;
+  size_type s;
   unsigned int numranges;
 
   in >> s >> numranges;
@@ -362,7 +416,7 @@ IndexSet::read(std::istream &in)
   set_size(s);
   for (unsigned int i=0; i<numranges; ++i)
     {
-      types::global_dof_index b, e;
+      size_type b, e;
       in >> b >> e;
       add_range(b,e);
     }
@@ -387,7 +441,7 @@ IndexSet::block_write(std::ostream &out) const
 void
 IndexSet::block_read(std::istream &in)
 {
-  types::global_dof_index size;
+  size_type size;
   size_t n_ranges;
   in.read(reinterpret_cast<char *>(&size), sizeof(size));
   in.read(reinterpret_cast<char *>(&n_ranges), sizeof(n_ranges));
@@ -404,7 +458,7 @@ IndexSet::block_read(std::istream &in)
 
 
 
-void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) const
+void IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 {
   compress();
 
@@ -414,7 +468,7 @@ void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) 
   for (std::vector<Range>::iterator it = ranges.begin();
        it != ranges.end();
        ++it)
-    for (types::global_dof_index i=it->begin; i<it->end; ++i)
+    for (size_type i=it->begin; i<it->end; ++i)
       indices.push_back (i);
 
   Assert (indices.size() == n_elements(), ExcInternalError());
@@ -432,6 +486,30 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 {
   compress ();
 
+#ifdef DEBUG
+  if (!overlapping)
+    {
+      const size_type n_global_elements
+        = Utilities::MPI::sum (n_elements(), communicator);
+      Assert (n_global_elements == size(),
+              ExcMessage ("You are trying to create an Epetra_Map object "
+                          "that partitions elements of an index set "
+                          "between processors. However, the union of the "
+                          "index sets on different processors does not "
+                          "contain all indices exactly once: the sum of "
+                          "the number of entries the various processors "
+                          "want to store locally is "
+                          + Utilities::int_to_string (n_global_elements) +
+                          " whereas the total size of the object to be "
+                          "allocated is "
+                          + Utilities::int_to_string (size()) +
+                          ". In other words, there are "
+                          "either indices that are not spoken for "
+                          "by any processor, or there are indices that are "
+                          "claimed by multiple processors."));
+    }
+#endif
+
   if ((is_contiguous() == true) && (!overlapping))
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),
@@ -443,7 +521,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 #endif
   else
     {
-      std::vector<types::global_dof_index> indices;
+      std::vector<size_type> indices;
       fill_index_vector(indices);
 
       return Epetra_Map (TrilinosWrappers::types::int_type(-1),

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparsity_pattern_h
-#define __deal2__sparsity_pattern_h
+#ifndef dealii__sparsity_pattern_h
+#define dealii__sparsity_pattern_h
 
 
 #include <deal.II/base/config.h>
@@ -35,11 +35,6 @@ template <typename number> class SparseMatrix;
 template <typename number> class SparseLUDecomposition;
 template <typename number> class SparseILU;
 template <class VECTOR> class VectorSlice;
-
-class CompressedSparsityPattern;
-class CompressedSetSparsityPattern;
-class CompressedSimpleSparsityPattern;
-
 
 namespace ChunkSparsityPatternIterators
 {
@@ -91,7 +86,7 @@ namespace internals
 
 
 /**
- * Iterators on sparsity patterns
+ * Iterators on objects of type SparsityPattern.
  */
 namespace SparsityPatternIterators
 {
@@ -208,14 +203,14 @@ namespace SparsityPatternIterators
 
 
   /**
-   * STL conforming iterator walking over the elements of a sparsity pattern.
+   * An iterator class for walking over the elements of a sparsity pattern.
    *
    * The typical use for these iterators is to iterate over the elements of a
    * sparsity pattern (or, since they also serve as the basis for iterating
    * over the elements of an associated matrix, over the elements of a sparse
-   * matrix) or over the elements of individual rows. Note that there is no
-   * guarantee that the elements of a row are actually traversed in an order
-   * in which columns monotonically increase. See the documentation of the
+   * matrix), or over the elements of individual rows. There is no guarantee
+   * that the elements of a row are actually traversed in an order in which
+   * column numbers monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
    *
    * @note This class operates directly on the internal data structures of the
@@ -345,15 +340,6 @@ public:
   const_iterator;
 
   /**
-   * Typedef an iterator class that allows to walk over the nonzero elements
-   * of a row of a sparsity pattern.
-   *
-   * @deprecated This typedef is deprecated. Use proper iterators instead.
-   */
-  typedef
-  const size_type *row_iterator;
-
-  /**
    * Typedef an iterator class that allows to walk over all nonzero elements
    * of a sparsity pattern.
    *
@@ -397,24 +383,25 @@ public:
    * Copy constructor. This constructor is only allowed to be called if the
    * matrix structure to be copied is empty. This is so in order to prevent
    * involuntary copies of objects for temporaries, which can use large
-   * amounts of computing time.  However, copy constructors are needed if yo
-   * want to use the STL data types on classes like this, e.g. to write such
+   * amounts of computing time. However, copy constructors are needed if one
+   * wants to place a SparsityPattern in a container, e.g., to write such
    * statements like <tt>v.push_back (SparsityPattern());</tt>, with
    * <tt>v</tt> a vector of SparsityPattern objects.
    *
    * Usually, it is sufficient to use the explicit keyword to disallow
-   * unwanted temporaries, but for the STL vectors, this does not work. Since
-   * copying a structure like this is not useful anyway because multiple
+   * unwanted temporaries, but this does not work for <tt>std::vector</tt>s.
+   * Since copying a structure like this is not useful anyway because multiple
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
    */
   SparsityPattern (const SparsityPattern &);
 
   /**
-   * Initialize a rectangular matrix.
+   * Initialize a rectangular pattern of size <tt>m x n</tt>.
    *
-   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
-   * number of nonzero entries per row
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] max_per_row Maximum number of nonzero entries per row.
    */
   SparsityPattern (const size_type m,
                    const size_type n,
@@ -422,35 +409,36 @@ public:
 
 
   /**
-   * Initialize a rectangular matrix.
+   * Initialize a rectangular pattern of size <tt>m x n</tt>.
    *
-   * @arg m number of rows @arg n number of columns @arg row_lengths possible
-   * number of nonzero entries for each row.  This vector must have one entry
-   * for each row.
+   * @param[in] m The number of rows.
+   * @param[in] n The number of columns.
+   * @param[in] row_lengths Possible number of nonzero entries for each row. This
+   * vector must have one entry for each row.
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
                    const std::vector<unsigned int> &row_lengths);
 
   /**
-   * Initialize a quadratic matrix of dimension <tt>n</tt> with at most
+   * Initialize a quadratic pattern of dimension <tt>m</tt> with at most
    * <tt>max_per_row</tt> nonzero entries per row.
    *
    * This constructor automatically enables optimized storage of diagonal
    * elements. To avoid this, use the constructor taking row and column
    * numbers separately.
    */
-  SparsityPattern (const size_type n,
+  SparsityPattern (const size_type m,
                    const unsigned int max_per_row);
 
   /**
-   * Initialize a quadratic matrix.
+   * Initialize a quadratic pattern of size <tt>m x m</tt>.
    *
-   * @arg m number of rows and columns @arg row_lengths possible number of
-   * nonzero entries for each row.  This vector must have one entry for each
-   * row.
+   * @param[in] m The number of rows and columns.
+   * @param[in] row_lengths Maximum number of nonzero entries for each row. This
+   * vector must have one entry for each row.
    */
-  SparsityPattern (const size_type               m,
+  SparsityPattern (const size_type m,
                    const std::vector<unsigned int> &row_lengths);
 
   /**
@@ -628,15 +616,14 @@ public:
                   const ForwardIterator end);
 
   /**
-   * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Although
-   * not a compressed sparsity pattern, this function is also instantiated if
-   * the argument is of type SparsityPattern (i.e., the current class).
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
+   * Copy data from an object of type DynamicSparsityPattern. Although not a
+   * compressed sparsity pattern, this function is also instantiated if the
+   * argument is of type SparsityPattern (i.e., the current class). Previous
+   * content of this object is lost, and the sparsity pattern is in compressed
+   * mode afterwards.
    */
   template <typename CompressedSparsityType>
-  void copy_from (const CompressedSparsityType &csp);
+  void copy_from (const CompressedSparsityType &dsp);
 
 
   /**
@@ -690,7 +677,7 @@ public:
 // @{
 
   /**
-   * STL-like iterator with the first entry of the matrix. The resulting
+   * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    *
@@ -705,7 +692,7 @@ public:
   iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals
@@ -943,6 +930,15 @@ public:
   void print_gnuplot (std::ostream &out) const;
 
   /**
+   * Prints the sparsity of the matrix in a .svg file which can be opened in a web browser.
+   * The .svg file contains squares which correspond to the entries in the matrix. An entry
+   * in the matrix which contains a non-zero value corresponds with a red square while a
+   * zero-valued entry in the matrix correspond with a white square.
+   */
+  void print_svg (std::ostream &out) const;
+
+
+  /**
    * Write the data of this object to a stream for the purpose of
    * serialization
    */
@@ -956,42 +952,10 @@ public:
   template <class Archive>
   void load (Archive &ar, const unsigned int version);
 
-// @}
-  /**
-   * @name Deprecated functions
-   */
-// @{
-
-
-  /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
-   *
-   * Note that if the given row is empty, i.e. does not contain any nonzero
-   * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
-   * that case.
-   *
-   * @deprecated Use the iterators provided by the begin() and end() functions
-   * instead.
-   */
-  row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
-
-  /**
-   * Final iterator of row <tt>r</tt>. It points to the first element past the
-   * end of line @p r, or past the end of the entire sparsity pattern.
-   *
-   * Note that the end iterator is not necessarily dereferencable. This is in
-   * particular the case if it is the end iterator for the last row of a
-   * matrix.
-   *
-   * @deprecated Use the iterators provided by the begin() and end() functions
-   * instead.
-   */
-  row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
-
-// @}
-
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+// @}
+
   /**
    * @addtogroup Exceptions
    * @{
@@ -1370,26 +1334,6 @@ SparsityPattern::end (const size_type r) const
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   return iterator(this, rowstart[r+1]);
-}
-
-
-
-inline
-SparsityPattern::row_iterator
-SparsityPattern::row_begin (const size_type r) const
-{
-  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
-  return &colnums[rowstart[r]];
-}
-
-
-
-inline
-SparsityPattern::row_iterator
-SparsityPattern::row_end (const size_type r) const
-{
-  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
-  return &colnums[rowstart[r+1]];
 }
 
 

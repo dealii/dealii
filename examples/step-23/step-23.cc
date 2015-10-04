@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2014 by the deal.II authors
+ * Copyright (C) 2006 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,6 +29,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -332,11 +333,9 @@ namespace Step23
               << std::endl
               << std::endl;
 
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    sparsity_pattern.compress();
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     // Then comes a block where we have to initialize the 3 matrices we need
     // in the course of the program: the mass matrix, the Laplace matrix, and

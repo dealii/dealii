@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -276,11 +276,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      // the FE_Nothing has no degrees of freedom and it is typically used in
-      // a context where we don't require any continuity along the interface
-      return FiniteElementDomination::no_requirements;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());
@@ -363,9 +370,10 @@ template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<1,spacedim> &x_source_fe,
-                                  const unsigned int        subface,
+                                  const unsigned int        /*subface*/,
                                   FullMatrix<double>       &interpolation_matrix) const
 {
+  (void)x_source_fe;
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
                                 this->dofs_per_face));
@@ -412,7 +420,7 @@ FE_FaceQ<1,spacedim>::hp_constraints_are_implemented () const
 template <int spacedim>
 FiniteElementDomination::Domination
 FE_FaceQ<1,spacedim>::
-compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const
+compare_for_face_domination (const FiniteElement<1,spacedim> &/*fe_other*/) const
 {
   return FiniteElementDomination::no_requirements;
 }
@@ -457,72 +465,17 @@ FE_FaceQ<1,spacedim>::update_each (const UpdateFlags flags) const
 }
 
 
-
-template <int spacedim>
-typename Mapping<1,spacedim>::InternalDataBase *
-FE_FaceQ<1,spacedim>::get_data (
-  const UpdateFlags,
-  const Mapping<1,spacedim> &,
-  const Quadrature<1> &) const
-{
-  return new typename Mapping<1,spacedim>::InternalDataBase;
-}
-
-
-template <int spacedim>
-typename Mapping<1,spacedim>::InternalDataBase *
-FE_FaceQ<1,spacedim>::get_face_data (
-  const UpdateFlags update_flags,
-  const Mapping<1,spacedim> &,
-  const Quadrature<0> &quadrature) const
-{
-  // generate a new data object and initialize some fields
-  typename Mapping<1,spacedim>::InternalDataBase *data =
-    new typename Mapping<1,spacedim>::InternalDataBase;
-
-  // check what needs to be initialized only once and what on every
-  // cell/face/subface we visit
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
-
-  const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.size();
-  AssertDimension(n_q_points, 1);
-
-  // No derivatives of this element are implemented.
-  if (flags & update_gradients || flags & update_hessians)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-  return data;
-}
-
-
-
-template <int spacedim>
-typename Mapping<1,spacedim>::InternalDataBase *
-FE_FaceQ<1,spacedim>::get_subface_data (
-  const UpdateFlags flags,
-  const Mapping<1,spacedim> &mapping,
-  const Quadrature<0> &quadrature) const
-{
-  return get_face_data (flags, mapping, quadrature);
-}
-
-
-
 template <int spacedim>
 void
-FE_FaceQ<1,spacedim>::fill_fe_values
-(const Mapping<1,spacedim> &,
- const typename Triangulation<1,spacedim>::cell_iterator &,
- const Quadrature<1> &,
- typename Mapping<1,spacedim>::InternalDataBase &,
- typename Mapping<1,spacedim>::InternalDataBase &,
- FEValuesData<1,spacedim> &,
- CellSimilarity::Similarity &) const
+FE_FaceQ<1,spacedim>::
+fill_fe_values(const Mapping<1,spacedim> &,
+               const typename Triangulation<1,spacedim>::cell_iterator &,
+               const Quadrature<1> &,
+               const typename Mapping<1,spacedim>::InternalDataBase &,
+               const typename FiniteElement<1,spacedim>::InternalDataBase &,
+               const internal::FEValues::MappingRelatedData<1,spacedim> &,
+               internal::FEValues::FiniteElementRelatedData<1,spacedim> &,
+               const CellSimilarity::Similarity ) const
 {
   // Do nothing, since we do not have values in the interior
 }
@@ -531,14 +484,15 @@ FE_FaceQ<1,spacedim>::fill_fe_values
 
 template <int spacedim>
 void
-FE_FaceQ<1,spacedim>::fill_fe_face_values (
-  const Mapping<1,spacedim> &,
-  const typename Triangulation<1,spacedim>::cell_iterator &,
-  const unsigned int face,
-  const Quadrature<0> &quadrature,
-  typename Mapping<1,spacedim>::InternalDataBase &,
-  typename Mapping<1,spacedim>::InternalDataBase &fedata,
-  FEValuesData<1,spacedim> &data) const
+FE_FaceQ<1,spacedim>::
+fill_fe_face_values (const Mapping<1,spacedim> &,
+                     const typename Triangulation<1,spacedim>::cell_iterator &,
+                     const unsigned int face,
+                     const Quadrature<0> &,
+                     const typename Mapping<1,spacedim>::InternalDataBase &,
+                     const typename FiniteElement<1,spacedim>::InternalDataBase &fedata,
+                     const internal::FEValues::MappingRelatedData<1,spacedim> &,
+                     internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const
 {
   const UpdateFlags flags(fedata.update_once | fedata.update_each);
 
@@ -546,25 +500,26 @@ FE_FaceQ<1,spacedim>::fill_fe_face_values (
   if (flags & update_values)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        data.shape_values(k,0) = 0.;
-      data.shape_values(foffset,0) = 1;
+        output_data.shape_values(k,0) = 0.;
+      output_data.shape_values(foffset,0) = 1;
     }
 }
 
 
 template <int spacedim>
 void
-FE_FaceQ<1,spacedim>::fill_fe_subface_values (
-  const Mapping<1,spacedim> &,
-  const typename Triangulation<1,spacedim>::cell_iterator &,
-  const unsigned int ,
-  const unsigned int ,
-  const Quadrature<0> &,
-  typename Mapping<1,spacedim>::InternalDataBase &,
-  typename Mapping<1,spacedim>::InternalDataBase &,
-  FEValuesData<1,spacedim> &) const
+FE_FaceQ<1,spacedim>::
+fill_fe_subface_values (const Mapping<1,spacedim> &,
+                        const typename Triangulation<1,spacedim>::cell_iterator &,
+                        const unsigned int ,
+                        const unsigned int ,
+                        const Quadrature<0> &,
+                        const typename Mapping<1,spacedim>::InternalDataBase &,
+                        const typename FiniteElement<1,spacedim>::InternalDataBase &,
+                        const internal::FEValues::MappingRelatedData<1,spacedim> &,
+                        internal::FEValues::FiniteElementRelatedData<1,spacedim> &) const
 {
-  Assert(false, ExcMessage("Should not fille subface values in 1D"));
+  Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
 }
 
 
@@ -660,11 +615,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      // the FE_Nothing has no degrees of freedom and it is typically used in
-      // a context where we don't require any continuity along the interface
-      return FiniteElementDomination::no_requirements;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());
@@ -757,6 +719,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
               v_in(k) = this->poly_space.compute_value(i, p);
             }
           const double result = H.least_squares(v_out, v_in);
+          (void)result;
           Assert(result < 1e-12, FETools::ExcLeastSquaresError (result));
 
           for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)

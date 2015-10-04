@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_block_sparse_matrix_h
-#define __deal2__petsc_block_sparse_matrix_h
+#ifndef dealii__petsc_block_sparse_matrix_h
+#define dealii__petsc_block_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -127,7 +127,7 @@ namespace PETScWrappers
 
     /**
      * Resize the matrix, by setting the number of block rows and columns.
-     * This deletes all blocks and replaces them by unitialized ones, i.e.
+     * This deletes all blocks and replaces them by uninitialized ones, i.e.
      * ones for which also the sizes are not yet set. You have to do that by
      * calling the @p reinit functions of the blocks themselves. Do not forget
      * to call collect_sizes() after that on this object.
@@ -338,4 +338,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif    // DEAL_II_WITH_PETSC
 
-#endif    // __deal2__petsc_block_sparse_matrix_h
+#endif    // dealii__petsc_block_sparse_matrix_h

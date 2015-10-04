@@ -16,22 +16,29 @@
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/lexical_cast.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/random.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <sstream>
+
+#ifndef DEAL_II_MSVC
+#  include <stdlib.h>
+#endif
 
 #ifdef DEAL_II_MSVC
 #  include <winsock2.h>
@@ -85,6 +92,36 @@ namespace Utilities
     return lc_string;
   }
 
+
+  std::string
+  replace_in_string(const std::string &input,
+                    const std::string &from,
+                    const std::string &to)
+  {
+    if (from.empty())
+      return input;
+
+    std::string out = input;
+    std::string::size_type pos = out.find(from);
+
+    while (pos != std::string::npos)
+      {
+        out.replace(pos, from.size(), to);
+        pos = out.find(from, pos + to.size());
+      }
+    return out;
+  }
+
+  std::string
+  trim(const std::string &input)
+  {
+    std::string::size_type start_idx = input.find_first_not_of(" ");
+    if (start_idx == std::string::npos)
+      return "";
+
+    std::string::size_type end_idx = input.find_last_not_of(" ");
+    return std::string( input, start_idx, end_idx+1-start_idx);
+  }
 
   std::string
   dim_string(const int dim, const int spacedim)
@@ -386,41 +423,13 @@ namespace Utilities
     if (sigma == 0)
       return a;
 
-    // we want to use rand(), but that function is not reentrant in a thread
-    // context. thus, use rand_r. this does not produce reproducible results
-    // between threads either, but at least it is reentrant. if you need
-    // an exactly reproducible sequence even in multithreaded contexts,
-    // then this is probably not the function to use.
-#ifdef DEAL_II_HAVE_RAND_R
-    static unsigned int seed = 0xabcd1234;
-    const double y = 1.0*rand_r(&seed)/RAND_MAX;
-#else
-    const double y = 1.0*rand()/RAND_MAX;
-#endif
-
-    // find x such that y=erf(x). do so
-    // using a Newton method to find
-    // the zero of F(x)=erf(x)-y. start
-    // at x=0
-    double x = 0;
-    unsigned int iteration = 0;
-    while (true)
-      {
-        const double residual = 0.5+boost::math::erf(x/std::sqrt(2.)/sigma)/2-y;
-
-        if (std::fabs(residual) < 1e-7)
-          break;
-
-        const double F_prime = 1./std::sqrt(2*3.1415926536)/sigma *
-                               std::exp(-x*x/sigma/sigma/2);
-        x += -residual / F_prime;
-
-        // make sure that we don't
-        // recurse endlessly
-        ++iteration;
-        Assert (iteration < 20, ExcInternalError());
-      };
-    return x+a;
+    // we would want to use rand(), but that function is not reentrant
+    // in a thread context. one could use rand_r, but this does not
+    // produce reproducible results between threads either (though at
+    // least it is reentrant). these two approaches being
+    // non-workable, use a thread-local random number generator here
+    static Threads::ThreadLocalStorage<boost::mt19937> random_number_generator;
+    return boost::normal_distribution<>(a,sigma)(random_number_generator.get());
   }
 
 
@@ -628,6 +637,40 @@ namespace Utilities
     }
 
 
+
+    std::string get_date ()
+    {
+      std::time_t  time1= std::time (0);
+      std::tm     *time = std::localtime(&time1);
+
+      std::ostringstream o;
+      o << time->tm_year + 1900 << "/"
+        << time->tm_mon + 1 << "/"
+        << time->tm_mday;
+
+      return o.str();
+    }
+
+
+
+    void posix_memalign (void **memptr, size_t alignment, size_t size)
+    {
+#ifndef DEAL_II_MSVC
+      const int ierr = ::posix_memalign (memptr, alignment, size);
+
+      AssertThrow (ierr == 0, ExcOutOfMemory());
+      AssertThrow (*memptr != 0, ExcOutOfMemory());
+#else
+      // Windows does not appear to have posix_memalign. just use the
+      // regular malloc in that case
+      *memptr = malloc (size);
+      (void)alignment;
+      AssertThrow (*memptr != 0, ExcOutOfMemory());
+#endif
+    }
+
+
+
     bool job_supports_mpi ()
     {
       return Utilities::MPI::job_supports_mpi();
@@ -700,13 +743,8 @@ namespace Utilities
 
     void destroy_communicator (Epetra_Comm &communicator)
     {
-      Assert (&communicator != 0, ExcInternalError());
-
-      // save the communicator, reset
-      // the map, and delete the
-      // communicator if this whole
-      // thing was created as an MPI
-      // communicator
+      // save the communicator, reset the map, and delete the communicator if
+      // this whole thing was created as an MPI communicator
 #ifdef DEAL_II_WITH_MPI
       Epetra_MpiComm
       *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);

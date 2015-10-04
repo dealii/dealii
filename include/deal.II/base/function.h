@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_h
-#define __deal2__function_h
+#ifndef dealii__function_h
+#define dealii__function_h
 
 
 #include <deal.II/base/config.h>
@@ -22,6 +22,7 @@
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx11/function.h>
 
@@ -310,11 +311,37 @@ public:
                                       std::vector<Vector<Number> >   &values) const;
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined exactly
-   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
-   * type with a certain number of elements?), this is only an estimate.
-   * however often quite close to the true value.
+   * Compute the Hessian of a given component at point <tt>p</tt>,
+   * that is the gradient of the gradient of the function.
+   */
+  virtual SymmetricTensor<2,dim,Number> hessian (const Point<dim>   &p,
+                                                 const unsigned int          component = 0) const;
+
+  /**
+   * Compute the Hessian of all components at point <tt>p</tt> and store
+   * them in <tt>values</tt>.
+   */
+  virtual void vector_hessian (const Point<dim>                           &p,
+                               std::vector<SymmetricTensor<2,dim,Number> > &values) const;
+
+  /**
+   * Compute the Hessian of one component at a set of points.
+   */
+  virtual void hessian_list (const std::vector<Point<dim> >              &points,
+                             std::vector<SymmetricTensor<2,dim,Number> > &values,
+                             const unsigned int                          component = 0) const;
+
+  /**
+   * Compute the Hessians of all components at a set of points.
+   */
+  virtual void vector_hessian_list (const std::vector<Point<dim> >                            &points,
+                                    std::vector<std::vector<SymmetricTensor<2,dim,Number> > > &values) const;
+
+
+  /**
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 };
@@ -378,7 +405,7 @@ public:
 
 
 /**
- * Provide a function which always returns the constant value handed to the
+ * Provide a function which always returns the constant values handed to the
  * constructor.
  *
  * Obviously, the derivates of this function are zero, which is why we derive
@@ -391,25 +418,37 @@ public:
  * <tt>ZeroFunction</tt> is known at compile time and need not be looked up
  * somewhere in memory.
  *
- * You can pass to the constructor an integer denoting the number of
- * components this function shall have. It defaults to one. If it is greater
- * than one, then the function will return the constant value in all its
- * components, which might not be overly useful a feature in most cases,
- * however.
- *
  * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
  */
 template <int dim, typename Number=double>
 class ConstantFunction : public ZeroFunction<dim, Number>
 {
 public:
   /**
-   * Constructor; takes the constant function value as an argument. The number
-   * of components is preset to one.
+   * Constructor; set values of all components to the provided one. The default number
+   * of components is one.
    */
   ConstantFunction (const Number       value,
                     const unsigned int n_components = 1);
+
+  /**
+   * Constructor; takes an <tt>std::vector<Number></tt> object as an argument. The number
+   * of components is determined by <tt>values.size()</tt>.
+   */
+  ConstantFunction (const std::vector<Number> &values);
+
+  /**
+   * Constructor; takes an <tt>Vector<Number></tt> object as an argument. The number
+   * of components is determined by <tt>values.size()</tt>.
+   */
+  ConstantFunction (const Vector<Number> &values);
+
+  /**
+   * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
+   * to initialize a new object.
+   */
+  ConstantFunction (const Number *begin_ptr, const unsigned int n_components);
 
   /**
    * Virtual destructor; absolutely necessary in this case.
@@ -419,25 +458,24 @@ public:
   virtual Number value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  virtual void   vector_value (const Point<dim> &p,
-                               Vector<Number>   &return_value) const;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<Number>   &return_value) const;
 
   virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Number>            &values,
+                           std::vector<Number>            &return_values,
                            const unsigned int              component = 0) const;
 
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<Number> >   &values) const;
+                                  std::vector<Vector<Number> >   &return_values) const;
 
   std::size_t memory_consumption () const;
 
 protected:
   /**
-   * Store the constant function value.
+   * Store the constant function value vector.
    */
-  const Number function_value;
+  std::vector<Number> function_value_vector;
 };
-
 
 
 /**
@@ -484,11 +522,25 @@ public:
   ComponentSelectFunction (const std::pair<unsigned int, unsigned int> &selected,
                            const unsigned int n_components);
 
+
+  /**
+   * Substitute function value with value of a <tt>ConstantFunction<dim, Number> <\tt>
+   * object and keep the current selection pattern.
+   *
+   * This is useful if you want to have different values in different components since the
+   * provided constructors of <tt>ComponentSelectFunction<dim, Number> <\tt>
+   * class can only have same value for all components.
+   *
+   * @note: we copy the underlaying component value data from @para f from its beginning.
+   * So the number of components of @para f cannot be less than the calling object.
+   */
+  virtual void substitute_function_value_with (const ConstantFunction<dim, Number> &f);
+
   /**
    * Return the value of the function at the given point for all components.
    */
-  virtual void   vector_value (const Point<dim> &p,
-                               Vector<Number>   &return_value) const;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<Number>   &return_value) const;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
@@ -500,11 +552,9 @@ public:
                                   std::vector<Vector<Number> >   &values) const;
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined exactly
-   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
-   * type with a certain number of elements?), this is only an estimate.
-   * however often quite close to the true value.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 
@@ -629,7 +679,7 @@ private:
  * here, the given function object is still a scalar function (i.e. it has a
  * single value at each space point) but that the Function object generated is
  * vector valued. The number of vector components is specified in the
- * constructor, where one also selectes a single one of these vector
+ * constructor, where one also selects a single one of these vector
  * components that should be filled by the passed object. The result is a
  * vector Function object that returns zero in each component except the
  * single selected one where it returns the value returned by the given as the

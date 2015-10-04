@@ -13,11 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__full_matrix_templates_h
-#define __deal2__full_matrix_templates_h
+#ifndef dealii__full_matrix_templates_h
+#define dealii__full_matrix_templates_h
 
 
-//TODO: this file has a lot of operations between matrices and matrices or matrices and vectors of different precision. we should go through the file and in each case pick the more accurate data type for intermediate results. currently, the choice is pretty much random. this may also allow us some operations where one operand is complex and the other is not
+// TODO: this file has a lot of operations between matrices and matrices or
+// matrices and vectors of different precision. we should go through the
+// file and in each case pick the more accurate data type for intermediate
+// results. currently, the choice is pretty much random. this may also allow
+// us some operations where one operand is complex and the other is not
+// -> use ProductType<T,U> type trait for the results
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/template_constraints.h>
@@ -368,16 +373,6 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
     for (size_type j=0; j<this->n_cols(); ++j)
       (*this)(i,j) = src(p_rows[i], p_cols[j]);
 }
-
-
-
-/*  template <typename number> */
-/*  template <typename number2> */
-/*  void FullMatrix<number>::fill (const number2* entries) */
-/*  { */
-/*      if (n_cols()*n_rows() != 0) */
-/*        std::copy (entries, entries+n_rows()*n_cols(), &this->values[0]); */
-/*  } */
 
 
 
@@ -1768,7 +1763,7 @@ FullMatrix<number>::gauss_jordan ()
 #endif
 
   // otherwise do it by hand. use the
-  // Gauss-Jordan-Algorithmus from
+  // Gauss-Jordan-Algorithm from
   // Stoer & Bulirsch I (4th Edition)
   // p. 153
   const size_type N = n();
@@ -1784,6 +1779,7 @@ FullMatrix<number>::gauss_jordan ()
   for (size_type i=0; i<N; ++i)
     diagonal_sum += std::abs((*this)(i,i));
   const double typical_diagonal_element = diagonal_sum/N;
+  (void)typical_diagonal_element;
 
   // initialize the array that holds
   // the permutations that we find

@@ -48,7 +48,7 @@
  *   mesh refinement. Several classes already exist to support the most common
  *   geometries, e.g., CylinderManifold, or PolarManifold, which represent
  *   respectively the geometry obtained when describing your space in
- *   cylindrical coordintes or in polar coordinates.
+ *   cylindrical coordinates or in polar coordinates.
  *
  *   <li> Integration: When using higher order finite element methods, it is
  *   often necessary to compute cell terms (like cell contributions to the
@@ -254,7 +254,7 @@
  *
  * Here, even starting with an initial, inappropriately chosen mesh retains
  * our ability to adequately refine the mesh into one that will serve us
- * well. This example may be manifactured here, but it is relevant, for example
+ * well. This example may be manufactured here, but it is relevant, for example
  * in the context of what GridGenerator::hyper_shell() produces in 3d
  * (see the documentation of this function). It is also germane to the
  * cases discussed in the @ref GlossDistorted "glossary entry on distorted cells".

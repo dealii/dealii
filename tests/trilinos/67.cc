@@ -95,7 +95,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
   // make sure that zeroing out rows does at
   // least not add new nonzero entries (it
   // may remove some, though)
-  Assert (m.n_nonzero_elements() <= nnz, ExcInternalError());
+  AssertThrow (m.n_nonzero_elements() <= nnz, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -109,7 +109,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

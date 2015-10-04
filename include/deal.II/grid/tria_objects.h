@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_objects_h
-#define __deal2__tria_objects_h
+#ifndef dealii__tria_objects_h
+#define dealii__tria_objects_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -271,7 +271,7 @@ namespace internal
 
       /**
        * Clear all user pointers or indices and reset their type, such that
-       * the next access may be aither or.
+       * the next access may be either or.
        */
       void clear_user_data();
 
@@ -282,8 +282,8 @@ namespace internal
 
       /**
        * Check the memory consistency of the different containers. Should only
-       * be called with the prepro flag @p DEBUG set. The function should be
-       * called from the functions of the higher TriaLevel classes.
+       * be called with the preprocessor flag @p DEBUG set. The function
+       * should be called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
@@ -383,7 +383,7 @@ namespace internal
       };
 
       /**
-       * Enum descibing the possible types of userdata.
+       * Enum describing the possible types of userdata.
        */
       enum UserDataType
       {
@@ -431,11 +431,11 @@ namespace internal
 
       /**
        * For edges, we enforce a standard convention that opposite edges
-       * should be parallel. Now, that's enforcable in most cases, and we have
-       * code that makes sure that if a mesh allows this to happen, that we
-       * have this convention. We also know that it is always possible to have
-       * opposite faces have parallel normal vectors. (For both things, see
-       * the Agelek, Anderson, Bangerth, Barth paper mentioned in the
+       * should be parallel. Now, that's enforceable in most cases, and we
+       * have code that makes sure that if a mesh allows this to happen, that
+       * we have this convention. We also know that it is always possible to
+       * have opposite faces have parallel normal vectors. (For both things,
+       * see the Agelek, Anderson, Bangerth, Barth paper mentioned in the
        * publications list.)
        *
        * The problem is that we originally had another condition, namely that
@@ -476,8 +476,8 @@ namespace internal
 
       /**
        * Check the memory consistency of the different containers. Should only
-       * be called with the prepro flag @p DEBUG set. The function should be
-       * called from the functions of the higher TriaLevel classes.
+       * be called with the preprocessor flag @p DEBUG set. The function
+       * should be called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
@@ -539,8 +539,8 @@ namespace internal
 
       /**
        * Check the memory consistency of the different containers. Should only
-       * be called with the prepro flag @p DEBUG set. The function should be
-       * called from the functions of the higher TriaLevel classes.
+       * be called with the preprocessor flag @p DEBUG set. The function
+       * should be called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
@@ -584,7 +584,7 @@ namespace internal
     template <class Archive>
     void
     TriaObjects<G>::BoundaryOrMaterialId::serialize(Archive &ar,
-                                                    const unsigned int version)
+                                                    const unsigned int /*version*/)
     {
       // serialize this
       // structure by

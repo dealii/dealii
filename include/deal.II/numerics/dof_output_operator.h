@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__dof_output_operator_h
-#define __deal2__dof_output_operator_h
+#ifndef dealii__dof_output_operator_h
+#define dealii__dof_output_operator_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/event.h>
 #include <deal.II/algorithms/operator.h>
@@ -44,7 +43,7 @@ namespace Algorithms
      * Constructor. The <tt>filename</tt> is the common base name of
      * all files and the argument <tt>digits</tt> should be the number
      * of digits of the highest number in the sequence. File names by
-     * default have the form "outputNN" with NNN the number set by the
+     * default have the form "outputNNN" with NNN the number set by the
      * last step command. Numbers with less digits are filled with
      * zeros from the left.
      */

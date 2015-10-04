@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ void test (PETScWrappers::Vector &v,
   w.compress (VectorOperation::insert);
 
   // make sure the scalar product is zero
-  Assert (v*w == 0, ExcInternalError());
+  AssertThrow (v*w == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -55,7 +55,7 @@ int main (int argc,char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         PETScWrappers::Vector v (100);
         PETScWrappers::Vector w (100);

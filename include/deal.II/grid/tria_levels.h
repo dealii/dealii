@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_levels_h
-#define __deal2__tria_levels_h
+#ifndef dealii__tria_levels_h
+#define dealii__tria_levels_h
 
 
 #include <deal.II/base/config.h>
@@ -70,6 +70,14 @@ namespace internal
        */
       std::vector<bool> coarsen_flags;
 
+
+      /**
+       * An integer that, for every active cell, stores the how many-th active
+       * cell this is. For non-active cells, this value is unused and set to
+       * an invalid value.
+       */
+      std::vector<unsigned int> active_cell_indices;
+
       /**
        * Levels and indices of the neighbors of the cells. Convention is, that
        * the neighbors of the cell with index @p i are stored in the fields
@@ -94,8 +102,8 @@ namespace internal
        * In one dimension, a neighbor may have any level less or equal the
        * level of this cell. If it has the same level, it may be refined an
        * arbitrary number of times, but the neighbor pointer still points to
-       * the cell on the same level, while the neighbors of the childs of the
-       * neighbor may point to this cell or its children.
+       * the cell on the same level, while the neighbors of the children of
+       * the neighbor may point to this cell or its children.
        *
        * In two and more dimensions, the neighbor is either on the same level
        * and refined (in which case its children have neighbor pointers to
@@ -161,8 +169,8 @@ namespace internal
 
       /**
        * Check the memory consistency of the different containers. Should only
-       * be called with the prepro flag @p DEBUG set. The function should be
-       * called from the functions of the higher TriaLevel classes.
+       * be called with the preprocessor flag @p DEBUG set. The function
+       * should be called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
@@ -201,8 +209,8 @@ namespace internal
 
     /**
      * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
-     * instead of TriaObjects. Refer to the documentation of the template for
-     * details.
+     * instead of TriaObjects. Refer to the documentation of the general class
+     * template for details.
      */
     template<>
     class TriaLevel<3>
@@ -210,6 +218,7 @@ namespace internal
     public:
       std::vector<unsigned char> refine_flags;
       std::vector<bool> coarsen_flags;
+      std::vector<unsigned int> active_cell_indices;
       std::vector<std::pair<int,int> > neighbors;
       std::vector<types::subdomain_id> subdomain_ids;
       std::vector<types::subdomain_id> level_subdomain_ids;
@@ -265,6 +274,11 @@ namespace internal
                                    const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
+
+      // do not serialize 'active_cell_indices' here. instead of storing them
+      // to the stream and re-reading them again later, we just rebuild them
+      // in Triangulation::load()
+
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;
@@ -280,6 +294,11 @@ namespace internal
                                  const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
+
+      // do not serialize 'active_cell_indices' here. instead of storing them
+      // to the stream and re-reading them again later, we just rebuild them
+      // in Triangulation::load()
+
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;

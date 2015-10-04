@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,18 +108,18 @@ void test()
   std::vector<Tensor<1,dim> > m(2);
   fe_function.vector_gradient (point, m);
 
-  Assert (std::fabs(m[0][0] - 1)
-          <
-          1e-10 * std::fabs(m[0][0] + 1),
-          ExcInternalError());
-  Assert (std::fabs(m[0][1])
-          <
-          1e-10,
-          ExcInternalError());
-  Assert (m[1].norm()
-          <
-          1e-10,
-          ExcInternalError());
+  AssertThrow (std::fabs(m[0][0] - 1)
+               <
+               1e-10 * std::fabs(m[0][0] + 1),
+               ExcInternalError());
+  AssertThrow (std::fabs(m[0][1])
+               <
+               1e-10,
+               ExcInternalError());
+  AssertThrow (m[1].norm()
+               <
+               1e-10,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

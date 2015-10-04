@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__error_estimator_h
-#define __deal2__error_estimator_h
+#ifndef dealii__error_estimator_h
+#define dealii__error_estimator_h
 
 
 #include <deal.II/base/config.h>
@@ -40,18 +40,27 @@ namespace hp
 
 
 /**
- * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz and
- * Babuska.  This error indicator tries to approximate the error per cell by
- * integration of the jump of the gradient of the solution along the faces of
- * each cell.  It can be understood as a gradient recovery estimator; see the
- * survey of Ainsworth and Oden, "A Posteriori Error Estimation in Finite Element
- * Analysis" (Wiley, 2000) for a complete discussion.
+ * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz
+ * and Babuska and its modification for the hp-FEM. This error indicator tries
+ * to approximate the error per cell by integration of the jump of the
+ * gradient of the solution along the faces of each cell.  It can be
+ * understood as a gradient recovery estimator; see the survey of Ainsworth
+ * and Oden, "A Posteriori Error Estimation in Finite Element Analysis"
+ * (Wiley, 2000) for a complete discussion.
  *
- * @note In spite of the name, this is not truly an a posteriori error
- * estimator, even if applied to the Poisson problem only. It gives good hints
- * for mesh refinement, but the estimate is not to be trusted. For higher
- * order trial spaces the integrals computed here tend to zero faster than the
- * error itself, thus ruling out the values as error estimators.
+ * In the original Kelly error estimator, the contribution of each face to the
+ * cell error is scaled with the cell diagonal. In the modified version,
+ * however, we employ a scaling factor which depends on the face diagonal and
+ * polynomial degrees of the adjacent elements. The choice between the two is
+ * done by means of the enumerator, defined within the class.
+ *
+ * @note In spite of the name, Kelly estimator is not truly an a posteriori
+ * error estimator, even if applied to the Poisson problem only. It gives good
+ * hints for mesh refinement, but the estimate is not to be trusted. For
+ * higher order trial spaces the integrals computed here tend to zero faster
+ * than the error itself, thus ruling out the values as error estimators.
+ * However, the modified version discussed below can be utilised to obtain the
+ * reliable error estimator by adding the residual (volume) part.
  *
  * The error estimator really only estimates the error for the generalized
  * Poisson equation $-\nabla\cdot a(x) \nabla u = f$ with either Dirichlet
@@ -60,9 +69,9 @@ namespace hp
  *
  * The error estimator returns a vector of estimated errors per cell which can
  * be used to feed the GridRefinement::refine_fixed_fraction,
- * GridRefinement::refine_fixed_number, and similar functions. This
- * vector contains elements of data type @p float, rather than @p double,
- * since accuracy is not important in the current context.
+ * GridRefinement::refine_fixed_number, and similar functions. This vector
+ * contains elements of data type @p float, rather than @p double, since
+ * accuracy is not important in the current context.
  *
  * The full reference for the paper in which this error estimator is defined
  * is as follows:
@@ -83,22 +92,24 @@ namespace hp
  * <h3>Implementation</h3>
  *
  * In principle, the implementation of the error estimation is simple: let \f[
- * \eta_K^2 = \frac h{24} \int_{\partial K} \left[a \frac{\partial
- * u_h}{\partial n}\right]^2 do \f] be the error estimator for cell $K$.
- * $[\cdot]$ denotes the jump of the argument at the face. In the paper of
- * Ainsworth, $h$ is divided by $24$, but this factor is a bit esoteric,
+ * \eta_K^2 = \sum_{F\in\partial K} c_F \int_{\partial K_F} \left[a
+ * \frac{\partial u_h}{\partial n}\right]^2 do \f] be the error estimator for
+ * cell $K$. $[\cdot]$ denotes the jump of the argument at the face. In the
+ * paper of Ainsworth $ c_F=\frac h{24} $, but this factor is a bit esoteric,
  * stemming from interpolation estimates and stability constants which may
  * hold for the Poisson problem, but may not hold for more general situations.
- * In the implementation, this factor is considered, but may lead to wrong
- * results. You may scale the vector appropriately afterwards.
+ * Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F} $, where $
+ * h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum polynomial
+ * degree of adjacent elements. The choice between the two is done by means of
+ * the enumerator, provided as the last argument in all functions.
  *
  * To perform the integration, use is made of the FEFaceValues and
  * FESubfaceValues classes. The integration is performed by looping over all
  * cells and integrating over faces that are not yet treated. This way we
  * avoid integration on faces twice, once for each time we visit one of the
  * adjacent cells. In a second loop over all cells, we sum up the
- * contributions of the faces (which are the integrated square of the jumps)
- * of each cell and take the square root.
+ * contributions of the faces (which are the integrated square of the jumps
+ * times some factor) of each cell and take the square root.
  *
  * The integration is done using a quadrature formula on the face. For linear
  * trial functions (FEQ1), the QGauss2 or even the QMidpoint rule will
@@ -107,16 +118,17 @@ namespace hp
  *
  * We store the contribution of each face in a @p map, as provided by the C++
  * standard library, with the iterator pointing to that face being the key
- * into the map. In fact, we do not store the indicator per face, but only the
- * integral listed above. When looping the second time over all cells, we have
- * to sum up the contributions of the faces, multiply them with $\frac h{24}$
- * and take the square root. By doing the multiplication with $h$ in the
- * second loop, we avoid problems to decide with which $h$ to multiply, that
- * of the cell on the one or that of the cell on the other side of the face.
+ * into the map. When looping the second time over all cells, we have to sum
+ * up the contributions of the faces and take the square root. For the Kelly
+ * estimator, the multiplication with $\frac h{24}$ is done in the second
+ * loop. By doing so we avoid problems to decide with which $h$ to multiply,
+ * that of the cell on the one or that of the cell on the other side of the
+ * face. Whereas for the hp-estimator the @p map stores integrals multiplied
+ * by $\frac {h_F}{2p_F}$, which are then summed in the second loop.
  *
- * $h$ is taken to be the greatest length of the diagonals of the cell. For
- * more or less uniform cells without deformed angles, this coincides with the
- * diameter of the cell.
+ * $h$ ($h_F$) is taken to be the greatest length of the diagonals of the cell
+ * (face). For more or less uniform cells (faces) without deformed angles,
+ * this coincides with the diameter of the cell (face).
  *
  *
  * <h3>Vector-valued functions</h3>
@@ -164,11 +176,12 @@ namespace hp
  * different faces to the cells easier.
  *
  * <li> The face belongs to a Neumann boundary.  In this case, the
- * contribution of the face $F\in\partial K$ looks like \f[ \int_F
+ * contribution of the face $F\in\partial K$ looks like \f[ n_F\int_F
  * \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds \f] where $g$ is the
- * Neumann boundary function. If the finite element is vector-valued, then
- * obviously the function denoting the Neumann boundary conditions needs to be
- * vector-valued as well.
+ * Neumann boundary function, $n_F=\frac {h}{24}$ and $n_F=\frac {h_F}{p}$ for
+ * the Kelly and hp-estimator, respectively. If the finite element is vector-
+ * valued, then obviously the function denoting the Neumann boundary
+ * conditions needs to be vector-valued as well.
  *
  * <li> No other boundary conditions are considered.
  * </ul>
@@ -233,13 +246,25 @@ namespace hp
  * that accepts several in- and output vectors at the same time.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006; parallelization by
- * Thomas Richter, 2000
+ * @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006, Denis Davydov,
+ * 2015; parallelization by Thomas Richter, 2000
  */
 template <int dim, int spacedim=dim>
 class KellyErrorEstimator
 {
 public:
+  /**
+   * The enum type given to the class functions to decide on the scaling
+   * factors of the facial integrals.
+   */
+  enum Strategy
+  {
+    //! Kelly error estimator with the factor $\frac {h}{24}$.
+    cell_diameter_over_24 = 0,
+    //! the boundary residual estimator with the factor $\frac {h_F}{2 max(p^+,p^-)}$.
+    face_diameter_over_twice_max_degree
+  };
+
   /**
    * Implementation of the error estimator described above. You may give a
    * coefficient, but there is a default value which denotes the constant
@@ -285,6 +310,9 @@ public:
    * the number of threads determined automatically. The parameter is retained
    * for compatibility with old versions of the library.
    *
+   * The @p strategy parameter is used to choose the scaling factor for the
+   * integral over cell's faces.
+   *
    * @note If the DoFHandler object given as an argument to this function
    * builds on a parallel::distributed::Triangulation, this function skips
    * computations on all cells that are not locally owned. In that case, the
@@ -308,7 +336,8 @@ public:
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id       material_id = numbers::invalid_material_id);
+                        const types::material_id       material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Calls the @p estimate function, see above, with
@@ -324,7 +353,8 @@ public:
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id       material_id = numbers::invalid_material_id);
+                        const types::material_id       material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Same function as above, but accepts more than one solution vector and
@@ -350,7 +380,8 @@ public:
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id           material_id = numbers::invalid_material_id);
+                        const types::material_id           material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Calls the @p estimate function, see above, with
@@ -366,7 +397,8 @@ public:
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id          material_id = numbers::invalid_material_id);
+                        const types::material_id          material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -384,7 +416,8 @@ public:
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id       material_id = numbers::invalid_material_id);
+                        const types::material_id       material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -401,7 +434,8 @@ public:
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id       material_id = numbers::invalid_material_id);
+                        const types::material_id       material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -419,7 +453,8 @@ public:
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id           material_id = numbers::invalid_material_id);
+                        const types::material_id           material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
 
   /**
@@ -436,8 +471,8 @@ public:
                         const Function<spacedim>    *coefficients   = 0,
                         const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-                        const types::material_id           material_id = numbers::invalid_material_id);
-
+                        const types::material_id           material_id = numbers::invalid_material_id,
+                        const Strategy strategy = cell_diameter_over_24);
 
   /**
    * Exception

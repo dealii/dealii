@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__polynomials_abf_h
-#define __deal2__polynomials_abf_h
+#ifndef dealii__polynomials_abf_h
+#define dealii__polynomials_abf_h
 
 
 #include <deal.II/base/config.h>
@@ -83,7 +83,9 @@ public:
   void compute (const Point<dim>            &unit_point,
                 std::vector<Tensor<1,dim> > &values,
                 std::vector<Tensor<2,dim> > &grads,
-                std::vector<Tensor<3,dim> > &grad_grads) const;
+                std::vector<Tensor<3,dim> > &grad_grads,
+                std::vector<Tensor<4,dim> > &third_derivatives,
+                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
    * Returns the number of ABF polynomials.
@@ -102,7 +104,7 @@ public:
   std::string name () const;
 
   /**
-   * Return the number of polynomials in the space <TT>RT(degree)</tt> without
+   * Return the number of polynomials in the space <tt>RT(degree)</tt> without
    * requiring to build an object of PolynomialsABF. This is required by the
    * FiniteElement classes.
    */
@@ -144,6 +146,16 @@ private:
    * Auxiliary memory.
    */
   mutable std::vector<Tensor<2,dim> > p_grad_grads;
+
+  /**
+   * Auxiliary memory.
+   */
+  mutable std::vector<Tensor<3,dim> > p_third_derivatives;
+
+  /**
+   * Auxiliary memory.
+   */
+  mutable std::vector<Tensor<4,dim> > p_fourth_derivatives;
 };
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_block_smoother_h
-#define __deal2__mg_block_smoother_h
+#ifndef dealii__mg_block_smoother_h
+#define dealii__mg_block_smoother_h
 
 
 #include <deal.II/base/config.h>
@@ -283,26 +283,21 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   bool T = transpose;
   if (symmetric && (steps2 % 2 == 0))
     T = false;
-//  cerr << 'S' << level;
-//  cerr << '(' << matrices[level]->m() << ',' << matrices[level]->n() << ')';
 
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
         {
-//        cerr << 'T';
           matrices[level].vmult(*r,u);
           r->sadd(-1.,1.,rhs);
           smoothers[level].Tvmult(*d, *r);
         }
       else
         {
-//        cerr << 'N';
           matrices[level].vmult(*r,u);
           r->sadd(-1.,1.,rhs);
           smoothers[level].vmult(*d, *r);
         }
-//      cerr << '{' << r->l2_norm() << '}';
       u += *d;
       if (symmetric)
         T = !T;

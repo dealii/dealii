@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,12 +137,15 @@ namespace SLEPcWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,5,0)
     int ierr;
     ierr = STSetType (st, const_cast<char *>(STFOLD));
+    (void)ierr;
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift (st, additional_data.shift_parameter);
+    (void)ierr;
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 #else
     // PETSc/SLEPc version must be < 3.5.0.
+    (void)st;
     Assert ((false),
             ExcMessage ("Folding transformation has been removed in SLEPc 3.5.0 and newer."
                         "You cannot use this transformation anymore."));
@@ -184,4 +187,3 @@ namespace SLEPcWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SLEPC
-

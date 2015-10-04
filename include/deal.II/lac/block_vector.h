@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_vector_h
-#define __deal2__block_vector_h
+#ifndef dealii__block_vector_h
+#define dealii__block_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -35,7 +35,6 @@ namespace TrilinosWrappers
   class BlockVector;
 }
 #endif
-
 
 
 /*! @addtogroup Vectors
@@ -89,21 +88,33 @@ public:
   /**
    * Constructor. There are three ways to use this constructor. First, without
    * any arguments, it generates an object with no blocks. Given one argument,
-   * it initializes <tt>num_blocks</tt> blocks, but these blocks have size
-   * zero. The third variant finally initializes all blocks to the same size
+   * it initializes <tt>n_blocks</tt> blocks, but these blocks have size zero.
+   * The third variant finally initializes all blocks to the same size
    * <tt>block_size</tt>.
    *
    * Confer the other constructor further down if you intend to use blocks of
    * different sizes.
    */
-  explicit BlockVector (const unsigned int num_blocks = 0,
+  explicit BlockVector (const unsigned int n_blocks = 0,
                         const size_type block_size = 0);
 
   /**
-   * Copy-Constructor. Dimension set to that of V, all components are copied
-   * from V
+   * Copy Constructor. Dimension set to that of @p v, all components are
+   * copied from @p v.
    */
   BlockVector (const BlockVector<Number> &V);
+
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Creates a new vector by stealing the internal data of
+   * the vector @p v.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  BlockVector (BlockVector<Number> &&v);
+#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -146,15 +157,16 @@ public:
   BlockVector (const BlockIndices &block_indices);
 
   /**
-   * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
-   * the vector with the elements pointed to by the range of iterators given
-   * as second and third argument. Apart from the first argument, this
-   * constructor is in complete analogy to the respective constructor of the
-   * <tt>std::vector</tt> class, but the first argument is needed in order to
-   * know how to subdivide the block vector into different blocks.
+   * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>.
+   * Initialize the vector with the elements pointed to by the range of
+   * iterators given as second and third argument. Apart from the first
+   * argument, this constructor is in complete analogy to the respective
+   * constructor of the <tt>std::vector</tt> class, but the first argument is
+   * needed in order to know how to subdivide the block vector into different
+   * blocks.
    */
   template <typename InputIterator>
-  BlockVector (const std::vector<size_type>    &n,
+  BlockVector (const std::vector<size_type>    &block_sizes,
                const InputIterator              first,
                const InputIterator              end);
 
@@ -180,27 +192,38 @@ public:
    * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
-  BlockVector &operator = (const value_type s);
+  BlockVector &operator= (const value_type s);
 
   /**
    * Copy operator for arguments of the same type. Resize the present vector
    * if necessary.
    */
-  BlockVector &
-  operator= (const BlockVector &V);
+  BlockVector<Number> &
+  operator= (const BlockVector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move the given vector. This operator replaces the present vector with @p
+   * v by efficiently swapping the internal data structures.
+   *
+   * @note This operator is only available if deal.II is configured with C++11
+   * support.
+   */
+  BlockVector<Number> &operator= (BlockVector<Number> &&v);
+#endif
 
   /**
    * Copy operator for template arguments of different types. Resize the
    * present vector if necessary.
    */
   template <class Number2>
-  BlockVector &
+  BlockVector<Number> &
   operator= (const BlockVector<Number2> &V);
 
   /**
    * Copy a regular vector into a block vector.
    */
-  BlockVector &
+  BlockVector<Number> &
   operator= (const Vector<Number> &V);
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -208,12 +231,13 @@ public:
    * A copy constructor from a Trilinos block vector to a deal.II block
    * vector.
    */
-  BlockVector &
+  BlockVector<Number> &
   operator= (const TrilinosWrappers::BlockVector &V);
 #endif
+
   /**
-   * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
-   * size <tt>block_size</tt> each.
+   * Reinitialize the BlockVector to contain <tt>n_blocks</tt> blocks of size
+   * <tt>block_size</tt> each.
    *
    * If the second argument is left at its default value, then the block
    * vector allocates the specified number of blocks but leaves them at zero
@@ -223,7 +247,7 @@ public:
    *
    * If <tt>fast==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const unsigned int num_blocks,
+  void reinit (const unsigned int n_blocks,
                const size_type block_size = 0,
                const bool fast = false);
 
@@ -243,7 +267,7 @@ public:
    * reinit() on one of the blocks, then subsequent actions on this object may
    * yield unpredictable results since they may be routed to the wrong block.
    */
-  void reinit (const std::vector<size_type> &N,
+  void reinit (const std::vector<size_type> &block_sizes,
                const bool                    fast=false);
 
   /**
@@ -289,10 +313,6 @@ public:
    * only swaps the pointers to the data of the two vectors and therefore does
    * not need to allocate temporary storage and move data around.
    *
-   * Limitation: right now this function only works if both vectors have the
-   * same number of blocks. If needed, the numbers of blocks should be
-   * exchanged, too.
-   *
    * This function is analog to the the swap() function of all C++ standard
    * containers. Also, there is a global function swap(u,v) that simply calls
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
@@ -301,8 +321,10 @@ public:
 
   /**
    * Output of vector in user-defined format.
+   *
+   * This function is deprecated.
    */
-  void print (const char *format = 0) const;
+  void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream.
@@ -353,19 +375,20 @@ public:
 
 template <typename Number>
 template <typename InputIterator>
-BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
+BlockVector<Number>::BlockVector (const std::vector<size_type>    &block_sizes,
                                   const InputIterator              first,
                                   const InputIterator              end)
 {
   // first set sizes of blocks, but
   // don't initialize them as we will
   // copy elements soon
-  reinit (n, true);
+  (void)end;
+  reinit (block_sizes, true);
   InputIterator start = first;
-  for (size_type b=0; b<n.size(); ++b)
+  for (size_type b=0; b<block_sizes.size(); ++b)
     {
       InputIterator end = start;
-      std::advance (end, static_cast<signed int>(n[b]));
+      std::advance (end, static_cast<signed int>(block_sizes[b]));
       std::copy (start, end, this->block(b).begin());
       start = end;
     };
@@ -377,12 +400,12 @@ BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const value_type s)
+BlockVector<Number>::operator= (const value_type s)
 {
 
   AssertIsFinite(s);
 
-  BaseClass::operator = (s);
+  BaseClass::operator= (s);
   return *this;
 }
 
@@ -391,21 +414,35 @@ BlockVector<Number>::operator = (const value_type s)
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const BlockVector &v)
+BlockVector<Number>::operator= (const BlockVector<Number> &v)
 {
   reinit (v, true);
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator= (BlockVector<Number> &&v)
+{
+  swap(v);
+
+  return *this;
+}
+#endif
 
 
 
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const Vector<Number> &v)
+BlockVector<Number>::operator= (const Vector<Number> &v)
 {
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 
@@ -415,10 +452,10 @@ template <typename Number>
 template <typename Number2>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const BlockVector<Number2> &v)
+BlockVector<Number>::operator= (const BlockVector<Number2> &v)
 {
   reinit (v, true);
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 
@@ -457,6 +494,43 @@ void swap (BlockVector<Number> &u,
 {
   u.swap (v);
 }
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class internally used in linear_operator.h. Specialization for
+     * BlockVector<number>.
+     */
+    template<typename number>
+    class ReinitHelper<BlockVector<number> >
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
+      {
+        v.reinit(matrix.get_row_indices(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
+      {
+        v.reinit(matrix.get_column_indices(), fast);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
 
 DEAL_II_NAMESPACE_CLOSE
 

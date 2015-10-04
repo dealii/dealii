@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,8 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler_policy.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
 #include <set>
 #include <algorithm>
@@ -843,14 +845,108 @@ namespace internal
         template <int spacedim>
         static
         void
-        renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &,
-                          const IndexSet &,
-                          DoFHandler<3,spacedim> &,
-                          const unsigned int               ,
-                          const bool                       )
+        renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
+                          const IndexSet &indices,
+                          DoFHandler<3,spacedim> &dof_handler,
+                          const unsigned int level,
+                          const bool check_validity)
         {
-          // TODO
-          AssertThrow(false, ExcNotImplemented());
+          if (level>=dof_handler.get_tria().n_levels())
+            return;
+          for (typename std::vector<typename DoFHandler<3,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
+               i!=dof_handler.mg_vertex_dofs.end(); ++i)
+            // if the present vertex lives on
+            // the present level
+            if ((i->get_coarsest_level() <= level) &&
+                (i->get_finest_level() >= level))
+              for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                {
+                  dealii::types::global_dof_index idx =i->get_index (level, d);
+                  if (idx != DoFHandler<3>::invalid_dof_index)
+                    i->set_index (level, d,
+                                  ((indices.n_elements() == 0) ?
+                                   new_numbers[idx] :
+                                   new_numbers[indices.index_within_set(idx)]));
+
+                  if (check_validity)
+                    Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                }
+
+          if (dof_handler.get_fe().dofs_per_line > 0 ||
+              dof_handler.get_fe().dofs_per_quad > 0)
+            {
+              // save user flags as they will be modified
+              std::vector<bool> user_flags;
+              dof_handler.get_tria().save_user_flags(user_flags);
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).clear_user_flags ();
+
+              // flag all lines adjacent to cells of the current level, as
+              // those lines logically belong to the same level as the cell,
+              // at least for isotropic refinement
+              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
+                   cell != dof_handler.end(level); ++cell)
+                for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
+                  cell->line(line)->set_user_flag();
+
+              for (typename DoFHandler<3,spacedim>::cell_iterator cell = dof_handler.begin();
+                   cell != dof_handler.end(); ++cell)
+                for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+                  if (cell->line(l)->user_flag_set())
+                    {
+                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                        {
+                          dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
+                          if (idx != DoFHandler<3>::invalid_dof_index)
+                            cell->line(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
+                                                                        new_numbers[idx] :
+                                                                        new_numbers[indices.index_within_set(idx)]));
+                          if (check_validity)
+                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                        }
+                      cell->line(l)->clear_user_flag();
+                    }
+
+              // flag all quads adjacent to cells of the current level, as
+              // those quads logically belong to the same level as the cell,
+              // at least for isotropic refinement
+              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
+                   cell != dof_handler.end(level); ++cell)
+                for (unsigned int quad=0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
+                  cell->quad(quad)->set_user_flag();
+
+              for (typename DoFHandler<3,spacedim>::cell_iterator cell = dof_handler.begin();
+                   cell != dof_handler.end(); ++cell)
+                for (unsigned int l=0; l<GeometryInfo<3>::quads_per_cell; ++l)
+                  if (cell->quad(l)->user_flag_set())
+                    {
+                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
+                        {
+                          dealii::types::global_dof_index idx = cell->quad(l)->mg_dof_index(level, d);
+                          if (idx != DoFHandler<1>::invalid_dof_index)
+                            cell->quad(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
+                                                                        new_numbers[idx] :
+                                                                        new_numbers[indices.index_within_set(idx)]));
+                          if (check_validity)
+                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                        }
+                      cell->quad(l)->clear_user_flag();
+                    }
+
+              // finally, restore user flags
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).load_user_flags (user_flags);
+            }
+
+          for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
+               i!=dof_handler.mg_levels[level]->dof_object.dofs.end(); ++i)
+            {
+              if (*i != DoFHandler<3>::invalid_dof_index)
+                {
+                  Assert(*i<new_numbers.size(), ExcInternalError());
+                  *i = ((indices.n_elements() == 0) ?
+                        new_numbers[*i] :
+                        new_numbers[indices.index_within_set(*i)]);
+                }
+            }
         }
 
 
@@ -869,9 +965,10 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      NumberCache
+      void
       Sequential<dim,spacedim>::
-      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
+                       NumberCache &number_cache_current ) const
       {
         const types::global_dof_index n_dofs =
           Implementation::distribute_dofs (0,
@@ -897,7 +994,7 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor
           = std::vector<IndexSet> (1,
                                    number_cache.locally_owned_dofs);
-        return number_cache;
+        number_cache_current = number_cache;
       }
 
 
@@ -928,10 +1025,11 @@ namespace internal
       }
 
       template <int dim, int spacedim>
-      NumberCache
+      void
       Sequential<dim,spacedim>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                     dealii::DoFHandler<dim,spacedim> &dof_handler) const
+                     dealii::DoFHandler<dim,spacedim> &dof_handler,
+                     NumberCache &number_cache_current) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
                                        dof_handler, true);
@@ -959,10 +1057,159 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor
           = std::vector<IndexSet> (1,
                                    number_cache.locally_owned_dofs);
-        return number_cache;
+        number_cache_current = number_cache;
       }
 
+      /* --------------------- class ParallelShared ---------------- */
 
+      template <int dim, int spacedim>
+      void
+      ParallelShared<dim,spacedim>::
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
+                       NumberCache &number_cache) const
+      {
+        Sequential<dim,spacedim>::distribute_dofs (dof_handler,number_cache);
+        DoFRenumbering::subdomain_wise (dof_handler);
+        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
+        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
+        number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
+        for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
+          number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
+        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
+      }
+
+      template <int dim, int spacedim>
+      void
+      ParallelShared<dim,spacedim>::
+      distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
+                          std::vector<NumberCache> &number_caches) const
+      {
+        // first, call the sequential function to distribute dofs
+        Sequential<dim,spacedim>:: distribute_mg_dofs (dof_handler, number_caches);
+        // now we need to update the number cache.
+        // This part is not yet implemented.
+        AssertThrow(false,ExcNotImplemented());
+      }
+
+      template <int dim, int spacedim>
+      void
+      ParallelShared<dim,spacedim>::
+      renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                     dealii::DoFHandler<dim,spacedim> &dof_handler,
+                     NumberCache &number_cache) const
+      {
+
+#ifndef DEAL_II_WITH_MPI
+        (void)new_numbers;
+        (void)dof_handler;
+        (void)number_cache;
+        Assert (false, ExcNotImplemented());
+#else
+        std::vector<types::global_dof_index> global_gathered_numbers (dof_handler.n_dofs (), 0);
+        // as we call DoFRenumbering::subdomain_wise (dof_handler) from distribute_dofs(),
+        // we need to support sequential-like input.
+        // Distributed-like input from, for example, component_wise renumbering is also supported.
+        if (new_numbers.size () == dof_handler.n_dofs ())
+          {
+            global_gathered_numbers = new_numbers;
+          }
+        else
+          {
+            Assert(new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
+                   ExcInternalError());
+            const parallel::shared::Triangulation<dim, spacedim> *tr =
+              (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
+            Assert(tr != 0, ExcInternalError());
+            const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
+            std::vector<types::global_dof_index> gathered_new_numbers (dof_handler.n_dofs (), 0);
+            Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
+                   dof_handler.get_tria ().locally_owned_subdomain (),
+                   ExcInternalError())
+
+            //gather new numbers among processors into one vector
+            {
+              std::vector<types::global_dof_index> new_numbers_copy (new_numbers);
+              // displs:
+              // Entry i specifies the displacement (relative to recvbuf )
+              // at which to place the incoming data from process i
+              // rcounts:
+              // containing the number of elements that are to be received from each process
+              std::vector<int> displs(n_cpu),
+                  rcounts(n_cpu);
+              types::global_dof_index shift = 0;
+              //set rcounts based on new_numbers:
+              int cur_count = new_numbers_copy.size ();
+              MPI_Allgather (&cur_count,  1, MPI_INT,
+                             &rcounts[0], 1, MPI_INT,
+                             tr->get_communicator ());
+
+              for (unsigned int i = 0; i < n_cpu; i++)
+                {
+                  displs[i]  = shift;
+                  shift     += rcounts[i];
+                }
+              Assert(((int)new_numbers_copy.size()) ==
+                     rcounts[Utilities::MPI::this_mpi_process (tr->get_communicator ())],
+                     ExcInternalError());
+              MPI_Allgatherv (&new_numbers_copy[0],     new_numbers_copy.size (),
+                              DEAL_II_DOF_INDEX_MPI_TYPE,
+                              &gathered_new_numbers[0], &rcounts[0],
+                              &displs[0],
+                              DEAL_II_DOF_INDEX_MPI_TYPE,
+                              tr->get_communicator ());
+            }
+
+            // put new numbers according to the current locally_owned_dofs_per_processor IndexSets
+            types::global_dof_index shift = 0;
+            // flag_1 and flag_2 are
+            // used to control that there is a
+            // one-to-one relation between old and new DoFs.
+            std::vector<unsigned int> flag_1 (dof_handler.n_dofs (), 0),
+                flag_2 (dof_handler.n_dofs (), 0);
+            for (unsigned int i = 0; i < n_cpu; i++)
+              {
+                const IndexSet &iset =
+                  number_cache.locally_owned_dofs_per_processor[i];
+                for (types::global_dof_index ind = 0;
+                     ind < iset.n_elements (); ind++)
+                  {
+                    const types::global_dof_index target = iset.nth_index_in_set (ind);
+                    const types::global_dof_index value  = gathered_new_numbers[shift + ind];
+                    Assert(target < dof_handler.n_dofs(), ExcInternalError());
+                    Assert(value  < dof_handler.n_dofs(), ExcInternalError());
+                    global_gathered_numbers[target] = value;
+                    flag_1[target]++;
+                    flag_2[value]++;
+                  }
+                shift += iset.n_elements ();
+              }
+
+            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
+                   ExcInternalError());
+            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
+                   ExcInternalError());
+            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1,
+                   ExcInternalError());
+            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1,
+                   ExcInternalError());
+          }
+        Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers, dof_handler, number_cache);
+        // correct number_cache:
+        number_cache.locally_owned_dofs_per_processor =
+          DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
+        number_cache.locally_owned_dofs =
+          number_cache.locally_owned_dofs_per_processor[dof_handler.get_tria ().locally_owned_subdomain ()];
+        // sequential renumbering returns a vector of size 1 here,
+        // correct this:
+        number_cache.n_locally_owned_dofs_per_processor.resize(number_cache.locally_owned_dofs_per_processor.size());
+        for (unsigned int i = 0;
+             i < number_cache.n_locally_owned_dofs_per_processor.size (); i++)
+          number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements ();
+
+        number_cache.n_locally_owned_dofs =
+          number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria ().locally_owned_subdomain ()];
+#endif
+      }
 
       /* --------------------- class ParallelDistributed ---------------- */
 
@@ -1529,6 +1776,7 @@ namespace internal
                ++it, ++buffer, ++idx)
             {
               const unsigned int num_cells = it->second.tree_index.size();
+              (void)num_cells;
 
               Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
               Assert(num_cells>0, ExcInternalError());
@@ -1762,6 +2010,7 @@ namespace internal
                ++it, ++buffer, ++idx)
             {
               const unsigned int num_cells = it->second.tree_index.size();
+              (void)num_cells;
 
               Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
               Assert(num_cells>0, ExcInternalError());
@@ -1927,9 +2176,10 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      NumberCache
+      void
       ParallelDistributed<dim, spacedim>::
-      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler) const
+      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
+                       NumberCache &number_cache_current) const
       {
         NumberCache number_cache;
 
@@ -2143,7 +2393,7 @@ namespace internal
 #endif // DEBUG
 #endif // DEAL_II_WITH_P4EST
 
-        return number_cache;
+        number_cache_current = number_cache;
       }
 
 
@@ -2248,7 +2498,7 @@ namespace internal
                                      number_cache
                                      .n_locally_owned_dofs_per_processor.begin()
                                      + tr->locally_owned_subdomain(),
-                                     0);
+                                     static_cast<dealii::types::global_dof_index>(0));
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
               if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
@@ -2269,7 +2519,7 @@ namespace internal
                                  .n_locally_owned_dofs_per_processor.begin(),
                                  number_cache
                                  .n_locally_owned_dofs_per_processor.end(),
-                                 0);
+                                 static_cast<dealii::types::global_dof_index>(0));
 
             number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
             number_cache.locally_owned_dofs
@@ -2394,11 +2644,15 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      NumberCache
+      void
       ParallelDistributed<dim, spacedim>::
       renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
-                     dealii::DoFHandler<dim,spacedim> &dof_handler) const
+                     dealii::DoFHandler<dim,spacedim> &dof_handler,
+                     NumberCache &number_cache_current) const
       {
+        (void)new_numbers;
+        (void)dof_handler;
+
         Assert (new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
                 ExcInternalError());
 
@@ -2409,31 +2663,29 @@ namespace internal
 #else
 
 
-        //calculate new IndexSet. First try
-        //to find out if the new indices are
-        //contiguous blocks. This avoids
-        //inserting each index individually
-        //into the IndexSet, which is slow.
-        //If we own no DoFs, we still need to
-        //go through this function, but we
-        //can skip this calculation.
+        // calculate new IndexSet. First try to find out if the new indices
+        // are contiguous blocks. This avoids inserting each index
+        // individually into the IndexSet, which is slow.  If we own no DoFs,
+        // we still need to go through this function, but we can skip this
+        // calculation.
 
         number_cache.locally_owned_dofs = IndexSet (dof_handler.n_dofs());
         if (dof_handler.locally_owned_dofs().n_elements()>0)
           {
-            std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers.begin();
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted (new_numbers);
+            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
+            std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers_sorted.begin();
             const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
             std::vector<std::pair<dealii::types::global_dof_index,unsigned int> > block_indices(n_blocks);
             block_indices[0].first = *it++;
             block_indices[0].second = 1;
             unsigned int current_block = 0, n_filled_blocks = 1;
-            for ( ; it != new_numbers.end(); ++it)
+            for ( ; it != new_numbers_sorted.end(); ++it)
               {
                 bool done = false;
 
-                // search from the current block onwards
-                // whether the next index is shifted by one
-                // from the previous one.
+                // search from the current block onwards whether the next
+                // index is shifted by one from the previous one.
                 for (unsigned int i=0; i<n_filled_blocks; ++i)
                   if (*it == block_indices[current_block].first
                       +block_indices[current_block].second)
@@ -2450,10 +2702,9 @@ namespace internal
                         ++current_block;
                     }
 
-                // could not find any contiguous range: need
-                // to add a new block if possible. Abort
-                // otherwise, which will add all elements
-                // individually to the IndexSet.
+                // could not find any contiguous range: need to add a new
+                // block if possible. Abort otherwise, which will add all
+                // elements individually to the IndexSet.
                 if (done == false)
                   {
                     if (n_filled_blocks < n_blocks)
@@ -2468,11 +2719,10 @@ namespace internal
                   }
               }
 
-            // check whether all indices could be assigned
-            // to blocks. If yes, we can add the block
-            // ranges to the IndexSet, otherwise we need
-            // to go through the indices once again and
-            // add each element individually
+            // check whether all indices could be assigned to blocks. If yes,
+            // we can add the block ranges to the IndexSet, otherwise we need
+            // to go through the indices once again and add each element
+            // individually
             unsigned int sum = 0;
             for (unsigned int i=0; i<n_filled_blocks; ++i)
               sum += block_indices[i].second;
@@ -2482,28 +2732,24 @@ namespace internal
                                                            block_indices[i].first+
                                                            block_indices[i].second);
             else
-              number_cache.locally_owned_dofs.add_indices(new_numbers.begin(), new_numbers.end());
+              number_cache.locally_owned_dofs.add_indices(new_numbers_sorted.begin(),
+                                                          new_numbers_sorted.end());
           }
 
 
         number_cache.locally_owned_dofs.compress();
         Assert (number_cache.locally_owned_dofs.n_elements() == new_numbers.size(),
                 ExcInternalError());
-        // also check with the number
-        // of locally owned degrees
-        // of freedom that the
-        // DoFHandler object still
-        // stores
+        // also check with the number of locally owned degrees of freedom that
+        // the DoFHandler object still stores
         Assert (number_cache.locally_owned_dofs.n_elements() ==
                 dof_handler.n_locally_owned_dofs(),
                 ExcInternalError());
 
-        // then also set this number
-        // in our own copy
+        // then also set this number in our own copy
         number_cache.n_locally_owned_dofs = dof_handler.n_locally_owned_dofs();
 
-        // mark not locally active DoFs as
-        // invalid
+        // mark not locally active DoFs as invalid
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
@@ -2523,9 +2769,7 @@ namespace internal
 
                     if (!dof_handler.locally_owned_dofs().is_element(local_dof_indices[i]))
                       {
-                        //this DoF is not owned
-                        //by us, so set it to
-                        //invalid.
+                        //this DoF is not owned by us, so set it to invalid.
                         local_dof_indices[i]
                           = DoFHandler<dim,spacedim>::invalid_dof_index;
                       }
@@ -2536,9 +2780,7 @@ namespace internal
         }
 
 
-        // renumber. Skip when there is
-        // nothing to do because we own no
-        // DoF.
+        // renumber. Skip when there is nothing to do because we own no DoF.
         if (dof_handler.locally_owned_dofs().n_elements() > 0)
           Implementation::renumber_dofs (new_numbers,
                                          dof_handler.locally_owned_dofs(),
@@ -2564,18 +2806,15 @@ namespace internal
             if (!cell->is_artificial())
               cell->set_user_flag();
 
-          // add each ghostcells'
-          // subdomain to the vertex and
-          // keep track of interesting
-          // neighbors
+          // add each ghostcells' subdomain to the vertex and keep track of
+          // interesting neighbors
           std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors;
 
           tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
 
-          // Send and receive cells. After this, only
-          // the local cells are marked, that received
-          // new data. This has to be communicated in a
+          // Send and receive cells. After this, only the local cells are
+          // marked, that received new data. This has to be communicated in a
           // second communication step.
           communicate_dof_indices_on_marked_cells (dof_handler,
                                                    vertices_with_ghost_neighbors,
@@ -2588,13 +2827,11 @@ namespace internal
                                                    tr->p4est_tree_to_coarse_cell_permutation);
 
 
-          // * Create global_dof_indexsets by
-          // transferring our own owned_dofs to
-          // every other machine.
+          // * Create global_dof_indexsets by transferring our own owned_dofs
+          // to every other machine.
           const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-          // Serialize our IndexSet and
-          // determine size.
+          // Serialize our IndexSet and determine size.
           std::ostringstream oss;
           number_cache.locally_owned_dofs.block_write(oss);
           std::string oss_str=oss.str();
@@ -2605,10 +2842,8 @@ namespace internal
           const unsigned int max_size
             = Utilities::MPI::max (my_size, tr->get_communicator());
 
-          // as we are reading past the end, we
-          // need to increase the size of the
-          // local buffer. This is filled with
-          // zeros.
+          // as we are reading past the end, we need to increase the size of
+          // the local buffer. This is filled with zeros.
           my_data.resize(max_size);
 
           std::vector<char> buffer(max_size*n_cpus);
@@ -2622,13 +2857,9 @@ namespace internal
             {
               std::stringstream strstr;
               strstr.write(&buffer[i*max_size],max_size);
-              // This does not read the whole
-              // buffer, when the size is
-              // smaller than
-              // max_size. Therefor we need to
-              // create a new stringstream in
-              // each iteration (resetting
-              // would be fine too).
+              // This does not read the whole buffer, when the size is smaller
+              // than max_size. Therefore we need to create a new stringstream
+              // in each iteration (resetting would be fine too).
               number_cache.locally_owned_dofs_per_processor[i]
               .block_read(strstr);
               number_cache.n_locally_owned_dofs_per_processor[i]
@@ -2646,7 +2877,7 @@ namespace internal
         }
 #endif
 
-        return number_cache;
+        number_cache_current = number_cache;
       }
     }
   }

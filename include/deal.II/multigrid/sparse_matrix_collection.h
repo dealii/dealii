@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_sparse_matrix_collection_h
-#define __deal2__mg_sparse_matrix_collection_h
+#ifndef dealii__mg_sparse_matrix_collection_h
+#define dealii__mg_sparse_matrix_collection_h
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/base/mg_level_object.h>
@@ -87,15 +87,15 @@ namespace mg
     for (unsigned int level=sparsity.min_level();
          level<=sparsity.max_level(); ++level)
       {
-        CompressedSparsityPattern c_sparsity(dof_handler.n_dofs(level));
-        MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-        sparsity[level].copy_from(c_sparsity);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
+        sparsity[level].copy_from(dsp);
         matrix[level].reinit(sparsity[level]);
         matrix_in[level].reinit(sparsity[level]);
         matrix_out[level].reinit(sparsity[level]);
         if (level>0)
           {
-            CompressedSparsityPattern ci_sparsity;
+            DynamicSparsityPattern ci_sparsity;
             ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
             MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
             sparsity_edge[level].copy_from(ci_sparsity);

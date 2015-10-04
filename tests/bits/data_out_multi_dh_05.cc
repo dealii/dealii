@@ -54,7 +54,7 @@ test ()
   for (unsigned int i=0; i<v2.size(); ++i) v4(i) = -v2(i);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation(dim,DataComponentInterpretation::component_is_part_of_vector);
+  component_interpretation(dim,DataComponentInterpretation::component_is_part_of_vector);
   DataOut<dim> data_out;
   data_out.add_data_vector (dof1, v1, "scalar1");
   data_out.add_data_vector (dof2, v2, std::vector<std::string>(dim,"vector1"),

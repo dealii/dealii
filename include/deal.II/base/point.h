@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__point_h
-#define __deal2__point_h
+#ifndef dealii__point_h
+#define dealii__point_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor_base.h>
+#include <deal.II/base/tensor.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -96,13 +96,6 @@ public:
   Point ();
 
   /**
-   * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>
-   * (in which case it is equivalent to the default constructor) or leaves the
-   * elements uninitialized if <tt>initialize==false</tt>.
-   */
-  explicit Point (const bool initialize);
-
-  /**
    * Convert a tensor to a point.
    */
   explicit Point (const Tensor<1,dim,Number> &);
@@ -146,7 +139,7 @@ public:
   /**
    * Read access to the <tt>index</tt>th coordinate.
    */
-  Number   operator () (const unsigned int index) const;
+  Number operator () (const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
@@ -159,9 +152,9 @@ public:
    */
 
   /**
-   * Add two point vectors.
+   * Add an offset given as Tensor<1,dim,Number> to a point.
    */
-  Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number> operator + (const Tensor<1,dim,Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -170,7 +163,7 @@ public:
    * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
    * rather than as a Point@<dim@>.
    */
-  Tensor<1,dim,Number>   operator - (const Point<dim,Number> &) const;
+  Tensor<1,dim,Number> operator - (const Point<dim,Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -178,12 +171,12 @@ public:
    * documentation of this class, the result is then naturally returned as a
    * Point@<dim@> object rather than as a Tensor@<1,dim@>.
    */
-  Point<dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number> operator - (const Tensor<1,dim,Number> &) const;
 
   /**
    * The opposite vector.
    */
-  Point<dim,Number>   operator - () const;
+  Point<dim,Number> operator - () const;
 
   /**
    * @}
@@ -196,31 +189,43 @@ public:
 
   /**
    * Multiply the current point by a factor.
+   *
+   * @relates EnableIfScalar
    */
-  Point<dim,Number>   operator * (const Number) const;
+  template <typename OtherNumber>
+  Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+  operator * (const OtherNumber) const;
 
   /**
    * Divide the current point by a factor.
    */
-  Point<dim,Number>   operator / (const Number) const;
+  template <typename OtherNumber>
+  Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+  operator / (const OtherNumber) const;
 
   /**
    * Return the scalar product of the vectors representing two points.
    */
-  Number              operator * (const Tensor<1,dim,Number> &p) const;
+  Number operator * (const Tensor<1,dim,Number> &p) const;
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
-   * square, or the square of the norm.
+   * square, or the square of the norm. In case of a complex number type it
+   * is equivalent to the contraction of this point vector with a complex
+   * conjugate of itself.
+   *
+   * @note This function is equivalent to
+   * Tensor<rank,dim,Number>::norm_square() which returns the square of the
+   * Frobenius norm.
    */
-  Number              square () const;
+  typename numbers::NumberTraits<Number>::real_type square () const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
-  Number distance (const Point<dim,Number> &p) const;
+  typename numbers::NumberTraits<Number>::real_type distance (const Point<dim,Number> &p) const;
 
   /**
    * @}
@@ -241,15 +246,6 @@ public:
 template <int dim, typename Number>
 inline
 Point<dim,Number>::Point ()
-{}
-
-
-
-template <int dim, typename Number>
-inline
-Point<dim,Number>::Point (const bool initialize)
-  :
-  Tensor<1,dim,Number>(initialize)
 {}
 
 
@@ -391,12 +387,28 @@ Point<dim,Number>::operator - () const
 
 
 template <int dim, typename Number>
+template<typename OtherNumber>
 inline
-Point<dim,Number>
-Point<dim,Number>::operator * (const Number factor) const
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+Point<dim,Number>::operator * (const OtherNumber factor) const
 {
-  Point<dim,Number> tmp = *this;
-  tmp *= factor;
+  Point<dim,typename ProductType<Number, OtherNumber>::type> tmp;
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] = this->operator[](i) * factor;
+  return tmp;
+}
+
+
+
+template <int dim, typename Number>
+template<typename OtherNumber>
+inline
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+Point<dim,Number>::operator / (const OtherNumber factor) const
+{
+  Point<dim,typename ProductType<Number, OtherNumber>::type> tmp;
+  for (unsigned int i=0; i<dim; ++i)
+    tmp[i] = this->operator[](i) / factor;
   return tmp;
 }
 
@@ -407,48 +419,36 @@ inline
 Number
 Point<dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 {
-  // simply pass down
-  return Tensor<1,dim,Number>::operator * (p);
+  Number res = Number();
+  for (unsigned int i=0; i<dim; ++i)
+    res += this->operator[](i) * p[i];
+  return res;
 }
 
 
 template <int dim, typename Number>
 inline
-Number
+typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::square () const
 {
-  Number q = Number();
-  for (unsigned int i=0; i<dim; ++i)
-    q += this->values[i] * this->values[i];
-  return q;
+  return this->norm_square();
 }
 
 
 
 template <int dim, typename Number>
 inline
-Number
+typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::distance (const Point<dim,Number> &p) const
 {
-  Number sum=0;
+  Number sum = Number();
   for (unsigned int i=0; i<dim; ++i)
     {
-      const double diff=this->values[i]-p(i);
-      sum += diff*diff;
+      const Number diff=this->values[i]-p(i);
+      sum += numbers::NumberTraits<Number>::abs_square (diff);
     }
 
   return std::sqrt(sum);
-}
-
-
-
-template <int dim, typename Number>
-inline
-Point<dim,Number> Point<dim,Number>::operator / (const Number factor) const
-{
-  Point<dim,Number> tmp = *this;
-  tmp /= factor;
-  return tmp;
 }
 
 
@@ -472,28 +472,17 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 
 /**
  * Global operator scaling a point vector by a scalar.
+ *
  * @relates Point
+ * @relates EnableIfScalar
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Point<dim,Number> operator * (const Number             factor,
-                              const Point<dim,Number> &p)
+Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const OtherNumber        factor,
+            const Point<dim,Number> &p)
 {
-  return p*factor;
-}
-
-
-
-/**
- * Global operator scaling a point vector by a scalar.
- * @relates Point
- */
-template <int dim>
-inline
-Point<dim,double> operator * (const double             factor,
-                              const Point<dim,double> &p)
-{
-  return p*factor;
+  return p * factor;
 }
 
 

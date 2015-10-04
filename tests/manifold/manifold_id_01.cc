@@ -1,5 +1,5 @@
 //----------------------------  manifold_id_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2014 by the mathLab team.
+//    Copyright (C) 2011 - 2015 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer

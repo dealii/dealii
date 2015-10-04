@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,7 +92,7 @@ void test (PETScWrappers::MatrixBase &m)
   // make sure that zeroing out rows does at
   // least not add new nonzero entries (it
   // may remove some, though)
-  Assert (m.n_nonzero_elements() <= nnz, ExcInternalError());
+  AssertThrow (m.n_nonzero_elements() <= nnz, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -108,7 +108,7 @@ int main (int argc,char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         PETScWrappers::SparseMatrix v (14,14,3);
         test (v);

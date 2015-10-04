@@ -82,7 +82,7 @@ void test ()
   deallog << "l1-norm: " << mat.l1_norm() << std::endl;
   if (myid==0)
     deallog << "mat(0,1): " << mat(0,1) << std::endl;
-  
+
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -91,7 +91,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   {
     deallog.push("PETSc");

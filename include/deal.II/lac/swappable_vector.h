@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__swappable_vector_h
-#define __deal2__swappable_vector_h
+#ifndef dealii__swappable_vector_h
+#define dealii__swappable_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -113,7 +113,7 @@ public:
    * in multithread mode, it spawns another thread that reads the data in
    * parallel to the usual execution of the program, such that when @p reload
    * is called, the data may eventually be available already. It might
-   * therefore be wirthwhile to call this function some time in advance, if
+   * therefore be worthwhile to call this function some time in advance, if
    * you know that the data will be needed, and loading takes some time, for
    * instance if the file to which the data was written is not in a local tmp
    * directory.
@@ -211,7 +211,7 @@ private:
 
 /*@}*/
 /*----------------------------   swappable_vector.h     ---------------------------*/
-/* end of #ifndef __deal2__swappable_vector_h */
+/* end of #ifndef dealii__swappable_vector_h */
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

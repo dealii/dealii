@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__conditional_ostream_h
-#define __deal2__conditional_ostream_h
+#ifndef dealii__conditional_ostream_h
+#define dealii__conditional_ostream_h
 
 #include <deal.II/base/config.h>
 

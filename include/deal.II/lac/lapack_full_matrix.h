@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__lapack_full_matrix_h
-#define __deal2__lapack_full_matrix_h
+#ifndef dealii__lapack_full_matrix_h
+#define dealii__lapack_full_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -146,14 +146,14 @@ public:
                const size_type cols);
 
   /**
-   * Return the dimension of the range space.
+   * Return the dimension of the codomain (or range) space.
    *
    * @note The matrix is of dimension $m \times n$.
    */
   unsigned int m () const;
 
   /**
-   * Return the number of the range space.
+   * Return the dimension of the domain space.
    *
    * @note The matrix is of dimension $m \times n$.
    */
@@ -193,7 +193,7 @@ public:
    * <li> If #state is LAPACKSupport::svd or LAPACKSupport::inverse_svd, this
    * function first multiplies with the right transformation matrix, then with
    * the diagonal matrix of singular values or their reciprocal values, and
-   * finally with the left trandformation matrix.
+   * finally with the left transformation matrix.
    * </ul>
    *
    * The optional parameter <tt>adding</tt> determines, whether the result is
@@ -205,20 +205,37 @@ public:
    *
    * @note Source and destination must not be the same vector.
    *
-   * @note This template only exists for compile-time compatibility with
-   * FullMatrix. Implementation is only available for
-   * <tt>VECTOR=Vector&lt;number&gt;</tt>
+   * @note The template with @p number2 only exists for compile-time
+   * compatibility with FullMatrix. Only the case @p number2 = @p number is
+   * implemented due to limitations in the underlying LAPACK interface. All
+   * other variants throw an error upon invocation.
    */
-  template <class VECTOR>
-  void vmult(VECTOR &dst, const VECTOR &src, const bool adding = false) const;
+  template <typename number2>
+  void vmult (Vector<number2>       &w,
+              const Vector<number2> &v,
+              const bool             adding = false) const;
+
+  /**
+   * Specialization of above function for compatible Vector::value_type.
+   */
+  void vmult (Vector<number>       &w,
+              const Vector<number> &v,
+              const bool            adding = false) const;
 
   /**
    * Adding Matrix-vector-multiplication.  <i>w += A*v</i>
    *
    * See the documentation of vmult() for details on the implementation.
    */
-  template <class VECTOR>
-  void vmult_add (VECTOR &w, const VECTOR &v) const;
+  template <typename number2>
+  void vmult_add (Vector<number2>       &w,
+                  const Vector<number2> &v) const;
+
+  /**
+   * Specialization of above function for compatible Vector::value_type.
+   */
+  void vmult_add (Vector<number>       &w,
+                  const Vector<number> &v) const;
 
   /**
    * Transpose matrix-vector-multiplication.
@@ -232,27 +249,31 @@ public:
    *
    * See the documentation of vmult() for details on the implementation.
    */
-  template <class VECTOR>
-  void Tvmult (VECTOR &w, const VECTOR &v,
+  template <typename number2>
+  void Tvmult (Vector<number2>       &w,
+               const Vector<number2> &v,
+               const bool             adding=false) const;
+
+  /**
+   * Specialization of above function for compatible Vector::value_type.
+   */
+  void Tvmult (Vector<number>       &w,
+               const Vector<number> &v,
                const bool            adding=false) const;
 
   /**
-   * Adding transpose matrix-vector-multiplication.  <i>w +=
+   * Adding transpose matrix-vector-multiplication. <i>w +=
    * A<sup>T</sup>*v</i>
    *
    * See the documentation of vmult() for details on the implementation.
    */
-  template <class VECTOR>
-  void Tvmult_add (VECTOR &w, const VECTOR &v) const;
+  template <typename number2>
+  void Tvmult_add (Vector<number2>       &w,
+                   const Vector<number2> &v) const;
 
-  void vmult (Vector<number>   &w,
-              const Vector<number> &v,
-              const bool            adding=false) const;
-  void vmult_add (Vector<number>       &w,
-                  const Vector<number> &v) const;
-  void Tvmult (Vector<number>       &w,
-               const Vector<number> &v,
-               const bool            adding=false) const;
+  /**
+   * Specialization of above function for compatible Vector::value_type.
+   */
   void Tvmult_add (Vector<number>       &w,
                    const Vector<number> &v) const;
 
@@ -561,7 +582,7 @@ public:
    * this are considered zero.
    */
   void print_formatted (std::ostream       &out,
-                        const unsigned int  presicion=3,
+                        const unsigned int  precision   = 3,
                         const bool          scientific  = true,
                         const unsigned int  width       = 0,
                         const char         *zero_string = " ",
@@ -738,38 +759,52 @@ LAPACKFullMatrix<number>::fill (
 
 
 template <typename number>
-template <class VECTOR>
-inline void
-LAPACKFullMatrix<number>::vmult(VECTOR &, const VECTOR &, bool) const
+template <typename number2>
+void
+LAPACKFullMatrix<number>::vmult (Vector<number2> &,
+                                 const Vector<number2> &,
+                                 const bool) const
 {
-  Assert(false, ExcNotImplemented());
+  Assert(false,
+         ExcMessage("LAPACKFullMatrix<number>::vmult must be called with a "
+                    "matching Vector<double> vector type."));
 }
 
 
 template <typename number>
-template <class VECTOR>
-inline void
-LAPACKFullMatrix<number>::vmult_add(VECTOR &, const VECTOR &) const
+template <typename number2>
+void
+LAPACKFullMatrix<number>::vmult_add (Vector<number2> &,
+                                     const Vector<number2> &) const
 {
-  Assert(false, ExcNotImplemented());
+  Assert(false,
+         ExcMessage("LAPACKFullMatrix<number>::vmult_add must be called with a "
+                    "matching Vector<double> vector type."));
 }
 
 
 template <typename number>
-template <class VECTOR>
-inline void
-LAPACKFullMatrix<number>::Tvmult(VECTOR &, const VECTOR &, bool) const
+template <typename number2>
+void
+LAPACKFullMatrix<number>::Tvmult (Vector<number2> &,
+                                  const Vector<number2> &,
+                                  const bool) const
 {
-  Assert(false, ExcNotImplemented());
+  Assert(false,
+         ExcMessage("LAPACKFullMatrix<number>::Tvmult must be called with a "
+                    "matching Vector<double> vector type."));
 }
 
 
 template <typename number>
-template <class VECTOR>
-inline void
-LAPACKFullMatrix<number>::Tvmult_add(VECTOR &, const VECTOR &) const
+template <typename number2>
+void
+LAPACKFullMatrix<number>::Tvmult_add (Vector<number2> &,
+                                      const Vector<number2> &) const
 {
-  Assert(false, ExcNotImplemented());
+  Assert(false,
+         ExcMessage("LAPACKFullMatrix<number>::Tvmult_add must be called with a "
+                    "matching Vector<double> vector type."));
 }
 
 

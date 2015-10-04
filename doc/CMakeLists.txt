@@ -57,3 +57,15 @@ INSTALL(FILES
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
   COMPONENT library
   )
+
+#
+# Add a dummy target to make documentation files known to IDEs.
+#
+
+FILE(GLOB _misc
+  ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/headers/*.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/news/changes.h
+  )
+
+ADD_LIBRARY(doxygen_headers OBJECT ${_misc})
+SET_TARGET_PROPERTIES(doxygen_headers PROPERTIES LINKER_LANGUAGE C)

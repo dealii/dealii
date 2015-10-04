@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mapping_cartesian_h
-#define __deal2__mapping_cartesian_h
+#ifndef dealii__mapping_cartesian_h
+#define dealii__mapping_cartesian_h
 
 
 #include <deal.II/base/config.h>
@@ -54,99 +54,8 @@ template <int dim, int spacedim=dim>
 class MappingCartesian : public Mapping<dim,spacedim>
 {
 public:
-  virtual
-  typename Mapping<dim, spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Quadrature<dim> &quadrature) const;
 
-  virtual
-  typename Mapping<dim, spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const;
-
-  virtual
-  typename Mapping<dim, spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const;
-
-  virtual void
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                             &quadrature,
-                  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                  std::vector<Point<spacedim> >                     &quadrature_points,
-                  std::vector<double>                               &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                  std::vector<Point<spacedim> > &,
-                  CellSimilarity::Similarity                        &cell_similarity) const ;
-
-
-  virtual void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int               face_no,
-                       const Quadrature<dim-1>&         quadrature,
-                       typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                       std::vector<Point<dim> >        &quadrature_points,
-                       std::vector<double>             &JxW_values,
-                       std::vector<Tensor<1,dim> >     &boundary_form,
-                       std::vector<Point<spacedim> >   &normal_vectors,
-                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
-  virtual void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int              face_no,
-                          const unsigned int              sub_no,
-                          const Quadrature<dim-1>&        quadrature,
-                          typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                          std::vector<Point<dim> >        &quadrature_points,
-                          std::vector<double>             &JxW_values,
-                          std::vector<Tensor<1,dim> >     &boundary_form,
-                          std::vector<Point<spacedim> >   &normal_vectors,
-                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
-
-  virtual void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-             VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  virtual void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const MappingType type) const;
-
-  virtual Point<spacedim>
-  transform_unit_to_real_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<dim>                                 &p) const;
-
-  /**
-   * Transforms the point @p p on the real cell to the point @p p_unit on the
-   * unit cell @p cell and returns @p p_unit.
-   *
-   * Uses Newton iteration and the @p transform_unit_to_real_cell function.
-   */
-  virtual Point<dim>
-  transform_real_to_unit_cell (
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const Point<spacedim>                            &p) const;
-
-
-  /**
-   * Return a pointer to a copy of the present object. The caller of this copy
-   * then assumes ownership of it.
-   */
+  // for documentation, see the Mapping base class
   virtual
   Mapping<dim, spacedim> *clone () const;
 
@@ -156,9 +65,94 @@ public:
    */
   bool preserves_vertex_locations () const;
 
-protected:
   /**
-   * Storage for internal data of the scaling.
+   * @name Mapping points between reference and real cells
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<spacedim>
+  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<dim>                                          &p) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  Point<dim>
+  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const Point<spacedim>                                     &p) const;
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Functions to transform tensors from reference to real coordinates
+   * @{
+   */
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
+             const MappingType                                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                 &internal,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >                          output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
+             const MappingType                                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
+
+  /**
+   * @}
+   */
+
+
+private:
+
+  /**
+   * @name Interface with FEValues
+   * @{
+   */
+
+  /**
+   * Storage for internal data of the mapping. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim, spacedim>::InternalDataBase
   {
@@ -174,21 +168,76 @@ protected:
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Length of the cell in different coordinate directions,
-     * <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
+     * Extents of the last cell we have seen in the coordinate directions,
+     * i.e., <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
      */
-    Tensor<1,dim> length;
+    mutable Tensor<1,dim> cell_extents;
 
     /**
      * The volume element
      */
-    double volume_element;
+    mutable double volume_element;
 
     /**
      * Vector of all quadrature points. Especially, all points on all faces.
      */
     std::vector<Point<dim> > quadrature_points;
   };
+
+  // documentation can be found in Mapping::requires_update_flags()
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
+  // documentation can be found in Mapping::get_data()
+  virtual
+  typename Mapping<dim, spacedim>::InternalDataBase *
+  get_data (const UpdateFlags,
+            const Quadrature<dim> &quadrature) const;
+
+  // documentation can be found in Mapping::get_face_data()
+  virtual
+  typename Mapping<dim, spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags flags,
+                 const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::get_subface_data()
+  virtual
+  typename Mapping<dim, spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags flags,
+                    const Quadrature<dim-1>& quadrature) const;
+
+  // documentation can be found in Mapping::fill_fe_values()
+  virtual
+  CellSimilarity::Similarity
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_face_values()
+  virtual void
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  // documentation can be found in Mapping::fill_fe_subface_values()
+  virtual void
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         subface_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  /**
+   * @}
+   */
+
+
 
   /**
    * Do the computation for the <tt>fill_*</tt> functions.
@@ -197,13 +246,9 @@ protected:
                      const unsigned int face_no,
                      const unsigned int sub_no,
                      const CellSimilarity::Similarity cell_similarity,
-                     InternalData &data,
+                     const InternalData &data,
                      std::vector<Point<dim> > &quadrature_points,
-                     std::vector<Point<dim> > &normal_vectors) const;
-
-private:
-  virtual UpdateFlags update_once (const UpdateFlags) const;
-  virtual UpdateFlags update_each (const UpdateFlags) const;
+                     std::vector<Tensor<1,dim> > &normal_vectors) const;
 
   /**
    * Value to indicate that a given face or subface number is invalid.
@@ -212,20 +257,6 @@ private:
 };
 
 /*@}*/
-
-/* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DOXYGEN
-
-template <int dim, int spacedim>
-inline
-bool
-MappingCartesian<dim,spacedim>::preserves_vertex_locations () const
-{
-  return true;
-}
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

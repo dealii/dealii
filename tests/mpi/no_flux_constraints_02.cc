@@ -18,8 +18,7 @@
 // check ConstraintMatrix for a distributed mesh on hyper shell with both
 // hanging nodes and no-normal-flux constraints on the outer boundary of the
 // shell.
-// fails because DoFRenumbering::hierarchical does not work correctly with
-// p4est right now. Also see test renumber_z_order_02
+// Also see test renumber_z_order_02
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -51,9 +50,8 @@ void test()
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
-  // create hypershell mesh and refine some
-  // cells. use some large numbers which make
-  // round-off influence more pronounced
+  // create hypershell mesh and refine some cells. use some large numbers
+  // which make round-off influence more pronounced
   const double R0      = 6371000.-2890000.;     /* m          */
   const double R1      = 6371000.-  35000.;     /* m          */
   GridGenerator::hyper_shell (triangulation,
@@ -204,7 +202,7 @@ void test()
   const std::pair<unsigned int,unsigned int> range = vector.local_range();
   for (unsigned int i=range.first; i<range.second; ++i)
     if (constraints.is_constrained(i))
-      Assert (vector(i)==0, ExcInternalError());
+      AssertThrow (vector(i)==0, ExcInternalError());
 
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -214,7 +212,7 @@ void test()
 int main(int argc, char *argv[])
 {
   {
-    Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv, numbers::invalid_unsigned_int);
+    Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 

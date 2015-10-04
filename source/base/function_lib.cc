@@ -586,13 +586,13 @@ namespace Functions
   }
 
   template<int dim>
-  Tensor<2,dim>
+  SymmetricTensor<2,dim>
   CosineFunction<dim>::hessian (const Point<dim>   &p,
                                 const unsigned int) const
   {
     const double pi2 = M_PI_2*M_PI_2;
 
-    Tensor<2,dim> result;
+    SymmetricTensor<2,dim> result;
     switch (dim)
       {
       case 1:
@@ -605,8 +605,8 @@ namespace Functions
             const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
             result[0][0] = coco;
             result[1][1] = coco;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
             result[0][1] = sisi;
-            result[1][0] = sisi;
           }
         break;
       case 3:
@@ -620,12 +620,10 @@ namespace Functions
             result[0][0] = cococo;
             result[1][1] = cococo;
             result[2][2] = cococo;
+            // for SymmetricTensor we assign [ij] and [ji] simultaneously:
             result[0][1] = sisico;
-            result[1][0] = sisico;
             result[0][2] = sicosi;
-            result[2][0] = sicosi;
             result[1][2] = cosisi;
-            result[2][1] = cosisi;
           }
         break;
       default:
@@ -636,8 +634,8 @@ namespace Functions
 
   template<int dim>
   void
-  CosineFunction<dim>::hessian_list (const std::vector<Point<dim> > &points,
-                                     std::vector<Tensor<2,dim> >    &hessians,
+  CosineFunction<dim>::hessian_list (const std::vector<Point<dim> >       &points,
+                                     std::vector<SymmetricTensor<2,dim> > &hessians,
                                      const unsigned int) const
   {
     Assert (hessians.size() == points.size(),
@@ -660,8 +658,8 @@ namespace Functions
                 const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
                 hessians[i][0][0] = coco;
                 hessians[i][1][1] = coco;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
                 hessians[i][0][1] = sisi;
-                hessians[i][1][0] = sisi;
               }
             break;
           case 3:
@@ -675,12 +673,10 @@ namespace Functions
                 hessians[i][0][0] = cococo;
                 hessians[i][1][1] = cococo;
                 hessians[i][2][2] = cococo;
+                // for SymmetricTensor we assign [ij] and [ji] simultaneously:
                 hessians[i][0][1] = sisico;
-                hessians[i][1][0] = sisico;
                 hessians[i][0][2] = sicosi;
-                hessians[i][2][0] = sicosi;
                 hessians[i][1][2] = cosisi;
-                hessians[i][2][1] = cosisi;
               }
             break;
           default:
@@ -1852,6 +1848,7 @@ namespace Functions
   FourierCosineFunction<dim>::value (const Point<dim>   &p,
                                      const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return std::cos(fourier_coefficients * p);
   }
@@ -1863,6 +1860,7 @@ namespace Functions
   FourierCosineFunction<dim>::gradient (const Point<dim>   &p,
                                         const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
@@ -1874,6 +1872,7 @@ namespace Functions
   FourierCosineFunction<dim>::laplacian (const Point<dim>   &p,
                                          const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return (fourier_coefficients * fourier_coefficients) * (-std::cos(fourier_coefficients * p));
   }
@@ -1900,6 +1899,7 @@ namespace Functions
   FourierSineFunction<dim>::value (const Point<dim>   &p,
                                    const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return std::sin(fourier_coefficients * p);
   }
@@ -1911,6 +1911,7 @@ namespace Functions
   FourierSineFunction<dim>::gradient (const Point<dim>   &p,
                                       const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
@@ -1922,6 +1923,7 @@ namespace Functions
   FourierSineFunction<dim>::laplacian (const Point<dim>   &p,
                                        const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
     return (fourier_coefficients * fourier_coefficients) * (-std::sin(fourier_coefficients * p));
   }
@@ -1955,6 +1957,7 @@ namespace Functions
   FourierSineSum<dim>::value (const Point<dim>   &p,
                               const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -1972,6 +1975,7 @@ namespace Functions
   FourierSineSum<dim>::gradient (const Point<dim>   &p,
                                  const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -1989,6 +1993,7 @@ namespace Functions
   FourierSineSum<dim>::laplacian (const Point<dim>   &p,
                                   const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -2027,6 +2032,7 @@ namespace Functions
   FourierCosineSum<dim>::value (const Point<dim>   &p,
                                 const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -2044,6 +2050,7 @@ namespace Functions
   FourierCosineSum<dim>::gradient (const Point<dim>   &p,
                                    const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -2061,6 +2068,7 @@ namespace Functions
   FourierCosineSum<dim>::laplacian (const Point<dim>   &p,
                                     const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
     const unsigned int n = weights.size();
@@ -2094,13 +2102,19 @@ namespace Functions
   Monomial<dim>::value (const Point<dim>   &p,
                         const unsigned int  component) const
   {
+    (void)component;
     Assert (component<this->n_components,
             ExcIndexRange(component, 0, this->n_components)) ;
 
     double prod = 1;
     for (unsigned int s=0; s<dim; ++s)
-      prod *= std::pow(p[s], exponents[s]);
-
+      {
+        if (p[s] < 0)
+          Assert(std::floor(exponents[s]) == exponents[s],
+                 ExcMessage("Exponentiation of a negative base number with "
+                            "a real exponent can't be performed."));
+        prod *= std::pow(p[s], exponents[s]);
+      }
     return prod;
   }
 
@@ -2125,6 +2139,7 @@ namespace Functions
   Monomial<dim>::gradient (const Point<dim>   &p,
                            const unsigned int  component) const
   {
+    (void)component;
     Assert (component==0, ExcIndexRange(component,0,1)) ;
 
     Tensor<1,dim> r;
@@ -2132,12 +2147,25 @@ namespace Functions
       {
         double prod = 1;
         for (unsigned int s=0; s<dim; ++s)
-          prod *= (s==d
-                   ?
-                   exponents[s] * std::pow(p[s], exponents[s]-1)
-                   :
-                   std::pow(p[s], exponents[s]));
-
+          {
+            if ((s==d) && (exponents[s] == 0) && (p[s] == 0))
+              {
+                prod = 0;
+                break;
+              }
+            else
+              {
+                if (p[s] < 0)
+                  Assert(std::floor(exponents[s]) == exponents[s],
+                         ExcMessage("Exponentiation of a negative base number with "
+                                    "a real exponent can't be performed."));
+                prod *= (s==d
+                         ?
+                         exponents[s] * std::pow(p[s], exponents[s]-1)
+                         :
+                         std::pow(p[s], exponents[s]));
+              }
+          }
         r[d] = prod;
       }
 
@@ -2312,8 +2340,86 @@ namespace Functions
                 +
                 p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]+1])*p_unit[1]) * p_unit[2]);
     }
-  }
 
+
+    // Interpolate the gradient of a data value from a table where ix
+    // denotes the lower left endpoint of the interval to interpolate
+    // in, p_unit denotes the point in unit coordinates, and dx
+    // denotes the width of the interval in each dimension.
+    Tensor<1,1> gradient_interpolate (const Table<1,double> &data_values,
+                                      const TableIndices<1> &ix,
+                                      const Point<1>        &p_unit,
+                                      const Point<1>        &dx)
+    {
+      (void)p_unit;
+      Tensor<1,1> grad;
+      grad[0] = (data_values[ix[0]+1] - data_values[ix[0]]) / dx[0];
+      return grad;
+    }
+
+
+    Tensor<1,2> gradient_interpolate (const Table<2,double> &data_values,
+                                      const TableIndices<2> &ix,
+                                      const Point<2>        &p_unit,
+                                      const Point<2>        &dx)
+    {
+      Tensor<1,2> grad;
+      double
+      u00 = data_values[ix[0]][ix[1]],
+      u01 = data_values[ix[0]+1][ix[1]],
+      u10 = data_values[ix[0]][ix[1]+1],
+      u11 = data_values[ix[0]+1][ix[1]+1];
+
+      grad[0] = ((1-p_unit[1])*(u01-u00) + p_unit[1]*(u11-u10))/dx[0];
+      grad[1] = ((1-p_unit[0])*(u10-u00) + p_unit[0]*(u11-u01))/dx[1];
+      return grad;
+    }
+
+
+    Tensor<1,3> gradient_interpolate (const Table<3,double> &data_values,
+                                      const TableIndices<3> &ix,
+                                      const Point<3>        &p_unit,
+                                      const Point<3>        &dx)
+    {
+      Tensor<1,3> grad;
+      double
+      u000 = data_values[ix[0]][ix[1]][ix[2]],
+      u001 = data_values[ix[0]+1][ix[1]][ix[2]],
+      u010 = data_values[ix[0]][ix[1]+1][ix[2]],
+      u100 = data_values[ix[0]][ix[1]][ix[2]+1],
+      u011 = data_values[ix[0]+1][ix[1]+1][ix[2]],
+      u101 = data_values[ix[0]+1][ix[1]][ix[2]+1],
+      u110 = data_values[ix[0]][ix[1]+1][ix[2]+1],
+      u111 = data_values[ix[0]+1][ix[1]+1][ix[2]+1];
+
+      grad[0] = ((1-p_unit[2])
+                 *
+                 ((1-p_unit[1])*(u001-u000) + p_unit[1]*(u011-u010))
+                 +
+                 p_unit[2]
+                 *
+                 ((1-p_unit[1])*(u101-u100) + p_unit[1]*(u111-u110))
+                )/dx[0];
+      grad[1] = ((1-p_unit[2])
+                 *
+                 ((1-p_unit[0])*(u010-u000) + p_unit[0]*(u011-u001))
+                 +
+                 p_unit[2]
+                 *
+                 ((1-p_unit[0])*(u110-u100) + p_unit[0]*(u111-u101))
+                )/dx[1];
+      grad[2] = ((1-p_unit[1])
+                 *
+                 ((1-p_unit[0])*(u100-u000) + p_unit[0]*(u101-u001))
+                 +
+                 p_unit[1]
+                 *
+                 ((1-p_unit[0])*(u110-u010) + p_unit[0]*(u111-u011))
+                )/dx[2];
+
+      return grad;
+    }
+  }
 
   template <int dim>
   InterpolatedTensorProductGridData<dim>::
@@ -2343,6 +2449,7 @@ namespace Functions
   InterpolatedTensorProductGridData<dim>::value(const Point<dim> &p,
                                                 const unsigned int component) const
   {
+    (void)component;
     Assert (component == 0,
             ExcMessage ("This is a scalar function object, the component can only be zero."));
 
@@ -2387,6 +2494,45 @@ namespace Functions
 
 
   template <int dim>
+  Tensor<1, dim>
+  InterpolatedTensorProductGridData<dim>::gradient(const Point<dim> &p,
+                                                   const unsigned int component) const
+  {
+    (void)component;
+    Assert (component == 0,
+            ExcMessage ("This is a scalar function object, the component can only be zero."));
+
+    // find out where this data point lies
+    TableIndices<dim> ix;
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        ix[d] = (std::lower_bound (coordinate_values[d].begin(),
+                                   coordinate_values[d].end(),
+                                   p[d])
+                 - coordinate_values[d].begin());
+
+        if (ix[d] == coordinate_values[d].size())
+          ix[d] = coordinate_values[d].size()-2;
+        else if (ix[d] > 0)
+          --ix[d];
+      }
+
+    Point<dim> dx;
+    for (unsigned int d=0; d<dim; ++d)
+      dx[d] = coordinate_values[d][ix[d]+1]-coordinate_values[d][ix[d]];
+
+    Point<dim> p_unit;
+    for (unsigned int d=0; d<dim; ++d)
+      p_unit[d] = std::max(std::min((p[d]-coordinate_values[d][ix[d]]) / dx[d],
+                                    1.),
+                           0.0);
+
+    return gradient_interpolate(data_values, ix, p_unit, dx);
+  }
+
+
+
+  template <int dim>
   InterpolatedUniformGridData<dim>::
   InterpolatedUniformGridData(const std_cxx11::array<std::pair<double,double>,dim> &interval_endpoints,
                               const std_cxx11::array<unsigned int,dim>             &n_subintervals,
@@ -2415,6 +2561,7 @@ namespace Functions
   InterpolatedUniformGridData<dim>::value(const Point<dim> &p,
                                           const unsigned int component) const
   {
+    (void)component;
     Assert (component == 0,
             ExcMessage ("This is a scalar function object, the component can only be zero."));
 
@@ -2449,6 +2596,113 @@ namespace Functions
     return interpolate (data_values, ix, p_unit);
   }
 
+  /* ---------------------- Polynomial ----------------------- */
+
+
+
+  template <int dim>
+  Polynomial<dim>::
+  Polynomial(const Table<2,double>     &exponents,
+             const std::vector<double> &coefficients)
+    :
+    Function<dim> (1),
+    exponents (exponents),
+    coefficients(coefficients)
+  {
+    Assert(exponents.n_rows() == coefficients.size(),
+           ExcDimensionMismatch(exponents.n_rows(), coefficients.size()));
+    Assert(exponents.n_cols() == dim,
+           ExcDimensionMismatch(exponents.n_cols(), dim));
+  }
+
+
+
+  template <int dim>
+  double
+  Polynomial<dim>::value (const Point<dim> &p,
+                          const unsigned int component) const
+  {
+    (void)component;
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    double prod;
+    double sum = 0;
+    for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
+      {
+        prod = 1;
+        for (unsigned int s=0; s< dim; ++s)
+          {
+            if (p[s] < 0)
+              Assert(std::floor(exponents[monom][s]) == exponents[monom][s],
+                     ExcMessage("Exponentiation of a negative base number with "
+                                "a real exponent can't be performed."));
+            prod *= std::pow(p[s], exponents[monom][s]);
+          }
+        sum += coefficients[monom]*prod;
+      }
+    return sum;
+  }
+
+
+
+  template <int dim>
+  void
+  Polynomial<dim>::value_list (const std::vector<Point<dim> > &points,
+                               std::vector<double>    &values,
+                               const unsigned int     component) const
+  {
+    Assert (values.size() == points.size(),
+            ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int i=0; i<points.size(); ++i)
+      values[i] = Polynomial<dim>::value (points[i], component);
+  }
+
+
+
+  template <int dim>
+  Tensor<1,dim>
+  Polynomial<dim>::gradient (const Point<dim> &p,
+                             const unsigned int component) const
+  {
+    (void)component;
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    Tensor<1,dim> r;
+
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        double sum = 0;
+
+        for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
+          {
+            double prod = 1;
+            for (unsigned int s=0; s < dim; ++s)
+              {
+                if ((s==d)&&(exponents[monom][s] == 0)&&(p[s] == 0))
+                  {
+                    prod = 0;
+                    break;
+                  }
+                else
+                  {
+                    if (p[s] < 0)
+                      Assert(std::floor(exponents[monom][s]) == exponents[monom][s],
+                             ExcMessage("Exponentiation of a negative base number with "
+                                        "a real exponent can't be performed."));
+                    prod *= (s==d
+                             ?
+                             exponents[monom][s] * std::pow(p[s], exponents[monom][s]-1)
+                             :
+                             std::pow(p[s], exponents[monom][s]));
+                  }
+              }
+            sum += coefficients[monom]*prod;
+          }
+        r[d] = sum;
+      }
+    return r;
+  }
 
 
 // explicit instantiations
@@ -2498,6 +2752,9 @@ namespace Functions
   template class InterpolatedUniformGridData<1>;
   template class InterpolatedUniformGridData<2>;
   template class InterpolatedUniformGridData<3>;
+  template class Polynomial<1>;
+  template class Polynomial<2>;
+  template class Polynomial<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE

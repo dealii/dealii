@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__householder_h
-#define __deal2__householder_h
+#ifndef dealii__householder_h
+#define dealii__householder_h
 
 
 #include <cmath>
@@ -171,7 +171,7 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
 
 
       // For all subsequent columns do
-      // the Householder reflexion
+      // the Householder reflection
       for (size_type k=j+1 ; k<n ; ++k)
         {
           number2 sum = diagonal[j]*this->el(j,k);

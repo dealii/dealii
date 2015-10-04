@@ -147,7 +147,7 @@ the following domain and functions (in $d=2$ space dimensions):
   \beta({\mathbf x})
   &=&
   \left(
-    \begin{array}{c}1 \\ 1+\frac 45 \sin(8\pi x)\end{array}
+    \begin{array}{c}2 \\ 1+\frac 45 \sin(8\pi x)\end{array}
   \right),
   \\
   f({\mathbf x})

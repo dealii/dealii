@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx11_unique_ptr_h
-#define __deal2__std_cxx11_unique_ptr_h
+#ifndef dealii__std_cxx11_unique_ptr_h
+#define dealii__std_cxx11_unique_ptr_h
 
 
 #include <deal.II/base/config.h>
@@ -31,7 +31,8 @@ DEAL_II_NAMESPACE_CLOSE
 
 #else
 
-#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
@@ -43,19 +44,17 @@ namespace std_cxx11
    * compiler -- in which case you also have std::unique_ptr; see for example
    * http://stackoverflow.com/questions/2953530/unique-ptr-boost-equivalent)
    *
-   * Consequently, we emulate the class by just wrapping a boost::shared_ptr
+   * Consequently, we emulate the class by just wrapping a boost::scoped_ptr
    * in the cheapest possible way -- by just deriving from it and repeating
-   * the basic constructors. Everything else is inherited from the shared_ptr
+   * the basic constructors. Everything else is inherited from the scoped_ptr
    * class.
    *
-   * This replacement comes with a certain overhead: doing reference counting
-   * instead of just passing ownership of pointers has a cost. But we don't
-   * use unique_ptrs in expensive places, and it is also a cost that will
-   * disappear once we require C++11 (and the cost of course does not apply if
-   * your compiler already supports C++11 and deal.II uses it).
+   * There is no overhead to this approach: scoped_ptr cannot be copied or
+   * moved. Instances of unique_ptr cannot be copied, and if you do not have a
+   * C++11 compiler, then you cannot move anything anyway.
    */
   template <typename T>
-  class unique_ptr : public boost::shared_ptr<T>
+  class unique_ptr : public boost::scoped_ptr<T>
   {
   public:
     unique_ptr () {}
@@ -63,7 +62,7 @@ namespace std_cxx11
     template<class Y>
     explicit unique_ptr (Y *p)
       :
-      boost::shared_ptr<T>(p)
+      boost::scoped_ptr<T>(p)
     {}
   };
 

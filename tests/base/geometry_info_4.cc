@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ void test ()
         phi_i = GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
 
         deallog << phi_i << std::endl;
-        Assert (phi_i == (i==v ? 1 : 0),
-                ExcInternalError());
+        AssertThrow (phi_i == (i==v ? 1 : 0),
+                     ExcInternalError());
       }
 
   // check that
@@ -51,7 +51,7 @@ void test ()
       double s = 0;
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
         s += GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v),i);
-      Assert (s == 1, ExcInternalError());
+      AssertThrow (s == 1, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
     }
@@ -63,7 +63,7 @@ void test ()
     double s = 0;
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       s += GeometryInfo<dim>::d_linear_shape_function(center,i);
-    Assert (s == 1, ExcInternalError());
+    AssertThrow (s == 1, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;
   }

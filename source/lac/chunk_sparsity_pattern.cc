@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,7 @@
 
 
 #include <deal.II/lac/chunk_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 
 
@@ -181,34 +179,38 @@ ChunkSparsityPattern::compress ()
 
 template <typename SparsityType>
 void
-ChunkSparsityPattern::copy_from (const SparsityType &csp,
+ChunkSparsityPattern::copy_from (const SparsityType &dsp,
                                  const size_type     chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
   this->chunk_size = chunk_size;
-  rows = csp.n_rows();
-  cols = csp.n_cols();
+  rows = dsp.n_rows();
+  cols = dsp.n_cols();
 
   // simple case: just use the given sparsity pattern
   if (chunk_size == 1)
     {
-      sparsity_pattern.copy_from (csp);
+      sparsity_pattern.copy_from (dsp);
       return;
     }
 
   // create a temporary compressed sparsity pattern that collects all entries
   // from the input sparsity pattern and then initialize the underlying small
   // sparsity pattern
-  const size_type m_chunks = (csp.n_rows()+chunk_size-1) / chunk_size,
-                  n_chunks = (csp.n_cols()+chunk_size-1) / chunk_size;
-  CompressedSimpleSparsityPattern temporary_sp(m_chunks, n_chunks);
+  const size_type m_chunks = (dsp.n_rows()+chunk_size-1) / chunk_size,
+                  n_chunks = (dsp.n_cols()+chunk_size-1) / chunk_size;
+  DynamicSparsityPattern temporary_sp(m_chunks, n_chunks);
 
-  for (size_type row = 0; row<csp.n_rows(); ++row)
+  for (size_type row = 0; row<dsp.n_rows(); ++row)
     {
-      typename SparsityType::row_iterator col_num = csp.row_begin (row);
       const size_type reduced_row = row/chunk_size;
-      for (; col_num != csp.row_end (row); ++col_num)
-        temporary_sp.add (reduced_row, *col_num/chunk_size);
+
+      // TODO: This could be made more efficient if we cached the
+      // previous column and only called add() if the previous and the
+      // current column lead to different chunk columns
+      for (typename SparsityType::iterator col_num = dsp.begin(row);
+           col_num != dsp.end(row); ++col_num)
+        temporary_sp.add (reduced_row, col_num->column()/chunk_size);
     }
 
   sparsity_pattern.copy_from (temporary_sp);
@@ -613,13 +615,7 @@ ChunkSparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template
-void ChunkSparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &,
-    const size_type);
-template
-void ChunkSparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &,
-    const size_type);
-template
-void ChunkSparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &,
+void ChunkSparsityPattern::copy_from<DynamicSparsityPattern> (const DynamicSparsityPattern &,
     const size_type);
 template
 void ChunkSparsityPattern::create_from<SparsityPattern>
@@ -629,24 +625,10 @@ void ChunkSparsityPattern::create_from<SparsityPattern>
  const unsigned int,
  const bool);
 template
-void ChunkSparsityPattern::create_from<CompressedSparsityPattern>
+void ChunkSparsityPattern::create_from<DynamicSparsityPattern>
 (const unsigned int,
  const unsigned int,
- const CompressedSparsityPattern &,
- const unsigned int,
- const bool);
-template
-void ChunkSparsityPattern::create_from<CompressedSetSparsityPattern>
-(const unsigned int,
- const unsigned int,
- const CompressedSetSparsityPattern &,
- const unsigned int,
- const bool);
-template
-void ChunkSparsityPattern::create_from<CompressedSimpleSparsityPattern>
-(const unsigned int,
- const unsigned int,
- const CompressedSimpleSparsityPattern &,
+ const DynamicSparsityPattern &,
  const unsigned int,
  const bool);
 template

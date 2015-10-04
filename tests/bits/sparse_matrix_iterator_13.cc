@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,36 +36,36 @@ void test ()
   SparseMatrix<double> m(sp);
 
   for (unsigned int row=0; row<sp.n_rows(); ++row)
-    Assert (m.begin(row)-m.begin(row) == 0,
-            ExcInternalError());
+    AssertThrow (m.begin(row)-m.begin(row) == 0,
+                 ExcInternalError());
 
   for (unsigned int row=0; row<sp.n_rows(); ++row)
-    Assert (m.end(row)-m.begin(row) == (int)sp.row_length(row),
-            ExcInternalError());
+    AssertThrow (m.end(row)-m.begin(row) == (int)sp.row_length(row),
+                 ExcInternalError());
   for (unsigned int row=0; row<sp.n_rows(); ++row)
-    Assert (m.begin(row)-m.end(row) == -(int)sp.row_length(row),
-            ExcInternalError());
+    AssertThrow (m.begin(row)-m.end(row) == -(int)sp.row_length(row),
+                 ExcInternalError());
 
   {
     unsigned int counter = 0;
     for (unsigned int row=0; row<sp.n_rows(); ++row)
       {
-        Assert (m.begin(row)-m.begin(0) == (int)counter,
-                ExcInternalError());
-        Assert (m.begin(0)-m.begin(row) == -(int)counter,
-                ExcInternalError());
+        AssertThrow (m.begin(row)-m.begin(0) == (int)counter,
+                     ExcInternalError());
+        AssertThrow (m.begin(0)-m.begin(row) == -(int)counter,
+                     ExcInternalError());
         counter += sp.row_length(row);
       }
   }
 
-  Assert (m.begin() - m.begin(0) == 0, ExcInternalError());
-  Assert (m.begin(0) - m.begin() == 0, ExcInternalError());
-  Assert (m.end(sp.n_rows()-1) - m.end() == 0, ExcInternalError());
-  Assert (m.end() - m.end(sp.n_rows()-1) == 0, ExcInternalError());
-  Assert (m.end() - m.begin() == (int)sp.n_nonzero_elements(),
-          ExcInternalError());
-  Assert (m.begin() - m.end() == -(int)sp.n_nonzero_elements(),
-          ExcInternalError());
+  AssertThrow (m.begin() - m.begin(0) == 0, ExcInternalError());
+  AssertThrow (m.begin(0) - m.begin() == 0, ExcInternalError());
+  AssertThrow (m.end(sp.n_rows()-1) - m.end() == 0, ExcInternalError());
+  AssertThrow (m.end() - m.end(sp.n_rows()-1) == 0, ExcInternalError());
+  AssertThrow (m.end() - m.begin() == (int)sp.n_nonzero_elements(),
+               ExcInternalError());
+  AssertThrow (m.begin() - m.end() == -(int)sp.n_nonzero_elements(),
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

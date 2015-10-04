@@ -244,7 +244,7 @@ test (const unsigned int p)
   // written out a little bit, only
   // write every so-many-th element
   SparseMatrix<double>::const_iterator p2 = A2.begin(),
-				       p3 = A3.begin();
+                                       p3 = A3.begin();
   for (unsigned int i=0; i<A2.n_nonzero_elements(); ++i, ++p2, ++p3)
     {
       if (i % (dim*dim*dim) == 0)

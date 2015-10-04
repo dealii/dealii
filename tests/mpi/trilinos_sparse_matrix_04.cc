@@ -100,17 +100,17 @@ void test ()
        ++p)
     if (my_id == 0)
       {
-	deallog << "Looking at entry (" << p->row() << ','
-		<< p->column() << ") with value "
-		<< p->value()
-		<< std::endl;
-	AssertThrow (p->row() == 0, ExcInternalError());
+        deallog << "Looking at entry (" << p->row() << ','
+                << p->column() << ") with value "
+                << p->value()
+                << std::endl;
+        AssertThrow (p->row() == 0, ExcInternalError());
       }
     else
       {
-	AssertThrow (p->row() == 2, ExcInternalError());
-      }  
-  
+        AssertThrow (p->row() == 2, ExcInternalError());
+      }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }
@@ -119,7 +119,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

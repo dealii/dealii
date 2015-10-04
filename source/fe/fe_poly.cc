@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,12 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
+#include <deal.II/base/tensor_product_polynomials_bubbles.h>
 #include <deal.II/base/polynomials_p.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/polynomials_rannacher_turek.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_values.h>
-
 #include <deal.II/fe/fe_poly.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,21 +30,22 @@ DEAL_II_NAMESPACE_OPEN
 
 template <>
 void
-FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
-(const Mapping<1,2>                        &mapping,
- const Triangulation<1,2>::cell_iterator   &cell,
- const Quadrature<1>                       &quadrature,
- Mapping<1,2>::InternalDataBase            &mapping_data,
- Mapping<1,2>::InternalDataBase            &fedata,
- FEValuesData<1,2>                         &data,
- CellSimilarity::Similarity           &cell_similarity) const
+FE_Poly<TensorProductPolynomials<1>,1,2>::
+fill_fe_values (const Mapping<1,2>                                &mapping,
+                const Triangulation<1,2>::cell_iterator &,
+                const Quadrature<1>                               &quadrature,
+                const Mapping<1,2>::InternalDataBase              &mapping_internal,
+                const FiniteElement<1,2>::InternalDataBase        &fedata,
+                const internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<1,2> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -51,36 +53,59 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_hessians[k],
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<2; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
 
 
 template <>
 void
-FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
-(const Mapping<2,3>                      &mapping,
- const Triangulation<2,3>::cell_iterator &cell,
- const Quadrature<2>                     &quadrature,
- Mapping<2,3>::InternalDataBase          &mapping_data,
- Mapping<2,3>::InternalDataBase          &fedata,
- FEValuesData<2,3>                       &data,
- CellSimilarity::Similarity         &cell_similarity) const
+FE_Poly<TensorProductPolynomials<2>,2,3>::
+fill_fe_values (const Mapping<2,3>                                &mapping,
+                const Triangulation<2,3>::cell_iterator &,
+                const Quadrature<2>                               &quadrature,
+                const Mapping<2,3>::InternalDataBase              &mapping_internal,
+                const FiniteElement<2,3>::InternalDataBase        &fedata,
+                const internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<2,3> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
 
   // assert that the following dynamics
   // cast is really well-defined.
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -88,37 +113,60 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_hessians[k],
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<3; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
 
 template <>
 void
-FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
-  const Mapping<1,2>                      &mapping,
-  const Triangulation<1,2>::cell_iterator &cell,
-  const Quadrature<1>                     &quadrature,
-  Mapping<1,2>::InternalDataBase          &mapping_data,
-  Mapping<1,2>::InternalDataBase          &fedata,
-  FEValuesData<1,2>                       &data,
-  CellSimilarity::Similarity         &cell_similarity) const
+FE_Poly<PolynomialSpace<1>,1,2>::
+fill_fe_values (const Mapping<1,2>                                &mapping,
+                const Triangulation<1,2>::cell_iterator &,
+                const Quadrature<1>                               &quadrature,
+                const Mapping<1,2>::InternalDataBase              &mapping_internal,
+                const FiniteElement<1,2>::InternalDataBase        &fedata,
+                const internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<1,2> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
 
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -126,32 +174,55 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<1>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_hessians[k],
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<2; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
 
 template <>
 void
-FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
-(const Mapping<2,3>                      &mapping,
- const Triangulation<2,3>::cell_iterator &cell,
- const Quadrature<2>                     &quadrature,
- Mapping<2,3>::InternalDataBase          &mapping_data,
- Mapping<2,3>::InternalDataBase          &fedata,
- FEValuesData<2,3>                       &data,
- CellSimilarity::Similarity         &cell_similarity) const
+FE_Poly<PolynomialSpace<2>,2,3>::
+fill_fe_values (const Mapping<2,3>                                &mapping,
+                const Triangulation<2,3>::cell_iterator &,
+                const Quadrature<2>                               &quadrature,
+                const Mapping<2,3>::InternalDataBase              &mapping_internal,
+                const FiniteElement<2,3>::InternalDataBase        &fedata,
+                const internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<2,3> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -159,17 +230,39 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<2>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_hessians[k],
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<3; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
 

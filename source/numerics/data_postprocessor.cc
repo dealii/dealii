@@ -30,10 +30,10 @@ DataPostprocessor<dim>::~DataPostprocessor()
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_scalar (const std::vector<double>         &uh,
-                                   const std::vector<Tensor<1,dim> > &duh,
-                                   const std::vector<Tensor<2,dim> > &dduh,
-                                   const std::vector<Point<dim> >    &normals,
+compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
+                                   const std::vector<Tensor<1,dim> > &/*duh*/,
+                                   const std::vector<Tensor<2,dim> > &/*dduh*/,
+                                   const std::vector<Point<dim> >    &/*normals*/,
                                    const std::vector<Point<dim> >    &/*evaluation_points*/,
                                    std::vector<Vector<double> >      &computed_quantities) const
 {
@@ -46,10 +46,10 @@ compute_derived_quantities_scalar (const std::vector<double>         &uh,
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (const std::vector<Vector<double> > &uh,
-                                   const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                   const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                   const std::vector<Point<dim> >                  &normals,
+compute_derived_quantities_vector (const std::vector<Vector<double> > &/*uh*/,
+                                   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
+                                   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+                                   const std::vector<Point<dim> >                  &/*normals*/,
                                    const std::vector<Point<dim> >                  &/*evaluation_points*/,
                                    std::vector<Vector<double> >                    &computed_quantities) const
 {

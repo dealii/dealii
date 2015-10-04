@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,8 @@ int main ()
     t[0][0] = 1;
 
     double x[1] = { 1 };
-    Assert ((t == SymmetricTensor<2,1>(x)),
-            ExcInternalError());
+    AssertThrow ((t == SymmetricTensor<2,1>(x)),
+                 ExcInternalError());
   }
 
   {
@@ -47,8 +47,8 @@ int main ()
     t[0][1] = 3;
 
     double x[3] = { 1, 2, 3 };
-    Assert ((t == SymmetricTensor<2,2>(x)),
-            ExcInternalError());
+    AssertThrow ((t == SymmetricTensor<2,2>(x)),
+                 ExcInternalError());
   }
 
   {
@@ -61,8 +61,8 @@ int main ()
     t[1][2] = 6;
 
     double x[6] = { 1, 2, 3, 4, 5, 6 };
-    Assert ((t == SymmetricTensor<2,3>(x)),
-            ExcInternalError());
+    AssertThrow ((t == SymmetricTensor<2,3>(x)),
+                 ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

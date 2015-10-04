@@ -1,11 +1,11 @@
 
 DEAL:0::FE_RaviartThomas<2>(0)
 DEAL:0::dim=2
-DEAL:0::n_cells: 41
+DEAL:0::n_cells: 44
 DEAL:0::OK
 DEAL:0::FE_RaviartThomas<2>(1)
 DEAL:0::dim=2
-DEAL:0::n_cells: 38
+DEAL:0::n_cells: 41
 DEAL:0::OK
 DEAL:0::FE_Nedelec<2>(0)
 DEAL:0::dim=2
@@ -13,7 +13,7 @@ DEAL:0::n_cells: 41
 DEAL:0::OK
 DEAL:0::FE_Nedelec<2>(1)
 DEAL:0::dim=2
-DEAL:0::n_cells: 41
+DEAL:0::n_cells: 44
 DEAL:0::OK
 DEAL:0::FE_Q<2>(3)
 DEAL:0::dim=2
@@ -21,7 +21,7 @@ DEAL:0::n_cells: 32
 DEAL:0::OK
 DEAL:0::FE_DGQ<2>(2)
 DEAL:0::dim=2
-DEAL:0::n_cells: 38
+DEAL:0::n_cells: 35
 DEAL:0::OK
 DEAL:0::FE_Q_DG0<2>(2)
 DEAL:0::dim=2
@@ -29,11 +29,11 @@ DEAL:0::n_cells: 50
 DEAL:0::OK
 DEAL:0::FE_RaviartThomas<3>(0)
 DEAL:0::dim=3
-DEAL:0::n_cells: 189
+DEAL:0::n_cells: 182
 DEAL:0::OK
 DEAL:0::FE_RaviartThomas<3>(1)
 DEAL:0::dim=3
-DEAL:0::n_cells: 147
+DEAL:0::n_cells: 154
 DEAL:0::OK
 DEAL:0::FE_Nedelec<3>(0)
 DEAL:0::dim=3
@@ -41,61 +41,61 @@ DEAL:0::n_cells: 140
 DEAL:0::OK
 DEAL:0::FE_Nedelec<3>(1)
 DEAL:0::dim=3
-DEAL:0::n_cells: 161
+DEAL:0::n_cells: 168
 DEAL:0::OK
 DEAL:0::FE_Q<3>(3)
 DEAL:0::dim=3
-DEAL:0::n_cells: 161
+DEAL:0::n_cells: 168
 DEAL:0::OK
 DEAL:0::FE_DGQ<3>(2)
 DEAL:0::dim=3
-DEAL:0::n_cells: 182
+DEAL:0::n_cells: 175
 DEAL:0::OK
 DEAL:0::FE_Q_DG0<3>(2)
 DEAL:0::dim=3
-DEAL:0::n_cells: 147
+DEAL:0::n_cells: 175
 DEAL:0::OK
 
 DEAL:1::FE_RaviartThomas<2>(0)
 DEAL:1::dim=2
-DEAL:1::n_cells: 41
+DEAL:1::n_cells: 44
 DEAL:1::FE_RaviartThomas<2>(1)
 DEAL:1::dim=2
-DEAL:1::n_cells: 38
+DEAL:1::n_cells: 41
 DEAL:1::FE_Nedelec<2>(0)
 DEAL:1::dim=2
 DEAL:1::n_cells: 41
 DEAL:1::FE_Nedelec<2>(1)
 DEAL:1::dim=2
-DEAL:1::n_cells: 41
+DEAL:1::n_cells: 44
 DEAL:1::FE_Q<2>(3)
 DEAL:1::dim=2
 DEAL:1::n_cells: 32
 DEAL:1::FE_DGQ<2>(2)
 DEAL:1::dim=2
-DEAL:1::n_cells: 38
+DEAL:1::n_cells: 35
 DEAL:1::FE_Q_DG0<2>(2)
 DEAL:1::dim=2
 DEAL:1::n_cells: 50
 DEAL:1::FE_RaviartThomas<3>(0)
 DEAL:1::dim=3
-DEAL:1::n_cells: 189
+DEAL:1::n_cells: 182
 DEAL:1::FE_RaviartThomas<3>(1)
 DEAL:1::dim=3
-DEAL:1::n_cells: 147
+DEAL:1::n_cells: 154
 DEAL:1::FE_Nedelec<3>(0)
 DEAL:1::dim=3
 DEAL:1::n_cells: 140
 DEAL:1::FE_Nedelec<3>(1)
 DEAL:1::dim=3
-DEAL:1::n_cells: 161
+DEAL:1::n_cells: 168
 DEAL:1::FE_Q<3>(3)
 DEAL:1::dim=3
-DEAL:1::n_cells: 161
+DEAL:1::n_cells: 168
 DEAL:1::FE_DGQ<3>(2)
 DEAL:1::dim=3
-DEAL:1::n_cells: 182
+DEAL:1::n_cells: 175
 DEAL:1::FE_Q_DG0<3>(2)
 DEAL:1::dim=3
-DEAL:1::n_cells: 147
+DEAL:1::n_cells: 175
 

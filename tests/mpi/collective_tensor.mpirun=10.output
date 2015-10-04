@@ -1,0 +1,7 @@
+
+DEAL:mpi::Running on 10 CPU(s).
+DEAL:mpi::1D tensor: 10.0000
+DEAL:mpi::2D tensor: 10.0000 20.0000
+DEAL:mpi::3D tensor: 10.0000 20.0000 30.0000
+DEAL:mpi::Rank 2 tensor: 10.0000 20.0000 30.0000 40.0000 50.0000 60.0000 70.0000 80.0000 90.0000
+DEAL:mpi::Symmetric tensor: 10.0000 20.0000 20.0000 30.0000

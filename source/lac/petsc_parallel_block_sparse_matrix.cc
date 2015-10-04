@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,37 +71,37 @@ namespace PETScWrappers
     BlockSparseMatrix::
     reinit(const std::vector<IndexSet> &rows,
            const std::vector<IndexSet> &cols,
-           const BlockCompressedSimpleSparsityPattern &bcsp,
+           const BlockDynamicSparsityPattern &bdsp,
            const MPI_Comm &com)
     {
-      Assert(rows.size() == bcsp.n_block_rows(), ExcMessage("invalid size"));
-      Assert(cols.size() == bcsp.n_block_cols(), ExcMessage("invalid size"));
+      Assert(rows.size() == bdsp.n_block_rows(), ExcMessage("invalid size"));
+      Assert(cols.size() == bdsp.n_block_cols(), ExcMessage("invalid size"));
 
 
       clear();
-      this->sub_objects.reinit (bcsp.n_block_rows(),
-                                bcsp.n_block_cols());
+      this->sub_objects.reinit (bdsp.n_block_rows(),
+                                bdsp.n_block_cols());
 
       std::vector<types::global_dof_index> row_sizes;
-      for (unsigned int r=0; r<bcsp.n_block_rows(); ++r)
-        row_sizes.push_back( bcsp.block(r,0).n_rows() );
+      for (unsigned int r=0; r<bdsp.n_block_rows(); ++r)
+        row_sizes.push_back( bdsp.block(r,0).n_rows() );
       this->row_block_indices.reinit (row_sizes);
 
       std::vector<types::global_dof_index> col_sizes;
-      for (unsigned int c=0; c<bcsp.n_block_cols(); ++c)
-        col_sizes.push_back( bcsp.block(0,c).n_cols() );
+      for (unsigned int c=0; c<bdsp.n_block_cols(); ++c)
+        col_sizes.push_back( bdsp.block(0,c).n_cols() );
       this->column_block_indices.reinit (col_sizes);
 
       for (unsigned int r=0; r<this->n_block_rows(); ++r)
         for (unsigned int c=0; c<this->n_block_cols(); ++c)
           {
-            Assert(rows[r].size() == bcsp.block(r,c).n_rows(), ExcMessage("invalid size"));
-            Assert(cols[c].size() == bcsp.block(r,c).n_cols(), ExcMessage("invalid size"));
+            Assert(rows[r].size() == bdsp.block(r,c).n_rows(), ExcMessage("invalid size"));
+            Assert(cols[c].size() == bdsp.block(r,c).n_cols(), ExcMessage("invalid size"));
 
             BlockType *p = new BlockType();
             p->reinit(rows[r],
                       cols[c],
-                      bcsp.block(r,c),
+                      bdsp.block(r,c),
                       com);
             this->sub_objects[r][c] = p;
           }
@@ -112,10 +112,10 @@ namespace PETScWrappers
     void
     BlockSparseMatrix::
     reinit(const std::vector<IndexSet> &sizes,
-           const BlockCompressedSimpleSparsityPattern &bcsp,
+           const BlockDynamicSparsityPattern &bdsp,
            const MPI_Comm &com)
     {
-      reinit(sizes, sizes, bcsp, com);
+      reinit(sizes, sizes, bdsp, com);
     }
 
 

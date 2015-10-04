@@ -269,24 +269,28 @@ void Step4<dim>::solve ()
   deallog.push("MueLu_Q");
   {
     solution = 0;
-    SolverControl           solver_control (1000, 1e-12);
+    SolverControl           solver_control (1000, 1e-8);
     SolverCG<>              solver (solver_control);
     TrilinosWrappers::PreconditionAMGMueLu preconditioner;
     preconditioner.initialize(system_matrix);
-    solver.solve (system_matrix, solution, system_rhs,
-                  preconditioner);
+    check_solver_within_range(
+      solver.solve (system_matrix, solution, system_rhs,
+                    preconditioner),
+      solver_control.last_step(), 31, 34);
   }
   deallog.pop();
 
   deallog.push("MueLu_Q_iso_Q1");
   {
     solution = 0;
-    SolverControl           solver_control (1000, 1e-12);
+    SolverControl           solver_control (1000, 1e-8);
     SolverCG<>              solver (solver_control);
     TrilinosWrappers::PreconditionAMGMueLu preconditioner;
     preconditioner.initialize(preconditioner_matrix);
-    solver.solve (system_matrix, solution, system_rhs,
-                  preconditioner);
+    check_solver_within_range(
+      solver.solve (system_matrix, solution, system_rhs,
+                    preconditioner),
+      solver_control.last_step(), 24, 40);
   }
   deallog.pop();
   deallog << std::endl;
@@ -320,7 +324,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   try
     {

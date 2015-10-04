@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_control_h
-#define __deal2__solver_control_h
+#ifndef dealii__solver_control_h
+#define dealii__solver_control_h
 
 
 #include <deal.II/base/config.h>
@@ -392,8 +392,8 @@ protected:
  * This is useful in cases where you don't want to solve exactly, but rather
  * want to gain two digits or if the maximal number of iterations is achieved.
  * For example: The maximal number of iterations is 20, the reduction factor
- * is 1% und the tolerance is 0.1%. The initial residual is 2.5. The process
- * will break if 20 iteration are comleted or the new residual is less then
+ * is 1% and the tolerance is 0.1%. The initial residual is 2.5. The process
+ * will break if 20 iteration are completed or the new residual is less then
  * 2.5*1% or if it is less then 0.1%.
  *
  * @author Guido Kanschat

@@ -77,10 +77,10 @@ void test ()
 
               deallog << "    " << c << " [" << q << "] [" << pp << ']'
                       << std::endl;
-              Assert ((p-pp).norm_square() < 1e-15*1e-15, ExcInternalError());
-              Assert (GeometryInfo<dim>::is_inside_unit_cell (p) ==
-                      GeometryInfo<dim>::is_inside_unit_cell (pp),
-                      ExcInternalError());
+              AssertThrow ((p-pp).norm_square() < 1e-15*1e-15, ExcInternalError());
+              AssertThrow (GeometryInfo<dim>::is_inside_unit_cell (p) ==
+                           GeometryInfo<dim>::is_inside_unit_cell (pp),
+                           ExcInternalError());
             }
         }
     }

@@ -43,7 +43,7 @@ void test (TrilinosWrappers::Vector &v,
     w(i) = v(i);
 
   // check that they're equal
-  Assert (v==w, ExcInternalError());
+  AssertThrow (v==w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -57,7 +57,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

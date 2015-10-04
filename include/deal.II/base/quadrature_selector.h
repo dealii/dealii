@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__quadrature_selector_h
-#define __deal2__quadrature_selector_h
+#ifndef dealii__quadrature_selector_h
+#define dealii__quadrature_selector_h
 
 
 #include <deal.II/base/quadrature.h>
@@ -42,8 +42,8 @@ class QuadratureSelector : public Quadrature<dim>
 public:
   /**
    * Constructor. Takes the name of the quadrature rule (one of "gauss",
-   * "milne", "weddle", etc) and, if it iss "gauss", the order of the
-   * quadrature rule as argument.
+   * "milne", "weddle", etc) and, if it is "gauss", the number of quadrature
+   * points in each coordinate direction.
    */
   QuadratureSelector (const std::string &s,
                       const unsigned int order=0);
@@ -66,8 +66,11 @@ public:
    */
   DeclException1 (ExcInvalidQGaussOrder,
                   int,
-                  << "You tried to generate QGauss with an invalid order of "
-                  << arg1 << " (must be >= 2)");
+                  << "You tried to generate a QGauss object with an invalid "
+                  << "number " << arg1
+                  << " of quadrature points in each coordinate "
+                  << "direction. This number must be greater than or equal "
+                  << "to 1.");
   /**
    * Exception
    */
@@ -75,15 +78,15 @@ public:
                   std::string,
                   unsigned int,
                   << "You tried to generate a " << arg1
-                  << " object; no order is needed (" << arg2
-                  << " was given as parameter)");
+                  << " object; no order is needed for objects of this kind, but "
+                  << arg2 << " was given as argument.");
   /**
    * Exception
    */
   DeclException1 (ExcInvalidQuadrature,
                   std::string,
                   << arg1
-                  << " is not a valid quadrature name for a quadrature rule");
+                  << " is not a valid name for a quadrature rule.");
   //@}
 private:
   /**

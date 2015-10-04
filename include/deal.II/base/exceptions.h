@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__exceptions_h
-#define __deal2__exceptions_h
+#ifndef dealii__exceptions_h
+#define dealii__exceptions_h
 
 #include <deal.II/base/config.h>
 
@@ -286,6 +286,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
+ * @note Active in DEBUG mode only
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
@@ -314,6 +315,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
+ * @note Active in DEBUG mode only
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
@@ -340,7 +342,7 @@ namespace deal_II_exceptions
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
- * @ref ExceptionBase
+ * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
@@ -377,10 +379,10 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase that can take
- * one runtime argument, but if none is given in the place where you
- * want to throw the exception, it simply reverts to the default text
- * provided when declaring the exception class through this macro.
+ * Declare an exception class derived from ExceptionBase that can take one
+ * runtime argument, but if none is given in the place where you want to throw
+ * the exception, it simply reverts to the default text provided when
+ * declaring the exception class through this macro.
  *
  * @ingroup Exceptions
  */
@@ -521,10 +523,10 @@ namespace deal_II_exceptions
   static dealii::ExceptionBase& Exception0 ()
 
 /**
- * Declare an exception class derived from ExceptionBase that can take
- * one runtime argument, but if none is given in the place where you
- * want to throw the exception, it simply reverts to the default text
- * provided when declaring the exception class through this macro.
+ * Declare an exception class derived from ExceptionBase that can take one
+ * runtime argument, but if none is given in the place where you want to throw
+ * the exception, it simply reverts to the default text provided when
+ * declaring the exception class through this macro.
  *
  * @ingroup Exceptions
  */
@@ -615,8 +617,8 @@ namespace StandardExceptions
    * of arithmetic operations that do not result from a division by zero (use
    * ExcDivideByZero for those).
    *
-   * The exception uses std::complex as its argument to ensure that we can
-   * use it for all scalar arguments (real or complex-valued).
+   * The exception uses std::complex as its argument to ensure that we can use
+   * it for all scalar arguments (real or complex-valued).
    */
   DeclException1 (ExcNumberNotFinite,
                   std::complex<double>,
@@ -768,7 +770,41 @@ namespace StandardExceptions
    * be used anyway, even though the respective function may only be called if
    * a derived class is used.
    */
-  DeclException0 (ExcPureFunctionCalled);
+  DeclExceptionMsg (ExcPureFunctionCalled,
+                    "You (or a place in the library) are trying to call a "
+                    "function that is declared as a virtual function in a "
+                    "base class but that has not been overridden in your "
+                    "derived class."
+                    "\n\n"
+                    "This exception happens in cases where the base class "
+                    "cannot provide a useful default implementation for "
+                    "the virtual function, but where we also do not want "
+                    "to mark the function as abstract (i.e., with '=0' at the end) "
+                    "because the function is not essential to the class in many "
+                    "contexts. In cases like this, the base class provides "
+                    "a dummy implementation that makes the compiler happy, but "
+                    "that then throws the current exception."
+                    "\n\n"
+                    "A concrete example would be the 'Function' class. It declares "
+                    "the existence of 'value()' and 'gradient()' member functions, "
+                    "and both are marked as 'virtual'. Derived classes have to "
+                    "override these functions for the values and gradients of a "
+                    "particular function. On the other hand, not every function "
+                    "has a gradient, and even for those that do, not every program "
+                    "actually needs to evaluate it. Consequently, there is no "
+                    "*requirement* that a derived class actually override the "
+                    "'gradient()' function (as there would be had it been marked "
+                    "as abstract). But, since the base class cannot know how to "
+                    "compute the gradient, if a derived class does not override "
+                    "the 'gradient()' function and it is called anyway, then the "
+                    "default implementation in the base class will simply throw "
+                    "an exception."
+                    "\n\n"
+                    "The exception you see is what happens in cases such as the "
+                    "one just illustrated. To fix the problem, you need to "
+                    "investigate whether the function being called should indeed have "
+                    "been called; if the answer is 'yes', then you need to "
+                    "implement the missing override in your class.");
 
   /**
    * Used for constructors that are disabled. Examples are copy constructors
@@ -839,11 +875,11 @@ namespace StandardExceptions
                   << " nor to " << arg3);
 
   /**
-   * This exception is one of the most often used ones, and indicates that an
-   * index is not within the expected range. For example, you might try to
-   * access an element of a vector which does not exist.
+   * This exception indicates that an index is not within the expected range.
+   * For example, it may be that you are trying to access an element of a
+   * vector which does not exist.
    *
-   * The constructor takes three <tt>int</tt>, namely
+   * The constructor takes three <tt>int</tt> arguments, namely
    * <ol>
    * <li> the violating index
    * <li> the lower bound
@@ -852,35 +888,60 @@ namespace StandardExceptions
    */
   DeclException3 (ExcIndexRange,
                   int, int, int,
-                  << "Index " << arg1 << " is not in [" << arg2 << ","
-                  << arg3 << "[");
+                  << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+                  << arg3 << ")."
+                  << (arg2==arg3 ?
+                      " In the current case, this half-open range is in fact empty, "
+                      "suggesting that you are accessing an element of an empty "
+                      "collection such as a vector that has not been set to the "
+                      "correct size."
+                      :
+                      ""));
 
   /**
-   * This generic exception will allow(enforce) the user to specify the type
-   * of indices which adds type safety to the program.
+   * This exception indicates that an index is not within the expected range.
+   * For example, it may be that you are trying to access an element of a
+   * vector which does not exist.
+   *
+   * The constructor takes three <tt>int</tt> arguments, namely
+   * <ol>
+   * <li> the violating index
+   * <li> the lower bound
+   * <li> the upper bound plus one
+   * </ol>
+   *
+   * This generic exception differs from ExcIndexRange by allowing to specify
+   * the type of indices.
    */
-  template<typename T>
+  template <typename T>
   DeclException3 (ExcIndexRangeType,
                   T,T,T,
-                  << "Index " << arg1 << " is not in [" << arg2 << ","
-                  << arg3 << "[");
+                  << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+                  << arg3 << ")."
+                  << (arg2==arg3 ?
+                      " In the current case, this half-open range is in fact empty, "
+                      "suggesting that you are accessing an element of an empty "
+                      "collection such as a vector that has not been set to the "
+                      "correct size."
+                      :
+                      ""));
 
   /**
    * A number is too small.
    */
   DeclException2 (ExcLowerRange,
                   int, int,
-                  << "Number " << arg1 << " must be larger or equal "
-                  << arg2);
+                  << "Number " << arg1 << " must be larger than or equal "
+                  << arg2 << ").");
 
   /**
    * A generic exception definition for the ExcLowerRange above.
    */
-  template<typename T>
+  template <typename T>
   DeclException2 (ExcLowerRangeType,
                   T, T,
-                  << "Number " << arg1 << " must be larger or equal "
-                  << arg2);
+                  << "Number " << arg1 << " must be larger than or equal "
+                  << arg2 << ".");
 
   /**
    * This exception indicates that the first argument should be an integer
@@ -939,11 +1000,15 @@ namespace StandardExceptions
                     "You are trying an operation on a vector that is only "
                     "allowed if the vector has no ghost elements, but the "
                     "vector you are operating on does have ghost elements. "
+                    "Specifically, vectors with ghost elements are read-only "
+                    "and cannot appear in operations that write into these "
+                    "vectors."
+                    "\n\n"
                     "See the glossary entry on 'Ghosted vectors' for more "
                     "information.");
 
   /**
-   * Some of our numerical classes allow for setting alll entries to zero
+   * Some of our numerical classes allow for setting all entries to zero
    * using the assignment operator <tt>=</tt>.
    *
    * In many cases, this assignment operator makes sense <b>only</b> for the
@@ -1020,11 +1085,10 @@ namespace StandardExceptions
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
 /**
- * An assertion that checks whether a number is finite or not.
- * We explicitly cast the number to std::complex to match
- * the signature of the exception (see there for an explanation
- * of why we use std::complex at all) and to satisfy the
- * fact that std::complex has no implicit conversions.
+ * An assertion that checks whether a number is finite or not. We explicitly
+ * cast the number to std::complex to match the signature of the exception
+ * (see there for an explanation of why we use std::complex at all) and to
+ * satisfy the fact that std::complex has no implicit conversions.
  *
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 2015

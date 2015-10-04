@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -595,7 +595,7 @@ namespace Patterns
     Assert (separator.size() > 0,
             ExcMessage ("The separator must have a non-zero length."));
     Assert (separator != ":",
-            ExcMessage ("The separator can not be a colon ':' sicne that "
+            ExcMessage ("The separator can not be a colon ':' since that "
                         "is the separator between the two elements of <key:value> pairs"));
   }
 
@@ -1271,12 +1271,29 @@ ParameterHandler::demangle (const std::string &s)
 
 
 
-bool
-ParameterHandler::is_parameter_node (const boost::property_tree::ptree &p)
+namespace
 {
-  return static_cast<bool>(p.get_optional<std::string>("value"));
-}
+  /**
+   * Return whether a given node is a parameter node (as opposed
+   * to being a subsection or alias node)
+   */
+  bool
+  is_parameter_node (const boost::property_tree::ptree &p)
+  {
+    return static_cast<bool>(p.get_optional<std::string>("value"));
+  }
 
+
+  /**
+   * Return whether a given node is a alias node (as opposed
+   * to being a subsection or parameter node)
+   */
+  bool
+  is_alias_node (const boost::property_tree::ptree &p)
+  {
+    return static_cast<bool>(p.get_optional<std::string>("alias"));
+  }
+}
 
 
 std::string
@@ -1365,10 +1382,19 @@ bool ParameterHandler::read_input (const std::string &filename,
   try
     {
       std::string openname = search.find(filename);
-      std::ifstream input (openname.c_str());
-      AssertThrow(input, ExcIO());
+      std::ifstream file (openname.c_str());
+      AssertThrow(file, ExcIO());
 
-      return read_input (input, filename);
+      std::string str;
+      std::string file_contents;
+
+      while (std::getline(file, str))
+        {
+          file_contents += str;
+          file_contents.push_back('\n');
+        }
+
+      return ParameterHandler::read_input_from_string (file_contents.c_str());
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1392,7 +1418,40 @@ bool ParameterHandler::read_input_from_string (const char *s)
 {
   // create an istringstream representation and pass it off
   // to the other functions doing this work
-  std::istringstream in (s);
+
+  // concatenate the lines ending with "\"
+
+  std::istringstream file(s);
+  std::string str;
+  std::string file_contents;
+  bool is_concatenated(false);
+  while (std::getline(file, str))
+    {
+      // if this str must be concatenated with the previous one
+      // we strip the whitespaces
+      if (is_concatenated)
+        {
+          const std::size_t str_begin = str.find_first_not_of(" \t");
+          if (str_begin == std::string::npos)
+            str = ""; // no content
+          else
+            str.erase(0,str_begin); // trim whitespaces from left
+        }
+
+      if ((std::find(str.begin(),str.end(),'\\') != str.end()) && str.find_last_of('\\') == str.length()-1)
+        {
+          str.erase(str.length()-1); // remove '\'
+          file_contents += str;
+          is_concatenated = true; // next line must be concatenated = true
+        }
+      else
+        {
+          is_concatenated = false; // next line must be concatenated = false
+          file_contents += str;
+          file_contents.push_back('\n');
+        }
+    }
+  std::istringstream in (file_contents);
   return read_input (in, "input string");
 }
 
@@ -1485,6 +1544,13 @@ namespace
                           << std::endl;
                 return false;
               }
+          }
+        else if (p->second.get_optional<std::string>("alias"))
+          {
+            // it is an alias node. alias nodes are static and
+            // there is nothing to do here (but the same applies as
+            // mentioned in the comment above about the static
+            // nodes inside parameter nodes
           }
         else
           {
@@ -1610,6 +1676,65 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
 
 
+void
+ParameterHandler::declare_alias(const std::string &existing_entry_name,
+                                const std::string &alias_name,
+                                const bool         alias_is_deprecated)
+{
+  // see if there is anything to refer to already
+  Assert (entries->get_optional<std::string>(get_current_full_path(existing_entry_name)),
+          ExcMessage ("You are trying to declare an alias entry <"
+                      + alias_name +
+                      "> that references an entry <"
+                      + existing_entry_name +
+                      ">, but the latter does not exist."));
+  // then also make sure that what is being referred to is in
+  // fact a parameter (not an alias or subsection)
+  Assert (entries->get_optional<std::string>(get_current_full_path(existing_entry_name) + path_separator + "value"),
+          ExcMessage ("You are trying to declare an alias entry <"
+                      + alias_name +
+                      "> that references an entry <"
+                      + existing_entry_name +
+                      ">, but the latter does not seem to be a "
+                      "parameter declaration."));
+
+
+  // now also make sure that if the alias has already been
+  // declared, that it is also an alias and refers to the same
+  // entry
+  if (entries->get_optional<std::string>(get_current_full_path(alias_name)))
+    {
+      Assert (entries->get_optional<std::string> (get_current_full_path(alias_name) + path_separator + "alias"),
+              ExcMessage ("You are trying to declare an alias entry <"
+                          + alias_name +
+                          "> but a non-alias entry already exists in this "
+                          "subsection (i.e., there is either a preexisting "
+                          "further subsection, or a parameter entry, with "
+                          "the same name as the alias)."));
+      Assert (entries->get<std::string> (get_current_full_path(alias_name) + path_separator + "alias")
+              ==
+              existing_entry_name,
+              ExcMessage ("You are trying to declare an alias entry <"
+                          + alias_name +
+                          "> but an alias entry already exists in this "
+                          "subsection and this existing alias references a "
+                          "different parameter entry. Specifically, "
+                          "you are trying to reference the entry <"
+                          + existing_entry_name +
+                          "> whereas the existing alias references "
+                          "the entry <"
+                          + entries->get<std::string> (get_current_full_path(alias_name) + path_separator + "alias") +
+                          ">."));
+    }
+
+  entries->put (get_current_full_path(alias_name) + path_separator + "alias",
+                existing_entry_name);
+  entries->put (get_current_full_path(alias_name) + path_separator + "deprecation_status",
+                (alias_is_deprecated ? "true" : "false"));
+}
+
+
+
 void ParameterHandler::enter_subsection (const std::string &subsection)
 {
   const std::string current_path = get_current_path ();
@@ -1656,47 +1781,55 @@ ParameterHandler::get (const std::string &entry_string) const
 
 long int ParameterHandler::get_integer (const std::string &entry_string) const
 {
-  std::string s = get (entry_string);
-  char *endptr;
-  const long int i = std::strtol (s.c_str(), &endptr, 10);
-
-  // assert that there was no error. an error would be if
-  // either there was no string to begin with, or if
-  // strtol set the endptr to anything but the end of
-  // the string
-  AssertThrow ((s.size()>0) && (*endptr == '\0'),
-               ExcConversionError(s));
-
-  return i;
+  try
+    {
+      return Utilities::string_to_int (get (entry_string));
+    }
+  catch (...)
+    {
+      AssertThrow (false,
+                   ExcMessage("Can't convert the parameter value <"
+                              + get(entry_string) +
+                              "> for entry <"
+                              + entry_string +
+                              " to an integer."));
+      return 0;
+    }
 }
 
 
 
 double ParameterHandler::get_double (const std::string &entry_string) const
 {
-  std::string s = get (entry_string);
-  char *endptr;
-  double d = std::strtod (s.c_str(), &endptr);
-
-  // assert that there was no error. an error would be if
-  // either there was no string to begin with, or if
-  // strtol set the endptr to anything but the end of
-  // the string
-  AssertThrow ((s.size()>0) && (*endptr == '\0'),
-               ExcConversionError(s));
-
-  return d;
+  try
+    {
+      return Utilities::string_to_double (get (entry_string));
+    }
+  catch (...)
+    {
+      AssertThrow (false,
+                   ExcMessage("Can't convert the parameter value <"
+                              + get(entry_string) +
+                              "> for entry <"
+                              + entry_string +
+                              " to a double precision variable."));
+      return 0;
+    }
 }
 
 
 
 bool ParameterHandler::get_bool (const std::string &entry_string) const
 {
-  std::string s = get(entry_string);
+  const std::string s = get(entry_string);
 
   AssertThrow ((s=="true") || (s=="false") ||
                (s=="yes") || (s=="no"),
-               ExcConversionError(s));
+               ExcMessage("Can't convert the parameter value <"
+                          + get(entry_string) +
+                          "> for entry <"
+                          + entry_string +
+                          " to a boolean."));
   if (s=="true" || s=="yes")
     return true;
   else
@@ -1709,21 +1842,24 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const std::string &new_value)
 {
-  // assert that the entry is indeed
-  // declared
-  if (entries->get_optional<std::string>
-      (get_current_full_path(entry_string) + path_separator + "value"))
+  // resolve aliases before looking up the correct entry
+  std::string path = get_current_full_path(entry_string);
+  if (entries->get_optional<std::string>(path + path_separator + "alias"))
+    path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
+
+  // assert that the entry is indeed declared
+  if (entries->get_optional<std::string>(path + path_separator + "value"))
     {
       const unsigned int pattern_index
-        = entries->get<unsigned int> (get_current_full_path(entry_string) + path_separator + "pattern");
+        = entries->get<unsigned int> (path + path_separator + "pattern");
       AssertThrow (patterns[pattern_index]->match(new_value),
                    ExcValueDoesNotMatchPattern (new_value,
                                                 entries->get<std::string>
-                                                (get_current_full_path(entry_string) +
+                                                (path +
                                                  path_separator +
                                                  "pattern_description")));
 
-      entries->put (get_current_full_path(entry_string) + path_separator + "value",
+      entries->put (path + path_separator + "value",
                     new_value);
     }
   else
@@ -2059,7 +2195,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
-        if (is_parameter_node (p->second) == true)
+        if ((is_parameter_node (p->second) == true)
+            ||
+            (is_alias_node (p->second) == true))
           {
             parameters_exist_here = true;
             break;
@@ -2117,6 +2255,39 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 // also output possible values
                 out << "{\\it Possible values:} "
                     << p->second.get<std::string> ("pattern_description")
+                    << std::endl;
+              }
+            else if (is_alias_node (p->second) == true)
+              {
+                const std::string alias = p->second.get<std::string>("alias");
+
+                // print name
+                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                    << "\\phantomsection\\label{parameters:";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "/";
+                out << demangle(p->first);
+                out << "}\n\n"
+                    << std::endl;
+
+                out << "\\index[prmindex]{"
+                    << demangle(p->first)
+                    << "}\n";
+                out << "\\index[prmindexfull]{";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "!";
+                out << demangle(p->first)
+                    << "}\n";
+
+                // finally print alias and indicate if it is deprecated
+                out << "This parameter is an alias for the parameter ``\\texttt{"
+                    << alias << "}''."
+                    << (p->second.get<std::string>("deprecation_status") == "true"
+                        ?
+                        " Its use is deprecated."
+                        :
+                        "")
+                    << "\n\n"
                     << std::endl;
               }
           out << "\\end{itemize}" << std::endl;
@@ -2211,7 +2382,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
            p != current_section.end(); ++p)
         if (is_parameter_node (p->second) == true)
           ++n_parameters;
-        else
+        else if (is_alias_node (p->second) == false)
           ++n_sections;
 
       if ((style != Description)
@@ -2228,7 +2399,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
-        if (is_parameter_node (p->second) == false)
+        if ((is_parameter_node (p->second) == false)
+            &&
+            (is_alias_node (p->second) == false))
           {
             // first print the subsection header
             switch (style)
@@ -2391,24 +2564,17 @@ ParameterHandler::scan_line (std::string         line,
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
     line.erase (line.find("#"), std::string::npos);
-  // replace every whitespace sequence
-  // by " "
+
+  // replace \t by space:
   while (line.find('\t') != std::string::npos)
     line.replace (line.find('\t'), 1, " ");
-  while (line.find("  ") != std::string::npos)
-    line.erase (line.find("  "), 1);
-  // now every existing whitespace
-  // should be exactly one ' ';
-  // if at beginning: delete
-  if ((line.length() != 0) && (std::isspace (line[0])))
-    line.erase (0, 1);
+
+  //trim start and end:
+  line = Utilities::trim(line);
+
   // if line is now empty: leave
   if (line.length() == 0)
     return true;
-
-  // also delete spaces at the end
-  if (std::isspace (line[line.length()-1]))
-    line.erase (line.size()-1, 1);
 
   // enter subsection
   if ((line.find ("SUBSECTION ") == 0) ||
@@ -2417,7 +2583,7 @@ ParameterHandler::scan_line (std::string         line,
       // delete this prefix
       line.erase (0, std::string("subsection").length()+1);
 
-      const std::string subsection = line;
+      const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
@@ -2443,6 +2609,18 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("END") == 0) ||
       (line.find ("end") == 0))
     {
+      line.erase (0, 3);
+      while ((line.size() > 0) && (std::isspace(line[0])))
+        line.erase (0, 1);
+
+      if (line.size()>0)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: invalid content after 'end'!" << std::endl;
+          return false;
+        }
+
       if (subsection_path.size() == 0)
         {
           std::cerr << "Line <" << lineno
@@ -2462,23 +2640,42 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("SET ") == 0) ||
       (line.find ("set ") == 0))
     {
-      // erase "set" statement and eliminate
-      // spaces around the '='
+      // erase "set" statement
       line.erase (0, 4);
-      if (line.find(" =") != std::string::npos)
-        line.replace (line.find(" ="), 2, "=");
-      if (line.find("= ") != std::string::npos)
-        line.replace (line.find("= "), 2, "=");
 
-      // extract entry name and value
-      std::string entry_name  (line, 0, line.find('='));
-      std::string entry_value (line, line.find('=')+1, std::string::npos);
+      std::string::size_type pos = line.find("=");
+      if (pos == std::string::npos)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: invalid format of set expression!" << std::endl;
+          return false;
+        }
 
-      const std::string current_path = get_current_path ();
+      // extract entry name and value and trim
+      std::string entry_name = Utilities::trim(std::string(line, 0, pos));
+      std::string entry_value = Utilities::trim(std::string(line, pos+1, std::string::npos));
 
-      // assert that the entry is indeed
-      // declared
-      if (entries->get_optional<std::string> (get_current_full_path(entry_name) + path_separator + "value"))
+      // resolve aliases before we look up the entry. if necessary, print
+      // a warning that the alias is deprecated
+      std::string path = get_current_full_path(entry_name);
+      if (entries->get_optional<std::string>(path + path_separator + "alias"))
+        {
+          if (entries->get<std::string>(path + path_separator + "deprecation_status") == "true")
+            {
+              std::cerr << "Warning in line <" << lineno
+                        << "> of file <" << input_filename
+                        << ">: You are using the deprecated spelling <"
+                        << entry_name
+                        << "> of the parameter <"
+                        << entries->get<std::string>(path + path_separator + "alias")
+                        << ">." << std::endl;
+            }
+          path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
+        }
+
+      // assert that the entry is indeed declared
+      if (entries->get_optional<std::string> (path + path_separator + "value"))
         {
           // if entry was declared:
           // does it match the regex? if not,
@@ -2489,7 +2686,7 @@ ParameterHandler::scan_line (std::string         line,
           if (entry_value.find ('{') == std::string::npos)
             {
               const unsigned int pattern_index
-                = entries->get<unsigned int> (get_current_full_path(entry_name) + path_separator + "pattern");
+                = entries->get<unsigned int> (path + path_separator + "pattern");
               if (!patterns[pattern_index]->match(entry_value))
                 {
                   std::cerr << "Line <" << lineno
@@ -2506,7 +2703,7 @@ ParameterHandler::scan_line (std::string         line,
                 }
             }
 
-          entries->put (get_current_full_path(entry_name) + path_separator + "value",
+          entries->put (path + path_separator + "value",
                         entry_value);
           return true;
         }
@@ -2530,8 +2727,7 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("INCLUDE ") == 0) ||
       (line.find ("include ") == 0))
     {
-      // erase "set" statement and eliminate
-      // spaces around the '='
+      // erase "include " statement and eliminate spaces
       line.erase (0, 7);
       while ((line.size() > 0) && (line[0] == ' '))
         line.erase (0, 1);

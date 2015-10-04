@@ -1,0 +1,13 @@
+
+DEAL:2d::processor 0: 1 locally owned active cells
+DEAL:2d::processor 1: 84 locally owned active cells
+DEAL:2d::processor 2: 171 locally owned active cells
+DEAL:2d::processor 0: 256.000 weight
+DEAL:2d::processor 1: 84.0000 weight
+DEAL:2d::processor 2: 171.000 weight
+DEAL:3d::processor 0: 1 locally owned active cells
+DEAL:3d::processor 1: 1364 locally owned active cells
+DEAL:3d::processor 2: 2731 locally owned active cells
+DEAL:3d::processor 0: 4096.00 weight
+DEAL:3d::processor 1: 1364.00 weight
+DEAL:3d::processor 2: 2731.00 weight

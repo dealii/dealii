@@ -33,6 +33,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_gmres.h>
@@ -421,8 +422,8 @@ namespace Step43
         PreconditionerMp>         &Mpinv,
         const PreconditionerA                         &Apreconditioner);
 
-      void vmult (TrilinosWrappers::BlockVector       &dst,
-                  const TrilinosWrappers::BlockVector &src) const;
+      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
+                  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> darcy_matrix;
@@ -430,7 +431,7 @@ namespace Step43
             PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
 
-      mutable TrilinosWrappers::Vector tmp;
+      mutable TrilinosWrappers::MPI::Vector tmp;
     };
 
 
@@ -445,14 +446,14 @@ namespace Step43
       darcy_matrix            (&S),
       m_inverse               (&Mpinv),
       a_preconditioner        (Apreconditioner),
-      tmp                     (darcy_matrix->block(1,1).m())
+      tmp                     (complete_index_set(darcy_matrix->block(1,1).m()))
     {}
 
 
     template <class PreconditionerA, class PreconditionerMp>
     void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-      TrilinosWrappers::BlockVector       &dst,
-      const TrilinosWrappers::BlockVector &src) const
+      TrilinosWrappers::MPI::BlockVector       &dst,
+      const TrilinosWrappers::MPI::BlockVector &src) const
     {
       a_preconditioner.vmult (dst.block(0), src.block(0));
       darcy_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
@@ -552,11 +553,11 @@ namespace Step43
     TrilinosWrappers::BlockSparseMatrix  darcy_matrix;
     TrilinosWrappers::BlockSparseMatrix  darcy_preconditioner_matrix;
 
-    TrilinosWrappers::BlockVector        darcy_solution;
-    TrilinosWrappers::BlockVector        darcy_rhs;
+    TrilinosWrappers::MPI::BlockVector   darcy_solution;
+    TrilinosWrappers::MPI::BlockVector   darcy_rhs;
 
-    TrilinosWrappers::BlockVector        last_computed_darcy_solution;
-    TrilinosWrappers::BlockVector        second_last_computed_darcy_solution;
+    TrilinosWrappers::MPI::BlockVector   last_computed_darcy_solution;
+    TrilinosWrappers::MPI::BlockVector   second_last_computed_darcy_solution;
 
 
     const unsigned int                   saturation_degree;
@@ -567,12 +568,12 @@ namespace Step43
     TrilinosWrappers::SparseMatrix       saturation_matrix;
 
 
-    TrilinosWrappers::Vector             saturation_solution;
-    TrilinosWrappers::Vector             old_saturation_solution;
-    TrilinosWrappers::Vector             old_old_saturation_solution;
-    TrilinosWrappers::Vector             saturation_rhs;
+    TrilinosWrappers::MPI::Vector        saturation_solution;
+    TrilinosWrappers::MPI::Vector        old_saturation_solution;
+    TrilinosWrappers::MPI::Vector        old_old_saturation_solution;
+    TrilinosWrappers::MPI::Vector        saturation_rhs;
 
-    TrilinosWrappers::Vector             saturation_matching_last_computed_darcy_solution;
+    TrilinosWrappers::MPI::Vector        saturation_matching_last_computed_darcy_solution;
 
     const double                         saturation_refinement_threshold;
 
@@ -677,13 +678,10 @@ namespace Step43
   // various blocks. This information is then used to create the sparsity
   // pattern for the Darcy and saturation system matrices as well as the
   // preconditioner matrix from which we build the Darcy preconditioner. As in
-  // step-31, we choose to create the pattern not as in the first few tutorial
-  // programs, but by using the blocked version of
-  // CompressedSimpleSparsityPattern. The reason for doing this is mainly
-  // memory, that is, the SparsityPattern class would consume too much memory
-  // when used in three spatial dimensions as we intend to do for this
-  // program. So, for this, we follow the same way as step-31 did and we don't
-  // have to repeat descriptions again for the rest of the member function.
+  // step-31, we choose to create the pattern using the blocked version of
+  // DynamicSparsityPattern. So, for this, we follow the same way as step-31
+  // did and we don't have to repeat descriptions again for the rest of the
+  // member function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::setup_dofs ()
   {
@@ -739,14 +737,14 @@ namespace Step43
     {
       darcy_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -758,10 +756,10 @@ namespace Step43
             coupling[c][d] = DoFTools::none;
 
 
-      DoFTools::make_sparsity_pattern (darcy_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (darcy_dof_handler, coupling, dsp,
                                        darcy_constraints, false);
 
-      darcy_matrix.reinit (csp);
+      darcy_matrix.reinit (dsp);
     }
 
     {
@@ -769,14 +767,14 @@ namespace Step43
       Mp_preconditioner.reset ();
       darcy_preconditioner_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
       for (unsigned int c=0; c<dim+1; ++c)
@@ -786,52 +784,49 @@ namespace Step43
           else
             coupling[c][d] = DoFTools::none;
 
-      DoFTools::make_sparsity_pattern (darcy_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (darcy_dof_handler, coupling, dsp,
                                        darcy_constraints, false);
 
-      darcy_preconditioner_matrix.reinit (csp);
+      darcy_preconditioner_matrix.reinit (dsp);
     }
 
 
     {
       saturation_matrix.clear ();
 
-      CompressedSimpleSparsityPattern csp (n_s, n_s);
+      DynamicSparsityPattern dsp (n_s, n_s);
 
-      DoFTools::make_sparsity_pattern (saturation_dof_handler, csp,
+      DoFTools::make_sparsity_pattern (saturation_dof_handler, dsp,
                                        saturation_constraints, false);
 
 
-      saturation_matrix.reinit (csp);
+      saturation_matrix.reinit (dsp);
     }
 
-    darcy_solution.reinit (2);
-    darcy_solution.block(0).reinit (n_u);
-    darcy_solution.block(1).reinit (n_p);
+    std::vector<IndexSet> darcy_partitioning(2);
+    darcy_partitioning[0] = complete_index_set (n_u);
+    darcy_partitioning[1] = complete_index_set (n_p);
+    darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     darcy_solution.collect_sizes ();
 
-    last_computed_darcy_solution.reinit (2);
-    last_computed_darcy_solution.block(0).reinit (n_u);
-    last_computed_darcy_solution.block(1).reinit (n_p);
+    last_computed_darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     last_computed_darcy_solution.collect_sizes ();
 
-    second_last_computed_darcy_solution.reinit (2);
-    second_last_computed_darcy_solution.block(0).reinit (n_u);
-    second_last_computed_darcy_solution.block(1).reinit (n_p);
+    second_last_computed_darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     second_last_computed_darcy_solution.collect_sizes ();
 
-    darcy_rhs.reinit (2);
-    darcy_rhs.block(0).reinit (n_u);
-    darcy_rhs.block(1).reinit (n_p);
+    darcy_rhs.reinit (darcy_partitioning, MPI_COMM_WORLD);
     darcy_rhs.collect_sizes ();
 
-    saturation_solution.reinit (n_s);
-    old_saturation_solution.reinit (n_s);
-    old_old_saturation_solution.reinit (n_s);
+    IndexSet saturation_partitioning = complete_index_set(n_s);
+    saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
+    old_saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
+    old_old_saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
 
-    saturation_matching_last_computed_darcy_solution.reinit (n_s);
+    saturation_matching_last_computed_darcy_solution.reinit (saturation_partitioning,
+                                                             MPI_COMM_WORLD);
 
-    saturation_rhs.reinit (n_s);
+    saturation_rhs.reinit (saturation_partitioning, MPI_COMM_WORLD);
   }
 
 
@@ -1539,9 +1534,9 @@ namespace Step43
           SolverControl solver_control (darcy_matrix.m(),
                                         1e-16*darcy_rhs.l2_norm());
 
-          SolverGMRES<TrilinosWrappers::BlockVector>
+          SolverGMRES<TrilinosWrappers::MPI::BlockVector>
           gmres (solver_control,
-                 SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+                 SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
           for (unsigned int i=0; i<darcy_solution.size(); ++i)
             if (darcy_constraints.is_constrained(i))
@@ -1634,7 +1629,7 @@ namespace Step43
 
       SolverControl solver_control (saturation_matrix.m(),
                                     1e-16*saturation_rhs.l2_norm());
-      SolverCG<TrilinosWrappers::Vector> cg (solver_control);
+      SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
 
       TrilinosWrappers::PreconditionIC preconditioner;
       preconditioner.initialize (saturation_matrix);
@@ -1676,7 +1671,7 @@ namespace Step43
       FEValues<dim> fe_values (saturation_fe, quadrature_formula, update_gradients);
       std::vector<Tensor<1,dim> > grad_saturation (1);
 
-      TrilinosWrappers::Vector extrapolated_saturation_solution (saturation_solution);
+      TrilinosWrappers::MPI::Vector extrapolated_saturation_solution (saturation_solution);
       if (timestep_number != 0)
         extrapolated_saturation_solution.sadd ((1. + time_step/old_time_step),
                                                time_step/old_time_step, old_saturation_solution);
@@ -1716,18 +1711,18 @@ namespace Step43
     triangulation.prepare_coarsening_and_refinement ();
 
     {
-      std::vector<TrilinosWrappers::Vector> x_saturation (3);
+      std::vector<TrilinosWrappers::MPI::Vector> x_saturation (3);
       x_saturation[0] = saturation_solution;
       x_saturation[1] = old_saturation_solution;
       x_saturation[2] = saturation_matching_last_computed_darcy_solution;
 
-      std::vector<TrilinosWrappers::BlockVector> x_darcy (2);
+      std::vector<TrilinosWrappers::MPI::BlockVector> x_darcy (2);
       x_darcy[0] = last_computed_darcy_solution;
       x_darcy[1] = second_last_computed_darcy_solution;
 
-      SolutionTransfer<dim,TrilinosWrappers::Vector> saturation_soltrans(saturation_dof_handler);
+      SolutionTransfer<dim,TrilinosWrappers::MPI::Vector> saturation_soltrans(saturation_dof_handler);
 
-      SolutionTransfer<dim,TrilinosWrappers::BlockVector> darcy_soltrans(darcy_dof_handler);
+      SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector> darcy_soltrans(darcy_dof_handler);
 
 
       triangulation.prepare_coarsening_and_refinement();
@@ -1738,7 +1733,7 @@ namespace Step43
       triangulation.execute_coarsening_and_refinement ();
       setup_dofs ();
 
-      std::vector<TrilinosWrappers::Vector> tmp_saturation (3);
+      std::vector<TrilinosWrappers::MPI::Vector> tmp_saturation (3);
       tmp_saturation[0].reinit (saturation_solution);
       tmp_saturation[1].reinit (saturation_solution);
       tmp_saturation[2].reinit (saturation_solution);
@@ -1748,7 +1743,7 @@ namespace Step43
       old_saturation_solution = tmp_saturation[1];
       saturation_matching_last_computed_darcy_solution = tmp_saturation[2];
 
-      std::vector<TrilinosWrappers::BlockVector> tmp_darcy (2);
+      std::vector<TrilinosWrappers::MPI::BlockVector> tmp_darcy (2);
       tmp_darcy[0].reinit (darcy_solution);
       tmp_darcy[1].reinit (darcy_solution);
       darcy_soltrans.interpolate(x_darcy, tmp_darcy);
@@ -2255,6 +2250,10 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use ./step-43"));
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();

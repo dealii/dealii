@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,17 +32,10 @@
 
 #include <fstream>
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 template<int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-		    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                  void *data)
+                    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                    void *data)
 {
   static int some_number = 0;
   deallog << "packing cell " << cell->id() << " with data=" << some_number << " status=";
@@ -62,8 +55,8 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
     {
       Assert(!cell->has_children(), ExcInternalError());
     }
-  
-  int * intdata = reinterpret_cast<int*>(data);
+
+  int *intdata = reinterpret_cast<int *>(data);
   *intdata = some_number;
 
   ++some_number;
@@ -71,16 +64,16 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
 
 template<int dim>
 void unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-		    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                  const void *data)
+                      const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                      const void *data)
 {
-  const int * intdata = reinterpret_cast<const int*>(data);
+  const int *intdata = reinterpret_cast<const int *>(data);
 
   deallog << "unpacking cell " << cell->id() << " with data=" << (*intdata) << " status=";
   if (status==parallel::distributed::Triangulation<dim,dim>::CELL_PERSIST)
     deallog << "PERSIST";
   else if (status==parallel::distributed::Triangulation<dim,dim>::CELL_REFINE)
-      deallog << "REFINE";
+    deallog << "REFINE";
   else if (status==parallel::distributed::Triangulation<dim,dim>::CELL_COARSEN)
     deallog << "COARSEN";
   deallog << std::endl;
@@ -109,37 +102,37 @@ void test()
       GridGenerator::subdivided_hyper_cube(tr, 2);
       tr.refine_global(1);
       deallog << "cells before: " << tr.n_global_active_cells() << std::endl;
-      
+
       typename Triangulation<dim,dim>::active_cell_iterator cell;
 
       for (cell = tr.begin_active();
            cell != tr.end();
            ++cell)
         {
-	  if (id_to_string(cell->id())=="0_1:0")
-	    {	      
-	      cell->set_refine_flag();
-	    }
-	  else if (id_to_string(cell->parent()->id())=="3_0:")
-	    cell->set_coarsen_flag();
-	  
-	  if (cell->is_locally_owned())
-	    {
-	      deallog << "myid=" << myid << " cellid=" << cell->id();
-	      if (cell->coarsen_flag_set())
-		deallog << " coarsening" << std::endl;
-	      else if (cell->refine_flag_set())
-		deallog << " refining" << std::endl;
-	      else
-		deallog << std::endl;
-	    }
-	}
+          if (cell->id().to_string()=="0_1:0")
+            {
+              cell->set_refine_flag();
+            }
+          else if (cell->parent()->id().to_string()=="3_0:")
+            cell->set_coarsen_flag();
+
+          if (cell->is_locally_owned())
+            {
+              deallog << "myid=" << myid << " cellid=" << cell->id();
+              if (cell->coarsen_flag_set())
+                deallog << " coarsening" << std::endl;
+              else if (cell->refine_flag_set())
+                deallog << " refining" << std::endl;
+              else
+                deallog << std::endl;
+            }
+        }
 
       unsigned int offset = tr.register_data_attach(sizeof(int), pack_function<dim>);
 
       deallog << "offset=" << offset << std::endl;
       tr.execute_coarsening_and_refinement();
-      
+
       deallog << "cells after: " << tr.n_global_active_cells() << std::endl;
 
       /*
@@ -147,12 +140,12 @@ void test()
            cell != tr.end();
            ++cell)
         {
-	  if (cell->is_locally_owned())
-	    deallog << "myid=" << myid << " cellid=" << cell->id() << std::endl;  
-	}*/
+      if (cell->is_locally_owned())
+      deallog << "myid=" << myid << " cellid=" << cell->id() << std::endl;
+      }*/
 
-      tr.notify_ready_to_unpack(offset, unpack_function<dim>);      
-      
+      tr.notify_ready_to_unpack(offset, unpack_function<dim>);
+
       const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "
               << checksum
@@ -165,7 +158,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
 
   test<2>();

@@ -69,13 +69,19 @@
  * @enddot
  *
  * <b>Legend:</b><br />
- * <blockquote>
- * <i>Green:</i> programs that show basic techniques; <br />
- * <i>Orange:</i> advanced techniques; <br />
- * <i>Yellow:</i> applications in fluid dynamics; <br />
- * <i>Light blue:</i> applications in solid mechanics; <br />
- * <i>Dark blue:</i> time dependent problems.
- * </blockquote>
+ * <ul>
+ *
+ * <li><i>Green:</i> programs that show basic techniques;
+ *
+ * <li><i>Orange:</i> advanced techniques;
+ *
+ * <li><i>Yellow:</i> applications in fluid dynamics;
+ *
+ * <li><i>Light blue:</i> applications in solid mechanics;
+ *
+ * <li><i>Dark blue:</i> time dependent problems.
+ *
+ * </ul>
  *
  * <a name="list"></a>
  * <h3>Tutorial programs listed by number</h3>
@@ -162,7 +168,7 @@
  *   <tr valign="top">
  *       <td>step-11</td>
  *       <td> Solving a Laplace problem with
- *       higher order mappings. Using strange constraints and
+ *       higher order mappings. Using mean value constraints and
  *       intermediate representations of sparsity patterns.
  *       </td></tr>
  *

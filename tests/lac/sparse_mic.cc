@@ -90,10 +90,10 @@ int main()
               Assert (false, ExcNotImplemented());
             };
           mic_pattern.compress();
-	  SparseMIC<double>::AdditionalData data;
-	  data.use_this_sparsity = &mic_pattern;
+          SparseMIC<double>::AdditionalData data;
+          data.use_this_sparsity = &mic_pattern;
           SparseMIC<double> mic;
-	  mic.initialize (A, data);
+          mic.initialize (A, data);
 
           // now for three test vectors v
           // determine norm of

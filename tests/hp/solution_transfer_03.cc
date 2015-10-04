@@ -64,7 +64,7 @@ int main()
 
   // Assign FE to cells
   hp::DoFHandler<2>::active_cell_iterator cell;
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();      
+  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
   cell = dof_handler.begin_active();
@@ -99,11 +99,12 @@ int main()
   triangulation.execute_coarsening_and_refinement ();
   // Assign FE_Q_ to all cells
   cell = dof_handler.begin_active();
-  for( ; cell != endc; ++cell){
-    cell->set_active_fe_index(0);          
-  }
+  for ( ; cell != endc; ++cell)
+    {
+      cell->set_active_fe_index(0);
+    }
   dof_handler.distribute_dofs (fe_collection);
-  
+
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
 

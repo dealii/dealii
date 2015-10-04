@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_in_h
-#define __deal2__grid_in_h
+#ifndef dealii__grid_in_h
+#define dealii__grid_in_h
 
 
 #include <deal.II/base/config.h>
@@ -209,27 +209,11 @@ struct SubCellData;
  * plug-in script can be found on the deal.II wiki page,
  * http://code.google.com/p/dealii/wiki/MeshInputAndOutput .
  *
- * There is also a little program <code>bin/mesh_conversion</code> (in the
- * directory where deal.II was installed), written by Jean-Paul Pelteret, that
- * can convert Cubit ABAQUS files into the UCD format that can be read in as
- * discussed above. The program was designed with the intention of exporting
- * geometries with complex boundary condition surfaces and multiple materials
- * from Cubit - information which is currently not easily obtained through
- * Cubit's python interface. Using the the program is simple: to use it, it
- * needs to be built and run with the command
- * @code
- *  /path/to/deal.II/bin/mesh_conversion <spatial_dimension> /path/to/input_file.inp /path/to/output_file.ucd
- * @endcode.
- * More information is available in the readme file included with the program
- * and located in the <code>contrib/mesh_conversion/README.txt</code> file in
- * the deal.II source directory tree. Note that the program's copyright
- * remains with its author and that it is under a separate license than the
- * rest of the library.
- *
- * To build the program, see the <code>doc/readmes.html</code> and
- * <code>doc/development/cmake.html</code> files.
- * </ul>
- *
+ * Alternatively, Cubit can generate ABAQUS files that can be read in via the
+ * read_abaqus() function. This may be a better option for geometries with
+ * complex boundary condition surfaces and multiple materials
+ *  - information which is currently not easily obtained through
+ * Cubit's python interface.
  *
  * <h3>Structure of input grid data. The GridReordering class</h3>
  *
@@ -241,7 +225,7 @@ struct SubCellData;
  *
  * In two dimensions, another difficulty occurs, which has to do with the
  * sense of a quadrilateral. A quad consists of four lines which have a
- * direction, which is per definitionem as follows:
+ * direction, which is by definition as follows:
  * @verbatim
  *   3-->--2
  *   |     |
@@ -277,7 +261,7 @@ struct SubCellData;
  * For this reason, the <tt>read_*</tt> functions of this class that read in
  * grids in various input formats call the GridReordering class to bring the
  * order of vertices that define the cells into an ordering that satisfies the
- * requiremenets of the Triangulation class. Be sure to read the documentation
+ * requirements of the Triangulation class. Be sure to read the documentation
  * of that class if you experience unexpected problems when reading grids
  * through this class.
  *
@@ -302,8 +286,9 @@ struct SubCellData;
  *
  * @ingroup grid
  * @ingroup input
- * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007
+ * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007, Jean-Paul Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
  */
+
 template <int dim, int spacedim=dim>
 class GridIn
 {
@@ -320,6 +305,8 @@ public:
     unv,
     /// Use read_ucd()
     ucd,
+    /// Use read_abaqus()
+    abaqus,
     /// Use read_dbmesh()
     dbmesh,
     /// Use read_xda()
@@ -377,6 +364,46 @@ public:
    * Read grid data from an ucd file. Numerical data is ignored.
    */
   void read_ucd (std::istream &in);
+
+  /**
+   * Read grid data from an Abaqus file. Numerical and constitutive data
+   * is ignored.
+   *
+   * @note The current implementation of this mesh reader is suboptimal,
+   *       and may therefore be slow for large meshes.
+   *
+   * @note Usage tips for Cubit:
+   * - Multiple material-id's can be defined in the mesh.
+   *   This is done by specifying blocksets in the pre-processor.
+   * - Arbitrary surface boundaries can be defined in the mesh.
+   *   This is done by specifying sidesets in the pre-processor.
+   *   In particular, boundaries are not confined to just surfaces (in 3d)
+   *   individual element faces can be added to the sideset as well.
+   *   This is useful when a boundary condition is to be applied on a
+   *   complex shape boundary that is difficult to define using "surfaces"
+   *   alone. Similar can be done in 2d.
+   *
+   * @note Compatibility information for this file format is listed below.
+   * - Files generated in Abaqus CAE 6.12 have been verified to be
+   *   correctly imported, but older (or newer) versions of Abaqus may
+   *   also generate valid input decks.
+   * - Files generated using Cubit 11.x, 12.x and 13.x are valid, but only
+   *   when using a specific set of export steps. These are as follows:
+   *     1. Go to "Analysis setup mode" by clicking on the disc icon in the
+   *        toolbar on the right.
+   *     2. Select "Export Mesh" under "Operation" by clicking on the
+   *        necessary icon in the toolbar on the right.
+   *     3. Select an output file. In Cubit version 11.0 and 12.0 it might be
+   *        necessary to click on the browse button and type it in the
+   *        dialogue that pops up.
+   *     4. Select the dimension to output in.
+   *     5. Tick the overwrite box.
+   *     6. If using Cubit v12.0 onwards, uncheck the box "Export using Cubit
+   *        ID's". An invalid file will encounter errors if this box is left
+   *        checked.
+   *     7. Click apply.
+   */
+  void read_abaqus (std::istream &in);
 
   /**
    * Read grid data from a file containing data in the DB mesh format.
@@ -576,8 +603,6 @@ private:
    */
   Format default_format;
 };
-
-
 
 /* -------------- declaration of explicit specializations ------------- */
 

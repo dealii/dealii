@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ void test_cell(const FEValuesBase<dim> &fev)
         u = 0.;
         u(i) = 1.;
         w = 0.;
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_gradients(u, indices, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(ugrad), true);
         cell_residual(w, fev, make_slice(ugrad));
         M.vmult(v,u);
         w.add(-1., v);
@@ -103,8 +103,8 @@ void test_boundary(const FEValuesBase<dim> &fev)
         u = 0.;
         u(i) = 1.;
         w = 0.;
-        fev.get_function_values(u, indices, uval, true);
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_values(u, indices, VectorSlice<std::vector<std::vector<double> > >(uval), true);
+        fev.get_function_gradients(u, indices, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(ugrad), true);
         nitsche_residual(w, fev, make_slice(uval), make_slice(ugrad), make_slice(null_val), 17);
         M.vmult(v,u);
         w.add(-1., v);
@@ -174,8 +174,8 @@ void test_face(const FEValuesBase<dim> &fev1,
         u1(i1) = 1.;
         w1 = 0.;
         w2 = 0.;
-        fev1.get_function_values(u1, indices1, u1val, true);
-        fev1.get_function_gradients(u1, indices1, u1grad, true);
+        fev1.get_function_values(u1, indices1, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
+        fev1.get_function_gradients(u1, indices1, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(u1grad), true);
         ip_residual(w1, w2, fev1, fev2,
                     make_slice(u1val), make_slice(u1grad),
                     make_slice(nullval), make_slice(nullgrad),
@@ -200,8 +200,8 @@ void test_face(const FEValuesBase<dim> &fev1,
 
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(u1, indices2, u1val, true);
-        fev2.get_function_gradients(u1, indices2, u1grad, true);
+        fev2.get_function_values(u1, indices2, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
+        fev2.get_function_gradients(u1, indices2, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(u1grad), true);
         ip_residual(w1, w2, fev1, fev2,
                     make_slice(nullval), make_slice(nullgrad),
                     make_slice(u1val), make_slice(u1grad),

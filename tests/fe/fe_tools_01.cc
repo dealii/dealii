@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,6 +59,7 @@ main()
   test_fe<2>("FE_Q<2>(2)");
   test_fe<2>("FE_Q<dim>(2)");
   test_fe<2>("FE_DGQ(1)");
+  test_fe<2>("FE_Bernstein(2)");
   test_fe<2>("FE_RaviartThomas(1)");
   test_fe<2>("FE_Q(QGaussLobatto(3))");
   test_fe<2>("FE_Q(QGaussLobatto(4))");

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -328,12 +328,12 @@
  *     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
  *       if (cell->face(f)->at_boundary())
  *         if (cell->face(f)->center()[0] == -1)
- *           cell->face(f)->set_boundary_indicator (42);
+ *           cell->face(f)->set_boundary_id (42);
  * @endcode
- * This calls functions TriaAccessor::set_boundary_indicator. In 3d, it may
- * also be appropriate to call TriaAccessor::set_all_boundary_indicators instead
+ * This calls functions TriaAccessor::set_boundary_id. In 3d, it may
+ * also be appropriate to call TriaAccessor::set_all_boundary_ids instead
  * on each of the selected faces. To query the boundary indicator of a particular
- * face or edge, use TriaAccessor::boundary_indicator.
+ * face or edge, use TriaAccessor::boundary_id.
  *
  * In older versions of the library (prior to 8.2), if you wanted also
  * to change the way the Triangulation class treated the boundary for
@@ -580,9 +580,9 @@
  * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly
  * used in the finite element community to indicate two slightly different,
  * but related things. The first is that we'd like to represent the finite
- * element solution as a linear combination of shape function, in the form
+ * element solution as a linear combination of shape functions, in the form
  * $u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf x)$. Here, $U_j$
- * is a vector of expension coefficients. Because we don't know their values
+ * is a vector of expansion coefficients. Because we don't know their values
  * yet (we will compute them as the solution of a linear or nonlinear system),
  * they are called "unknowns" or "degrees of freedom". The second meaning of
  * the term can be explained as follows: A mathematical description of finite
@@ -974,7 +974,7 @@
  *
  * The full reference for this paper is as follows:
  * @code
-Article{BK07,
+@Article{BK07,
   author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
   title =        {Data Structures and Requirements for hp Finite Element
                   Software},
@@ -985,10 +985,7 @@ Article{BK07,
   pages =        {4/1--4/31}
 }
  * @endcode
- * It is available as Technical Report ISC-07-04-MATH from the
- * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
- * for Scientific Computation, Texas A&amp;M University</a>, and also
- * from http://www.math.tamu.edu/~bangerth/publications.html .
+ * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  *
  * The numerical examples shown in that paper are generated with a slightly
  * modified version of step-27. The main difference to that
@@ -1068,7 +1065,7 @@ Article{BK07,
  *
  * <dd> Every object that makes up a Triangulation (cells, faces,
  * edges, etc.), is associated with a unique number (of type
- * types::manifol_id) that is used to identify which manifold object
+ * types::manifold_id) that is used to identify which manifold object
  * is responsible to generate new points when the mesh is refined.
  *
  * By default, all manifold indicators of a mesh are set to
@@ -1157,7 +1154,7 @@ Article{BK07,
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
- * "Adaptive multilevel methods with local smoothing", that
+ * "Adaptive Multilevel Methods with Local Smoothing for H1- and Hcurl-Conforming High Order Finite Element Methods", that
  * describes many of the algorithms and data structures used in the implementation
  * of the multigrid framework of deal.II. It underlies the implementation of
  * the classes that are used in step-16 for multigrid
@@ -1165,16 +1162,19 @@ Article{BK07,
  *
  * The full reference for this paper is as follows:
  * @code
-Article{JK10,
-  author =       {B. Janssen and G. Kanschat},
-  title =        {Adaptive multilevel methods with local smoothing},
-  journal =      {submitted},
-  year =         2010
-}
+@article{janssen2011adaptive,
+  title={Adaptive Multilevel Methods with Local Smoothing for H\^{}1-and H\^{}curl-Conforming High Order Finite Element Methods},
+  author={Janssen, B{\"a}rbel and Kanschat, Guido},
+  journal={SIAM Journal on Scientific Computing},
+  volume={33},
+  number={4},
+  pages={2095--2114},
+  year={2011},
+  publisher={SIAM}}
  * @endcode
- * It is available as Technical Report IAMCS-2009-131 from the
- * <a href="http://iamcs.tamu.edu/research_sub.php?tab_sub=research&cms_id=8">Institute
- * for Applied Mathematics and Computational Science, Texas A&amp;M University</a>.
+ * See 
+ * <a href="http://dx.doi.org/10.1137/090778523">DOI:10.1137/090778523</a>
+ * for the paper and <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for more details.
  * </dd>
  *
  *
@@ -1214,6 +1214,26 @@ Article{JK10,
  *     <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
  *     <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
+ *
+ *
+ * <dt class="glossary">@anchor GlossPeriodicConstraints <b>Periodic boundary
+ * conditions</b></dt>
+ * <dd>Periodic boundary condition are often used when only part of the physical
+ * relevant domain is modeled. One assumes that the solution simply continues
+ * periodically with respect to the boundaries that are considered periodic.
+ * In deal.II, support for this is through DoFTools::make_periodicity_constraints()
+ * and GridTools::collect_periodic_faces(). As soon as a
+ * parallel::distributed::Triangulation is used also
+ * parallel::distributed::Triangulation::add_periodicity() has to be called to make
+ * sure that all the processes know about relevant parts of the triangulation on both
+ * sides of the periodic boundary. A typical process for distributed triangulations would be:
+ * -# Create a mesh
+ * -# Gather the periodic faces using GridTools::collect_periodic_faces() (Triangulation)
+ * -# Add the periodicity information to the mesh
+ * using parallel::distributed::Triangulation::add_periodicity()
+ * -# Gather the periodic faces using GridTools::collect_periodic_faces() (DoFHandler)
+ * -# Add periodicity constraints using DoFTools::make_periodicity_constraints()
+ *
  *
  * <dt class="glossary">@anchor GlossPrimitive <b>Primitive finite
  * elements</b></dt>
@@ -1456,7 +1476,7 @@ Article{JK10,
  *
  *
  * <dt class="glossary">@anchor workstream_paper <b>%WorkStream paper</b></dt>
- * <dd>The "%WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
+ * <dd>The "WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
  *   that discusses the design and implementation of WorkStream. WorkStream is, at its
  *   core, a design pattern, i.e., something that is used over and over in finite element
  *   codes and that can, consequently, be implemented generically. In particular, the

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__time_stepping_h
-#define __deal2__time_stepping_h
+#ifndef dealii__time_stepping_h
+#define dealii__time_stepping_h
 
 
 #include <deal.II/base/config.h>
@@ -92,7 +92,7 @@ namespace TimeStepping
       VECTOR &y) = 0;
 
     /**
-     * Empty structure used to store informations.
+     * Empty structure used to store information.
      */
     struct Status {};
 

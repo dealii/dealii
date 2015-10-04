@@ -58,11 +58,11 @@ public:
     VECTOR src_cpy = src;
     constraints.distribute(src_cpy);
     FEEvaluation<dim,fe_degree,fe_degree+1,1,Number>
-      fe_eval(dof_handler.get_fe(), QGauss<1>(fe_degree+1),
-              update_gradients | update_values | update_JxW_values);
+    fe_eval(dof_handler.get_fe(), QGauss<1>(fe_degree+1),
+            update_gradients | update_values | update_JxW_values);
     dst = 0;
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for ( ; cell != endc; ++cell)
       {
         fe_eval.reinit(cell);

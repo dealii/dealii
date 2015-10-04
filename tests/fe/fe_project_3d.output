@@ -1,0 +1,32 @@
+
+DEAL::3d
+Rectangular grid:
+dim: 3	FE_Nedelec<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::300		4.543286	0	0	0	0	0	0
+DEAL::1944		0.768808	0	0	0	0	0	0
+DEAL::dim: 3	FE_RaviartThomas<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::240		1.704443	0	0	0	0	0	0
+DEAL::1728		1.047194	0	0	0	0	0	0
+DEAL::
+Affine grid:
+dim: 3	FE_Nedelec<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::300		4.043897	0	0	0.007018	0.007018	0	0
+DEAL::1944		0.785617	0	0	0.000527	0.000527	0	0
+DEAL::dim: 3	FE_RaviartThomas<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::240		2.853715	0	0	0	0	0	0
+DEAL::1728		1.108491	0	0	0	0	0	0
+DEAL::
+Non-affine grid:
+dim: 3	FE_Nedelec<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::300		4.500380	0.052702	0.052702	0.893524	0.893783	-0.067389	-0.067366
+DEAL::1944		0.800197	0.006576	0.006576	0.160602	0.160603	-0.026230	-0.026230
+DEAL::dim: 3	FE_RaviartThomas<3>(1)
+DEAL::DoFs		||u-u_h||_1	curl(u_h)	tangentials	curl(curl(u_h))	curl_curl_traces	div(u_h)	boundary_flux
+DEAL::240		2.198354	0.020423	0.020435	1.920196	2.031656	0.049057	0.049057
+DEAL::1728		1.150110	0.022659	0.022658	0.638775	0.724501	0.016784	0.016784
+DEAL::

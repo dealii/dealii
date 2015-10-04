@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_block_mask_h
-#define __deal2__fe_block_mask_h
+#ifndef dealii__fe_block_mask_h
+#define dealii__fe_block_mask_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -128,7 +128,7 @@ public:
 
   /**
    * Return whether this block mask represents a mask with exactly
-   * <code>n</code> blocks. This is true if either it was initilized with a
+   * <code>n</code> blocks. This is true if either it was initialized with a
    * vector with exactly <code>n</code> entries of type <code>bool</code> (in
    * this case, @p n must equal the result of size()) or if it was initialized
    * with an empty vector (or using the default constructor) in which case it

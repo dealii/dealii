@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ FE_DGP<dim,spacedim>::get_name () const
 {
   // note that the FETools::get_fe_from_name function depends on the
   // particular format of the string this function returns, so they have to be
-  // kept in synch
+  // kept in sync
 
   std::ostringstream namebuf;
   namebuf << "FE_DGP<"
@@ -102,6 +102,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // case, both elements have no dofs on their faces and the face
   // interpolation matrix is necessarily empty -- i.e. there isn't much we
   // need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim,spacedim> FE;
   typedef FE_DGP<dim,spacedim> FEDGP;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)
@@ -131,6 +132,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
   // case, both elements have no dofs on their faces and the face
   // interpolation matrix is necessarily empty -- i.e. there isn't much we
   // need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim,spacedim> FE;
   typedef FE_DGP<dim,spacedim> FEDGP;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)

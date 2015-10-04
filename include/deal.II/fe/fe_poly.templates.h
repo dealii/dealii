@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
+#include <deal.II/base/tensor_product_polynomials_bubbles.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_poly.h>
 
@@ -62,6 +63,7 @@ FE_Poly<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
                                                    const Point<dim> &p,
                                                    const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return poly_space.compute_value(i, p);
@@ -75,7 +77,7 @@ FE_Poly<POLY,dim,spacedim>::shape_grad (const unsigned int i,
                                         const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return poly_space.compute_grad(i, p);
+  return poly_space.template compute_derivative<1>(i, p);
 }
 
 
@@ -86,9 +88,10 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
                                                   const Point<dim> &p,
                                                   const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return poly_space.compute_grad(i, p);
+  return poly_space.template compute_derivative<1>(i, p);
 }
 
 
@@ -99,7 +102,7 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_grad (const unsigned int i,
                                              const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return poly_space.compute_grad_grad(i, p);
+  return poly_space.template compute_derivative<2>(i, p);
 }
 
 
@@ -110,9 +113,60 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int i,
                                                        const Point<dim> &p,
                                                        const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return poly_space.compute_grad_grad(i, p);
+  return poly_space.template compute_derivative<2>(i, p);
+}
+
+
+
+template <class POLY, int dim, int spacedim>
+Tensor<3,dim>
+FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative (const unsigned int i,
+                                                  const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  return poly_space.template compute_derivative<3>(i, p);
+}
+
+
+
+template <class POLY, int dim, int spacedim>
+Tensor<3,dim>
+FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative_component (const unsigned int i,
+                                                            const Point<dim> &p,
+                                                            const unsigned int component) const
+{
+  (void)component;
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return poly_space.template compute_derivative<3>(i, p);
+}
+
+
+
+template <class POLY, int dim, int spacedim>
+Tensor<4,dim>
+FE_Poly<POLY,dim,spacedim>::shape_4th_derivative (const unsigned int i,
+                                                  const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  return poly_space.template compute_derivative<4>(i, p);
+}
+
+
+
+template <class POLY, int dim, int spacedim>
+Tensor<4,dim>
+FE_Poly<POLY,dim,spacedim>::shape_4th_derivative_component (const unsigned int i,
+                                                            const Point<dim> &p,
+                                                            const unsigned int component) const
+{
+  (void)component;
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return poly_space.template compute_derivative<4>(i, p);
 }
 
 
@@ -147,93 +201,18 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
+    out |= update_hessians | update_covariant_transformation
+           | update_gradients | update_jacobian_pushed_forward_grads;
+  if (flags & update_3rd_derivatives)
+    out |= update_3rd_derivatives | update_covariant_transformation
+           | update_hessians | update_gradients
+           | update_jacobian_pushed_forward_grads
+           | update_jacobian_pushed_forward_2nd_derivatives;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
 
   return out;
 }
-
-
-
-//---------------------------------------------------------------------------
-// Data field initialization
-//---------------------------------------------------------------------------
-
-template <class POLY, int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
-FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
-                                      const Mapping<dim,spacedim>    &mapping,
-                                      const Quadrature<dim> &quadrature) const
-{
-  // generate a new data object and
-  // initialize some fields
-  InternalData *data = new InternalData;
-
-  // check what needs to be
-  // initialized only once and what
-  // on every cell/face/subface we
-  // visit
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
-
-  const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.size();
-
-  // some scratch arrays
-  std::vector<double> values(0);
-  std::vector<Tensor<1,dim> > grads(0);
-  std::vector<Tensor<2,dim> > grad_grads(0);
-
-  // initialize fields only if really
-  // necessary. otherwise, don't
-  // allocate memory
-  if (flags & update_values)
-    {
-      values.resize (this->dofs_per_cell);
-      data->shape_values.resize (this->dofs_per_cell,
-                                 std::vector<double> (n_q_points));
-    }
-
-  if (flags & update_gradients)
-    {
-      grads.resize (this->dofs_per_cell);
-      data->shape_gradients.resize (this->dofs_per_cell,
-                                    std::vector<Tensor<1,dim> > (n_q_points));
-    }
-
-  // if second derivatives through
-  // finite differencing is required,
-  // then initialize some objects for
-  // that
-  if (flags & update_hessians)
-    data->initialize_2nd (this, mapping, quadrature);
-
-  // next already fill those fields
-  // of which we have information by
-  // now. note that the shape
-  // gradients are only those on the
-  // unit cell, and need to be
-  // transformed when visiting an
-  // actual cell
-  if (flags & (update_values | update_gradients))
-    for (unsigned int i=0; i<n_q_points; ++i)
-      {
-        poly_space.compute(quadrature.point(i),
-                           values, grads, grad_grads);
-
-        if (flags & update_values)
-          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-            data->shape_values[k][i] = values[k];
-
-        if (flags & update_gradients)
-          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-            data->shape_gradients[k][i] = grads[k];
-      }
-  return data;
-}
-
 
 
 
@@ -244,21 +223,22 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_values
-(const Mapping<dim,spacedim>                      &mapping,
- const typename Triangulation<dim,spacedim>::cell_iterator &cell,
- const Quadrature<dim>                            &quadrature,
- typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- typename Mapping<dim,spacedim>::InternalDataBase &fedata,
- FEValuesData<dim,spacedim>                       &data,
- CellSimilarity::Similarity                  &cell_similarity) const
+FE_Poly<POLY,dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim>                                  &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const Quadrature<dim>                                        &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data,
+                const CellSimilarity::Similarity                              cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -266,16 +246,38 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k], data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (fe_data.shape_gradients[k],
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell, QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
+      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_hessians[k],
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+        {
+          mapping.transform (fe_data.shape_3rd_derivatives[k],
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
 
@@ -283,20 +285,21 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                    face,
-                     const Quadrature<dim-1>              &quadrature,
-                     typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                     typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-                     FEValuesData<dim,spacedim>                    &data) const
+fill_fe_face_values (const Mapping<dim,spacedim>                                  &mapping,
+                     const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
+                     const unsigned int                                            face,
+                     const Quadrature<dim-1>                                      &quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                     const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // offset determines which data set
   // to take (all data sets for all
@@ -315,103 +318,63 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
+        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
+
+      if (flags & update_hessians)
+        {
+          mapping.transform (make_slice(fe_data.shape_hessians[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives)
+        {
+          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
     }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
-
-
-//codimension 1
-// template <>
-// inline
-// void
-// FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_subface_values (const Mapping<1,2> &,
-//                                                             const Triangulation<1,2>::cell_iterator &,
-//                                                             const unsigned int,
-//                                                             const unsigned int,
-//                                                             const Quadrature<0> &,
-//                                                             Mapping<1,2>::InternalDataBase &,
-//                                                             Mapping<1,2>::InternalDataBase &,
-//                                                             FEValuesData<1,2> &) const
-// {
-//   AssertThrow(false, ExcNotImplemented());
-// }
-
-
-// template <>
-// inline
-// void
-// FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_subface_values (const Mapping<2,3> &,
-//                                                             const Triangulation<2,3>::cell_iterator &,
-//                                                             const unsigned int,
-//                                                             const unsigned int,
-//                                                             const Quadrature<1> &,
-//                                                             Mapping<2,3>::InternalDataBase &,
-//                                                             Mapping<2,3>::InternalDataBase &,
-//                                                             FEValuesData<2,3> &) const
-// {
-//   AssertThrow(false, ExcNotImplemented());
-// }
-
-
-// template <>
-// inline
-// void
-// FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_subface_values (const Mapping<1,2> &,
-//                                                             const Triangulation<1,2>::cell_iterator &,
-//                                                             const unsigned int,
-//                                                             const unsigned int,
-//                                                             const Quadrature<0> &,
-//                                                             Mapping<1,2>::InternalDataBase &,
-//                                                             Mapping<1,2>::InternalDataBase &,
-//                                                             FEValuesData<1,2> &) const
-// {
-//   AssertThrow(false, ExcNotImplemented());
-// }
-
-
-// template <>
-// inline
-// void
-// FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_subface_values (const Mapping<2,3> &,
-//                                                             const Triangulation<2,3>::cell_iterator &,
-//                                                             const unsigned int,
-//                                                             const unsigned int,
-//                                                             const Quadrature<1> &,
-//                                                             Mapping<2,3>::InternalDataBase &,
-//                                                             Mapping<2,3>::InternalDataBase &,
-//                                                             FEValuesData<2,3> &) const
-// {
-//   AssertThrow(false, ExcNotImplemented());
-// }
-
-
-
 
 template <class POLY, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
-                                                    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                    const unsigned int                    face,
-                                                    const unsigned int                    subface,
-                                                    const Quadrature<dim-1>              &quadrature,
-                                                    typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                                                    typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-                                                    FEValuesData<dim,spacedim>                    &data) const
+FE_Poly<POLY,dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim>                                  &mapping,
+                        const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
+                        const unsigned int                                            face,
+                        const unsigned int                                            subface,
+                        const Quadrature<dim-1>                                      &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                        const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
+                        internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // offset determines which data set
   // to take (all data sets for all
@@ -431,19 +394,70 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
     {
       if (flags & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
-          data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                          data.shape_gradients[k],
-                          mapping_data, mapping_covariant);
-    }
+        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                           mapping_covariant,
+                           mapping_internal,
+                           output_data.shape_gradients[k]);
 
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      if (flags & update_hessians)
+        {
+          mapping.transform (make_slice(fe_data.shape_hessians[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_gradient,
+                             mapping_internal,
+                             output_data.shape_hessians[k]);
+
+          for (unsigned int i=0; i<quadrature.size(); ++i)
+            for (unsigned int j=0; j<spacedim; ++j)
+              output_data.shape_hessians[k][i] -=
+                mapping_data.jacobian_pushed_forward_grads[i][j]
+                * output_data.shape_gradients[k][i][j];
+        }
+
+      if (flags & update_3rd_derivatives)
+        {
+          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                        offset,
+                                        quadrature.size()),
+                             mapping_covariant_hessian,
+                             mapping_internal,
+                             output_data.shape_3rd_derivatives[k]);
+
+          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
+        }
+    }
 }
 
+template <class POLY, int dim, int spacedim>
+inline void
+FE_Poly<POLY,dim,spacedim>::
+correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
+                           const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+                           const unsigned int                                                n_q_points,
+                           const unsigned int                                                dof) const
+{
+  for (unsigned int i=0; i<n_q_points; ++i)
+    for (unsigned int j=0; j<spacedim; ++j)
+      for (unsigned int k=0; k<spacedim; ++k)
+        for (unsigned int l=0; l<spacedim; ++l)
+          for (unsigned int m=0; m<spacedim; ++m)
+            {
+              output_data.shape_3rd_derivatives[dof][i][j][k][l] -=
+                (mapping_data.jacobian_pushed_forward_grads[i][m][j][l] *
+                 output_data.shape_hessians[dof][i][k][m])
+                + (mapping_data.jacobian_pushed_forward_grads[i][m][k][l] *
+                   output_data.shape_hessians[dof][i][j][m])
+                + (mapping_data.jacobian_pushed_forward_grads[i][m][j][k] *
+                   output_data.shape_hessians[dof][i][l][m])
+                + (mapping_data.jacobian_pushed_forward_2nd_derivatives[i][m][j][k][l] *
+                   output_data.shape_gradients[dof][i][m]);
+            }
 
+}
 
 namespace internal
 {

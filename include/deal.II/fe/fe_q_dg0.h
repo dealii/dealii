@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__fe_q_dg0_h
-#define __deal2__fe_q_dg0_h
+#ifndef dealii__fe_q_dg0_h
+#define dealii__fe_q_dg0_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>

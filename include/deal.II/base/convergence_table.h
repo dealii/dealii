@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__convergence_table_h
-#define __deal2__convergence_table_h
+#ifndef dealii__convergence_table_h
+#define dealii__convergence_table_h
 
 
 #include <deal.II/base/config.h>
@@ -161,7 +161,7 @@ public:
    * the convergence rates of `all' columns (see the following two functions).
    *
    * The Column::flag==1 is reserved for omitting the column from convergence
-   * rate evalution.
+   * rate evaluation.
    */
   void
   omit_column_from_convergence_rate_evaluation(const std::string &key);
@@ -170,7 +170,7 @@ public:
    * Evaluates convergence rates due to the <tt>rate_mode</tt> in relation to
    * the reference column <tt>reference_column_key</tt>. This function
    * evaluates the rates of ALL columns except of the columns that are to be
-   * omitted (see previous function) and execpt of the columns that are
+   * omitted (see previous function) and except of the columns that are
    * previously evaluated rate columns.  This function allows to evaluate the
    * convergence rate for almost all columns of a table without calling
    * evaluate_convergence_rates() for each column separately.
@@ -187,7 +187,7 @@ public:
   /**
    * Evaluates convergence rates due to the <tt>rate_mode</tt>. This function
    * evaluates the rates of ALL columns except of the columns that are to be
-   * omitted (see previous function) and execpt of the columns that are
+   * omitted (see previous function) and except of the columns that are
    * previously evaluated rate columns.  This function allows to evaluate the
    * convergence rate for almost all columns of a table without calling
    * evaluate_convergence_rates() for each column separately.

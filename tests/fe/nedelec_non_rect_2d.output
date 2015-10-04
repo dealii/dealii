@@ -1,0 +1,4 @@
+
+DEAL::p=0 L2_error: 0.864275
+DEAL::p=1 L2_error: 0.0650158
+DEAL::p=2 L2_error: 2.32125e-15

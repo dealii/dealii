@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__utilities_h
-#define __deal2__utilities_h
+#ifndef dealii__utilities_h
+#define dealii__utilities_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -84,7 +84,7 @@ namespace Utilities
    * deal.II classes, by default spacedim is equal to dimension, the above
    * string is usually contracted to "<dim>", instead of "<dim,spacedim>".
    * This function returns a string containing "dim" if dim is equal to
-   * spacedim, otherwhise it returns "dim,spacedim".
+   * spacedim, otherwise it returns "dim,spacedim".
    */
   std::string dim_string(const int dim, const int spacedim);
 
@@ -113,12 +113,12 @@ namespace Utilities
   /**
    * Given a string that contains text separated by a @p delimiter, split it
    * into its components; for each component, remove leading and trailing
-   * spaces. The default value of the delimiter is a comma, so that the function
-   * splits comma separated lists of strings.
+   * spaces. The default value of the delimiter is a comma, so that the
+   * function splits comma separated lists of strings.
    *
-   * To make data input from tables simpler, if the input string ends in
-   * a delimiter (possibly followed by an arbitrary amount of whitespace),
-   * then this last delimiter is ignored. For example,
+   * To make data input from tables simpler, if the input string ends in a
+   * delimiter (possibly followed by an arbitrary amount of whitespace), then
+   * this last delimiter is ignored. For example,
    * @code
    *   Utilities::split_string_list("abc; def; ghi; ", ';');
    * @endcode
@@ -135,8 +135,8 @@ namespace Utilities
    * @code
    *   Utilities::split_string_list(" ; ", ';');
    * @endcode
-   * yields a one-element list. Because of the trimming of
-   * whitespace, the single element is the empty string.
+   * yields a one-element list. Because of the trimming of whitespace, the
+   * single element is the empty string.
    *
    * This function can digest the case that the delimiter is a space. In this
    * case, it returns all words in the string. Combined with the rules above,
@@ -144,9 +144,9 @@ namespace Utilities
    * @code
    *   Utilities::split_string_list("abc def ghi ", ' ');
    * @endcode
-   * yields again the 3-element list of output <code>{"abc","def","ghi"}</code>
-   * from above despite the presence of space at the end of the string.
-   * Furthermore,
+   * yields again the 3-element list of output
+   * <code>{"abc","def","ghi"}</code> from above despite the presence of space
+   * at the end of the string. Furthermore,
    * @code
    *   Utilities::split_string_list("      ", ' ');
    * @endcode
@@ -180,7 +180,7 @@ namespace Utilities
 
   /**
    * Read a (signed) integer starting at the position in @p name indicated by
-   * the second argument, and retun this integer as a pair together with how
+   * the second argument, and return this integer as a pair together with how
    * many characters it takes up in the string.
    *
    * If no integer can be read at the indicated position, return
@@ -191,18 +191,32 @@ namespace Utilities
                            const unsigned int position);
 
   /**
+   * Return a string with all occurrences of @p from in @p input replaced by
+   * @p to.
+   */
+  std::string replace_in_string(const std::string &input,
+                                const std::string &from,
+                                const std::string &to);
+
+  /**
+   * Return a string with all spaces at the beginning and end of @p input removed.
+   */
+  std::string trim(const std::string &input);
+
+  /**
    * Generate a random number from a normalized Gaussian probability
    * distribution centered around @p a and with standard deviation @p sigma.
    *
    * This function is reentrant, i.e., it can safely be called from multiple
-   * threads at the same time. However, if so done, then there is no guarantee
-   * that each thread will get the same sequence of numbers every time.
-   * Rather, the produced sequence of random numbers will be apportioned to
-   * the different threads in non-deterministic ways. If this is a problem,
-   * for example for exactly reproducibility, then you need to use separate
-   * random number facilities for separate threads, rather than this global
-   * function. For example, the C++11 standard offers such objects, as does
-   * BOOST.
+   * threads at the same time. In addition, each thread will get the same
+   * sequence of numbers every time. On the other hand, if you run
+   * Threads::Task objects via the Threading Building Blocks, then tasks will
+   * be assigned to mostly random threads, and may get a different sequence of
+   * random numbers in different runs of the program, since a previous task
+   * may already have consumed the first few random numbers generated for the
+   * thread you're on. If this is a problem, you need to create your own
+   * random number generator objects every time you want to start from a
+   * defined point.
    *
    * @note Like the system function rand(), this function produces the same
    * sequence of random numbers every time a program is started. This is an
@@ -374,6 +388,28 @@ namespace Utilities
      * Return the present time as HH:MM:SS.
      */
     std::string get_time ();
+
+    /**
+     * Return the present date as YYYY/MM/DD. MM and DD may be either one or
+     * two digits.
+     */
+    std::string get_date ();
+
+    /**
+     * Call the system function posix_memalign, or a replacement function if
+     * not available, to allocate memory with a certain minimal alignment. The
+     * first argument will then return a pointer to this memory block that can
+     * be released later on through a standard <code>free</code> call.
+     *
+     * @param memptr The address of a pointer variable that will after this
+     * call point to the allocated memory.
+     * @param alignment The minimal alignment of the memory block, in bytes.
+     * @param size The size of the memory block to be allocated, in bytes.
+     *
+     * @note This function checks internally for error codes, rather than
+     * leaving this task to the calling site.
+     */
+    void posix_memalign (void **memptr, size_t alignment, size_t size);
 
     /**
      * @deprecated Use Utilities::MPI::job_supports_mpi() instead.
@@ -615,7 +651,7 @@ namespace Utilities
                 // did len
                 // become==0
                 // somehow? that
-                // shouln't have
+                // shouldn't have
                 // happened
                 Assert (false, ExcInternalError());
               }

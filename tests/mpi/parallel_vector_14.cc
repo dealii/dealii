@@ -81,7 +81,7 @@ void test ()
 
       // copy vector content to non-ghosted vectors, manually created.
       parallel::distributed::Vector<double> v_dist(local_owned, MPI_COMM_WORLD),
-        w_dist(v_dist), u_dist(v_dist);
+               w_dist(v_dist), u_dist(v_dist);
 
       v_dist = v;
       w_dist = w;
@@ -123,7 +123,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

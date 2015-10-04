@@ -45,7 +45,7 @@ void test ()
   local_relevant.add_range(1,2);
 
 
-  typename LA::MPI::Vector x;  
+  typename LA::MPI::Vector x;
   x.reinit(local_active, MPI_COMM_WORLD);
   x=0;
   typename LA::MPI::Vector g(local_active, local_relevant, MPI_COMM_WORLD);
@@ -56,7 +56,7 @@ void test ()
   x.compress(VectorOperation::insert);
   g=x;
   deallog << "all_zero? " << g.all_zero() << " (should be false)" << std::endl;
-  
+
   // done
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -66,7 +66,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

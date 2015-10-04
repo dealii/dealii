@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ void check ()
       if (coarse_grid.begin_active()->face(f)->line(e)->center()[0] == 0)
         if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)
           if (coarse_grid.begin_active()->face(f)->line(e)->center()[2] == 0)
-            coarse_grid.begin_active()->face(f)->line(e)->set_boundary_indicator (99);
+            coarse_grid.begin_active()->face(f)->line(e)->set_boundary_id (99);
   coarse_grid.set_boundary (99, my_boundary);
 
   // now try to refine this one

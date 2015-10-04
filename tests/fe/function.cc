@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,8 +61,8 @@ void vector_values(const FiniteElement<dim> &fe)
     v(i) = i;
 
   FEValues<dim> feval(fe, quadrature, update_values);
-  std::vector<Vector<double> > local(quadrature.size(),
-                                     Vector<double>(fe.n_components()));
+  std::vector<Vector<float> > local(quadrature.size(),
+                                    Vector<float>(fe.n_components()));
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   const typename DoFHandler<dim>::active_cell_iterator end = dof.end();

@@ -13,12 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__numbers_h
-#define __deal2__numbers_h
+#ifndef dealii__numbers_h
+#define dealii__numbers_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/types.h>
+
+#include <cmath>
 #include <complex>
 
 DEAL_II_NAMESPACE_OPEN
@@ -89,6 +91,18 @@ namespace numbers
    * 1/sqrt(2)
    */
   static const double  SQRT1_2 = 0.70710678118654752440;
+
+  /**
+   * Check whether a value is not a number.
+   *
+   * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
+   * <code>_isnan</code>, whichever is available on the system and returns the
+   * result.
+   *
+   * If none of the functions detecting NaN is available, this function
+   * returns false.
+   */
+  bool is_nan (const double x);
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.
@@ -222,13 +236,68 @@ namespace numbers
     real_type abs (const std::complex<number> &x);
   };
 
-}
+  // --------------- inline and template functions ---------------- //
+
+  inline bool is_nan (const double x)
+  {
+#ifdef DEAL_II_HAVE_STD_ISNAN
+    return std::isnan(x);
+#elif defined(DEAL_II_HAVE_ISNAN)
+    return isnan(x);
+#elif defined(DEAL_II_HAVE_UNDERSCORE_ISNAN)
+    return _isnan(x);
+#else
+    return false;
+#endif
+  }
+
+  inline bool is_finite (const double x)
+  {
+#ifdef DEAL_II_HAVE_ISFINITE
+    return !is_nan(x) && std::isfinite (x);
+#else
+    // Check against infinities. Note
+    // that if x is a NaN, then both
+    // comparisons will be false
+    return ((x >= -std::numeric_limits<double>::max())
+            &&
+            (x <= std::numeric_limits<double>::max()));
+#endif
+  }
 
 
-// --------------- inline and template functions ---------------- //
 
-namespace numbers
-{
+  inline bool is_finite (const std::complex<double> &x)
+  {
+    // Check complex numbers for infinity
+    // by testing real and imaginary part
+    return ( is_finite (x.real())
+             &&
+             is_finite (x.imag()) );
+  }
+
+
+
+  inline bool is_finite (const std::complex<float> &x)
+  {
+    // Check complex numbers for infinity
+    // by testing real and imaginary part
+    return ( is_finite (x.real())
+             &&
+             is_finite (x.imag()) );
+  }
+
+
+
+  inline bool is_finite (const std::complex<long double> &x)
+  {
+    // Same for std::complex<long double>
+    return ( is_finite (x.real())
+             &&
+             is_finite (x.imag()) );
+  }
+
+
   template <typename number>
   const number &
   NumberTraits<number>::conjugate (const number &x)
@@ -251,7 +320,7 @@ namespace numbers
   typename NumberTraits<number>::real_type
   NumberTraits<number>::abs (const number &x)
   {
-    return std::fabs(x);
+    return std::abs(x);
   }
 
 

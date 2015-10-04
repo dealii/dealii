@@ -66,7 +66,7 @@ void test ()
       TrilinosWrappers::BlockVector::iterator p2 = v2.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p2)
         *p2 = i;
-      Assert (p2==v2.end(), ExcInternalError());
+      AssertThrow (p2==v2.end(), ExcInternalError());
 
       // check that the two vectors are equal
       deallog << "Check 1: " << (v1==v2 ? "true" : "false") << std::endl;
@@ -103,9 +103,9 @@ void test ()
 
       TrilinosWrappers::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+        AssertThrow (*p1 == i, ExcInternalError());
 
-      Assert (p1 == v1.end(), ExcInternalError());
+      AssertThrow (p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
@@ -113,7 +113,7 @@ void test ()
 
       // check backwards
       for (unsigned int i=0; i<v1.size(); ++i, --p1)
-        Assert (*p1 == v1.size()-i-1, ExcInternalError());
+        AssertThrow (*p1 == v1.size()-i-1, ExcInternalError());
 
       // if we came thus far,
       // everything is alright
@@ -133,9 +133,9 @@ void test ()
 
       TrilinosWrappers::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+        AssertThrow (*p1 == i, ExcInternalError());
 
-      Assert (p1 == v1.end(), ExcInternalError());
+      AssertThrow (p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
@@ -146,7 +146,7 @@ void test ()
         {
           const double val = *p1;
           const double ref = v1.size()-i-1;
-          Assert (val==ref, ExcInternalError());
+          AssertThrow (val==ref, ExcInternalError());
         };
 
       // if we came thus far,
@@ -309,7 +309,7 @@ void test ()
         {
           const TrilinosWrappers::BlockVector::iterator p = (v1.begin()+i);
           for (unsigned int j=0; j<v1.size(); ++j)
-            Assert (p[(signed)j-(signed)i] == j, ExcInternalError());
+            AssertThrow (p[(signed)j-(signed)i] == j, ExcInternalError());
         };
 
       // if we came thus far,
@@ -331,7 +331,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

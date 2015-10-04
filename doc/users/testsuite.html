@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                 "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>The deal.II Testsuite</title>
+  <link href="../screen.css" rel="StyleSheet">
+  <meta name="copyright" content="Copyright (C) 1998 - 2015 by the deal.II Authors">
+  <meta name="keywords" content="deal dealii finite elements fem triangulation">
+  <meta http-equiv="content-language" content="en">
+</head>
+<body>
+
+
+    <h1>Setting up testsuite in user projects</h1>
+
+    <p>
+      This page provides details about how to set up a testsuite in a user
+      project similar to the one that is used to test deal.II itself.
+    </p>
+
+    <div class="toc">
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#examples">Examples</a></li>
+        <ol>
+          <li><a href="#simple">Simple configuration</a></li>
+          <li><a href="#advanced">Advanced configuration</a></li>
+        </ol>
+      </ol>
+    </div>
+
+    <a name="overview"></a>
+    <h2>Overview</h2>
+
+    <p>
+      deal.II features an extensive <a
+        href="../developers/testsuite.html">testsuite</a> to ensure
+      consistent, well-defined behavior of its building blocks during
+      development and for releases. But, the larger a user program/project
+      becomes, the more important it is to also check user code for
+      continued correctness during development. This is mainly done via
+      <a href="https://en.wikipedia.org/wiki/Unit_testing">unit</a> and
+      <a href="https://en.wikipedia.org/wiki/Regression_testing">regression testing</a>.
+    </p>
+
+    <p>
+      deal.II provides a mechanism to conveniently set up unit and
+      regression tests in a user project (very much like they are handled
+      in the library itself). At its heart a test is a small executable
+      that is invoked and an output file for comparison. The executable
+      that should be run can be defined in two different ways: Either as a
+      source file in conjunction with a comparison file:
+      <pre>
+my_test_1.cc
+my_test_1.output</pre>
+      In this case <code>my_test_1.cc</code> contains a full executable (with
+      a main function) that produces some output. The screen output is then
+      compared against <code>my_test_1.output</code>. Alternatively, a
+      parameter file together with a comparison file can be provided:
+      <pre>
+my_test_2.prm
+my_test_2.output</pre>
+      In this case an already built executable (that is defined by a CMake
+      variable) is invoked with the path of <code>my_test_2.prm</code> as
+      first argument. Again, its screen output is compared against
+      <code>my_test_2.output</code>
+    </p>
+
+    <a name="examples"></a>
+    <h2>Examples</h2>
+
+    <p>
+      This section presents two different examples of how to use the
+      testsuite facilities. Possible directory layouts together with the
+      necessary CMake configuration are discussed.
+    </p>
+
+    <a name="simple"></a>
+    <h3>Simple configuration</h3>
+
+    <p>
+      For the purpose of an example, let us pretend that step-1 could read
+      input files (defined on the command line) and do some computation
+      based on their contents. Then, we can set up tests for expected
+      output for given a given configuration file.
+
+      This can be done by creating a subdirectory <code>tests</code> and
+      adding a test of the second type (i.e., parameter file and comparison
+      file). In detail the directory and file layout is as follows:
+      <pre>
+CMakeLists.txt
+step-1.cc
+tests/CMakeLists
+tests/my_test.output
+tests/my_test.prm</pre>
+      In order to enable testing the top-level <code>CMakeLists.txt</code>
+      file has to be augmented by a call to <code>ENABLE_TESTING()</code>
+      and a subsequent descent into the <code>tests/</code> subdirectory via
+      <code>ADD_SUBDIRECTORY(tests)</code>. For convenience, here is the
+      full top-level <code>CMakeLists.txt</code> file:
+      <pre class="cmake">
+SET(TARGET step-1)
+SET(TARGET_SRC step-1.cc)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+FIND_PACKAGE(deal.II 8.3 REQUIRED
+  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+  )
+
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(${TARGET})
+DEAL_II_INVOKE_AUTOPILOT()
+
+# Enable testing and descent into tests/ subdirectory:
+ENABLE_TESTING()
+ADD_SUBDIRECTORY(tests)</pre>
+      The corresponding file <code>tests/CMakeLists.txt</code> contains
+      only two statements:
+      <pre class="cmake">
+SET(TEST_TARGET ${TARGET})
+DEAL_II_PICKUP_TESTS()</pre>
+      The first statement sets the variable <code>TEST_TARGET</code> to the
+      executable that should be invoked (in our case the contents of the
+      variable <code>TARGET</code>). The second statement is a call to a
+      deal.II macro that will go through the directory contents and define
+      all test targets.
+    </p>
+
+    <p>Due to the fact that step-1 produces only two lines of output and
+    parses no parameters, we can set up a somewhat silly test by just
+    providing the comparison file and an empty parameter file:
+    <pre>
+$ touch tests/my_test.prm
+$ echo "Grid written to grid-1.eps" >  tests/my_test.output
+$ echo "Grid written to grid-2.eps" >> tests/my_test.output</pre>
+    After that, reconfigure and call the test driver <code>ctest</code>:
+    <pre>
+$ cmake .
+[...]
+$ ctest
+Test project .../examples/step-1
+    Start 1: tests/my_test.debug
+1/1 Test #1: tests/my_test.debug ..............   Passed    1.72 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.72 sec</pre>
+    </p>
+
+    <p>
+      <i>Remark:</i> The test driver will compare the combined output
+      stream of stdout and stderr against the comparison file. If the test
+      creates a file <code>output</code> and writes to it, the comparison
+      file is compared against this output file instead. In this case
+      stdout and stderr are discarded.
+    </p>
+
+    <a name="advanced"></a>
+    <h3>Advanced configuration</h3>
+
+    <p>
+      Above setup is too inflexible for larger projects that might consist
+      of individual libraries and an independent main program. Therefore,
+      as a second example a project is presented that consists of a support
+      library "support" and an executable "step". The task shall be to
+      provide unit tests for the library "support" and simple configuration
+      type tests for "step". In detail:
+      <pre>
+CMakeLists.txt
+
+src/CMakeLists.txt
+src/step.cc
+src/support.cc
+
+tests/step/CMakeLists
+tests/step/my_test_1.prm
+tests/step/my_test_1.output
+
+tests/support/CMakeLists
+tests/support/my_test_2.cc
+tests/support/my_test_2.output</pre>
+    </p>
+
+    <p>
+      Again, we want to use the "autopilot" configuration for user projects
+      (see the <a href="cmakelists.html">cmake documentation</a> for
+      details). The top-level <code>CMakeLists.txt</code> is now solely
+      responsible for finding deal.II, enable testing, and descending into
+      subdirectories:
+      <pre class="cmake">
+# top-level CMakelists.txt
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+FIND_PACKAGE(deal.II 8.3 REQUIRED
+  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+  )
+
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(step)
+ENABLE_TESTING()
+
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(tests/step)
+ADD_SUBDIRECTORY(tests/support)</pre>
+      The library and executable are defined in
+      <code>src/CMakeLists.txt</code>:
+      <pre class="cmake">
+# src/CMakeLists.txt
+
+# set up shared library by hand:
+ADD_LIBRARY(support SHARED support.cc)
+DEAL_II_SETUP_TARGET(support)
+
+# set up executable with autopilot macro:
+SET(TARGET "step")
+SET(TARGET_SRC step.cc)
+DEAL_II_INVOKE_AUTOPILOT()
+TARGET_LINK_LIBRARIES(${TARGET} support)</pre>
+
+      Similarly to the first example, setting up tests for the executable
+      "step" is just a matter of defining a variable and a call to a macro:
+      <pre class="cmake">
+# tests/step/CMakeLists.txt
+
+SET(TEST_TARGET step)
+DEAL_II_PICKUP_TESTS()</pre>
+      In contrast, the tests for the support library consist of a source file
+      that has a main function. The object file generated from this source
+      file will be linked against deal.II and every library listed in
+      <code>TEST_LIBRARIES</code>:
+      <pre class="cmake">
+# tests/support/CMakeLists.txt
+
+SET(TEST_LIBRARIES support)
+DEAL_II_PICKUP_TESTS()</pre>
+    Again, reconfigure and run ctest:
+      <pre>
+$ cmake .
+$ ctest
+Test project .../examples/step
+    Start 1: step/my_test_1.debug
+1/2 Test #1: step/my_test_1.debug .............   Passed    0.21 sec
+    Start 2: support/my_test_2.debug
+2/2 Test #2: support/my_test_2.debug ..........   Passed    0.22 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.43 sec</pre>
+    </p>
+
+    <p>
+      <i>Remark:</i> For further information consult the <a
+        href="../developers/testsuite.html">testsuite documentation</a> for
+      the library. With the sole exception of the testsuite setup (that
+      happens unconditionally in user testsuites), this documentation also
+      applies for user testsuites.
+    </p>
+
+    <p>
+    <i>Remark:</i> The full configuration options for
+      <code>DEAL_II_PICKUP_TESTS()</code> are:
+    </p>
+    <pre>
+TEST_LIBRARIES
+TEST_LIBRARIES_DEBUG
+  - additionally used for tests with debug configuration
+TEST_LIBRARIES_RELEASE
+  - additionally used for tests with release configuration
+
+TEST_TARGET or
+TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
+  - used instead of TEST_TARGET for debug/release configuration
+
+NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
+  - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
+    "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead
+
+TEST_TIME_LIMIT
+  - specifying the maximal wall clock time in seconds a test is allowed
+    to run</pre>
+    <hr />
+    <div class="right">
+      <a href="http://validator.w3.org/check?uri=referer" target="_top">
+        <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+      <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+        <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+    </div>
+
+  </body>
+</html>

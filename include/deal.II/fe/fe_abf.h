@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_abf_h
-#define __deal2__fe_abf_h
+#ifndef dealii__fe_abf_h
+#define dealii__fe_abf_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
@@ -171,28 +171,6 @@ private:
    * weakly.
    */
   void initialize_restriction ();
-
-  /**
-   * Given a set of flags indicating what quantities are requested from a @p
-   * FEValues object, return which of these can be precomputed once and for
-   * all. Often, the values of shape function at quadrature points can be
-   * precomputed, for example, in which case the return value of this function
-   * would be the logical and of the input @p flags and @p update_values.
-   *
-   * For the present kind of finite element, this is exactly the case.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * This is the opposite to the above function: given a set of flags
-   * indicating what we want to know, return which of these need to be
-   * computed each time we visit a new cell.
-   *
-   * If for the computation of one quantity something else is also required
-   * (for example, we often need the covariant transformation when gradients
-   * need to be computed), include this in the result as well.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * Fields of cell-independent data.

@@ -76,18 +76,18 @@ void check_this (Triangulation<3> &tria)
 
             for (unsigned int q=0; q<quadrature.size(); ++q)
               {
-                Assert ((fe_face_values1.quadrature_point(q)-
-                         fe_face_values2.quadrature_point(q)).norm_square()
-                        < 1e-20,
-                        ExcInternalError());
+                AssertThrow ((fe_face_values1.quadrature_point(q)-
+                              fe_face_values2.quadrature_point(q)).norm_square()
+                             < 1e-20,
+                             ExcInternalError());
 
-                Assert (std::fabs(fe_face_values1.JxW(q)-
-                                  fe_face_values2.JxW(q)) < 1e-14,
-                        ExcInternalError());
-                Assert ((fe_face_values1.normal_vector(q) +
-                         fe_face_values2.normal_vector(q)).square()
-                        < 1e-20,
-                        ExcInternalError());
+                AssertThrow (std::fabs(fe_face_values1.JxW(q)-
+                                       fe_face_values2.JxW(q)) < 1e-14,
+                             ExcInternalError());
+                AssertThrow ((fe_face_values1.normal_vector(q) +
+                              fe_face_values2.normal_vector(q)).norm_square()
+                             < 1e-20,
+                             ExcInternalError());
               }
           }
 }

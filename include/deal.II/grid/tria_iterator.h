@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_iterator_h
-#define __deal2__tria_iterator_h
+#ifndef dealii__tria_iterator_h
+#define dealii__tria_iterator_h
 
 
 /*----------------------------   tria-iterator.h     ---------------------------*/
@@ -49,13 +49,12 @@ template <typename> class TriaActiveIterator;
 
 
 /**
- * This class implements an iterator, analogous to those of the standard
- * template library (STL). It fulfills the requirements of a bidirectional
- * iterator.  See the C++ documentation for further details of iterator
- * specification and usage.
+ * This class implements an iterator, analogous to those used in the standard
+ * library. It fulfills the requirements of a bidirectional iterator. See the
+ * C++ documentation for further details of iterator specification and usage.
  *
  *
- * In addition to the STL iterators an iterator of this class provides a
+ * In addition to the standard interface, an iterator of this class provides a
  * <tt>-@></tt> operator, i.e. you can write statements like
  * @code
  * i->set_refine_flag ();
@@ -80,7 +79,7 @@ template <typename> class TriaActiveIterator;
  * The objects pointed to are accessors, derived from TriaAccessorBase. Which
  * kind of accessor is determined by the template argument <em>Accessor</em>.
  * These accessors are not so much data structures as they are a collection of
- * functions providing access to the data stored in Tringulation or DoFHandler
+ * functions providing access to the data stored in Triangulation or DoFHandler
  * objects. Using these accessors, the structure of these classes is hidden
  * from the application program.
  *
@@ -120,16 +119,16 @@ template <typename> class TriaActiveIterator;
  * more functionality.
  *
  * Furthermore, the iterators described here satisfy the requirement of input
- * and bidirectional iterators as stated by the C++ standard and the STL
- * documentation. It is therefore possible to use the functions from the
- * algorithm section of the C++ standard, e.g. <em>count_if</em> (see the
- * documentation for Triangulation for an example) and several others.
+ * and bidirectional iterators as stated by the C++ standard. It is therefore
+ * possible to use the functions from the algorithm section of the C++
+ * standard, e.g., <em>count_if</em> (see the documentation for Triangulation
+ * for an example) and several others.
  *
  * <h3>Implementation</h3>
  *
  * The iterator class itself does not have much functionality. It only becomes
  * useful when assigned an Accessor (the second template parameter), which
- * really does the access to data. An Accessor has to fulfil some
+ * really does the access to data. An Accessor has to fulfill some
  * requirements:
  *
  * <ul>
@@ -199,7 +198,7 @@ template <typename> class TriaActiveIterator;
  * set to false.
  *
  * The last two checks are not made in <tt>state()</tt> since both cases
- * should only occur upon unitialized construction through @p memcpy and the
+ * should only occur upon uninitialized construction through @p memcpy and the
  * like (the parent triangulation can only be set upon construction). If an
  * iterator is constructed empty through the empty constructor,
  * <tt>present_level==-2</tt> and <tt>present_index==-2</tt>. Thus, the
@@ -214,7 +213,7 @@ template <typename> class TriaActiveIterator;
  * invalid provides a second track of security: if we should have forgotten a
  * check in the library when an iterator is incremented or decremented, we
  * automatically convert the iterator from the allowed state "past-the-end" to
- * the disallowed state "invalid" which increases the chance that somehwen
+ * the disallowed state "invalid" which increases the chance that some time
  * earlier than for past-the-end iterators an exception is raised.
  *
  * @ref Triangulation
@@ -420,6 +419,12 @@ public:
    */
   bool operator < (const TriaRawIterator &) const;
 
+  /**
+   * Another comparison operator, implementing with the same ordering as
+   * #operator<.
+   */
+  bool operator > (const TriaRawIterator &) const;
+
   /**@name Advancement of iterators*/
   /*@{*/
   /**
@@ -532,7 +537,7 @@ protected:
    *
    * In fact, we would not need them to be friends if they were for different
    * dimensions, but the compiler dislikes giving a fixed dimension and
-   * variable accessor since then it says that would be a artial
+   * variable accessor since then it says that would be a partial
    * specialization.
    */
   template <typename SomeAccessor> friend class TriaRawIterator;
@@ -1014,6 +1019,17 @@ TriaRawIterator<Accessor>::operator < (const TriaRawIterator<Accessor> &other) c
 
   return ((**this) < (*other));
 }
+
+
+
+template <typename Accessor>
+inline
+bool
+TriaRawIterator<Accessor>::operator > (const TriaRawIterator<Accessor> &other) const
+{
+  return (other < *this);
+}
+
 
 
 template <typename Accessor>

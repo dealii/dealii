@@ -276,12 +276,12 @@ describe this. A first attempt looks like this:
 	  {
 	    if ((face_center[2] <= 2.5 || face_center[2] >= 5) &&
 	        face_center[1] >= 3)
-	      cell->face(f)->set_boundary_indicator(8);
+	      cell->face(f)->set_boundary_id(8);
 
 	    if (face_center[2] >= 2.5 &&
 	        face_center[2] <= 5
 	        && face_center[1] >= 3)
-	      cell->face(f)->set_boundary_indicator(9);
+	      cell->face(f)->set_boundary_id(9);
 	  }
       }
 
@@ -325,8 +325,8 @@ mid-edge points are in the wrong place (you see this by comparing the
 picture with the one of the coarse mesh). What is happening is that we
 are only telling the triangulation to use these geometry objects for
 the <i>faces</i> but not for the adjacent <i>edges</i> as well. This is
-easily fixed by using the function TriaAccessor::set_all_boundary_indicators()
-instead of TriaAccessor::set_boundary_indicator() used above. With this change,
+easily fixed by using the function TriaAccessor::set_all_boundary_ids()
+instead of TriaAccessor::set_boundary_id() used above. With this change,
 the grid now looks like this:
 
 <img
@@ -374,11 +374,11 @@ code does the trick:
             {
               if ((face_center[2] < 2.5 || face_center[2] > 5)
                   && face_center[1] >= 3)
-                cell->face(f)->set_all_boundary_indicators(8);
+                cell->face(f)->set_all_boundary_ids(8);
 
               if (face_center[2] > 2.5 && face_center[2] < 5
                   && face_center[1] >= 3)
-                cell->face(f)->set_all_boundary_indicators(9);
+                cell->face(f)->set_all_boundary_ids(9);
             }
       }
 }

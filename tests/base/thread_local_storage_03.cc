@@ -51,7 +51,7 @@ void test ()
   t = Threads::new_thread (&X::f, x);
 
   AssertThrow (t.return_value() == 42,
-          ExcInternalError());
+               ExcInternalError());
 }
 
 

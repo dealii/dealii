@@ -375,10 +375,10 @@ namespace Step50
     //check(constraints);
     //check(hanging_node_constraints);
 
+    DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
+    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
 
-    CompressedSimpleSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
-    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
 
     // The multigrid constraints have to be
     // initialized. They need to know about
@@ -439,19 +439,18 @@ namespace Step50
     // matrices.
     for (unsigned int level=0; level<n_levels; ++level)
       {
-        CompressedSparsityPattern csp;
-        csp.reinit(mg_dof_handler.n_dofs(level),
-                   mg_dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
+        DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
+                                   mg_dof_handler.n_dofs(level));
+        MGTools::make_sparsity_pattern(mg_dof_handler, dsp, level);
 
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
                                   mg_dof_handler.locally_owned_mg_dofs(level),
-                                  csp,
+                                  dsp,
                                   MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
                                             mg_dof_handler.locally_owned_mg_dofs(level),
-                                            csp,
+                                            dsp,
                                             MPI_COMM_WORLD, true);
       }
   }
@@ -610,9 +609,9 @@ namespace Step50
     // for each degree of freedom. Due to the way the ConstraintMatrix
     // stores its data, the function to add a constraint on a single
     // degree of freedom and force it to be zero is called
-    // Constraintmatrix::add_line(); doing so for several degrees of
+    // ConstraintMatrix::add_line(); doing so for several degrees of
     // freedom at once can be done using
-    // Constraintmatrix::add_lines():
+    // ConstraintMatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)

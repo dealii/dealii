@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,12 +27,15 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_abf.h>
+#include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
@@ -110,7 +113,7 @@ namespace
   // The following three functions serve to fill the maps from element
   // names to elements fe_name_map below. The first one exists because
   // we have finite elements which are not implemented for nonzero
-  // codimension. These should be transfered to the second function
+  // codimension. These should be transferred to the second function
   // eventually.
 
   template <int dim>
@@ -122,7 +125,9 @@ namespace
     result["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
     result["FE_ABF"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_ABF<dim> >);
+    result["FE_BDM"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_BDM<dim> >);
     result["FE_RaviartThomas"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     result["FE_RaviartThomasNodal"]
@@ -141,6 +146,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim> >);
     result["FE_Nothing"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
   }
@@ -162,6 +169,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
   }
 
   // The function filling the vector fe_name_map below. It iterates
@@ -703,7 +712,8 @@ namespace FETools
       const FiniteElement<dim, spacedim> &fe,
       const FEValues<dim, spacedim> &coarse,
       const Householder<double> &H,
-      FullMatrix<number> &this_matrix)
+      FullMatrix<number> &this_matrix,
+      const double threshold)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nd = fe.n_components ();
@@ -736,7 +746,10 @@ namespace FETools
       // solve the least squares
       // problem.
       const double result = H.least_squares (v_fine, v_coarse);
-      Assert (result < 1.e-12, ExcLeastSquaresError (result));
+      Assert (result <= threshold, ExcLeastSquaresError (result));
+      // Avoid warnings in release mode
+      (void)result;
+      (void)threshold;
 
       // Copy into the result
       // matrix. Since the matrix
@@ -754,7 +767,8 @@ namespace FETools
     compute_embedding_matrices_for_refinement_case (
       const FiniteElement<dim, spacedim> &fe,
       std::vector<FullMatrix<number> > &matrices,
-      const unsigned int ref_case)
+      const unsigned int ref_case,
+      const double threshold)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
@@ -845,7 +859,7 @@ namespace FETools
                 {
                   task_group +=
                     Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
-                                       i, fe, coarse, H, this_matrix);
+                                       i, fe, coarse, H, this_matrix, threshold);
                 }
               task_group.join_all();
             }
@@ -854,7 +868,7 @@ namespace FETools
               for (unsigned int i = 0; i < n; ++i)
                 {
                   compute_embedding_for_shape_function<dim, number, spacedim>
-                  (i, fe, coarse, H, this_matrix);
+                  (i, fe, coarse, H, this_matrix, threshold);
                 }
             }
 
@@ -876,7 +890,8 @@ namespace FETools
   void
   compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                              std::vector<std::vector<FullMatrix<number> > > &matrices,
-                             const bool isotropic_only)
+                             const bool isotropic_only,
+                             const double threshold)
   {
     Threads::TaskGroup<void> task_group;
 
@@ -887,7 +902,7 @@ namespace FETools
 
     for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
       task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
-                                       fe, matrices[ref_case-1], ref_case);
+                                       fe, matrices[ref_case-1], ref_case, threshold);
 
     task_group.join_all ();
   }
@@ -899,7 +914,8 @@ namespace FETools
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
                                   const unsigned int face_coarse,
-                                  const unsigned int face_fine)
+                                  const unsigned int face_fine,
+                                  const double threshold)
   {
     Assert(face_coarse==0, ExcNotImplemented());
     Assert(face_fine==0, ExcNotImplemented());
@@ -1071,7 +1087,10 @@ namespace FETools
             // solve the least squares
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
-            Assert (result < 1.e-12, ExcLeastSquaresError(result));
+            Assert (result <= threshold, ExcLeastSquaresError(result));
+            // Avoid compiler warnings in Release mode
+            (void)result;
+            (void)threshold;
 
             // Copy into the result
             // matrix. Since the matrix
@@ -1091,33 +1110,6 @@ namespace FETools
       }
   }
 
-
-  /*
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<1,2>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<1,3>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-    template <>
-    void
-    compute_projection_matrices(const FiniteElement<2,3>&,
-                                std::vector<std::vector<FullMatrix<double> > >&, bool)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  */
 
 
   template <int dim, typename number, int spacedim>
@@ -1340,10 +1332,6 @@ namespace FETools
         // have to figure out what the
         // base elements are. this can
         // only be done recursively
-
-
-
-
         if (name_part == "FESystem")
           {
             // next we have to get at the
@@ -1490,9 +1478,9 @@ namespace FETools
             // Make sure no other thread
             // is just adding an element
             Threads::Mutex::ScopedLock lock (fe_name_map_lock);
-
             AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
                          ExcInvalidFEName(name));
+
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
             // part should be left.
@@ -1578,6 +1566,7 @@ namespace FETools
         if (pos2-pos1 == 2)
           {
             const char dimchar = '0' + dim;
+            (void)dimchar;
             if (name.at(pos1+1) != 'd')
               Assert (name.at(pos1+1) == dimchar,
                       ExcInvalidFEDimension(name.at(pos1+1), dim));

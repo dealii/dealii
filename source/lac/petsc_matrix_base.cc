@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,6 +50,7 @@ namespace PETScWrappers
       const PetscScalar *values;
 
       int ierr;
+      (void)ierr;
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
@@ -113,6 +114,7 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::operator = (const value_type d)
   {
+    (void)d;
     Assert (d==value_type(), ExcScalarAssignmentOnlyForZeroValue());
 
     assert_is_compressed ();
@@ -473,6 +475,7 @@ namespace PETScWrappers
   {
     const int ierr = MatAXPY (matrix, factor,
                               other, DIFFERENT_NONZERO_PATTERN);
+    (void)ierr;
 
     Assert (ierr == 0, ExcPETScError(ierr));
 
@@ -487,6 +490,7 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMult (matrix, src, dst);
+    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -499,6 +503,7 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMultTranspose (matrix, src, dst);
+    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -511,6 +516,7 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMultAdd (matrix, src, dst, dst);
+    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -523,6 +529,7 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMultTransposeAdd (matrix, src, dst, dst);
+    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -553,6 +560,7 @@ namespace PETScWrappers
   MatrixBase::transpose ()
   {
     int ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
+    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -609,7 +617,7 @@ namespace PETScWrappers
 
   void
   MatrixBase::print (std::ostream &out,
-                     const bool    alternative_output) const
+                     const bool    /*alternative_output*/) const
   {
     std::pair<MatrixBase::size_type, MatrixBase::size_type>
     loc_range = local_range();
@@ -621,8 +629,8 @@ namespace PETScWrappers
     MatrixBase::size_type row;
     for (row = loc_range.first; row < loc_range.second; ++row)
       {
-        int ierr;
-        ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        int ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        (void)ierr;
         AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
         for (PetscInt col = 0; col < ncols; ++col)

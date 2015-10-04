@@ -160,7 +160,7 @@ void test()
   const std::pair<unsigned int,unsigned int> range = vector.local_range();
   for (unsigned int i=range.first; i<range.second; ++i)
     if (constraints.is_constrained(i))
-      Assert (vector(i)==0, ExcInternalError());
+      AssertThrow (vector(i)==0, ExcInternalError());
 
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -170,7 +170,7 @@ void test()
 int main(int argc, char *argv[])
 {
   {
-    Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv, numbers::invalid_unsigned_int);
+    Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 

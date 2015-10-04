@@ -68,18 +68,18 @@ void test()
 
   data_out.write_vtu_in_parallel("output.vtu", MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
-  
+
   if (myid==0)
     {
       std::vector<std::string> filenames;
       filenames.push_back("output.vtu");
-      {	
-	std::ofstream master("output.pvtu");
-	data_out.write_pvtu_record (master, filenames);
+      {
+        std::ofstream master("output.pvtu");
+        data_out.write_pvtu_record (master, filenames);
       }
-      
+
       cat_file("output.vtu");
-      cat_file("output.pvtu");      
+      cat_file("output.pvtu");
     }
   deallog << "OK" << std::endl;
 }
@@ -87,7 +87,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

@@ -20,7 +20,7 @@
 # configuration to determine paths, locations and names. Some linkage and
 # crosscompilation setup happens also in here.
 #
-# Definitions marked with *) can be overriden by defining them to cache
+# Definitions marked with *) can be overridden by defining them to cache
 # prior to the call of this file. This is done with the help of the
 # SET_IF_EMPTY macro.
 #
@@ -47,7 +47,6 @@
 #     DEAL_II_LIBRARY_RELDIR          *)
 #     DEAL_II_PROJECT_CONFIG_RELDIR   *)
 #     DEAL_II_SHARE_RELDIR            *)
-#     DEAL_II_CMAKE_MACROS_RELDIR     *)
 #     DEAL_II_DOCREADME_RELDIR        *)
 #     DEAL_II_DOCHTML_RELDIR          *)
 #     DEAL_II_EXAMPLES_RELDIR         *)
@@ -124,7 +123,6 @@ SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
 SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")
 SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
 SET_IF_EMPTY(DEAL_II_SHARE_RELDIR "share/${DEAL_II_PACKAGE_NAME}")
-SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "${DEAL_II_SHARE_RELDIR}/cmake/macros")
 #
 # ... but install the documentation into prominent places:
 #

@@ -53,7 +53,7 @@ void test (const unsigned int size_1, const unsigned int size_2)
       double result = 0;
       for (unsigned int j=0; j<m.n(); ++j)
         result += (i+2*j)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   for (unsigned int i=0; i<w.size(); ++i)
@@ -66,7 +66,7 @@ void test (const unsigned int size_1, const unsigned int size_2)
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (v(i) == result, ExcInternalError());
+      AssertThrow (v(i) == result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -81,7 +81,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

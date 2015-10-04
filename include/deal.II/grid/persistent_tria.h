@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__persistent_tria_h
-#define __deal2__persistent_tria_h
+#ifndef dealii__persistent_tria_h
+#define dealii__persistent_tria_h
 
 
 #include <deal.II/base/config.h>

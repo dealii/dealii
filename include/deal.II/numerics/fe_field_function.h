@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_function_h
-#define __deal2__fe_function_h
+#ifndef dealii__fe_function_h
+#define dealii__fe_function_h
 
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -68,32 +68,35 @@ namespace Functions
    *
    * An example of how to use this function is the following:
    *
-   * \code
+   * @code
    *
-   * // Generate two triangulations Triangulation<dim> tria_1;
+   * // Generate two triangulations
+   * Triangulation<dim> tria_1;
    * Triangulation<dim> tria_2;
    *
-   * // Read the triangulations from files, or build them up, or get // them
-   * from some place...  Assume that tria_2 is *entirely* // included in
-   * tria_1 ...
+   * // Read the triangulations from files, or build them up, or get them
+   * // from some place. Assume that tria_2 is *entirely* included in tria_1.
    *
-   * // Associate a dofhandler and a solution to the first // triangulation
-   * DoFHandler<dim> dh1(tria_1); Vector<double> solution_1;
+   * // Associate a dof handler and a solution to the first triangulation
+   * DoFHandler<dim> dh1 (tria_1);
+   * Vector<double> solution_1;
    *
-   * // Do the same with the second DoFHandler<dim> dh2; Vector<double>
-   * solution_2;
+   * // Do the same with the second
+   * DoFHandler<dim> dh2 (tria_2);
+   * Vector<double> solution_2;
    *
-   * // Setup the system, assemble matrices, solve problems and get the //
-   * nobel prize on the first domain... ...
+   * // Setup the system, assemble matrices, solve problems and get the
+   * // nobel prize on the first domain...
    *
-   * // Now project it to the second domain FEFieldFunction<dim> fe_function_1
-   * (dh_1, solution_1); VectorTools::project(dh_2, constraints_2, quad,
-   * fe_function_1, solution_2);
+   * // Now project it to the second domain
+   * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
+   * VectorTools::project (dh_2, constraints_2, quad, fe_function_1, solution_2);
    *
-   * // Or interpolate it... Vector<double> solution_3;
-   * VectorTools::interpolate(dh_2, fe_function_1, solution_3);
+   * // Or interpolate it...
+   * Vector<double> solution_3;
+   * VectorTools::interpolate (dh_2, fe_function_1, solution_3);
    *
-   * \endcode
+   * @endcode
    *
    * The snippet of code above will work assuming that the second
    * triangulation is entirely included in the first one.
@@ -121,9 +124,9 @@ namespace Functions
    * @ref GlossGhostCell).
    * If the cell is artificial, we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
-   * exception of type VectorTools::ExcPointNotAvailableHere. The same
-   * kind of exception will also be produced if the cell is a ghost cell: On
-   * such cells, one could in principle evaluate the solution, but it becomes
+   * exception of type VectorTools::ExcPointNotAvailableHere. The same kind of
+   * exception will also be produced if the cell is a ghost cell: On such
+   * cells, one could in principle evaluate the solution, but it becomes
    * easier if we do not allow to do so because then there is exactly one
    * processor in a parallel distributed computation that can indeed evaluate
    * the solution. Consequently, it is clear which processor is responsible

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,8 +90,8 @@ void test ()
   for (SparseMatrix<double>::iterator p=B.begin();
        p!=B.end(); ++p)
     if (p->column() != p->row())
-      Assert (B(p->row(),p->column()) != B(p->column(),p->row()),
-              ExcInternalError());
+      AssertThrow (B(p->row(),p->column()) != B(p->column(),p->row()),
+                   ExcInternalError());
 
 
   SparseMatrixEZ<double> B_ez(dof_handler.n_dofs(),

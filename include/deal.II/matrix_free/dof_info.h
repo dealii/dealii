@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,14 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_dof_info_h
-#define __deal2__matrix_free_dof_info_h
+#ifndef dealii__matrix_free_dof_info_h
+#define dealii__matrix_free_dof_info_h
 
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/vectorization.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/matrix_free/helper_functions.h>
 
@@ -265,7 +266,7 @@ namespace internal
                                const std::vector<unsigned int> &renumbering,
                                const std::vector<unsigned int> &irregular_cells,
                                const bool                       do_blocking,
-                               CompressedSimpleSparsityPattern &connectivity) const;
+                               DynamicSparsityPattern &connectivity) const;
 
       /**
        * Renumbers the degrees of freedom to give good access for this class.

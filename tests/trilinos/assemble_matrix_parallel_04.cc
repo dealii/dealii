@@ -37,6 +37,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
@@ -251,9 +252,9 @@ void LaplaceProblem<dim>::setup_system ()
   CellFilter begin(IteratorFilters::LocallyOwnedCell(),dof_handler.begin_active());
   CellFilter end(IteratorFilters::LocallyOwnedCell(),dof_handler.end());
   graph = GraphColoring::make_graph_coloring(begin,end,
-        static_cast<std_cxx11::function<std::vector<types::global_dof_index>
-        (FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> const &)> >
-        (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
+                                             static_cast<std_cxx11::function<std::vector<types::global_dof_index>
+                                             (FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> const &)> >
+                                             (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
 
   TrilinosWrappers::BlockSparsityPattern csp(2,2);
   std::vector<IndexSet> locally_owned(2), relevant_set(2);
@@ -323,9 +324,9 @@ LaplaceProblem<dim>::local_assemble (const FilteredIterator<typename DoFHandler<
                                        fe_values.shape_grad(j,q_point) *
                                        fe_values.JxW(q_point));
 
-            data.local_rhs(i) += (fe_values.shape_value(i,q_point) *
-                                  rhs_value *
-                                  fe_values.JxW(q_point));
+          data.local_rhs(i) += (fe_values.shape_value(i,q_point) *
+                                rhs_value *
+                                fe_values.JxW(q_point));
         }
     }
 
@@ -380,21 +381,21 @@ void LaplaceProblem<dim>::assemble_test ()
   test_rhs = 0;
 
   WorkStream::
-    run (graph,
-         std_cxx11::bind (&LaplaceProblem<dim>::
-                          local_assemble,
-                          this,
-                          std_cxx11::_1,
-                          std_cxx11::_2,
-                          std_cxx11::_3),
-         std_cxx11::bind (&LaplaceProblem<dim>::
-                          copy_local_to_global,
-                          this,
-                          std_cxx11::_1),
-         Assembly::Scratch::Data<dim>(fe, quadrature),
-         Assembly::Copy::Data (false),
-         2*MultithreadInfo::n_threads(),
-         1);
+  run (graph,
+       std_cxx11::bind (&LaplaceProblem<dim>::
+                        local_assemble,
+                        this,
+                        std_cxx11::_1,
+                        std_cxx11::_2,
+                        std_cxx11::_3),
+       std_cxx11::bind (&LaplaceProblem<dim>::
+                        copy_local_to_global,
+                        this,
+                        std_cxx11::_1),
+       Assembly::Scratch::Data<dim>(fe, quadrature),
+       Assembly::Copy::Data (false),
+       2*MultithreadInfo::n_threads(),
+       1);
   test_matrix.compress(VectorOperation::add);
   test_rhs.compress(VectorOperation::add);
 
@@ -465,7 +466,7 @@ int main (int argc, char **argv)
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  Utilities::MPI::MPI_InitFinalize init(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   {
     deallog.push("2d");

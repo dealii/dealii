@@ -99,11 +99,9 @@ test_mesh(DoFHandler<dim> &mgdofs)
   cells.collect_sizes();
   faces.collect_sizes();
 
-  NamedData<BlockVector<double>* > out_data;
-  BlockVector<double> *p = &cells;
-  out_data.add(p, "cells");
-  p = &faces;
-  out_data.add(p, "faces");
+  AnyData out_data;
+  out_data.add<BlockVector<double>*>(&cells, "cells");
+  out_data.add<BlockVector<double>*>(&faces, "faces");
 
   Local<dim> local;
   EmptyInfoBox info_box;

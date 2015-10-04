@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,6 @@ void test(FiniteElement<dim> &fe)
   typename DoFHandler<dim>::face_iterator face = cell->face(1);
 
   MeshWorker::Assembler::MGMatrixSimple<FullMatrix<double> > ass;
-  ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
   ass.initialize_info(info, false);
 

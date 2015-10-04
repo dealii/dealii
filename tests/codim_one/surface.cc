@@ -76,7 +76,7 @@ void test(std::string filename)
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      const std::vector<Point<spacedim> > &cellnormals = fe_values.get_normal_vectors();
+      const std::vector<Tensor<1,spacedim> > &cellnormals = fe_values.get_all_normal_vectors();
       const std::vector<Point<spacedim> > &quad_points = fe_values.get_quadrature_points();
 
       for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)

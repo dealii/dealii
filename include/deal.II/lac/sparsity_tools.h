@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparsity_tools_h
-#define __deal2__sparsity_tools_h
+#ifndef dealii__sparsity_tools_h
+#define dealii__sparsity_tools_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <vector>
 
@@ -129,16 +130,50 @@ namespace SparsityTools
    * part of the algorithm that chooses starting indices.
    */
   void
-  reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
-                         std::vector<SparsityPattern::size_type> &new_indices,
-                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>());
+  reorder_Cuthill_McKee (const DynamicSparsityPattern &sparsity,
+                         std::vector<DynamicSparsityPattern::size_type> &new_indices,
+                         const std::vector<DynamicSparsityPattern::size_type> &starting_indices = std::vector<DynamicSparsityPattern::size_type>());
 
+  /**
+   * As above, but taking a SparsityPattern object instead.
+   *
+   * @deprecated
+   */
+  void
+  reorder_Cuthill_McKee (const SparsityPattern &sparsity,
+                         std::vector<SparsityPattern::size_type> &new_indices,
+                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>()) DEAL_II_DEPRECATED;
+
+  /**
+   * For a given sparsity pattern, compute a re-enumeration of row/column
+   * indices in a hierarchical way, similar to what
+   * DoFRenumbering::hierarchical does for degrees of freedom on
+   * hierarchically refined meshes.
+   *
+   * This algorithm first selects a node with the minimum number of neighbors
+   * and puts that node and its direct neighbors into one chunk. Next, it
+   * selects one of the neighbors of the already selected nodes, adds the node
+   * and its direct neighbors that are not part of one of the previous chunks,
+   * into the next. After this sweep, neighboring nodes are grouped together.
+   * To ensure a similar grouping on a more global level, this grouping is
+   * called recursively on the groups so formed. The recursion stops when no
+   * further grouping is possible. Eventually, the ordering obtained by this
+   * method passes through the indices represented in the sparsity pattern in
+   * a z-like way.
+   *
+   * If the graph has two or more unconnected components, the algorithm will
+   * number each component consecutively, starting with the components with
+   * the lowest number of nodes.
+   */
+  void
+  reorder_hierarchical (const DynamicSparsityPattern                   &sparsity,
+                        std::vector<DynamicSparsityPattern::size_type> &new_indices);
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Communciate rows in a compressed sparsity pattern over MPI.
+   * Communicate rows in a compressed sparsity pattern over MPI.
    *
-   * @param csp is the sparsity pattern that has been built locally and for
+   * @param dsp is the sparsity pattern that has been built locally and for
    * which we need to exchange entries with other processors to make sure that
    * each processor knows all the elements of the rows of a matrix it stores
    * and that may eventually be written to. This sparsity pattern will be
@@ -151,26 +186,26 @@ namespace SparsityTools
    * processors that all participate in this operation.
    *
    * @param myrange indicates the range of elements stored locally and should
-   * be the one used in the constructor of the
-   * CompressedSimpleSparsityPattern.  This should be the locally relevant
-   * set.  Only rows contained in myrange are checked in csp for transfer.
-   * This function needs to be used with PETScWrappers::MPI::SparseMatrix for
-   * it to work correctly in a parallel computation.
+   * be the one used in the constructor of the DynamicSparsityPattern.  This
+   * should be the locally relevant set.  Only rows contained in myrange are
+   * checked in dsp for transfer. This function needs to be used with
+   * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
+   * computation.
    */
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<typename CSP_t::size_type> &rows_per_cpu,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
+                                   const std::vector<typename DSP_t::size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);
 
   /**
    * similar to the function above, but includes support for
-   * BlockCompressedSimpleSparsityPattern. @p owned_set_per_cpu is typically
+   * BlockDynamicSparsityPattern. @p owned_set_per_cpu is typically
    * DoFHandler::locally_owned_dofs_per_processor and @p myrange are
    * locally_relevant_dofs.
    */
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
                                    const std::vector<IndexSet> &owned_set_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);

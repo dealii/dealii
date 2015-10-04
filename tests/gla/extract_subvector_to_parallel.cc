@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,15 +53,15 @@ void test (Vector &vector)
   std::vector<typename Vector::value_type> values1 (indices.size());
   vector.extract_subvector_to (indices, values1);
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    Assert (values1[j] == 2*j, ExcInternalError());
+    AssertThrow (values1[j] == 2*j, ExcInternalError());
 
   // do the same with the version of the function that takes iterators
   std::vector<typename Vector::value_type> values2 (indices.size());
   vector.extract_subvector_to (indices.begin(),
-			       indices.end(),
-			       values2.begin());
+                               indices.end(),
+                               values2.begin());
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    Assert (values2[j] == 2*j, ExcInternalError());
+    AssertThrow (values2[j] == 2*j, ExcInternalError());
 
   // done
   if (myid==0)
@@ -72,7 +72,7 @@ void test (Vector &vector)
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   {
@@ -120,15 +120,15 @@ int main (int argc, char **argv)
     {
       IndexSet block1(10);
       if (myid==0)
-	block1.add_range(0,7);
+        block1.add_range(0,7);
       if (myid==1)
-	block1.add_range(7,10);
+        block1.add_range(7,10);
 
       IndexSet block2(6);
       if (myid==0)
-	block2.add_range(0,2);
+        block2.add_range(0,2);
       if (myid==1)
-	block2.add_range(2,6);
+        block2.add_range(2,6);
 
       partitioning.push_back(block1);
       partitioning.push_back(block2);

@@ -1,7 +1,7 @@
 //----------------------------  periodicity_05.cc  ---------------------------
 //    Version: $Name$
 //
-//    Copyright (C) 2002 - 2014 by the deal.II authors
+//    Copyright (C) 2002 - 2015 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -89,7 +89,7 @@ private:
 };
 
 Deal2PeriodicBug::Deal2PeriodicBug()
-:  fe(2), dof_handler(triangulation)
+  :  fe(2), dof_handler(triangulation)
 {}
 
 
@@ -133,10 +133,10 @@ void Deal2PeriodicBug::makeGrid()
   deallog<< "Constructing the grid..." <<std::endl;
   const Point<2> p1(0,0), p2(1,1);
   GridGenerator::hyper_rectangle(triangulation,p1,p2);
-  triangulation.begin_active()->face(2)->set_boundary_indicator(1);
-  triangulation.begin_active()->face(3)->set_boundary_indicator(1);
-  triangulation.begin_active()->face(0)->set_boundary_indicator(0);
-  triangulation.begin_active()->face(1)->set_boundary_indicator(2);
+  triangulation.begin_active()->face(2)->set_boundary_id(1);
+  triangulation.begin_active()->face(3)->set_boundary_id(1);
+  triangulation.begin_active()->face(0)->set_boundary_id(0);
+  triangulation.begin_active()->face(1)->set_boundary_id(2);
   triangulation.refine_global(1);
 
   Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();

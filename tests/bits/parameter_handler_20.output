@@ -1,0 +1,11 @@
+
+DEAL::* check
+DEAL::input: 1.00000 2.00000
+DEAL::* check
+DEAL::input: 1.00000 2.00000
+DEAL::* check
+DEAL::read_input() failed
+DEAL::* check
+DEAL::read_input() failed
+DEAL::* check
+DEAL::read_input() failed

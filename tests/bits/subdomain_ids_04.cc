@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ void test ()
       for (unsigned int d=0; d<dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1<<d);
-      Assert (subdomain < (1<<dim), ExcInternalError());
+      AssertThrow (subdomain < (1<<dim), ExcInternalError());
 
       cell->set_subdomain_id (subdomain);
     };
@@ -94,11 +94,11 @@ void test ()
       {
         // we must just have crossed the
         // boundary to another subdomain
-        Assert (subdomain_association[i] == present_subdomain+1,
-                ExcInternalError());
+        AssertThrow (subdomain_association[i] == present_subdomain+1,
+                     ExcInternalError());
         ++present_subdomain;
       }
-  Assert (present_subdomain == (1<<dim)-1, ExcInternalError());
+  AssertThrow (present_subdomain == (1<<dim)-1, ExcInternalError());
 }
 
 

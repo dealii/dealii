@@ -56,7 +56,7 @@ SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad)
           rho_average += quad.weight(i)*(quad.point(i)-center).norm();
           mid_point += quad.weight(i)*quad.point(i);
         }
-      // Project the mid_pont back to the right location
+      // Project the mid_point back to the right location
       Tensor<1,spacedim> R = mid_point-center;
       // Scale it to have radius rho_average
       R *= rho_average/R.norm();

@@ -57,8 +57,8 @@ void test ()
   v*=2.0;
   if (myid < 8)
     {
-      Assert(v(myid*2) == myid*4.0, ExcInternalError());
-      Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+      AssertThrow(v(myid*2) == myid*4.0, ExcInternalError());
+      AssertThrow(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
     }
 
   // check l2 norm
@@ -106,12 +106,12 @@ void test ()
   // check inner product
   {
     const double norm_sqr = v.norm_sqr();
-    Assert (std::fabs(v * v - norm_sqr) < 1e-15,
-            ExcInternalError());
+    AssertThrow (std::fabs(v * v - norm_sqr) < 1e-15,
+                 ExcInternalError());
     parallel::distributed::Vector<double> v2;
     v2 = v;
-    Assert (std::fabs(v2 * v - norm_sqr) < 1e-15,
-            ExcInternalError());
+    AssertThrow (std::fabs(v2 * v - norm_sqr) < 1e-15,
+                 ExcInternalError());
 
     if (myid<8)
       v2.local_element(0) = -1;
@@ -221,7 +221,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

@@ -219,10 +219,30 @@ namespace
 
     return encoded_data;
   }
-#endif
 
 
-#ifdef DEAL_II_WITH_ZLIB
+  /**
+   * Convert between the enum specified inside VtkFlags and the preprocessor
+   * constant defined by zlib.
+   */
+  int get_zlib_compression_level(const DataOutBase::VtkFlags::ZlibCompressionLevel level)
+  {
+    switch (level)
+      {
+      case (DataOutBase::VtkFlags::no_compression):
+        return Z_NO_COMPRESSION;
+      case (DataOutBase::VtkFlags::best_speed):
+        return Z_BEST_SPEED;
+      case (DataOutBase::VtkFlags::best_compression):
+        return Z_BEST_COMPRESSION;
+      case (DataOutBase::VtkFlags::default_compression):
+        return Z_DEFAULT_COMPRESSION;
+      default:
+        Assert(false, ExcNotImplemented());
+        return Z_NO_COMPRESSION;
+      }
+  }
+
   /**
    * Do a zlib compression followed
    * by a base64 encoding of the
@@ -230,8 +250,9 @@ namespace
    * written to the given stream.
    */
   template <typename T>
-  void write_compressed_block (const std::vector<T> &data,
-                               std::ostream         &output_stream)
+  void write_compressed_block (const std::vector<T>        &data,
+                               const DataOutBase::VtkFlags &flags,
+                               std::ostream                &output_stream)
   {
     if (data.size() != 0)
       {
@@ -244,7 +265,8 @@ namespace
                              &compressed_data_length,
                              (const Bytef *) &data[0],
                              data.size() * sizeof(T),
-                             Z_BEST_COMPRESSION);
+                             get_zlib_compression_level(flags.compression_level));
+        (void)err;
         Assert (err == Z_OK, ExcInternalError());
 
         // now encode the compression header
@@ -398,6 +420,7 @@ namespace DataOutBase
            patch != patches.end(); ++patch)
         {
           const unsigned int n_subdivisions = patch->n_subdivisions;
+          (void)n_subdivisions;
 
           Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
                   (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
@@ -564,7 +587,7 @@ namespace
   };
 #endif
 
-  // NOTE: The dimension of the array is choosen to 5 to allow the choice
+  // NOTE: The dimension of the array is chosen to 5 to allow the choice
   // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general
   // Wolfgang supposed that we don't need it in general, but however this
   // choice avoids a -Warray-bounds check warning
@@ -664,43 +687,119 @@ namespace
   }
 
   /**
+   * Class describing common functionality between different output streams.
+   *
+   * @ingroup output
+   */
+  template<typename FlagsType>
+  class StreamBase
+  {
+  public:
+    /*
+     * Constructor. Stores a reference to the output stream for immediate use.
+     */
+    StreamBase (std::ostream &stream,
+                const FlagsType &flags)
+      :
+      selected_component (numbers::invalid_unsigned_int),
+      stream (stream),
+      flags (flags)
+    {}
+
+    /**
+     * Output operator for points. All inheriting classes should implement this
+     * function.
+     */
+    template <int dim>
+    void write_point (const unsigned int,
+                      const Point<dim> &)
+    {
+      Assert (false, ExcMessage ("The derived class you are using needs to "
+                                 "reimplement this function if you want to call "
+                                 "it."));
+    }
+
+    /**
+     * Do whatever is necessary to terminate the list of points. The default
+     * implementation does nothing; derived classes that do not require any
+     * action do not need to reimplement this.
+     */
+    void flush_points () {}
+
+    /**
+     * Write dim-dimensional cell with first vertex at number start and further
+     * vertices offset by the specified values. Values not needed are
+     * ignored. All inheriting classes should implement this function.
+     */
+    template <int dim>
+    void write_cell (const unsigned int /*index*/,
+                     const unsigned int /*start*/,
+                     const unsigned int /*x_offset*/,
+                     const unsigned int /*y_offset*/,
+                     const unsigned int /*z_offset*/)
+    {
+      Assert (false, ExcMessage ("The derived class you are using needs to "
+                                 "reimplement this function if you want to call "
+                                 "it."));
+    }
+
+    /**
+     * Do whatever is necessary to terminate the list of cells. This function is
+     * usually only reimplemented if deal.II is compiled with zlib. The default
+     * implementation does nothing; derived classes that do not require any
+     * action do not need to reimplement this.
+     */
+    void flush_cells () {}
+
+    /**
+     * Forwarding of an output stream. This function is usually only
+     * reimplemented if inheriting classes use zlib.
+     */
+    template <typename T>
+    std::ostream &operator<< (const T &t)
+    {
+      stream << t;
+      return stream;
+    }
+
+    /**
+     * Since the GMV and Tecplot formats read the x, y and z coordinates in
+     * separate fields, we enable write() to output only a single selected
+     * component at once and do this dim times for the whole set of nodes. This
+     * integer can be used to select the component written.
+     */
+    unsigned int selected_component;
+
+  protected:
+    /**
+     * The ostream to use. Since the life span of these objects is small, we use
+     * a very simple storage technique.
+     */
+    std::ostream &stream;
+
+    /**
+     * The flags controlling the output.
+     */
+    const FlagsType flags;
+  };
+
+  /**
    * Class for writing basic
    * entities in @ref
    * SoftwareOpenDX format,
    * depending on the flags.
    */
-  class DXStream
+  class DXStream : public StreamBase<DataOutBase::DXFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     DXStream (std::ostream &stream,
-              const DataOutBase::DXFlags flags);
+              const DataOutBase::DXFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -718,12 +817,6 @@ namespace
                      const unsigned int z_offset);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
      * Write a complete set of
      * data for a single node.
      *
@@ -736,27 +829,6 @@ namespace
     template<typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::DXFlags flags;
   };
 
   /**
@@ -765,38 +837,17 @@ namespace
    * format, depending on the
    * flags.
    */
-  class GmvStream
+  class GmvStream : public StreamBase<DataOutBase::GmvFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     GmvStream (std::ostream &stream,
-               const DataOutBase::GmvFlags flags);
+               const DataOutBase::GmvFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -807,52 +858,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-    /**
-     * Since GMV reads the x, y
-     * and z coordinates in
-     * separate fields, we enable
-     * write() to output only a
-     * single selected component
-     * at once and do this dim
-     * times for the whole set of
-     * nodes. This integer can be
-     * used to select the
-     * component written.
-     */
-    unsigned int selected_component;
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::GmvFlags flags;
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
   /**
@@ -861,37 +871,17 @@ namespace
    * SoftwareTecplot format,
    * depending on the flags.
    */
-  class TecplotStream
+  class TecplotStream : public StreamBase<DataOutBase::TecplotFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
-    TecplotStream (std::ostream &stream, const DataOutBase::TecplotFlags flags);
+    TecplotStream (std::ostream &stream,
+                   const DataOutBase::TecplotFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -902,52 +892,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-    /**
-     * Since TECPLOT reads the x, y
-     * and z coordinates in
-     * separate fields, we enable
-     * write() to output only a
-     * single selected component
-     * at once and do this dim
-     * times for the whole set of
-     * nodes. This integer can be
-     * used to select the
-     * component written.
-     */
-    unsigned int selected_component;
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::TecplotFlags flags;
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
   /**
@@ -956,38 +905,17 @@ namespace
    * @ref SoftwareAVS, depending on
    * the flags.
    */
-  class UcdStream
+  class UcdStream : public StreamBase<DataOutBase::UcdFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     UcdStream (std::ostream &stream,
-               const DataOutBase::UcdFlags flags);
+               const DataOutBase::UcdFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The additional offset 1 is
      * added inside this
      * function.
@@ -1002,17 +930,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
 
     /**
      * Write a complete set of
@@ -1027,26 +949,6 @@ namespace
     template<typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::UcdFlags flags;
   };
 
   /**
@@ -1055,38 +957,17 @@ namespace
    * format, depending on the
    * flags.
    */
-  class VtkStream
+  class VtkStream : public StreamBase<DataOutBase::VtkFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     VtkStream (std::ostream &stream,
-               const DataOutBase::VtkFlags flags);
+               const DataOutBase::VtkFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -1097,73 +978,27 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::VtkFlags flags;
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
 
-  class VtuStream
+  class VtuStream : public StreamBase<DataOutBase::VtkFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     VtuStream (std::ostream &stream,
-               const DataOutBase::VtkFlags flags);
+               const DataOutBase::VtkFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
-    /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
     void flush_points ();
 
     /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -1174,21 +1009,14 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
 
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
     void flush_cells ();
 
-    /**
-     * Forwarding of output stream
-     */
     template <typename T>
     std::ostream &operator<< (const T &);
 
@@ -1208,20 +1036,6 @@ namespace
 
   private:
     /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::VtkFlags flags;
-
-    /**
      * A list of vertices and
      * cells, to be used in case we
      * want to compress the data.
@@ -1240,10 +1054,10 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  DXStream::DXStream(std::ostream &out,
-                     const DataOutBase::DXFlags f)
+  DXStream::DXStream (std::ostream &out,
+                      const DataOutBase::DXFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase<DataOutBase::DXFlags> (out, f)
   {}
 
 
@@ -1269,19 +1083,14 @@ namespace
   }
 
 
-  void
-  DXStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  DXStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  DXStream::write_cell (unsigned int,
+                        unsigned int start,
+                        unsigned int d1,
+                        unsigned int d2,
+                        unsigned int d3)
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
@@ -1314,16 +1123,12 @@ namespace
   }
 
 
-  void
-  DXStream::flush_cells ()
-  {}
-
 
   template<typename data>
   inline
   void
-  DXStream::write_dataset(const unsigned int     /*index*/,
-                          const std::vector<data> &values)
+  DXStream::write_dataset (const unsigned int,
+                           const std::vector<data> &values)
   {
     if (flags.data_binary)
       {
@@ -1343,10 +1148,9 @@ namespace
 //----------------------------------------------------------------------//
 
   GmvStream::GmvStream (std::ostream &out,
-                        const DataOutBase::GmvFlags f)
+                        const DataOutBase::GmvFlags &f)
     :
-    selected_component(numbers::invalid_unsigned_int),
-    stream(out), flags(f)
+    StreamBase<DataOutBase::GmvFlags> (out, f)
   {}
 
 
@@ -1361,19 +1165,14 @@ namespace
   }
 
 
-  void
-  GmvStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  GmvStream::write_cell(
-    unsigned int,
-    unsigned int s,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  GmvStream::write_cell (unsigned int,
+                         unsigned int s,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     // Vertices are numbered starting
     // with one.
@@ -1399,17 +1198,10 @@ namespace
 
 
 
-  void
-  GmvStream::flush_cells ()
-  {}
-
-
-//----------------------------------------------------------------------//
-
-  TecplotStream::TecplotStream(std::ostream &out, const DataOutBase::TecplotFlags f)
+  TecplotStream::TecplotStream (std::ostream &out,
+                                const DataOutBase::TecplotFlags &f)
     :
-    selected_component(numbers::invalid_unsigned_int),
-    stream(out), flags(f)
+    StreamBase<DataOutBase::TecplotFlags> (out, f)
   {}
 
 
@@ -1424,19 +1216,14 @@ namespace
   }
 
 
-  void
-  TecplotStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  TecplotStream::write_cell(
-    unsigned int,
-    unsigned int s,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  TecplotStream::write_cell (unsigned int,
+                             unsigned int s,
+                             unsigned int d1,
+                             unsigned int d2,
+                             unsigned int d3)
   {
     const unsigned int start = s+1;
 
@@ -1459,17 +1246,10 @@ namespace
 
 
 
-  void
-  TecplotStream::flush_cells ()
-  {}
-
-
-
-//----------------------------------------------------------------------//
-
-  UcdStream::UcdStream(std::ostream &out, const DataOutBase::UcdFlags f)
+  UcdStream::UcdStream (std::ostream &out,
+                        const DataOutBase::UcdFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase<DataOutBase::UcdFlags> (out, f)
   {}
 
 
@@ -1491,19 +1271,13 @@ namespace
 
 
 
-  void
-  UcdStream::flush_points ()
-  {}
-
-
   template<int dim>
   void
-  UcdStream::write_cell(
-    unsigned int index,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  UcdStream::write_cell (unsigned int index,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
@@ -1535,16 +1309,11 @@ namespace
 
 
 
-  void
-  UcdStream::flush_cells ()
-  {}
-
-
   template<typename data>
   inline
   void
-  UcdStream::write_dataset(const unsigned int       index,
-                           const std::vector<data> &values)
+  UcdStream::write_dataset (const unsigned int index,
+                            const std::vector<data> &values)
   {
     stream << index+1;
     for (unsigned int i=0; i<values.size(); ++i)
@@ -1556,9 +1325,10 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  VtkStream::VtkStream(std::ostream &out, const DataOutBase::VtkFlags f)
+  VtkStream::VtkStream (std::ostream &out,
+                        const DataOutBase::VtkFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase<DataOutBase::VtkFlags> (out, f)
   {}
 
 
@@ -1577,19 +1347,13 @@ namespace
 
 
 
-  void
-  VtkStream::flush_points ()
-  {}
-
-
   template<int dim>
   void
-  VtkStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  VtkStream::write_cell (unsigned int,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t'
            << start << '\t'
@@ -1610,15 +1374,11 @@ namespace
   }
 
 
-  void
-  VtkStream::flush_cells ()
-  {}
 
-
-
-  VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags f)
+  VtuStream::VtuStream (std::ostream &out,
+                        const DataOutBase::VtkFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase<DataOutBase::VtkFlags> (out, f)
   {}
 
 
@@ -1661,12 +1421,11 @@ namespace
 
   template<int dim>
   void
-  VtuStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  VtuStream::write_cell (unsigned int,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
 #if !defined(DEAL_II_WITH_ZLIB)
     stream << start << '\t'
@@ -1725,7 +1484,7 @@ namespace
     // compress the data we have in
     // memory and write them to the
     // stream. then release the data
-    write_compressed_block (data, stream);
+    write_compressed_block (data, flags, stream);
 #else
     for (unsigned int i=0; i<data.size(); ++i)
       stream << data[i] << ' ';
@@ -1733,45 +1492,9 @@ namespace
 
     return stream;
   }
-
-  template <typename T>
-  std::ostream &
-  DXStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  GmvStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  UcdStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  VtkStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
 }
 
 
-//----------------------------------------------------------------------//
 
 namespace DataOutBase
 {
@@ -1905,16 +1628,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DataOutFilterFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   DXFlags::DXFlags (const bool write_neighbors,
                     const bool int_binary,
                     const bool coordinates_binary,
@@ -1962,17 +1675,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DXFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-
   void UcdFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Write preamble", "true",
@@ -1990,41 +1692,6 @@ namespace DataOutBase
     write_preamble = prm.get_bool ("Write preamble");
   }
 
-
-  std::size_t
-  UcdFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-  GnuplotFlags::GnuplotFlags ()
-    :
-    dummy (0)
-  {}
-
-
-
-  void GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
-  size_t
-  GnuplotFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
 
 
   SvgFlags::SvgFlags (const unsigned int height_vector,
@@ -2045,16 +1712,6 @@ namespace DataOutBase
   {}
 
 
-  std::size_t
-  SvgFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
 
   void PovrayFlags::declare_parameters (ParameterHandler &prm)
   {
@@ -2067,7 +1724,7 @@ namespace DataOutBase
                        "Whether POVRAY should use bicubic patches");
     prm.declare_entry ("Include external file", "true",
                        Patterns::Bool (),
-                       "Whether camera and lightling information should "
+                       "Whether camera and lighting information should "
                        "be put into an external file \"data.inc\" or into "
                        "the POVRAY input file");
   }
@@ -2079,16 +1736,6 @@ namespace DataOutBase
     smooth        = prm.get_bool ("Use smooth triangles");
     bicubic_patch = prm.get_bool ("Use bicubic patches");
     external_data = prm.get_bool ("Include external file");
-  }
-
-
-
-  std::size_t
-  PovrayFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
   }
 
 
@@ -2329,122 +1976,38 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  EpsFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-  GmvFlags::GmvFlags ()
-  {}
-
-
-
-  void GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-  std::size_t
-  GmvFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   TecplotFlags::
   TecplotFlags (const char *tecplot_binary_file_name,
-                const char *zone_name)
+                const char *zone_name,
+                const double solution_time)
     :
     tecplot_binary_file_name(tecplot_binary_file_name),
-    zone_name(zone_name)
+    zone_name(zone_name),
+    solution_time (solution_time)
   {}
 
-
-
-  void TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
 
 
   std::size_t
   TecplotFlags::memory_consumption () const
   {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
+    return sizeof(*this)
+           + MemoryConsumption::memory_consumption(tecplot_binary_file_name)
+           + MemoryConsumption::memory_consumption(zone_name);
   }
 
 
 
   VtkFlags::VtkFlags (const double time,
                       const unsigned int cycle,
-                      const bool print_date_and_time)
+                      const bool print_date_and_time,
+                      const VtkFlags::ZlibCompressionLevel compression_level)
     :
     time (time),
     cycle (cycle),
-    print_date_and_time (print_date_and_time)
+    print_date_and_time (print_date_and_time),
+    compression_level (compression_level)
   {}
-
-
-
-  void VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
-  std::size_t
-  VtkFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-  Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
-    :
-    dummy (0)
-  {}
-
-
-
-  void Deal_II_IntermediateFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-  std::size_t
-  Deal_II_IntermediateFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
 
 
 
@@ -2988,17 +2551,9 @@ namespace DataOutBase
     // preamble
     if (flags.write_preamble)
       {
-        std::time_t  time1= std::time (0);
-        std::tm     *time = std::localtime(&time1);
         out << "# This file was generated by the deal.II library." << '\n'
-            << "# Date =  "
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday << '\n'
-            << "# Time =  "
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec << '\n'
+            << "# Date =  " << Utilities::System::get_date() << "\n"
+            << "# Time =  " << Utilities::System::get_time() << "\n"
             << "#" << '\n'
             << "# For a description of the UCD format see the AVS Developer's guide."
             << '\n'
@@ -3310,19 +2865,12 @@ namespace DataOutBase
     if (flags.write_neighbors)
       out << "component \"neighbors\" value \"neighbors\"" << '\n';
 
-    if (true)
-      {
-        std::time_t  time1= std::time (0);
-        std::tm     *time = std::localtime(&time1);
-        out << "attribute \"created\" string \""
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday
-            << ' '
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec << '"' << '\n';
-      }
+    {
+      out << "attribute \"created\" string \""
+          << Utilities::System::get_date()
+          << ' '
+          << Utilities::System::get_time() << '"' << '\n';
+    }
 
     out << "end" << '\n';
     // Write all binary data now
@@ -3375,48 +2923,36 @@ namespace DataOutBase
     const unsigned int n_data_sets = data_names.size();
 
     // write preamble
-    if (true)
-      {
-        // block this to have local
-        // variables destroyed after
-        // use
-        const std::time_t  time1= std::time (0);
-        const std::tm     *time = std::localtime(&time1);
-        out << "# This file was generated by the deal.II library." << '\n'
-            << "# Date =  "
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday << '\n'
-            << "# Time =  "
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec << '\n'
-            << "#" << '\n'
-            << "# For a description of the GNUPLOT format see the GNUPLOT manual."
-            << '\n'
-            << "#" << '\n'
-            << "# ";
+    {
+      out << "# This file was generated by the deal.II library." << '\n'
+          << "# Date =  " << Utilities::System::get_date() << '\n'
+          << "# Time =  " << Utilities::System::get_time() << '\n'
+          << "#" << '\n'
+          << "# For a description of the GNUPLOT format see the GNUPLOT manual."
+          << '\n'
+          << "#" << '\n'
+          << "# ";
 
-        switch (spacedim)
-          {
-          case 1:
-            out << "<x> ";
-            break;
-          case 2:
-            out << "<x> <y> ";
-            break;
-          case 3:
-            out << "<x> <y> <z> ";
-            break;
+      switch (spacedim)
+        {
+        case 1:
+          out << "<x> ";
+          break;
+        case 2:
+          out << "<x> <y> ";
+          break;
+        case 3:
+          out << "<x> <y> <z> ";
+          break;
 
-          default:
-            Assert (false, ExcNotImplemented());
-          }
+        default:
+          Assert (false, ExcNotImplemented());
+        }
 
-        for (unsigned int i=0; i<data_names.size(); ++i)
-          out << '<' << data_names[i] << "> ";
-        out << '\n';
-      }
+      for (unsigned int i=0; i<data_names.size(); ++i)
+        out << '<' << data_names[i] << "> ";
+      out << '\n';
+    }
 
 
     // loop over all patches
@@ -3610,60 +3146,50 @@ namespace DataOutBase
     Assert (spacedim==2, ExcNotImplemented());
 
     const unsigned int n_data_sets = data_names.size();
+    (void)n_data_sets;
 
     // write preamble
-    if (true)
-      {
-        // block this to have local
-        // variables destroyed after use
-        const std::time_t  time1= std::time (0);
-        const std::tm     *time = std::localtime(&time1);
-        out << "/* This file was generated by the deal.II library." << '\n'
-            << "   Date =  "
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday << '\n'
-            << "   Time =  "
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec << '\n'
-            << '\n'
-            << "   For a description of the POVRAY format see the POVRAY manual."
-            << '\n'
-            << "*/ " << '\n';
+    {
+      out << "/* This file was generated by the deal.II library." << '\n'
+          << "   Date =  " << Utilities::System::get_date() << '\n'
+          << "   Time =  " << Utilities::System::get_time() << '\n'
+          << '\n'
+          << "   For a description of the POVRAY format see the POVRAY manual."
+          << '\n'
+          << "*/ " << '\n';
 
-        // include files
-        out << "#include \"colors.inc\" " << '\n'
-            << "#include \"textures.inc\" " << '\n';
+      // include files
+      out << "#include \"colors.inc\" " << '\n'
+          << "#include \"textures.inc\" " << '\n';
 
 
-        // use external include file for textures,
-        // camera and light
-        if (flags.external_data)
-          out << "#include \"data.inc\" " << '\n';
-        else                          // all definitions in data file
-          {
-            // camera
-            out << '\n' << '\n'
-                << "camera {"            << '\n'
-                << "  location <1,4,-7>" << '\n'
-                << "  look_at <0,0,0>"   << '\n'
-                << "  angle 30"          << '\n'
-                << "}"                   << '\n';
+      // use external include file for textures,
+      // camera and light
+      if (flags.external_data)
+        out << "#include \"data.inc\" " << '\n';
+      else                          // all definitions in data file
+        {
+          // camera
+          out << '\n' << '\n'
+              << "camera {"            << '\n'
+              << "  location <1,4,-7>" << '\n'
+              << "  look_at <0,0,0>"   << '\n'
+              << "  angle 30"          << '\n'
+              << "}"                   << '\n';
 
-            // light
-            out << '\n'
-                << "light_source {"      << '\n'
-                << "  <1,4,-7>"      << '\n'
-                << "  color Grey"        << '\n'
-                << "}"                   << '\n';
-            out << '\n'
-                << "light_source {"      << '\n'
-                << "  <0,20,0>"      << '\n'
-                << "  color White"       << '\n'
-                << "}"                   << '\n';
-          }
-      }
+          // light
+          out << '\n'
+              << "light_source {"      << '\n'
+              << "  <1,4,-7>"      << '\n'
+              << "  color Grey"        << '\n'
+              << "}"                   << '\n';
+          out << '\n'
+              << "light_source {"      << '\n'
+              << "  <0,20,0>"      << '\n'
+              << "  color White"       << '\n'
+              << "}"                   << '\n';
+        }
+    }
 
     // max. and min. heigth of solution
     Assert(patches.size()>0, ExcInternalError());
@@ -3946,11 +3472,11 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
+  void write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                   const std::vector<std::string>          &/*data_names*/,
                   const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
-                  const EpsFlags                          &flags,
-                  std::ostream                            &out)
+                  const EpsFlags                          &/*flags*/,
+                  std::ostream                            &/*out*/)
   {
     // not implemented, see the documentation of the function
     AssertThrow (dim==2, ExcNotImplemented());
@@ -4210,58 +3736,49 @@ namespace DataOutBase
 
 
     // now write preamble
-    if (true)
-      {
-        // block this to have local
-        // variables destroyed after
-        // use
-        std::time_t  time1= std::time (0);
-        std::tm     *time = std::localtime(&time1);
-        out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
-            << "%%Title: deal.II Output" << '\n'
-            << "%%Creator: the deal.II library" << '\n'
-            << "%%Creation Date: "
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday << " - "
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec << '\n'
-            << "%%BoundingBox: "
-            // lower left corner
-            << "0 0 "
-            // upper right corner
-            << static_cast<unsigned int>( (x_max-x_min) * scale + 0.5)
-            << ' '
-            << static_cast<unsigned int>( (y_max-y_min) * scale + 0.5)
-            << '\n';
+    {
+      out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
+          << "%%Title: deal.II Output" << '\n'
+          << "%%Creator: the deal.II library" << '\n'
+          << "%%Creation Date: "
+          << Utilities::System::get_date()
+          << " - "
+          << Utilities::System::get_time() << '\n'
+          << "%%BoundingBox: "
+          // lower left corner
+          << "0 0 "
+          // upper right corner
+          << static_cast<unsigned int>( (x_max-x_min) * scale + 0.5)
+          << ' '
+          << static_cast<unsigned int>( (y_max-y_min) * scale + 0.5)
+          << '\n';
 
-        // define some abbreviations to keep
-        // the output small:
-        // m=move turtle to
-        // l=define a line
-        // s=set rgb color
-        // sg=set gray value
-        // lx=close the line and plot the line
-        // lf=close the line and fill the interior
-        out << "/m {moveto} bind def"      << '\n'
-            << "/l {lineto} bind def"      << '\n'
-            << "/s {setrgbcolor} bind def" << '\n'
-            << "/sg {setgray} bind def"    << '\n'
-            << "/lx {lineto closepath stroke} bind def" << '\n'
-            << "/lf {lineto closepath fill} bind def"   << '\n';
+      // define some abbreviations to keep
+      // the output small:
+      // m=move turtle to
+      // l=define a line
+      // s=set rgb color
+      // sg=set gray value
+      // lx=close the line and plot the line
+      // lf=close the line and fill the interior
+      out << "/m {moveto} bind def"      << '\n'
+          << "/l {lineto} bind def"      << '\n'
+          << "/s {setrgbcolor} bind def" << '\n'
+          << "/sg {setgray} bind def"    << '\n'
+          << "/lx {lineto closepath stroke} bind def" << '\n'
+          << "/lf {lineto closepath fill} bind def"   << '\n';
 
-        out << "%%EndProlog" << '\n'
-            << '\n';
-        // set fine lines
-        out << flags.line_width << " setlinewidth" << '\n';
-        // allow only five digits
-        // for output (instead of the
-        // default six); this should suffice
-        // even for fine grids, but reduces
-        // the file size significantly
-        out << std::setprecision (5);
-      }
+      out << "%%EndProlog" << '\n'
+          << '\n';
+      // set fine lines
+      out << flags.line_width << " setlinewidth" << '\n';
+      // allow only five digits
+      // for output (instead of the
+      // default six); this should suffice
+      // even for fine grids, but reduces
+      // the file size significantly
+      out << std::setprecision (5);
+    }
 
     // check if min and max
     // values for the color are
@@ -4544,17 +4061,9 @@ namespace DataOutBase
     ///////////
     // preamble
     {
-      std::time_t  time1= std::time (0);
-      std::tm     *time = std::localtime(&time1);
       out << "# This file was generated by the deal.II library." << '\n'
-          << "# Date =  "
-          << time->tm_year+1900 << "/"
-          << time->tm_mon+1 << "/"
-          << time->tm_mday << '\n'
-          << "# Time =  "
-          << time->tm_hour << ":"
-          << std::setw(2) << time->tm_min << ":"
-          << std::setw(2) << time->tm_sec << '\n'
+          << "# Date =  " << Utilities::System::get_date() << '\n'
+          << "# Time =  " << Utilities::System::get_time() << '\n'
           << "#" << '\n'
           << "# For a description of the Tecplot format see the Tecplot documentation."
           << '\n'
@@ -4586,6 +4095,9 @@ namespace DataOutBase
       out << "zone ";
       if (flags.zone_name)
         out << "t=\"" << flags.zone_name << "\" ";
+
+      if (flags.solution_time >= 0.0)
+        out << "strandid=1, solutiontime=" << flags.solution_time <<", ";
 
       out << "f=feblock, n=" << n_nodes << ", e=" << n_cells
           << ", et=" << tecplot_cell_type[dim] << '\n';
@@ -5117,34 +4629,27 @@ namespace DataOutBase
 
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in
-    // first patch. checks against all
-    // other patches are made in
-    // write_gmv_reorder_data_vectors
-    Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-            (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-            ExcDimensionMismatch (patches[0].points_are_available
-                                  ?
-                                  (n_data_sets + spacedim)
-                                  :
-                                  n_data_sets,
-                                  patches[0].data.n_rows()));
+    // first patch.
+    if (patches[0].points_are_available)
+      {
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+      }
+    else
+      {
+        AssertDimension(n_data_sets, patches[0].data.n_rows())
+      }
 
     ///////////////////////
     // preamble
     {
-      std::time_t  time1= std::time (0);
-      std::tm     *time = std::localtime(&time1);
       out << "# vtk DataFile Version 3.0"
           << '\n'
           << "#This file was generated by the deal.II library";
       if (flags.print_date_and_time)
-        out << " on "
-            << time->tm_year+1900 << "/"
-            << time->tm_mon+1 << "/"
-            << time->tm_mday << " at "
-            << time->tm_hour << ":"
-            << std::setw(2) << time->tm_min << ":"
-            << std::setw(2) << time->tm_sec;
+        {
+          out << " on " << Utilities::System::get_date()
+              << " at " << Utilities::System::get_time();
+        }
       else
         out << ".";
       out << '\n'
@@ -5361,21 +4866,16 @@ namespace DataOutBase
                          const VtkFlags &flags)
   {
     AssertThrow (out, ExcIO());
-    std::time_t  time1= std::time (0);
-    std::tm     *time = std::localtime(&time1);
     out << "<?xml version=\"1.0\" ?> \n";
     out << "<!-- \n";
     out << "# vtk DataFile Version 3.0"
         << '\n'
         << "#This file was generated by the deal.II library";
     if (flags.print_date_and_time)
-      out << " on "
-          << time->tm_year+1900 << "/"
-          << time->tm_mon+1 << "/"
-          << time->tm_mday << " at "
-          << time->tm_hour << ":"
-          << std::setw(2) << time->tm_min << ":"
-          << std::setw(2) << time->tm_sec;
+      {
+        out << " on " << Utilities::System::get_time()
+            << " at " << Utilities::System::get_date();
+      }
     else
       out << ".";
     out << "\n-->\n";
@@ -5542,15 +5042,14 @@ namespace DataOutBase
     // first patch. checks against all
     // other patches are made in
     // write_gmv_reorder_data_vectors
-    Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-            (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-            ExcDimensionMismatch (patches[0].points_are_available
-                                  ?
-                                  (n_data_sets + spacedim)
-                                  :
-                                  n_data_sets,
-                                  patches[0].data.n_rows()));
-
+    if (patches[0].points_are_available)
+      {
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+      }
+    else
+      {
+        AssertDimension(n_data_sets, patches[0].data.n_rows())
+      }
 
 #ifdef DEAL_II_WITH_ZLIB
     const char *ascii_or_binary = "binary";
@@ -5802,8 +5301,8 @@ namespace DataOutBase
 
   template <int spacedim>
   void write_svg (const std::vector<Patch<2,spacedim> > &patches,
-                  const std::vector<std::string> &data_names,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                  const std::vector<std::string> &/*data_names*/,
+                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
                   const SvgFlags &flags,
                   std::ostream &out)
   {
@@ -5927,7 +5426,7 @@ namespace DataOutBase
     Point<3> camera_direction_temp;
     Point<3> camera_horizontal_temp;
 
-    const float angle_factor = 3.14159265 / 180.;
+    const float angle_factor = 3.14159265f / 180.f;
 
     // (I) rotate the camera to the chosen polar angle
     camera_position_temp[1] = cos(angle_factor * flags.polar_angle) * camera_position[1] - sin(angle_factor * flags.polar_angle) * camera_position[2];
@@ -6694,16 +6193,10 @@ write_pvd_record (std::ostream &out,
 
   out << "<?xml version=\"1.0\"?>\n";
 
-  std::time_t  time1= std::time (0);
-  std::tm     *time = std::localtime(&time1);
   out << "<!--\n";
-  out << "#This file was generated by the deal.II library on "
-      << time->tm_year+1900 << "/"
-      << time->tm_mon+1 << "/"
-      << time->tm_mday << " at "
-      << time->tm_hour << ":"
-      << std::setw(2) << time->tm_min << ":"
-      << std::setw(2) << time->tm_sec
+  out << "#This file was generated by the deal.II library"
+      << " on " << Utilities::System::get_date()
+      << " at " << Utilities::System::get_time()
       << "\n-->\n";
 
   out << "<VTKFile type=\"Collection\" version=\"0.1\" ByteOrder=\"LittleEndian\">\n";
@@ -6738,16 +6231,10 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 
   out << "<?xml version=\"1.0\"?>\n";
 
-  std::time_t  time1= std::time (0);
-  std::tm     *time = std::localtime(&time1);
   out << "<!--\n";
-  out << "#This file was generated by the deal.II library on "
-      << time->tm_year+1900 << "/"
-      << time->tm_mon+1 << "/"
-      << time->tm_mday << " at "
-      << time->tm_hour << ":"
-      << std::setw(2) << time->tm_min << ":"
-      << std::setw(2) << time->tm_sec
+  out << "#This file was generated by the deal.II library"
+      << " on " << Utilities::System::get_date()
+      << " at " << Utilities::System::get_time()
       << "\n-->\n";
 
   out << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
@@ -7177,7 +6664,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                                        const DataOutBase::DataOutFilter &data_filter,
                                        const bool write_mesh_file,
                                        const std::string &mesh_filename,
@@ -7188,7 +6675,6 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // throw an exception, but first make
   // sure the compiler does not warn about
   // the now unused function arguments
-  (void)patches;
   (void)data_filter;
   (void)write_mesh_file;
   (void)mesh_filename;
@@ -7532,94 +7018,33 @@ DataOutInterface<dim,spacedim>::set_default_format(const DataOutBase::OutputForm
   default_fmt = fmt;
 }
 
-
-
 template <int dim, int spacedim>
+template <typename FlagType>
 void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::DXFlags &flags)
+DataOutInterface<dim, spacedim>::set_flags (const FlagType &flags)
 {
-  dx_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::UcdFlags &flags)
-{
-  ucd_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GnuplotFlags &flags)
-{
-  gnuplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::PovrayFlags &flags)
-{
-  povray_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::EpsFlags &flags)
-{
-  eps_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GmvFlags &flags)
-{
-  gmv_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::TecplotFlags &flags)
-{
-  tecplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::VtkFlags &flags)
-{
-  vtk_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::SvgFlags &flags)
-{
-  svg_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::Deal_II_IntermediateFlags &flags)
-{
-  deal_II_intermediate_flags = flags;
+  // The price for not writing ten duplicates of this function is some loss in
+  // type safety.
+  if (typeid(flags) == typeid(dx_flags))
+    dx_flags = *reinterpret_cast<const DataOutBase::DXFlags *>(&flags);
+  else if (typeid(flags) == typeid(ucd_flags))
+    ucd_flags = *reinterpret_cast<const DataOutBase::UcdFlags *>(&flags);
+  else if (typeid(flags) == typeid(povray_flags))
+    povray_flags = *reinterpret_cast<const DataOutBase::PovrayFlags *>(&flags);
+  else if (typeid(flags) == typeid(eps_flags))
+    eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
+  else if (typeid(flags) == typeid(gmv_flags))
+    gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
+  else if (typeid(flags) == typeid(tecplot_flags))
+    tecplot_flags = *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
+  else if (typeid(flags) == typeid(vtk_flags))
+    vtk_flags = *reinterpret_cast<const DataOutBase::VtkFlags *>(&flags);
+  else if (typeid(flags) == typeid(svg_flags))
+    svg_flags = *reinterpret_cast<const DataOutBase::SvgFlags *>(&flags);
+  else if (typeid(flags) == typeid(deal_II_intermediate_flags))
+    deal_II_intermediate_flags = *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
+  else
+    Assert(false, ExcNotImplemented());
 }
 
 

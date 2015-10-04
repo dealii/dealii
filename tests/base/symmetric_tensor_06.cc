@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,13 +67,13 @@ void test ()
             }
         bs[i][j] = tmp_ij;
       }
-  double_contract (ba, ta, aa);
+  ba = double_contract<2,0,3,1>(ta, aa);
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       {
-        Assert (as[i][j] == aa[i][j], ExcInternalError());
-        Assert (bs[i][j] == ba[i][j], ExcInternalError());
+        AssertThrow (as[i][j] == aa[i][j], ExcInternalError());
+        AssertThrow (bs[i][j] == ba[i][j], ExcInternalError());
       }
 
 }

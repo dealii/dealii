@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,14 +38,14 @@ void test ()
       std::ostringstream s;
       s << "test test" << number << "test test";
 
-      Assert (Utilities::get_integer_at_position (s.str(),
-                                                  9).first
-              == number,
-              ExcInternalError());
-      Assert (Utilities::get_integer_at_position (s.str(),
-                                                  9).second
-              == i+1,
-              ExcInternalError());
+      AssertThrow (Utilities::get_integer_at_position (s.str(),
+                                                       9).first
+                   == number,
+                   ExcInternalError());
+      AssertThrow (Utilities::get_integer_at_position (s.str(),
+                                                       9).second
+                   == i+1,
+                   ExcInternalError());
 
       deallog << i << ' ' << Utilities::get_integer_at_position (s.str(),
                                                                  9).first

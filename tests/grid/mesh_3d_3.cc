@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,14 +59,14 @@ int main ()
 
   // make sure by hand that certain
   // vertices match up
-  Assert (cells[0]->vertex(1) == cells[1]->vertex(4),
-          ExcInternalError());
-  Assert (cells[0]->vertex(3) == cells[1]->vertex(6),
-          ExcInternalError());
-  Assert (cells[0]->vertex(5) == cells[1]->vertex(5),
-          ExcInternalError());
-  Assert (cells[0]->vertex(7) == cells[1]->vertex(7),
-          ExcInternalError());
+  AssertThrow (cells[0]->vertex(1) == cells[1]->vertex(4),
+               ExcInternalError());
+  AssertThrow (cells[0]->vertex(3) == cells[1]->vertex(6),
+               ExcInternalError());
+  AssertThrow (cells[0]->vertex(5) == cells[1]->vertex(5),
+               ExcInternalError());
+  AssertThrow (cells[0]->vertex(7) == cells[1]->vertex(7),
+               ExcInternalError());
 }
 
 

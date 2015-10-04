@@ -141,6 +141,10 @@ namespace Utilities
       const unsigned int max_n_destinations
         = Utilities::MPI::max (destinations.size(), mpi_comm);
 
+      if (max_n_destinations==0)
+        // all processes have nothing to send/receive:
+        return std::vector<unsigned int>();
+
       // now that we know the number
       // of data packets every
       // processor wants to send, set
@@ -192,6 +196,7 @@ namespace Utilities
                         int *len,
                         MPI_Datatype *)
       {
+        (void)len;
         const MinMaxAvg *in_lhs = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
@@ -334,6 +339,7 @@ namespace Utilities
                                         const unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
+      (void)constructor_has_already_run;
       Assert (constructor_has_already_run == false,
               ExcMessage ("You can only create a single object of this class "
                           "in a program since it initializes the MPI system."));
@@ -349,7 +355,7 @@ namespace Utilities
                    ExcMessage ("MPI error. You can only start MPI once!"));
 
       int mpi_err, provided;
-      // this works likempi_err = MPI_Init (&argc, &argv); but tells MPI that
+      // this works like mpi_err = MPI_Init (&argc, &argv); but tells MPI that
       // we might use several threads but never call two MPI functions at the
       // same time. For an explanation see on why we do this see
       // http://www.open-mpi.org/community/lists/users/2010/03/12244.php

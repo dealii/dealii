@@ -50,7 +50,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
@@ -911,25 +911,32 @@ namespace Step42
         GridTools::transform(&rotate_half_sphere, triangulation);
         GridTools::shift(Point<dim>(0.5, 0.5, 0.5), triangulation);
 
-        static HyperBallBoundary<dim> boundary_description(Point<dim>(0.5, 0.5, 0.5), radius);
-        triangulation.set_boundary(0, boundary_description);
+        static SphericalManifold<dim> manifold_description(Point<dim>(0.5, 0.5, 0.5));
+        GridTools::copy_boundary_to_manifold_id(triangulation);
+        triangulation.set_manifold(0, manifold_description);
       }
     // Alternatively, create a hypercube mesh. After creating it,
     // assign boundary indicators as follows:
     // @code
-    //    _______
-    //   /  1    /|
-    //  /______ / |
-    // |       | 8|
-    // |   8   | /
-    // |_______|/
-    //     6
+    // >     _______
+    // >    /  1    /|
+    // >   /______ / |
+    // >  |       | 8|
+    // >  |   8   | /
+    // >  |_______|/
+    // >      6
     // @endcode
     // In other words, the boundary indicators of the sides of the cube are 8.
     // The boundary indicator of the bottom is 6 and the top has indicator 1.
-    // We will make use of these indicators later when evaluating which
-    // boundary will carry Dirichlet boundary conditions or will be
-    // subject to potential contact.
+    // We set these by looping over all cells of all faces and looking at
+    // coordinate values of the cell center, and will make use of these
+    // indicators later when evaluating which boundary will carry Dirichlet
+    // boundary conditions or will be subject to potential contact.
+    // (In the current case, the mesh contains only a single cell, and all of
+    // its faces are on the boundary, so both the loop over all cells and the
+    // query whether a face is on the boundary are, strictly speaking,
+    // unnecessary; we retain them simply out of habit: this kind of code can
+    // be found in many programs in essentially this form.)
     else
       {
         const Point<dim> p1(0, 0, 0);
@@ -937,26 +944,24 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        /* boundary_indicators:
-
-         */
         Triangulation<3>::active_cell_iterator
         cell = triangulation.begin_active(),
         endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            {
-              if (cell->face(face)->center()[2] == p2(2))
-                cell->face(face)->set_boundary_indicator(1);
-              if (cell->face(face)->center()[0] == p1(0)
-                  || cell->face(face)->center()[0] == p2(0)
-                  || cell->face(face)->center()[1] == p1(1)
-                  || cell->face(face)->center()[1] == p2(1))
-                cell->face(face)->set_boundary_indicator(8);
-              if (cell->face(face)->center()[2] == p1(2))
-                cell->face(face)->set_boundary_indicator(6);
-            }
+          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+               ++face_no)
+            if (cell->face(face_no)->at_boundary())
+              {
+                if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(1);
+                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[0] - p2[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p1[1]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(8);
+                if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(6);
+              }
       }
 
     triangulation.refine_global(n_initial_global_refinements);
@@ -1116,7 +1121,7 @@ namespace Step42
   // for the finite element are located. We achieve this by using a
   // QGaussLobatto quadrature formula here, along with initializing the finite
   // element with a set of interpolation points derived from the same quadrature
-  // formula. The remainder of the function is relatively straightfoward: we
+  // formula. The remainder of the function is relatively straightforward: we
   // put the resulting matrix into the given argument; because we know the
   // matrix is diagonal, it is sufficient to have a loop over only $i$ not
   // not over $j$. Strictly speaking, we could even avoid multiplying the
@@ -1152,7 +1157,7 @@ namespace Step42
              ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
@@ -1242,7 +1247,7 @@ namespace Step42
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell->face(face)->get_dof_indices(dof_indices);
@@ -1421,7 +1426,7 @@ namespace Step42
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 &&
-                cell->face(face)->boundary_indicator() == 1)
+                cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1553,7 +1558,7 @@ namespace Step42
 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
-                && cell->face(face)->boundary_indicator() == 1)
+                && cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1901,6 +1906,11 @@ namespace Step42
       {
         TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         solution_transfer.interpolate(distributed_solution);
+
+        // enforce constraints to make the interpolated solution conforming on
+        // the new mesh:
+        constraints_hanging_nodes.distribute(distributed_solution);
+
         solution = distributed_solution;
         compute_nonlinear_residual(solution);
       }
@@ -2064,7 +2074,7 @@ namespace Step42
   // residual (newton_rhs_uncondensed) and corresponding diagonal entry
   // of the mass matrix (diag_mass_matrix_vector). Because it is
   // not unlikely that hanging nodes show up in the contact area
-  // it is important to apply contraints_hanging_nodes.distribute
+  // it is important to apply constraints_hanging_nodes.distribute
   // to the distributed_lambda vector.
   template <int dim>
   void
@@ -2102,7 +2112,7 @@ namespace Step42
         for (unsigned int face = 0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
 

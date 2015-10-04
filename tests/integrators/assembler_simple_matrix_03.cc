@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,6 @@ void test(FiniteElement<dim> &fe)
 
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > ass;
   ass.initialize(M);
-  ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
   ass.initialize_info(info, false);
   MeshWorker::DoFInfo<dim> infon(dof.block_info());

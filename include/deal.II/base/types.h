@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__types_h
-#define __deal2__types_h
+#ifndef dealii__types_h
+#define dealii__types_h
 
 
 #include <deal.II/base/config.h>
@@ -201,7 +201,7 @@ namespace numbers
   /**
    * Invalid manifold_id which we need in several places as a default value.
    * We assume that all valid manifold_ids lie in the range [0,
-   * invalid_maifold_id).
+   * invalid_manifold_id).
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"

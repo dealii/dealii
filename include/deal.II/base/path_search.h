@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__path_search_h
-#define __deal2__path_search_h
+#ifndef dealii__path_search_h
+#define dealii__path_search_h
 
 
 #include <deal.II/base/config.h>
@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * This piece of code will first traverse all paths in the list set up for
- * file class <TT>MESH</tt>. If it manages to open a file, it returns the
+ * file class <tt>MESH</tt>. If it manages to open a file, it returns the
  * <tt>istream</tt> object. If not, it will try to append the first suffix of
  * the suffix list and do the same. And so on. If no file is found in the end,
  * an exception is thrown.

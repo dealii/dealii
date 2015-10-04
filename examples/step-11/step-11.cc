@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2014 by the deal.II authors
+ * Copyright (C) 2001 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -44,9 +44,9 @@
 #include <deal.II/numerics/matrix_tools.h>
 
 // Just this one is new: it declares a class
-// <code>CompressedSparsityPattern</code>, which we will use and explain
+// DynamicSparsityPattern, which we will use and explain
 // further down below.
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // We will make use of the std::find algorithm of the C++ standard library, so
 // we have to include the following file for its declaration:
@@ -138,11 +138,11 @@ namespace Step11
     // Next task is to construct the object representing the constraint that
     // the mean value of the degrees of freedom on the boundary shall be
     // zero. For this, we first want a list of those nodes which are actually
-    // at the boundary. The <code>DoFTools</code> class has a function that
-    // returns an array of Boolean values where <code>true</code> indicates
-    // that the node is at the boundary. The second argument denotes a mask
-    // selecting which components of vector valued finite elements we want to
-    // be considered. This sort of information is encoded using the
+    // at the boundary. The <code>DoFTools</code> namespace has a function
+    // that returns an array of Boolean values where <code>true</code>
+    // indicates that the node is at the boundary. The second argument denotes
+    // a mask selecting which components of vector valued finite elements we
+    // want to be considered. This sort of information is encoded using the
     // ComponentMask class (see also @ref GlossComponentMask). Since we have a
     // scalar finite element anyway, this mask in reality should have only one
     // entry with a <code>true</code> value. However, the ComponentMask class
@@ -202,7 +202,7 @@ namespace Step11
     //
     // Since this can be so difficult that no reasonable answer can be given
     // that allows allocation of only a reasonable amount of memory, there is
-    // a class <code>CompressedSparsityPattern</code>, that can help us out
+    // a class DynamicSparsityPattern, that can help us out
     // here. It does not require that we know in advance how many entries rows
     // could have, but allows just about any length. It is thus significantly
     // more flexible in case you do not have good estimates of row lengths,
@@ -215,15 +215,15 @@ namespace Step11
     // pattern due to the differential operator, then condense it with the
     // constraints object which adds those positions in the sparsity pattern
     // that are required for the elimination of the constraint.
-    CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                   dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    mean_value_constraints.condense (csp);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    mean_value_constraints.condense (dsp);
 
     // Finally, once we have the full pattern, we can initialize an object of
     // type <code>SparsityPattern</code> from it and in turn initialize the
     // matrix with it. Note that this is actually necessary, since the
-    // <code>CompressedSparsityPattern</code> is so inefficient compared to
+    // DynamicSparsityPattern is so inefficient compared to
     // the <code>SparsityPattern</code> class due to the more flexible data
     // structures it has to use, that we can impossibly base the sparse matrix
     // class on it, but rather need an object of type
@@ -236,7 +236,7 @@ namespace Step11
     // compressed object right from the start, to which you cannot add new
     // entries anymore. The <code>compress</code> call is therefore implicit
     // in the <code>copy_from</code> call.
-    sparsity_pattern.copy_from (csp);
+    sparsity_pattern.copy_from (dsp);
     system_matrix.reinit (sparsity_pattern);
   }
 
@@ -289,7 +289,7 @@ namespace Step11
     // mapping; or you want to assembled the matrix with a coefficient in the
     // Laplace operator. For this reason, there are quite a large number of
     // variants of these functions in the <code>MatrixCreator</code> and
-    // <code>MatrixTools</code> classes. Whenever you need a slightly
+    // <code>MatrixTools</code> namespaces. Whenever you need a slightly
     // different version of these functions than the ones called above, it is
     // certainly worthwhile to take a look at the documentation and to check
     // whether something fits your needs.

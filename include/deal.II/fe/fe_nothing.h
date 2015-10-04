@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_nothing_h
-#define __deal2__fe_nothing_h
+#ifndef dealii__fe_nothing_h
+#define dealii__fe_nothing_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe.h>
@@ -82,10 +82,18 @@ class FE_Nothing : public FiniteElement<dim,spacedim>
 public:
 
   /**
-   * Constructor. Argument denotes the number of components to give this
+   * Constructor. First argument denotes the number of components to give this
    * finite element (default = 1).
+   *
+   * Second argument decides whether FE_Nothing
+   * will dominate any other FE in compare_for_face_domination() (default = false).
+   * Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
+   * we will force the traces of the two functions to be the same. Because the
+   * FE_Nothing encodes a space that is zero everywhere, this means that the Q1
+   * field will be forced to become zero at this interface.
    */
-  FE_Nothing (const unsigned int n_components = 1);
+  FE_Nothing (const unsigned int n_components = 1,
+              const bool dominate = false);
 
   /**
    * A sort of virtual copy constructor. Some places in the library, for
@@ -147,57 +155,39 @@ public:
   double
   shape_value (const unsigned int i, const Point<dim> &p) const;
 
-  /**
-   * Fill the fields of FEValues. This function performs all the operations
-   * needed to compute the data of an FEValues object.
-   *
-   * In the current case, this function returns no meaningful information,
-   * since the element has no degrees of freedom.
-   */
   virtual
   void
-  fill_fe_values (const Mapping<dim,spacedim> &mapping,
+  fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim> &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-                  FEValuesData<dim,spacedim> &data,
-                  CellSimilarity::Similarity &cell_similarity) const;
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                  const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
+                  const CellSimilarity::Similarity                           cell_similarity) const;
 
-  /**
-   * Fill the fields of FEFaceValues. This function performs all the
-   * operations needed to compute the data of an FEFaceValues object.
-   *
-   * In the current case, this function returns no meaningful information,
-   * since the element has no degrees of freedom.
-   */
   virtual
   void
-  fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
+  fill_fe_face_values (const Mapping<dim,spacedim>                               &mapping,
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int face,
-                       const Quadrature<dim-1> & quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                       typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-                       FEValuesData<dim,spacedim> &data) const;
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                       const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
-  /**
-   * Fill the fields of FESubFaceValues. This function performs all the
-   * operations needed to compute the data of an FESubFaceValues object.
-   *
-   * In the current case, this function returns no meaningful information,
-   * since the element has no degrees of freedom.
-   */
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
+  fill_fe_subface_values (const Mapping<dim,spacedim>                               &mapping,
                           const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int face,
-                          const unsigned int subface,
-                          const Quadrature<dim-1> & quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                          typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-                          FEValuesData<dim,spacedim> &data) const;
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         sub_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                          const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                          const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                          internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
   /**
    * Prepare internal data structures and fill in values independent of the
@@ -209,7 +199,7 @@ public:
    * no meaningful data exists for this element.
    */
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags     update_flags,
             const Mapping<dim,spacedim>     &mapping,
             const Quadrature<dim> &quadrature) const;
@@ -223,9 +213,10 @@ public:
    * particular the
    * @ref hp_paper "hp paper".
    *
-   * In the current case, this element is always assumed to dominate, unless
-   * it is also of type FE_Nothing().  In that situation, either element can
-   * dominate.
+   * In the current case, this element is assumed to dominate if the second
+   * argument in the constructor @p dominate is true. When this argument is false
+   * and @p fe_other is also of type FE_Nothing(), either element can dominate.
+   * Otherwise there are no_requirements.
    */
   virtual
   FiniteElementDomination::Domination
@@ -279,6 +270,16 @@ public:
                                     const unsigned int index,
                                     FullMatrix<double>  &interpolation_matrix) const;
 
+  /**
+   * @return true if the FE dominates any other.
+   */
+  bool is_dominating() const;
+
+private:
+  /**
+   * If true, this element will dominate any other apart from itself in compare_for_face_domination();
+   */
+  const bool dominate;
 
 };
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_q_hierarchical_h
-#define __deal2__fe_q_hierarchical_h
+#ifndef dealii__fe_q_hierarchical_h
+#define dealii__fe_q_hierarchical_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
@@ -29,23 +29,12 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of Hierarchical finite elements @p Qp that yield the finite
+ * Implementation of hierarchical @p Qp shape functions that yield the finite
  * element space of continuous, piecewise polynomials of degree @p p. This
  * class is realized using tensor product polynomials based on a hierarchical
- * basis @p Hierarchical on the interval <tt>[0,1]</tt> which is suitable for
- * building an @p hp tensor product finite element, if we assume that each
- * element has a single degree.
- *
- * There are not many differences between @p FE_Q_Hierarchical and @p FE_Q,
- * except that we add a function @p embedding_dofs that takes a given integer
- * @p q, between @p 1 and @p p, and returns the numbering of basis functions
- * of the element of order @p q in basis of order @p p.  This function is
- * useful if one wants to make calculations using the hierarchical nature of
- * these shape functions.
- *
- * The unit support points now are reduced to @p 0, @p 1, and <tt>0.5</tt> in
- * one dimension, and tensor products in higher dimensions. Thus, various
- * interpolation functions will only work correctly for the linear case.
+ * basis Polynomials::Hierarchical on the interval <tt>[0,1]</tt> which is
+ * suitable for building an @p hp tensor product finite element if we assume
+ * that each element has a single degree.
  *
  * The constructor of this class takes the degree @p p of this finite element.
  *
@@ -549,7 +538,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  *
  *
- * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005
+ * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005, Denis Davydov, 2015
  */
 template <int dim>
 class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
@@ -590,6 +579,20 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
+   * Return the matrix interpolating from the given finite element to the
+   * present one. Interpolation only between FE_Q_Hierarchical is supported.
+   */
+  virtual void get_interpolation_matrix(const FiniteElement< dim> &source,
+                                        FullMatrix< double > &matrix) const;
+
+  /**
+   * Embedding matrix between grids. Only isotropic refinement is supported.
+   */
+  virtual const
+  FullMatrix<double> &get_prolongation_matrix  (const unsigned int child,
+                                                const RefinementCase<dim> &refinement_case = RefinementCase< dim >::isotropic_refinement) const;
+
+  /**
    * If, on a vertex, several finite elements are active, the hp code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
@@ -607,6 +610,20 @@ public:
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+  /**
+   * Same as above but for lines.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+  /**
+   * Same as above but for faces.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
 
   /*@}*/
 
@@ -674,6 +691,31 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
 
+  /**
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void interpolate(std::vector<double>       &local_dofs,
+                   const std::vector<double> &values) const;
+
+  /**
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void
+  interpolate(std::vector<double>                &local_dofs,
+              const std::vector<Vector<double> > &values,
+              unsigned int offset = 0) const;
+
+  /**
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void
+  interpolate(std::vector<double> &local_dofs,
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+
+
 protected:
   /**
    * @p clone function instead of a copy constructor.
@@ -709,7 +751,7 @@ private:
    * This function constructs a table which fe_q_hierarchical index each
    * degree of freedom in the hierarchic numbering would have.
    *
-   * This function is anologous to the
+   * This function is analogous to the
    * FETools::hierarchical_to_lexicographic_numbering() function. However, in
    * contrast to the fe_q_hierarchical numbering defined above, the
    * lexicographic numbering originates from the tensor products of

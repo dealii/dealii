@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2014 by the deal.II authors
+ * Copyright (C) 2006 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,6 +29,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -37,7 +38,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -53,8 +54,8 @@
 #include <fstream>
 #include <iostream>
 
-// This is the only new one: We will need a library function defined in a
-// class GridTools that computes the minimal cell diameter.
+// This is the only new one: We will need a library function defined in the
+// namespace GridTools that computes the minimal cell diameter.
 #include <deal.II/grid/grid_tools.h>
 
 // The last step is as in all previous programs:
@@ -270,8 +271,9 @@ namespace Step24
   {
     const Point<dim> center;
     GridGenerator::hyper_ball (triangulation, center, 1.);
-    static const HyperBallBoundary<dim> boundary_description (center, 1.);
-    triangulation.set_boundary (0,boundary_description);
+    static const SphericalManifold<dim> boundary_description (center);
+    triangulation.set_all_manifold_ids_on_boundary(0);
+    triangulation.set_manifold (0,boundary_description);
     triangulation.refine_global (7);
 
     time_step = GridTools::minimal_cell_diameter(triangulation) /
@@ -289,11 +291,9 @@ namespace Step24
               << std::endl
               << std::endl;
 
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    sparsity_pattern.compress();
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
     mass_matrix.reinit (sparsity_pattern);

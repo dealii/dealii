@@ -64,7 +64,7 @@ void test(std::ostream & /*out*/)
 int main(int argc, char *argv[])
 {
   deal_II_exceptions::disable_abort_on_exception();
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);

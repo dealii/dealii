@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,4 +16,5 @@
 #
 # Configuration for the OpenCASCADE library:
 #
+
 CONFIGURE_FEATURE(OPENCASCADE)

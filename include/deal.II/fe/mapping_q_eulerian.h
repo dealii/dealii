@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mapping_q_eulerian_h
-#define __deal2__mapping_q_eulerian_h
+#ifndef dealii__mapping_q_eulerian_h
+#define dealii__mapping_q_eulerian_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/thread_management.h>
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * mapping from the initial configuration to the current configuration, and a
  * reference to the DoFHandler. The most common case is to use the solution
  * vector for the problem under consideration as the shift vector. The key
- * reqirement is that the number of components of the given vector field be
+ * requirement is that the number of components of the given vector field be
  * equal to (or possibly greater than) the number of space dimensions. If
  * there are more components than space dimensions (for example, if one is
  * working with a coupled problem where there are additional solution
@@ -61,8 +61,9 @@ DEAL_II_NAMESPACE_OPEN
  *    FESystem<dim> fe(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
  *    DoFHandler<dim> dof_handler(triangulation);
  *    dof_handler.distribute_dofs(fe);
- *    Vector<double> soln_vector(dof_handler.n_dofs());
- *    MappingQEulerian<dim> q2_mapping(2,soln_vector,dof_handler);
+ *    Vector<double> displacement_field(dof_handler.n_dofs());
+ *    // ... compute displacement field somehow...
+ *    MappingQEulerian<dim> q2_mapping(2, dof_handler, displacement_field);
  * @endcode
  *
  * In this example, our element consists of <tt>(dim+1)</tt> components. Only
@@ -81,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  * parallel codes using the PETSc wrapper classes, the type of the vector can
  * be specified as template parameter <tt>EulerVectorType</tt> Not specifying
  * this template argument in applications using the PETSc vector classes leads
- * to the construction of a copy of the vector which is not acccessible
+ * to the construction of a copy of the vector which is not accessible
  * afterwards!
  *
  * @author Joshua White, 2008
@@ -91,20 +92,39 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 {
 public:
   /**
-   * Constructor. The first argument is the polynomical degree of the desired
-   * Qp mapping.  It then takes a <tt>Vector<double> &</tt> to specify the
-   * transformation of the domain from the reference to the current
-   * configuration.  The organization of the elements in the @p Vector must
-   * follow the concept how deal.II stores solutions that are associated to a
-   * triangulation.  This is automatically the case if the @p Vector
-   * represents the solution of the previous step of a nonlinear problem.
-   * Alternatively, the @p Vector can be initialized by
-   * <tt>DoFAccessor::set_dof_values()</tt>.
+   * Constructor.
+   *
+   * @param[in] degree The polynomial degree of the desired $Q_p$ mapping.
+   * @param[in] euler_dof_handler A DoFHandler object that defines a finite
+   * element space. This space needs to have at least dim components and the
+   * first dim components of the space will be considered displacements
+   * relative to the original positions of the cells of the triangulation.
+   * @param[in] euler_vector A finite element function in the space defined by
+   * the second argument. The first dim components of this function will be
+   * interpreted as the displacement we use in defining the mapping,
+   * relative to the location of cells of the underlying triangulation.
    */
+  MappingQEulerian (const unsigned int              degree,
+                    const DoFHandler<dim,spacedim> &euler_dof_handler,
+                    const VECTOR                   &euler_vector);
 
-  MappingQEulerian (const unsigned int     degree,
-                    const VECTOR  &euler_vector,
-                    const DoFHandler<dim,spacedim>  &euler_dof_handler);
+  /**
+   * @deprecated Use the constructor with the reverse order of second and
+   * third argument.
+   */
+  MappingQEulerian (const unsigned int              degree,
+                    const VECTOR                   &euler_vector,
+                    const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
+
+  /**
+   * Return the mapped vertices of the cell. For the current class, this function does
+   * not use the support points from the geometry of the current cell but
+   * instead evaluates an externally given displacement field in addition to
+   * the geometry of the cell.
+   */
+  virtual
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -127,25 +147,24 @@ public:
 
 protected:
   /**
-   * Implementation of the interface in MappingQ. Overrides the function in
-   * the base class, since we cannot use any cell similarity for this class.
+   * Compute mapping-related information for a cell.
+   * See the documentation of Mapping::fill_fe_values() for
+   * a discussion of purpose, arguments, and return value of this function.
+   *
+   * This function overrides the function in
+   * the base class since we cannot use any cell similarity for this class.
    */
-  virtual void
+  virtual
+  CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                  typename std::vector<Point<spacedim> >                    &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity) const;
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
    * Reference to the vector of shifts.
    */
-
   SmartPointer<const VECTOR, MappingQEulerian<dim,VECTOR,spacedim> > euler_vector;
 
   /**
@@ -192,12 +211,13 @@ private:
   mutable Threads::Mutex fe_values_mutex;
 
   /**
-   * Compute the positions of the support points in the current configuration
+   * Compute the positions of the support points in the current configuration.
+   * See the documentation of MappingQGeneric::compute_mapping_support_points()
+   * for more information.
    */
-  virtual void compute_mapping_support_points(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
-
+  virtual
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 };
 
 /*@}*/
@@ -221,5 +241,5 @@ MappingQEulerian<dim,VECTOR,spacedim>::preserves_vertex_locations () const
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // __deal2__mapping_q_eulerian_h
+#endif // dealii__mapping_q_eulerian_h
 

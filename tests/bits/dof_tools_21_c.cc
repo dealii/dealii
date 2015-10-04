@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,8 +110,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
       if (cell_2->face(j)->center()(1) < -2.9)
         face_2 = cell_2->face(j);
     }
-  face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
 
   cell_2->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
@@ -186,8 +186,8 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
       if (cell_2->face(j)->center()(2) < -2.9)
         face_2 = cell_2->face(j);
     }
-  face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
 
   cell_2->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();

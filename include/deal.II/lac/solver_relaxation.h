@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_relaxation_h
-#define __deal2__solver_relaxation_h
+#ifndef dealii__solver_relaxation_h
+#define dealii__solver_relaxation_h
 
 
 #include <deal.II/base/config.h>
@@ -76,7 +76,7 @@ public:
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
-   * R(x_k,b)$. The amtrix <i>A</i> itself is only used to compute the
+   * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
    * residual.
    */
   template<class MATRIX, class RELAXATION>

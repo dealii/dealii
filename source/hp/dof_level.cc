@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@ namespace internal
     void
     DoFLevel::compress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
     {
+      (void)fe_collection;
       return;
 
       if (dof_offsets.size() == 0 || dof_indices.size()==0)

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,6 +36,7 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_gmres.h>
@@ -411,7 +412,7 @@ namespace Step35
 
     EquationData::Velocity<dim>       vel_exact;
     std::map<types::global_dof_index, double>    boundary_values;
-    std::vector<types::boundary_id> boundary_indicators;
+    std::vector<types::boundary_id> boundary_ids;
 
     Triangulation<dim> triangulation;
 
@@ -708,7 +709,7 @@ namespace Step35
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
 
-    boundary_indicators = triangulation.get_boundary_indicators();
+    boundary_ids = triangulation.get_boundary_ids();
 
     dof_handler_velocity.distribute_dofs (fe_velocity);
     DoFRenumbering::boost::Cuthill_McKee (dof_handler_velocity);
@@ -789,13 +790,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_velocity_matrices()
   {
-    sparsity_pattern_velocity.reinit (dof_handler_velocity.n_dofs(),
-                                      dof_handler_velocity.n_dofs(),
-                                      dof_handler_velocity.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_velocity,
-                                     sparsity_pattern_velocity);
-    sparsity_pattern_velocity.compress();
-
+    {
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_velocity.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_velocity, dsp);
+      sparsity_pattern_velocity.copy_from (dsp);
+    }
     vel_Laplace_plus_Mass.reinit (sparsity_pattern_velocity);
     for (unsigned int d=0; d<dim; ++d)
       vel_it_matrix[d].reinit (sparsity_pattern_velocity);
@@ -817,11 +816,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_pressure_matrices()
   {
-    sparsity_pattern_pressure.reinit (dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs(),
-                                      dof_handler_pressure.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_pressure, sparsity_pattern_pressure);
-
-    sparsity_pattern_pressure.compress();
+    {
+      DynamicSparsityPattern dsp(dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_pressure, dsp);
+      sparsity_pattern_pressure.copy_from (dsp);
+    }
 
     pres_Laplace.reinit (sparsity_pattern_pressure);
     pres_iterative.reinit (sparsity_pattern_pressure);
@@ -847,13 +846,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_gradient_operator()
   {
-    sparsity_pattern_pres_vel.reinit (dof_handler_velocity.n_dofs(),
-                                      dof_handler_pressure.n_dofs(),
-                                      dof_handler_velocity.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_velocity,
-                                     dof_handler_pressure,
-                                     sparsity_pattern_pres_vel);
-    sparsity_pattern_pres_vel.compress();
+    {
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_velocity, dof_handler_pressure, dsp);
+      sparsity_pattern_pres_vel.copy_from (dsp);
+    }
 
     InitGradPerTaskData per_task_data (0, fe_velocity.dofs_per_cell,
                                        fe_pressure.dofs_per_cell);
@@ -985,7 +982,10 @@ namespace Step35
   NavierStokesProjection<dim>::interpolate_velocity()
   {
     for (unsigned int d=0; d<dim; ++d)
-      u_star[d].equ (2., u_n[d], -1, u_n_minus_1[d]);
+      {
+        u_star[d].equ (2., u_n[d]);
+        u_star[d] -=  u_n_minus_1[d];
+      }
   }
 
 
@@ -1006,14 +1006,16 @@ namespace Step35
   void
   NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
   {
-    pres_tmp.equ (-1., pres_n, -4./3., phi_n, 1./3., phi_n_minus_1);
+    pres_tmp.equ (-1., pres_n);
+    pres_tmp.add (-4./3., phi_n, 1./3., phi_n_minus_1);
 
     assemble_advection_term();
 
     for (unsigned int d=0; d<dim; ++d)
       {
         force[d] = 0.;
-        v_tmp.equ (2./dt,u_n[d],-.5/dt,u_n_minus_1[d]);
+        v_tmp.equ (2./dt,u_n[d]);
+        v_tmp.add (-.5/dt,u_n_minus_1[d]);
         vel_Mass.vmult_add (force[d], v_tmp);
 
         pres_Diff[d].vmult_add (force[d], pres_tmp);
@@ -1025,8 +1027,8 @@ namespace Step35
         vel_exact.set_component(d);
         boundary_values.clear();
         for (std::vector<types::boundary_id>::const_iterator
-             boundaries = boundary_indicators.begin();
-             boundaries != boundary_indicators.end();
+             boundaries = boundary_ids.begin();
+             boundaries != boundary_ids.end();
              ++boundaries)
           {
             switch (*boundaries)
@@ -1241,7 +1243,8 @@ namespace Step35
           prec_mass.initialize (pres_Mass);
         pres_n = pres_tmp;
         prec_mass.solve (pres_n);
-        pres_n.sadd(1./Re, 1., pres_n_minus_1, 1., phi_n);
+        pres_n.sadd(1./Re, 1., pres_n_minus_1);
+        pres_n += phi_n;
         break;
       default:
         Assert (false, ExcNotImplemented());

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -296,7 +296,7 @@ ENDIF()
 # - Wolfgang Bangerth, 2014
 #
 IF(DEAL_II_WITH_CXX11)
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
   CHECK_CXX_COMPILER_BUG(
     "
     #include <functional>
@@ -349,14 +349,14 @@ ENDIF()
 
 
 #
-# in intel (at least 13.1 and 14), vectorization causes
+# In intel (at least 13.1 and 14), vectorization causes
 # wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
 # or tests/hp/solution_transfer.cc
 # A work-around is to disable all vectorization.
 #
-# - Timo Heister, 2013
+# - Timo Heister, 2013, 2015
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0.3" )
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
 ENDIF()
 
@@ -375,3 +375,51 @@ IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
   SET(DEAL_II_CONSTEXPR_BUG TRUE)
 ENDIF()
+
+
+#
+# Intel (at least 14, 15) has a bug where it incorrectly detects multiple
+# matching function candidates and dies during type resolution in a
+# perfectly valid SFINAE scenario. This seems to happen because the templated
+# variant is not discarded (where it should be):
+#
+# error: more than one instance of overloaded function
+#     "has_vmult_add<Range, T>::test [with Range=double, T=MyMatrix]"
+# matches the argument list:
+#     function template "void has_vmult_add<Range, T>::test<C>(decltype((<expression>))) [with Range=double, T=MyMatrix]"
+#     function template "void has_vmult_add<Range, T>::test<C>(decltype((&C::vmult_add<double>))) [with Range=double, T=MyMatrix]"
+# [...]
+#
+# - Matthias Maier, 2015
+#
+
+IF(DEAL_II_WITH_CXX11)
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  CHECK_CXX_COMPILER_BUG(
+    "
+    template <typename Range, typename T> struct has_vmult_add
+    {
+      template <typename C>
+      static void test(decltype(&C::vmult_add));
+
+      template <typename C>
+      static void test(decltype(&C::template vmult_add<Range>));
+
+      typedef decltype(test<T>(0)) type;
+    };
+
+    struct MyMatrix
+    {
+      void vmult_add() const;
+    };
+
+    int main()
+    {
+      typedef has_vmult_add<double, MyMatrix>::type test;
+    }
+    "
+    DEAL_II_ICC_SFINAE_BUG
+    )
+  RESET_CMAKE_REQUIRED()
+ENDIF()
+

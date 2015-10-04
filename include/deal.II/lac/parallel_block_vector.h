@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__parallel_block_vector_h
-#define __deal2__parallel_block_vector_h
+#ifndef dealii__parallel_block_vector_h
+#define dealii__parallel_block_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -44,10 +44,10 @@ namespace parallel
 
 
     /**
-     * An implementation of block vectors based on distribued deal.II vectors.
-     * While the base class provides for most of the interface, this class
-     * handles the actual allocation of vectors and provides functions that
-     * are specific to the underlying vector type.
+     * An implementation of block vectors based on distributed deal.II
+     * vectors. While the base class provides for most of the interface, this
+     * class handles the actual allocation of vectors and provides functions
+     * that are specific to the underlying vector type.
      *
      * @note Instantiations for this template are provided for <tt>@<float@>
      * and @<double@></tt>; others can be generated in application programs
@@ -139,7 +139,7 @@ namespace parallel
                    const MPI_Comm  communicator);
 
       /**
-       * Same as above but the ghost indicies are assumed to be empty.
+       * Same as above but the ghost indices are assumed to be empty.
        */
       BlockVector (const std::vector<IndexSet> &local_ranges,
                    const MPI_Comm  communicator);

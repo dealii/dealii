@@ -31,22 +31,17 @@ namespace MeshWorker
     const unsigned int nqp = fevalv[0]->n_quadrature_points;
 
     values.resize(global_data->n_values());
-//    deallog << "values: " << values.size() << " [";
     // For all selected finite
     // element functions
     for (unsigned int i=0; i<values.size(); ++i)
       {
         values[i].resize(n_components);
-//      deallog << ' ' << values[i].size() << " {";
         // For all components
         for (unsigned int j=0; j<values[i].size(); ++j)
           {
             values[i][j].resize(nqp);
-//          deallog << ' ' << values[i][j].size();
           }
-//      deallog << " }";
       }
-//    deallog << " ]" << std::endl;
 
     gradients.resize(global_data->n_gradients());
     // For all selected finite
@@ -234,4 +229,3 @@ namespace MeshWorker
 
 
 DEAL_II_NAMESPACE_CLOSE
-

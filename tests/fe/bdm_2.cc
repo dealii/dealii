@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Show the shape functions of the Raviart-Thomas element on a grid
+// Show the shape functions of the BDM element on a grid
 // with only one cell. This cell is rotated, stretched, scaled, etc,
 // and on each of these cells each time we evaluate the shape
 // functions.
@@ -57,26 +57,26 @@ transform_grid (Triangulation<2> &tria,
 {
   switch (transform)
     {
-      // first round: take
-      // original grid
+    // first round: take
+    // original grid
     case 0:
       break;
 
-      // second round: rotate
-      // triangulation
+    // second round: rotate
+    // triangulation
     case 1:
       GridTools::rotate (3.14159265358/2, tria);
       break;
 
-      // third round: inflate
-      // by a factor of 2
+    // third round: inflate
+    // by a factor of 2
     case 2:
       GridTools::scale (2, tria);
       break;
 
-      // third round: scale
-      // back, rotate back,
-      // stretch
+    // third round: scale
+    // back, rotate back,
+    // stretch
     case 3:
       GridTools::scale (.5, tria);
       GridTools::rotate (-3.14159265358/2, tria);
@@ -172,7 +172,9 @@ main()
   deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=1; degree<4; ++degree)
-    plot_shape_functions<2>(degree);
+    {
+      plot_shape_functions<2>(degree);
+    }
 
   return 0;
 }

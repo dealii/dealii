@@ -6,7 +6,7 @@ On the finest mesh, the solution looks like this:
   <img src="http://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
-More impoartantly, we would like to see if the multigrid method really
+More importantly, we would like to see if the multigrid method really
 improved the solver performance. Therefore, here is the textual
 output:
 
@@ -64,7 +64,7 @@ it shows the power of multigrid methods.
 We encourage you to switch on timing output by calling the function
 LogStream::log_execution_time() of the deallog object and compare to
 step 6. You will see that the multigrid method has quite an overhead
-on coarse meshes, but that that it always beats other methods on fine
+on coarse meshes, but that it always beats other methods on fine
 meshes because of its optimal complexity.
 
 A close inspection of this program's performance shows that it is mostly

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,11 +39,11 @@ void check_norms ()
         vec(i) = static_cast<number>(Testing::rand())/static_cast<number>(RAND_MAX);
       const typename Vector<number>::real_type norm = vec.l2_norm();
       for (unsigned int i=0; i<30; ++i)
-        Assert (vec.l2_norm() == norm, ExcInternalError());
+        AssertThrow (vec.l2_norm() == norm, ExcInternalError());
 
       Vector<number> vec2 (vec);
       for (unsigned int i=0; i<10; ++i)
-        Assert (vec2.l2_norm() == norm, ExcInternalError());
+        AssertThrow (vec2.l2_norm() == norm, ExcInternalError());
     }
 }
 

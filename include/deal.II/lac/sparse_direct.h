@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_direct_h
-#define __deal2__sparse_direct_h
+#ifndef dealii__sparse_direct_h
+#define dealii__sparse_direct_h
 
 
 #include <deal.II/base/config.h>
@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this link</a>).
  * UMFPACK is a set of routines for solving non-symmetric sparse linear
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
- * sparse LU factorization. Matrices may have symmetric or unsymmetrix
+ * sparse LU factorization. Matrices may have symmetric or unsymmetric
  * sparsity patterns, and may have unsymmetric entries. The use of this class
  * is explained in the
  * @ref step_22 "step-22"
@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This matrix class implements the usual interface of preconditioners, that
  * is a function initialize(const SparseMatrix<double>&matrix,const
- * AdditionalData) for initalizing and the whole set of vmult() functions
+ * AdditionalData) for initializing and the whole set of vmult() functions
  * common to all matrices. Implemented here are only vmult() and vmult_add(),
  * which perform multiplication with the inverse matrix. Furthermore, this
  * class provides an older interface, consisting of the functions factorize()
@@ -85,7 +85,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Dummy class needed for the usual initalization interface of
+   * Dummy class needed for the usual initialization interface of
    * preconditioners.
    */
   class AdditionalData
@@ -184,20 +184,6 @@ public:
    */
   void Tvmult (BlockVector<double> &dst,
                const BlockVector<double> &src) const;
-
-  /**
-   * Same as vmult(), but adding to the previous solution. Not implemented yet
-   * but necessary for compiling certain other classes.
-   */
-  void vmult_add (Vector<double> &dst,
-                  const Vector<double> &src) const;
-
-  /**
-   * Same as before, but uses the transpose of the matrix, i.e. this function
-   * multiplies with $A^{-T}$.
-   */
-  void Tvmult_add (Vector<double> &dst,
-                   const Vector<double> &src) const;
 
   /**
    * @}
@@ -340,4 +326,4 @@ private:
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_direct_h
+#endif // dealii__sparse_direct_h

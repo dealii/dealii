@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,8 +33,8 @@ void test ()
     for (unsigned int j=i; j<dim; ++j)
       t[i][j] = (1.+(i+1)*(j*2));
 
-  Assert (trace(deviator(t)) < 1e-15*t.norm(),
-          ExcInternalError());
+  AssertThrow (trace(deviator(t)) < 1e-15*t.norm(),
+               ExcInternalError());
 }
 
 

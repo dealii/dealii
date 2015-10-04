@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,17 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__memory_consumption_h
-#define __deal2__memory_consumption_h
+#ifndef dealii__memory_consumption_h
+#define dealii__memory_consumption_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 
 #include <string>
 #include <complex>
 #include <vector>
 #include <cstddef>
+#include <cstring>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,9 +37,8 @@ template <typename T> class VectorizedArray;
 /**
  * This namespace provides functions helping to determine the amount of memory
  * used by objects. The goal is not necessarily to give the amount of memory
- * used up to the last bit (what is the memory used by an STL
- * <tt>std::map<></tt> object?), but rather to aid in the search for memory
- * bottlenecks.
+ * used up to the last bit (what is the memory used by a <tt>std::map</tt>
+ * object?), but rather to aid in the search for memory bottlenecks.
  *
  * This namespace has a single member function memory_consumption() and a lot
  * of specializations. Depending on the argument type of the function, there
@@ -54,7 +55,7 @@ template <typename T> class VectorizedArray;
  * memory_consumption() will simply call the member function of same name. It
  * is up to the implementation of the data type to provide a good estimate of
  * the amount of memory used. Inside this function, the use of
- * MemoryConsumpton::memory_consumption() for compounds of the class helps to
+ * MemoryConsumption::memory_consumption() for compounds of the class helps to
  * obtain this estimate. Most classes in the deal.II library have such a
  * member function.
  *
@@ -172,6 +173,15 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const long double);
 
   /**
+   * Determine the amount of memory consumed by a C-style string. The returned
+   * value does not include the size of the pointer. This function only
+   * measures up to (and including) the NUL byte; the underlying buffer may be
+   * larger.
+   */
+  inline
+  std::size_t memory_consumption (const char *string);
+
+  /**
    * Determine the amount of memory in bytes consumed by a
    * <tt>std::complex</tt> variable.
    */
@@ -228,10 +238,10 @@ namespace MemoryConsumption
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
    * Since in this library we do not usually store simple data elements like
-   * <tt>double</tt>s in such arrays (but rather use STL <tt>std::vector</tt>s
-   * or deal.II <tt>Vector</tt> objects), we do not provide specializations
-   * like for the <tt>std::vector</tt> arrays, but always use the loop over
-   * all elements.
+   * <tt>double</tt>s in such arrays (but rather use <tt>std::vector</tt>s or
+   * deal.II <tt>Vector</tt> objects), we do not provide specializations like
+   * for the <tt>std::vector</tt> arrays, but always use the loop over all
+   * elements.
    */
   template <typename T, int N>
   inline
@@ -346,6 +356,15 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t memory_consumption (const std_cxx11::shared_ptr<T> &);
+
+  /**
+   * Return the amount of memory used by a std_cxx11::unique_ptr object.
+   *
+   * @note This returns the size of the pointer, not of the object pointed to.
+   */
+  template <typename T>
+  inline
+  std::size_t memory_consumption (const std_cxx11::unique_ptr<T> &);
 }
 
 
@@ -438,6 +457,21 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const long double)
   {
     return sizeof(long double);
+  }
+
+
+
+  inline
+  std::size_t memory_consumption (const char *string)
+  {
+    if (string == NULL)
+      {
+        return 0;
+      }
+    else
+      {
+        return sizeof(char)*(strlen(string) /*Remember the NUL*/ + 1);
+      }
   }
 
 
@@ -600,6 +634,16 @@ namespace MemoryConsumption
   memory_consumption (const std_cxx11::shared_ptr<T> &)
   {
     return sizeof(std_cxx11::shared_ptr<T>);
+  }
+
+
+
+  template <typename T>
+  inline
+  std::size_t
+  memory_consumption (const std_cxx11::unique_ptr<T> &)
+  {
+    return sizeof(std_cxx11::unique_ptr<T>);
   }
 
 

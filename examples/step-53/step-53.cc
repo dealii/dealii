@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2014, 2015 by the deal.II authors
+ * Copyright (C) 2014 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -386,10 +386,10 @@ namespace Step53
 
     // The next step is to explain to the triangulation to use our geometry
     // object whenever a new point is needed upon refining the mesh. We do
-    // this by telling the triangulation to use our geometry for everythin
+    // this by telling the triangulation to use our geometry for everything
     // that has manifold indicator zero, and then proceed to mark all cells
     // and their bounding faces and edges with manifold indicator zero. This
-    // ensures that the triangulation consults our geometry object everytime
+    // ensures that the triangulation consults our geometry object every time
     // a new vertex is needed. Since manifold indicators are inherited from
     // mother to children, this also happens after several recursive
     // refinement steps.
@@ -413,7 +413,7 @@ namespace Step53
         for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
              cell!=triangulation.end(); ++cell)
           for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-            if (cell->face(f)->boundary_indicator() == 5)
+            if (cell->face(f)->boundary_id() == 5)
               {
                 cell->set_refine_flag ();
                 break;

@@ -16,7 +16,7 @@
 // Author: Guido Kanschat
 
 // A little program reading a grid *.inp and writing it to *.eps.
-// Some more functionality should be added som time.
+// Some more functionality should be added some time.
 
 #include <grid/tria.h>
 #include <grid/grid_in.h>

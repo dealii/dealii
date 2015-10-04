@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,8 @@ void test (Vector<double> &v)
   v.compress ();
 
   // then check the norm
-  Assert (std::fabs(v.mean_value() - sum/v.size()) < 1e-14*sum/v.size(),
-          ExcInternalError());
+  AssertThrow (std::fabs(v.mean_value() - sum/v.size()) < 1e-14*sum/v.size(),
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

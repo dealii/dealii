@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,12 +45,12 @@ void test()
     vec.block(1).reinit (is, MPI_COMM_WORLD);
   }
   vec.collect_sizes();
-  Assert (vec.block(0).local_size() == 100, ExcInternalError());
-  Assert (vec.block(0).local_range().first == 100*myid, ExcInternalError());
-  Assert (vec.block(0).local_range().second == 100*myid+100, ExcInternalError());
-  Assert (vec.block(1).local_size() == 100, ExcInternalError());
-  Assert (vec.block(1).local_range().first == 100*myid, ExcInternalError());
-  Assert (vec.block(1).local_range().second == 100*myid+100, ExcInternalError());
+  AssertThrow (vec.block(0).local_size() == 100, ExcInternalError());
+  AssertThrow (vec.block(0).local_range().first == 100*myid, ExcInternalError());
+  AssertThrow (vec.block(0).local_range().second == 100*myid+100, ExcInternalError());
+  AssertThrow (vec.block(1).local_size() == 100, ExcInternalError());
+  AssertThrow (vec.block(1).local_range().first == 100*myid, ExcInternalError());
+  AssertThrow (vec.block(1).local_range().second == 100*myid+100, ExcInternalError());
 
   for (unsigned int i=vec.block(0).local_range().first; i<vec.block(0).local_range().second; ++i)
     vec.block(0)(i) = i;
@@ -63,7 +63,7 @@ void test()
     double exact_l1 = 0;
     for (unsigned int i=0; i<vec.block(0).size(); ++i)
       exact_l1 += 2*i;
-    Assert (vec.l1_norm() == exact_l1, ExcInternalError());
+    AssertThrow (vec.l1_norm() == exact_l1, ExcInternalError());
   }
 
 
@@ -116,20 +116,20 @@ void test()
 
   // verify correctness
   if (myid != 0)
-    Assert (vec(vec.block(0).local_range().first+10) == vec.block(0).local_range().first-25,
-            ExcInternalError());
+    AssertThrow (vec(vec.block(0).local_range().first+10) == vec.block(0).local_range().first-25,
+                 ExcInternalError());
 
   if (myid != n_processes-1)
-    Assert (vec(vec.block(0).local_range().first+90) == vec.block(0).local_range().first+105,
-            ExcInternalError());
+    AssertThrow (vec(vec.block(0).local_range().first+90) == vec.block(0).local_range().first+105,
+                 ExcInternalError());
 
   if (myid != 0)
-    Assert (vec(vec.block(0).size()+vec.block(1).local_range().first+10) == vec.block(1).local_range().first-25,
-            ExcInternalError());
+    AssertThrow (vec(vec.block(0).size()+vec.block(1).local_range().first+10) == vec.block(1).local_range().first-25,
+                 ExcInternalError());
 
   if (myid != n_processes-1)
-    Assert (vec(vec.block(0).size()+vec.block(1).local_range().first+90) == vec.block(1).local_range().first+105,
-            ExcInternalError());
+    AssertThrow (vec(vec.block(0).size()+vec.block(1).local_range().first+90) == vec.block(1).local_range().first+105,
+                 ExcInternalError());
 
 
   for (unsigned int i=vec.block(0).local_range().first; i<vec.block(0).local_range().second; ++i)
@@ -139,7 +139,7 @@ void test()
           (i != vec.block(0).local_range().first+90))
         {
           double val = vec.block(0)(i);
-          Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
+          AssertThrow (std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
@@ -149,7 +149,7 @@ void test()
           (i != vec.block(1).local_range().first+90))
         {
           double val = vec.block(1)(i);
-          Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
+          AssertThrow (std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
 
@@ -170,7 +170,7 @@ void test()
       }
 
     const double l1_norm = vec.l1_norm();
-    Assert (l1_norm == 2*exact_l1, ExcInternalError());
+    AssertThrow (l1_norm == 2*exact_l1, ExcInternalError());
 
     // generate output. write the norm divided by two so that it matches the
     // results of the _01 test
@@ -182,7 +182,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

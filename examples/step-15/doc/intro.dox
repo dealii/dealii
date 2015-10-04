@@ -29,6 +29,9 @@ locally be constructed as a graph but not globally.
 Because the equation is non-linear, we can't solve it directly. Rather, we
 have to use Newton's method to compute the solution iteratively.
 
+@dealiiVideoLecture{31.5,31.55,31.6}
+(@dealiiVideoLectureSeeAlso{31.65,31.7})
+
 
 
 <h3>Classical formulation</h3>
@@ -40,7 +43,7 @@ In a classical sense, the problem is given in the following form:
     -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
     \qquad &&\textrm{in} ~ \Omega
     \\
-    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega.
   @f}
 
 $\Omega$ is the domain we get by projecting the wire's positions into $x-y$
@@ -109,7 +112,7 @@ Reducing this space to a finite dimensional space with basis $\left\{
 \varphi_{0},\dots , \varphi_{N-1}\right\}$, we can write the solution:
 
 @f[
-  \delta u^{n}=\sum_{j=0}^{N-1} U_{j} \varphi_{j}
+  \delta u^{n}=\sum_{j=0}^{N-1} \delta U_{j} \varphi_{j}.
 @f]
 
 Using the basis functions as test functions and defining $a_{n}:=\frac{1}
@@ -118,15 +121,15 @@ Using the basis functions as test functions and defining $a_{n}:=\frac{1}
 @f[
   \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
   \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
-  \varphi_{j} \right) \right] \cdot U_{j}=\left( \nabla \varphi_{i} , a_{n}
-  \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1
+  \varphi_{j} \right) \right] \cdot \delta U_{j}=\left( \nabla \varphi_{i} , a_{n}
+  \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1,
 @f]
 
 where the solution $\delta u^{n}$ is given by the coefficients $\delta U^{n}_{j}$.
 This linear system of equations can be rewritten as:
 
 @f[
-  A^{n}\; \delta U^{n}=b^{n}
+  A^{n}\; \delta U^{n}=b^{n},
 @f]
 
 where the entries of the matrix $A^{n}$ are given by:
@@ -134,17 +137,17 @@ where the entries of the matrix $A^{n}$ are given by:
 @f[
   A^{n}_{ij}:= \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
   \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
-  \varphi_{j} \right)
+  \varphi_{j} \right),
 @f]
 
 and the right hand side $b^{n}$ is given by:
 
 @f[
-  b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right)
+  b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right).
 @f]
 
 
-<h3> Solver issues </h3>
+<h3> Questions about the appropriate solver </h3>
 
 The matrix that corresponds to the Newton step above can be reformulated to
 show its structure a bit better. Rewriting it slightly, we get that it has the
@@ -156,7 +159,7 @@ form
     \nabla \varphi_i,
     B
     \nabla \varphi_j
-  \right)
+  \right),
 @f]
 where the matrix $B$ (of size $d \times d$ in $d$ space dimensions) is given
 by the following expression:
@@ -185,6 +188,15 @@ $\lambda_1=a_n \left(1-\frac{|\nabla u^n|^2}{1+|\nabla u^n|^2}\right) > 0$ while
 that are perpendicular to $v_1$ and each other are eigenvectors with
 eigenvalue $a_n$. Since all eigenvalues are positive, $B$ is positive definite
 and so is $A$. We can thus use the CG method for solving the Newton steps.
+(The fact that the matrix $A$ is symmetric and positive definite should not come
+as a surprise. It results from taking the derivative of an operator that
+results from taking the derivative of an energy functional: the minimal 
+surface equation simply minimizes some non-quadratic energy. Consequently,
+the Newton matrix, as the matrix of second derivatives of a scalar energy,
+must be symmetric since the derivative with regard to the $i$th and $j$th
+degree of freedom should clearly commute. Likewise, if the energy functional
+is convex, then the matrix of second derivatives must be positive definite,
+and the direct calculation above simply reaffirms this.) 
 
 It is worth noting, however, that the positive definiteness degenerates for
 problems where $\nabla u$ becomes large. In other words, if we simply multiply

@@ -99,10 +99,10 @@ void check (Triangulation<3> &tria)
           // properly oriented
           // faces. mesh_3d_7 does it
           // for mis-oriented faces
-          Assert (cell->face_orientation(f) == true,
-                  ExcInternalError());
-          Assert (cell->neighbor(f)->face_orientation(nn) == true,
-                  ExcInternalError());
+          AssertThrow (cell->face_orientation(f) == true,
+                       ExcInternalError());
+          AssertThrow (cell->neighbor(f)->face_orientation(nn) == true,
+                       ExcInternalError());
 
           fe_face_values1.reinit (cell, f);
           fe_face_values2.reinit (cell->neighbor(f), nn);
@@ -114,10 +114,10 @@ void check (Triangulation<3> &tria)
             {
               deallog << "  " << fe_face_values1.quadrature_point(q)
                       << std::endl;
-              Assert ((fe_face_values1.quadrature_point(q)-
-                       fe_face_values2.quadrature_point(q)).norm_square()
-                      < 1e-20,
-                      ExcInternalError());
+              AssertThrow ((fe_face_values1.quadrature_point(q)-
+                            fe_face_values2.quadrature_point(q)).norm_square()
+                           < 1e-20,
+                           ExcInternalError());
             }
         }
 }

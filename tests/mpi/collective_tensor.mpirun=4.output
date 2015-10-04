@@ -1,0 +1,7 @@
+
+DEAL:mpi::Running on 4 CPU(s).
+DEAL:mpi::1D tensor: 4.00000
+DEAL:mpi::2D tensor: 4.00000 8.00000
+DEAL:mpi::3D tensor: 4.00000 8.00000 12.0000
+DEAL:mpi::Rank 2 tensor: 4.00000 8.00000 12.0000 16.0000 20.0000 24.0000 28.0000 32.0000 36.0000
+DEAL:mpi::Symmetric tensor: 4.00000 8.00000 8.00000 12.0000

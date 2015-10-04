@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__vector_memory_h
-#define __deal2__vector_memory_h
+#ifndef dealii__vector_memory_h
+#define dealii__vector_memory_h
 
 
 #include <deal.II/base/config.h>

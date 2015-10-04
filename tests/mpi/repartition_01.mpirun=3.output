@@ -1,0 +1,13 @@
+
+DEAL:0::locally owned cells: 0 / 16
+DEAL:0::locally owned cells: 4 / 16
+DEAL:0::Checksum: 3877634849
+DEAL:0::OK
+
+DEAL:1::locally owned cells: 0 / 16
+DEAL:1::locally owned cells: 8 / 16
+
+
+DEAL:2::locally owned cells: 16 / 16
+DEAL:2::locally owned cells: 4 / 16
+

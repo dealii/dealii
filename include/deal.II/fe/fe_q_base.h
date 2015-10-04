@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_q_base_h
-#define __deal2__fe_q_base_h
+#ifndef dealii__fe_q_base_h
+#define dealii__fe_q_base_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe_poly.h>
@@ -27,8 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * This class collects the basic methods used in FE_Q and FE_Q_DG0. There is
- * no public constructor for this class as it is not functional as a stand-
+ * This class collects the basic methods used in FE_Q, FE_Q_DG0 and FE_Q_Bubbles.
+ * There is no public constructor for this class as it is not functional as a stand-
  * alone. The completion of definitions is left to the derived classes.
  *
  * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
@@ -324,6 +324,13 @@ private:
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
+
+  /*
+   * The highest polynomial degree of the underlying tensor product space
+   * without any enrichment. For FE_Q*(p) this is p. Note that enrichments
+   * may lead to a difference to degree.
+   */
+  const unsigned int q_degree;
 };
 
 

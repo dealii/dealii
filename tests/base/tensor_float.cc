@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ int main ()
   Tensor<2,dim,float> t(a);
   Tensor<2,dim,float> tt;
   Tensor<2,dim,float> result(b);
-  Assert (transpose(transpose(t)) == t, ExcInternalError());
-  Assert (transpose(transpose(result)) == result, ExcInternalError());
+  AssertThrow (transpose(transpose(t)) == t, ExcInternalError());
+  AssertThrow (transpose(transpose(result)) == result, ExcInternalError());
 
   Vector<float> unrolled(9);
 
@@ -61,7 +61,7 @@ int main ()
 
   deallog << "norm(t)=" << t.norm() << std::endl;
 
-  contract (tt,t,t);
+  tt = t * t;
 
   deallog << "tt=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)
@@ -80,18 +80,17 @@ int main ()
       e1[0] = 1.;
       e2[1] = 1.;
       e3[2] = 1.;
-      Tensor<1,3,float> result;
-      cross_product(result,e1,e2);
+      Tensor<1,3,float> result = cross_product_3d(e1, e2);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1])
               << '\t' << static_cast<double>(result[2]) << std::endl;
 
-      cross_product(result,e2,e3);
+      result = cross_product_3d(e2, e3);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1]) << '\t'
               << static_cast<double>(result[2]) << std::endl;
 
-      cross_product(result,e3,e1);
+      result = cross_product_3d(e3, e1);
       deallog << '\t' << static_cast<double>(result[0])
               << '\t' << static_cast<double>(result[1])
               << '\t' << static_cast<double>(result[2]) << std::endl;

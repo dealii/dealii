@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 by the deal.II authors 
+//    Copyright (C) 2014 - 2015 by the deal.II authors
 //
 //    This file is subject to LGPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@
 
 using namespace OpenCASCADE;
 
-int main () 
+int main ()
 {
   // Create a bspline passing through the points
   std::vector<Point<3> > pts;
@@ -38,21 +38,21 @@ int main ()
   std::string line;
   unsigned int counter = 0;
 
-  while(std::getline(in,line))
-       {
-       counter++;
-       if ( (counter == 4) ||
-            (counter == 5) ||
-            (counter == 6) ||
-            (counter == 18) ||
-            (counter == 19)   )
-          {
-	  }
-       else
-          out << line << std::endl;
-       }
+  while (std::getline(in,line))
+    {
+      counter++;
+      if ( (counter == 4) ||
+           (counter == 5) ||
+           (counter == 6) ||
+           (counter == 18) ||
+           (counter == 19)   )
+        {
+        }
+      else
+        out << line << std::endl;
+    }
   in.close();
   out.close();
   return 0;
 }
-                  
+

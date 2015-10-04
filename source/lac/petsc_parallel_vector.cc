@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,10 +30,8 @@ namespace PETScWrappers
 
     Vector::Vector ()
     {
-      // this is an invalid empty vector, so we
-      // can just as well create a sequential
-      // one to avoid all the overhead incurred
-      // by parallelism
+      // this is an invalid empty vector, so we can just as well create a
+      // sequential one to avoid all the overhead incurred by parallelism
       const int n = 0;
       const int ierr
         = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
@@ -82,6 +80,7 @@ namespace PETScWrappers
     }
 
 
+
     Vector::Vector (const IndexSet   &local,
                     const MPI_Comm     &communicator)
       :
@@ -90,6 +89,23 @@ namespace PETScWrappers
       Assert(local.is_contiguous(), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
     }
+
+
+
+    void
+    Vector::clear ()
+    {
+      // destroy the PETSc Vec and create an invalid empty vector,
+      // so we can just as well create a sequential one to avoid
+      // all the overhead incurred by parallelism
+      attained_ownership = true;
+      VectorBase::clear ();
+
+      const int n = 0;
+      int ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
+
 
 
     void
@@ -251,6 +267,7 @@ namespace PETScWrappers
     Vector::create_vector (const size_type n,
                            const size_type local_size)
     {
+      (void)n;
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = false;
 
@@ -270,6 +287,7 @@ namespace PETScWrappers
                            const size_type local_size,
                            const IndexSet &ghostnodes)
     {
+      (void)n;
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = true;
       ghost_indices = ghostnodes;

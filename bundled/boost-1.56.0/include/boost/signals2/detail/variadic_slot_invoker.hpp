@@ -94,6 +94,7 @@ namespace boost
         template<typename Func, unsigned ... indices, typename ... Args>
           R m_invoke(void *, Func &func, unsigned_meta_array<indices...>, BOOST_SIGNALS2_TUPLE<Args...> args) const
         {
+          (void)args; // Silence a faulty -Wunused-but-set-parameter diagnostic emitted by gcc up to 4.8*
           func(BOOST_SIGNALS2_GET<indices>(args)...);
           return R();
         }

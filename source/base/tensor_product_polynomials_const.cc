@@ -69,8 +69,6 @@ TensorProductPolynomialsConst<dim>::compute_grad (const unsigned int i,
     return Tensor<1,dim>();
 }
 
-
-
 template <int dim>
 Tensor<2,dim>
 TensorProductPolynomialsConst<dim>::compute_grad_grad (const unsigned int i,
@@ -93,7 +91,9 @@ TensorProductPolynomialsConst<dim>::
 compute (const Point<dim>            &p,
          std::vector<double>         &values,
          std::vector<Tensor<1,dim> > &grads,
-         std::vector<Tensor<2,dim> > &grad_grads) const
+         std::vector<Tensor<2,dim> > &grad_grads,
+         std::vector<Tensor<3,dim> > &third_derivatives,
+         std::vector<Tensor<4,dim> > &fourth_derivatives) const
 {
   Assert (values.size()==this->n_tensor_pols+1 || values.size()==0,
           ExcDimensionMismatch2(values.size(), this->n_tensor_pols+1, 0));
@@ -101,10 +101,15 @@ compute (const Point<dim>            &p,
           ExcDimensionMismatch2(grads.size(), this->n_tensor_pols+1, 0));
   Assert (grad_grads.size()==this->n_tensor_pols+1 || grad_grads.size()==0,
           ExcDimensionMismatch2(grad_grads.size(), this->n_tensor_pols+1, 0));
+  Assert (third_derivatives.size()==this->n_tensor_pols+1 || third_derivatives.size()==0,
+          ExcDimensionMismatch2(third_derivatives.size(), this->n_tensor_pols+1, 0));
+  Assert (fourth_derivatives.size()==this->n_tensor_pols+1 || fourth_derivatives.size()==0,
+          ExcDimensionMismatch2(fourth_derivatives.size(), this->n_tensor_pols+1, 0));
 
   // remove slot for const value, go into the base class compute method and
   // finally append the const value again
   bool do_values = false, do_grads = false, do_grad_grads = false;
+  bool do_3rd_derivatives = false, do_4th_derivatives = false;
   if (values.empty() == false)
     {
       values.pop_back();
@@ -120,16 +125,30 @@ compute (const Point<dim>            &p,
       grad_grads.pop_back();
       do_grad_grads = true;
     }
+  if (third_derivatives.empty() == false)
+    {
+      third_derivatives.resize(this->n_tensor_pols);
+      do_3rd_derivatives = true;
+    }
+  if (fourth_derivatives.empty() == false)
+    {
+      fourth_derivatives.resize(this->n_tensor_pols);
+      do_4th_derivatives = true;
+    }
 
-  this->TensorProductPolynomials<dim>::compute(p, values, grads, grad_grads);
+  this->TensorProductPolynomials<dim>::compute(p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
-  //for dgq node: values =1, grads=0, grads_grads=0
+  //for dgq node: values =1, grads=0, grads_grads=0, third_derivatives=0, fourth_derivatives=0
   if (do_values)
     values.push_back(1.);
   if (do_grads)
     grads.push_back(Tensor<1,dim>());
   if (do_grad_grads)
     grad_grads.push_back(Tensor<2,dim>());
+  if (do_3rd_derivatives)
+    third_derivatives.push_back(Tensor<3,dim>());
+  if (do_4th_derivatives)
+    fourth_derivatives.push_back(Tensor<4,dim>());
 }
 
 

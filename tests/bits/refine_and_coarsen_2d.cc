@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,8 @@ void check ()
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
        cell != tria.end(); ++cell, ++index)
-    Assert (cells[index] == cell,
-            ExcInternalError());
+    AssertThrow (cells[index] == cell,
+                 ExcInternalError());
 
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_mapping_info_h
-#define __deal2__matrix_free_mapping_info_h
+#ifndef dealii__matrix_free_mapping_info_h
+#define dealii__matrix_free_mapping_info_h
 
 
 #include <deal.II/base/exceptions.h>
@@ -328,7 +328,7 @@ namespace internal
                              const unsigned int  my_q,
                              CellType (&cell_t_prev)[n_vector_elements],
                              CellType (&cell_t)[n_vector_elements],
-                             FEValues<dim,dim> &fe_values,
+                             dealii::FEValues<dim,dim> &fe_values,
                              CellData          &cell_data) const;
     };
 

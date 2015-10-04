@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__manifold_lib_h
-#define __deal2__manifold_lib_h
+#ifndef dealii__manifold_lib_h
+#define dealii__manifold_lib_h
 
 
 #include <deal.II/base/config.h>
@@ -46,6 +46,10 @@ DEAL_II_NAMESPACE_OPEN
  * it cannot be attached to cells containing the center of the coordinate
  * system. This point is a singular point of the coordinate transformation,
  * and there taking averages does not make any sense.
+ *
+ * This class is used in step-1 and step-2 to describe the boundaries
+ * of circles. Its use is also discussed in the results section of
+ * step-6.
  *
  * @ingroup manifold
  *
@@ -164,7 +168,7 @@ protected:
 
 private:
   /**
-   * Helper FlatManifold to compute temptative midpoints.
+   * Helper FlatManifold to compute tentative midpoints.
    */
   FlatManifold<dim,spacedim> flat_manifold;
 
@@ -180,11 +184,11 @@ private:
  * Function<spacedim> and Function<chartdim> objects describing the
  * push_forward() and pull_back() functions.
  *
- * You can use this Manifold object to describe any arbitray shape domain, as
+ * You can use this Manifold object to describe any arbitrary shape domain, as
  * long as you can express it in terms of an invertible map, for which you
  * provide both the forward expression, and the inverse expression.
  *
- * In debug mode, a check is performed to verify that the tranformations are
+ * In debug mode, a check is performed to verify that the transformations are
  * actually one the inverse of the other.
  *
  * @ingroup manifold

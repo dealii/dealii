@@ -1,0 +1,29 @@
+
+DEAL::** 5 by 4 ** 
+DEAL::0 0
+DEAL::0 1
+DEAL::3 3
+DEAL::OK
+DEAL::row 0:
+DEAL::row= 0, col= 0, index= 0
+DEAL::row= 0, col= 1, index= 1
+DEAL::row 1:
+DEAL::row 2:
+DEAL::row 3:
+DEAL::row= 3, col= 3, index= 0
+DEAL::row 4:
+DEAL::OK
+DEAL::** 5 by 5 ** 
+DEAL::0 0
+DEAL::0 1
+DEAL::3 3
+DEAL::OK
+DEAL::row 0:
+DEAL::row= 0, col= 0, index= 0
+DEAL::row= 0, col= 1, index= 1
+DEAL::row 1:
+DEAL::row 2:
+DEAL::row 3:
+DEAL::row= 3, col= 3, index= 0
+DEAL::row 4:
+DEAL::OK

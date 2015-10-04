@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_iterator_selector_h
-#define __deal2__tria_iterator_selector_h
+#ifndef dealii__tria_iterator_selector_h
+#define dealii__tria_iterator_selector_h
 
 
 #include <deal.II/base/config.h>
@@ -39,12 +39,15 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 1D case only. See the
+     * These are the declarations for the 1D case only. See the
      * @ref Iterators
      * module for more information.
      *
-     * A @p line_iterator is typdef'd to an iterator operating on the @p lines
-     * member variable of a <tt>Triangulation<1></tt> object. An @p
+     * A @p vertex_iterator is typedef'd to an iterator operating on the @p
+     * vertices member variable of a <tt>Triangulation<1></tt> object.
+     *
+     * A @p line_iterator is typedef'd to an iterator operating on the @p
+     * lines member variable of a <tt>Triangulation<1></tt> object. An @p
      * active_line_iterator only operates on the active lines. @p
      * raw_line_iterator objects operate on all lines, used or not.
      *
@@ -70,6 +73,8 @@ namespace internal
     template <int spacedim>
     struct Iterators<1,spacedim>
     {
+      typedef TriaIterator      <dealii::TriaAccessor<0, 1, spacedim> > vertex_iterator;
+
       typedef TriaRawIterator   <dealii::CellAccessor<1,spacedim> > raw_line_iterator;
       typedef TriaIterator      <dealii::CellAccessor<1,spacedim> > line_iterator;
       typedef TriaActiveIterator<dealii::CellAccessor<1,spacedim> > active_line_iterator;
@@ -89,12 +94,15 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 2D case only. See the
+     * These are the declarations for the 2D case only. See the
      * @ref Iterators
      * module for more information.
      *
-     * A @p line_iterator is typdef'd to an iterator operating on the @p lines
-     * member variable of a <tt>Triangulation<2></tt> object. An @p
+     * A @p vertex_iterator is typedef'd to an iterator operating on the @p
+     * vertices member variable of a <tt>Triangulation<2></tt> object.
+     *
+     * A @p line_iterator is typedef'd to an iterator operating on the @p
+     * lines member variable of a <tt>Triangulation<2></tt> object. An @p
      * active_line_iterator only operates on the active lines. @p
      * raw_line_iterator objects operate on all lines, used or not. Using @p
      * active_line_iterators may not be particularly in 2D useful since it
@@ -126,6 +134,8 @@ namespace internal
     template <int spacedim>
     struct Iterators<2,spacedim>
     {
+      typedef TriaIterator      <dealii::TriaAccessor<0, 2, spacedim> > vertex_iterator;
+
       typedef TriaRawIterator   <dealii::TriaAccessor<1, 2, spacedim> > raw_line_iterator;
       typedef TriaIterator      <dealii::TriaAccessor<1, 2, spacedim> > line_iterator;
       typedef TriaActiveIterator<dealii::TriaAccessor<1, 2, spacedim> > active_line_iterator;
@@ -144,7 +154,7 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 3D case only. See the
+     * These are the declarations for the 3D case only. See the
      * @ref Iterators
      * module for more information.
      *
@@ -166,6 +176,8 @@ namespace internal
     template <int spacedim>
     struct Iterators<3,spacedim>
     {
+      typedef TriaIterator      <dealii::TriaAccessor<0, 3, spacedim> > vertex_iterator;
+
       typedef TriaRawIterator   <dealii::TriaAccessor<1, 3, spacedim> > raw_line_iterator;
       typedef TriaIterator      <dealii::TriaAccessor<1, 3, spacedim> > line_iterator;
       typedef TriaActiveIterator<dealii::TriaAccessor<1, 3, spacedim> > active_line_iterator;
@@ -187,4 +199,4 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__tria_iterator_selector_h
+#endif // dealii__tria_iterator_selector_h

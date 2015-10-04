@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,7 +71,7 @@ void test()
            cell != triangulation.end(); ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      Assert (index == triangulation.n_active_cells(), ExcInternalError());
+      AssertThrow (index == triangulation.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -100,16 +100,16 @@ void test()
       IndexSet all (N);
       all.add_range (0, N);
 
-      Assert (dof_handler.n_locally_owned_dofs() == N,
-              ExcInternalError());
-      Assert (dof_handler.locally_owned_dofs() == all,
-              ExcInternalError());
-      Assert (dof_handler.n_locally_owned_dofs_per_processor() ==
-              std::vector<types::global_dof_index> (1,N),
-              ExcInternalError());
-      Assert (dof_handler.locally_owned_dofs_per_processor() ==
-              std::vector<IndexSet>(1,all),
-              ExcInternalError());
+      AssertThrow (dof_handler.n_locally_owned_dofs() == N,
+                   ExcInternalError());
+      AssertThrow (dof_handler.locally_owned_dofs() == all,
+                   ExcInternalError());
+      AssertThrow (dof_handler.n_locally_owned_dofs_per_processor() ==
+                   std::vector<types::global_dof_index> (1,N),
+                   ExcInternalError());
+      AssertThrow (dof_handler.locally_owned_dofs_per_processor() ==
+                   std::vector<IndexSet>(1,all),
+                   ExcInternalError());
     }
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@
 #include <deal.II/lac/matrix_block.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
@@ -109,8 +109,8 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   BlockSparsityPattern sparsity;
   sparsity.reinit(dof.block_info().global().size(),
                   dof.block_info().global().size());
-  BlockCompressedSparsityPattern c_sparsity(dof.block_info().global(),
-                                            dof.block_info().global());
+  BlockDynamicSparsityPattern c_sparsity(dof.block_info().global(),
+                                         dof.block_info().global());
   DoFTools::make_flux_sparsity_pattern(dof, c_sparsity, constraints, false);
   sparsity.copy_from(c_sparsity);
 

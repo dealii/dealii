@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_raviart_thomas_h
-#define __deal2__fe_raviart_thomas_h
+#ifndef dealii__fe_raviart_thomas_h
+#define dealii__fe_raviart_thomas_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
@@ -95,7 +95,7 @@ template <int dim, int spacedim> class MappingQ;
  * The node values above rely on integrals, which will be computed by
  * quadrature rules themselves. The generalized support points are a set of
  * points such that this quadrature can be performed with sufficient accuracy.
- * The points needed are thode of QGauss<sub>k+1</sub> on each face as well as
+ * The points needed are those of QGauss<sub>k+1</sub> on each face as well as
  * QGauss<sub>k</sub> in the interior of the cell (or none for
  * RT<sub>0</sub>).
  *

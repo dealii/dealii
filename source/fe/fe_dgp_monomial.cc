@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -181,6 +181,8 @@ get_interpolation_matrix (const FiniteElement<dim> &source_fe,
       // matrix is simple
       const unsigned int m=interpolation_matrix.m();
       const unsigned int n=interpolation_matrix.n();
+      (void)m;
+      (void)n;
       Assert (m == this->dofs_per_cell, ExcDimensionMismatch (m, this->dofs_per_cell));
       Assert (n == source_dgp_monomial->dofs_per_cell,
               ExcDimensionMismatch (n, source_dgp_monomial->dofs_per_cell));
@@ -255,6 +257,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
@@ -284,6 +287,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),

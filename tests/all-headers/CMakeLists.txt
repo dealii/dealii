@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,9 +14,13 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+#
+# Set up test environment (does not pick up anything):
+#
+DEAL_II_PICKUP_TESTS()
 
 #
 # Header tests are special:
@@ -32,8 +36,13 @@ SET(_category all-headers)
 # Glob together all header files and strip SOURCE_DIR/include/deal.II to
 # get a correct relative path:
 #
-FILE(GLOB_RECURSE _headers RELATIVE ${DEAL_II_SOURCE_DIR}/include/deal.II
-  ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h
+IF(DEAL_II_BUILD_DIR)
+  LIST(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
+ELSE()
+  LIST(GET DEAL_II_INCLUDE_DIRS 0 _include_dir)
+ENDIF()
+FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
+  ${_include_dir}/deal.II/*.h
   )
 
 FOREACH(_header ${_headers})
@@ -62,15 +71,7 @@ FOREACH(_header ${_headers})
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
         ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
-
-      SET_TARGET_PROPERTIES(${_target} PROPERTIES
-        LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-        COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-        )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-        )
+      DEAL_II_SETUP_TARGET(${_target} ${_build})
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_header}>
         )
@@ -85,9 +86,9 @@ FOREACH(_header ${_headers})
       # And finally add the test:
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
-          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
-          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES

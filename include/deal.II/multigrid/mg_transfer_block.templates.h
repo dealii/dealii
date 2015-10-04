@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mg_transfer_block_templates_h
-#define __deal2__mg_transfer_block_templates_h
+#ifndef dealii__mg_transfer_block_templates_h
+#define dealii__mg_transfer_block_templates_h
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>

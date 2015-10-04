@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __tests_tests_h
-#define __tests_tests_h
+#ifndef dealii__tests_h
+#define dealii__tests_h
 
 // common definitions used in all the tests
 
@@ -32,6 +32,16 @@
 #include <sstream>
 #include <iomanip>
 
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#  include <cfenv>
+#endif
+
+
+// silence extra diagnostics in the testsuite
+#ifdef DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#endif
+
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
@@ -46,50 +56,50 @@ using namespace dealii;
 // we put this into a namespace to not conflict with stdlib
 namespace Testing
 {
-int rand(bool reseed=false, int seed=1) throw()
-{
-  static int r[32];
-  static int k;
-  static bool inited=false;
-  if (!inited || reseed)
-    {
-      //srand treats a seed 0 as 1 for some reason
-      r[0]=(seed==0)?1:seed;
+  int rand(bool reseed=false, int seed=1) throw()
+  {
+    static int r[32];
+    static int k;
+    static bool inited=false;
+    if (!inited || reseed)
+      {
+        //srand treats a seed 0 as 1 for some reason
+        r[0]=(seed==0)?1:seed;
 
-      for (int i=1; i<31; i++)
-        {
-          r[i] = (16807LL * r[i-1]) % 2147483647;
-          if (r[i] < 0)
-            r[i] += 2147483647;
-        }
-      k=31;
-      for (int i=31; i<34; i++)
-        {
-          r[k%32] = r[(k+32-31)%32];
-          k=(k+1)%32;
-        }
+        for (int i=1; i<31; i++)
+          {
+            r[i] = (16807LL * r[i-1]) % 2147483647;
+            if (r[i] < 0)
+              r[i] += 2147483647;
+          }
+        k=31;
+        for (int i=31; i<34; i++)
+          {
+            r[k%32] = r[(k+32-31)%32];
+            k=(k+1)%32;
+          }
 
-      for (int i=34; i<344; i++)
-        {
-          r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
-          k=(k+1)%32;
-        }
-      inited=true;
-      if (reseed==true)
-        return 0;// do not generate new no
-    }
+        for (int i=34; i<344; i++)
+          {
+            r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+            k=(k+1)%32;
+          }
+        inited=true;
+        if (reseed==true)
+          return 0;// do not generate new no
+      }
 
-  r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
-  int ret = r[k%32];
-  k=(k+1)%32;
-  return (unsigned int)ret >> 1;
-}
+    r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+    int ret = r[k%32];
+    k=(k+1)%32;
+    return (unsigned int)ret >> 1;
+  }
 
 // reseed our random number generator
-void srand(int seed) throw()
-{
-  rand(true, seed);
-}
+  void srand(int seed) throw()
+  {
+    rand(true, seed);
+  }
 }
 
 
@@ -124,8 +134,9 @@ void cat_file(const char *filename)
 void sort_file_contents (const std::string &filename)
 {
   int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
-  Assert (error == 0, ExcInternalError());
+  AssertThrow (error == 0, ExcInternalError());
 }
+
 
 
 
@@ -136,11 +147,15 @@ void sort_file_contents (const std::string &filename)
  * Also, while GCC prepends the name by "virtual " if the function is virtual,
  * Intel's ICC does not do that, so filter that out as well.
  */
-void unify_pretty_function (const std::string &filename)
+std::string unify_pretty_function (const std::string &text)
 {
-  int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' -e 's/^DEAL::virtual /DEAL::/g' ") + filename).c_str());
-
-  Assert (error == 0, ExcInternalError());
+  std::string t=text;
+  t=Utilities::replace_in_string(t, " &", " & ");
+  t=Utilities::replace_in_string(t, " & ,", "&,");
+  t=Utilities::replace_in_string(t, " & )", "&)");
+  t=Utilities::replace_in_string(t, " & ", "& ");
+  t=Utilities::replace_in_string(t, "virtual ", "");
+  return t;
 }
 
 
@@ -154,22 +169,22 @@ void unify_pretty_function (const std::string &filename)
  */
 
 #define check_solver_within_range(SOLVER_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
-{                                                                              \
-  const unsigned int previous_depth = deallog.depth_file(0);                   \
-  SOLVER_COMMAND;                                                              \
-  deallog.depth_file(previous_depth);                                          \
-  const unsigned int steps = CONTROL_COMMAND;                                  \
-  if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \
-    {                                                                          \
-      deallog << "Solver stopped within " << MIN_ALLOWED << " - "              \
-              << MAX_ALLOWED << " iterations" << std::endl;                    \
-    }                                                                          \
-  else                                                                         \
-    {                                                                          \
-      deallog << "Solver stopped after " << steps << " iterations"             \
-              << std::endl;                                                    \
-    }                                                                          \
-}
+  {                                                                              \
+    const unsigned int previous_depth = deallog.depth_file(0);                   \
+    SOLVER_COMMAND;                                                              \
+    deallog.depth_file(previous_depth);                                          \
+    const unsigned int steps = CONTROL_COMMAND;                                  \
+    if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \
+      {                                                                          \
+        deallog << "Solver stopped within " << MIN_ALLOWED << " - "              \
+                << MAX_ALLOWED << " iterations" << std::endl;                    \
+      }                                                                          \
+    else                                                                         \
+      {                                                                          \
+        deallog << "Solver stopped after " << steps << " iterations"             \
+                << std::endl;                                                    \
+      }                                                                          \
+  }
 
 
 // ------------------------------ Functions used in initializing subsystems -------------------
@@ -180,21 +195,19 @@ void unify_pretty_function (const std::string &filename)
  * each of them runs 64 threads, then we get astronomical loads.
  * Limit concurrency to a fixed (small) number of threads, independent
  * of the core count.
- *
- * Note that we can't do this if we run in MPI mode because then
- * MPI_InitFinalize already calls this function. Since every test
- * calls MPI_InitFinalize itself, we can't adjust the thread count
- * for this here.
  */
-#ifndef DEAL_II_WITH_MPI
+inline unsigned int testing_max_num_threads()
+{
+  return 5;
+}
+
 struct LimitConcurrency
 {
   LimitConcurrency ()
   {
-    MultithreadInfo::set_thread_limit (5);
+    MultithreadInfo::set_thread_limit (testing_max_num_threads());
   }
 } limit_concurrency;
-#endif
 
 
 
@@ -212,23 +225,23 @@ namespace
     // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
     // it up in stageLog->classLog, make sure it has the same number of entries:
     Assert(stageLog->stageInfo->classLog->numClasses == stageLog->classLog->numClasses,
-	   dealii::ExcInternalError());
+           dealii::ExcInternalError());
 
     bool errors = false;
-    for (int i=0;i<stageLog->stageInfo->classLog->numClasses;++i)
+    for (int i=0; i<stageLog->stageInfo->classLog->numClasses; ++i)
       {
-	if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
-	    stageLog->stageInfo->classLog->classInfo[i].creations)
-	  {
-	    errors = true;
-	    std::cerr << "ERROR: PETSc objects leaking of type '"
-		      << stageLog->classLog->classInfo[i].name << "'"
-		      << " with "
-		      << stageLog->stageInfo->classLog->classInfo[i].creations
-		      << " creations and only "
-		      << stageLog->stageInfo->classLog->classInfo[i].destructions
-		      << " destructions." << std::endl;
-	  }
+        if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
+            stageLog->stageInfo->classLog->classInfo[i].creations)
+          {
+            errors = true;
+            std::cerr << "ERROR: PETSc objects leaking of type '"
+                      << stageLog->classLog->classInfo[i].name << "'"
+                      << " with "
+                      << stageLog->stageInfo->classLog->classInfo[i].creations
+                      << " creations and only "
+                      << stageLog->stageInfo->classLog->classInfo[i].destructions
+                      << " destructions." << std::endl;
+          }
       }
 
     if (errors)
@@ -424,6 +437,22 @@ struct SwitchOffStacktrace
 } deal_II_stacktrace_dummy;
 
 
+
+/* Enable floating point exceptions in debug mode and if we have
+   detected that they are usable: */
+
+struct EnableFPE
+{
+  EnableFPE ()
+  {
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+    // enable floating point exceptions
+    feenableexcept(FE_DIVBYZERO|FE_INVALID);
+#endif
+  }
+} deal_II_enable_fpe;
+
+
 /* Set grainsizes for parallel mode smaller than they would otherwise be.
  * This is used to test that the parallel algorithms in lac/ work alright:
  */
@@ -452,4 +481,4 @@ struct SetGrainSizes
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // __tests_tests_h
+#endif // dealii__tests_h

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -190,15 +190,15 @@ void FindBug<dim>::dirichlet_conditions ()
 
 
   std::vector<bool> fixed_dofs (dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_indicators;
-  boundary_indicators.insert (0);
+  std::set<types::boundary_id> boundary_ids;
+  boundary_ids.insert (0);
 
   // get a list of those boundary DoFs which
   // we want to be fixed:
   DoFTools::extract_boundary_dofs (dof_handler,
                                    component_mask,
                                    fixed_dofs,
-                                   boundary_indicators);
+                                   boundary_ids);
 
   // (Primitive) Check if the DoFs
   // where adjusted correctly (note
@@ -210,11 +210,11 @@ void FindBug<dim>::dirichlet_conditions ()
     {
       if (fixed_dofs[i] == true)
         {
-          Assert (dirichlet_dofs[i] == 0, ExcInternalError());
+          AssertThrow (dirichlet_dofs[i] == 0, ExcInternalError());
         }
       else
         {
-          Assert (dirichlet_dofs[i] == 1, ExcInternalError());
+          AssertThrow (dirichlet_dofs[i] == 1, ExcInternalError());
         };
     };
 

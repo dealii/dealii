@@ -1,0 +1,62 @@
+
+DEAL:0::locally owned cells: 0 / 4
+DEAL:0::* global refine:
+DEAL:0::locally owned cells: 0 / 16
+DEAL:0::* repartition:
+DEAL:0::locally owned cells: 4 / 16
+DEAL:0::unpacking cell 0_2:00 with data=4 status=PERSIST
+DEAL:0::unpacking cell 0_2:01 with data=5 status=PERSIST
+DEAL:0::unpacking cell 0_2:02 with data=6 status=PERSIST
+DEAL:0::unpacking cell 0_2:03 with data=7 status=PERSIST
+DEAL:0::Checksum: 3877634849
+DEAL:0::OK
+
+DEAL:1::locally owned cells: 0 / 4
+DEAL:1::* global refine:
+DEAL:1::locally owned cells: 0 / 16
+DEAL:1::* repartition:
+DEAL:1::locally owned cells: 8 / 16
+DEAL:1::unpacking cell 0_2:10 with data=8 status=PERSIST
+DEAL:1::unpacking cell 0_2:11 with data=9 status=PERSIST
+DEAL:1::unpacking cell 0_2:12 with data=10 status=PERSIST
+DEAL:1::unpacking cell 0_2:13 with data=11 status=PERSIST
+DEAL:1::unpacking cell 0_2:20 with data=12 status=PERSIST
+DEAL:1::unpacking cell 0_2:21 with data=13 status=PERSIST
+DEAL:1::unpacking cell 0_2:22 with data=14 status=PERSIST
+DEAL:1::unpacking cell 0_2:23 with data=15 status=PERSIST
+
+
+DEAL:2::locally owned cells: 4 / 4
+DEAL:2::* global refine:
+DEAL:2::packing cell 0_1:0 with data=0 status=REFINE
+DEAL:2::packing cell 0_1:1 with data=1 status=REFINE
+DEAL:2::packing cell 0_1:2 with data=2 status=REFINE
+DEAL:2::packing cell 0_1:3 with data=3 status=REFINE
+DEAL:2::locally owned cells: 16 / 16
+DEAL:2::unpacking cell 0_1:0 with data=0 status=REFINE
+DEAL:2::unpacking cell 0_1:1 with data=1 status=REFINE
+DEAL:2::unpacking cell 0_1:2 with data=2 status=REFINE
+DEAL:2::unpacking cell 0_1:3 with data=3 status=REFINE
+DEAL:2::* repartition:
+DEAL:2::packing cell 0_2:00 with data=4 status=PERSIST
+DEAL:2::packing cell 0_2:01 with data=5 status=PERSIST
+DEAL:2::packing cell 0_2:02 with data=6 status=PERSIST
+DEAL:2::packing cell 0_2:03 with data=7 status=PERSIST
+DEAL:2::packing cell 0_2:10 with data=8 status=PERSIST
+DEAL:2::packing cell 0_2:11 with data=9 status=PERSIST
+DEAL:2::packing cell 0_2:12 with data=10 status=PERSIST
+DEAL:2::packing cell 0_2:13 with data=11 status=PERSIST
+DEAL:2::packing cell 0_2:20 with data=12 status=PERSIST
+DEAL:2::packing cell 0_2:21 with data=13 status=PERSIST
+DEAL:2::packing cell 0_2:22 with data=14 status=PERSIST
+DEAL:2::packing cell 0_2:23 with data=15 status=PERSIST
+DEAL:2::packing cell 0_2:30 with data=16 status=PERSIST
+DEAL:2::packing cell 0_2:31 with data=17 status=PERSIST
+DEAL:2::packing cell 0_2:32 with data=18 status=PERSIST
+DEAL:2::packing cell 0_2:33 with data=19 status=PERSIST
+DEAL:2::locally owned cells: 4 / 16
+DEAL:2::unpacking cell 0_2:30 with data=16 status=PERSIST
+DEAL:2::unpacking cell 0_2:31 with data=17 status=PERSIST
+DEAL:2::unpacking cell 0_2:32 with data=18 status=PERSIST
+DEAL:2::unpacking cell 0_2:33 with data=19 status=PERSIST
+

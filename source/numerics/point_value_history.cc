@@ -291,7 +291,7 @@ void PointValueHistory<dim>
   // GridTools::find_active_cell_around_point
   // to obtain a cell to search is an
   // option for these methods, but currently
-  // the GridTools method does not cater for
+  // the GridTools function does not cater for
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
   for (unsigned int component = 0;
@@ -514,6 +514,7 @@ void PointValueHistory<dim>
   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
+  (void)n_stored;
   Assert (component_names.size() == n_stored, ExcDimensionMismatch (component_names.size(), n_stored));
 
   names->second = component_names;
@@ -657,9 +658,9 @@ void PointValueHistory<dim>
         {
           // Extract data for the
           // PostProcessor object
-          std::vector< double > uh (n_quadrature_points, 0.0);
-          std::vector< Tensor< 1, dim > > duh (n_quadrature_points, Tensor <1, dim> ());
-          std::vector< Tensor< 2, dim > > dduh (n_quadrature_points, Tensor <2, dim> ());
+          std::vector< typename VECTOR::value_type > uh (n_quadrature_points, 0.0);
+          std::vector< Tensor< 1, dim, typename VECTOR::value_type > > duh (n_quadrature_points, Tensor <1, dim, typename VECTOR::value_type> ());
+          std::vector< Tensor< 2, dim, typename VECTOR::value_type > > dduh (n_quadrature_points, Tensor <2, dim, typename VECTOR::value_type> ());
           std::vector<Point<dim> > dummy_normals (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -690,10 +691,11 @@ void PointValueHistory<dim>
 
           // Call compute_derived_quantities_vector
           // or compute_derived_quantities_scalar
+          // TODO this function should also operate with typename VECTOR::value_type
           data_postprocessor.
           compute_derived_quantities_scalar(std::vector< double > (1, uh[selected_point]),
-                                            std::vector< Tensor< 1, dim > > (1, duh[selected_point]),
-                                            std::vector< Tensor< 2, dim > > (1, dduh[selected_point]),
+                                            std::vector< Tensor< 1, dim > > (1, Tensor< 1, dim >(duh[selected_point]) ),
+                                            std::vector< Tensor< 2, dim > > (1, Tensor< 2, dim >(dduh[selected_point]) ),
                                             dummy_normals,
                                             std::vector<Point<dim> > (1, evaluation_points[selected_point]),
                                             computed_quantities);
@@ -702,9 +704,9 @@ void PointValueHistory<dim>
       else     // The case of a vector FE
         {
           // Extract data for the PostProcessor object
-          std::vector< Vector< double > > uh (n_quadrature_points, Vector <double> (n_components));
-          std::vector< std::vector< Tensor< 1, dim > > > duh (n_quadrature_points, std::vector< Tensor< 1, dim > > (n_components,  Tensor< 1, dim >()));
-          std::vector< std::vector< Tensor< 2, dim > > > dduh (n_quadrature_points, std::vector< Tensor< 2, dim > > (n_components,  Tensor< 2, dim >()));
+          std::vector< Vector< typename VECTOR::value_type > > uh (n_quadrature_points, Vector <typename VECTOR::value_type> (n_components));
+          std::vector< std::vector< Tensor< 1, dim, typename VECTOR::value_type > > > duh (n_quadrature_points, std::vector< Tensor< 1, dim, typename VECTOR::value_type > > (n_components,  Tensor< 1, dim, typename VECTOR::value_type >()));
+          std::vector< std::vector< Tensor< 2, dim, typename VECTOR::value_type > > > dduh (n_quadrature_points, std::vector< Tensor< 2, dim, typename VECTOR::value_type > > (n_components,  Tensor< 2, dim, typename VECTOR::value_type >()));
           std::vector<Point<dim> > dummy_normals  (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -734,12 +736,29 @@ void PointValueHistory<dim>
                 }
             }
 
+          // FIXME: We need tmp vectors below because the data
+          // postprocessors are not equipped to deal with anything but
+          // doubles (scalars and tensors).
+          const Vector< typename VECTOR::value_type >                        &uh_s   = uh[selected_point];
+          const std::vector< Tensor< 1, dim, typename VECTOR::value_type > > &duh_s  = duh[selected_point];
+          const std::vector< Tensor< 2, dim, typename VECTOR::value_type > > &dduh_s = dduh[selected_point];
+          std::vector< Tensor< 1, dim > > tmp_d (duh_s.size());
+          for (unsigned int i = 0; i < duh_s.size(); i++)
+            tmp_d[i] = duh_s[i];
+
+          std::vector< Tensor< 2, dim > > tmp_dd (dduh_s.size());
+          for (unsigned int i = 0; i < dduh_s.size(); i++)
+            tmp_dd[i] = dduh_s[i];
+
+          Vector< double > tmp(uh_s.size());
+          for (unsigned int i = 0; i < uh_s.size(); i++)
+            tmp[i] = uh_s[i];
           // Call compute_derived_quantities_vector
           // or compute_derived_quantities_scalar
           data_postprocessor.
-          compute_derived_quantities_vector(std::vector< Vector< double > > (1, uh[selected_point]),
-                                            std::vector< std::vector< Tensor< 1, dim > > > (1, duh[selected_point]),
-                                            std::vector< std::vector< Tensor< 2, dim > > > (1, dduh[selected_point]),
+          compute_derived_quantities_vector(std::vector< Vector< double > > (1, tmp),
+                                            std::vector< std::vector< Tensor< 1, dim > > > (1, tmp_d),
+                                            std::vector< std::vector< Tensor< 2, dim > > > (1, tmp_dd),
                                             dummy_normals,
                                             std::vector<Point<dim> > (1, evaluation_points[selected_point]),
                                             computed_quantities);

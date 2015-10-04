@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__theta_timestepping_h
-#define __deal2__theta_timestepping_h
+#ifndef dealii__theta_timestepping_h
+#define dealii__theta_timestepping_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/algorithms/operator.h>
@@ -192,7 +192,7 @@ namespace Algorithms
   public:
     /**
      * Constructor, receiving the two operators stored in #op_explicit and
-     * #op_implicit. For their meening, see the description of those
+     * #op_implicit. For their meaning, see the description of those
      * variables.
      */
     ThetaTimestepping (Operator<VECTOR> &op_explicit,

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,10 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mapping_q1_eulerian_h
-#define __deal2__mapping_q1_eulerian_h
+#ifndef dealii__mapping_q1_eulerian_h
+#define dealii__mapping_q1_eulerian_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -100,11 +101,21 @@ public:
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**
+   * Return the mapped vertices of the cell. For the current class, this function does
+   * not use the support points from the geometry of the current cell but
+   * instead evaluates an externally given displacement field in addition to
+   * the geometry of the cell.
+   */
+  virtual
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+  /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  MappingQ1Eulerian<dim,VECTOR,spacedim> *clone () const;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general
@@ -122,20 +133,30 @@ public:
 
 protected:
   /**
-   * Implementation of the interface in MappingQ1. Overrides the function in
-   * the base class, since we cannot use any cell similarity for this class.
+   * Compute mapping-related information for a cell.
+   * See the documentation of Mapping::fill_fe_values() for
+   * a discussion of purpose, arguments, and return value of this function.
+   *
+   * This function overrides the function in
+   * the base class since we cannot use any cell similarity for this class.
    */
-  virtual void
+  virtual
+  CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                  typename std::vector<Point<spacedim> >                    &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity) const;
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+
+  /**
+   * Compute the support points of the mapping. For the current class, these are
+   * the vertices, as obtained by calling Mapping::get_vertices().
+   * See the documentation of MappingQGeneric::compute_mapping_support_points()
+   * for more information.
+   */
+  virtual
+  std::vector<Point<spacedim> >
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Reference to the vector of shifts.
@@ -146,17 +167,6 @@ protected:
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
   SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
-
-
-private:
-  /**
-   * Computes the support points of the mapping. For @p MappingQ1Eulerian
-   * these are the vertices.
-   */
-  virtual void compute_mapping_support_points(
-    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim> > &a) const;
-
 };
 
 /*@}*/

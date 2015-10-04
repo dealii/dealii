@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solution_transfer_h
-#define __deal2__solution_transfer_h
+#ifndef dealii__solution_transfer_h
+#define dealii__solution_transfer_h
 
 
 /*----------------------------   solutiontransfer.h     ----------------------*/
@@ -35,9 +35,9 @@ DEAL_II_NAMESPACE_OPEN
  * solution vector) from one mesh to another that is obtained from the first
  * by a single refinement and/or coarsening step. During interpolation the
  * vector is reinitialized to the new size and filled with the interpolated
- * values. This class is used in the step-15, step-31, and step-33 tutorial
- * programs. A version of this class that works on parallel triangulations is
- * available as parallel::distributed::SolutionTransfer.
+ * values. This class is used in the step-15, step-26, step-31, and step-33
+ * tutorial programs. A version of this class that works on parallel
+ * triangulations is available as parallel::distributed::SolutionTransfer.
  *
  * <h3>Usage</h3>
  *
@@ -110,9 +110,9 @@ DEAL_II_NAMESPACE_OPEN
  * soltrans.interpolate(solution, interpolated_solution);
  * @endcode
  *
- * Multiple calls to the function <tt>interpolate (const Vector<number> &in,
- * Vector<number> &out)</tt> are NOT allowed. Interpolating several functions
- * can be performed in one step by using <tt>void interpolate (const
+ * Multiple calls to the function <code>interpolate (const Vector<number> &in,
+ * Vector<number> &out)</code> are NOT allowed. Interpolating several
+ * functions can be performed in one step by using <tt>void interpolate (const
  * vector<Vector<number> >&all_in, vector<Vector<number> >&all_out)
  * const</tt>, and using the respective @p
  * prepare_for_coarsening_and_refinement function taking several vectors as
@@ -125,6 +125,21 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The template argument @p number denotes the data type of the vectors you
  * want to transfer.
+ *
+ *
+ * <h3>Interpolating in the presence of hanging nodes and boundary values</h3>
+ *
+ * The interpolation onto the new mesh is a local operation, i.e., it
+ * interpolates onto the new mesh only. If that new mesh has hanging nodes,
+ * you will therefore get a solution that does not satisfy hanging node
+ * constraints. The same is true with boundary values: the interpolated
+ * solution will just be the interpolation of the old solution at the
+ * boundary, and this may or may not satisfy boundary values at newly
+ * introduced boundary nodes.
+ *
+ * Consequently, you may have to apply hanging node or boundary value
+ * constraints after interpolation. step-15 and step-26 have examples of
+ * dealing with this.
  *
  *
  * <h3>Implementation</h3>

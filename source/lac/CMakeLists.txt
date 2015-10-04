@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,9 +23,7 @@ SET(_src
   block_vector.cc
   chunk_sparse_matrix.cc
   chunk_sparsity_pattern.cc
-  compressed_set_sparsity_pattern.cc
-  compressed_simple_sparsity_pattern.cc
-  compressed_sparsity_pattern.cc
+  dynamic_sparsity_pattern.cc
   constraint_matrix.cc
   full_matrix.cc
   lapack_full_matrix.cc
@@ -48,6 +46,7 @@ SET(_src
   precondition_block.cc
   precondition_block_ez.cc
   relaxation_block.cc
+  read_write_vector.cc
   slepc_solver.cc
   slepc_spectral_transformation.cc
   solver.cc
@@ -56,6 +55,7 @@ SET(_src
   sparse_direct.cc
   sparse_ilu.cc
   sparse_matrix.cc
+  sparse_matrix_inst2.cc
   sparse_matrix_ez.cc
   sparse_mic.cc
   sparse_vanka.cc
@@ -65,7 +65,10 @@ SET(_src
   tridiagonal_matrix.cc
   trilinos_block_sparse_matrix.cc
   trilinos_block_vector.cc
+  trilinos_parallel_block_vector.cc
   trilinos_precondition.cc
+  trilinos_precondition_ml.cc
+  trilinos_precondition_muelu.cc
   trilinos_solver.cc
   trilinos_sparse_matrix.cc
   trilinos_sparsity_pattern.cc
@@ -86,6 +89,7 @@ SET(_inst
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
+  read_write_vector.inst.in
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in

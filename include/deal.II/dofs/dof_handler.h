@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_handler_h
-#define __deal2__dof_handler_h
+#ifndef dealii__dof_handler_h
+#define dealii__dof_handler_h
 
 
 
@@ -112,7 +112,7 @@ namespace internal
  * for dofs are given to the largest cells as well as their bounding lines and
  * vertices, with the dofs of more refined cells getting higher numbers.
  *
- * This numbering implies very large bandwiths of the resulting matrices and
+ * This numbering implies very large bandwidths of the resulting matrices and
  * is thus vastly suboptimal for some solution algorithms. For this reason,
  * the DoFRenumbering class offers several algorithms to reorder the dof
  * numbering according. See there for a discussion of the implemented
@@ -136,7 +136,7 @@ namespace internal
  * <h3>User defined renumbering schemes</h3>
  *
  * The DoFRenumbering class offers a number of renumbering schemes like the
- * Cuthill-McKey scheme. Basically, the function sets up an array in which for
+ * Cuthill-McKee scheme. Basically, the function sets up an array in which for
  * each degree of freedom we store the new index this DoF should have after
  * renumbering. Using this array, the renumber_dofs() function of the present
  * class is called, which actually performs the change from old DoF indices to
@@ -706,14 +706,14 @@ public:
    * function.
    */
   types::global_dof_index
-  n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+  n_boundary_dofs (const FunctionMap &boundary_ids) const;
 
   /**
    * Same function, but with different data type of the argument, which is
    * here simply a list of the boundary indicators under consideration.
    */
   types::global_dof_index
-  n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
+  n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const;
 
   /**
    * Access to an object informing of the block structure of the dof handler.
@@ -1186,7 +1186,7 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=0, ExcNotInitialized());
+  Assert(selected_fe!=0, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
 }
 

@@ -102,12 +102,6 @@ namespace Algorithms
     if (output != 0)
       (*output) << 0U << out;
 
-    // Avoid warnings because time and timestep cannot be converted to VECTOR*
-    const bool explicit_silent = op_explicit->silent_compatibility;
-    const bool implicit_silent = op_implicit->silent_compatibility;
-    op_explicit->silent_compatibility = true;
-    op_implicit->silent_compatibility = true;
-
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
       {
         const bool step_change = control.advance();
@@ -134,8 +128,6 @@ namespace Algorithms
 
         d_explicit.time = control.now();
       }
-    op_explicit->silent_compatibility = explicit_silent;
-    op_implicit->silent_compatibility = implicit_silent;
     deallog.pop();
   }
 }

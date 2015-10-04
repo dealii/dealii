@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,10 @@ namespace PETScWrappers
     BlockVector &
     BlockVector::operator = (const PETScWrappers::BlockVector &v)
     {
-      Assert (v.get_block_indices() == this->get_block_indices(),
-              ExcNonMatchingBlockVectors());
+      this->block_indices = v.get_block_indices();
+
+      if (this->components.size() != this->n_blocks())
+        this->components.resize(this->n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->block(i) = v.block(i);

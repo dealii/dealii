@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,107 +78,20 @@ FE_PolyFace<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 }
 
 
-
-//---------------------------------------------------------------------------
-// Data field initialization
-//---------------------------------------------------------------------------
-
-template <class POLY, int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
-FE_PolyFace<POLY,dim,spacedim>::get_data (
-  const UpdateFlags,
-  const Mapping<dim,spacedim> &,
-  const Quadrature<dim> &) const
-{
-  InternalData *data = new InternalData;
-  return data;
-}
-
-
-template <class POLY, int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
-FE_PolyFace<POLY,dim,spacedim>::get_face_data (
-  const UpdateFlags update_flags,
-  const Mapping<dim,spacedim> &,
-  const Quadrature<dim-1>& quadrature) const
-{
-  // generate a new data object and
-  // initialize some fields
-  InternalData *data = new InternalData;
-
-  // check what needs to be
-  // initialized only once and what
-  // on every cell/face/subface we
-  // visit
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
-
-  const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.size();
-
-  // some scratch arrays
-  std::vector<double> values(0);
-  std::vector<Tensor<1,dim-1> > grads(0);
-  std::vector<Tensor<2,dim-1> > grad_grads(0);
-
-  // initialize fields only if really
-  // necessary. otherwise, don't
-  // allocate memory
-  if (flags & update_values)
-    {
-      values.resize (poly_space.n());
-      data->shape_values.resize (poly_space.n(),
-                                 std::vector<double> (n_q_points));
-      for (unsigned int i=0; i<n_q_points; ++i)
-        {
-          poly_space.compute(quadrature.point(i),
-                             values, grads, grad_grads);
-
-          for (unsigned int k=0; k<poly_space.n(); ++k)
-            data->shape_values[k][i] = values[k];
-        }
-    }
-  // No derivatives of this element
-  // are implemented.
-  if (flags & update_gradients || flags & update_hessians)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-  return data;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
-FE_PolyFace<POLY,dim,spacedim>::get_subface_data (
-  const UpdateFlags flags,
-  const Mapping<dim,spacedim> &mapping,
-  const Quadrature<dim-1>& quadrature) const
-{
-  return get_face_data (flags, mapping,
-                        QProjector<dim-1>::project_to_all_children(quadrature));
-}
-
-
-
-
-
 //---------------------------------------------------------------------------
 // Fill data of FEValues
 //---------------------------------------------------------------------------
 template <class POLY, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
-(const Mapping<dim,spacedim> &,
- const typename Triangulation<dim,spacedim>::cell_iterator &,
- const Quadrature<dim> &,
- typename Mapping<dim,spacedim>::InternalDataBase &,
- typename Mapping<dim,spacedim>::InternalDataBase &,
- FEValuesData<dim,spacedim> &,
- CellSimilarity::Similarity &) const
+FE_PolyFace<POLY,dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim> &,
+                const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const Quadrature<dim> &,
+                const typename Mapping<dim,spacedim>::InternalDataBase &,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &,
+                const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &,
+                const CellSimilarity::Similarity ) const
 {
   // Do nothing, since we do not have
   // values in the interior
@@ -188,21 +101,22 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
 
 template <class POLY, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
-  const Mapping<dim,spacedim> &,
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
-  const unsigned int face,
-  const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-  FEValuesData<dim,spacedim> &data) const
+FE_PolyFace<POLY,dim,spacedim>::
+fill_fe_face_values (const Mapping<dim,spacedim> &,
+                     const typename Triangulation<dim,spacedim>::cell_iterator &,
+                     const unsigned int face,
+                     const Quadrature<dim-1>& quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                     const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -210,7 +124,7 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
     for (unsigned int i=0; i<quadrature.size(); ++i)
       {
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          data.shape_values(k,i) = 0.;
+          output_data.shape_values(k,i) = 0.;
         switch (dim)
           {
           case 3:
@@ -220,7 +134,7 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
               {
                 const unsigned int foffset = this->first_quad_index + this->dofs_per_quad * face;
                 for (unsigned int k=0; k<this->dofs_per_quad; ++k)
-                  data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
+                  output_data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
               }
           }
           case 2:
@@ -232,7 +146,8 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
                 for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_face; ++line)
                   {
                     for (unsigned int k=0; k<this->dofs_per_line; ++k)
-                      data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face, line)*this->dofs_per_line+k,i) = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
+                      output_data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face, line)*this->dofs_per_line+k,i)
+                        = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
                   }
               }
           }
@@ -241,7 +156,8 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
             // Fill data for vertex shape functions
             if (this->dofs_per_vertex != 0)
               for (unsigned int lvertex=0; lvertex<GeometryInfo<dim>::vertices_per_face; ++lvertex)
-                data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face, lvertex),i) = fe_data.shape_values[lvertex][i];
+                output_data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face, lvertex),i)
+                  = fe_data.shape_values[lvertex][i];
             break;
           }
           }
@@ -251,22 +167,23 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
 
 template <class POLY, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
-  const Mapping<dim,spacedim> &,
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
-  const unsigned int face,
-  const unsigned int subface,
-  const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-  FEValuesData<dim,spacedim> &data) const
+FE_PolyFace<POLY,dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim> &,
+                        const typename Triangulation<dim,spacedim>::cell_iterator &,
+                        const unsigned int face,
+                        const unsigned int subface,
+                        const Quadrature<dim-1>& quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase &,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+                        const internal::FEValues::MappingRelatedData<dim,spacedim> &,
+                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -277,9 +194,9 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
     for (unsigned int i=0; i<quadrature.size(); ++i)
       {
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          data.shape_values(k,i) = 0.;
+          output_data.shape_values(k,i) = 0.;
         for (unsigned int k=0; k<fe_data.shape_values.size(); ++k)
-          data.shape_values(foffset+k,i) = fe_data.shape_values[k][i+offset];
+          output_data.shape_values(foffset+k,i) = fe_data.shape_values[k][i+offset];
       }
 
   Assert (!(flags & update_gradients), ExcNotImplemented());

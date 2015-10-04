@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_time_h
-#define __deal2__function_time_h
+#ifndef dealii__function_time_h
+#define dealii__function_time_h
 
 
 #include <deal.II/base/config.h>
@@ -42,21 +42,27 @@ DEAL_II_NAMESPACE_OPEN
  * computations which need only be done once for every new time. For example,
  * if a time dependent function had a factor <tt>sin(t)</tt>, then it may be a
  * reasonable choice to calculate this factor in a derived version of
- * <tt>set_time</tt>, store it in a member variable and use that one rather
- * than computing it every time <tt>operator()</tt>, <tt>value_list</tt> or
- * one of the other functions is called.
+ * set_time(), store it in a member variable and use that one rather than
+ * computing it every time <tt>value()</tt>, <tt>value_list</tt> or one of the
+ * other functions of class Function is called.
  *
- * By default, the <tt>advance_time</tt> function calls the <tt>set_time</tt>
- * function with the new time, so it is sufficient in most cases to overload
- * only <tt>set_time</tt> for computations as sketched out above.
+ * By default, the advance_time() function calls the set_time() function with
+ * the new time, so it is sufficient in most cases to overload only set_time()
+ * for computations as sketched out above.
  *
  * The constructor of this class takes an initial value for the time variable,
  * which defaults to zero. Because a default value is given, none of the
  * derived classes needs to take an initial value for the time variable if not
  * needed.
  *
- * Once again the warning: do not use the <tt>time</tt> variable for any other
- * purpose than the intended one! This will inevitably lead to confusion.
+ * @tparam Number The data type in which time values are to be stored. This
+ * will, in almost all cases, simply be the default @p double, but there are
+ * cases where one may want to store the time in a different (and always
+ * scalar) type. An example would be an interval type that can store a value
+ * as well as its uncertainty. Another example would be a type that allows for
+ * Automatic Differentiation (see, for example, the Sacado type used in
+ * step-33) and thereby can generate analytic (temporal) derivatives of a
+ * function.
  *
  *
  * @ingroup functions
@@ -67,7 +73,7 @@ class FunctionTime
 {
 public:
   /**
-   * Constructor. May take an initial vakue for the time variable, which
+   * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
    */
   FunctionTime (const Number initial_time = Number(0.0));
@@ -78,7 +84,7 @@ public:
   virtual ~FunctionTime();
 
   /**
-   * Return the value of the time variable/
+   * Return the value of the time variable.
    */
   Number get_time () const;
 

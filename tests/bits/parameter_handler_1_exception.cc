@@ -30,7 +30,7 @@ void check (const char *p)
   try
     {
       prm.declare_entry ("test_1", "abc",
-			 Patterns::List(Patterns::Integer(-1,1),2,3));
+                         Patterns::List(Patterns::Integer(-1,1),2,3));
     }
   catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
     {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mg_transfer_component_templates_h
-#define __deal2__mg_transfer_component_templates_h
+#ifndef dealii__mg_transfer_component_templates_h
+#define dealii__mg_transfer_component_templates_h
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -151,12 +151,6 @@ MGTransferSelect<number>::do_copy_from_mg (
   OutVector                            &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-//  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-
-//  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-//  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-//  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
-
   typename DoFHandler<dim,spacedim>::active_cell_iterator
   level_cell = mg_dof_handler.begin_active();
   const typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -166,8 +160,7 @@ MGTransferSelect<number>::do_copy_from_mg (
   // data appropriately to the output
   // vector
 
-  // Note that the level is
-  // monotonuosly increasing
+  // Note that the level is increasing monotonically
   dst = 0;
   for (; level_cell != endc; ++level_cell)
     {
@@ -203,8 +196,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   // data appropriately to the output
   // vector
 
-  // Note that the level is
-  // monotonuosly increasing
+  // Note that the level is increasing monotonically
   dst = 0;
   for (; level_cell != endc; ++level_cell)
     {

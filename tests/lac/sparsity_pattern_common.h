@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/lac/compressed_set_sparsity_pattern.h>
@@ -53,10 +54,6 @@ void do_reinit (ChunkSparsityPattern &sp)
 }
 
 
-void do_reinit (CompressedSparsityPattern &sp)
-{
-  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
-}
 
 void do_reinit (CompressedSimpleSparsityPattern &sp,
                 const IndexSet &index_set = IndexSet())
@@ -64,10 +61,6 @@ void do_reinit (CompressedSimpleSparsityPattern &sp,
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), index_set);
 }
 
-void do_reinit (CompressedSetSparsityPattern &sp)
-{
-  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
-}
 
 
 
@@ -167,28 +160,13 @@ void copy_with_offdiagonals_1<ChunkSparsityPattern> ()
 
 
 template <>
-void copy_with_offdiagonals_1<CompressedSparsityPattern> ()
+void copy_with_offdiagonals_1<DynamicSparsityPattern> ()
 {
   // this sparsity pattern doesn't have this
   // function
   deallog << "OK" << std::endl;
 }
 
-template <>
-void copy_with_offdiagonals_1<CompressedSimpleSparsityPattern> ()
-{
-  // this sparsity pattern doesn't have this
-  // function
-  deallog << "OK" << std::endl;
-}
-
-template <>
-void copy_with_offdiagonals_1<CompressedSetSparsityPattern> ()
-{
-  // this sparsity pattern doesn't have this
-  // function
-  deallog << "OK" << std::endl;
-}
 
 
 
@@ -225,32 +203,13 @@ void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
 
 
 template <>
-void copy_with_offdiagonals_2<CompressedSparsityPattern> ()
+void copy_with_offdiagonals_2<DynamicSparsityPattern> ()
 {
   // this sparsity pattern doesn't have this
   // function
   deallog << "OK" << std::endl;
 }
 
-
-
-template <>
-void copy_with_offdiagonals_2<CompressedSimpleSparsityPattern> ()
-{
-  // this sparsity pattern doesn't have this
-  // function
-  deallog << "OK" << std::endl;
-}
-
-
-
-template <>
-void copy_with_offdiagonals_2<CompressedSetSparsityPattern> ()
-{
-  // this sparsity pattern doesn't have this
-  // function
-  deallog << "OK" << std::endl;
-}
 
 
 
@@ -274,49 +233,11 @@ do_copy_from (const std::list<std::set<unsigned int,std::greater<unsigned int> >
 }
 
 
-template <typename SP>
-void
-do_copy_from (const CompressedSparsityPattern &sparsity,
-              SP &sp4)
-{
-  std::list<std::set<unsigned int,std::greater<unsigned int> > > sparsity_x;
-  for (unsigned int i=0; i<sparsity.n_rows(); ++i)
-    {
-      sparsity_x.push_back
-      (std::set<unsigned int,std::greater<unsigned int> >());
-
-      for (unsigned int j=0; j<sparsity.n_cols(); ++j)
-        if (sparsity.exists(i,j))
-          sparsity_x.back().insert (j);
-    }
-
-  do_copy_from (sparsity_x, sp4);
-}
 
 
 template <typename SP>
 void
-do_copy_from (const CompressedSimpleSparsityPattern &sparsity,
-              SP &sp4)
-{
-  std::list<std::set<unsigned int,std::greater<unsigned int> > > sparsity_x;
-  for (unsigned int i=0; i<sparsity.n_rows(); ++i)
-    {
-      sparsity_x.push_back
-      (std::set<unsigned int,std::greater<unsigned int> >());
-
-      for (unsigned int j=0; j<sparsity.n_cols(); ++j)
-        if (sparsity.exists(i,j))
-          sparsity_x.back().insert (j);
-    }
-
-  do_copy_from (sparsity_x, sp4);
-}
-
-
-template <typename SP>
-void
-do_copy_from (const CompressedSetSparsityPattern &sparsity,
+do_copy_from (const DynamicSparsityPattern &sparsity,
               SP &sp4)
 {
   std::list<std::set<unsigned int,std::greater<unsigned int> > > sparsity_x;
@@ -385,18 +306,24 @@ void copy_from_1 ()
   if ((sparsity_pattern.stores_only_added_elements() == true)
       &&
       (sp4.stores_only_added_elements() == true))
-    Assert (sparsity_pattern.n_nonzero_elements() ==
-            sp4.n_nonzero_elements(),
-            ExcInternalError());
+    AssertThrow (sparsity_pattern.n_nonzero_elements() ==
+                 sp4.n_nonzero_elements(),
+                 ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      if ((sparsity_pattern.stores_only_added_elements() == true)
-          &&
-          (sp4.stores_only_added_elements() == true))
-        Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-                ExcInternalError())
+      {
+        if ((sparsity_pattern.stores_only_added_elements() == true)
+            &&
+            (sp4.stores_only_added_elements() == true))
+          {
+            AssertThrow (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+                         ExcInternalError());
+          }
         else if (sparsity_pattern.exists(i,j))
-          Assert (sp4.exists (i,j), ExcInternalError());
+          {
+            AssertThrow (sp4.exists (i,j), ExcInternalError());
+          }
+      }
 
   deallog << "OK" << std::endl;
 }
@@ -420,18 +347,24 @@ void copy_from_2 ()
   if ((sparsity_pattern.stores_only_added_elements() == true)
       &&
       (sp4.stores_only_added_elements() == true))
-    Assert (sparsity_pattern.n_nonzero_elements() ==
-            sp4.n_nonzero_elements(),
-            ExcInternalError());
+    AssertThrow (sparsity_pattern.n_nonzero_elements() ==
+                 sp4.n_nonzero_elements(),
+                 ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      if ((sparsity_pattern.stores_only_added_elements() == true)
-          &&
-          (sp4.stores_only_added_elements() == true))
-        Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-                ExcInternalError())
+      {
+        if ((sparsity_pattern.stores_only_added_elements() == true)
+            &&
+            (sp4.stores_only_added_elements() == true))
+          {
+            AssertThrow (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+                         ExcInternalError());
+          }
         else if (sparsity_pattern.exists(i,j))
-          Assert (sp4.exists (i,j), ExcInternalError());
+          {
+            AssertThrow (sp4.exists (i,j), ExcInternalError());
+          }
+      }
 
   deallog << "OK" << std::endl;
 }
@@ -455,24 +388,28 @@ void copy_from_4 ()
   // now check for equivalence of original
   // and copy
   if (sp4.stores_only_added_elements() == true)
-    Assert (sp4.n_nonzero_elements() ==
-            static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                      sparsity_pattern.frobenius_norm()
-                                      + 0.5),
-            ExcInternalError())
-    else
-      Assert (sp4.n_nonzero_elements() >=
-              static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                        sparsity_pattern.frobenius_norm()
-                                        + 0.5),
-              ExcInternalError());
+    {
+      AssertThrow (sp4.n_nonzero_elements() ==
+                   static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+                                             sparsity_pattern.frobenius_norm()
+                                             + 0.5),
+                   ExcInternalError());
+    }
+  else
+    {
+      AssertThrow (sp4.n_nonzero_elements() >=
+                   static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+                                             sparsity_pattern.frobenius_norm()
+                                             + 0.5),
+                   ExcInternalError());
+    }
 
   for (unsigned int i=0; i<M; ++i)
     for (unsigned int j=0; j<M; ++j)
       if (std::abs((int)(i-j)) == 3)
-        Assert (sp4.exists (i,j)
-                == true,
-                ExcInternalError());
+        AssertThrow (sp4.exists (i,j)
+                     == true,
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -490,15 +427,15 @@ void matrix_position ()
   // function should be the inverse
   // of operator()
   for (unsigned int i=0; i<sparsity_pattern.n_nonzero_elements(); ++i)
-    Assert (sparsity_pattern(sparsity_pattern.matrix_position(i).first,
-                             sparsity_pattern.matrix_position(i).second) == i,
-            ExcInternalError());
+    AssertThrow (sparsity_pattern(sparsity_pattern.matrix_position(i).first,
+                                  sparsity_pattern.matrix_position(i).second) == i,
+                 ExcInternalError());
   for (types::global_dof_index row=0; row<sparsity_pattern.n_rows(); ++row)
     for (types::global_dof_index col=0; col<sparsity_pattern.n_cols(); ++col)
       if (sparsity_pattern(row,col) != SparsityPattern::invalid_entry)
-        Assert (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
-                std::make_pair(row,col),
-                ExcInternalError());
+        AssertThrow (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
+                     std::make_pair(row,col),
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -513,29 +450,13 @@ void matrix_position<ChunkSparsityPattern> ()
 
 
 template <>
-void matrix_position<CompressedSparsityPattern> ()
+void matrix_position<DynamicSparsityPattern> ()
 {
   // this class doesn't have that function
   deallog << "OK" << std::endl;
 }
 
 
-
-template <>
-void matrix_position<CompressedSimpleSparsityPattern> ()
-{
-  // this class doesn't have that function
-  deallog << "OK" << std::endl;
-}
-
-
-
-template <>
-void matrix_position<CompressedSetSparsityPattern> ()
-{
-  // this class doesn't have that function
-  deallog << "OK" << std::endl;
-}
 
 
 
@@ -565,8 +486,8 @@ void block_read_write ()
 
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      Assert (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
-              ExcInternalError());
+      AssertThrow (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
+                   ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -574,32 +495,13 @@ void block_read_write ()
 
 
 template <>
-void block_read_write<CompressedSparsityPattern> ()
+void block_read_write<DynamicSparsityPattern> ()
 {
   // not implemented for this sparsity
   // pattern
   deallog << "OK" << std::endl;
 }
 
-
-
-template <>
-void block_read_write<CompressedSimpleSparsityPattern> ()
-{
-  // not implemented for this sparsity
-  // pattern
-  deallog << "OK" << std::endl;
-}
-
-
-
-template <>
-void block_read_write<CompressedSetSparsityPattern> ()
-{
-  // not implemented for this sparsity
-  // pattern
-  deallog << "OK" << std::endl;
-}
 
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_matrix_base_h
-#define __deal2__petsc_matrix_base_h
+#ifndef dealii__petsc_matrix_base_h
+#define dealii__petsc_matrix_base_h
 
 
 #include <deal.II/base/config.h>
@@ -46,10 +46,10 @@ namespace PETScWrappers
   namespace MatrixIterators
   {
     /**
-     * STL conforming iterator. This class acts as an iterator walking over
-     * the elements of PETSc matrices. Since PETSc offers a uniform interface
-     * for all types of matrices, this iterator can be used to access both
-     * sparse and full matrices.
+     * This class acts as an iterator walking over the elements of PETSc
+     * matrices. Since PETSc offers a uniform interface for all types of
+     * matrices, this iterator can be used to access both sparse and full
+     * matrices.
      *
      * Note that PETSc does not give any guarantees as to the order of
      * elements within each row. Note also that accessing the elements of a
@@ -250,7 +250,7 @@ namespace PETScWrappers
    *
    * The interface of this class is modeled after the existing SparseMatrix
    * class in deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since PETSc only supports a single scalar type
+   * exchangeable. However, since PETSc only supports a single scalar type
    * (either double, float, or a complex data type), it is not templated, and
    * only works with whatever your PETSc installation has defined the data
    * type PetscScalar to.
@@ -784,7 +784,7 @@ namespace PETScWrappers
                           const VectorBase &b) const;
 
     /**
-     * STL-like iterator with the first entry.
+     * Iterator starting at the first entry.
      */
     const_iterator begin () const;
 
@@ -794,7 +794,7 @@ namespace PETScWrappers
     const_iterator end () const;
 
     /**
-     * STL-like iterator with the first entry of row @p r.
+     * Iterator starting at the first entry of row @p r.
      *
      * Note that if the given row is empty, i.e. does not contain any nonzero
      * entries, then the iterator returned by this function equals
@@ -921,8 +921,8 @@ namespace PETScWrappers
 
     /**
      * Internal function that checks that there are no pending insert/add
-     * operations. Throws an exception otherwise. Useful before calling
-     * any PETSc internal functions modifying the matrix.
+     * operations. Throws an exception otherwise. Useful before calling any
+     * PETSc internal functions modifying the matrix.
      */
     void assert_is_compressed();
 
@@ -1226,6 +1226,8 @@ namespace PETScWrappers
                    const PetscScalar  *values,
                    const bool         elide_zero_values)
   {
+    (void)elide_zero_values;
+
     prepare_action(VectorOperation::insert);
 
     const PetscInt petsc_i = row;
@@ -1234,8 +1236,7 @@ namespace PETScWrappers
     PetscScalar const *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    // If we don't elide zeros, the pointers are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
@@ -1246,8 +1247,8 @@ namespace PETScWrappers
     else
 #endif
       {
-        // Otherwise, extract nonzero values in
-        // each row and get the respective index.
+        // Otherwise, extract nonzero values in each row and get the
+        // respective index.
         if (column_indices.size() < n_cols)
           {
             column_indices.resize(n_cols);
@@ -1291,16 +1292,11 @@ namespace PETScWrappers
 
     if (value == PetscScalar())
       {
-        // we have to do checkings on Insert/Add
-        // in any case
-        // to be consistent with the MPI
-        // communication model (see the comments
-        // in the documentation of
-        // TrilinosWrappers::Vector), but we can
-        // save some work if the addend is
-        // zero. However, these actions are done
-        // in case we pass on to the other
-        // function.
+        // we have to check after using Insert/Add in any case to be
+        // consistent with the MPI communication model (see the comments in
+        // the documentation of TrilinosWrappers::Vector), but we can save
+        // some work if the addend is zero. However, these actions are done
+        // in case we pass on to the other function.
         prepare_action(VectorOperation::add);
 
         return;
@@ -1368,10 +1364,12 @@ namespace PETScWrappers
   MatrixBase::add (const size_type    row,
                    const size_type    n_cols,
                    const size_type   *col_indices,
-                   const PetscScalar  *values,
+                   const PetscScalar *values,
                    const bool         elide_zero_values,
                    const bool          /*col_indices_are_sorted*/)
   {
+    (void)elide_zero_values;
+
     prepare_action(VectorOperation::add);
 
     const PetscInt petsc_i = row;
@@ -1380,8 +1378,7 @@ namespace PETScWrappers
     PetscScalar const *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    // If we don't elide zeros, the pointers are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
@@ -1392,8 +1389,8 @@ namespace PETScWrappers
     else
 #endif
       {
-        // Otherwise, extract nonzero values in
-        // each row and get the respective index.
+        // Otherwise, extract nonzero values in each row and get the
+        // respective index.
         if (column_indices.size() < n_cols)
           {
             column_indices.resize(n_cols);

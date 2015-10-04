@@ -230,25 +230,22 @@ namespace Advection
 
     info_box.add_update_flags(update_flags, true, true, true, true);
 
-    NamedData<Vector<double>* > solution_data;
+    AnyData solution_data;
 
-    Vector<double> *u = &solution;
-
-    solution_data.add(u, "solution");
+    solution_data.add<Vector<double>* >(&solution, "solution");
     info_box.cell_selector.add("solution", true, true, false);
     info_box.boundary_selector.add("solution", true, false, false);
     info_box.face_selector.add("solution", true, false, false);
 
-    info_box.initialize(fe, mapping, solution_data);
+    info_box.initialize(fe, mapping, solution_data, solution);
 
 //deallog<<"\nWe are now going to attend construction of  MeshWorker::DoFInfo..."<<std::endl;
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 //deallog<<"\nApparently it DoFInfo was constructed fine!"<<std::endl;
 
     MeshWorker::Assembler::ResidualSimple<Vector<double> > assembler;
-    NamedData<Vector<double>* > data;
-    Vector<double> *rhs = &residual;
-    data.add(rhs, "Residual");
+    AnyData data;
+    data.add<Vector<double>* >(&residual, "Residual");
     assembler.initialize(data);
 
     MeshWorker::LoopControl lctrl;
@@ -308,7 +305,7 @@ namespace Advection
   void AdvectionProblem<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
                                                        MeshWorker::IntegrationInfo<dim> &info)
   {
-    const unsigned int boundary_id = dinfo.face->boundary_indicator();
+    const unsigned int boundary_id = dinfo.face->boundary_id();
 
     // We only have a non-zero boundary contribution at the
     // x=0 boundary

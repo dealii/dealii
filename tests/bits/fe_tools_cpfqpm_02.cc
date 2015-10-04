@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,6 +95,6 @@ check_this (const FiniteElement<dim> &fe,
     product(i,i) -= 1;
 
   output_matrix (product);
-  Assert (product.frobenius_norm() < 1e-10, ExcInternalError());
+  AssertThrow (product.frobenius_norm() < 1e-10, ExcInternalError());
 }
 

@@ -60,113 +60,112 @@ Number of degrees of freedom: 186,624 (99,840+36,864+49,920)
 Timestep 0:  t=0 years
 
    Rebuilding Stokes preconditioner...
-   Solving Stokes system... 41 iterations.
-   Maximal velocity: 60.672 cm/year
-   Time step: 17661 years
+   Solving Stokes system... 40 iterations.
+   Maximal velocity: 60.4935 cm/year
+   Time step: 18166.9 years
    17 CG iterations for temperature
    Temperature range: 973 4273.16
 
-Number of active cells: 16,803 (on 7 levels)
-Number of degrees of freedom: 266,589 (144,120+50,409+72,060)
+Number of active cells: 16,389 (on 7 levels)
+Number of degrees of freedom: 259,617 (140,300+49,167+70,150)
 
 Timestep 0:  t=0 years
 
    Rebuilding Stokes preconditioner...
-   Solving Stokes system... 33 iterations.
-   Maximal velocity: 60.6718 cm/year
-   Time step: 11032.2 years
+   Solving Stokes system... 49 iterations.
+   Maximal velocity: 60.5202 cm/year
+   Time step: 10619.2 years
    19 CG iterations for temperature
    Temperature range: 973 4273.16
 
-Number of active cells: 21,024 (on 8 levels)
-Number of degrees of freedom: 339,999 (184,618+63,072+92,309)
+Number of active cells: 20,124 (on 8 levels)
+Number of degrees of freedom: 323,145 (175,182+60,372+87,591)
 
 Timestep 0:  t=0 years
 
    Rebuilding Stokes preconditioner...
-   Solving Stokes system... 33 iterations.
-   Maximal velocity: 60.6835 cm/year
-   Time step: 5520.09 years
+   Solving Stokes system... 51 iterations.
+   Maximal velocity: 59.9101 cm/year
+   Time step: 5334.14 years
    18 CG iterations for temperature
-   Temperature range: 973 4273.44
+   Temperature range: 973 4273.43
 
-Timestep 1:  t=5520.09 years
+Timestep 1:  t=5334.14 years
 
-   Solving Stokes system... 34 iterations.
-   Maximal velocity: 61.9054 cm/year
-   Time step: 5410.41 years
+   Solving Stokes system... 49 iterations.
+   Maximal velocity: 61.0837 cm/year
+   Time step: 5232.24 years
    18 CG iterations for temperature
-   Temperature range: 973 4273.44
+   Temperature range: 973 4273.43
 
-Timestep 2:  t=10930.5 years
+Timestep 2:  t=10566.4 years
 
    Solving Stokes system... 24 iterations.
-   Maximal velocity: 63.1348 cm/year
-   Time step: 5304.37 years
+   Maximal velocity: 62.265 cm/year
+   Time step: 5133.56 years
    18 CG iterations for temperature
-   Temperature range: 973 4273.44
+   Temperature range: 973 4273.43
 
 [...]
 
-Timestep 100:  t=283833 years
+Timestep 100:  t=270918 years
 
-   Solving Stokes system... 23 iterations.
-   Maximal velocity: 168.248 cm/year
-   Time step: 1732.43 years
-   18 CG iterations for temperature
-   Temperature range: 973 4285.06
+   Solving Stokes system... 22 iterations.
+   Maximal velocity: 161.391 cm/year
+   Time step: 1683.55 years
+   17 CG iterations for temperature
+   Temperature range: 973 4282.45
 
-Number of active cells: 42,681 (on 8 levels)
-Number of degrees of freedom: 694,359 (377,544+128,043+188,772)
+Number of active cells: 54,717 (on 8 levels)
+Number of degrees of freedom: 880,626 (477,650+164,151+238,825)
 
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |       140s |            |
+| Total wallclock time elapsed since start    |       170s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |       103 |      7.08s |       5.1% |
-| Assemble temperature matrices   |        12 |     0.702s |       0.5% |
-| Assemble temperature rhs        |       103 |      10.3s |       7.3% |
-| Build Stokes preconditioner     |        12 |       3.6s |       2.6% |
-| Solve Stokes system             |       103 |       103s |        74% |
-| Solve temperature system        |       103 |      8.13s |       5.8% |
-| Postprocessing                  |         3 |     0.417s |       0.3% |
-| Refine mesh structure, part 1   |        12 |     0.859s |      0.61% |
-| Refine mesh structure, part 2   |        12 |      1.15s |      0.82% |
-| Setup dof systems               |        13 |      4.13s |       2.9% |
+| Assemble Stokes system          |       103 |      2.25s |       1.3% |
+| Assemble temperature matrices   |        12 |     0.296s |      0.17% |
+| Assemble temperature rhs        |       103 |      9.66s |       5.7% |
+| Build Stokes preconditioner     |        12 |      1.78s |         1% |
+| Solve Stokes system             |       103 |       149s |        88% |
+| Solve temperature system        |       103 |      1.84s |       1.1% |
+| Postprocessing                  |         3 |     0.398s |      0.23% |
+| Refine mesh structure, part 1   |        12 |     0.599s |      0.35% |
+| Refine mesh structure, part 2   |        12 |     0.216s |      0.13% |
+| Setup dof systems               |        13 |      2.15s |       1.3% |
 +---------------------------------+-----------+------------+------------+
 
 [...]
 
-Timestep 7092:  t=1.00027e+08 years
+Timestep 6946:  t=1.00001e+08 years
 
-   Solving Stokes system... 26 iterations.
-   Maximal velocity: 8.08888 cm/year
-   Time step: 35734.5 years
+   Solving Stokes system... 12 iterations.
+   Maximal velocity: 8.94391 cm/year
+   Time step: 31505.4 years
    18 CG iterations for temperature
    Temperature range: 973 4273.04
 
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |  8.36e+03s |            |
+| Total wallclock time elapsed since start    |  8.86e+03s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |      7095 |       482s |       5.8% |
-| Assemble temperature matrices   |       712 |      40.6s |      0.49% |
-| Assemble temperature rhs        |      7095 |       671s |         8% |
-| Build Stokes preconditioner     |       712 |       231s |       2.8% |
-| Solve Stokes system             |      7095 |  5.99e+03s |        72% |
-| Solve temperature system        |      7095 |       578s |       6.9% |
-| Postprocessing                  |       143 |      19.3s |      0.23% |
-| Refine mesh structure, part 1   |       711 |      48.7s |      0.58% |
-| Refine mesh structure, part 2   |       711 |      68.6s |      0.82% |
-| Setup dof systems               |       712 |       223s |       2.7% |
+| Assemble Stokes system          |      6949 |       153s |       1.7% |
+| Assemble temperature matrices   |       697 |      18.2s |       0.2% |
+| Assemble temperature rhs        |      6949 |       600s |       6.8% |
+| Build Stokes preconditioner     |       697 |       115s |       1.3% |
+| Solve Stokes system             |      6949 |  7.56e+03s |        85% |
+| Solve temperature system        |      6949 |       123s |       1.4% |
+| Postprocessing                  |       140 |      18.1s |       0.2% |
+| Refine mesh structure, part 1   |       696 |      34.6s |      0.39% |
+| Refine mesh structure, part 2   |       696 |      12.6s |      0.14% |
+| Setup dof systems               |       697 |       130s |       1.5% |
 +---------------------------------+-----------+------------+------------+
-
 </pre>
 </code>
 
@@ -181,7 +180,11 @@ systems.
 
 We can clearly not show all output files produced by this program when
 run for a longer period of time, so let us
-only show the output from every 2500th time step here:
+only show the output from every 2500th time step here (these figures
+are from a version of this tutorial program before the introduction of
+manifolds, when it was not yet possible to arrange vertices along
+circles; the figures may therefore look slightly different if you run
+the current version):
 <table>
   <tr>
     <td>
@@ -482,9 +485,7 @@ able to.
 </ul>
 
 
-<h3> Possible extensions </h3>
-
-There are many ways to extend the current program. However, rather than
+There are many other ways to extend the current program. However, rather than
 discussing them here, let us point to the much larger open
 source code Aspect (see http://aspect.dealii.org/ ) that constitutes the
 further development of step-32 and that already includes many such possible

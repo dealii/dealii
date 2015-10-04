@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 template <typename U, typename V>
 void compare (const U &u, const V &v)
 {
-  Assert (static_cast<double>(u)==static_cast<double>(v), ExcInternalError());
+  AssertThrow (static_cast<double>(u)==static_cast<double>(v), ExcInternalError());
 }
 
 

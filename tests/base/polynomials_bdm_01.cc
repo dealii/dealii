@@ -37,6 +37,8 @@ void plot(const PolynomialsBDM<dim> &poly)
   std::vector<Tensor<1,dim> > values(poly.n());
   std::vector<Tensor<2,dim> > grads;
   std::vector<Tensor<3,dim> > grads2;
+  std::vector<Tensor<4,dim> > thirds;
+  std::vector<Tensor<5,dim> > fourths;
 
 
   for (unsigned int k=0; k<quadrature.size(); ++k)
@@ -46,7 +48,7 @@ void plot(const PolynomialsBDM<dim> &poly)
 
       deallog << "BDM" << poly.degree() << '<' << dim << '>'
               << '\t' << quadrature.point(k);
-      poly.compute(quadrature.point(k), values, grads, grads2);
+      poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i=0; i<poly.n(); ++i)
         for (unsigned int d=0; d<dim; ++d)

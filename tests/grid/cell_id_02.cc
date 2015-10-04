@@ -63,7 +63,7 @@ void check (TRIA &tr)
 
 int main (int argc, char *argv[])
 {
-  // Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  // Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   initlog();
   deal_II_exceptions::disable_abort_on_exception();

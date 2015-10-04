@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,8 +62,8 @@ void test (const FiniteElement<dim> &fe,
                            delta_x;
             }
 
-          Assert ((gradient-fd_grad).norm () <= 2e-5,
-                  ExcInternalError());
+          AssertThrow ((gradient-fd_grad).norm () <= 2e-5,
+                       ExcInternalError());
         }
   deallog << "OK" << std::endl;
 }

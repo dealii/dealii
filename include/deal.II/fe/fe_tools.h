@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_tools_H
-#define __deal2__fe_tools_H
+#ifndef dealii__fe_tools_H
+#define dealii__fe_tools_H
 
 
 
@@ -296,11 +296,15 @@ namespace FETools
    *
    * @param isotropic_only Set to <code>true</code> if you only want to
    * compute matrices for isotropic refinement.
+   *
+   * @param threshold is the gap allowed in the least squares
+   * algorithm computing the embedding.
    */
   template <int dim, typename number, int spacedim>
   void compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   std::vector<std::vector<FullMatrix<number> > > &matrices,
-                                  const bool isotropic_only = false);
+                                  const bool isotropic_only = false,
+                                  const double threshold = 1.e-12);
 
   /**
    * Compute the embedding matrices on faces needed for constraint matrices.
@@ -317,6 +321,9 @@ namespace FETools
    * @param face_fine The number of the face on the refined side of the face
    * for which this is computed.
    *
+   * @param threshold is the gap allowed in the least squares
+   * algorithm computing the embedding.
+   *
    * @warning This function will be used in computing constraint matrices. It
    * is not sufficiently tested yet.
    */
@@ -325,7 +332,8 @@ namespace FETools
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
                                   FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
                                   const unsigned int face_coarse,
-                                  const unsigned int face_fine);
+                                  const unsigned int face_fine,
+                                  const double threshold = 1.e-12);
 
   /**
    * For all possible (isotropic and anisotropic) refinement cases compute the
@@ -474,8 +482,8 @@ namespace FETools
    * correspond to the number of columns of @p projection_matrix.  The size of
    * @p vector_of_tensors_at_nodes must correspond to the number of rows of @p
    * vector_of_tensors_at_nodes .  The projection matrix @p projection_matrix
-   * desribes the projection of scalar data from the quadrature points and can
-   * be obtained from the
+   * describes the projection of scalar data from the quadrature points and
+   * can be obtained from the
    * FETools::compute_projection_from_quadrature_points_matrix function.
    */
   template <int dim>
@@ -535,7 +543,7 @@ namespace FETools
    * The same is true if @p fe1 is a continuous and @p fe2 is a discontinuous
    * finite element. For the case that @p fe1 is a discontinuous and @p fe2 is
    * a continuous finite element there is no point interpolation defined at
-   * the discontinuities.  Therefore the meanvalue is taken at the DoF values
+   * the discontinuities.  Therefore the mean value is taken at the DoF values
    * on the discontinuities.
    *
    * Note that for continuous elements on grids with hanging nodes (i.e.
@@ -1047,6 +1055,6 @@ namespace FETools
 DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   fe_tools.h     ---------------------------*/
-/* end of #ifndef __deal2__fe_tools_H */
+/* end of #ifndef dealii__fe_tools_H */
 #endif
 /*----------------------------   fe_tools.h     ---------------------------*/

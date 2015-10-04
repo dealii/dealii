@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@ create_quadrature (const std::string &s,
 {
   if (s == "gauss")
     {
-      AssertThrow(order >= 2, ExcInvalidQGaussOrder(order));
+      AssertThrow(order >= 1, ExcInvalidQGaussOrder(order));
       return QGauss<dim>(order);
     }
   else

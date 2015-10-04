@@ -233,7 +233,7 @@ private:
   DoFHandler<dim>    mg_dof_handler_renumbered;
 
   const unsigned int degree;
-  std::vector<std::set<unsigned int> >
+  std::vector<std::set<types::global_dof_index> >
   boundary_indices, boundary_indices_renumbered;
 
 };
@@ -293,13 +293,13 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &dof,
   QTrapez<1> trapez;
   QIterated<dim> quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
-  NamedData<MGLevelObject<Vector<double> >* > data;
-  data.add(&v, "mg_vector");
+  AnyData data;
+  data.add<MGLevelObject<Vector<double> >* >(&v, "mg_vector");
   info_box.cell_selector.add("mg_vector");
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
-  info_box.initialize(fe, mapping, data);
+  info_box.initialize(fe, mapping, data, v);
 
   MeshWorker::DoFInfo<dim> dof_info(dof);
 

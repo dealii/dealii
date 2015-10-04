@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_matrix_h
-#define __deal2__sparse_matrix_h
+#ifndef dealii__sparse_matrix_h
+#define dealii__sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -292,7 +292,7 @@ namespace SparseMatrixIterators
 
 
   /**
-   * STL conforming iterator for constant and non-constant matrices.
+   * Iterator for constant and non-constant matrices.
    *
    * The typical use for these iterators is to iterate over the elements of a
    * sparse matrix or over the elements of individual rows. Note that there is
@@ -470,7 +470,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of the matrix entries. This typedef is analogous to
+   * <tt>value_type</tt> in the standard library containers.
    */
   typedef number value_type;
 
@@ -486,19 +487,18 @@ public:
   typedef typename numbers::NumberTraits<number>::real_type real_type;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator cannot change the values of the
-   * matrix.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator cannot change the values of the matrix.
    */
   typedef
   SparseMatrixIterators::Iterator<number,true>
   const_iterator;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator @em can change the values of the
-   * matrix, but of course can't change the sparsity pattern as this is fixed
-   * once a sparse matrix is attached to it.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator @em can change the values of the matrix, but of
+   * course can't change the sparsity pattern as this is fixed once a sparse
+   * matrix is attached to it.
    */
   typedef
   SparseMatrixIterators::Iterator<number,false>
@@ -520,7 +520,7 @@ public:
   };
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**
@@ -641,13 +641,13 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the image space. To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space. To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -869,12 +869,15 @@ public:
   void symmetrize ();
 
   /**
-   * Copy the given matrix to this one.  The operation triggers an assertion
-   * if the sparsity patterns of the two involved matrices do not point to the
-   * same object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
-   * <tt>operator =</tt>, since this may lead to unwanted usage, e.g. in copy
-   * arguments to functions, which should really be arguments by reference.
+   * Copy the matrix given as argument into the current object.
+   *
+   * Copying matrices is an expensive operation that we do not want to happen
+   * by accident through compiler generated code for <code>operator=</code>.
+   * (This would happen, for example, if one accidentally declared a function
+   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
+   * The functionality of copying matrices is implemented in this member function
+   * instead. All copy operations of objects of this type therefore require an
+   * explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
@@ -1368,8 +1371,7 @@ public:
   iterator begin ();
 
   /**
-   * Return an iterator pointing the element past the last one of
-   * this matrix.
+   * Return an iterator pointing the element past the last one of this matrix.
    */
   const_iterator end () const;
 
@@ -1381,11 +1383,11 @@ public:
   /**
    * Return an iterator pointing to the first element of row @p r.
    *
-   * Note that if the given row is empty, i.e. does not contain any
-   * nonzero entries, then the iterator returned by this function
-   * equals <tt>end(r)</tt>. The returned iterator may not be
-   * dereferencable in that case if neither row @p r nor any of the
-   * following rows contain any nonzero entries.
+   * Note that if the given row is empty, i.e. does not contain any nonzero
+   * entries, then the iterator returned by this function equals
+   * <tt>end(r)</tt>. The returned iterator may not be dereferencable in that
+   * case if neither row @p r nor any of the following rows contain any
+   * nonzero entries.
    */
   const_iterator begin (const size_type r) const;
 
@@ -1395,12 +1397,12 @@ public:
   iterator begin (const size_type r);
 
   /**
-   * Return an iterator pointing the element past the last one of
-   * row @p r , or past the end of the entire sparsity pattern if
-   * none of the rows after @p r contain any entries at all.
+   * Return an iterator pointing the element past the last one of row @p r ,
+   * or past the end of the entire sparsity pattern if none of the rows after
+   * @p r contain any entries at all.
    *
-   * Note that the end iterator is not necessarily dereferencable. This is
-   * in particular the case if it is the end iterator for the last row of a
+   * Note that the end iterator is not necessarily dereferencable. This is in
+   * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
   const_iterator end (const size_type r) const;
@@ -1517,7 +1519,11 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcDifferentSparsityPatterns);
+  DeclExceptionMsg (ExcDifferentSparsityPatterns,
+                    "When copying one sparse matrix into another, "
+                    "or when adding one sparse matrix to another, "
+                    "both matrices need to refer to the same "
+                    "sparsity pattern.");
   /**
    * Exception
    */
@@ -1568,7 +1574,7 @@ private:
 
   /**
    * Allocated size of #val. This can be larger than the actually used part if
-   * the size of the matrix was reduced somewhen in the past by associating a
+   * the size of the matrix was reduced sometime in the past by associating a
    * sparsity pattern with a smaller size to this object, using the reinit()
    * function.
    */
@@ -1633,7 +1639,7 @@ SparseMatrix<number>::set (const size_type i,
   if (index == SparsityPattern::invalid_entry)
     {
       Assert ((index != SparsityPattern::invalid_entry) ||
-              (value == 0.),
+              (value == number()),
               ExcInvalidIndex(i, j));
       return;
     }
@@ -1710,7 +1716,7 @@ SparseMatrix<number>::add (const size_type i,
 {
   AssertIsFinite(value);
 
-  if (value == 0)
+  if (value == number())
     return;
 
   const size_type index = cols->operator()(i, j);
@@ -1720,7 +1726,7 @@ SparseMatrix<number>::add (const size_type i,
   if (index == SparsityPattern::invalid_entry)
     {
       Assert ((index != SparsityPattern::invalid_entry) ||
-              (value == 0.),
+              (value == number()),
               ExcInvalidIndex(i, j));
       return;
     }
@@ -1814,9 +1820,9 @@ SparseMatrix<number>::operator /= (const number factor)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (factor !=0, ExcDivideByZero());
+  Assert (factor != number(), ExcDivideByZero());
 
-  const number factor_inv = 1. / factor;
+  const number factor_inv = number(1.) / factor;
 
   number             *val_ptr    = &val[0];
   const number *const end_ptr    = &val[cols->n_nonzero_elements()];

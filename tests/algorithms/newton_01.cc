@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,6 @@
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/newton.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/base/named_data.h>
 
 
 //test computing square root of 2 with newton's method
@@ -69,7 +68,7 @@ public:
 
 void SquareRoot::residual (AnyData &out, const AnyData &in)
 {
-  Vector<double>& v = *out.entry<Vector<double>*>(0);
+  Vector<double> &v = *out.entry<Vector<double>*>(0);
   //residuum = 0
   v(0) = 0.;
   const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
@@ -78,7 +77,7 @@ void SquareRoot::residual (AnyData &out, const AnyData &in)
 
 void SquareRoot::solve (AnyData &out, const AnyData &in)
 {
-  Vector<double>& v = *out.entry<Vector<double>*>(0);
+  Vector<double> &v = *out.entry<Vector<double>*>(0);
   v(0) = 0;
   const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
   const Vector<double> &r = *in.entry<const Vector<double>*>("Newton residual");
@@ -101,19 +100,18 @@ void test ()
     sq_solver);
   newton.initialize(output);
 
-  NamedData<Vector<double>*> in_data;
-  NamedData<Vector<double>*> out_data;
+  AnyData in_data;
+  AnyData out_data;
 
   Vector<double> solution (1);
   solution = 10.;
-  Vector<double> *p = &solution;
-  out_data.add(p, "solution");
+  out_data.add<Vector<double>*>(&solution, "solution");
 
   newton.control.set_reduction(1.e-20);
   newton.control.log_history(true);
   newton.debug_vectors = true;
   newton(out_data, in_data);
-  deallog << " square root " << (*out_data(0))(0) << std::endl;
+  deallog << " square root " << (*out_data.read<Vector<double>*>(0))(0) << std::endl;
 }
 
 

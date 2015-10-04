@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,9 +70,7 @@ int main ()
   B2.fill(B2data);
   C.fill(Cdata);
 
-  GrowingVectorMemory<Vector<double> > simple_mem;
-
-  BlockMatrixArray<double> matrix(2, 2, simple_mem);
+  BlockMatrixArray<double> matrix(2, 2);
 
   matrix.enter(A,0,0,2.);
   matrix.enter(B1,0,1,-1.);
@@ -95,10 +93,9 @@ int main ()
   matrix.vmult(y, result);
 
   SolverControl control(100,1.e-10);
-  GrowingVectorMemory<BlockVector<double> > mem;
   PreconditionIdentity id;
 
-  SolverCG<BlockVector<double> > cg(control, mem);
+  SolverCG<BlockVector<double> > cg(control);
   cg.solve(matrix, x, y, id);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
@@ -113,7 +110,7 @@ int main ()
   Cinv.invert(C);
 
   BlockTrianglePrecondition<double>
-  precondition(2, simple_mem);
+  precondition(2);
   precondition.enter(Ainv,0,0,.5);
   precondition.enter(Cinv,1,1);
 
@@ -124,7 +121,7 @@ int main ()
   precondition.enter(B1,1,0,-1., true);
   precondition.enter(B2,1,0,1.);
 
-  SolverGMRES<BlockVector<double> > gmres(control, mem);
+  SolverGMRES<BlockVector<double> > gmres(control);
   gmres.solve(matrix, x, y, precondition);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;

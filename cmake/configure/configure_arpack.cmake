@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,3 +20,4 @@
 SET(FEATURE_ARPACK_DEPENDS LAPACK)
 
 CONFIGURE_FEATURE(ARPACK)
+SET(DEAL_II_ARPACK_WITH_PARPACK ${ARPACK_WITH_PARPACK})

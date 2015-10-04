@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,7 +110,7 @@ void make_mesh (Triangulation<dim,spacedim> &tria)
       for (unsigned int d=0; d<dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1<<d);
-      Assert (subdomain < (1<<dim), ExcInternalError());
+      AssertThrow (subdomain < (1<<dim), ExcInternalError());
 
       cell->set_subdomain_id (subdomain);
     }
@@ -193,7 +193,7 @@ check ()
 
 //                                   now compare the results of the two
 //                                   computations
-  Assert (error1 == error2, ExcInternalError());
+  AssertThrow (error1 == error2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

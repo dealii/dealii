@@ -54,8 +54,8 @@ check_vmult_quadratic(std::vector<double> &residuals,
   GrowingVectorMemory<> mem;
 
   SolverControl control(10, 1.e-13, false);
-  SolverRichardson<> rich(control, mem, .01);
-  SolverRichardson<> prich(control, mem, 1.);
+  SolverRichardson<> rich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<> prich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
 
   const types::global_dof_index block_size = (types::global_dof_index) std::sqrt(A.n()+.3);
   const unsigned int n_blocks = A.n()/block_size;
@@ -130,8 +130,8 @@ check_vmult_quadratic(std::vector<double> &residuals,
   GrowingVectorMemory<> mem;
 
   SolverControl control(10, 1.e-13, false);
-  SolverRichardson<> rich(control, mem, .01);
-  SolverRichardson<> prich(control, mem, 1.);
+  SolverRichardson<> rich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<> prich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
   PreconditionIdentity identity;
   PreconditionJacobi<BlockSparseMatrix<double> > jacobi;
   jacobi.initialize(A, .5);
@@ -287,13 +287,13 @@ int main()
   deallog.threshold_double(1.e-10);
   const unsigned int size = 5;
   const unsigned int row_length = 3;
-/*#else
-  deallog.depth_console(1000);
-  deallog.log_execution_time(true);
-  deallog.log_time_differences(true);
-  const unsigned int size = 50;
-  const unsigned int row_length = 9;
-  #endif*/
+  /*#else
+    deallog.depth_console(1000);
+    deallog.log_execution_time(true);
+    deallog.log_time_differences(true);
+    const unsigned int size = 50;
+    const unsigned int row_length = 9;
+    #endif*/
 
   check_ez_iterator();
   check_conjugate(logfile);
@@ -395,7 +395,7 @@ int main()
   std::remove ("sparse_matrices.tmp");
 
   SparseMatrix<double>::const_iterator p    =A.begin(),
-				       p_tmp=A_tmp.begin();
+                                       p_tmp=A_tmp.begin();
   for (; p!=A.end(); ++p, ++p_tmp)
     if (std::fabs(p->value() - p_tmp->value()) <=
         std::fabs(1e-14*p->value()))

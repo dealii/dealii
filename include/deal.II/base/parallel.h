@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__parallel_h
-#define __deal2__parallel_h
+#ifndef dealii__parallel_h
+#define dealii__parallel_h
 
 
 #include <deal.II/base/config.h>
@@ -45,8 +45,8 @@ namespace parallel
   namespace internal
   {
     /**
-     * Helper struct to tell us if we can use SIMD instructions for the given @p
-     * Number type.
+     * Helper struct to tell us if we can use SIMD instructions for the given
+     * @p Number type.
      */
     template <typename Number>
     struct EnableOpenMPSimdFor

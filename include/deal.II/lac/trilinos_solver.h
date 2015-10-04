@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_solver_h
-#define __deal2__trilinos_solver_h
+#ifndef dealii__trilinos_solver_h
+#define dealii__trilinos_solver_h
 
 
 #include <deal.II/base/config.h>
@@ -27,10 +27,13 @@
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/parallel_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_LinearProblem.h>
 #  include <AztecOO.h>
 #  include <Epetra_Operator.h>
 #  include <Amesos.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -87,6 +90,7 @@ namespace TrilinosWrappers
        * it is quite inelegant to set a specific option of one solver in the
        * base class for all solvers.
        */
+      explicit
       AdditionalData (const bool         output_solver_details   = false,
                       const unsigned int gmres_restart_parameter = 30);
 
@@ -273,6 +277,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -318,6 +323,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -364,6 +370,7 @@ namespace TrilinosWrappers
        * Constructor. By default, set the number of temporary vectors to 30,
        * i.e. do a restart every 30 iterations.
        */
+      explicit
       AdditionalData (const bool         output_solver_details = false,
                       const unsigned int restart_parameter = 30);
 
@@ -416,6 +423,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -462,6 +470,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false);
 
       /**
@@ -516,6 +525,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
+      explicit
       AdditionalData (const bool output_solver_details = false,
                       const std::string &solver_type = "Amesos_Klu");
 

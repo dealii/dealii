@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_matrix_base_h
-#define __deal2__block_matrix_base_h
+#ifndef dealii__block_matrix_base_h
+#define dealii__block_matrix_base_h
 
 
 #include <deal.II/base/config.h>
@@ -228,7 +228,7 @@ namespace BlockMatrixIterators
               const size_type col);
 
     /**
-     * Initalize const accessor from non const accessor.
+     * Initialize const accessor from non const accessor.
      */
     Accessor(const Accessor<BlockMatrix, false> &);
 
@@ -347,7 +347,8 @@ public:
   typedef MatrixType BlockType;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. These are analogous to typedefs in the standard
+   * library containers.
    */
   typedef typename BlockType::value_type value_type;
   typedef value_type             *pointer;
@@ -376,12 +377,15 @@ public:
   ~BlockMatrixBase ();
 
   /**
-   * Copy the given matrix to this one.  The operation throws an error if the
-   * sparsity patterns of the two involved matrices do not point to the same
-   * object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
-   * operator=(), since this may lead to unwanted usage, e.g. in copy
-   * arguments to functions, which should really be arguments by reference.
+   * Copy the matrix given as argument into the current object.
+   *
+   * Copying matrices is an expensive operation that we do not want to happen
+   * by accident through compiler generated code for <code>operator=</code>.
+   * (This would happen, for example, if one accidentally declared a function
+   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
+   * The functionality of copying matrices is implemented in this member function
+   * instead. All copy operations of objects of this type therefore require an
+   * explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
@@ -409,13 +413,13 @@ public:
          const unsigned int column) const;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -582,6 +586,10 @@ public:
    * pattern of the calling matrix does not contain all the elements in the
    * sparsity pattern of the input matrix, this function will throw an
    * exception.
+   *
+   * Depending on MatrixType, however, additional restrictions might arise.
+   * Some sparse matrix formats require <tt>matrix</tt> to be based on the
+   * same sparsity pattern as the calling matrix.
    */
   void add (const value_type                   factor,
             const BlockMatrixBase<MatrixType> &matrix);
@@ -691,13 +699,13 @@ public:
    * Print the matrix to the given stream, using the format <tt>(line,col)
    * value</tt>, i.e. one nonzero entry of the matrix per line. The optional
    * flag outputs the sparsity pattern in a different style according to the
-   * underlying sparsematrix type.
+   * underlying sparse matrix type.
    */
   void print (std::ostream &out,
               const bool    alternative_output = false) const;
 
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   iterator begin ();
 
@@ -707,7 +715,7 @@ public:
   iterator end ();
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    */
   iterator begin (const size_type r);
 
@@ -716,7 +724,7 @@ public:
    */
   iterator end (const size_type r);
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   const_iterator begin () const;
 
@@ -726,7 +734,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    */
   const_iterator begin (const size_type r) const;
 
@@ -981,7 +989,7 @@ private:
      * Temporary vector for storing the local values (they need to be
      * reordered when writing local to global).
      */
-    std::vector<std::vector<double> > column_values;
+    std::vector<std::vector<value_type> > column_values;
 
     /**
      * A mutex variable used to guard access to the member variables of this
@@ -1075,6 +1083,7 @@ namespace BlockMatrixIterators
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
   {
+    (void)col;
     Assert(col==0, ExcNotImplemented());
 
     // check if this is a regular row or
@@ -1284,6 +1293,7 @@ namespace BlockMatrixIterators
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
   {
+    (void)col;
     Assert(col==0, ExcNotImplemented());
     // check if this is a regular row or
     // the end of the matrix
@@ -1764,9 +1774,9 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
   // comes from an element matrix).
   for (size_type j=0; j<n_cols; ++j)
     {
-      double value = values[j];
+      number value = values[j];
 
-      if (value == 0 && elide_zero_values == true)
+      if (value == number() && elide_zero_values == true)
         continue;
 
       const std::pair<unsigned int, size_type>
@@ -2011,9 +2021,9 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
   // it comes from an element matrix).
   for (size_type j=0; j<n_cols; ++j)
     {
-      double value = values[j];
+      number value = values[j];
 
-      if (value == 0 && elide_zero_values == true)
+      if (value == number() && elide_zero_values == true)
         continue;
 
       const std::pair<unsigned int, size_type>
@@ -2664,4 +2674,4 @@ BlockMatrixBase<MatrixType>::prepare_set_operation ()
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // __deal2__block_matrix_base_h
+#endif    // dealii__block_matrix_base_h

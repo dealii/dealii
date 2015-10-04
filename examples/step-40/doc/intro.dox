@@ -26,7 +26,7 @@ instructions for PETSc.
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-@dealiiVideoLecture{41.5}
+@dealiiVideoLecture{41.5,41.75}
 
 Given today's computers, most finite element computations can be done on
 a single machine. The majority of previous tutorial programs therefore

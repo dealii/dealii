@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,6 +44,7 @@ namespace internal
                    const unsigned int       local_index,
                    const types::global_dof_index       global_index)
     {
+      (void)fe_index;
       Assert ((fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
               ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
       Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),

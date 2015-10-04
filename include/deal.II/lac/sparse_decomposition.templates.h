@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__sparse_decomposition_templates_h
-#define __deal2__sparse_decomposition_templates_h
+#ifndef dealii__sparse_decomposition_templates_h
+#define dealii__sparse_decomposition_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>
@@ -232,4 +232,4 @@ SparseLUDecomposition<number>::memory_consumption () const
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_decomposition_templates_h
+#endif // dealii__sparse_decomposition_templates_h

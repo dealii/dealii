@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 by the deal.II authors 
+//    Copyright (C) 2014 - 2015 by the deal.II authors
 //
 //    This file is subject to LGPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------
 
-// Create a BSpline surface, and test axis projection. 
+// Create a BSpline surface, and test axis projection.
 
 #include "../tests.h"
 #include <fstream>
@@ -30,10 +30,10 @@
 
 using namespace OpenCASCADE;
 
-int main () 
+int main ()
 {
   std::ofstream logfile("output");
-  
+
   // Create a bspline passing through the points
   std::vector<Point<3> > pts;
   pts.push_back(Point<3>(0,0,0));
@@ -42,7 +42,7 @@ int main ()
   pts.push_back(Point<3>(0,0,-1));
 
   TopoDS_Edge edge1 = interpolation_curve(pts);
-  for(unsigned int i=0; i<pts.size(); ++i)
+  for (unsigned int i=0; i<pts.size(); ++i)
     pts[i] += Point<3>(0,1,0);
   TopoDS_Edge edge2 = interpolation_curve(pts);
 
@@ -50,16 +50,16 @@ int main ()
 
 
   NormalToMeshProjectionBoundary<2,3> manifold(face);
-  
+
   Triangulation<2,3> tria;
   GridGenerator::hyper_cube(tria);
 
   tria.begin_active()->set_all_manifold_ids(1);
   tria.set_manifold(1, manifold);
-  
+
   tria.refine_global(2);
   GridOut gridout;
   gridout.write_msh(tria, logfile);
 
   return 0;
-}                  
+}

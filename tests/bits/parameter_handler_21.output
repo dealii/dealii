@@ -1,0 +1,13 @@
+
+DEAL::defaults='' defined='one option' input='set v=' result=''
+DEAL::defaults='one option' defined='one option' input='' result='one option'
+DEAL::defaults='' defined='one option' input='set v=one option' result='one option'
+DEAL::defaults='' defined='bla|bla 2|1' input='' result=''
+DEAL::defaults='' defined='bla|bla 2|1' input='set v=bla 2' result='bla 2'
+DEAL::defaults='' defined='bla|bla 2|1' input='set v=1,bla 2' result='1,bla 2'
+DEAL::defaults='' defined='bla|bla 2|1' input='set v=bla,bla,bla' result='bla,bla,bla'
+DEAL::defaults='default,alsodefault' defined='default|nodefault|alsodefault' input='' result='default,alsodefault'
+DEAL::defaults='default,alsodefault' defined='default|nodefault|alsodefault' input='set v=nodefault' result='nodefault'
+DEAL::defaults='  input 2  ,  have spaces  ' defined='have spaces|input 2' input='' result='  input 2  ,  have spaces  '
+DEAL::defaults='input 2' defined='have spaces|input 2' input='set v=   input 2  ,   have spaces  ' result='input 2  ,   have spaces'
+DEAL::defaults='' defined='double  spaces|input 2' input='set v = double  spaces  ,  double  spaces' result='double  spaces  ,  double  spaces'

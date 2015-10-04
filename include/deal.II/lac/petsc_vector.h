@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_vector_h
-#define __deal2__petsc_vector_h
+#ifndef dealii__petsc_vector_h
+#define dealii__petsc_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -44,6 +44,8 @@ namespace PETScWrappers
    * the actual work depending on the actual vector type (much like using
    * virtual functions). Only the functions creating a vector of specific type
    * differ, and are implemented in this particular class.
+   *
+   * This class is deprecated, use PETScWrappers::MPI::Vector instead.
    *
    * @ingroup Vectors
    * @author Wolfgang Bangerth, 2004
@@ -117,6 +119,12 @@ namespace PETScWrappers
     explicit Vector (const MPI::Vector &v);
 
     /**
+     * Release all memory and return to a state just like after having called
+     * the default constructor.
+     */
+    void clear ();
+
+    /**
      * Copy the given vector. Resize the present vector if necessary.
      */
     Vector &operator = (const Vector &v);
@@ -181,7 +189,7 @@ namespace PETScWrappers
      * vector. @p n denotes the total size of the vector to be created.
      */
     void create_vector (const size_type n);
-  };
+  } DEAL_II_DEPRECATED;
 
   /*@}*/
 

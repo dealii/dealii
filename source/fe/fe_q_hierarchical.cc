@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,13 +29,20 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  /**
+   * A function which maps  in[i] to i,i.e. output[in[i]] = i;
+   */
   inline
   std::vector<unsigned int>
   invert_numbering (const std::vector<unsigned int> &in)
   {
     std::vector<unsigned int> out (in.size());
     for (unsigned int i=0; i<in.size(); ++i)
-      out[in[i]]=i;
+      {
+        Assert (in[i] < out.size(),
+                dealii::ExcIndexRange(in[i],0,out.size()));
+        out[in[i]]=i;
+      }
     return out;
   }
 }
@@ -62,7 +69,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
   // values of the linear functionals of
   // the master 1d cell applied to the
   // shape functions of the two 1d subcells.
-  // The matrix @p{dofs_subcell} constains
+  // The matrix @p{dofs_subcell} contains
   // the values of the linear functionals
   // on each 1d subcell applied to the
   // shape functions on the master 1d
@@ -116,6 +123,39 @@ FE_Q_Hierarchical<dim>::get_name () const
 }
 
 
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::interpolate(
+  std::vector<double> &,
+  const std::vector<double> &) const
+{
+  // The default implementation assumes that the FE has a delta property,
+  // i.e., values at the support points equal the corresponding DoFs. This
+  // is obviously not the case here.
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::interpolate(
+  std::vector<double> &,
+  const std::vector<Vector<double> > &,
+  unsigned int) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::interpolate(
+  std::vector<double> &,
+  const VectorSlice<const std::vector<std::vector<double> > > &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
 
 template <int dim>
 FiniteElement<dim> *
@@ -124,6 +164,67 @@ FE_Q_Hierarchical<dim>::clone() const
   return new FE_Q_Hierarchical<dim>(*this);
 }
 
+template <int dim>
+void
+FE_Q_Hierarchical<dim>::get_interpolation_matrix(const FiniteElement< dim> &source,
+                                                 FullMatrix< double > &matrix) const
+{
+  // support interpolation between FE_Q_Hierarchical only.
+  if (const FE_Q_Hierarchical<dim> *source_fe
+      = dynamic_cast<const FE_Q_Hierarchical<dim>*>(&source))
+    {
+      // ok, source is a Q_Hierarchical element, so we will be able to do the work
+      Assert (matrix.m() == this->dofs_per_cell,
+              ExcDimensionMismatch (matrix.m(),
+                                    this->dofs_per_cell));
+      Assert (matrix.n() == source.dofs_per_cell,
+              ExcDimensionMismatch (matrix.m(),
+                                    source_fe->dofs_per_cell));
+
+      // Recall that DoFs are renumbered in the following order:
+      // vertices, lines, quads, hexes.
+      // As we deal with hierarchical FE, interpolation matrix is rather easy:
+      // it has 1 on pairs of dofs which are the same.
+      // To get those use get_embedding_dofs();
+
+      matrix = 0.;
+
+      // distinguish between the case when we interpolate to a richer element
+      if (this->dofs_per_cell >= source_fe->dofs_per_cell)
+        {
+          const std::vector<unsigned int> dof_map = this->get_embedding_dofs(source_fe->degree);
+          for (unsigned int j=0; j < dof_map.size(); j++)
+            matrix[dof_map[j]][j] = 1.;
+        }
+      // and when just truncate higher modes.
+      else
+        {
+          const std::vector<unsigned int> dof_map = source_fe->get_embedding_dofs(this->degree);
+          for (unsigned int j=0; j < dof_map.size(); j++)
+            matrix[j][dof_map[j]] = 1.;
+        }
+    }
+  else
+    {
+      AssertThrow(false, dealii::ExcMessage("Interpolation is supported only between FE_Q_Hierarchical"));
+    }
+
+}
+
+template <int dim>
+const FullMatrix<double> &
+FE_Q_Hierarchical<dim>::get_prolongation_matrix (const unsigned int child,
+                                                 const RefinementCase<dim> &refinement_case) const
+{
+  Assert (refinement_case==RefinementCase<dim>::isotropic_refinement,
+          ExcMessage("Prolongation matrices are only available for isotropic refinement!"));
+
+  Assert (child<GeometryInfo<dim>::n_children(refinement_case),
+          ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
+
+  return this->prolongation[refinement_case-1][child];
+
+}
 
 
 template <int dim>
@@ -168,6 +269,83 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
     }
 }
 
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q_Hierarchical<dim>::
+hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+  // we can presently only compute
+  // these identities if both FEs are
+  // FE_Q_Hierarchicals or if the other
+  // one is an FE_Nothing.
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+    {
+      const unsigned int &this_dpl  = this->dofs_per_line;
+      const unsigned int &other_dpl = fe_other.dofs_per_line;
+
+      // we deal with hierarchical 1d polynomials where dofs are enumerated increasingly.
+      // Thus we return a vector of pairs
+      // for the first N-1, where N is minimum number of
+      // dofs_per_line for each FE_Q_Hierarchical.
+      std::vector<std::pair<unsigned int, unsigned int> > res;
+      for (unsigned int i = 0; i < std::min(this_dpl,other_dpl); i++)
+        res.push_back(std::make_pair (i, i));
+
+      return res;
+    }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    {
+      // the FE_Nothing has no
+      // degrees of freedom, so there
+      // are no equivalencies to be
+      // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q_Hierarchical<dim>::
+hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+  // we can presently only compute
+  // these identities if both FEs are
+  // FE_Q_Hierarchicals or if the other
+  // one is an FE_Nothing.
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+    {
+      const unsigned int &this_dpq  = this->dofs_per_quad;
+      const unsigned int &other_dpq = fe_other.dofs_per_quad;
+
+      // we deal with hierarchical 1d polynomials where dofs are enumerated increasingly.
+      // Thus we return a vector of pairs
+      // for the first N-1, where N is minimum number of
+      // dofs_per_line for each FE_Q_Hierarchical.
+      std::vector<std::pair<unsigned int, unsigned int> > res;
+      for (unsigned int i = 0; i < std::min(this_dpq,other_dpq); i++)
+        res.push_back(std::make_pair (i, i));
+
+      return res;
+    }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    {
+      // the FE_Nothing has no
+      // degrees of freedom, so there
+      // are no equivalencies to be
+      // recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
 
 template <int dim>
 FiniteElementDomination::Domination
@@ -177,6 +355,8 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
   if (const FE_Q_Hierarchical<dim> *fe_q_other
       = dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other))
     {
+      // the element with lowest polynomial degree
+      // dominates the other.
       if (this->degree < fe_q_other->degree)
         return FiniteElementDomination::this_element_dominates;
       else if (this->degree == fe_q_other->degree)
@@ -184,15 +364,18 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      // the FE_Nothing has no
-      // degrees of freedom and it is
-      // typically used in a context
-      // where we don't require any
-      // continuity along the
-      // interface
-      return FiniteElementDomination::no_requirements;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());
@@ -211,6 +394,53 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
                                          std::vector<FullMatrix<double> > &dofs_subcell) const
 {
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+
+  // The dofs_subcell matrices are transposed
+  // (4.19), (4.21) and (4.27),(4.28),(4.30) in
+  // Demkowicz, Oden, Rachowicz, Hardy, CMAMAE 77, 79-112, 1989
+  // so that
+  // DoFs_c(j) = dofs_subcell[c](j,k) dofs_cell(k)
+
+  // TODO: The dofs_subcell shall differ by a factor 2^p due to shape functions
+  // defined on [0,1] instead of [-1,1]. However, that does not seem to be
+  // the case. Perhaps this factor is added later on in auxiliary functions which
+  // use these matrices.
+
+  // dofs_cells[0](j,k):
+  //    0  1 |  2  3  4.
+  // 0  1  0 |         .
+  // 1  0  0 |         .
+  // -------------------
+  // 2          \      .
+  // 3            \  2^k * k! / (k-j)!j!
+  // 4               \ .
+
+  // dofs_subcells[0](j,k):
+  //    0    1   |  2  3   4  5  6 .
+  // 0  1    0   |                 .
+  // 1  1/2  1/2 | -1  0  -1  0  -1.
+  // -------------------------------
+  // 2              \              .
+  // 3                 \     (-1)^(k+j)/ 2^k * k!/(k-j)!j!
+  // 4                     \       .
+
+  // dofs_cells[1](j,k):
+  //    0  1 |  2  3  4.
+  // 0  0  0 |         .
+  // 1  0  1 |         .
+  // -------------------
+  // 2          \      .
+  // 3             \   (-1)^(k+j) * 2^k * k!/(k-j)!j!
+  // 4                \.
+
+  // dofs_subcells[1](j,k):
+  //    0    1   |  2  3   4  5  6 .
+  // 0  1/2  1/2 | -1  0  -1  0  -1.
+  // 1  0    1   |                 .
+  // -------------------------------
+  // 2              \              .
+  // 3                 \      1/ 2^k * k!/(k-j)!j!
+  // 4                             .
 
   for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
     for (unsigned int j=0; j<dofs_1d; ++j)
@@ -239,12 +469,13 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
                   ((c==1) && (j==0) && ((k % 2)==0)))
                 dofs_subcell[c](j,k) = -1.;
             }
-          // lower diagonal block
+          // upper diagonal block
           else if ((j>=2) && (k>=2) && (j<=k))
             {
               double factor = 1.;
               for (unsigned int i=1; i<=j; ++i)
                 factor *= ((double) (k-i+1))/((double) i);
+              // factor == k * (k-1) * ... * (k-j+1) / j! = k! / (k-j)! / j!
               if (c==0)
                 {
                   dofs_subcell[c](j,k) = ((k+j) % 2 == 0) ?
@@ -546,6 +777,9 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
   // Lagrange functions used in
   // FE_Q), so there's not much we
   // can do here.
+
+  // TODO shouldn't we just at least make support points unique,
+  // even though the delta property is not satisfied for this FE?
   unsigned int k=0;
   for (unsigned int iz=0; iz <= ((dim>2) ? this->degree : 0) ; ++iz)
     for (unsigned int iy=0; iy <= ((dim>1) ? this->degree : 0) ; ++iy)
@@ -637,6 +871,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // we will be able to do the work
   const FE_Q_Hierarchical<dim> &source_fe
     = dynamic_cast<const FE_Q_Hierarchical<dim>&>(x_source_fe);
+  (void)source_fe;
 
   // Make sure, that the element,
   // for which the DoFs should be
@@ -658,6 +893,12 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
     {
     case 2:
     {
+      // In 2-dimension the constraints are trivial.
+      // First this->dofs_per_face DoFs of the constrained
+      // element are made equal to the current (dominating)
+      // element, which corresponds to 1 on diagonal of the matrix.
+      // DoFs which correspond to higher polynomials
+      // are zeroed (zero rows in the matrix).
       for (unsigned int i = 0; i < this->dofs_per_face; ++i)
         interpolation_matrix (i, i) = 1;
 

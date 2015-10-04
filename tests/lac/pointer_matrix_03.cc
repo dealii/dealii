@@ -22,13 +22,13 @@
 #include <deal.II/lac/vector.h>
 
 template<typename number>
-  void
-  checkConstructor3(char *name)
-  {
-    deallog << "Init with matrix name" << std::endl;
-    PointerMatrix<FullMatrix<number>, Vector<number> > P(name);
-    deallog << "Is matrix empty:" << P.empty() << std::endl;
-  }
+void
+checkConstructor3(char *name)
+{
+  deallog << "Init with matrix name" << std::endl;
+  PointerMatrix<FullMatrix<number>, Vector<number> > P(name);
+  deallog << "Is matrix empty:" << P.empty() << std::endl;
+}
 
 int
 main()

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@
 #include <deal.II/fe/fe_system.h>
 
 using namespace LocalIntegrators::Divergence;
+
 
 template <int dim>
 void test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
@@ -63,7 +64,7 @@ void test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
       u = 0.;
       u(i) = 1.;
       w = 0.;
-      fev.get_function_gradients(u, indices, ugrad, true);
+      fev.get_function_gradients(u, indices, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(ugrad), true);
       cell_residual(w, fes, make_slice(ugrad));
       Md.vmult(v,u);
       w.add(-1., v);
@@ -119,7 +120,7 @@ void test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
       u = 0.;
       u(i) = 1.;
       w = 0.;
-      fev.get_function_values(u, indices, uval, true);
+      fev.get_function_values(u, indices, VectorSlice<std::vector<std::vector<double> > >(uval), true);
       u_dot_n_residual(w, fev, fes, make_slice(uval));
       M.vmult(v,u);
       w.add(-1., v);

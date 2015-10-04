@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>deal.II GDB documentation</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012 - 2015 by the deal.II authors">
+    <meta name="keywords" content="deal dealii finite elements fem triangulation">
+    <meta http-equiv="content-language" content="en">
+  </head>
+  <body>
+
+    <h1>Configuration for debugging deal.II projects via GDB</h1>
+
+    <p><acronym>deal.II</acronym> comes with a simple set of pretty-printers
+      that provide descriptions to GDB (the GNU debugger) on how to usefully
+      print <acronym>deal.II</acronym> objects. For example, without
+      pretty-printing, GDB prints points as</p>
+    <pre class="sample">
+(gdb) print point
+$1 = {&lt;dealii::Tensor&lt;1, 2, double&gt;&gt; = {static dimension = &lt;optimized out&gt;,
+static rank = &lt;optimized out&gt;, static n_independent_components = &lt;optimized out&gt;, values = {{
+static dimension = &lt;optimized out&gt;, static rank = &lt;optimized out&gt;,
+static n_independent_components = &lt;optimized out&gt;, value = 0}, {
+static dimension = &lt;optimized out&gt;, static rank = &lt;optimized out&gt;,
+static n_independent_components = &lt;optimized out&gt;, value = 0}}}, &lt;No data fields&gt;}</pre>
+    but with pretty-printing enabled GDB prints
+    <pre class="sample">
+(gdb) print point
+$1 = {0, 0}</pre>
+    which is much easier to read.</p>
+
+<h2>Setting up GDB for just deal.II</h2>
+<p>If you only plan on using GDB with <acronym>deal.II</acronym> then it
+  suffices to rename the provided GDB pretty-printing file and place it in your
+  home directory. This can be done with the following shell commands
+  (where <code>dealii_source_directory</code> is the root directory containing
+  all <acronym>deal.II</acronym> source files):
+  <pre class="sample">
+cd dealii_source_directory
+cp contrib/utilities/dotgdbinit.py ~/.gdbinit</pre>
+</p>
+
+<h2>Setting up GDB for deal.II and other sets of printers</h2>
+<p>
+  Configuring GDB to use multiple sets of pretty-printers (i.e., sets of
+  pretty-printers from <acronym>deal.II</acronym> as well as other projects)
+  takes a little more work. The recommended procedure is
+  <ol>
+    <li> Decide on a directory where you will place all of your pretty-printing
+      files. A good choice would be creating a new
+      folder <code>.gdbscripts</code> in your home directory, and this is the
+      choice assumed for the rest of this demonstration.
+    <li> Move the Python source code parts (so everything after, and not
+      including, the line containing just the word <code>python</code> near the
+      beginning up to (and also not including) the line containing just the
+      word <code>end</code>) of the
+      file <code>contrib/utilities/dotgdbinit.py</code> into the directory from
+      the first step. Rename this file to <code>deal.py</code> so that we can
+      import it into the master GDB file in the next step.
+    <li> Add the following to your <code>.gdbinit</code> file, which also
+      resides in your home directory:
+      <pre class="sample">
+set print pretty 1
+
+python
+
+import os
+import sys
+sys.path.append(os.path.expanduser("~/.gdbscripts/"))
+import deal
+
+end</pre>
+      The statements between <code>python</code> and <code>end</code> are
+      executed as python code by GDB. The line
+      <pre class="sample">
+import deal</pre>
+      executes the code necessary to enable the <acronym>deal.II</acronym>
+      pretty-printers (it loads the file created in the last step).
+  </ol>
+  Use a similar procedure on other pretty-printing files (which should also be
+  located in <code>.gdbscripts/</code>) to set up any other pretty-printing
+  code.
+</p>
+<hr />
+<div class="right">
+  <a href="http://validator.w3.org/check?uri=referer" target="_top">
+    <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+    <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+</div>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_faces_h
-#define __deal2__hp_dof_faces_h
+#ifndef dealii__hp_dof_faces_h
+#define dealii__hp_dof_faces_h
 
 
 #include <deal.II/base/config.h>
@@ -216,7 +216,7 @@ namespace internal
      * cells, as this information is independent of the hierarchical structure
      * of cells, which are organized in levels. In 2D we store information on
      * degrees of freedom located on lines whereas in 3D we store information
-     * on drefrees of freedom located on quads and lines. In 1D we do nothing,
+     * on degrees of freedom located on quads and lines. In 1D we do nothing,
      * as the faces of lines are vertices which are treated separately.
      *
      * Apart from the internal::hp::DoFObjects object containing the data to
@@ -366,7 +366,7 @@ namespace internal
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
-                   const unsigned int                obj_level) const
+                   const unsigned int                /*obj_level*/) const
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
@@ -423,7 +423,7 @@ namespace internal
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const types::global_dof_index     global_index,
-                   const unsigned int                obj_level)
+                   const unsigned int                /*obj_level*/)
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
@@ -521,7 +521,7 @@ namespace internal
     types::global_dof_index
     DoFIndicesOnFacesOrEdges<structdim>::
     nth_active_fe_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
-                         const unsigned int                obj_level,
+                         const unsigned int                /*obj_level*/,
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
@@ -579,7 +579,7 @@ namespace internal
     fe_index_is_active (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                         const unsigned int                obj_index,
                         const unsigned int                fe_index,
-                        const unsigned int                obj_level) const
+                        const unsigned int                /*obj_level*/) const
     {
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));

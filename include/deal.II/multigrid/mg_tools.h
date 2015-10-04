@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_tools_h
-#define __deal2__mg_tools_h
+#ifndef dealii__mg_tools_h
+#define dealii__mg_tools_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>
@@ -42,9 +42,9 @@ template <typename number> class BlockSparseMatrix;
 /**
  * This is a collection of functions operating on, and manipulating the
  * numbers of degrees of freedom in a multilevel triangulation. It is similar
- * in purpose and function to the @p DoFTools class, but operates on levels of
- * DoFHandler objects. See there and the documentation of the member functions
- * for more information.
+ * in purpose and function to the @p DoFTools namespace, but operates on
+ * levels of DoFHandler objects. See there and the documentation of the member
+ * functions for more information.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005, 2012
  */

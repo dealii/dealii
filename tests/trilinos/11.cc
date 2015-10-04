@@ -32,7 +32,7 @@ void test (TrilinosWrappers::Vector &v)
 
   v.compress (VectorOperation::insert);
 
-  Assert (v.size() == 100, ExcInternalError());
+  AssertThrow (v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -46,7 +46,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

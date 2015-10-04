@@ -39,7 +39,7 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   #
   # Gcc does not emit a warning if testing -Wno-... flags which leads to
   # false positive detection. Unfortunately it later warns that an unknown
-  # warning option is used if another warning is emited in the same
+  # warning option is used if another warning is emitted in the same
   # compilation unit.
   # Therefore we invert the test for -Wno-... flags:
   #

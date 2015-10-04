@@ -43,8 +43,8 @@ void test (TrilinosWrappers::BlockVector &v)
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i, ExcInternalError());
-      Assert (v(i) == i, ExcInternalError());
+      AssertThrow (w(i) == i, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
     }
 
   // now also check the reverse assignment
@@ -52,8 +52,8 @@ void test (TrilinosWrappers::BlockVector &v)
   w = v;
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i, ExcInternalError());
-      Assert (v(i) == i, ExcInternalError());
+      AssertThrow (w(i) == i, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
     }
 
 
@@ -69,7 +69,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

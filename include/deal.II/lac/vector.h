@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__vector_h
-#define __deal2__vector_h
+#ifndef dealii__vector_h
+#define dealii__vector_h
 
 
 #include <deal.II/base/config.h>
@@ -156,13 +156,24 @@ public:
   Vector ();
 
   /**
-   * Copy-constructor. Sets the dimension to that of the given vector, and
+   * Copy constructor. Sets the dimension to that of the given vector, and
    * copies all elements.
    *
-   * We would like to make this constructor explicit, but STL insists on using
-   * it implicitly.
+   * We would like to make this constructor explicit, but standard containers
+   * insist on using it implicitly.
    */
   Vector (const Vector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Creates a new vector by stealing the internal data of
+   * the vector @p v.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  Vector (Vector<Number> &&v);
+#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -273,8 +284,8 @@ public:
    * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
    * memory is freed, i.e. if you want to resize the vector and release the
    * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the STL
-   * containers.
+   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
+   * standard library containers.
    *
    * If @p fast is false, the vector is filled by zeros. Otherwise, the
    * elements are left an unspecified state.
@@ -325,7 +336,7 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  Vector<Number> &operator = (const Number s);
+  Vector<Number> &operator= (const Number s);
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -333,6 +344,17 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator= (const Vector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move the given vector. This operator replaces the present vector with @p
+   * v by efficiently swapping the internal data structures.
+   *
+   * @note This operator is only available if deal.II is configured with C++11
+   * support.
+   */
+  Vector<Number> &operator= (Vector<Number> &&v);
+#endif
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -354,7 +376,7 @@ public:
    * during configuration time.
    */
   Vector<Number> &
-  operator = (const PETScWrappers::Vector &v);
+  operator= (const PETScWrappers::Vector &v);
 
   /**
    * Another copy operator: copy the values from a parallel PETSc wrapper
@@ -367,7 +389,7 @@ public:
    * the other jobs do something else.
    */
   Vector<Number> &
-  operator = (const PETScWrappers::MPI::Vector &v);
+  operator= (const PETScWrappers::MPI::Vector &v);
 #endif
 
 
@@ -384,7 +406,7 @@ public:
    * the other jobs do something else.
    */
   Vector<Number> &
-  operator = (const TrilinosWrappers::MPI::Vector &v);
+  operator= (const TrilinosWrappers::MPI::Vector &v);
 
   /**
    * Another copy operator: copy the values from a sequential Trilinos wrapper
@@ -392,7 +414,7 @@ public:
    * during configuration time.
    */
   Vector<Number> &
-  operator = (const TrilinosWrappers::Vector &v);
+  operator= (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
@@ -401,7 +423,7 @@ public:
    * of different sizes makes not much sense anyway.
    */
   template <typename Number2>
-  bool operator == (const Vector<Number2> &v) const;
+  bool operator== (const Vector<Number2> &v) const;
 
   /**
    * Test for inequality. This function assumes that the present vector and
@@ -638,14 +660,16 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Number s);
+  void add (const Number s) DEAL_II_DEPRECATED;
 
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
+   * @deprecated Use the <tt>operator +=</tt> instead.
+   *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Vector<Number> &V);
+  void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
 
 
   /**
@@ -683,17 +707,21 @@ public:
   /**
    * Scaling and multiple addition.
    *
+   * This function is deprecated.
+   *
    * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
              const Vector<Number> &V,
              const Number          b,
-             const Vector<Number> &W);
+             const Vector<Number> &W) DEAL_II_DEPRECATED;
 
   /**
    * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
    * c*X</tt>.
+   *
+   * This function is deprecated.
    *
    * @dealiiOperationIsMultithreaded
    */
@@ -703,7 +731,7 @@ public:
              const Number          b,
              const Vector<Number> &W,
              const Number          c,
-             const Vector<Number> &X);
+             const Vector<Number> &X) DEAL_II_DEPRECATED;
 
   /**
    * Scale each element of the vector by a constant value.
@@ -752,19 +780,23 @@ public:
   /**
    * Assignment <tt>*this = a*u + b*v</tt>.
    *
+   * This function is deprecated.
+   *
    * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
-            const Number b, const Vector<Number> &v);
+            const Number b, const Vector<Number> &v) DEAL_II_DEPRECATED;
 
   /**
    * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+   *
+   * This function is deprecated.
    *
    * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v,
-            const Number c, const Vector<Number> &w);
+            const Number c, const Vector<Number> &w) DEAL_II_DEPRECATED;
 
   /**
    * Compute the elementwise ratio of the two given vectors, that is let
@@ -779,7 +811,7 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   void ratio (const Vector<Number> &a,
-              const Vector<Number> &b);
+              const Vector<Number> &b) DEAL_II_DEPRECATED;
 
   /**
    * This function does nothing but is there for compatibility with the @p
@@ -803,8 +835,10 @@ public:
   /**
    * Output of vector in user-defined format. For complex-valued vectors, the
    * format should include specifiers for both the real and imaginary parts.
+   *
+   * This function is deprecated.
    */
-  void print (const char *format = 0) const;
+  void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream. @p precision denotes the desired precision with which
@@ -822,10 +856,12 @@ public:
    * manipulator, if printing across.  If @p across is @p true then the vector
    * is printed in a line, while if @p false then the elements are printed on
    * a separate line each.
+   *
+   * This function is deprecated.
    */
   void print (LogStream &out,
               const unsigned int width = 6,
-              const bool across = true) const;
+              const bool across = true) const DEAL_II_DEPRECATED;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the
@@ -955,7 +991,7 @@ protected:
   /**
    * LAPACK matrices need access to the data.
    */
-  friend class LAPACKFullMatrix<Number>;
+  template <typename Number2> friend class LAPACKFullMatrix;
 
   /**
    * VectorView will access the pointer.
@@ -965,8 +1001,8 @@ protected:
 private:
 
   /**
-   * Allocate and align @p val along 64-byte boundaries. The size
-   * of the allocated memory is determined by @p max_vec_size .
+   * Allocate and align @p val along 64-byte boundaries. The size of the
+   * allocated memory is determined by @p max_vec_size .
    */
   void allocate();
 
@@ -1077,7 +1113,7 @@ namespace internal
 template <typename Number>
 inline
 Vector<Number> &
-Vector<Number>::operator = (const Vector<Number> &v)
+Vector<Number>::operator= (const Vector<Number> &v)
 {
   dealii::internal::Vector::copy_vector (v, *this);
   return *this;
@@ -1085,11 +1121,25 @@ Vector<Number>::operator = (const Vector<Number> &v)
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+inline
+Vector<Number> &
+Vector<Number>::operator= (Vector<Number> &&v)
+{
+  swap(v);
+
+  return *this;
+}
+#endif
+
+
+
 template <typename Number>
 template <typename Number2>
 inline
 Vector<Number> &
-Vector<Number>::operator = (const Vector<Number2> &v)
+Vector<Number>::operator= (const Vector<Number2> &v)
 {
   internal::Vector::copy_vector (v, *this);
   return *this;
@@ -1333,7 +1383,7 @@ void
 Vector<Number>::save (Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar   &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;
   ar &boost::serialization::make_array(val, max_vec_size);

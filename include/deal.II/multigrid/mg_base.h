@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_base_h
-#define __deal2__mg_base_h
+#ifndef dealii__mg_base_h
+#define dealii__mg_base_h
 
 /*
  * This file contains MGLevelObject and some abstract base classes
@@ -144,7 +144,7 @@ public:
  * component or for some components. The classes MGTransferSelect and
  * MGTransferBlock handle these cases.
  *
- * MGTransferSelect is used if you use mutligrid (on Vector objects) for a
+ * MGTransferSelect is used if you use multigrid (on Vector objects) for a
  * single component, possibly grouped using <tt>mg_target_component</tt>.
  *
  * The class MGTransferBlock handles the case where your multigrid method
@@ -185,7 +185,7 @@ public:
    * region covered by cells on level <tt>from_level</tt> is smaller than that
    * of level <tt>from_level-1</tt> (local refinement), then some degrees of
    * freedom in <tt>dst</tt> are active and will not be altered. For the other
-   * degress of freedom, the result of the restriction is added.
+   * degrees of freedom, the result of the restriction is added.
    *
    * @arg src is a vector with as many elements as there are degrees of
    * freedom on the finer level

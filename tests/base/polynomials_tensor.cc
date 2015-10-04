@@ -38,8 +38,10 @@ void check_point (const Point<dim> &x,
   std::vector<Tensor<1,dim> > values(n);
   std::vector<Tensor<2,dim> > gradients(n);
   std::vector<Tensor<3,dim> > seconds(0);
+  std::vector<Tensor<4,dim> > thirds(0);
+  std::vector<Tensor<5,dim> > fourths(0);
 
-  p.compute(x, values, gradients, seconds);
+  p.compute(x, values, gradients, seconds, thirds, fourths);
 
   deallog << "Point " << x << std::endl;
   for (unsigned int i=0; i<n; ++i)

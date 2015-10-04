@@ -50,7 +50,7 @@ namespace dealii
         XMLParameterWriter (QTreeWidget *tree_widget);
 				     /**
 				      * This function writes the parameter values stored in <tt>tree_widget</tt>
-				      * to @p device in XML format. We use the QXmlStreaWriter class
+				      * to @p device in XML format. We use the QXmlStreamWriter class
 				      * for this. The root element is
 				      * <code>&lt;ParameterHandler&gt;</code>
 				      */

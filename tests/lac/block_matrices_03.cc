@@ -36,7 +36,7 @@
 
 
 void do_add (const bool even_or_odd,
-	     BlockSparseMatrix<double> &bsm)
+             BlockSparseMatrix<double> &bsm)
 {
   BlockSparseMatrix<double>::size_type col_indices[5];
   for (unsigned int i=0; i<5 ; ++i)
@@ -90,7 +90,7 @@ void test ()
 
   // divide whole matrix by 100 to get back to the effect of a single set
   bsm /= 100;
-  
+
   bsm.print_formatted (deallog.get_file_stream());
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ int main ()
   // flags set
   tria.prepare_coarsening_and_refinement();
   for (cell=tria.begin_active(); cell!=endc; ++cell)
-    Assert (!cell->refine_flag_set(), ExcInternalError());
+    AssertThrow (!cell->refine_flag_set(), ExcInternalError());
 
   tria.execute_coarsening_and_refinement();
 

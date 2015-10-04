@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_levels_h
-#define __deal2__dof_levels_h
+#ifndef dealii__dof_levels_h
+#define dealii__dof_levels_h
 
 
 #include <deal.II/base/config.h>

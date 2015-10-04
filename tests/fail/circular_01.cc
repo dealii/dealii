@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -817,7 +817,7 @@ void LaplaceProblem<3>::create_coarse_grid ()
           (cell->face(f)->center()[2] != 7)
           &&
           (cell->face(f)->at_boundary()))
-        cell->face(f)->set_boundary_indicator (1);
+        cell->face(f)->set_boundary_id (1);
 
   triangulation.refine_global (1);
 }

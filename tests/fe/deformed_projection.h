@@ -55,6 +55,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_abf.h>

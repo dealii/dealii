@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__time_stepping_templates_h
-#define __deal2__time_stepping_templates_h
+#ifndef dealii__time_stepping_templates_h
+#define dealii__time_stepping_templates_h
 
 #include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/exceptions.h>
@@ -138,7 +138,7 @@ namespace TimeStepping
   template <typename VECTOR>
   double ExplicitRungeKutta<VECTOR>::evolve_one_time_step(
     std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> /*id_minus_tau_J_inverse*/,
     double t,
     double delta_t,
     VECTOR &y)
@@ -674,7 +674,7 @@ namespace TimeStepping
   template <typename VECTOR>
   double EmbeddedExplicitRungeKutta<VECTOR>::evolve_one_time_step(
     std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> /*id_minus_tau_J_inverse*/,
     double t,
     double delta_t,
     VECTOR &y)

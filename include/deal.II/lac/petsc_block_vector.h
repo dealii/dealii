@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_block_vector_h
-#define __deal2__petsc_block_vector_h
+#ifndef dealii__petsc_block_vector_h
+#define dealii__petsc_block_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -42,6 +42,8 @@ namespace PETScWrappers
    * in PETScWrappers. While the base class provides for most of the
    * interface, this class handles the actual allocation of vectors and
    * provides functions that are specific to the underlying vector type.
+   *
+   * This class is deprecated, use PETScWrappers::MPI::BlockVector.
    *
    * @ingroup Vectors
    *
@@ -242,7 +244,7 @@ namespace PETScWrappers
      */
     DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
     ///@}
-  };
+  } DEAL_II_DEPRECATED;
 
   /*@}*/
 
@@ -302,6 +304,7 @@ namespace PETScWrappers
     // first set sizes of blocks, but
     // don't initialize them as we will
     // copy elements soon
+    (void)end;
     reinit (n, true);
     InputIterator start = first;
     for (unsigned int b=0; b<n.size(); ++b)

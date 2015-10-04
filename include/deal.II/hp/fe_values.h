@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_fe_values_h
-#define __deal2__hp_fe_values_h
+#ifndef dealii__hp_fe_values_h
+#define dealii__hp_fe_values_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe.h>

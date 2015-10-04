@@ -38,7 +38,7 @@ CONFIGURE_FILE( # for binary dir:
 
 ########################################################################
 #                                                                      #
-#              Setup and install the convenience macros:               #
+#                   Setup and install cmake macros:                    #
 #                                                                      #
 ########################################################################
 
@@ -47,12 +47,14 @@ SET(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
   )
 FILE(COPY ${_macros}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_CMAKE_MACROS_RELDIR}
+  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
   )
 INSTALL(FILES ${_macros}
-  DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
+  DESTINATION ${DEAL_II_SHARE_RELDIR}/macros
   COMPONENT library
   )
 
@@ -70,11 +72,9 @@ INSTALL(FILES ${_macros}
 STRIP_FLAG(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
-# Strip -Wno-deprecated from DEAL_II_CXX_FLAGS so that deprecation warnings
-# are actually shown for user code:
+# Strip -Wno-deprecated-declarations from DEAL_II_CXX_FLAGS so that
+# deprecation warnings are actually shown for user code:
 #
-
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 #
@@ -103,10 +103,9 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     SET(_type "STATIC")
   ENDIF()
 
-  SET(_reldir "\${DEAL_II_LIBRARY_RELDIR}")
-  
+  SET(_name "${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}")
   SET(CONFIG_LIBRARIES_${_build}
-    "\${DEAL_II_PATH}/${_reldir}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
+    "\${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}/${_name}"
     ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_LIBRARIES}
     )
@@ -205,7 +204,7 @@ SET(_files
   )
 SET(_makefiles
   ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
-  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
+  ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
   )
 FOREACH(_file ${_files} ${_makefiles})
   FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
@@ -214,12 +213,25 @@ ENDFOREACH()
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")
+    STRING(REPLACE "DEAL_II_WITH_" "" _name ${var})
+
     FOREACH(_file ${_files})
       FILE(APPEND ${_file} "SET(${var} ${${var}})\n")
+      IF(${var} AND NOT "${${_name}_VERSION}" STREQUAL "")
+        FILE(APPEND ${_file}
+          "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
+          )
+      ENDIF()
     ENDFOREACH()
+
     FOREACH(_file ${_makefiles})
       IF(${var})
         FILE(APPEND ${_file} "${var} = true\n")
+        IF(NOT "${${_name}_VERSION}" STREQUAL "")
+          FILE(APPEND ${_file}
+            "DEAL_II_${_name}_VERSION = ${${_name}_VERSION}\n"
+            )
+        ENDIF()
       ELSE()
         FILE(APPEND ${_file} "${var} = false\n")
       ENDIF()

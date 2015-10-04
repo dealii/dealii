@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,7 +24,7 @@
 #
 # FEATURE_${feature}_DEPENDS    (a variable)
 #    a variable which contains an optional list of other features
-#    this feature depends on (and which have to be enbled for this feature
+#    this feature depends on (and which have to be enabled for this feature
 #    to work.)
 #    Features must be given with short name, i.e. without DEAL_II_WITH_
 #
@@ -55,7 +55,7 @@
 #    external dependencies.
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro)
-#    which should print a meaningfull error message (with FATAL_ERROR) for
+#    which should print a meaningful error message (with FATAL_ERROR) for
 #    the case that no usable library was found.
 #    If not defined, a suitable default error message will be printed.
 #
@@ -197,12 +197,12 @@ MACRO(CONFIGURE_FEATURE _feature)
         IF(DEAL_II_WITH_${_feature})
           MESSAGE(FATAL_ERROR "\n"
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
-            "${_dependency} has to be set to \"ON\".\n\n"
+            "DEAL_II_WITH_${_dependency} has to be set to \"ON\".\n\n"
             )
         ELSE()
           MESSAGE(STATUS
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
-            "${_dependency} has to be set to \"ON\"."
+            "DEAL_II_WITH_${_dependency} has to be set to \"ON\"."
             )
           PURGE_FEATURE(${_feature})
           SET_CACHED_OPTION(${_feature} OFF)

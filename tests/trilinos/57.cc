@@ -40,12 +40,12 @@ void test (TrilinosWrappers::Vector &v)
 
   // check that the vector is really
   // non-negative
-  Assert (v.is_non_negative() == true, ExcInternalError());
+  AssertThrow (v.is_non_negative() == true, ExcInternalError());
 
   // then set a single element to a negative
   // value and check again
   v(v.size()/2) = -1;
-  Assert (v.is_non_negative() == false, ExcInternalError());
+  AssertThrow (v.is_non_negative() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -59,7 +59,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

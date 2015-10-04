@@ -25,7 +25,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 8
 
 template<int dim>
 void plot_FE_System_shape_functions()
@@ -97,6 +97,3 @@ main()
 
   return 0;
 }
-
-
-

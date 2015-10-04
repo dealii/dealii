@@ -39,7 +39,7 @@ private:
 
 void execute (const X &x)
 {
-  Assert (x.i == 42, ExcInternalError());
+  AssertThrow (x.i == 42, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

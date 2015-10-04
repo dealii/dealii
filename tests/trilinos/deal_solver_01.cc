@@ -40,8 +40,8 @@
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
 check_solve( SOLVER &solver,
-	     const SolverControl &solver_control,
-	     const MATRIX &A,
+             const SolverControl &solver_control,
+             const MATRIX &A,
              VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   {

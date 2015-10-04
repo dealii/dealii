@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_matrix_ez_h
-#define __deal2__sparse_matrix_ez_h
+#ifndef dealii__sparse_matrix_ez_h
+#define dealii__sparse_matrix_ez_h
 
 
 #include <deal.II/base/config.h>
@@ -169,7 +169,7 @@ public:
 public:
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {
@@ -289,12 +289,13 @@ public:
   };
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**
@@ -373,13 +374,13 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -428,12 +429,23 @@ public:
    */
 //@{
   /**
-   * Set the element <tt>(i,j)</tt> to @p value. Allocates the entry, if it
-   * does not exist and @p value is non-zero. If <tt>value</tt> is not a
-   * finite number an exception is thrown.
+   * Set the element <tt>(i,j)</tt> to @p value.
+   *
+   * If <tt>value</tt> is not a finite number an exception is thrown.
+   *
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
+   *
+   * If anyway a new element will be inserted and it does not exist,
+   * allocates the entry.
+   *
+   * @note You may need to insert some zero elements to keep a
+   * symmetric sparsity pattern for the matrix.
    */
   void set (const size_type i, const size_type j,
-            const number value);
+            const number value, const bool elide_zero_values = true);
 
   /**
    * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
@@ -507,21 +519,29 @@ public:
             const bool       col_indices_are_sorted = false);
 
   /**
-   * Copy the given matrix to this one.  The operation throws an error if the
-   * sparsity patterns of the two involved matrices do not point to the same
-   * object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
-   * <tt>operator =</tt>, since this may lead to unwanted usage, e.g. in copy
-   * arguments to functions, which should really be arguments by reference.
+   * Copy the matrix given as argument into the current object.
+   *
+   * Copying matrices is an expensive operation that we do not want to happen
+   * by accident through compiler generated code for <code>operator=</code>.
+   * (This would happen, for example, if one accidentally declared a function
+   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
+   * The functionality of copying matrices is implemented in this member function
+   * instead. All copy operations of objects of this type therefore require an
+   * explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
+   *
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
    *
    * The function returns a reference to @p this.
    */
   template <class MATRIX>
   SparseMatrixEZ<number> &
-  copy_from (const MATRIX &source);
+  copy_from (const MATRIX &source, const bool elide_zero_values = true);
 
   /**
    * Add @p matrix scaled by @p factor to this matrix.
@@ -663,7 +683,7 @@ public:
    */
 //@{
   /**
-   * STL-like iterator with the first existing entry.
+   * Iterator starting at the first existing entry.
    */
   const_iterator begin () const;
 
@@ -673,8 +693,8 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row @p r. If this row is empty,
-   * the result is <tt>end(r)</tt>, which does NOT point into row @p r..
+   * Iterator starting at the first entry of row @p r. If this row is empty,
+   * the result is <tt>end(r)</tt>, which does NOT point into row @p r.
    */
   const_iterator begin (const size_type r) const;
 
@@ -838,6 +858,11 @@ private:
    * Increment when a row grows.
    */
   unsigned int increment;
+
+  /**
+   * Remember the user provided default row length.
+   */
+  unsigned int saved_default_row_length;
 };
 
 /**
@@ -1194,15 +1219,15 @@ template <typename number>
 inline
 void SparseMatrixEZ<number>::set (const size_type i,
                                   const size_type j,
-                                  const number value)
+                                  const number value,
+                                  const bool elide_zero_values)
 {
-
   AssertIsFinite(value);
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 
-  if (value == 0.)
+  if (elide_zero_values && value == 0.)
     {
       Entry *entry = locate(i,j);
       if (entry != 0)
@@ -1370,9 +1395,12 @@ template<typename number>
 template <class MATRIX>
 inline
 SparseMatrixEZ<number> &
-SparseMatrixEZ<number>::copy_from (const MATRIX &M)
+SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values)
 {
-  reinit(M.m(), M.n());
+  reinit(M.m(),
+         M.n(),
+         this->saved_default_row_length,
+         this->increment);
 
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
@@ -1382,8 +1410,7 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M)
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
-        if (entry->value() != 0)
-          set(row, entry->column(), entry->value());
+        set(row, entry->column(), entry->value(), elide_zero_values);
     }
 
   return *this;

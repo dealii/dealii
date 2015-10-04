@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_qmrs_h
-#define __deal2__solver_qmrs_h
+#ifndef dealii__solver_qmrs_h
+#define dealii__solver_qmrs_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/solver.h>
@@ -90,6 +90,7 @@ public:
      * The default is no exact residual computation and breakdown parameter
      * 1e-16.
      */
+    explicit
     AdditionalData(bool exact_residual = false,
                    double breakdown=1.e-16) :
       exact_residual(exact_residual),

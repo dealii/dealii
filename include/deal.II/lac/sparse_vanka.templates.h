@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_vanka_templates_h
-#define __deal2__sparse_vanka_templates_h
+#ifndef dealii__sparse_vanka_templates_h
+#define dealii__sparse_vanka_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>
@@ -262,7 +262,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
         //   SparsityPattern object
         //
         // since we do not explicitly
-        // consider nonsysmmetric sparsity
+        // consider nonsymmetric sparsity
         // patterns, the first element
         // of each entry simply denotes
         // all degrees of freedom that

@@ -45,31 +45,31 @@ template<int dim>
 void test(FiniteElement<dim> &fe)
 {
   deallog << "dim=" << dim << std::endl;
-  
-    parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-    GridGenerator::hyper_ball(triangulation);
-    triangulation.refine_global(1);
-    
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-	typename Triangulation<dim>::active_cell_iterator
-	  cell = triangulation.begin_active();
-	for (;cell!=triangulation.end();++cell)
-	  if (Testing::rand()%2)
-	    cell->set_refine_flag ();
-      }
 
-    triangulation.execute_coarsening_and_refinement();
-    deallog << "n_cells: " << triangulation.n_global_active_cells() << std::endl;
-    DoFHandler<dim> dof_handler(triangulation);
+  parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+  GridGenerator::hyper_ball(triangulation);
+  triangulation.refine_global(1);
 
-    dof_handler.distribute_dofs(fe);
-	
-    ConstraintMatrix constraints;
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-      deallog << "OK" << std::endl;
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      typename Triangulation<dim>::active_cell_iterator
+      cell = triangulation.begin_active();
+      for (; cell!=triangulation.end(); ++cell)
+        if (Testing::rand()%2)
+          cell->set_refine_flag ();
+    }
+
+  triangulation.execute_coarsening_and_refinement();
+  deallog << "n_cells: " << triangulation.n_global_active_cells() << std::endl;
+  DoFHandler<dim> dof_handler(triangulation);
+
+  dof_handler.distribute_dofs(fe);
+
+  ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "OK" << std::endl;
 }
 
 template <int dim>
@@ -84,18 +84,18 @@ void testit()
   fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_DGQ<dim>(2)));
   fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_Q_DG0<dim>(2)));
 
-  for (unsigned int i=0;i<fes.size();++i)
+  for (unsigned int i=0; i<fes.size(); ++i)
     {
       deallog << fes[i]->get_name() << std::endl;
       test<dim>(*fes[i]);
     }
-  
+
 }
 
 
 int main(int argc, char *argv[])
-{  
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
 
   testit<2>();

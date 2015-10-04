@@ -1,7 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
 IF(DEAL_II_WITH_TRILINOS)
   DEAL_II_PICKUP_TESTS()
 ENDIF()

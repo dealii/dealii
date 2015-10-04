@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,14 +66,14 @@ void test(std::string filename)
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
           for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
             {
-              Assert (bv.find(cell->face(f)->vertex_dof_index(v,i))
-                      != bv.end(),
-                      ExcInternalError());
-              Assert (bv[cell->face(f)->vertex_dof_index(v,i)]
-                      ==
-                      Functions::SquareFunction<spacedim>()
-                      .value(cell->face(f)->vertex(v),i),
-                      ExcInternalError());
+              AssertThrow (bv.find(cell->face(f)->vertex_dof_index(v,i))
+                           != bv.end(),
+                           ExcInternalError());
+              AssertThrow (bv[cell->face(f)->vertex_dof_index(v,i)]
+                           ==
+                           Functions::SquareFunction<spacedim>()
+                           .value(cell->face(f)->vertex(v),i),
+                           ExcInternalError());
             }
 }
 

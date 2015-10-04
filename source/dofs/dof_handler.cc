@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
 #include <set>
 #include <algorithm>
@@ -33,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 //TODO[WB]: do not use a plain pointer for DoFHandler::faces, but rather an
-//auto_ptr or some such thing. alternatively, why not use the DoFFaces object
+//unique_ptr or some such thing. alternatively, why not use the DoFFaces object
 //right away?
 
 template<int dim, int spacedim>
@@ -49,7 +51,7 @@ template <int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::default_fe_index;
 
 
-// reference the invalid_dof_index variable explicitely to work around
+// reference the invalid_dof_index variable explicitly to work around
 // a bug in the icc8 compiler
 namespace internal
 {
@@ -72,6 +74,8 @@ namespace internal
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
+    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dim,spacedim>*>(&policy))
+      policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
     policy_name += Utilities::int_to_string(dim)+
@@ -762,9 +766,13 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   // decide whether we need a
   // sequential or a parallel
   // distributed policy
-  if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
-      == 0)
+      != 0)
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
+  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+           (&tria)
+           == 0)
     policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
@@ -802,9 +810,13 @@ DoFHandler<dim,spacedim>::initialize(
   // decide whether we need a
   // sequential or a parallel
   // distributed policy
-  if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&t)
-      == 0)
+      != 0)
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
+  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+           (&t)
+           == 0)
     policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
@@ -992,33 +1004,33 @@ types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (FunctionMap::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
 
 template <>
-types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1031,33 +1043,33 @@ types::global_dof_index DoFHandler<1,2>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (FunctionMap::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
 
 template <>
-types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1102,9 +1114,9 @@ types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 
 template<int dim, int spacedim>
 types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
-  Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1121,8 +1133,8 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f)
           &&
-          (boundary_indicators.find(cell->face(f)->boundary_indicator()) !=
-           boundary_indicators.end()))
+          (boundary_ids.find(cell->face(f)->boundary_id()) !=
+           boundary_ids.end()))
         {
           cell->face(f)->get_dof_indices (dofs_on_face);
           for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -1136,9 +1148,9 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
 
 template<int dim, int spacedim>
 types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
-  Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1155,10 +1167,10 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &b
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f)
           &&
-          (std::find (boundary_indicators.begin(),
-                      boundary_indicators.end(),
-                      cell->face(f)->boundary_indicator()) !=
-           boundary_indicators.end()))
+          (std::find (boundary_ids.begin(),
+                      boundary_ids.end(),
+                      cell->face(f)->boundary_id()) !=
+           boundary_ids.end()))
         {
           cell->face(f)->get_dof_indices (dofs_on_face);
           for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -1225,7 +1237,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   internal::DoFHandler::Implementation::reserve_space (*this);
 
   // hand things off to the policy
-  number_cache = policy->distribute_dofs (*this);
+  policy->distribute_dofs (*this,number_cache);
 
   // initialize the block info object
   // only if this is a sequential
@@ -1239,9 +1251,11 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
 {
+  (void)fe;
   Assert(levels.size()>0, ExcMessage("Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
 
   const FiniteElement<dim, spacedim> *old_fe = selected_fe;
+  (void)old_fe;
   Assert(old_fe == &fe, ExcMessage("You are required to use the same FE for level and active DoFs!") );
 
   clear_mg_space();
@@ -1342,7 +1356,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
               ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
-  number_cache = policy->renumber_dofs (new_numbers, *this);
+  policy->renumber_dofs (new_numbers, *this,number_cache);
 }
 
 

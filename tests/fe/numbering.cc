@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -182,14 +182,14 @@ void check (const FE_Q<dim> &fe)
           hierarchic_to_lexicographic_numbering[next_index++] = (n-1)*n*n+n*(i+1)+j+1;
 
       // inside hex
-      Assert (fe.dofs_per_hex == fe.dofs_per_quad*fe.dofs_per_line,
-              ExcInternalError());
+      AssertThrow (fe.dofs_per_hex == fe.dofs_per_quad*fe.dofs_per_line,
+                   ExcInternalError());
       for (unsigned int i=0; i<fe.dofs_per_line; ++i)
         for (unsigned int j=0; j<fe.dofs_per_line; ++j)
           for (unsigned int k=0; k<fe.dofs_per_line; ++k)
             hierarchic_to_lexicographic_numbering[next_index++] = n*n*(i+1)+n*(j+1)+k+1;
 
-      Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+      AssertThrow (next_index == fe.dofs_per_cell, ExcInternalError());
 
       break;
     }
@@ -224,8 +224,8 @@ void check (const FE_Q<dim> &fe)
   // for equality
   std::vector<unsigned int> h2l (fe.dofs_per_cell);
   FETools::hierarchic_to_lexicographic_numbering (fe, h2l);
-  Assert (hierarchic_to_lexicographic_numbering == h2l,
-          ExcInternalError());
+  AssertThrow (hierarchic_to_lexicographic_numbering == h2l,
+               ExcInternalError());
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mapping_collection_h
-#define __deal2__mapping_collection_h
+#ifndef dealii__mapping_collection_h
+#define dealii__mapping_collection_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

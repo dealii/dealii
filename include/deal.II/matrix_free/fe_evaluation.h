@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_fe_evaluation_h
-#define __deal2__matrix_free_fe_evaluation_h
+#ifndef dealii__matrix_free_fe_evaluation_h
+#define dealii__matrix_free_fe_evaluation_h
 
 
 #include <deal.II/base/config.h>
@@ -1173,7 +1173,7 @@ public:
                        const unsigned int q_point);
 
   /**
-   * Write a constribution that is tested by the divergence to the field
+   * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
    * the function @p integrate(...,true) is called, this specifies what is
@@ -3217,7 +3217,7 @@ FEEvaluationBase<dim,n_components_,Number>
 ::get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_cell);
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_dofs[comp][dof];
   return return_value;
@@ -3234,7 +3234,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_quad[comp][q_point];
   return return_value;
@@ -3252,7 +3252,7 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > grad_out (false);
+  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -3477,7 +3477,7 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hessian_out (false);
+  Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hessian_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -3554,7 +3554,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
-  Tensor<1,n_components_,VectorizedArray<Number> > laplacian_out (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > laplacian_out;
   const Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hess_diag
     = get_hessian_diagonal(q_point);
   for (unsigned int comp=0; comp<n_components; ++comp)
@@ -3666,7 +3666,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->values_quad_submitted == true,
           internal::ExcAccessToUninitializedField());
 #endif
-  Tensor<1,n_components_,VectorizedArray<Number> > return_value (false);
+  Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; ++comp)
     return_value[comp] = this->values_quad[comp][0];
   const unsigned int n_q_points = this->data->n_q_points;
@@ -3808,7 +3808,7 @@ FEEvaluationAccess<dim,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,dim,VectorizedArray<Number> > grad_out (false);
+  Tensor<1,dim,VectorizedArray<Number> > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -4102,7 +4102,7 @@ FEEvaluationAccess<dim,dim,Number>
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl (false);
+  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl;
   switch (dim)
     {
     case 1:
@@ -4407,7 +4407,7 @@ FEEvaluationAccess<1,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
-  Tensor<1,1,VectorizedArray<Number> > grad_out (false);
+  Tensor<1,1,VectorizedArray<Number> > grad_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -5797,7 +5797,6 @@ namespace internal
         for (unsigned int c=0; c<n_components; c++)
           {
             VectorizedArray<Number> temp1[temp_size];
-            VectorizedArray<Number> temp2[temp_size];
 
             // grad x
             if (evaluate_grad == true)
@@ -6661,7 +6660,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   // value from that
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      Point<dim,VectorizedArray<Number> > point (false);
+      Point<dim,VectorizedArray<Number> > point;
       switch (dim)
         {
         case 1:

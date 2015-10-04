@@ -22,11 +22,11 @@ approximation, and so on.
 
 For some differential equations, it is known that piecewise linear
 approximations of the boundary, i.e. $Q_1$ mappings, are not
-sufficient if the boundary of the domain is curved. Examples are the
+sufficient if the boundary of the exact domain is curved. Examples are the
 biharmonic equation using $C^1$ elements, or the Euler
-equation on domains with curved reflective boundaries. In these cases,
+equations of gas dynamics on domains with curved reflective boundaries. In these cases,
 it is necessary to compute the integrals using a higher order
-mapping. The reason, of course, is that if we do not use a higher
+mapping. If we do not use such a higher
 order mapping, the order of approximation of the boundary dominates
 the order of convergence of the entire numerical scheme, irrespective
 of the order of convergence of the discretization in the interior of
@@ -42,20 +42,30 @@ different methods.
 
 
 The first method uses a triangulated approximation of the circle with
-unit radius and integrates the unit function over it. Of course, if
-the domain were the exact unit circle, then the area would be pi, but
+unit radius and integrates the function that is constant one over it. Of course, if
+the domain were the exact unit circle, then the area would be $\pi$, but
 since we only use an approximation by piecewise polynomial segments,
-the value of the area is not exactly pi. However, it is known that as
+the value of the area we integrate over is not exactly $\pi$. However, it is known that as
 we refine the triangulation, a $Q_p$ mapping approximates the boundary
 with an order $h^{p+1}$, where $h$ is the mesh
-width. We will check the values of the computed area of the circle and
-their convergence towards pi under mesh refinement for different
+size. We will check the values of the computed area of the circle and
+their convergence towards $\pi$ under mesh refinement for different
 mappings. We will also find a convergence behavior that is surprising
 at first, but has a good explanation.
 
 
 
 The second method works similarly, but this time does not use the area
-of the triangulated unit circle, but rather its perimeter. Pi is then
-approximated by half of the perimeter, as the radius is equal to one.
+of the triangulated unit circle, but rather its perimeter. $\pi$ is then
+approximated by half of the perimeter, as we choose the radius equal to one.
 
+
+@note This tutorial shows in essence how to choose a particular
+mapping for integrals, by attaching a particular geometry to the
+triangulation (as had already been done in step-1, for example) and
+then passing a mapping argument to the FEValues class that is used for
+all integrals in deal.II. The geometry we choose is a circle, for
+which deal.II already has a class (SphericalManifold) that can be
+used. If you want to define your own geometry, for example because it
+is complicated and cannot be described by the classes already
+available in deal.II, you will want to read through step-53.

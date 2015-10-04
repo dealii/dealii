@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/distributed/tria.h>
 
 #include <deal.II/base/std_cxx11/bind.h>
 
@@ -300,13 +301,13 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   //
   // for the neighbor gradient, we need several auxiliary fields, depending on
   // the way we get it (see below)
-  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
   gradients_here (n_solution_vectors,
-                  std::vector<std::vector<Tensor<1,spacedim> > >(2, std::vector<Tensor<1,spacedim> >(n_components)));
-  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
+                  std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > >(2, std::vector<Tensor<1,spacedim,typename InputVector::value_type> >(n_components)));
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
   gradients_neighbor (gradients_here);
-  std::vector<Vector<double> >
-  grad_neighbor (n_solution_vectors, Vector<double>(n_components));
+  std::vector<Vector<typename InputVector::value_type> >
+  grad_neighbor (n_solution_vectors, Vector<typename InputVector::value_type>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -330,9 +331,9 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
-  typename DH::active_cell_iterator cell = dof_handler.begin_active();
-  for (unsigned int cell_index=0; cell != dof_handler.end();
-       ++cell, ++cell_index)
+  for (typename DH::active_cell_iterator cell = dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell)
     if (((subdomain_id == numbers::invalid_subdomain_id)
          ||
          (cell->subdomain_id() == subdomain_id))
@@ -342,7 +343,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
          (cell->material_id() == material_id)))
       {
         for (unsigned int n=0; n<n_solution_vectors; ++n)
-          (*errors[n])(cell_index) = 0;
+          (*errors[n])(cell->active_cell_index()) = 0;
 
         // loop over the two points bounding this line. n==0 is left point,
         // n==1 is right point
@@ -429,12 +430,12 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
                     const double jump = ((grad_here - grad_neighbor[s](component)) *
                                          coefficient_values(component));
-                    (*errors[s])(cell_index) += jump*jump * cell->diameter();
+                    (*errors[s])(cell->active_cell_index()) += jump*jump * cell->diameter();
                   }
           }
 
         for (unsigned int s=0; s<n_solution_vectors; ++s)
-          (*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
+          (*errors[s])(cell->active_cell_index()) = std::sqrt((*errors[s])(cell->active_cell_index()));
       }
 }
 

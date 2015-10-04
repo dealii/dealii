@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,11 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_output_h
-#define __deal2__mesh_worker_output_h
+#ifndef dealii__mesh_worker_output_h
+#define dealii__mesh_worker_output_h
 
 #include <deal.II/meshworker/dof_info.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,20 +63,17 @@ int main ()
   Triangulation<3> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
 
-  volume_mesh.set_boundary (1, boundary_description);
   volume_mesh.set_boundary (0, boundary_description);
   volume_mesh.refine_global (3);
 
   static HyperBallBoundary<3-1,3> surface_description;
-  triangulation.set_boundary (1, surface_description);
   triangulation.set_boundary (0, surface_description);
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
   GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
-                                    boundary_ids);
-  triangulation.set_boundary (1);
+                                        boundary_ids);
   triangulation.set_boundary (0);
   GridTools::transform (&warp<3>, triangulation);
 

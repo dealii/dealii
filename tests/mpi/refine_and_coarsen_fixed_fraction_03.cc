@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ void test()
           ++my_cell_index;
           indicators(cell_index) = my_cell_index+1;
         }
-    Assert (my_cell_index == 20, ExcInternalError());
+    AssertThrow (my_cell_index == 20, ExcInternalError());
   }
 
   parallel::distributed::GridRefinement
@@ -116,7 +116,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

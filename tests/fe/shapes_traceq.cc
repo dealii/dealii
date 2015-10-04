@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,6 @@
 
 #include "../tests.h"
 #include "shapes.h"
-//#include "../deal.II/tests/tests.h"
-//#include "../deal.II/tests/fe/shapes.h"
 #include <deal.II/fe/fe_trace.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -24,7 +22,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 8
 
 
 template<int dim>

@@ -63,9 +63,9 @@
   platforms:
 </p>
 <ul>
-  <li>GNU/Linux: GCC version 4.1 or later; Clang version 3.0 or later;
-  ICC versions 13* or 14*</li>
-  <li>Mac OS X: GCC version 4.1 or later; Clang version 3.0 or later.
+  <li>GNU/Linux: GCC version 4.6 or later; Clang version 3.3 or later;
+  ICC versions 15 or later</li>
+  <li>Mac OS X: GCC version 4.6 or later; Clang version 3.3 or later.
     Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX"
     target="_top">deal.II Wiki</a> for installation instructions.</li>
   <li>Windows: Currently, Windows is not supported officially.
@@ -119,7 +119,10 @@
 	    for it. Most integrated development environments
 	    like <a href="http://www.kdevelop.org/" target="_top">kdevelop</a>
 	    or <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
-	    in debuggers as well.
+	    in debuggers as well. <acronym>deal.II</acronym> has some support for
+	    pretty printing its own classes through GDB;
+	    see <a href="users/gdb.html">the GDB configuration guide</a> for
+	    setup information.
 	</li>
 
       <li> <p>
@@ -391,14 +394,6 @@
       </li>
 
       <li>
-        <p>
-          <i>mesh_converter</i>: If you wish to compile and install the
-          <code>mesh_converter</code> tool discussed in the documentation
-	  of the <code>GridIn</code> class, specify
-          <code>-DDEAL_II_COMPONENT_MESH_CONVERTER=ON</code>. (This is in fact
-          the default.)
-	</p>
-
         <p>
           <i>parameter_gui</i>: If you wish to compile and install the
           <code>parameter_gui</code> tool discussed in the documentation

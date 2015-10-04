@@ -63,7 +63,7 @@ namespace DerivativeApproximation
      * The following class is used to describe the data needed to compute the
      * finite difference approximation to the gradient on a cell. See the
      * general documentation of this class for more information on
-     * implementational details.
+     * implementation details.
      *
      * @author Wolfgang Bangerth, 2000
      */
@@ -87,7 +87,7 @@ namespace DerivativeApproximation
        * Likewise declare the data type that holds the derivative projected to a
        * certain directions.
        */
-      typedef double        ProjectedDerivative;
+      typedef Tensor<0,dim> ProjectedDerivative;
 
       /**
        * Given an FEValues object initialized to a cell, and a solution vector,
@@ -133,14 +133,14 @@ namespace DerivativeApproximation
     {
       if (fe_values.get_fe().n_components() == 1)
         {
-          std::vector<ProjectedDerivative> values (1);
+          std::vector<typename InputVector::value_type> values (1);
           fe_values.get_function_values (solution, values);
           return values[0];
         }
       else
         {
-          std::vector<Vector<double> > values
-          (1, Vector<double>(fe_values.get_fe().n_components()));
+          std::vector<Vector<typename InputVector::value_type> > values
+          (1, Vector<typename InputVector::value_type>(fe_values.get_fe().n_components()));
           fe_values.get_function_values (solution, values);
           return values[0](component);
         }
@@ -249,16 +249,16 @@ namespace DerivativeApproximation
     {
       if (fe_values.get_fe().n_components() == 1)
         {
-          std::vector<ProjectedDerivative> values (1);
+          std::vector<Tensor<1,dim,typename InputVector::value_type> > values (1);
           fe_values.get_function_gradients (solution, values);
-          return values[0];
+          return ProjectedDerivative(values[0]);
         }
       else
         {
-          std::vector<std::vector<ProjectedDerivative> > values
-          (1, std::vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
+          std::vector<std::vector<Tensor<1,dim,typename InputVector::value_type> > > values
+          (1, std::vector<Tensor<1,dim,typename InputVector::value_type> >(fe_values.get_fe().n_components()));
           fe_values.get_function_gradients (solution, values);
-          return values[0][component];
+          return ProjectedDerivative(values[0][component]);
         };
     }
 
@@ -592,16 +592,16 @@ namespace DerivativeApproximation
     {
       if (fe_values.get_fe().n_components() == 1)
         {
-          std::vector<ProjectedDerivative> values (1);
+          std::vector<Tensor<2,dim,typename InputVector::value_type> > values (1);
           fe_values.get_function_hessians (solution, values);
-          return values[0];
+          return ProjectedDerivative(values[0]);
         }
       else
         {
-          std::vector<std::vector<ProjectedDerivative> > values
-          (1, std::vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
+          std::vector<std::vector<Tensor<2,dim,typename InputVector::value_type> > > values
+          (1, std::vector<Tensor<2,dim,typename InputVector::value_type> >(fe_values.get_fe().n_components()));
           fe_values.get_function_hessians (solution, values);
-          return values[0][component];
+          return ProjectedDerivative(values[0][component]);
         };
     }
 
@@ -891,11 +891,7 @@ namespace DerivativeApproximation
                this_midpoint_value);
           projected_finite_difference /= distance;
 
-          typename DerivativeDescription::Derivative projected_derivative_update;
-          outer_product (projected_derivative_update,
-                         y,
-                         projected_finite_difference);
-          projected_derivative += projected_derivative_update;
+          projected_derivative += outer_product(y, projected_finite_difference);
         };
 
       // can we determine an
@@ -913,7 +909,7 @@ namespace DerivativeApproximation
       // compute Y^-1 g
       const Tensor<2,dim> Y_inverse = invert(Y);
 
-      contract (derivative, Y_inverse, projected_derivative);
+      derivative = Y_inverse * projected_derivative;
 
       // finally symmetrize the derivative
       DerivativeDescription::symmetrize (derivative);

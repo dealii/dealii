@@ -42,11 +42,11 @@ int main()
     t[0][0] = 1.23456;
     t[0][1] = 7.87965;
     t[1][1] = 3.35792;
-    Assert (7*t == 7.0 * t, ExcInternalError());
-    Assert (t*7 == t * 7.0, ExcInternalError());
-    Assert (t*7 == 7*t    , ExcInternalError());
-    Assert ((t*7 - (t+t+t+t+t+t+t)).norm() < 1e-12, ExcInternalError());
+    AssertThrow (7*t == 7.0 * t, ExcInternalError());
+    AssertThrow (t*7 == t * 7.0, ExcInternalError());
+    AssertThrow (t*7 == 7*t    , ExcInternalError());
+    AssertThrow ((t*7 - (t+t+t+t+t+t+t)).norm() < 1e-12, ExcInternalError());
   }
-  
+
   deallog << "OK" << std::endl;
 }

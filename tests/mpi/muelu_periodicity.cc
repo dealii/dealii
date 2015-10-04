@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2014 by the deal.II authors
+ * Copyright (C) 2008 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -362,12 +362,12 @@ namespace Step22
       std::vector<unsigned int> first_vector_components;
       first_vector_components.push_back(0);
 
-      GridTools::collect_periodic_faces
-      (dof_handler, 2, 3, 1, periodicity_vector, Tensor<1,dim>(),
-       matrix, first_vector_components);
+      GridTools::collect_periodic_faces(
+        dof_handler, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
 
-      DoFTools::make_periodicity_constraints<DoFHandler<dim> >
-      (periodicity_vector, constraints, fe.component_mask(velocities));
+      DoFTools::make_periodicity_constraints<DoFHandler<dim>>(
+                                                             periodicity_vector, constraints, fe.component_mask(velocities)),
+                                                                                 first_vector_components;
 #endif
     }
 
@@ -724,9 +724,8 @@ namespace Step22
     std::vector<unsigned int> first_vector_components;
     first_vector_components.push_back(0);
 
-    GridTools::collect_periodic_faces
-    (triangulation, 2, 3, 1, periodicity_vector, Tensor<1,dim>(),
-     matrix, first_vector_components);
+    GridTools::collect_periodic_faces(
+      triangulation, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
 
     triangulation.add_periodicity(periodicity_vector);
 #endif
@@ -770,7 +769,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step22;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       deallog.depth_console (0);
 
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)==0)

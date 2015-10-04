@@ -45,7 +45,7 @@ void test ()
   // make sure that we got here just fine but that there is nothing else
   AssertThrow (in, ExcIO());
   in >> i;
-  AssertThrow (!in, ExcIO());  
+  AssertThrow (!in, ExcIO());
 }
 
 

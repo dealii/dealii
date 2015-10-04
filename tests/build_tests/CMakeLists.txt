@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,9 +14,18 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+#
+# Set up test environment (does not pick up anything):
+#
+DEAL_II_PICKUP_TESTS()
+
+IF(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+  INCLUDE(${DEAL_II_TARGET_CONFIG})
+  SET(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+ENDIF()
 
 #
 # build_tests tests are special:
@@ -47,7 +56,16 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
+#
+# Glob together all tests:
+#
+IF(DEAL_II_BUILD_DIR)
+  LIST(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
+  GET_FILENAME_COMPONENT(_binary_dir ${_include_dir} PATH)
+  FILE(GLOB _steps ${_binary_dir}/examples/step-*)
+ELSE()
+  FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
+ENDIF()
 
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
@@ -66,7 +84,7 @@ FOREACH(_step_full ${_steps})
       FILE(GLOB _files ${_step_full}/*)
       SET(_command)
       FOREACH(_file ${_files})
-        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc|.svn)")
+        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc)$")
           LIST(APPEND _command
             COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${_step_dir}
             )
@@ -99,7 +117,7 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
         COMMAND rm -f ${_step_dir}/failing_configure_output
         COMMAND ${CMAKE_COMMAND}
-          -DDEAL_II_DIR=${DEAL_II_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
+          -DDEAL_II_DIR=${DEAL_II_DIR} -DCMAKE_BUILD_TYPE=${_build} .
           > ${_step_dir}/configure_output 2>&1
           || (mv ${_step_dir}/configure_output
                  ${_step_dir}/failing_configure_output
@@ -179,9 +197,9 @@ FOREACH(_step_full ${_steps})
       # And finally add the test:
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
-          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${_step_dir}/interrupt_guard
-          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES

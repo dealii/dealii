@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,8 +66,8 @@ MACRO(make_quicktest test_basename build_name mpi_run)
 
   ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/tests/run_test.cmake
+      -DBINARY_DIR=${CMAKE_BINARY_DIR}
+      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")

@@ -13,15 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_h
-#define __deal2__solver_h
+#ifndef dealii__solver_h
+#define dealii__solver_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_control.h>
 
+// Ignore deprecation warnings for auto_ptr.
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -322,6 +325,11 @@ template <class VECTOR = Vector<double> >
 class Solver : public Subscriptor
 {
 public:
+  /**
+   * A typedef for the underlying vector type
+   */
+  typedef VECTOR vector_type;
+
   /**
    * Constructor. Takes a control object which evaluates the conditions for
    * convergence, and an object that allows solvers to allocate memory for

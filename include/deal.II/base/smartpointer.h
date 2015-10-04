@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__smartpointer_h
-#define __deal2__smartpointer_h
+#ifndef dealii__smartpointer_h
+#define dealii__smartpointer_h
 
 
 #include <deal.II/base/config.h>
@@ -70,14 +70,14 @@ public:
   SmartPointer ();
 
   /**
-   * Copy constructor for SmartPointer. We do now copy the object subscribed
+   * Copy constructor for SmartPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
   template <class Q>
   SmartPointer (const SmartPointer<T,Q> &tt);
 
   /**
-   * Copy constructor for SmartPointer. We do now copy the object subscribed
+   * Copy constructor for SmartPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
   SmartPointer (const SmartPointer<T,P> &tt);
@@ -180,7 +180,7 @@ public:
 
 private:
   /**
-   * Pointer to the object we want to subscribt to. Since it is often
+   * Pointer to the object we want to subscribe to. Since it is often
    * necessary to follow this pointer when debugging, we have deliberately
    * chosen a short name.
    */

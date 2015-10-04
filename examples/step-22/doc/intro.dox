@@ -19,7 +19,7 @@ California Institute of Technology.
 This program deals with the Stokes system of equations which reads as
 follows in non-dimensionalized form:
 @f{eqnarray*}
-  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
+  -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
   \\
   -\textrm{div}\; \textbf{u} &=& 0,
 @f}
@@ -47,22 +47,6 @@ become clear once we discuss the weak form of the equations.
 The equations covered here fall into the class of vector-valued problems. A
 toplevel overview of this topic can be found in the @ref vector_valued module.
 
-@note Different people mean different things when they talk about the Stokes
-equations. We here adopt the convention of the solid mechanics community which
-uses the symmetric gradient. This differs from the convention in the fluids
-community by a factor of two since the fact that $\textrm{div}\; \textbf{u}=0$
-implies that $-\textrm{div}\; \varepsilon(\textbf{u}) = \frac 12 \Delta
-\textbf{u}$. The equations above are therefore equivalent to
-@f{eqnarray*}
-  -\frac 12 \Delta\textbf{u} + \nabla p &=& \textbf{f},
-  \\
-  -\textrm{div}\; \textbf{u} &=& 0.
-@f}
-The Stokes equations that the fluid dynamics community would refer to do not
-have the factor $\frac 12$ in front. Depending on your viewpoint you may
-therefore want to adjust the bilinear form in the program when building the
-system matrix and preconditioner.
-
 
 <h3>Weak form</h3>
 
@@ -70,7 +54,7 @@ The weak form of the equations is obtained by writing it in vector
 form as
 @f{eqnarray*}
   \begin{pmatrix}
-    {-\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
+    {-2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
     \\
     {-\textrm{div}\; \textbf{u}}
   \end{pmatrix}
@@ -86,7 +70,7 @@ function $\phi = \begin{pmatrix}\textbf v \\ q\end{pmatrix}$ and integrating
 over the domain $\Omega$, yielding the following set of equations:
 @f{eqnarray*}
   (\mathrm v,
-   -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p)_{\Omega}
+   -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
   =
@@ -98,7 +82,7 @@ which has to hold for all test functions $\phi = \begin{pmatrix}\textbf v
 In practice, one wants to impose as little regularity on the pressure
 variable as possible; consequently, we integrate by parts the second term:
 @f{eqnarray*}
-  (\mathrm v, -\textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
+  (\mathrm v, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -108,9 +92,9 @@ variable as possible; consequently, we integrate by parts the second term:
 @f}
 Likewise, we integrate by parts the first term to obtain
 @f{eqnarray*}
-  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  (\nabla \mathrm v, 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
-  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  (\textbf{n} \otimes \mathrm v, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -121,9 +105,9 @@ Likewise, we integrate by parts the first term to obtain
 where the scalar product between two tensor-valued quantities is here
 defined as
 @f{eqnarray*}
-  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  (\nabla \mathrm v, 2\; \varepsilon(\textbf{u}))_{\Omega}
   =
-  \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
+  2 \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
   \varepsilon(\textbf{u})_{ij} \ dx.
 @f}
 Because the scalar product between a general tensor like
@@ -132,9 +116,9 @@ $\varepsilon(\textbf{u})$ equals the scalar product between the
 symmetrized forms of the two, we can also write the bilinear form
 above as follows:
 @f{eqnarray*}
-  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
-  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  (\textbf{n} \otimes \mathrm v, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -145,7 +129,7 @@ above as follows:
 We will deal with the boundary terms in the next section, but it is already
 clear from the domain terms
 @f{eqnarray*}
-  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -157,6 +141,7 @@ form, and consequently a symmetric (if indefinite) system matrix.
 <h3>%Boundary conditions</h3>
 
 @dealiiVideoLecture{21.5}
+(@dealiiVideoLectureSeeAlso{21.55,21.6,21.65})
 
 The weak form just derived immediately presents us with different
 possibilities for imposing boundary conditions:
@@ -173,7 +158,7 @@ possibilities for imposing boundary conditions:
     and consequently that
     @f{eqnarray*}
       -(\textbf{n} \otimes \mathrm
-        v,\varepsilon(\textbf{u}))_{\Gamma_D}
+        v, 2\; \varepsilon(\textbf{u}))_{\Gamma_D}
       +
       (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_D}
       = 0.
@@ -191,46 +176,46 @@ possibilities for imposing boundary conditions:
     boundary terms as follows:
     @f{eqnarray*}
       -(\textbf{n} \otimes \mathrm
-        v,\varepsilon(\textbf{u}))_{\Gamma_N}
+        v, 2\; \varepsilon(\textbf{u}))_{\Gamma_N}
       +
       (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_N}
       &=&
       \sum_{i,j=1}^d
-      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      -(n_i v_j, 2\; \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       +
       \sum_{i=1}^d
       (n_i v_i, p)_{\Gamma_N}
       \\
       &=&
       \sum_{i,j=1}^d
-      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      -(n_i v_j, 2\; \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       +
       \sum_{i,j=1}^d
       (n_i v_j, p \delta_{ij})_{\Gamma_N}
       \\
       &=&
       \sum_{i,j=1}^d
-      (n_i v_j,p \delta_{ij} - \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      (n_i v_j,p \delta_{ij} - 2\; \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       \\
       &=&
       (\textbf{n} \otimes \mathrm v,
-      p \textbf{1} - \varepsilon(\textbf{u}))_{\Gamma_N}.
+      p \textbf{1} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
       \\
       &=&
       (\mathrm v,
-       \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})])_{\Gamma_N}.
+       \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
     @f}
     In other words, on the Neumann part of the boundary we can
     prescribe values for the total stress:
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
     If the boundary is subdivided into Dirichlet and Neumann parts
     $\Gamma_D,\Gamma_N$, this then leads to the following weak form:
     @f{eqnarray*}
-      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
       (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -244,13 +229,13 @@ possibilities for imposing boundary conditions:
 <li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
     Dirichlet and Neumann boundary conditions. They would read
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
     @f}
     with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
     @f{eqnarray*}
-      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
       (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -272,7 +257,7 @@ possibilities for imposing boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
       \\
-      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} -
+      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0.
@@ -293,7 +278,7 @@ possibilities for imposing boundary conditions:
       \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
-      \left(\textbf{n}\cdot [p \textbf{1} -
+      \left(\textbf{n}\cdot [p \textbf{1} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0,
@@ -314,7 +299,7 @@ boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
 $\textbf u\in \textbf V_g = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=\textbf
 g_D\}, p\in Q=L^2(\Omega)$ so that
 @f{eqnarray*}
-  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -346,7 +331,7 @@ pressures.
 This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
 that
 @f{eqnarray*}
-  (\varepsilon(\mathrm v_h),\varepsilon(\textbf u_h))_{\Omega}
+  (\varepsilon(\mathrm v_h), 2\; \varepsilon(\textbf u_h))_{\Omega}
   - (\textrm{div}\; \textbf{v}_h, p_h)_{\Omega}
   -
   (q_h,\textrm{div}\; \textbf{u}_h)_{\Omega}
@@ -584,7 +569,7 @@ from below. Without trying to be entirely realistic, we model this situation
 by solving the following set of equations and boundary conditions on the
 domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
 @f{eqnarray*}
-  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& 0,
+  -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& 0,
   \\
   -\textrm{div}\; \textbf{u} &=& 0,
   \\
@@ -603,7 +588,7 @@ domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
   \end{array}\right)
   \qquad\qquad \textrm{at}\ z=0, x=0,
 @f}
-and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} -
+and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} - 2
 \varepsilon(\textbf{u})] = 0$ everywhere else. In other words, at the
 left part of the top surface we prescribe that the fluid moves with the
 continental plate to the left at speed $-1$, that it moves to the right on the
@@ -747,7 +732,8 @@ element at a time; however, its data structures are poorly adapted for the
 large numbers of nonzero entries per row created by our discretization in
 3d, leading to a quadratic behavior. Replacing the internal algorithms in
 deal.II to set many elements at a time, and using a
-BlockCompressedSimpleSparsityPattern as a better adapted data structure,
+BlockCompressedSimpleSparsityPattern (which has, as of early 2015, been in turn
+replaced by BlockDynamicSparsityPattern) as a better adapted data structure,
 removed this bottleneck at the price of a slightly higher memory
 consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is

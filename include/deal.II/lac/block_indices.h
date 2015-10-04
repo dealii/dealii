@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_indices_h
-#define __deal2__block_indices_h
+#ifndef dealii__block_indices_h
+#define dealii__block_indices_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 #include <cstddef>
 #include <vector>
 
@@ -65,9 +66,10 @@ public:
 
   /**
    * Constructor. Initialize the number of entries in each block @p i as
-   * <tt>n[i]</tt>. The number of blocks will be the size of the vector
+   * <tt>block_sizes[i]</tt>. The number of blocks will be the size of @p
+   * block_sizes.
    */
-  BlockIndices (const std::vector<size_type> &n);
+  BlockIndices (const std::vector<size_type> &block_sizes);
 
   /**
    * Specialized constructor for a structure with blocks of equal size.
@@ -83,10 +85,11 @@ public:
 
   /**
    * Reinitialize the number of indices within each block from the given
-   * argument. The number of blocks will be adjusted to the size of @p n and
-   * the size of block @p i is set to <tt>n[i]</tt>.
+   * argument. The number of blocks will be adjusted to the size of
+   * <tt>block_sizes</tt> and the size of block @p i is set to
+   * <tt>block_sizes[i]</tt>.
    */
-  void reinit (const std::vector<size_type> &n);
+  void reinit (const std::vector<size_type> &block_sizes);
 
   /**
    * Add another block of given size to the end of the block structure.
@@ -113,6 +116,13 @@ public:
    * The size of the @p ith block.
    */
   size_type block_size (const unsigned int i) const;
+
+  /**
+   * String representation of the block sizes. The output is of the
+   * form `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s`
+   * is total_size() and `b1` etc. are the values of block_size().
+   */
+  std::string to_string () const;
 
   //@}
 
@@ -208,86 +218,6 @@ operator << (LogStream &s, const BlockIndices &bi)
 }
 
 
-template <typename MatrixType> class BlockMatrixBase;
-template <typename SparsityType> class BlockSparsityPatternBase;
-template <typename number>     class BlockSparseMatrixEZ;
-
-/**
- * A class that can be used to determine whether a given type is a block
- * matrix type or not. For example,
- * @code
- *   IsBlockMatrix<SparseMatrix<double> >::value
- * @endcode
- * has the value false, whereas
- * @code
- *   IsBlockMatrix<BlockSparseMatrix<double> >::value
- * @endcode
- * is true. This is sometimes useful in template contexts where we may want to
- * do things differently depending on whether a template type denotes a
- * regular or a block matrix type.
- *
- * @see
- * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, 2009
- */
-template <typename MatrixType>
-struct IsBlockMatrix
-{
-private:
-  struct yes_type
-  {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
-
-  /**
-   * Overload returning true if the class is derived from BlockMatrixBase,
-   * which is what block matrices do (with the exception of
-   * BlockSparseMatrixEZ).
-   */
-  template <typename T>
-  static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
-
-  /**
-   * Overload returning true if the class is derived from
-   * BlockSparsityPatternBase, which is what block sparsity patterns do.
-   */
-  template <typename T>
-  static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
-
-  /**
-   * Overload for BlockSparseMatrixEZ, which is the only block matrix not
-   * derived from BlockMatrixBase at the time of writing this class.
-   */
-  template <typename T>
-  static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
-
-  /**
-   * Catch all for all other potential matrix types that are not block
-   * matrices.
-   */
-  static no_type check_for_block_matrix (...);
-
-public:
-  /**
-   * A statically computable value that indicates whether the template
-   * argument to this class is a block matrix (in fact whether the type is
-   * derived from BlockMatrixBase<T>).
-   */
-  static const bool value = (sizeof(check_for_block_matrix
-                                    ((MatrixType *)0))
-                             ==
-                             sizeof(yes_type));
-};
-
-
-// instantiation of the static member
-template <typename MatrixType>
-const bool IsBlockMatrix<MatrixType>::value;
-
 
 /* ---------------------- template and inline functions ------------------- */
 
@@ -306,16 +236,16 @@ BlockIndices::reinit (const unsigned int nb,
 
 inline
 void
-BlockIndices::reinit (const std::vector<size_type> &n)
+BlockIndices::reinit (const std::vector<size_type> &block_sizes)
 {
-  if (start_indices.size() != n.size()+1)
+  if (start_indices.size() != block_sizes.size()+1)
     {
-      n_blocks = static_cast<unsigned int>(n.size());
+      n_blocks = static_cast<unsigned int>(block_sizes.size());
       start_indices.resize(n_blocks+1);
     }
   start_indices[0] = 0;
   for (size_type i=1; i<=n_blocks; ++i)
-    start_indices[i] = start_indices[i-1] + n[i-1];
+    start_indices[i] = start_indices[i-1] + block_sizes[i-1];
 }
 
 
@@ -343,12 +273,12 @@ BlockIndices::BlockIndices (
 
 
 inline
-BlockIndices::BlockIndices (const std::vector<size_type> &n)
+BlockIndices::BlockIndices (const std::vector<size_type> &block_sizes)
   :
-  n_blocks(static_cast<unsigned int>(n.size())),
-  start_indices(n.size()+1)
+  n_blocks(static_cast<unsigned int>(block_sizes.size())),
+  start_indices(block_sizes.size()+1)
 {
-  reinit (n);
+  reinit (block_sizes);
 }
 
 
@@ -373,8 +303,8 @@ BlockIndices::global_to_local (const size_type i) const
   while (i < start_indices[block])
     --block;
 
-  return std::pair<size_type,size_type>(block,
-                                        i-start_indices[block]);
+  return std::pair<unsigned int,size_type>(block,
+                                           i-start_indices[block]);
 }
 
 
@@ -421,6 +351,23 @@ BlockIndices::block_size (const unsigned int block) const
 
 
 inline
+std::string
+BlockIndices::to_string () const
+{
+  std::string result = "[" + Utilities::int_to_string(n_blocks) + "->";
+  for (unsigned int i=0; i<n_blocks; ++i)
+    {
+      if (i>0)
+        result += ',';
+      result += Utilities::int_to_string(block_size(i));
+    }
+  result += "|" + Utilities::int_to_string(total_size()) + ']';
+  return result;
+}
+
+
+
+inline
 BlockIndices::size_type
 BlockIndices::block_start (const unsigned int block) const
 {
@@ -461,11 +408,8 @@ inline
 void
 BlockIndices::swap (BlockIndices &b)
 {
-  Assert (n_blocks == b.n_blocks,
-          ExcDimensionMismatch(n_blocks, b.n_blocks));
-
-  for (size_type i=0; i<=n_blocks; ++i)
-    std::swap (start_indices[i], b.start_indices[i]);
+  std::swap(n_blocks, b.n_blocks);
+  std::swap(start_indices, b.start_indices);
 }
 
 

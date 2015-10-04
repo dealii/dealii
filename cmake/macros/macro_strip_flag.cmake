@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Remove all occurences of "${flag}" in the string variable.
+# Remove all occurrences of "${flag}" in the string variable.
 #
 # Usage:
 #     STRIP_FLAG(variable flag)

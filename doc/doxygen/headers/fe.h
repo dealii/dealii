@@ -69,7 +69,7 @@
  * @defgroup feaccess Finite element access/FEValues classes
  *
  * The classes in this module are used when one wants to assemble matrices or
- * vectors. They link finite elements, quadrature objects, and mappins: the
+ * vectors. They link finite elements, quadrature objects, and mappings: the
  * finite element classes describe a finite element space on a unit cell
  * (i.e. the unit line segment, square, or cube <tt>[0,1]^d</tt>), the
  * quadrature classes describe where quadrature points are located and what
@@ -100,7 +100,7 @@
  *
  * The actual workings of the FEValues class and friends is
  * complicated because it has to be general yet efficient. The page on
- * @ref UpdateFlagsEssay attempts to give an overview of how this
+ * @ref UpdateFlags attempts to give an overview of how this
  * works.
  *
  * @ingroup feall

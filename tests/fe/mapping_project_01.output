@@ -1,0 +1,23 @@
+
+DEAL::Check project for 2D cube from (-1,-1), to (1,1).
+DEAL::The test point has real coordinates: 0.500 -0.500, and unit coordinates: 0.750 0.250
+DEAL::For face: 0, the test point projects to: 0.250
+DEAL::For face: 1, the test point projects to: 0.250
+DEAL::For face: 2, the test point projects to: 0.750
+DEAL::For face: 3, the test point projects to: 0.750
+DEAL::Check project for 3D cube from (-1,-1,-1) to (1,1,1).
+DEAL::The test point has real coordinates: 0.500 -0.500 0.00, and unit coordinates: 0.750 0.250 0.500
+DEAL::For face: 0, the test point projects to: 0.250 0.500
+DEAL::For face: 1, the test point projects to: 0.250 0.500
+DEAL::For face: 2, the test point projects to: 0.750 0.500
+DEAL::For face: 3, the test point projects to: 0.750 0.500
+DEAL::For face: 4, the test point projects to: 0.750 0.250
+DEAL::For face: 5, the test point projects to: 0.750 0.250
+DEAL::Check project for 3D parallelepiped with vectors (2, 0, 0), (0, 2, 0), and (0, 1, 2).
+DEAL::The test point has real coordinates: 1.00 1.00 1.00, and unit coordinates: 0.500 0.250 0.500
+DEAL::For face: 0, the test point projects to: 0.250 0.500
+DEAL::For face: 1, the test point projects to: 0.250 0.500
+DEAL::For face: 2, the test point projects to: 0.500 0.500
+DEAL::For face: 3, the test point projects to: 0.500 0.500
+DEAL::For face: 4, the test point projects to: 0.500 0.250
+DEAL::For face: 5, the test point projects to: 0.500 0.250

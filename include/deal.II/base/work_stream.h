@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__work_stream_h
-#define __deal2__work_stream_h
+#ifndef dealii__work_stream_h
+#define dealii__work_stream_h
 
 
 #include <deal.II/base/config.h>
@@ -123,7 +123,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Once an item is processed by the copier, it is deleted and the ScratchData
  * and CopyData objects that were used in its computation are considered
- * unused and may be re-used for the next invokation of the worker function,
+ * unused and may be re-used for the next invocation of the worker function,
  * on this or another thread.
  *
  * The functions in this namespace only really work in parallel when
@@ -307,7 +307,7 @@ namespace WorkStream
         /**
          * Constructor. Take an iterator range, the size of a buffer that can
          * hold items, and the sample additional data object that will be
-         * passed to each worker and copier function invokation.
+         * passed to each worker and copier function invocation.
          */
         IteratorRangeToItemStream (const Iterator       &begin,
                                    const Iterator       &end,
@@ -677,7 +677,7 @@ namespace WorkStream
                 }
             }
 
-          // mark current item as useable again
+          // mark current item as usable again
           current_item->currently_in_use = false;
 
 
@@ -1264,6 +1264,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 
 //----------------------------   work_stream.h     ---------------------------
-// end of #ifndef __deal2__work_stream_h
+// end of #ifndef dealii__work_stream_h
 #endif
 //----------------------------   work_stream.h     ---------------------------

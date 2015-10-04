@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ void test ()
           {
             deallog << "Reference cell: face " << f << ": " << alternating_forms[v]
                     << std::endl;
-            Assert (alternating_forms[v].norm() == 1, ExcInternalError());
+            AssertThrow (alternating_forms[v].norm() == 1, ExcInternalError());
           }
       }
   }
@@ -84,9 +84,9 @@ void test ()
             // other faces are
             // squashed
             if (f < 2)
-              Assert (alternating_forms[v].norm() == 1, ExcInternalError())
+              AssertThrow (alternating_forms[v].norm() == 1, ExcInternalError())
               else
-                Assert (alternating_forms[v].norm() == 0.1, ExcInternalError());
+                AssertThrow (alternating_forms[v].norm() == 0.1, ExcInternalError());
           }
       }
   }
@@ -135,9 +135,9 @@ void test ()
             // vector would have
             // rotated along)
             if (f<2)
-              Assert (alternating_forms[v].norm() == 1, ExcInternalError())
+              AssertThrow (alternating_forms[v].norm() == 1, ExcInternalError())
               else
-                Assert (alternating_forms[v].norm() == 0.1, ExcInternalError());
+                AssertThrow (alternating_forms[v].norm() == 0.1, ExcInternalError());
           }
       }
   }

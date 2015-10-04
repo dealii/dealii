@@ -14,23 +14,29 @@
 ##
 ## ---------------------------------------------------------------------
 
+# This script downloads images referenced in the tutorial steps and patches
+# the URLs to point to the local files. To be run in the doc/doxygen/deal.II
+# directory of an installed deal.II documentation.
+
 if [ ! -f index.html ]
 then
   echo "Please run this script in the doc output directory (install/doc)"
   exit 1
 fi
 
-mkdir images >/dev/null
+mkdir -p images
 
 echo "Downloading images (press ctrl-c to cancel) ..."
 cd images
 {
 trap "echo \"(skipping)\"" SIGINT
-wget -q -nd -A png,gif -m -l 1 -np  http://www.dealii.org/images/steps/developer/
+wget -q -nd -A png,gif -m -l 1 -np http://www.dealii.org/images/steps/developer/
 }
+rm robots.txt*
 cd ..
 
 echo "Patching html files ..."
 sed -i 's#"http://www.dealii.org/images/steps/developer/\(step-.*\)"#"images/\1"#g' step_*.html
+sed -i 's#"https://www.dealii.org/images/steps/developer/\(step-.*\)"#"images/\1"#g' step_*.html
 
 echo "all done!"

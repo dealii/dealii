@@ -36,7 +36,7 @@ void test (TrilinosWrappers::Vector &v)
 
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert (v(i) == i+1., ExcInternalError());
+    AssertThrow (v(i) == i+1., ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -50,7 +50,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

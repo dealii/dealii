@@ -87,7 +87,8 @@
 # Furthermore, the following variables controlling the testsuite can be set
 # and will be automatically handed down to cmake:
 #
-#   TEST_DIFF
+#   NUMDIFF_DIR
+#   DIFF_DIR
 #   TEST_TIME_LIMIT
 #   TEST_PICKUP_REGEX
 #
@@ -267,7 +268,7 @@ ENDIF()
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
   IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
-      _var MATCHES "^(DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)" OR
+      _var MATCHES "^(DOCUMENTATION|EXAMPLES|PARAMETER_GUI)" OR
       _var MATCHES "^(ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|METIS|MPI)_" OR
       _var MATCHES "^(NETCDF|P4EST|PETSC|SLEPC|THREADS|TBB|TRILINOS)_" OR
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK|MUPARSER)_" OR

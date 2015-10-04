@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -44,9 +44,12 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
 
+// IndexSet is used to set the size of PETScWrappers::Vector:
+#include <deal.II/base/index_set.h>
+
 // PETSc appears here because SLEPc depends on this library:
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 // And then we need to actually import the interfaces for solvers that SLEPc
 // provides:
@@ -89,9 +92,9 @@ namespace Step36
     // the right hand side. We also need not just one solution function, but a
     // whole set of these for the eigenfunctions we want to compute, along
     // with the corresponding eigenvalues:
-    PETScWrappers::SparseMatrix        stiffness_matrix, mass_matrix;
-    std::vector<PETScWrappers::Vector> eigenfunctions;
-    std::vector<double>                eigenvalues;
+    PETScWrappers::SparseMatrix             stiffness_matrix, mass_matrix;
+    std::vector<PETScWrappers::MPI::Vector> eigenfunctions;
+    std::vector<double>                     eigenvalues;
 
     // And then we need an object that will store several run-time parameters
     // that we will specify in an input file:
@@ -151,13 +154,13 @@ namespace Step36
   // sure that we do not need to re-allocate memory and free the one used
   // previously. One way to do that would be to use code like this:
   // @code
-  //   CompressedSimpleSparsityPattern
-  //      csp (dof_handler.n_dofs(),
+  //   DynamicSparsityPattern
+  //      dsp (dof_handler.n_dofs(),
   //           dof_handler.n_dofs());
-  //   DoFTools::make_sparsity_pattern (dof_handler, csp);
-  //   csp.compress ();
-  //   stiffness_matrix.reinit (csp);
-  //   mass_matrix.reinit (csp);
+  //   DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  //   dsp.compress ();
+  //   stiffness_matrix.reinit (dsp);
+  //   mass_matrix.reinit (dsp);
   // @endcode
   // instead of the two <code>reinit()</code> calls for the
   // stiffness and mass matrices below.
@@ -194,11 +197,19 @@ namespace Step36
     // The next step is to take care of the eigenspectrum. In this case, the
     // outputs are eigenvalues and eigenfunctions, so we set the size of the
     // list of eigenfunctions and eigenvalues to be as large as we asked for
-    // in the input file:
+    // in the input file. When using a PETScWrappers::MPI::Vector, the Vector
+    // is initialized using an IndexSet. IndexSet is used not only to resize the
+    // PETScWrappers::MPI::Vector but it also associates an index in the
+    // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a
+    // a more detailed explanation). The function complete_index_set() creates
+    // an IndexSet where every valid index is part of the set. Note that this
+    // program can only be run sequentially and will throw an exception if used
+    // in parallel.
+    IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs ();
     eigenfunctions
     .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-      eigenfunctions[i].reinit (dof_handler.n_dofs ());
+      eigenfunctions[i].reinit (eigenfunction_index_set, MPI_COMM_WORLD);
 
     eigenvalues.resize (eigenfunctions.size ());
   }
@@ -466,6 +477,12 @@ int main (int argc, char **argv)
       using namespace Step36;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use ./step-36"));
+
       {
         deallog.depth_console (0);
 

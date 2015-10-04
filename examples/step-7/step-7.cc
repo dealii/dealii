@@ -28,6 +28,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -530,12 +531,10 @@ namespace Step7
                                              hanging_node_constraints);
     hanging_node_constraints.close ();
 
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    hanging_node_constraints.condense (sparsity_pattern);
-    sparsity_pattern.compress();
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    hanging_node_constraints.condense (dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
 
@@ -669,7 +668,7 @@ namespace Step7
         for (unsigned int face_number=0; face_number<GeometryInfo<dim>::faces_per_cell; ++face_number)
           if (cell->face(face_number)->at_boundary()
               &&
-              (cell->face(face_number)->boundary_indicator() == 1))
+              (cell->face(face_number)->boundary_id() == 1))
             {
               // If we came into here, then we have found an external face
               // belonging to Gamma2. Next, we have to compute the values of
@@ -992,7 +991,7 @@ namespace Step7
                 if ((std::fabs(cell->face(face_number)->center()(0) - (-1)) < 1e-12)
                     ||
                     (std::fabs(cell->face(face_number)->center()(1) - (-1)) < 1e-12))
-                  cell->face(face_number)->set_boundary_indicator (1);
+                  cell->face(face_number)->set_boundary_id (1);
           }
         else
           refine_grid ();

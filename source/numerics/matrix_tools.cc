@@ -71,7 +71,7 @@ namespace MatrixCreator
      * just like a
      * <tt>std::pair<iterator,iterator></tt>
      * but is templatized on the
-     * dof handler that shouls be used.
+     * dof handler that should be used.
      */
     template <typename DH>
     struct IteratorRange
@@ -201,11 +201,12 @@ namespace MatrixCreator
       };
 
 
+      template <typename number>
       struct CopyData
       {
         std::vector<types::global_dof_index> dof_indices;
-        FullMatrix<double>        cell_matrix;
-        dealii::Vector<double>    cell_rhs;
+        FullMatrix<number>        cell_matrix;
+        dealii::Vector<number>    cell_rhs;
         const ConstraintMatrix   *constraints;
       };
     }
@@ -213,10 +214,11 @@ namespace MatrixCreator
 
     template <int dim,
               int spacedim,
-              typename CellIterator>
+              typename CellIterator,
+              typename number>
     void mass_assembler (const CellIterator &cell,
                          MatrixCreator::internal::AssemblerData::Scratch<dim,spacedim> &data,
-                         MatrixCreator::internal::AssemblerData::CopyData              &copy_data)
+                         MatrixCreator::internal::AssemblerData::CopyData<number>      &copy_data)
     {
       data.x_fe_values.reinit (cell);
       const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();
@@ -397,7 +399,7 @@ namespace MatrixCreator
               typename CellIterator>
     void laplace_assembler (const CellIterator &cell,
                             MatrixCreator::internal::AssemblerData::Scratch<dim,spacedim> &data,
-                            MatrixCreator::internal::AssemblerData::CopyData              &copy_data)
+                            MatrixCreator::internal::AssemblerData::CopyData<double>      &copy_data)
     {
       data.x_fe_values.reinit (cell);
       const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();
@@ -573,13 +575,15 @@ namespace MatrixCreator
 
 
 
-    template <typename MatrixType,
+    template <typename number,
+              typename MatrixType,
               typename VectorType>
-    void copy_local_to_global (const AssemblerData::CopyData &data,
+    void copy_local_to_global (const AssemblerData::CopyData<number> &data,
                                MatrixType *matrix,
                                VectorType *right_hand_side)
     {
       const unsigned int dofs_per_cell = data.dof_indices.size();
+      (void)dofs_per_cell;
 
       Assert (data.cell_matrix.m() == dofs_per_cell,
               ExcInternalError());
@@ -665,7 +669,7 @@ namespace MatrixCreator
                     coefficient, /*rhs_function=*/0,
                     q_collection, mapping_collection);
 
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -674,10 +678,10 @@ namespace MatrixCreator
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                      std_cxx11::_1, &matrix, (Vector<double> *)0),
+                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                                      std_cxx11::_1, &matrix, (Vector<number> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -703,7 +707,7 @@ namespace MatrixCreator
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
@@ -721,7 +725,7 @@ namespace MatrixCreator
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,
                     q_collection, mapping_collection);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -730,9 +734,9 @@ namespace MatrixCreator
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std_cxx11::bind(&MatrixCreator::internal::
-                                     copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+                                     copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
                                      std_cxx11::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
@@ -745,7 +749,7 @@ namespace MatrixCreator
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
@@ -775,7 +779,7 @@ namespace MatrixCreator
                     (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
                     coefficient, /*rhs_function=*/0,
                     q, mapping);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -784,10 +788,10 @@ namespace MatrixCreator
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                      std_cxx11::_1, &matrix, (Vector<double> *)0),
+                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                                      std_cxx11::_1, &matrix, (Vector<number> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -813,7 +817,7 @@ namespace MatrixCreator
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
@@ -828,7 +832,7 @@ namespace MatrixCreator
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,
                     q, mapping);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -837,9 +841,9 @@ namespace MatrixCreator
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+                     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
                                       std_cxx11::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
@@ -852,7 +856,7 @@ namespace MatrixCreator
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
@@ -867,7 +871,7 @@ namespace MatrixCreator
     template <int dim, int spacedim>
     void
     create_boundary_mass_matrix_1 (typename DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
-                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,
                                    spacedim> > &copy_data,
                                    Mapping<dim, spacedim> const &mapping,
@@ -925,7 +929,7 @@ namespace MatrixCreator
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         // check if this face is on that part of
         // the boundary we are interested in
-        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+        if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
             copy_data.cell_matrix.push_back(FullMatrix<double> (copy_data.dofs_per_cell,
@@ -936,7 +940,7 @@ namespace MatrixCreator
             if (fe_is_system)
               // FE has several components
               {
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
 
@@ -982,8 +986,8 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
                       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                        normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
-                                                         * fe_values.normal_vector(point)(bcomp);
+                        normal_adjustment[point][comp] = fe_values.normal_vector(point)[bcomp]
+                                                         * fe_values.normal_vector(point)[bcomp];
                   }
 
                 for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -1029,7 +1033,7 @@ namespace MatrixCreator
             else
               // FE is a scalar one
               {
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
                 if (coefficient != 0)
@@ -1106,7 +1110,7 @@ namespace MatrixCreator
         {
           // check if this face is on that part of
           // the boundary we are interested in
-          if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+          if (boundary_functions.find(copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
               for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
@@ -1135,17 +1139,16 @@ namespace MatrixCreator
 
     template <>
     void
-    create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &cell,
-                                        MatrixCreator::internal::AssemblerBoundary::Scratch const
-                                        &scratch,
+    create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &/*cell*/,
+                                        MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                         MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1,
-                                        3> > &copy_data,
-                                        Mapping<1,3> const &mapping,
-                                        FiniteElement<1,3> const &fe,
-                                        Quadrature<0> const &q,
-                                        FunctionMap<3>::type const &boundary_functions,
-                                        Function<3> const *const coefficient,
-                                        std::vector<unsigned int> const &component_mapping)
+                                        3> > &/*copy_data*/,
+                                        Mapping<1,3> const &,
+                                        FiniteElement<1,3> const &,
+                                        Quadrature<0> const &,
+                                        FunctionMap<3>::type const &/*boundary_functions*/,
+                                        Function<3> const *const /*coefficient*/,
+                                        std::vector<unsigned int> const &/*component_mapping*/)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1231,7 +1234,7 @@ namespace MatrixCreator
     void
     create_hp_boundary_mass_matrix_1 (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator const
                                       &cell,
-                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                       MatrixCreator::internal::AssemblerBoundary
                                       ::CopyData<hp::DoFHandler<dim,spacedim> > &copy_data,
                                       hp::MappingCollection<dim,spacedim> const &mapping,
@@ -1283,7 +1286,7 @@ namespace MatrixCreator
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         // check if this face is on that part of
         // the boundary we are interested in
-        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+        if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
             x_fe_values.reinit (cell, face);
@@ -1299,7 +1302,7 @@ namespace MatrixCreator
               {
                 rhs_values_system.resize (fe_values.n_quadrature_points,
                                           Vector<double>(n_function_components));
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
 
@@ -1384,7 +1387,7 @@ namespace MatrixCreator
               // FE is a scalar one
               {
                 rhs_values_scalar.resize (fe_values.n_quadrature_points);
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
                 if (coefficient != 0)
@@ -1482,7 +1485,7 @@ namespace MatrixCreator
         {
           // check if this face is on that part of
           // the boundary we are interested in
-          if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+          if (boundary_functions.find(copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
 #ifdef DEBUG
@@ -1678,7 +1681,7 @@ namespace MatrixCreator
                     (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
                     coefficient, /*rhs_function=*/0,
                     q_collection, mapping_collection);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -1689,7 +1692,7 @@ namespace MatrixCreator
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                       std_cxx11::_1,
                                       &matrix,
                                       (Vector<double> *)NULL),
@@ -1704,7 +1707,7 @@ namespace MatrixCreator
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
   }
@@ -1735,7 +1738,7 @@ namespace MatrixCreator
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,
                     q_collection, mapping_collection);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -1746,7 +1749,7 @@ namespace MatrixCreator
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                       std_cxx11::_1,
                                       &matrix,
                                       &rhs_vector),
@@ -1763,7 +1766,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -1790,7 +1793,7 @@ namespace MatrixCreator
                     (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
                     coefficient, /*rhs_function=*/0,
                     q, mapping);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -1801,7 +1804,7 @@ namespace MatrixCreator
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                       std_cxx11::_1,
                                       &matrix,
                                       (Vector<double> *)0),
@@ -1816,7 +1819,7 @@ namespace MatrixCreator
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
@@ -1844,7 +1847,7 @@ namespace MatrixCreator
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,
                     q, mapping);
-    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
@@ -1855,7 +1858,7 @@ namespace MatrixCreator
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
                      std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                       std_cxx11::_1,
                                       &matrix,
                                       &rhs_vector),
@@ -1872,7 +1875,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -2131,6 +2134,7 @@ namespace MatrixTools
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());
+        (void)n_dofs;
 
         // get global index and index
         // in the block in which this
@@ -2324,6 +2328,7 @@ namespace MatrixTools
                              PETScVector      &right_hand_side,
                              const bool        eliminate_columns)
       {
+        (void)eliminate_columns;
         Assert (eliminate_columns == false, ExcNotImplemented());
 
         Assert (matrix.n() == right_hand_side.size(),
@@ -2349,9 +2354,9 @@ namespace MatrixTools
             // find such an entry, take one
             PetscScalar average_nonzero_diagonal_entry = 1;
             for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
-              if (matrix.diag_element(i) != 0)
+              if (matrix.diag_element(i) != PetscScalar ())
                 {
-                  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+                  average_nonzero_diagonal_entry = std::abs(matrix.diag_element(i));
                   break;
                 }
 
@@ -2538,6 +2543,7 @@ namespace MatrixTools
                              const bool           eliminate_columns)
       {
         Assert (eliminate_columns == false, ExcNotImplemented());
+        (void)eliminate_columns;
 
         Assert (matrix.n() == right_hand_side.size(),
                 ExcDimensionMismatch(matrix.n(), right_hand_side.size()));

@@ -50,7 +50,7 @@
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition_selector.h>
 #include <deal.II/lac/solver_cg.h>
@@ -1543,7 +1543,7 @@ namespace Step44
           if (cell->face(face)->center()[0] < 0.5 * parameters.scale
               &&
               cell->face(face)->center()[1] < 0.5 * parameters.scale)
-            cell->face(face)->set_boundary_indicator(6);
+            cell->face(face)->set_boundary_id(6);
   }
 
 
@@ -1582,20 +1582,20 @@ namespace Step44
       const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
       const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
 
-      BlockCompressedSimpleSparsityPattern csp(n_blocks, n_blocks);
+      BlockDynamicSparsityPattern dsp(n_blocks, n_blocks);
 
-      csp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
-      csp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
-      csp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
+      dsp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
+      dsp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
+      dsp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
 
-      csp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
-      csp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
-      csp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
+      dsp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
+      dsp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
+      dsp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
 
-      csp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
-      csp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
-      csp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
-      csp.collect_sizes();
+      dsp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
+      dsp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
+      dsp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
+      dsp.collect_sizes();
 
       // The global system matrix initially has the following structure
       // @f{align*}
@@ -1630,10 +1630,10 @@ namespace Step44
             coupling[ii][jj] = DoFTools::always;
       DoFTools::make_sparsity_pattern(dof_handler_ref,
                                       coupling,
-                                      csp,
+                                      dsp,
                                       constraints,
                                       false);
-      sparsity_pattern.copy_from(csp);
+      sparsity_pattern.copy_from(dsp);
     }
 
     tangent_matrix.reinit(sparsity_pattern);
@@ -2372,7 +2372,7 @@ namespace Step44
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
          ++face)
       if (cell->face(face)->at_boundary() == true
-          && cell->face(face)->boundary_indicator() == 6)
+          && cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
 
@@ -2663,7 +2663,8 @@ namespace Step44
       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
       //      $
-      A.block(J_dof).equ(1.0, system_rhs.block(J_dof), -1.0, B.block(J_dof));
+      A.block(J_dof) = system_rhs.block(J_dof);
+      A.block(J_dof) -= B.block(J_dof);
       //      $
       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
       //      =
@@ -3150,7 +3151,7 @@ namespace Step44
     Vector<double> soln(solution_n.size());
     for (unsigned int i = 0; i < soln.size(); ++i)
       soln(i) = solution_n(i);
-    MappingQEulerian<dim> q_mapping(degree, soln, dof_handler_ref);
+    MappingQEulerian<dim> q_mapping(degree, dof_handler_ref, soln);
     data_out.build_patches(q_mapping, degree);
 
     std::ostringstream filename;

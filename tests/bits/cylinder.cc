@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,7 @@ int main ()
        face!=tria.end_face(); ++face)
     {
       deallog << face << "   "
-              << (int)face->boundary_indicator() << "  "
+              << (int)face->boundary_id() << "  "
               << '<' << face->vertex(0) << '>' << std::endl
               << "           <" << face->vertex(1) << '>' << std::endl
               << "           <" << face->vertex(2) << '>' << std::endl

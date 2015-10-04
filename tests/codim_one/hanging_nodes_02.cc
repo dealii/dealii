@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ int main ()
     Triangulation<spacedim>::active_cell_iterator
     cell = volume_mesh.begin_active();
 
-    cell->face(0)->set_all_boundary_indicators (1);
+    cell->face(0)->set_all_boundary_ids (1);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
     GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh, boundary_ids);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,8 @@
 struct X
 {
   X ()
-  :
-  i(1)
+    :
+    i(1)
   {};
 
   int i;
@@ -43,16 +43,16 @@ void execute (Threads::Mutex &m)
   // check correct default initialization
   bool exists;
   int i = tls_data.get(exists).i;
-  Assert (i == 1, ExcInternalError());
-  Assert (exists == false, ExcInternalError());
+  AssertThrow (i == 1, ExcInternalError());
+  AssertThrow (exists == false, ExcInternalError());
 
   // set value
   tls_data.get(exists).i = 2;
 
   // try again. should have existed this time around
   i = tls_data.get(exists).i;
-  Assert (i == 2, ExcInternalError());
-  Assert (exists == true, ExcInternalError());
+  AssertThrow (i == 2, ExcInternalError());
+  AssertThrow (exists == true, ExcInternalError());
 
   // wait for the barrier to clear
   m.acquire ();
@@ -61,8 +61,8 @@ void execute (Threads::Mutex &m)
   // at this point, the tls object should have been cleared and should
   // be back at its original value
   i = tls_data.get(exists).i;
-  Assert (i == 1, ExcInternalError());
-  Assert (exists == false, ExcInternalError());
+  AssertThrow (i == 1, ExcInternalError());
+  AssertThrow (exists == false, ExcInternalError());
 }
 
 

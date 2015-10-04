@@ -57,16 +57,16 @@ void test ()
   vb.compress(VectorOperation::insert);
   v=vb;
 
-  {  
+  {
     typename LA::MPI::Vector x;
     typename LA::MPI::Vector y;
     x=y;
   }
-  {  
+  {
     typename LA::MPI::Vector x;
     x=v;
   }
-  {  
+  {
     typename LA::MPI::Vector x;
     x=vb;
   }
@@ -80,7 +80,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   {
     deallog.push("PETSc");

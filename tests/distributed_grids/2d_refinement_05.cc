@@ -87,8 +87,8 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
       deallog << "Checksum: "
-	      << tr.get_checksum ()
-	      << std::endl;
+              << tr.get_checksum ()
+              << std::endl;
 
       assert_tria_equal(tr, tr2);
 
@@ -98,7 +98,7 @@ void test(std::ostream & /*out*/)
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);

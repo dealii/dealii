@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,11 @@
 
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_block_vector.h>
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
 #  include <Epetra_Vector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 
@@ -122,6 +125,19 @@ namespace TrilinosWrappers
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+    Vector::Vector (Vector &&v)
+    {
+      // initialize a minimal, valid object and swap
+      last_action = Zero;
+      vector.reset(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
+
+      swap(v);
+    }
+#endif
+
+
+
     Vector::Vector (const Epetra_Map &input_map,
                     const VectorBase &v)
       :
@@ -192,6 +208,7 @@ namespace TrilinosWrappers
       else if (fast == false)
         {
           const int ierr = vector->PutScalar(0.);
+          (void)ierr;
           Assert (ierr == 0, ExcTrilinosError(ierr));
         }
 
@@ -242,6 +259,7 @@ namespace TrilinosWrappers
               // distribution
               int ierr;
               ierr = vector->GlobalAssemble (last_action);
+              (void)ierr;
               Assert (ierr == 0, ExcTrilinosError(ierr));
 
               ierr = vector->PutScalar(0.0);
@@ -416,6 +434,16 @@ namespace TrilinosWrappers
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+    Vector &Vector::operator= (Vector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
+
+
+
     Vector &
     Vector::operator = (const TrilinosWrappers::Vector &v)
     {
@@ -446,10 +474,11 @@ namespace TrilinosWrappers
               ExcMessage ("The input vector has overlapping data, "
                           "which is not allowed."));
 
-      if (vector->Map().SameAs(m.col_partitioner()) == false)
+      if (vector->Map().SameAs(m.trilinos_matrix().ColMap()) == false)
         {
-          Epetra_Map map = m.col_partitioner();
-          vector.reset (new Epetra_FEVector(map));
+          vector.reset (new Epetra_FEVector(
+                          m.trilinos_matrix().ColMap()
+                        ));
         }
 
       Epetra_Import data_exchange (vector->Map(), v.vector->Map());
@@ -545,6 +574,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -571,6 +601,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -604,6 +635,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -627,6 +659,7 @@ namespace TrilinosWrappers
     // the vector, initialize our
     // map with the map in v, and
     // generate the vector.
+    (void)fast;
     if (allow_different_maps == false)
       {
         if (local_range() != v.local_range())
@@ -645,6 +678,7 @@ namespace TrilinosWrappers
                                 " seems to be the same. Check vector setup!"));
 
             ierr = vector->GlobalAssemble(last_action);
+            (void)ierr;
             Assert (ierr == 0, ExcTrilinosError(ierr));
 
             ierr = vector->PutScalar(0.0);
@@ -711,6 +745,7 @@ namespace TrilinosWrappers
 
     const int ierr = vector->Update(1.0, *v.vector, 0.0);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr;
 
     return *this;
   }

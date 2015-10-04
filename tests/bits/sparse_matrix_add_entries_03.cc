@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,11 +62,11 @@ void test ()
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
-          Assert (m(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow (m(i,j) == i*j*.5+.5, ExcInternalError());
         }
       else
         {
-          Assert (m.el(i,j) == 0, ExcInternalError());
+          AssertThrow (m.el(i,j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __LAPACK_TEMPLATES_H
-#define __LAPACK_TEMPLATES_H
+#ifndef dealii__lapack_templates_h
+#define dealii__lapack_templates_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/lapack_support.h>

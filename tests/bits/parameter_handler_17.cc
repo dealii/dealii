@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,12 +29,12 @@ void check ()
 {
   ParameterHandler prm;
   prm.declare_entry ("a", "this that and the other", Patterns::Anything(),
-		     "");
+                     "");
   try
     {
       prm.get_double ("a");
     }
-  catch (const ParameterHandler::ExcConversionError &)
+  catch (...)
     {
       deallog << "get_double() detected the mistake" << std::endl;
     }
@@ -43,7 +43,7 @@ void check ()
     {
       prm.get_integer ("a");
     }
-  catch (const ParameterHandler::ExcConversionError &)
+  catch (...)
     {
       deallog << "get_integer() detected the mistake" << std::endl;
     }
@@ -52,11 +52,11 @@ void check ()
     {
       prm.get_bool ("a");
     }
-  catch (const ParameterHandler::ExcConversionError &)
+  catch (...)
     {
       deallog << "get_bool() detected the mistake" << std::endl;
     }
-  
+
 }
 
 

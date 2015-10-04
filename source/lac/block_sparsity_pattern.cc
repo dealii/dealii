@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,6 +49,7 @@ BlockSparsityPatternBase (const BlockSparsityPatternBase &s)
   :
   Subscriptor ()
 {
+  (void)s;
   Assert(s.rows==0, ExcInvalidConstructorCall());
   Assert(s.columns==0, ExcInvalidConstructorCall());
 
@@ -270,7 +271,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream &out) const
 
 template <>
 void
-BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::print(std::ostream &out) const
+BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
 {
   size_type k=0;
   for (size_type ib=0; ib<n_block_rows(); ++ib)
@@ -281,7 +282,7 @@ BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::print(std::ostream &o
           size_type l=0;
           for (size_type jb=0; jb<n_block_cols(); ++jb)
             {
-              const CompressedSimpleSparsityPattern &b = block(ib,jb);
+              const DynamicSparsityPattern &b = block(ib,jb);
               if (b.row_index_set().size()==0 || b.row_index_set().is_element(i))
                 for (size_type j=0; j<b.n_cols(); ++j)
                   if (b.exists(i,j))
@@ -317,31 +318,6 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(std::ostream &out) 
       k += block(ib,0).n_rows();
     }
 }
-
-
-
-
-// Remark: The following explicit instantiations needed to be moved to
-// this place here to work around a problem with gcc3.3 on Apple MacOSX.
-// The reason is that some of the functions instantiated here are used
-// further down; if they are not explicitly instantiated here, then the
-// compiler will do an implicit instantiation and give it internal linkage
-// (despite the later explicit instantiation that should make sure it
-// gets external linkage). To make sure the functions have external
-// linkage, we need to place the explicit instantiation before the first
-// use.
-//
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
-// +++++++++++++
-
-
-template class BlockSparsityPatternBase<SparsityPattern>;
-template class BlockSparsityPatternBase<CompressedSparsityPattern>;
-template class BlockSparsityPatternBase<CompressedSimpleSparsityPattern>;
-template class BlockSparsityPatternBase<CompressedSetSparsityPattern>;
-#ifdef DEAL_II_WITH_TRILINOS
-template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
-#endif
 
 
 
@@ -421,50 +397,16 @@ BlockSparsityPattern::memory_consumption () const
 
 
 void
-BlockSparsityPattern::copy_from  (const BlockCompressedSparsityPattern &csp)
+BlockSparsityPattern::copy_from  (const BlockDynamicSparsityPattern &dsp)
 {
   // delete old content, set block
   // sizes anew
-  reinit (csp.n_block_rows(), csp.n_block_cols());
+  reinit (dsp.n_block_rows(), dsp.n_block_cols());
 
   // copy over blocks
   for (size_type i=0; i<n_block_rows(); ++i)
     for (size_type j=0; j<n_block_cols(); ++j)
-      block(i,j).copy_from (csp.block(i,j));
-
-  // and finally enquire their new
-  // sizes
-  collect_sizes();
-}
-
-void
-BlockSparsityPattern::copy_from  (const BlockCompressedSimpleSparsityPattern &csp)
-{
-  // delete old content, set block
-  // sizes anew
-  reinit (csp.n_block_rows(), csp.n_block_cols());
-
-  // copy over blocks
-  for (size_type i=0; i<rows; ++i)
-    for (size_type j=0; j<rows; ++j)
-      block(i,j).copy_from (csp.block(i,j));
-
-  // and finally enquire their new
-  // sizes
-  collect_sizes();
-}
-
-void
-BlockSparsityPattern::copy_from  (const BlockCompressedSetSparsityPattern &csp)
-{
-  // delete old content, set block
-  // sizes anew
-  reinit (csp.n_block_rows(), csp.n_block_cols());
-
-  // copy over blocks
-  for (size_type i=0; i<rows; ++i)
-    for (size_type j=0; j<rows; ++j)
-      block(i,j).copy_from (csp.block(i,j));
+      block(i,j).copy_from (dsp.block(i,j));
 
   // and finally enquire their new
   // sizes
@@ -473,153 +415,28 @@ BlockSparsityPattern::copy_from  (const BlockCompressedSetSparsityPattern &csp)
 
 
 
-BlockCompressedSparsityPattern::BlockCompressedSparsityPattern ()
+
+BlockDynamicSparsityPattern::BlockDynamicSparsityPattern ()
 {}
 
 
 
-BlockCompressedSparsityPattern::
-BlockCompressedSparsityPattern (
-  const size_type n_rows,
-  const size_type n_columns)
+BlockDynamicSparsityPattern::
+BlockDynamicSparsityPattern (const size_type n_rows,
+                             const size_type n_columns)
   :
-  BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
-                                                      n_columns)
-{}
-
-
-BlockCompressedSparsityPattern::
-BlockCompressedSparsityPattern (
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices)
-{
-  reinit(row_indices, col_indices);
-}
-
-
-BlockCompressedSparsityPattern::
-BlockCompressedSparsityPattern (
-  const BlockIndices &row_indices,
-  const BlockIndices &col_indices)
-{
-  reinit(row_indices, col_indices);
-}
-
-
-void
-BlockCompressedSparsityPattern::reinit (
-  const std::vector<size_type> &row_block_sizes,
-  const std::vector<size_type> &col_block_sizes)
-{
-  BlockSparsityPatternBase<CompressedSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
-  for (size_type i=0; i<row_block_sizes.size(); ++i)
-    for (size_type j=0; j<col_block_sizes.size(); ++j)
-      this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
-  this->collect_sizes();
-}
-
-
-
-void
-BlockCompressedSparsityPattern::reinit (
-  const BlockIndices &row_indices,
-  const BlockIndices &col_indices)
-{
-  BlockSparsityPatternBase<CompressedSparsityPattern>::reinit(row_indices.size(),
-                                                              col_indices.size());
-  for (size_type i=0; i<row_indices.size(); ++i)
-    for (size_type j=0; j<col_indices.size(); ++j)
-      this->block(i,j).reinit(row_indices.block_size(i),
-                              col_indices.block_size(j));
-  this->collect_sizes();
-}
-
-
-
-BlockCompressedSetSparsityPattern::BlockCompressedSetSparsityPattern ()
+  BlockSparsityPatternBase<DynamicSparsityPattern>(n_rows,
+                                                   n_columns)
 {}
 
 
 
-BlockCompressedSetSparsityPattern::
-BlockCompressedSetSparsityPattern (
-  const size_type n_rows,
-  const size_type n_columns)
+BlockDynamicSparsityPattern::
+BlockDynamicSparsityPattern (const std::vector<size_type> &row_indices,
+                             const std::vector<size_type> &col_indices)
   :
-  BlockSparsityPatternBase<CompressedSetSparsityPattern>(n_rows,
-                                                         n_columns)
-{}
-
-
-BlockCompressedSetSparsityPattern::
-BlockCompressedSetSparsityPattern (
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices)
-{
-  reinit(row_indices, col_indices);
-}
-
-
-BlockCompressedSetSparsityPattern::
-BlockCompressedSetSparsityPattern (
-  const BlockIndices &row_indices,
-  const BlockIndices &col_indices)
-{
-  reinit(row_indices, col_indices);
-}
-
-
-void
-BlockCompressedSetSparsityPattern::reinit (
-  const std::vector<size_type> &row_block_sizes,
-  const std::vector<size_type> &col_block_sizes)
-{
-  BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
-  for (size_type i=0; i<row_block_sizes.size(); ++i)
-    for (size_type j=0; j<col_block_sizes.size(); ++j)
-      this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
-  this->collect_sizes();
-}
-
-
-
-void
-BlockCompressedSetSparsityPattern::reinit (
-  const BlockIndices &row_indices,
-  const BlockIndices &col_indices)
-{
-  BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit(row_indices.size(),
-      col_indices.size());
-  for (size_type i=0; i<row_indices.size(); ++i)
-    for (size_type j=0; j<col_indices.size(); ++j)
-      this->block(i,j).reinit(row_indices.block_size(i),
-                              col_indices.block_size(j));
-  this->collect_sizes();
-}
-
-
-
-BlockCompressedSimpleSparsityPattern::BlockCompressedSimpleSparsityPattern ()
-{}
-
-
-
-BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const size_type n_rows,
-                                      const size_type n_columns)
-  :
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(n_rows,
-                                                            n_columns)
-{}
-
-
-
-BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const std::vector<size_type> &row_indices,
-                                      const std::vector<size_type> &col_indices)
-  :
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(row_indices.size(),
-                                                            col_indices.size())
+  BlockSparsityPatternBase<DynamicSparsityPattern>(row_indices.size(),
+                                                   col_indices.size())
 {
   for (size_type i=0; i<row_indices.size(); ++i)
     for (size_type j=0; j<col_indices.size(); ++j)
@@ -628,11 +445,11 @@ BlockCompressedSimpleSparsityPattern (const std::vector<size_type> &row_indices,
 }
 
 
-BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> &partitioning)
+BlockDynamicSparsityPattern::
+BlockDynamicSparsityPattern (const std::vector<IndexSet> &partitioning)
   :
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(partitioning.size(),
-                                                            partitioning.size())
+  BlockSparsityPatternBase<DynamicSparsityPattern>(partitioning.size(),
+                                                   partitioning.size())
 {
   for (size_type i=0; i<partitioning.size(); ++i)
     for (size_type j=0; j<partitioning.size(); ++j)
@@ -643,13 +460,20 @@ BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> &partitioning)
 }
 
 
+BlockDynamicSparsityPattern::
+BlockDynamicSparsityPattern (const BlockIndices &row_indices,
+                             const BlockIndices &col_indices)
+{
+  reinit(row_indices, col_indices);
+}
+
 
 void
-BlockCompressedSimpleSparsityPattern::reinit (
+BlockDynamicSparsityPattern::reinit (
   const std::vector<size_type> &row_block_sizes,
   const std::vector<size_type> &col_block_sizes)
 {
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::
+  BlockSparsityPatternBase<DynamicSparsityPattern>::
   reinit(row_block_sizes.size(), col_block_sizes.size());
   for (size_type i=0; i<row_block_sizes.size(); ++i)
     for (size_type j=0; j<col_block_sizes.size(); ++j)
@@ -658,16 +482,30 @@ BlockCompressedSimpleSparsityPattern::reinit (
 }
 
 void
-BlockCompressedSimpleSparsityPattern::reinit (
+BlockDynamicSparsityPattern::reinit (
   const std::vector< IndexSet > &partitioning)
 {
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::
+  BlockSparsityPatternBase<DynamicSparsityPattern>::
   reinit(partitioning.size(), partitioning.size());
   for (size_type i=0; i<partitioning.size(); ++i)
     for (size_type j=0; j<partitioning.size(); ++j)
       this->block(i,j).reinit(partitioning[i].size(),
                               partitioning[j].size(),
                               partitioning[i]);
+  this->collect_sizes();
+}
+
+void
+BlockDynamicSparsityPattern::reinit (
+  const BlockIndices &row_indices,
+  const BlockIndices &col_indices)
+{
+  BlockSparsityPatternBase<DynamicSparsityPattern>::reinit(row_indices.size(),
+                                                           col_indices.size());
+  for (size_type i=0; i<row_indices.size(); ++i)
+    for (size_type j=0; j<col_indices.size(); ++j)
+      this->block(i,j).reinit(row_indices.block_size(i),
+                              col_indices.block_size(j));
   this->collect_sizes();
 }
 
@@ -848,9 +686,10 @@ namespace TrilinosWrappers
 
 #endif
 
-// Remark: The explicit instantiations for "BlockSparsityPatternBase" were moved
-// to the top of this source file. The reason is a slightly buggy version
-// of the Apple gcc v.3.3.
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+template class BlockSparsityPatternBase<SparsityPattern>;
+template class BlockSparsityPatternBase<DynamicSparsityPattern>;
+#ifdef DEAL_II_WITH_TRILINOS
+template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

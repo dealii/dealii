@@ -1,5 +1,5 @@
 //----------------------------  spherical_manifold_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2014 by the mathLab team.
+//    Copyright (C) 2011 - 2015 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -9,7 +9,7 @@
 //----------------------------  spherical_manifold_02.cc  ---------------------------
 
 
-// Test that the flat manifold does what it should on a sphere. 
+// Test that the flat manifold does what it should on a sphere.
 
 #include "../tests.h"
 
@@ -31,23 +31,24 @@ template <int dim, int spacedim>
 void test(unsigned int ref=1)
 {
   SphericalManifold<dim,spacedim> manifold;
-  
+
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_ball (tria);
-  
+
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
-  
-  for(cell = tria.begin_active(); cell != tria.end(); ++cell) 
+
+  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     cell->set_all_manifold_ids(1);
-  
-  for(cell = tria.begin_active(); cell != tria.end(); ++cell) {
-    if(cell->center().distance(Point<spacedim>()) < 1e-10)
-      cell->set_all_manifold_ids(0);
-  }
-  
+
+  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
+    {
+      if (cell->center().distance(Point<spacedim>()) < 1e-10)
+        cell->set_all_manifold_ids(0);
+    }
+
   tria.set_manifold(1, manifold);
   tria.refine_global(2);
-  
+
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
 }
@@ -58,10 +59,10 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<2,2>();
   test<3,3>();
-  
+
   return 0;
 }
 

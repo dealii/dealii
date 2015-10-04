@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_lib_h
-#define __deal2__matrix_lib_h
+#ifndef dealii__matrix_lib_h
+#define dealii__matrix_lib_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/vector_memory.h>
@@ -43,6 +43,11 @@ template<typename number> class SparseMatrix;
  *
  * Here is an example multiplying two different FullMatrix objects:
  * @include product_matrix.cc
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -142,6 +147,11 @@ private:
  * Matrix-vector products of this matrix are composed of those of the original
  * matrix with the vector and then scaling of the result by a constant factor.
  *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators"
+ * for further details.
+ *
  * @author Guido Kanschat, 2007
  */
 template<class VECTOR>
@@ -179,7 +189,7 @@ public:
   void vmult (VECTOR &w, const VECTOR &v) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   void Tvmult (VECTOR &w, const VECTOR &v) const;
 
@@ -204,6 +214,11 @@ private:
  *
  * The documentation of ProductMatrix applies with exception that these
  * matrices here may be rectangular.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -297,7 +312,7 @@ private:
  * a vector $\mathbf v$ and $\frac 1n {\mathbf 1}_n$ yields the <i>mean
  * value</i> of the entries of ${\mathbf v}$. Consequently, $ \left[I-\frac
  * 1n{\mathbf 1}_n{\mathbf 1}_n^T\right] \mathbf v = \mathbf v - \left[\frac
- * 1n \mathbf v} \cdot {\mathbf 1}_n\right]{\mathbf 1}_n$ subtracts from every
+ * 1n {\mathbf v} \cdot {\mathbf 1}_n\right]{\mathbf 1}_n$ subtracts from every
  * vector element the mean value of all elements.
  *
  * @author Guido Kanschat, 2002, 2003
@@ -350,7 +365,7 @@ public:
               const BlockVector<number> &src) const;
 
   /**
-   * Add a soruce to dest, where the mean value in the selected component is
+   * Add a source to dest, where the mean value in the selected component is
    * subtracted.
    */
   template <typename number>
@@ -406,6 +421,11 @@ private:
  * section on
  * @ref Instantiations
  * in the manual).
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2005
  */

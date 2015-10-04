@@ -106,7 +106,7 @@ void test ()
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      Assert (dy(global_index) == y(global_index), ExcInternalError());
+      AssertThrow (dy(global_index) == y(global_index), ExcInternalError());
     }
 
   A.vmult_add (y, x);
@@ -117,7 +117,7 @@ void test ()
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      Assert (dy(global_index) == y(global_index), ExcInternalError());
+      AssertThrow (dy(global_index) == y(global_index), ExcInternalError());
     }
 
   A.Tvmult (x, y);
@@ -125,7 +125,7 @@ void test ()
   for (unsigned int i=0; i<col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      Assert (dx(global_index) == x(global_index), ExcInternalError());
+      AssertThrow (dx(global_index) == x(global_index), ExcInternalError());
     }
 
   A.Tvmult_add (x, y);
@@ -133,7 +133,7 @@ void test ()
   for (unsigned int i=0; i<col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      Assert (dx(global_index) == x(global_index), ExcInternalError());
+      AssertThrow (dx(global_index) == x(global_index), ExcInternalError());
     }
 
   if (my_id == 0) deallog << "OK" << std::endl;
@@ -143,7 +143,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

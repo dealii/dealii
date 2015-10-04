@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ void
 set_boundary_ids (Triangulation<dim> &tria)
 {
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    tria.begin_active()->face(f)->set_boundary_indicator (f);
+    tria.begin_active()->face(f)->set_boundary_id (f);
 }
 
 
@@ -138,8 +138,8 @@ main()
   try
     {
       std::ofstream logfile(output_file_name.c_str());
-      logfile << std::setprecision (2);
-      deallog << std::setprecision (2);
+      logfile << std::setprecision (8);
+      deallog << std::setprecision (8);
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,18 +80,18 @@ void test()
            cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->at_boundary(f) &&
-              (cell->face(f)->boundary_indicator() == boundary_id))
+              (cell->face(f)->boundary_id() == boundary_id))
             for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
               for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
                 {
-                  Assert (bv.find(cell->face(f)->vertex_dof_index(v,i))
-                          != bv.end(),
-                          ExcInternalError());
-                  Assert (bv[cell->face(f)->vertex_dof_index(v,i)]
-                          ==
-                          X<spacedim>()
-                          .value(cell->face(f)->vertex(v),i),
-                          ExcInternalError());
+                  AssertThrow (bv.find(cell->face(f)->vertex_dof_index(v,i))
+                               != bv.end(),
+                               ExcInternalError());
+                  AssertThrow (bv[cell->face(f)->vertex_dof_index(v,i)]
+                               ==
+                               X<spacedim>()
+                               .value(cell->face(f)->vertex(v),i),
+                               ExcInternalError());
                 }
     }
 }

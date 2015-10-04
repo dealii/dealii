@@ -58,6 +58,6 @@
  * freedom; among its functions are ones that sort degrees of freedom in
  * downstream direction, for example, and ones that sort degrees of freedom in
  * such a way that the bandwidth of associated matrices is minimized. Finally,
- * the DoFTools class offers a variety of algorithms around handling degrees
- * of freedom.
+ * the DoFTools namespace offers a variety of algorithms around handling
+ * degrees of freedom.
  */

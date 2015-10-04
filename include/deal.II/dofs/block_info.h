@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_info_h
-#define __deal2__block_info_h
+#ifndef dealii__block_info_h
+#define dealii__block_info_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/memory_consumption.h>
@@ -165,7 +165,7 @@ public:
    */
   template <class Archive>
   void serialize (Archive &ar,
-                  const unsigned int version);
+                  const unsigned int /*version*/);
 
 private:
   /**
@@ -295,7 +295,7 @@ BlockInfo::memory_consumption () const
 
 template <class Archive>
 void BlockInfo::serialize (Archive &ar,
-                           const unsigned int version)
+                           const unsigned int /*version*/)
 {
   ar &bi_global;
   ar &levels;

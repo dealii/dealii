@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,15 +25,63 @@ Mapping<dim, spacedim>::~Mapping ()
 {}
 
 
+template <int dim, int spacedim>
+std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+Mapping<dim, spacedim>::get_vertices (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    {
+      vertices[i] = cell->vertex(i);
+    }
+  return vertices;
+}
+
+
+template<int dim, int spacedim>
+Point<dim-1>
+Mapping<dim,spacedim>::
+project_real_point_to_unit_point_on_face (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int &face_no,
+  const Point<spacedim> &p) const
+{
+  //The function doesn't make physical sense for dim=1
+  Assert(dim>1, ExcNotImplemented());
+  //Not implemented for higher dimensions
+  Assert(dim<=3, ExcNotImplemented());
+
+  Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
+
+  Point<dim-1> unit_face_pt;
+
+  if (dim==2)
+    {
+      if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
+        unit_face_pt = Point<dim-1>(unit_cell_pt(1));
+      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
+        unit_face_pt = Point<dim-1>(unit_cell_pt(0));
+    }
+  else if (dim==3)
+    {
+      if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
+        unit_face_pt = Point<dim-1>(unit_cell_pt(1), unit_cell_pt(2));
+      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
+        unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(2));
+      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 2)
+        unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(1));
+    }
+
+  return unit_face_pt;
+}
+
 /*------------------------------ InternalDataBase ------------------------------*/
 
 
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
-  update_flags(update_default),
-  update_once(update_default),
-  update_each(update_default),
-  first_cell(true)
+  update_each(update_default)
 {}
 
 

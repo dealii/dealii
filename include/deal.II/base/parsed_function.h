@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__parsed_function_h
-#define __deal2__parsed_function_h
+#ifndef dealii__parsed_function_h
+#define dealii__parsed_function_h
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/function_parser.h>
@@ -112,7 +112,7 @@ namespace Functions
      * Parse parameters needed by this class.  If the number of components
      * which is parsed does not match the number of components of this object,
      * an assertion is thrown and the program is aborted.  In order for the
-     * class to function properly, we follow the same convenctions declared in
+     * class to function properly, we follow the same conventions declared in
      * the FunctionParser class (look there for a detailed description of the
      * syntax for function declarations).
      *

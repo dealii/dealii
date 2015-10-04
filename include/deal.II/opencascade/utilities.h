@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__occ_utilities_h
-#define __deal2__occ_utilities_h
+#ifndef dealii__occ_utilities_h
+#define dealii__occ_utilities_h
 
 #include <deal.II/base/config.h>
 

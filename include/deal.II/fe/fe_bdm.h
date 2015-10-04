@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_bdm_h
-#define __deal2__fe_bdm_h
+#ifndef dealii__fe_bdm_h
+#define dealii__fe_bdm_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
@@ -34,7 +34,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Degrees of freedom</h3>
  *
- * @todo This is for 2D only.
+ * @todo The 3D version exhibits some numerical instabilities, in
+ * particular for higher order
  *
  * @todo Restriction matrices are missing.
  *
@@ -102,13 +103,19 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void initialize_support_points (const unsigned int bdm_degree);
+  /**
+   * The values in the face support points of the polynomials needed as
+   * test functions. The outer vector is indexed by quadrature points, the
+   * inner by the test function. The test function space is PolynomialsP<dim-1>.
+   */
+  std::vector<std::vector<double> > test_values_face;
   /**
    * The values in the interior support points of the polynomials needed as
    * test functions. The outer vector is indexed by quadrature points, the
-   * inner by the test function.
+   * inner by the test function. The test function space is PolynomialsP<dim>.
    */
-  std::vector<std::vector<double> > test_values;
+  std::vector<std::vector<double> > test_values_cell;
 };
 
 DEAL_II_NAMESPACE_CLOSE

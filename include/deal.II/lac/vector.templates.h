@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__vector_templates_h
-#define __deal2__vector_templates_h
+#ifndef dealii__vector_templates_h
+#define dealii__vector_templates_h
 
 
 #include <deal.II/base/template_constraints.h>
@@ -42,12 +42,7 @@
 #include <iostream>
 #include <iomanip>
 
-#ifndef _MSC_VER
-#  include <mm_malloc.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
-
 
 
 namespace internal
@@ -144,7 +139,7 @@ namespace internal
   }
 
 
-  // Define the functors neccessary to use SIMD with TBB.
+  // Define the functors necessary to use SIMD with TBB.
   template <typename Number>
   struct Vectorization_multiply_factor
   {
@@ -563,7 +558,6 @@ namespace internal
 
 
 
-
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number> &v)
   :
@@ -580,8 +574,23 @@ Vector<Number>::Vector (const Vector<Number> &v)
 }
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+Vector<Number>::Vector (Vector<Number> &&v)
+  :
+  Subscriptor(),
+  vec_size(0),
+  max_vec_size(0),
+  val(0)
+{
+  swap(v);
+}
+#endif
+
+
+
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber> &v)
@@ -597,11 +606,10 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
       std::copy (v.begin(), v.end(), begin());
     }
 }
-
 #endif
 
-#ifdef DEAL_II_WITH_PETSC
 
+#ifdef DEAL_II_WITH_PETSC
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
@@ -651,6 +659,7 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 }
 
 #endif
+
 
 #ifdef DEAL_II_WITH_TRILINOS
 
@@ -712,6 +721,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 
 #endif
 
+
 template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2> &v,
@@ -719,18 +729,6 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
 {
   reinit (v.size(), fast);
 }
-
-// Moved to vector.h as an inline function by Luca Heltai on
-// 2009/04/12 to prevent strange compiling errors, after making swap
-// virtual.
-// template <typename Number>
-// void
-// Vector<Number>::swap (Vector<Number> &v)
-// {
-//   std::swap (vec_size,     v.vec_size);
-//   std::swap (max_vec_size, v.max_vec_size);
-//   std::swap (val,          v.val);
-// }
 
 
 
@@ -835,7 +833,7 @@ namespace internal
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const Number s)
+Vector<Number>::operator= (const Number s)
 {
   AssertIsFinite(s);
   if (s != Number())
@@ -857,7 +855,7 @@ Vector<Number>::operator = (const Number s)
 #ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
 template <>
 Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator = (const std::complex<float> s)
+Vector<std::complex<float> >::operator= (const std::complex<float> s)
 {
   AssertIsFinite(s);
   if (s != std::complex<float>())
@@ -1186,12 +1184,15 @@ namespace internal
                      ResultType        &result,
                      const int          depth = -1)
     {
+      (void)depth;
+
       if (vec_size <= 4096)
         {
           // the vector is short enough so we perform the summation. first
           // work on the regular part. The innermost 32 values are expanded in
           // order to obtain known loop bounds for most of the work.
           const Number *X_original = X;
+          (void)X_original;
           ResultType outer_results [128];
           size_type n_chunks = vec_size / 32;
           const size_type remainder = vec_size % 32;
@@ -1468,6 +1469,16 @@ Vector<Number>::lp_norm (const real_type p) const
         }
       return scale * std::pow(sum, static_cast<real_type>(1./p));
     }
+}
+
+
+
+template <>
+Vector<int>::real_type
+Vector<int>::lp_norm (const real_type) const
+{
+  Assert(false, ExcMessage("No lp norm for integer vectors"));
+  return -1;
 }
 
 
@@ -1771,7 +1782,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const BlockVector<Number> &v)
+Vector<Number>::operator= (const BlockVector<Number> &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1790,7 +1801,7 @@ Vector<Number>::operator = (const BlockVector<Number> &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const PETScWrappers::Vector &v)
+Vector<Number>::operator= (const PETScWrappers::Vector &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1817,7 +1828,7 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
+Vector<Number>::operator= (const PETScWrappers::MPI::Vector &v)
 {
   // do this in a two-stage process:
   // first convert to a sequential petsc
@@ -1835,7 +1846,7 @@ Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
+Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
 {
   // Generate a localized version
   // of the Trilinos vectors and
@@ -1850,7 +1861,7 @@ Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
+Vector<Number>::operator= (const TrilinosWrappers::Vector &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1873,7 +1884,7 @@ Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
 template <typename Number>
 template <typename Number2>
 bool
-Vector<Number>::operator == (const Vector<Number2> &v) const
+Vector<Number>::operator== (const Vector<Number2> &v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
@@ -2047,8 +2058,9 @@ Vector<Number>::allocate()
 {
   // make sure that we don't create a memory leak
   Assert (val == 0, ExcInternalError());
-  val = static_cast<Number *>(_mm_malloc (sizeof(Number)*max_vec_size, 64));
-  Assert (val != 0, ExcOutOfMemory());
+
+  // then allocate memory with the proper alignment requirements of 64 bytes
+  Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*max_vec_size);
 }
 
 
@@ -2057,7 +2069,7 @@ template <typename Number>
 void
 Vector<Number>::deallocate()
 {
-  _mm_free(val);
+  free(val);
   val = 0;
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,8 @@ void test ()
     hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-    Assert (fe_collection.n_components() == dim,
-            ExcInternalError());
+    AssertThrow (fe_collection.n_components() == dim,
+                 ExcInternalError());
   }
 
   // now the same with one of the elements
@@ -51,8 +51,8 @@ void test ()
       hp::FECollection<dim> fe_collection;
       fe_collection.push_back (FESystem<dim>(FESystem<dim>(FE_Q<dim>(2),dim),1));
       fe_collection.push_back (FE_RaviartThomas<dim>(1));
-      Assert (fe_collection.n_blocks() == 1,
-              ExcInternalError());
+      AssertThrow (fe_collection.n_blocks() == 1,
+                   ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

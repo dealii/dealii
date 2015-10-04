@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,7 @@ void test ()
   }
 
   // H1 seminorm. the function is u(x)=x, so
-  // its H1 seminorm should be equal to 1/2
+  // its H1 seminorm should be equal to 1
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
@@ -121,7 +121,7 @@ void test ()
     // also ensure that we indeed get the
     // same value on every cell
     diff. add(-1);
-    Assert (diff.l2_norm() == 0, ExcInternalError());
+    AssertThrow (diff.l2_norm() == 0, ExcInternalError());
   }
 
   // W1infty norm. the Linfty norm is one, so
@@ -136,7 +136,7 @@ void test ()
                                        VectorTools::W1infty_norm);
     deallog << "W1infty, diff=" << diff.linfty_norm() << std::endl;
     diff.add(-2);
-    Assert (diff.l1_norm() > 0.5, ExcInternalError());
+    AssertThrow (diff.l1_norm() > 0.5, ExcInternalError());
   }
 }
 

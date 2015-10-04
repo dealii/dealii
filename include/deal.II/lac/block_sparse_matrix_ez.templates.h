@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_ez_templates_h
-#define __deal2__block_sparse_matrix_ez_templates_h
+#ifndef dealii__block_sparse_matrix_ez_templates_h
+#define dealii__block_sparse_matrix_ez_templates_h
 
 
 #include <deal.II/base/config.h>
@@ -76,6 +76,7 @@ template <typename number>
 BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator = (const double d)
 {
+  (void)d;
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (unsigned int r=0; r<n_block_rows(); ++r)
@@ -174,42 +175,6 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
   column_indices.reinit (col_sizes);
 }
 
-
-
-
-//  template <typename number>
-//  unsigned int
-//  BlockSparseMatrixEZ<number>::n_nonzero_elements () const
-//  {
-//    return sparsity_pattern->n_nonzero_elements ();
-//  };
-
-
-
-//  template <typename number>
-//  unsigned int
-//  BlockSparseMatrixEZ<number>::n_actually_nonzero_elements () const
-//  {
-//    unsigned int count = 0;
-//    for (unsigned int i=0; i<rows; ++i)
-//      for (unsigned int j=0; j<columns; ++j)
-//        count += sub_objects[i][j]->n_actually_nonzero_elements ();
-//    return count;
-//  };
-
-
-
-//  template <typename number>
-//  std::size_t
-//  BlockSparseMatrixEZ<number>::memory_consumption () const
-//  {
-//    std::size_t mem = sizeof(*this);
-//    mem += MemoryConsumption::memory_consumption (sub_objects);
-//    for (unsigned int r=0; r<rows; ++r)
-//      for (unsigned int c=0; c<columns; ++c)
-//        mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
-//    return mem;
-//  };
 
 
 

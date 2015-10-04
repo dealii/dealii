@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ FE_Q_iso_Q1<dim,spacedim>::get_name () const
 {
   // note that the FETools::get_fe_from_name function depends on the
   // particular format of the string this function returns, so they have to be
-  // kept in synch
+  // kept in sync
 
   std::ostringstream namebuf;
   namebuf << "FE_Q_iso_Q1<"
@@ -98,11 +98,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::neither_element_dominates;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      // the FE_Nothing has no degrees of freedom and it is typically used in
-      // a context where we don't require any continuity along the interface
-      return FiniteElementDomination::no_requirements;
+      if (fe_nothing->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // the FE_Nothing has no degrees of freedom and it is typically used in
+          // a context where we don't require any continuity along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());

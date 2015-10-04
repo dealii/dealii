@@ -50,8 +50,8 @@ void test ()
   v.compress(VectorOperation::add);
   v*=2.0;
 
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  AssertThrow(v(myid*2) == myid*4.0, ExcInternalError());
+  AssertThrow(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
   // set ghost dof, compress
   v(1) = 7;
@@ -65,7 +65,7 @@ void test ()
 
   // import ghosts onto all procs
   v.update_ghost_values();
-  Assert (v(1) == 7. * numproc, ExcInternalError());
+  AssertThrow (v(1) == 7. * numproc, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();
@@ -80,7 +80,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__quadrature_h
-#define __deal2__quadrature_h
+#ifndef dealii__quadrature_h
+#define dealii__quadrature_h
 
 
 #include <deal.II/base/config.h>
@@ -28,16 +28,16 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Base class for quadrature formulæ in arbitrary dimensions. This class
+ * Base class for quadrature formulae in arbitrary dimensions. This class
  * stores quadrature points and weights on the unit line [0,1], unit square
  * [0,1]x[0,1], etc.
  *
  * There are a number of derived classes, denoting concrete integration
- * formulæ. Their names names prefixed by <tt>Q</tt>. Refer to the list of
+ * formulae. Their names names prefixed by <tt>Q</tt>. Refer to the list of
  * derived classes for more details.
  *
  * The schemes for higher dimensions are typically tensor products of the one-
- * dimensional formulæ, but refer to the section on implementation detail
+ * dimensional formulae, but refer to the section on implementation detail
  * below.
  *
  * In order to allow for dimension independent programming, a quadrature
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * initializes to a single quadrature point with weight one. Access to the
  * weight is possible, while access to the quadrature point is not permitted,
  * since a Point of dimension zero contains no information. The main purpose
- * of these formulæ is their use in QProjector, which will create a useful
+ * of these formulae is their use in QProjector, which will create a useful
  * formula of dimension one out of them.
  *
  * <h3>Mathematical background</h3>
@@ -56,18 +56,18 @@ DEAL_II_NAMESPACE_OPEN
  * of each formula. The order of the integration error is <tt>m+1</tt>, that
  * is, the error is the size of the cell to the <tt>m+1</tt> by the Bramble-
  * Hilbert Lemma. The number <tt>m</tt> is to be found in the documentation of
- * each concrete formula. For the optimal formulæ QGauss we have $m = 2N-1$,
- * where N is the constructor parameter to QGauss. The tensor product formulæ
+ * each concrete formula. For the optimal formulae QGauss we have $m = 2N-1$,
+ * where N is the constructor parameter to QGauss. The tensor product formulae
  * are exact on tensor product polynomials of degree <tt>m</tt> in each space
  * direction, but they are still only of <tt>m+1</tt>st order.
  *
  * <h3>Implementation details</h3>
  *
- * Most integration formulæ in more than one space dimension are tensor
- * products of quadrature formulæ in one space dimension, or more generally
+ * Most integration formulae in more than one space dimension are tensor
+ * products of quadrature formulae in one space dimension, or more generally
  * the tensor product of a formula in <tt>(dim-1)</tt> dimensions and one in
  * one dimension. There is a special constructor to generate a quadrature
- * formula from two others.  For example, the QGauss@<dim@> formulæ include
+ * formula from two others.  For example, the QGauss@<dim@> formulae include
  * <i>N<sup>dim</sup></i> quadrature points in <tt>dim</tt> dimensions, where
  * N is the constructor parameter of QGauss.
  *
@@ -274,7 +274,7 @@ public:
  * the sum of the weights of the left- and the rightmost quadrature point.
  *
  * Since all dimensions higher than one are built up by tensor products of one
- * dimensional and <tt>dim-1</tt> dimensional quadrature formulæ, the
+ * dimensional and <tt>dim-1</tt> dimensional quadrature formulae, the
  * argument given to the constructor needs to be a quadrature formula in one
  * space dimension, rather than in <tt>dim</tt> dimensions.
  *
@@ -298,7 +298,9 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidQuadratureFormula);
+  DeclExceptionMsg (ExcInvalidQuadratureFormula,
+                    "The quadrature formula you provided cannot be used "
+                    "as the basis for iteration.");
 private:
   /**
    * Check whether the given quadrature formula has quadrature points at the

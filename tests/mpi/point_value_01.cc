@@ -47,19 +47,19 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-  
+
   FE_Q<dim> fe(1);
-  
+
   DoFHandler<dim> dof_handler (triangulation);
-  
+
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (1);
-  
+
   dof_handler.distribute_dofs (fe);
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs ();
   parallel::distributed::Vector<double> locally_owned_solution
-    (locally_owned_dofs, MPI_COMM_WORLD);
+  (locally_owned_dofs, MPI_COMM_WORLD);
 
   locally_owned_solution=1;
 
@@ -79,50 +79,50 @@ void test()
 
   Vector<double> value(1);
 
-  for(; point_iterator!=points_end; point_iterator++)
-  {
-    try
+  for (; point_iterator!=points_end; point_iterator++)
     {
-      VectorTools::point_value (dof_handler, locally_owned_solution,
-                                *point_iterator, value);
-      if (std::abs(value[0]-1.)>1e-8)
-        ExcInternalError();
-    }
-    catch (const VectorTools::ExcPointNotAvailableHere &)
-    {}
+      try
+        {
+          VectorTools::point_value (dof_handler, locally_owned_solution,
+                                    *point_iterator, value);
+          if (std::abs(value[0]-1.)>1e-8)
+            ExcInternalError();
+        }
+      catch (const VectorTools::ExcPointNotAvailableHere &)
+        {}
 
-    MPI_Barrier(MPI_COMM_WORLD);
-  
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-      deallog << *point_iterator << " OK" << std::endl;
-  }
+      MPI_Barrier(MPI_COMM_WORLD);
+
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+        deallog << *point_iterator << " OK" << std::endl;
+    }
 }
 
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
-  {
-    std::ofstream logfile("output");
-    deallog.attach(logfile, false);
-    deallog.depth_console(0);
-    deallog.threshold_double(1.e-10);
-    
-    deallog.push("2d");
-    test<2>();
-    deallog.pop();
-    deallog.push("3d");
-    test<3>();
-    deallog.pop();
-  }
+    {
+      std::ofstream logfile("output");
+      deallog.attach(logfile, false);
+      deallog.depth_console(0);
+      deallog.threshold_double(1.e-10);
+
+      deallog.push("2d");
+      test<2>();
+      deallog.pop();
+      deallog.push("3d");
+      test<3>();
+      deallog.pop();
+    }
   else
-  {
-    test<2>();
-    test<3>();
-  }
+    {
+      test<2>();
+      test<3>();
+    }
 
   return 0;
 }

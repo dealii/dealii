@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__newton_h
-#define __deal2__newton_h
+#ifndef dealii__newton_h
+#define dealii__newton_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/solver_control.h>
@@ -95,11 +95,6 @@ namespace Algorithms
      * #residual and #inverse_derivative.
      */
     virtual void operator() (AnyData &out, const AnyData &in);
-
-    /**
-     * @deprecated Use the function using AnyData
-     */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
     virtual void notify(const Event &);
 

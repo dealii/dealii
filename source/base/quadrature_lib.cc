@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
 
+
 #include <cmath>
 #include <limits>
 #include <algorithm>
@@ -27,15 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 // please note: for a given dimension, we need the quadrature formulae
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
-
-namespace
-{
-  template <typename number>
-  number abs (const number a)
-  {
-    return ((a>0) ? a : -a);
-  }
-}
 
 
 
@@ -157,7 +149,7 @@ QGauss<1>::QGauss (const unsigned int n)
           pp = n*(z*p1-p2)/(z*z-1);
           z = z-p1/pp;
         }
-      while (abs(p1/pp) > tolerance);
+      while (std::abs(p1/pp) > tolerance);
 
       double x = .5*z;
       this->quadrature_points[i-1] = Point<1>(.5-x);
@@ -770,7 +762,11 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
       {
         Assert( this->quadrature_points[i] != origin,
                 ExcMessage("The singularity cannot be on a Gauss point of the same order!") );
-        this->weights[i] /= std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha );
+        double denominator = std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha);
+        Assert( denominator != 0.0,
+                ExcMessage("The quadrature formula you are using does not allow to "
+                           "factor out the singularity, which is zero at one point."));
+        this->weights[i] /= denominator;
       }
 }
 
@@ -820,7 +816,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   origins.push_back(Point<2>(0.,singularity[1]));
   origins.push_back(singularity);
 
-  // Lexycographical ordering.
+  // Lexicographical ordering.
 
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
@@ -1014,6 +1010,333 @@ QWeddle<dim>::QWeddle ()
   Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>())
 {}
 
+template <int dim>
+QTelles<dim>::QTelles (
+  const Quadrature<1> &base_quad, const Point<dim> &singularity)
+  :
+/**
+* We need the explicit implementation if dim == 1. If dim > 1 we use the
+* former implementation and apply a tensorial product to obtain the higher
+* dimensions.
+**/
+  Quadrature<dim>(
+    dim == 2 ?
+    QAnisotropic<dim>(
+      QTelles<1>(base_quad, Point<1>(singularity[0])),
+      QTelles<1>(base_quad, Point<1>(singularity[1]))) :
+    dim == 3 ?
+    QAnisotropic<dim>(
+      QTelles<1>(base_quad, Point<1>(singularity[0])),
+      QTelles<1>(base_quad, Point<1>(singularity[1])),
+      QTelles<1>(base_quad, Point<1>(singularity[2]))) :
+    Quadrature<dim>())
+{
+}
+
+template <int dim>
+QTelles<dim>::QTelles (
+  const unsigned int n, const Point<dim> &singularity)
+  :
+/**
+* In this case we map the standard Gauss Legendre formula using the given
+* singularity point coordinates.
+**/
+  Quadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
+{}
+
+
+
+template <>
+QTelles<1>::QTelles (
+  const Quadrature<1> &base_quad, const Point<1> &singularity)
+  :
+/**
+* We explicitly implement the Telles' variable change if dim == 1.
+**/
+  Quadrature<1>(base_quad)
+{
+  /**
+  * We define all the constants to be used in the implementation of
+  * Telles' rule
+  **/
+  const double eta_bar = singularity[0] * 2. - 1.;
+  const double eta_star = eta_bar * eta_bar - 1.;
+  double gamma_bar;
+
+  std::vector<Point<1> > quadrature_points_dummy(quadrature_points.size());
+  std::vector<double> weights_dummy(weights.size());
+  unsigned int cont = 0;
+  const double tol = 1e-10;
+  for (unsigned int d = 0; d < quadrature_points.size(); ++d)
+    {
+      if (std::abs(quadrature_points[d][0] - singularity[0]) > tol)
+        {
+          quadrature_points_dummy[d-cont] = quadrature_points[d];
+          weights_dummy[d-cont] = weights[d];
+        }
+      else
+        {
+          // We need to remove the singularity point from the quadrature point
+          // list. To do so we use the variable cont.
+          cont = 1;
+        }
+
+    }
+  if (cont == 1)
+    {
+      quadrature_points.resize(quadrature_points_dummy.size()-1);
+      weights.resize(weights_dummy.size()-1);
+      for (unsigned int d = 0; d < quadrature_points.size()-1; ++d)
+        {
+          quadrature_points[d] = quadrature_points_dummy[d];
+          weights[d] = weights_dummy[d];
+        }
+    }
+  // We need to check if the singularity is at the boundary of the interval.
+  if (std::abs(eta_star) <= tol)
+    {
+      gamma_bar = std::pow((eta_bar * eta_star + std::abs(eta_star)),1.0 / 3.0)
+                  + std::pow((eta_bar * eta_star - std::abs(eta_star)), 1.0 / 3.0)
+                  + eta_bar;
+    }
+  else
+    {
+      gamma_bar = (eta_bar * eta_star + std::abs(eta_star))/std::abs(eta_bar * eta_star + std::abs(eta_star))*
+                  std::pow(std::abs(eta_bar * eta_star + std::abs(eta_star)),1.0 / 3.0)
+                  + (eta_bar * eta_star - std::abs(eta_star))/std::abs(eta_bar * eta_star - std::abs(eta_star))*
+                  std::pow(std::abs(eta_bar * eta_star - std::abs(eta_star)), 1.0 / 3.0)
+                  + eta_bar;
+    }
+  for (unsigned int q = 0; q < quadrature_points.size(); ++q)
+    {
+      double gamma = quadrature_points[q][0] * 2 - 1;
+      double eta = (std::pow(gamma - gamma_bar, 3.0)
+                    + gamma_bar * (gamma_bar * gamma_bar + 3))
+                   / (1 + 3 * gamma_bar * gamma_bar);
+
+      double J = 3 * ((gamma - gamma_bar) *(gamma - gamma_bar))
+                 / (1 + 3 * gamma_bar * gamma_bar);
+
+      quadrature_points[q][0] = (eta + 1) / 2.0;
+      weights[q] = J * weights[q];
+
+    }
+}
+
+
+
+template <>
+std::vector<double>
+QGaussChebyshev<1>::get_quadrature_points(const unsigned int n)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be cos((2i+1)Pi/(2N+2))
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1.+double(2*i+1)/double(2*(n-1)+2))));
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussChebyshev<1>::get_quadrature_weights(const unsigned int n)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = numbers::PI/double(n);
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
+  :
+  Quadrature<1> (n)
+{
+
+  Assert(n>0,ExcMessage("Need at least one point for the quadrature rule"));
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+
+}
+
+
+template <int dim>
+QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
+  :
+  Quadrature<dim> (QGaussChebyshev<dim-1>(n), QGaussChebyshev<1>(n))
+{}
+
+
+
+
+
+template <>
+std::vector<double>
+QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
+                                               EndPoint ep)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be -cos(2i Pi/(2N+1))
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    if (ep == QGaussRadauChebyshev::left)
+      points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
+    else
+      {
+        Assert(ep==QGaussRadauChebyshev::right,ExcInvalidConstructorCall());
+        points[i] = 1./2.*(1.-std::cos(numbers::PI*(2*double(n-1-i)/(2*double(n-1)+1.))));
+      }
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
+                                                EndPoint ep)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = 2.*numbers::PI/double(2*(n-1)+1.);
+      if (ep==left && i==0)
+        weights[i] /= 2.;
+      else if (ep==right && i==(n-1))
+        weights[i] /= 2.;
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
+                                              QGaussRadauChebyshev<1>::EndPoint ep)
+  :
+  Quadrature<1> (n),
+  ep (ep)
+{
+
+  Assert(n>0,ExcMessage("Need at least one point for quadrature rules"));
+  std::vector<double> p=get_quadrature_points(n,ep);
+  std::vector<double> w=get_quadrature_weights(n,ep);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+}
+
+
+template <>
+QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
+                                               EndPoint ep)
+  :
+  Quadrature<2> (QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)),
+                 QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
+{}
+
+
+template <int dim>
+QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
+                                                 EndPoint ep)
+  :
+  Quadrature<dim> (QGaussRadauChebyshev<dim-1>(n,static_cast<typename QGaussRadauChebyshev<dim-1>::EndPoint>(ep)),
+                   QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
+{}
+
+
+template <>
+std::vector<double>
+QGaussLobattoChebyshev<1>::get_quadrature_points(const unsigned int n)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be cos(i Pi/N)
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1+double(i)/double(n-1))));
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussLobattoChebyshev<1>::get_quadrature_weights(const unsigned int n)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = numbers::PI/double((n-1));
+      if (i==0 || i==(n-1))
+        weights[i] /= 2.;
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
+  :
+  Quadrature<1> (n)
+{
+
+  Assert(n>1,ExcMessage("Need at least two points for Gauss-Lobatto quadrature rule"));
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+
+}
+
+
+template <int dim>
+QGaussLobattoChebyshev<dim>::QGaussLobattoChebyshev (const unsigned int n)
+  :
+  Quadrature<dim> (QGaussLobattoChebyshev<dim-1>(n), QGaussLobattoChebyshev<1>(n))
+{}
 
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
@@ -1036,5 +1359,21 @@ template class QWeddle<3>;
 template class QSorted<1>;
 template class QSorted<2>;
 template class QSorted<3>;
+
+template class QTelles<1> ;
+template class QTelles<2> ;
+template class QTelles<3> ;
+
+template class QGaussChebyshev<1>;
+template class QGaussChebyshev<2>;
+template class QGaussChebyshev<3>;
+
+template class QGaussRadauChebyshev<1>;
+template class QGaussRadauChebyshev<2>;
+template class QGaussRadauChebyshev<3>;
+
+template class QGaussLobattoChebyshev<1>;
+template class QGaussLobattoChebyshev<2>;
+template class QGaussLobattoChebyshev<3>;
 
 DEAL_II_NAMESPACE_CLOSE

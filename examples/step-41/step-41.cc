@@ -31,7 +31,7 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -98,11 +98,11 @@ namespace Step41
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
-    TrilinosWrappers::Vector       solution;
-    TrilinosWrappers::Vector       system_rhs;
-    TrilinosWrappers::Vector       complete_system_rhs;
-    TrilinosWrappers::Vector       diagonal_of_mass_matrix;
-    TrilinosWrappers::Vector       contact_force;
+    TrilinosWrappers::MPI::Vector  solution;
+    TrilinosWrappers::MPI::Vector  system_rhs;
+    TrilinosWrappers::MPI::Vector  complete_system_rhs;
+    TrilinosWrappers::MPI::Vector  diagonal_of_mass_matrix;
+    TrilinosWrappers::MPI::Vector  contact_force;
   };
 
 
@@ -127,7 +127,7 @@ namespace Step41
   };
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &p,
+  double RightHandSide<dim>::value (const Point<dim> &,
                                     const unsigned int component) const
   {
     Assert (component == 0, ExcNotImplemented());
@@ -148,7 +148,7 @@ namespace Step41
   };
 
   template <int dim>
-  double BoundaryValues<dim>::value (const Point<dim> &p,
+  double BoundaryValues<dim>::value (const Point<dim> &,
                                      const unsigned int component) const
   {
     Assert (component == 0, ExcNotImplemented());
@@ -246,19 +246,20 @@ namespace Step41
                                               constraints);
     constraints.close ();
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler,
-                                     c_sparsity,
+                                     dsp,
                                      constraints,
                                      false);
 
-    system_matrix.reinit (c_sparsity);
-    complete_system_matrix.reinit (c_sparsity);
+    system_matrix.reinit (dsp);
+    complete_system_matrix.reinit (dsp);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
-    complete_system_rhs.reinit (dof_handler.n_dofs());
-    contact_force.reinit (dof_handler.n_dofs());
+    IndexSet solution_index_set = dof_handler.locally_owned_dofs();
+    solution.reinit (solution_index_set, MPI_COMM_WORLD);
+    system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    complete_system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    contact_force.reinit (solution_index_set, MPI_COMM_WORLD);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -266,9 +267,9 @@ namespace Step41
     // diagonal, and in the following then first compute all of this as a
     // matrix and then extract the diagonal elements for later use:
     TrilinosWrappers::SparseMatrix mass_matrix;
-    mass_matrix.reinit (c_sparsity);
+    mass_matrix.reinit (dsp);
     assemble_mass_matrix_diagonal (mass_matrix);
-    diagonal_of_mass_matrix.reinit (dof_handler.n_dofs());
+    diagonal_of_mass_matrix.reinit (solution_index_set);
     for (unsigned int j=0; j<solution.size (); j++)
       diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
   }
@@ -300,7 +301,7 @@ namespace Step41
     const unsigned int        n_q_points    = quadrature_formula.size();
 
     FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
-    TrilinosWrappers::Vector  cell_rhs (dofs_per_cell);
+    Vector<double>            cell_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -432,7 +433,7 @@ namespace Step41
 
     const double penalty_parameter = 100.0;
 
-    TrilinosWrappers::Vector lambda (dof_handler.n_dofs());
+    TrilinosWrappers::MPI::Vector lambda (complete_index_set(dof_handler.n_dofs()));
     complete_system_matrix.residual (lambda,
                                      solution, complete_system_rhs);
     contact_force.ratio (lambda, diagonal_of_mass_matrix);
@@ -556,7 +557,7 @@ namespace Step41
     std::cout << "   Solving system..." << std::endl;
 
     ReductionControl                    reduction_control (100, 1e-12, 1e-3);
-    SolverCG<TrilinosWrappers::Vector>  solver (reduction_control);
+    SolverCG<TrilinosWrappers::MPI::Vector>  solver (reduction_control);
     TrilinosWrappers::PreconditionAMG   precondition;
     precondition.initialize (system_matrix);
 
@@ -670,6 +671,10 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run ();

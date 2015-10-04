@@ -19,9 +19,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
@@ -29,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -39,6 +38,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/distributed/tria.h>
 
 
 #include <algorithm>
@@ -260,6 +260,7 @@ namespace DoFTools
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
     const Triangulation<dim,spacedim> &tria = dof_handler.get_tria();
+    (void)tria;
 
     AssertDimension (cell_data.size(), tria.n_active_cells());
     AssertDimension (dof_data.size(), dof_handler.n_dofs());
@@ -338,6 +339,7 @@ namespace DoFTools
                 std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+    (void)fe;
 
     Assert(component_mask.represents_n_components(fe.n_components()),
            ExcMessage ("The given component mask is not sized correctly to represent the "
@@ -383,6 +385,7 @@ namespace DoFTools
                 std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.begin_active()->get_fe();
+    (void)fe;
 
     Assert(component_mask.represents_n_components(fe.n_components()),
            ExcMessage ("The given component mask is not sized correctly to represent the "
@@ -517,7 +520,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const ComponentMask           &component_mask,
                          std::vector<bool>             &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
              (&dof_handler.get_tria())
@@ -527,7 +530,7 @@ namespace DoFTools
 
     IndexSet indices;
     extract_boundary_dofs (dof_handler, component_mask,
-                           indices, boundary_indicators);
+                           indices, boundary_ids);
 
     // clear and reset array by default values
     selected_dofs.clear ();
@@ -543,11 +546,11 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const ComponentMask       &component_mask,
                          IndexSet             &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert (component_mask.represents_n_components(n_components(dof_handler)),
             ExcMessage ("Component mask has invalid size."));
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
 
@@ -557,7 +560,7 @@ namespace DoFTools
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+    const bool check_boundary_id = (boundary_ids.size() != 0);
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -585,9 +588,9 @@ namespace DoFTools
         for (unsigned int face=0;
              face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
           if (cell->at_boundary(face))
-            if (! check_boundary_indicator ||
-                (boundary_indicators.find (cell->face(face)->boundary_indicator())
-                 != boundary_indicators.end()))
+            if (! check_boundary_id ||
+                (boundary_ids.find (cell->face(face)->boundary_id())
+                 != boundary_ids.end()))
               {
                 const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
@@ -650,16 +653,16 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
                                          const ComponentMask           &component_mask,
                                          std::vector<bool>             &selected_dofs,
-                                         const std::set<types::boundary_id> &boundary_indicators)
+                                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert (component_mask.represents_n_components (n_components(dof_handler)),
             ExcMessage ("This component mask has the wrong size."));
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+    const bool check_boundary_id = (boundary_ids.size() != 0);
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -683,9 +686,9 @@ namespace DoFTools
       for (unsigned int face=0;
            face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
         if (cell->at_boundary(face))
-          if (! check_boundary_indicator ||
-              (boundary_indicators.find (cell->face(face)->boundary_indicator())
-               != boundary_indicators.end()))
+          if (! check_boundary_id ||
+              (boundary_ids.find (cell->face(face)->boundary_id())
+               != boundary_ids.end()))
             {
               const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
@@ -1108,11 +1111,131 @@ namespace DoFTools
     typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (unsigned int index=0; cell!=endc; ++cell, ++index)
-      active_fe_indices[index] = cell->active_fe_index();
+    for (; cell!=endc; ++cell)
+      active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
   }
 
+  template <class DH>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_subdomain (const DH  &dof_handler)
+  {
+    // If the Triangulation is distributed, the only thing we can usefully
+    // ask is for its locally owned subdomain
+    Assert ((dynamic_cast<const parallel::distributed::
+             Triangulation<DH::dimension,DH::space_dimension> *>
+             (&dof_handler.get_tria()) == 0),
+            ExcMessage ("For parallel::distributed::Triangulation objects and "
+                        "associated DoF handler objects, asking for any information "
+                        "related to a subdomain other than the locally owned one does "
+                        "not make sense."));
 
+    //the following is a random process (flip of a coin), thus should be called once only.
+    std::vector< dealii::types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
+    dealii::DoFTools::get_subdomain_association (dof_handler, subdomain_association);
+
+    const unsigned int n_subdomains = 1 + (*std::max_element (subdomain_association.begin (),
+                                                              subdomain_association.end ()   ));
+
+    std::vector<dealii::IndexSet> index_sets (n_subdomains,dealii::IndexSet(dof_handler.n_dofs()));
+
+    // loop over subdomain_association and populate IndexSet when a
+    // change in subdomain ID is found
+    dealii::types::global_dof_index i_min          = 0;
+    dealii::types::global_dof_index this_subdomain = subdomain_association[0];
+
+    for (dealii::types::global_dof_index index = 1;
+         index < subdomain_association.size (); ++index)
+      {
+        //found index different from the current one
+        if (subdomain_association[index] != this_subdomain)
+          {
+            index_sets[this_subdomain].add_range (i_min, index);
+            i_min = index;
+            this_subdomain = subdomain_association[index];
+          }
+      }
+
+    // the very last element is of different index
+    if (i_min == subdomain_association.size () - 1)
+      {
+        index_sets[this_subdomain].add_index (i_min);
+      }
+
+    // otherwise there are at least two different indices
+    else
+      {
+        index_sets[this_subdomain].add_range (
+          i_min, subdomain_association.size ());
+      }
+
+    for (unsigned int i = 0; i < n_subdomains; i++)
+      index_sets[i].compress ();
+
+    return index_sets;
+  }
+
+  template <class DH>
+  std::vector<IndexSet>
+  locally_relevant_dofs_per_subdomain (const DH  &dof_handler)
+  {
+    // If the Triangulation is distributed, the only thing we can usefully
+    // ask is for its locally owned subdomain
+    Assert ((dynamic_cast<const parallel::distributed::
+             Triangulation<DH::dimension,DH::space_dimension> *>
+             (&dof_handler.get_tria()) == 0),
+            ExcMessage ("For parallel::distributed::Triangulation objects and "
+                        "associated DoF handler objects, asking for any information "
+                        "related to a subdomain other than the locally owned one does "
+                        "not make sense."));
+
+    // Collect all the locally owned DoFs
+    // Note: Even though the distribution of DoFs by the locally_owned_dofs_per_subdomain
+    // function is pseudo-random, we will collect all the DoFs on the subdomain
+    // and its layer cell. Therefore, the random nature of this function does
+    // not play a role in the extraction of the locally relevant DoFs
+    std::vector<IndexSet> dof_set = locally_owned_dofs_per_subdomain(dof_handler);
+    const dealii::types::subdomain_id n_subdomains = dof_set.size();
+
+    // Add the DoFs on the adjacent (equivalent ghost) cells to the IndexSet,
+    // cache them in a set. Need to check each DoF manually because we can't
+    // be sure that the DoF range of locally_owned_dofs is really contiguous.
+    for (dealii::types::subdomain_id subdomain_id = 0;
+         subdomain_id < n_subdomains; ++subdomain_id)
+      {
+        // Extract the layer of cells around this subdomain
+        std_cxx11::function<bool (const typename DH::active_cell_iterator &)> predicate
+          = IteratorFilters::SubdomainEqualTo(subdomain_id);
+        const std::vector<typename DH::active_cell_iterator>
+        active_halo_layer = GridTools::compute_active_cell_halo_layer (dof_handler,
+                            predicate);
+
+        // Extract DoFs associated with halo layer
+        std::vector<types::global_dof_index> local_dof_indices;
+        std::set<types::global_dof_index> subdomain_halo_global_dof_indices;
+        for (typename std::vector<typename DH::active_cell_iterator>::const_iterator
+             it_cell = active_halo_layer.begin(); it_cell!=active_halo_layer.end(); ++it_cell)
+          {
+            const typename DH::active_cell_iterator &cell = *it_cell;
+            Assert(cell->subdomain_id() != subdomain_id,
+                   ExcMessage("The subdomain ID of the halo cell should not match that of the vector entry."));
+
+            local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+            cell->get_dof_indices(local_dof_indices);
+
+            for (std::vector<types::global_dof_index>::iterator it=local_dof_indices.begin();
+                 it!=local_dof_indices.end();
+                 ++it)
+              subdomain_halo_global_dof_indices.insert(*it);
+          }
+
+        dof_set[subdomain_id].add_indices(subdomain_halo_global_dof_indices.begin(),
+                                          subdomain_halo_global_dof_indices.end());
+
+        dof_set[subdomain_id].compress();
+      }
+
+    return dof_set;
+  }
 
   template <class DH>
   void
@@ -1132,6 +1255,9 @@ namespace DoFTools
            ExcDimensionMismatch(subdomain_association.size(),
                                 dof_handler.n_dofs()));
 
+    Assert(dof_handler.n_dofs() > 0,
+           ExcMessage("Number of DoF is not positive. "
+                      "This could happen when the function is called before NumberCache is written."));
     // preset all values by an invalid value
     std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
                  numbers::invalid_subdomain_id);
@@ -1446,6 +1572,7 @@ namespace DoFTools
       = *std::max_element (target_component.begin(),
                            target_component.end());
     const unsigned int n_target_components = max_component + 1;
+    (void)n_target_components; // silence possible warning about unused variable
 
     AssertDimension (dofs_per_component.size(), n_target_components);
 
@@ -1482,12 +1609,12 @@ namespace DoFTools
             ExcInternalError());
 
     // reduce information from all CPUs
-#if defined(DEAL_II_WITH_P4EST) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_WITH_MPI
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&dof_handler.get_tria())))
       {
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
@@ -1538,6 +1665,8 @@ namespace DoFTools
           = *std::max_element (target_block.begin(),
                                target_block.end());
         const unsigned int n_target_blocks = max_block + 1;
+        (void)n_target_blocks; // silence possible warning about unused variable
+
         const unsigned int n_blocks = fe.n_blocks();
 
         AssertDimension (dofs_per_block.size(), n_target_blocks);
@@ -1559,12 +1688,11 @@ namespace DoFTools
           += std::count(dofs_by_block.begin(), dofs_by_block.end(),
                         block);
 
-#ifdef DEAL_II_WITH_P4EST
 #ifdef DEAL_II_WITH_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
-        if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> *tria
-            = (dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+        if (const parallel::Triangulation<DH::dimension,DH::space_dimension> *tria
+            = (dynamic_cast<const parallel::Triangulation<DH::dimension,DH::space_dimension>*>
                (&dof_handler.get_tria())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
@@ -1573,7 +1701,6 @@ namespace DoFTools
                             DEAL_II_DOF_INDEX_MPI_TYPE,
                             MPI_SUM, tria->get_communicator());
           }
-#endif
 #endif
       }
   }
@@ -1622,10 +1749,10 @@ namespace DoFTools
   template <class DH>
   void map_dof_to_boundary_indices (
     const DH                      &dof_handler,
-    const std::set<types::boundary_id> &boundary_indicators,
+    const std::set<types::boundary_id> &boundary_ids,
     std::vector<types::global_dof_index>     &mapping)
   {
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
     mapping.clear ();
@@ -1633,7 +1760,7 @@ namespace DoFTools
                     DH::invalid_dof_index);
 
     // return if there is nothing to do
-    if (boundary_indicators.size() == 0)
+    if (boundary_ids.size() == 0)
       return;
 
     std::vector<types::global_dof_index> dofs_on_face;
@@ -1644,8 +1771,8 @@ namespace DoFTools
                                       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-        if (boundary_indicators.find (cell->face(f)->boundary_indicator()) !=
-            boundary_indicators.end())
+        if (boundary_ids.find (cell->face(f)->boundary_id()) !=
+            boundary_ids.end())
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
@@ -1656,7 +1783,7 @@ namespace DoFTools
           }
 
     AssertDimension (next_boundary_index,
-                     dof_handler.n_boundary_dofs (boundary_indicators));
+                     dof_handler.n_boundary_dofs (boundary_ids));
   }
 
   namespace internal

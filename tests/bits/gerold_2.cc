@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <fstream>
@@ -56,7 +56,7 @@ void LaplaceProblem<dim>::run ()
   std::ifstream input_file(SOURCE_DIR "/gerold_1.inp");
   grid_in.read_ucd(input_file);
 
-  SparsityPattern cell_connectivity;
+  DynamicSparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells (triangulation,
                                              cell_connectivity);
   std::vector<types::global_dof_index> permutation(triangulation.n_active_cells());

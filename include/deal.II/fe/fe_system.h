@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_system_h
-#define __deal2__fe_system_h
+#ifndef dealii__fe_system_h
+#define dealii__fe_system_h
 
 
 /*----------------------------   fe_system.h     ---------------------------*/
@@ -27,6 +27,7 @@
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * This class provides an interface to group several elements together into
@@ -517,6 +518,64 @@ public:
                              const unsigned int component) const;
 
   /**
+   * Return the tensor of third derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. Since this finite element is
+   * always vector-valued, we return the value of the only non-zero component
+   * of the vector value of this shape function. If the shape function has
+   * more than one non-zero component (which we refer to with the term non-
+   * primitive), then throw an exception of type @p
+   * ExcShapeFunctionNotPrimitive.
+   *
+   * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * @p FiniteElement (corresponding to the @p ith shape function) depend on
+   * the shape of the cell in real space.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the third derivatives of the @p componentth vector component of
+   * the @p ith shape function at the point @p p. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector valued in general, it relays the computation
+   * of these values to the base elements.
+   */
+  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
+   * Return the tensor of fourth derivatives of the @p ith shape function at
+   * point @p p on the unit cell. The derivatives are derivatives on the unit
+   * cell with respect to unit cell coordinates. Since this finite element is
+   * always vector-valued, we return the value of the only non-zero component
+   * of the vector value of this shape function. If the shape function has
+   * more than one non-zero component (which we refer to with the term non-
+   * primitive), then throw an exception of type @p
+   * ExcShapeFunctionNotPrimitive.
+   *
+   * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
+   * @p FiniteElement (corresponding to the @p ith shape function) depend on
+   * the shape of the cell in real space.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
+                                              const Point<dim>   &p) const;
+
+  /**
+   * Return the fourth derivatives of the @p componentth vector component of
+   * the @p ith shape function at the point @p p. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector valued in general, it relays the computation
+   * of these values to the base elements.
+   */
+  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim>   &p,
+                                                        const unsigned int component) const;
+
+  /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
    * <tt>source.dofs_per_cell</tt>.
@@ -797,67 +856,54 @@ protected:
    */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags      update_flags,
             const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const ;
+            const Quadrature<dim> &quadrature) const;
 
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags      update_flags,
                  const Mapping<dim,spacedim>    &mapping,
-                 const Quadrature<dim-1> &quadrature) const ;
+                 const Quadrature<dim-1> &quadrature) const;
 
-  virtual typename Mapping<dim,spacedim>::InternalDataBase *
+  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags      update_flags,
                     const Mapping<dim,spacedim>    &mapping,
-                    const Quadrature<dim-1> &quadrature) const ;
+                    const Quadrature<dim-1> &quadrature) const;
 
-  /**
-   * Implementation of the same function in FiniteElement.
-   *
-   * Passes on control to @p compute_fill that does the work for all three
-   * <tt>fill_fe*_values</tt> functions.
-   */
-  virtual void
-  fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
+  virtual
+  void
+  fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                            &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                  FEValuesData<dim,spacedim>                       &data,
-                  CellSimilarity::Similarity                  &cell_similarity) const;
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                  const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
+                  const CellSimilarity::Similarity                           cell_similarity) const;
 
-  /**
-   * Implementation of the same function in FiniteElement.
-   *
-   * Passes on control to @p compute_fill that does the work for all three
-   * <tt>fill_fe*_values</tt> functions.
-   */
-  virtual void
-  fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+  virtual
+  void
+  fill_fe_face_values (const Mapping<dim,spacedim>                               &mapping,
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                    face_no,
-                       const Quadrature<dim-1>              &quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
-                       FEValuesData<dim,spacedim>                    &data) const ;
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                       const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
-  /**
-   * Implementation of the same function in FiniteElement.
-   *
-   * Passes on control to @p compute_fill that does the work for all three
-   * <tt>fill_fe*_values</tt> functions.
-   */
-  virtual void
-  fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+  virtual
+  void
+  fill_fe_subface_values (const Mapping<dim,spacedim>                               &mapping,
                           const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                    face_no,
-                          const unsigned int                    sub_no,
-                          const Quadrature<dim-1>              &quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
-                          FEValuesData<dim,spacedim>                    &data) const ;
-
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         sub_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
+                          const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
+                          const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                          internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
   /**
    * Do the work for the three <tt>fill_fe*_values</tt> functions.
@@ -875,10 +921,11 @@ protected:
                      const unsigned int                                face_no,
                      const unsigned int                                sub_no,
                      const Quadrature<dim_1>                          &quadrature,
-                     CellSimilarity::Similarity                   cell_similarity,
-                     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                     typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                     FEValuesData<dim,spacedim>                       &data) const ;
+                     const CellSimilarity::Similarity                   cell_similarity,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
+                     const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
 private:
 
@@ -1038,6 +1085,24 @@ private:
   hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
+   * Compute the equivalent of compute_fill(), but only for the base element
+   * specified by the second-to-last argument. Some elements are grouped
+   * together to stay within the limit of 8 function arguments of boost.
+   */
+  template <int dim_1>
+  void
+  compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
+                         const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+                         CellSimilarity::Similarity>       cell_and_similarity,
+                         const std::pair<unsigned int,unsigned int>        face_sub_no,
+                         const Quadrature<dim_1>                          &quadrature,
+                         const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
+                         const typename FiniteElement<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
+                         const unsigned int                                base_element,
+                         const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+
+  /**
    * Usually: Fields of cell-independent data.
    *
    * However, here, this class does not itself store the data but only
@@ -1048,22 +1113,15 @@ private:
   public:
     /**
      * Constructor. Is called by the @p get_data function. Sets the size of
-     * the @p base_fe_datas vector to @p n_base_elements and initializes the
-     * compute_hessians field.
+     * the @p base_fe_datas vector to @p n_base_elements.
      */
-    InternalData (const unsigned int n_base_elements,
-                  const bool         compute_hessians);
+    InternalData (const unsigned int n_base_elements);
 
     /**
      * Destructor. Deletes all @p InternalDatas whose pointers are stored by
      * the @p base_fe_datas vector.
      */
     ~InternalData();
-
-    /**
-     * Flag indicating whether second derivatives shall be computed.
-     */
-    const bool compute_hessians;
 
     /**
      * Gives write-access to the pointer to a @p InternalData of the @p
@@ -1079,29 +1137,13 @@ private:
     typename FiniteElement<dim,spacedim>::InternalDataBase &
     get_fe_data (const unsigned int base_no) const;
 
-
     /**
-     * Gives write-access to the pointer to a @p FEValuesData for the @p
-     * base_noth base element.
+     * Gives read-access to the pointer to an object to which into which the
+     * <code>base_no</code>th base element will write its output when calling
+     * FiniteElement::fill_fe_values() and similar functions.
      */
-    void set_fe_values_data (const unsigned int base_no,
-                             FEValuesData<dim,spacedim> *);
-
-    /**
-     * Gives read-access to the pointer to a @p FEValuesData for the @p
-     * base_noth base element.
-     */
-    FEValuesData<dim,spacedim> &get_fe_values_data (const unsigned int base_no) const;
-
-    /**
-     * Deletes the @p FEValuesData the <tt>fe_datas[base_no]</tt> pointer is
-     * pointing to. Sets <tt>fe_datas[base_no]</tt> to zero.
-     *
-     * This function is used to delete @p FEValuesData that are needed only on
-     * the first cell but not any more afterwards.  This is the case for e.g.
-     * Lagrangian elements (see e.g. @p FE_Q classes).
-     */
-    void delete_fe_values_data (const unsigned int base_no);
+    internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+    get_fe_output_object (const unsigned int base_no) const;
 
     /**
      * Set the @p first_cell flag to @p false. Used by the @p FEValues class
@@ -1127,14 +1169,14 @@ private:
     typename std::vector<typename FiniteElement<dim,spacedim>::InternalDataBase *> base_fe_datas;
 
     /**
-     * Pointers to the @p FEValuesData objects that are given to the @p
-     * fill_fe_values function of the base elements. They are accessed to by
-     * the @p set_ and @p get_fe_values_data functions.
+     * A collection of objects to which the base elements will write their output
+     * when we call
+     * FiniteElement::fill_fe_values() and related functions on them.
      *
      * The size of this vector is set to @p n_base_elements by the
      * InternalData constructor.
      */
-    std::vector<FEValuesData<dim,spacedim> *> base_fe_values_datas;
+    mutable std::vector<internal::FEValues::FiniteElementRelatedData<dim,spacedim> > base_fe_output_objects;
   };
 
   /*

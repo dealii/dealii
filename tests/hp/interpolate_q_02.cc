@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,8 +104,8 @@ void test ()
                                              hp::QCollection<dim>(QGauss<dim>(q+2)),
                                              VectorTools::L2_norm);
           if (q<=p)
-            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-                    ExcInternalError());
+            AssertThrow (error.l2_norm() < 1e-12*interpolant.l2_norm(),
+                         ExcInternalError());
 
           deallog << fe.get_name() << ", P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()

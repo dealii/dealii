@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_dg_vector_h
-#define __deal2__fe_dg_vector_h
+#ifndef dealii__fe_dg_vector_h
+#define dealii__fe_dg_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>

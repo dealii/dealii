@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__parallel_vector_h
-#define __deal2__parallel_vector_h
+#ifndef dealii__parallel_vector_h
+#define dealii__parallel_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>
@@ -360,9 +360,11 @@ namespace parallel
       /**
        * This method copies the local range from another vector with the same
        * local range, but possibly different layout of ghost indices.
+       *
+       * This function is deprecated.
        */
       void copy_from (const Vector<Number> &in_vector,
-                      const bool            call_update_ghost_values = false);
+                      const bool            call_update_ghost_values = false) DEAL_II_DEPRECATED;
 
       /**
        * Sets all elements of the vector to the scalar @p s. If the scalar is
@@ -636,22 +638,28 @@ namespace parallel
 
       /**
        * Returns the number of ghost elements present on the vector.
+       *
+       * This function is deprecated.
        */
-      size_type n_ghost_entries () const;
+      size_type n_ghost_entries () const DEAL_II_DEPRECATED;
 
       /**
        * Return an index set that describes which elements of this vector are
        * not owned by the current processor but can be written into or read
        * from locally (ghost elements).
+       *
+       * This function is deprecated.
        */
-      const IndexSet &ghost_elements() const;
+      const IndexSet &ghost_elements() const DEAL_II_DEPRECATED;
 
       /**
        * Returns whether the given global index is a ghost index on the
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
+       *
+       * This function is deprecated.
        */
-      bool is_ghost_entry (const types::global_dof_index global_index) const;
+      bool is_ghost_entry (const types::global_dof_index global_index) const DEAL_II_DEPRECATED;
 
       /**
        * Make the @p Vector class a bit like the <tt>vector<></tt> class of
@@ -784,7 +792,7 @@ namespace parallel
       Vector<Number> &operator -= (const Vector<Number> &V);
 
       /**
-       * A collective add operation: This funnction adds a whole set of values
+       * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
       template <typename OtherNumber>
@@ -813,12 +821,14 @@ namespace parallel
        * Addition of @p s to all components. Note that @p s is a scalar and
        * not a vector.
        */
-      void add (const Number s);
+      void add (const Number s) DEAL_II_DEPRECATED;
 
       /**
        * Simple vector addition, equal to the <tt>operator +=</tt>.
+       *
+       * @deprecated Use the <tt>operator +=</tt> instead.
        */
-      void add (const Vector<Number> &V);
+      void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
@@ -848,16 +858,20 @@ namespace parallel
 
       /**
        * Scaling and multiple addition.
+       *
+       * This function is deprecated.
        */
       void sadd (const Number          s,
                  const Number          a,
                  const Vector<Number> &V,
                  const Number          b,
-                 const Vector<Number> &W);
+                 const Vector<Number> &W) DEAL_II_DEPRECATED;
 
       /**
        * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
        * c*X</tt>.
+       *
+       * This function is deprecated.
        */
       void sadd (const Number          s,
                  const Number          a,
@@ -865,7 +879,7 @@ namespace parallel
                  const Number          b,
                  const Vector<Number> &W,
                  const Number          c,
-                 const Vector<Number> &X);
+                 const Vector<Number> &X) DEAL_II_DEPRECATED;
 
       /**
        * Scale each element of the vector by a constant value.
@@ -905,16 +919,20 @@ namespace parallel
 
       /**
        * Assignment <tt>*this = a*u + b*v</tt>.
+       *
+       * This function is deprecated.
        */
       void equ (const Number a, const Vector<Number> &u,
-                const Number b, const Vector<Number> &v);
+                const Number b, const Vector<Number> &v) DEAL_II_DEPRECATED;
 
       /**
        * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+       *
+       * This function is deprecated.
        */
       void equ (const Number a, const Vector<Number> &u,
                 const Number b, const Vector<Number> &v,
-                const Number c, const Vector<Number> &w);
+                const Number c, const Vector<Number> &w) DEAL_II_DEPRECATED;
 
       /**
        * Compute the elementwise ratio of the two given vectors, that is let
@@ -927,7 +945,7 @@ namespace parallel
        * attempt is made to catch such situations.
        */
       void ratio (const Vector<Number> &a,
-                  const Vector<Number> &b);
+                  const Vector<Number> &b) DEAL_II_DEPRECATED;
       //@}
 
 
@@ -944,7 +962,7 @@ namespace parallel
       /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
-       * the have the same local size and the same ghost indices. They do not
+       * they have the same local size and the same ghost indices. They do not
        * necessarily need to be the same data field. This is a local operation
        * only, i.e., if only some processors decide that the partitioning is
        * not compatible, only these processors will return @p false, whereas
@@ -953,6 +971,21 @@ namespace parallel
       bool
       partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
 
+      /**
+       * Checks whether the given partitioner is compatible with the
+       * partitioner used for this vector. Two partitioners are compatible if
+       * they have the same local size and the same ghost indices. They do not
+       * necessarily need to be the same data field. As opposed to
+       * partitioners_are_compatible(), this method checks for compatibility
+       * among all processors and the method only returns @p true if the
+       * partitioner is the same on all processors.
+       *
+       * This method performs global communication, so make sure to use it
+       * only in a context where all processors call it the same number of
+       * times.
+       */
+      bool
+      partitioners_are_globally_compatible (const Utilities::MPI::Partitioner &part) const;
 
       /**
        * Prints the vector to the output stream @p out.
@@ -1291,13 +1324,18 @@ namespace parallel
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
-          size_type local_ranges_different_loc = (local_range() !=
-                                                  c.local_range());
-          if ((partitioner->n_mpi_processes() > 1 &&
-               Utilities::MPI::max(local_ranges_different_loc,
-                                   partitioner->get_communicator()) != 0)
+          // local ranges are also the same if both partitioners are empty
+          // (even if they happen to define the empty range as [0,0) or [c,c)
+          // for some c!=0 in a different way).
+          int local_ranges_are_identical =
+            (local_range() == c.local_range() ||
+             (local_range().second == local_range().first &&
+              c.local_range().second == c.local_range().first));
+          if ((c.partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::min(local_ranges_are_identical,
+                                   c.partitioner->get_communicator()) == 0)
               ||
-              local_ranges_different_loc)
+              !local_ranges_are_identical)
             reinit (c, true);
           else
             must_update_ghost_values |= vector_is_ghosted;
@@ -1316,6 +1354,8 @@ namespace parallel
 
       if (must_update_ghost_values)
         update_ghost_values();
+      else
+        zero_out_ghosts();
       return *this;
     }
 
@@ -2321,17 +2361,6 @@ namespace parallel
     Vector<Number>::get_mpi_communicator() const
     {
       return partitioner->get_communicator();
-    }
-
-
-
-    template <typename Number>
-    inline
-    bool
-    Vector<Number>::partitioners_are_compatible
-    (const Utilities::MPI::Partitioner &part) const
-    {
-      return partitioner->is_compatible (part);
     }
 
 #endif  // ifndef DOXYGEN

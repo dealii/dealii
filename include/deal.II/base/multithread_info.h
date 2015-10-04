@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__multithread_info_h
-#define __deal2__multithread_info_h
+#ifndef dealii__multithread_info_h
+#define dealii__multithread_info_h
 //---------------------------------------------------------------------------
 
 
@@ -71,11 +71,9 @@ public:
   static unsigned int n_threads ();
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined exactly
-   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
-   * type with a certain number of elements?), this is only an estimate.
-   * however often quite close to the true value.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   static std::size_t memory_consumption ();
 
@@ -86,19 +84,12 @@ public:
    * given, the default from TBB is used (based on the number of cores in the
    * system).
    *
-   * Due to limitations in the way TBB can be controlled, only the first call
-   * to this method will have any effect. In practice, this means that you
-   * need to call this function before you get to any point in your program
-   * where multiple threads may be created. In other words, the correct place
-   * for a call to this function is at the top of your <code>main()</code>
-   * function.
-   *
-   * This routine is called automatically by MPI_InitFinalize. Use the
-   * appropriate argument of the constructor of MPI_InitFinalize if you have
-   * an MPI based code.
+   * This routine is executed automatically with the default argument before
+   * your code in main() is running (using a static constructor). It is also
+   * executed by MPI_InitFinalize. Use the appropriate argument of the
+   * constructor of MPI_InitFinalize if you have an MPI based code.
    */
   static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
-
 
   /**
    * Returns if the TBB is running using a single thread either because of
@@ -150,6 +141,6 @@ extern MultithreadInfo multithread_info DEAL_II_DEPRECATED;
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef __deal2__multithread_info_h
+// end of #ifndef dealii__multithread_info_h
 #endif
 //---------------------------------------------------------------------------

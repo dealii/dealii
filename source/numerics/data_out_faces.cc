@@ -153,7 +153,12 @@ build_one_patch (const FaceDescriptor *cell_and_face,
               // thus does not depend on the number of components of the data
               // vector
               if (update_flags & update_normal_vectors)
-                data.patch_normals=this_fe_patch_values.get_normal_vectors();
+                {
+//TODO: undo this copying when we can change the data type of
+//  data.patch_normals to Tensor<1,spacedim> as well
+                  for (unsigned int q=0; q<this_fe_patch_values.n_quadrature_points; ++q)
+                    data.patch_normals[q] = Point<dim>(this_fe_patch_values.get_all_normal_vectors()[q]);
+                }
 
               if (n_components == 1)
                 {

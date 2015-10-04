@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__transpose_matrix_h
-#define __deal2__transpose_matrix_h
+#ifndef dealii__transpose_matrix_h
+#define dealii__transpose_matrix_h
 
 
 #include <deal.II/base/subscriptor.h>
@@ -24,13 +24,18 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * The transpose of a given matrix.  This auxiliary class swaps the effect ov
+ * The transpose of a given matrix.  This auxiliary class swaps the effect of
  * vmult() and Tvmult() as well as vmult_add() and Tvmult_add().
  *
  * The implementation is analogous to the class PointerMatrix.
  *
  * @note The transposed matrix is never actually assembled. Instead, only the
  * matrix vector multiplication is performed in a transposed way.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat, 2006
@@ -85,7 +90,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -97,7 +102,7 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product, adding to <tt>dst</tt>.
+   * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const;

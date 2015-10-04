@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,20 +59,22 @@ void test()
 
 
   GridGenerator::subdivided_hyper_rectangle(triangulation,
-					    n_cells,
-					    left_bottom,
-					    right_top,
-					    true);
+                                            n_cells,
+                                            left_bottom,
+                                            right_top,
+                                            true);
 
   typename Triangulation<2>::active_cell_iterator
-    cell = triangulation.begin_active(),
-    endc = triangulation.end();
-  for (; cell!=endc; ++cell){
-    Point<2> cell_center = cell->center();
-    if (abs(cell_center(0) - 1500) < 550){
-      cell->set_refine_flag ();
+  cell = triangulation.begin_active(),
+  endc = triangulation.end();
+  for (; cell!=endc; ++cell)
+    {
+      Point<2> cell_center = cell->center();
+      if (abs(cell_center(0) - 1500) < 550)
+        {
+          cell->set_refine_flag ();
+        }
     }
-  }
 
   triangulation.execute_coarsening_and_refinement ();
 
@@ -81,10 +83,10 @@ void test()
   try
     {
       std::pair<typename Triangulation<2>::active_cell_iterator, Point<2> > current_cell =
-	GridTools::find_active_cell_around_point(MappingQ1<2>(), triangulation, test_point);
+        GridTools::find_active_cell_around_point(MappingQ1<2>(), triangulation, test_point);
 
       deallog << "cell: index = " << current_cell.first->index()
-	      << " level = " << current_cell.first->level() << std::endl;
+              << " level = " << current_cell.first->level() << std::endl;
       deallog << " pos: " << current_cell.second << std::endl;
     }
   catch (GridTools::ExcPointNotFound<2> &e)

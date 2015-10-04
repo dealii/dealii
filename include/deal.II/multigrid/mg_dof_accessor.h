@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_dof_accessor_h
-#define __deal2__mg_dof_accessor_h
+#ifndef dealii__mg_dof_accessor_h
+#define dealii__mg_dof_accessor_h
 
 #warning This file is deprecated. Use <deal.II/dofs/dof_accessor.h> instead.
 #include <deal.II/dofs/dof_accessor.h>

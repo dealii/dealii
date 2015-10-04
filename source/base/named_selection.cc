@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/named_data.h>
+#include <deal.II/algorithms/named_selection.h>
 #include <deal.II/algorithms/any_data.h>
 
 DEAL_II_NAMESPACE_OPEN

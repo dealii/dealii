@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -157,7 +157,7 @@ void test()
   // set boundary id on cell 1
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     if (tr.begin_active()->at_boundary(f))
-      tr.begin_active()->face(f)->set_boundary_indicator (1);
+      tr.begin_active()->face(f)->set_boundary_id (1);
 
   test(tr);
 }

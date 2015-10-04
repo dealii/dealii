@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,9 +75,9 @@ void check ()
     std::string s = "set x=5\n";
     bool success = prm.read_input_from_string (s.c_str());
     deallog << "success? "
-	    << success
-	    << " (should work), x correct? "
-	    << (prm.get_integer("x")==5) << std::endl;
+            << success
+            << " (should work), x correct? "
+            << (prm.get_integer("x")==5) << std::endl;
     prm.leave_subsection();
   }
 

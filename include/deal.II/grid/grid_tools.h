@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_tools_H
-#define __deal2__grid_tools_H
+#ifndef dealii__grid_tools_H
+#define dealii__grid_tools_H
 
 
 #include <deal.II/base/config.h>
@@ -26,6 +26,7 @@
 
 #include <bitset>
 #include <list>
+#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -127,7 +128,7 @@ namespace GridTools
                  const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
-   * Return the diamater of the smallest active cell of a triangulation. See
+   * Return the diameter of the smallest active cell of a triangulation. See
    * step-24 for an example of use of this function.
    */
   template <int dim, int spacedim>
@@ -135,7 +136,7 @@ namespace GridTools
   minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Return the diamater of the largest active cell of a triangulation.
+   * Return the diameter of the largest active cell of a triangulation.
    */
   template <int dim, int spacedim>
   double
@@ -242,7 +243,7 @@ namespace GridTools
    * triangulation stated there hold for this function as well.
    */
   template <int dim, int spacedim>
-  void shift (const Point<spacedim>   &shift_vector,
+  void shift (const Tensor<1,spacedim>    &shift_vector,
               Triangulation<dim,spacedim> &triangulation);
 
 
@@ -295,6 +296,15 @@ namespace GridTools
   void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                           Triangulation<dim> &tria,
                           const Function<dim,double> *coefficient = 0);
+
+  /**
+   * Returns a std::map with all vertices of faces located in the boundary
+   *
+   * @param[in] tria The Triangulation object.
+   */
+  template <int dim, int spacedim>
+  std::map<unsigned int,Point<spacedim> >
+  get_all_vertices_at_boundary (const Triangulation<dim, spacedim> &tria);
 
   /**
    * Scale the entire triangulation by the given factor. To preserve the
@@ -547,6 +557,93 @@ namespace GridTools
   get_active_neighbors (const typename Container::active_cell_iterator        &cell,
                         std::vector<typename Container::active_cell_iterator> &active_neighbors);
 
+  /**
+   * Extract and return the active cell layer around a subdomain (set of active
+   * cells) in the @p container (i.e. those that share a common set of vertices
+   * with the subdomain but are not a part of it).
+   * Here, the "subdomain" consists of exactly all of those cells for which the
+   * @p predicate returns @p true.
+   *
+   * An example of a custom predicate is one that checks for a given material id
+   * @code
+   * template<int dim>
+   * bool
+   * pred_mat_id(const typename Triangulation<dim>::active_cell_iterator & cell)
+   * {
+   *   return cell->material_id() ==  1;
+   * }
+   * @endcode
+   * and we can then extract the layer of cells around this material with the
+   * following call:
+   * @code
+   * GridTools::compute_active_cell_halo_layer(tria, pred_mat_id<dim>);
+   * @endcode
+   *
+   * Predicates that are frequently useful can be found in namespace IteratorFilters.
+   * For example, it is possible to extracting a layer based on material id
+   * @code
+   * GridTools::compute_active_cell_halo_layer(tria,
+   *                                           IteratorFilters::MaterialIdEqualTo(1, true));
+   * @endcode
+   * or based on a set of active FE indices for an hp::DoFHandler
+   * @code
+   * GridTools::compute_active_cell_halo_layer(hp_dof_handler,
+   *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
+   * @endcode
+   * Note that in the last two examples we ensure that the predicate returns
+   * true only for locally owned cells. This means that the halo layer will
+   * not contain any artificial cells.
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer).
+   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * DoFHandler, or hp::DoFHandler).
+   * @param[in] predicate A function  (or object of a type with an operator())
+   * defining the subdomain around which the halo layer is to be extracted. It
+   * is a function that takes in an active cell and returns a boolean.
+   * @return A list of active cells sharing at least one common vertex with the
+   * predicated subdomain.
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_active_cell_halo_layer (const Container                                                                    &container,
+                                  const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate);
+
+  /**
+   * Extract and return ghost cells which are the active cell layer
+   * around all locally owned cells. This is most relevant for
+   * parallel::shared::Triangulation where it will return a subset of all
+   * ghost cells on a processor, but for parallel::distributed::Triangulation
+   * this will return all the ghost cells.
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer).
+   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * DoFHandler, or hp::DoFHandler).
+   * @return A list of ghost cells
+   *
+   * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  compute_ghost_cell_halo_layer (const Container &container);
+
+
+  /**
+   * Return the adjacent cells of all the vertices. If a vertex is also a
+   * hanging node, the associated coarse cell is also returned. The vertices
+   * are ordered by the vertex index. This is the number returned by the
+   * function <code>cell-@>vertex_index()</code>. Notice that only the
+   * indices marked in the array returned by
+   * Triangulation<dim,spacedim>::get_used_vertices() are used.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
+  vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
+
+
   /*@}*/
   /**
    * @name Partitions and subdomains of triangulations
@@ -564,7 +661,30 @@ namespace GridTools
   template <int dim, int spacedim>
   void
   get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
-                                  SparsityPattern                    &connectivity);
+                                  DynamicSparsityPattern             &connectivity);
+
+  /**
+   * As above, but filling a SparsityPattern object instead.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  void
+  get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
+                                  SparsityPattern                    &connectivity) DEAL_II_DEPRECATED;
+
+  /**
+   * Produce a sparsity pattern in which nonzero entries indicate that two
+   * cells are connected via a common vertex. The diagonal entries of the
+   * sparsity pattern are also set.
+   *
+   * The rows and columns refer to the cells as they are traversed in their
+   * natural order using cell iterators.
+   */
+  template <int dim, int spacedim>
+  void
+  get_vertex_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
+                                    DynamicSparsityPattern             &connectivity);
 
   /**
    * Use the METIS partitioner to generate a partitioning of the active cells
@@ -899,29 +1019,24 @@ namespace GridTools
     /**
      * The relative orientation of the first face with respect to the second
      * face as described in orthogonal_equality() and
-     * make_periodicity_constraints() (and stored as a bitset).
+     * DoFTools::make_periodicity_constraints() (and stored as a bitset).
      */
     std::bitset<3> orientation;
 
     /**
-     * A matrix that describes how vector valued DoFs of the first face should
-     * be modified prior to constraining to the DoFs of the second face. If
-     * the std::vector first_vector_components is non empty the matrix is
-     * interpreted as a @p dim $\times$ @p dim rotation matrix that is applied
-     * to all vector valued blocks listed in @p first_vector_components of the
-     * FESystem. If @p first_vector_components is empty the matrix is
-     * interpreted as an interpolation matrix with size no_face_dofs $\times$
-     * no_face_dofs. For more details see make_periodicity_constraints() and
+     * A @p dim $\times$ @p dim rotation matrix that describes how vector
+     * valued DoFs of the first face should be modified prior to
+     * constraining to the DoFs of the second face.
+     *
+     * The rotation matrix is used in
+     * DoFTools::make_periodicity_constriants() by applying the rotation to
+     * all vector valued blocks listed in the parameter
+     * @p first_vector_components of the finite element space.
+     * For more details see DoFTools::make_periodicity_constraints() and
      * the glossary
      * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
-
-    /**
-     * A vector of unsigned ints pointing to the first components of all
-     * vector valued blocks that should be rotated by matrix.
-     */
-    std::vector<unsigned int> first_vector_components;
   };
 
 
@@ -931,11 +1046,11 @@ namespace GridTools
    * @p face1 and @p face2 are considered equal, if a one to one matching
    * between its vertices can be achieved via an orthogonal equality relation.
    *
-   * Hereby, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
+   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
    * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
    * direction @p direction. If the parameter @p matrix is a reference to a
-   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
-   * identity matrix.
+   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is
+   * the identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1
    * with respect to @p face2 is returned in the bitset @p orientation, where
@@ -1015,9 +1130,10 @@ namespace GridTools
 
 
   /**
-   * This function will collect periodic face pairs on the coarsest mesh level
-   * of the given @p container (a Triangulation or DoFHandler) and add them to
-   * the vector @p matched_pairs leaving the original contents intact.
+   * This function will collect periodic face pairs on the coarsest mesh
+   * level of the given @p container (a Triangulation or DoFHandler) and
+   * add them to the vector @p matched_pairs leaving the original contents
+   * intact.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id @p
    * b_id1 and a 'second' boundary consisting of all faces belonging to @p
@@ -1028,25 +1144,31 @@ namespace GridTools
    * orthogonal_equality().
    *
    * The bitset that is returned inside of PeriodicFacePair encodes the
-   * _relative_ orientation of the first face with respect to the second face,
-   * see the documentation of orthogonal_equality() for further details.
+   * _relative_ orientation of the first face with respect to the second
+   * face, see the documentation of orthogonal_equality() for further
+   * details.
    *
    * The @p direction refers to the space direction in which periodicity is
-   * enforced.
+   * enforced. When maching periodic faces this vector component is ignored.
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary. This can be
-   * used to implement conditions such as $u(0,y)=u(1,y+1)$.
+   * them to the corresponding vertices of the 'second' boundary. This can
+   * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
-   * Optionally a (dim x dim) rotation matrix @p matrix along with a vector @p
-   * first_vector_components can be specified that describes how vector valued
-   * DoFs of the first face should be modified prior to constraining to the
-   * DoFs of the second face. If @p first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all vector
-   * valued blocks listed in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
+   * Optionally, a $dim\times dim$ rotation @p matrix can be specified that
+   * describes how vector valued DoFs of the first face should be modified
+   * prior to constraining to the DoFs of the second face.
+   * The @p matrix is used in two places. First, @p matrix will be supplied
+   * to orthogonal_equality() and used for matching faces: Two vertices
+   * $v_1$ and $v_2$ match if
+   * $\text{matrix}\cdot v_1 + \text{offset} - v_2$
+   * is parallel to the unit vector in unit direction @p direction.
+   * (For more details see DoFTools::make_periodicity_constraints(), the
+   * glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
+   * and @ref step_45 "step-45"). Second, @p matrix will be stored in the
+   * PeriodicFacePair collection @p matched_pairs for further use.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1058,11 +1180,11 @@ namespace GridTools
    * periodicity algebraically.
    *
    * @note Because elements will be added to @p matched_pairs (and existing
-   * entries will be preserved), it is possible to call this function several
-   * times with different boundary ids to generate a vector with all periodic
-   * pairs.
+   * entries will be preserved), it is possible to call this function
+   * several times with different boundary ids to generate a vector with
+   * all periodic pairs.
    *
-   * @author Daniel Arndt, Matthias Maier, 2013, 2014
+   * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename CONTAINER>
   void
@@ -1073,8 +1195,7 @@ namespace GridTools
    const int                                                          direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const Tensor<1,CONTAINER::space_dimension>                        &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
-   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
 
 
   /**
@@ -1083,32 +1204,21 @@ namespace GridTools
    * @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of two
-   * boundary_indicators this function defines a 'left' boundary as all faces
-   * with local face index <code>2*dimension</code> and boundary indicator @p
-   * b_id and, similarly, a 'right' boundary consisting of all face with local
-   * face index <code>2*dimension+1</code> and boundary indicator @p b_id.
+   * boundary_ids this function defines a 'left' boundary as all faces with
+   * local face index <code>2*dimension</code> and boundary indicator @p b_id
+   * and, similarly, a 'right' boundary consisting of all face with local face
+   * index <code>2*dimension+1</code> and boundary indicator @p b_id.
    *
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.
    *
-   * Optionally a rotation matrix @p matrix along with a vector @p
-   * first_vector_components can be specified that describes how vector valued
-   * DoFs of the first face should be modified prior to constraining to the
-   * DoFs of the second face. If @p first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all vector
-   * valued blocks listet in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
-   *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * See above function for further details.
    *
    * @note This version of collect_periodic_face_pairs() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
    *
-   * @author Daniel Arndt, Matthias Maier, 2013, 2014
+   * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename CONTAINER>
   void
@@ -1118,8 +1228,7 @@ namespace GridTools
    const int                                                          direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const dealii::Tensor<1,CONTAINER::space_dimension>                &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
-   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
 
   /*@}*/
   /**
@@ -1137,7 +1246,7 @@ namespace GridTools
    * over. This is a function you'd typically call when there is only one
    * active level on your Triangulation.
    *
-   * The optional parameter @p reset_boundary_ids, indicates wether this
+   * The optional parameter @p reset_boundary_ids, indicates whether this
    * function should reset the boundary_ids of the Triangulation to its
    * default value 0 after copying its value to the manifold_id. By default,
    * boundary_ids are left untouched.
@@ -1158,7 +1267,7 @@ namespace GridTools
    * underlying manifold.
    *
    * When reading a Triangulation from a supported input format, typical
-   * informations that can be stored in a file are boundary conditions for
+   * information that can be stored in a file are boundary conditions for
    * boundary faces (which we store in the boundary_id of the faces), material
    * types for cells (which we store in the material_id of the cells) and in
    * some cases subdomain ids for cells (which we store in the subdomain_id of
@@ -1171,7 +1280,7 @@ namespace GridTools
    * Manifold objects for new points. This function iterates over active cells
    * and copies the material_ids to the manifold_ids.
    *
-   * The optional parameter @p compute_face_ids, indicates wether this
+   * The optional parameter @p compute_face_ids, indicates whether this
    * function should also set the manifold_ids of the faces (both for internal
    * faces and for faces on the boundary). If set to true, then each face will
    * get a manifold_id equal to the minimum of the surrounding manifold_ids,
@@ -1259,6 +1368,7 @@ namespace GridTools
 
 namespace GridTools
 {
+
   template <int dim, typename Predicate, int spacedim>
   void transform (const Predicate    &predicate,
                   Triangulation<dim, spacedim> &triangulation)
@@ -1408,7 +1518,6 @@ namespace GridTools
 
 
 
-
 // declaration of explicit specializations
 
   template <>
@@ -1427,6 +1536,6 @@ namespace GridTools
 DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   grid_tools.h     ---------------------------*/
-/* end of #ifndef __deal2__grid_tools_H */
+/* end of #ifndef dealii__grid_tools_H */
 #endif
 /*----------------------------   grid_tools.h     ---------------------------*/

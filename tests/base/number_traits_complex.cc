@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,11 +23,22 @@
 #include <limits>
 #include <typeinfo>
 
+// replace type names found on MAC OS
+std::string cleanup_type(const std::string &in)
+{
+  std::string ret = in;
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
+  return ret;
+}
+
 
 template <typename number>
 void check (const number &x)
 {
-  deallog << "typeid(x).name() = " << typeid(x).name()
+  deallog << "typeid(x).name() = "
+          << cleanup_type(typeid(x).name())
           << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "

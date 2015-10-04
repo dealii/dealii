@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_matrix_ez_templates_h
-#define __deal2__sparse_matrix_ez_templates_h
+#ifndef dealii__sparse_matrix_ez_templates_h
+#define dealii__sparse_matrix_ez_templates_h
 
 
 #include <deal.II/lac/sparse_matrix_ez.h>
@@ -66,6 +66,7 @@ template <typename number>
 SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator= (const SparseMatrixEZ<number> &m)
 {
+  (void)m;
   Assert (m.empty(), ExcInvalidConstructorCall());
   return *this;
 }
@@ -75,6 +76,7 @@ template <typename number>
 SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator = (const double d)
 {
+  (void)d;
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   typename std::vector<Entry>::iterator e = data.begin();
@@ -100,6 +102,7 @@ SparseMatrixEZ<number>::reinit(const size_type n_rows,
 {
   clear();
 
+  saved_default_row_length = default_row_length;
   increment = default_increment;
 
   n_columns = n_cols;
@@ -506,7 +509,7 @@ SparseMatrixEZ<number>::print_formatted ( std::ostream          &out,
         width = precision+2;
     }
 
-  // TODO: Skip nonexisting entries
+  // TODO: Skip nonexistant entries
   for (size_type i=0; i<m(); ++i)
     {
       for (size_type j=0; j<n(); ++j)
@@ -544,31 +547,11 @@ SparseMatrixEZ<number>::block_write (std::ostream &out) const
   out.write(reinterpret_cast<const char *>(&*r),
             sizeof(RowInfo) * row_info.size());
 
-//   Just in case that vector entries are not stored consecutively
-//   const typename std::vector<RowInfo>::const_iterator re = row_info.end();
-
-//   while (r != re)
-//     {
-//       out.write(reinterpret_cast<const char*>(&*r),
-//              sizeof(RowInfo));
-//       ++r;
-//     }
-
   out << "][";
 
   typename std::vector<Entry>::const_iterator d = data.begin();
   out.write(reinterpret_cast<const char *>(&*d),
             sizeof(Entry) * data.size());
-
-//   Just in case that vector entries are not stored consecutively
-//   const typename std::vector<Entry>::const_iterator de = data.end();
-
-//   while (d != de)
-//     {
-//       out.write(reinterpret_cast<const char*>(&*d),
-//              sizeof(Entry));
-//       ++d;
-//     }
 
   out << ']';
 
@@ -628,4 +611,4 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_matrix_ez_templates_h
+#endif // dealii__sparse_matrix_ez_templates_h

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_lib_h
-#define __deal2__function_lib_h
+#ifndef dealii__function_lib_h
+#define dealii__function_lib_h
 
 
 #include <deal.II/base/config.h>
@@ -236,14 +236,14 @@ namespace Functions
     /**
      * Second derivatives at a single point.
      */
-    virtual Tensor<2,dim> hessian (const Point<dim>   &p,
-                                   const unsigned int  component = 0) const;
+    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
+                                            const unsigned int  component = 0) const;
 
     /**
      * Second derivatives at multiple points.
      */
     virtual void hessian_list (const std::vector<Point<dim> > &points,
-                               std::vector<Tensor<2,dim> >    &hessians,
+                               std::vector<SymmetricTensor<2,dim> >    &hessians,
                                const unsigned int              component = 0) const;
   };
 
@@ -578,11 +578,10 @@ namespace Functions
                                  const unsigned int              component = 0) const;
 
     /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object. Since sometimes the size of objects can not be determined
-     * exactly (for example: what is the memory consumption of an STL
-     * <tt>std::map</tt> type with a certain number of elements?), this is
-     * only an estimate. however often quite close to the true value.
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object. This is not exact (but will usually be close) because
+     * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
+     * difficult.
      */
     std::size_t memory_consumption () const;
 
@@ -1033,7 +1032,8 @@ namespace Functions
    * described by a $dim$-tuple of exponents. Consequently, the class's
    * constructor takes a Tensor<1,dim> to describe the set of exponents. Most
    * of the time these exponents will of course be integers, but real
-   * exponents are of course equally valid.
+   * exponents are of course equally valid. Exponents can't be real when the
+   * bases are negative numbers.
    *
    * @author Wolfgang Bangerth, 2006
    */
@@ -1154,6 +1154,22 @@ namespace Functions
     value (const Point<dim> &p,
            const unsigned int component = 0) const;
 
+    /**
+     * Compute the gradient of the function defined by bilinear interpolation
+     * of the given data set.
+     *
+     * @param p The point at which the function gradient is to be evaluated.
+     * @param component The vector component. Since this function is scalar,
+     * only zero is a valid argument here.
+     * @return The value of the gradient of the interpolated function at this
+     * point. If the point lies outside the set of coordinates, the function
+     * is extended by a constant and so its gradient is extended by 0.
+     */
+    virtual
+    Tensor<1, dim>
+    gradient (const Point<dim>    &p,
+              const unsigned int component = 0) const;
+
   private:
     /**
      * The set of coordinate values in each of the coordinate directions.
@@ -1255,6 +1271,71 @@ namespace Functions
      */
     const Table<dim,double>                     data_values;
   };
+
+
+  /**
+   * A class that represents a function object for a polynomial. A polynomial
+   * is composed by the summation of multiple monomials. If the polynomial has
+   * n monomials and the dimension is equal to dim, the polynomial can be
+   * written as $\sum_{i=1}^{n} a_{i}(\prod_{d=1}^{dim}
+   * x_{d}^{\alpha_{i,d}})$, where $a_{i}$ are the coefficients of the
+   * monomials and $\alpha_{i,d}$ are their exponents. The class's constructor
+   * takes a Table<2,double> to describe the set of exponents and a
+   * Vector<double> to describe the set of coefficients.
+   *
+   * @author Ángel Rodríguez, 2015
+   */
+  template <int dim>
+  class Polynomial : public Function<dim>
+  {
+  public:
+    /**
+     * Constructor. The coefficients and the exponents of the polynomial are
+     * passed as arguments. The Table<2, double> exponents has a number of
+     * rows equal to the number of monomials of the polynomial and a number of
+     * columns equal to dim. The i-th row of the exponents table contains the
+     * ${\alpha_{i,d}}$ exponents of the i-th monomial $a_{i}\prod_{d=1}^{dim}
+     * x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients vector
+     * contains the coefficient $a_{i}$ for the i-th monomial.
+     */
+    Polynomial (const Table<2,double>     &exponents,
+                const std::vector<double> &coefficients);
+
+    /**
+     * Function value at one point.
+     */
+    virtual double value (const Point<dim> &p,
+                          const unsigned int component = 0) const;
+
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<double>      &values,
+                             const unsigned int       component = 0) const;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1,dim> gradient (const Point<dim> &p,
+                                    const unsigned int component = 0) const;
+
+  private:
+
+    /**
+     * The set of exponents.
+     */
+    const Table<2,double> exponents;
+
+    /**
+     * The set of coefficients.
+     */
+    const std::vector<double> coefficients;
+  };
+
+
+
 }
 DEAL_II_NAMESPACE_CLOSE
 

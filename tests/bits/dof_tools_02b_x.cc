@@ -52,9 +52,9 @@ check_this (const DoFHandler<dim> &dof_handler)
   for (unsigned int l=0; l<20; ++l)
     {
       const unsigned int line = l*(sp.n_rows()/20);
-      for (CompressedSetSparsityPattern::row_iterator
-           c = sp.row_begin(line); c!=sp.row_end(line); ++c)
-        deallog << *c << " ";
+      for (CompressedSetSparsityPattern::iterator
+           c = sp.begin(line); c!=sp.end(line); ++c)
+        deallog << c->column() << " ";
       deallog << std::endl;
     }
 

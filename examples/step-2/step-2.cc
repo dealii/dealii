@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2014 by the deal.II authors
+ * Copyright (C) 1999 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -48,7 +48,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 // We will also need to use an intermediate sparsity pattern structure, which
 // is found in this file:
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // We will want to use a special algorithm to renumber degrees of freedom. It
 // is declared here:
@@ -64,7 +64,7 @@ using namespace dealii;
 // @sect3{Mesh generation}
 
 // This is the function that produced the circular grid in the previous step-1
-// example program. The sole difference is that it returns the grid it
+// example program with fewer refinements steps. The sole difference is that it returns the grid it
 // produces via its argument.
 //
 // The details of what the function does are explained in step-1. The only
@@ -85,13 +85,13 @@ void make_grid (Triangulation<2> &triangulation)
                outer_radius = 1.0;
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
-                              10);
+                              5 );
 
   static const SphericalManifold<2> manifold_description(center);
   triangulation.set_all_manifold_ids(0);
   triangulation.set_manifold (0, manifold_description);
 
-  for (unsigned int step=0; step<5; ++step)
+  for (unsigned int step=0; step<3; ++step)
     {
       Triangulation<2>::active_cell_iterator
       cell = triangulation.begin_active(),
@@ -195,32 +195,32 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
   // number, leading to a lot of wasted memory, sometimes too much for the
   // machine used, even if the unused memory can be released immediately after
   // computing the sparsity pattern. In order to avoid this, we use an
-  // intermediate object of type CompressedSparsityPattern that uses a
+  // intermediate object of type DynamicSparsityPattern that uses a
   // different %internal data structure and that we can later copy into the
   // SparsityPattern object without much overhead. (Some more information on
   // these data structures can be found in the @ref Sparsity module.) In order
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:
-  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                        dof_handler.n_dofs());
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
+                                                  dof_handler.n_dofs());
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
+  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
 
   // Now we are ready to create the actual sparsity pattern that we could
   // later use for our matrix. It will just contain the data already assembled
-  // in the CompressedSparsityPattern.
+  // in the DynamicSparsityPattern.
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (compressed_sparsity_pattern);
+  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
-  std::ofstream out ("sparsity_pattern.1");
-  sparsity_pattern.print_gnuplot (out);
-  // The result is in GNUPLOT format, where in each line of the output file,
-  // the coordinates of one nonzero entry are listed. The output will be shown
-  // below.
+  std::ofstream out ("sparsity_pattern1.svg");
+  sparsity_pattern.print_svg (out);
+  // The result is stored in an <code>.svg</code> file, where each nonzero entry in the
+  // matrix corresponds with a red square in the image. The output will be
+  // shown below.
   //
   // If you look at it, you will note that the sparsity pattern is
   // symmetric. This should not come as a surprise, since we have not given
@@ -265,15 +265,15 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
-  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                        dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
+                                                  dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (compressed_sparsity_pattern);
+  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
 
-  std::ofstream out ("sparsity_pattern.2");
-  sparsity_pattern.print_gnuplot (out);
+  std::ofstream out ("sparsity_pattern2.svg");
+  sparsity_pattern.print_svg (out);
 }
 
 // Again, the output is shown below. Note that the nonzero entries are

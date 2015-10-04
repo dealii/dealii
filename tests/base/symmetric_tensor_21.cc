@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ int main ()
   t = 0;
   deallog << t.norm() << std::endl;
 
-  Assert (t.norm() == 0, ExcInternalError());
+  AssertThrow (t.norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

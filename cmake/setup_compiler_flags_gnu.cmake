@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -58,19 +58,13 @@ ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 # Setup various warnings:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wextra")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wpointer-arith")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
-
-#
-# Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
-# principle a good idea, triggers a lot in BOOST in various places.
-# Unfortunately, this warning is included in -W/-Wall, so disable it if the
-# compiler supports it.
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 
 #
 # Disable Wlong-long that will trigger a lot of warnings when compiling
@@ -81,34 +75,43 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 #
 # Disable deprecation warnings
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
-  # Silence Clang warnings about unused parameters:
+  # Silence Clang warnings about unused compiler parameters (works around a
+  # regression in the clang driver frontend of certain versions):
   #
-  SET(DEAL_II_CXX_FLAGS "-Qunused-arguments ${DEAL_II_CXX_FLAGS}")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Qunused-arguments")
 
   #
-  # *Boy*, clang seems to be the very definition of "pedantic" in
-  # "-pedantic" mode, so disable a bunch of harmless warnings
-  # (that are mainly triggered in third party headers so that we cannot
-  # easily fix them...)
+  # Clang verbosely warns about not supporting all our friend declarations
+  # (and consequently removing access control altogether)
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-dangling-else")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 
-  # suppress warnings in boost 1.56:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
+
+  # without c++11 enabled, clang produces a ton of warnings in boost:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c99-extensions")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-variadic-macros")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
+
+  #
+  # Clang versions prior to 3.6 emit a lot of false positives wrt
+  # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
+  # (which is equivalent to clang < 3.6).
+  #
+  # FIXME: I wait for the day with a clang version "4.0"... and I will
+  # curse the person that thought it is a _great_ idea to come up with
+  # independent version numbers for clang on Mac...
+  #
+  IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6" OR
+      ( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3") )
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+  ENDIF()
 ENDIF()
 
 
@@ -137,8 +140,6 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused")
 ENDIF()
 
 
@@ -181,4 +182,3 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ENDIF()
 
 ENDIF()
-

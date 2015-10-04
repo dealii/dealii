@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,11 +71,11 @@ void check_this (Triangulation<3> &tria)
             const Triangulation<3>::active_cell_iterator neighbor_child
               = neighbor->child(neighbor_child_index);
 
-            Assert (neighbor_child->face(neighbor_neighbor) ==
-                    cell->face(face_no)->child(subface_no),
-                    ExcInternalError());
-            Assert (!neighbor->child(neighbor_child_index)->has_children(),
-                    ExcInternalError());
+            AssertThrow (neighbor_child->face(neighbor_neighbor) ==
+                         cell->face(face_no)->child(subface_no),
+                         ExcInternalError());
+            AssertThrow (!neighbor->child(neighbor_child_index)->has_children(),
+                         ExcInternalError());
           }
 }
 

@@ -491,8 +491,7 @@ namespace internal
     Tensor<1,2>
     normalized_alternating_product (const Tensor<1,2> (&basis_vectors)[1])
     {
-      Tensor<1,2> tmp;
-      cross_product (tmp, basis_vectors[0]);
+      Tensor<1,2> tmp = cross_product_2d (basis_vectors[0]);
       return tmp/tmp.norm();
     }
 
@@ -513,8 +512,7 @@ namespace internal
     Tensor<1,3>
     normalized_alternating_product (const Tensor<1,3> (&basis_vectors)[2])
     {
-      Tensor<1,3> tmp;
-      cross_product (tmp, basis_vectors[0], basis_vectors[1]);
+      Tensor<1,3> tmp = cross_product_3d (basis_vectors[0], basis_vectors[1]);
       return tmp/tmp.norm();
     }
 
@@ -689,11 +687,8 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
   { {1,2},{3,0},{0,3},{2,1}};
   for (unsigned int vertex=0; vertex<vertices_per_face; ++vertex)
     {
-      // first define the two tangent
-      // vectors at the vertex by
-      // using the two lines
-      // radiating away from this
-      // vertex
+      // first define the two tangent vectors at the vertex by using the
+      // two lines radiating away from this vertex
       const Tensor<1,3> tangents[2]
         = { face->vertex(neighboring_vertices[vertex][0])
             - face->vertex(vertex),
@@ -701,13 +696,9 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
             - face->vertex(vertex)
           };
 
-      // then compute the normal by
-      // taking the cross
-      // product. since the normal is
-      // not required to be
-      // normalized, no problem here
-      cross_product (face_vertex_normals[vertex],
-                     tangents[0], tangents[1]);
+      // then compute the normal by taking the cross product. since the
+      // normal is not required to be normalized, no problem here
+      face_vertex_normals[vertex] = cross_product_3d(tangents[0], tangents[1]);
     };
 }
 
@@ -813,10 +804,9 @@ namespace internal
         for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
           for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
             {
-              Tensor<2,dim> tmp;
-              outer_product (tmp,
-                             GeometryInfo<dim>::d_linear_shape_function_gradient (xi, i),
-                             GeometryInfo<dim>::d_linear_shape_function_gradient (xi, j));
+              Tensor<2, dim> tmp = outer_product(
+                                     GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i),
+                                     GeometryInfo<dim>::d_linear_shape_function_gradient(xi, j));
               H_k += (object->vertex(i) * object->vertex(j)) * tmp;
             }
 

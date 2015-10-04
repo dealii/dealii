@@ -14,56 +14,88 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup the testsuite.
+# Set up the testsuite.
 #
 # We define toplevel targets:
 #    setup_tests    - set up testsuite subprojects
-#    regen_tests    - rerun configure stage in every testsuite subproject
-#    clean_tests    - run the 'clean' target in every testsuite subproject
 #    prune_tests    - remove all testsuite subprojects
 #
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+
+MACRO(SET_IF_EMPTY _variable)
+  IF("${${_variable}}" STREQUAL "")
+    SET(${_variable} ${ARGN})
+  ENDIF()
+ENDMACRO()
+
 SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
 
-#
-# First of all, our quicktests:
-#
+IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
-ADD_SUBDIRECTORY(quick_tests)
+  IF(POLICY CMP0037)
+    # allow to override "test" target for quick tests
+    CMAKE_POLICY(SET CMP0037 OLD)
+  ENDIF()
+
+  #
+  # If this CMakeLists.txt file is called from within the deal.II build
+  # system, set up quick tests as well:
+  #
+  ADD_SUBDIRECTORY(quick_tests)
+
+  MESSAGE(STATUS "Setting up testsuite")
+
+  #
+  # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
+  # CMAKE_BINARY_DIR/tests:
+  #
+  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
+
+  SET(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
+
+ELSE()
+
+  MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
+  MESSAGE(STATUS "")
+
+  IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+    MESSAGE(FATAL_ERROR "The testsuite cannot be configured in-source. "
+      "Please create a separate build directory!"
+      )
+  ENDIF()
+
+  FIND_PACKAGE(deal.II 8.3 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
+  PROJECT(testsuite NONE)
+  SET(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
+ENDIF()
+
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
 #
-# Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
-# CMAKE_BINARY_DIR/tests:
+# Always undefine the following variables in the setup_tests target:
 #
-
-MESSAGE(STATUS "Setting up testsuite")
-
-FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
-FILE(WRITE ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake "")
-
-#
-# A config line for tests:
-#
-
-SET(_options "")
-LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
-LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
-FOREACH(_var
-  DIFF_DIR NUMDIFF_DIR TEST_DIFF TEST_PICKUP_REGEX TEST_TIME_LIMIT
-  MPIEXEC MPIEXEC_NUMPROC_FLAG MPIEXEC_PREFLAGS MPIEXEC_POSTFLAGS
-  )
+FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
   LIST(APPEND _options "-U${_var}")
-  IF(DEFINED ${_var})
+  IF(NOT "${${_var}}" STREQUAL "")
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
 
-SET(_categories
-  a-framework algorithms all-headers aniso arpack base bits build_tests
-  codim_one deal.II distributed_grids fe gla grid hp integrators lac lapack
-  manifold matrix_free mesh_converter metis mpi multigrid opencascade petsc
-  serialization slepc trilinos umfpack
+#
+# Find all testsuite subprojects, i.e., every directory that contains a
+# CMakeLists.txt file (with the exception of "quick_tests").
+#
+SET(_categories)
+FILE(GLOB _dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/*
   )
+FOREACH(_dir ${_dirs})
+  IF( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt AND
+      NOT ${_dir} MATCHES quick_tests)
+    LIST(APPEND _categories ${_dir})
+  ENDIF()
+ENDFOREACH()
 
 #
 # Custom targets for the testsuite:
@@ -75,52 +107,39 @@ ADD_CUSTOM_TARGET(setup_tests)
 # Remove all tests:
 ADD_CUSTOM_TARGET(prune_tests)
 
-# Regenerate tests (run "make rebuild_cache" in subprojects):
-ADD_CUSTOM_TARGET(regen_tests)
-
-# Regenerate tests (run "make clean" in subprojects):
-ADD_CUSTOM_TARGET(clean_tests)
-
 FOREACH(_category ${_categories})
-  SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
+  SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
+
+  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
+
+  IF(DEAL_II_MSVC)
+    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
+  ELSE()
+    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir} > /dev/null)
+  ENDIF()
 
   ADD_CUSTOM_TARGET(setup_tests_${_category}
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${CMAKE_BINARY_DIR}/tests/${_category}
-    COMMAND cd ${CMAKE_BINARY_DIR}/tests/${_category} &&
-      ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-      > /dev/null
+    COMMAND ${_command}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
   ADD_CUSTOM_TARGET(prune_tests_${_category}
     COMMAND ${CMAKE_COMMAND} -E remove_directory
-      ${CMAKE_BINARY_DIR}/tests/${_category}
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
-  ADD_CUSTOM_TARGET(regen_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target regenerate
-    COMMENT "Processing tests/${_category}"
-    )
-  ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
-
-  ADD_CUSTOM_TARGET(clean_tests_${_category}
-    COMMAND
-      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target clean
-    COMMENT "Processing tests/${_category}"
-    )
-  ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
-
-  FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
+  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
     "SUBDIRS(${_category})\n"
     )
 ENDFOREACH()
 
-MESSAGE(STATUS "Setting up testsuite - Done")
 
+IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+  MESSAGE(STATUS "Setting up testsuite - Done")
+ENDIF()

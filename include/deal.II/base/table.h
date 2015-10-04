@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__table_h
-#define __deal2__table_h
+#ifndef dealii__table_h
+#define dealii__table_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -64,7 +64,7 @@ namespace internal
     /**
      * @internal Have a class which declares some nested typedefs, depending
      * on its template parameters. The general template declares nothing, but
-     * there are more useful specializations regaring the last parameter
+     * there are more useful specializations regarding the last parameter
      * indicating constness of the table for which accessor objects are to be
      * generated in this namespace.
      */
@@ -193,7 +193,7 @@ namespace internal
       DeclException3 (ExcIndexRange, int, int, int,
                       << "Index " << N-P+1 << "has a value of "
                       << arg1 << " but needs to be in the range ["
-                      << arg2 << "," << arg3 << "[");
+                      << arg2 << "," << arg3 << "[.");
     private:
       /**
        * Store the data given to the constructor. There are no non-const
@@ -301,7 +301,7 @@ namespace internal
       iterator begin () const;
 
       /**
-       * Return an interator to the element past the end of this row.
+       * Return an iterator to the element past the end of this row.
        */
       iterator end () const;
 
@@ -403,6 +403,8 @@ template <int N, typename T>
 class TableBase : public Subscriptor
 {
 public:
+  typedef T value_type;
+
   /**
    * Integer type used to count the number of elements in this container.
    */
@@ -863,6 +865,8 @@ public:
   void reinit (const unsigned int size1,
                const unsigned int size2,
                const bool         fast = false);
+
+  using TableBase<2,T>::reinit;
 
   /**
    * Access operator. Generate an object that accesses the requested row of

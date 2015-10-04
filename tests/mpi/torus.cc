@@ -61,14 +61,15 @@
 
 typedef parallel::distributed::Triangulation<2,3>::cell_iterator cell_iterator;
 DeclException1(ExcMissingCell,
-	       cell_iterator,
-	       << "Trying to find cell " << arg1 << " but it doesn't appear to be in the list");
+               cell_iterator,
+               << "Trying to find cell " << arg1 << " but it doesn't appear to be in the list");
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  using namespace dealii;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;
-  
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       static std::ofstream logfile("output");
@@ -76,11 +77,11 @@ int main(int argc, char *argv[])
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
     }
-      
+
   parallel::distributed::Triangulation<2,3> triangulation(MPI_COMM_WORLD,
-							  typename Triangulation<2,3>::MeshSmoothing
-							  (Triangulation<2,3>::smoothing_on_refinement |
-							   Triangulation<2,3 >::smoothing_on_coarsening));
+                                                          typename Triangulation<2,3>::MeshSmoothing
+                                                          (Triangulation<2,3>::smoothing_on_refinement |
+                                                           Triangulation<2,3 >::smoothing_on_coarsening));
   GridGenerator::torus(triangulation, 1, 0.2);
 
   // create a set of all cells, and insert all cells into it
@@ -91,26 +92,26 @@ int main(int argc, char *argv[])
     {
       cells.insert (cell);
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "Adding cell " << cell << std::endl;
+        deallog << "Adding cell " << cell << std::endl;
     }
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "List contains " << cells.size() << " items" << std::endl;
 
   // verify that every cell is in there
-  for(parallel::distributed::Triangulation<2,3>::cell_iterator cell= triangulation.begin(0);
-      cell!=triangulation.end(0);
-      ++cell)
-    Assert (cells.find(cell)!=cells.end(),
-	    ExcMissingCell(cell));
+  for (parallel::distributed::Triangulation<2,3>::cell_iterator cell= triangulation.begin(0);
+       cell!=triangulation.end(0);
+       ++cell)
+    AssertThrow (cells.find(cell)!=cells.end(),
+                 ExcMissingCell(cell));
 
   // refine triangulation and verify that every coarse mesh cell is in there
   triangulation.refine_global(2);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "List contains " << cells.size() << " items" << std::endl;
-  for(parallel::distributed::Triangulation<2,3>::cell_iterator cell= triangulation.begin(0);
-      cell!=triangulation.end(0);
-      ++cell)
-    Assert (cells.find(cell)!=cells.end(),
-	    ExcMissingCell(cell));
+  for (parallel::distributed::Triangulation<2,3>::cell_iterator cell= triangulation.begin(0);
+       cell!=triangulation.end(0);
+       ++cell)
+    AssertThrow (cells.find(cell)!=cells.end(),
+                 ExcMissingCell(cell));
 }

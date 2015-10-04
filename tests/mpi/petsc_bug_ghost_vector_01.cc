@@ -83,11 +83,11 @@ void test ()
   const unsigned int n_mpi_processes=Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   MPI_Comm mpi_communicator= MPI_COMM_WORLD;
   parallel::distributed::Triangulation<2> fluid_triangulation(mpi_communicator,
-							      typename Triangulation<2>::MeshSmoothing
-							      (Triangulation<2>::smoothing_on_refinement |
-							       Triangulation<2>::smoothing_on_coarsening));
+                                                              typename Triangulation<2>::MeshSmoothing
+                                                              (Triangulation<2>::smoothing_on_refinement |
+                                                                  Triangulation<2>::smoothing_on_coarsening));
 
-  {    
+  {
     Triangulation<2> tmp_tria_fluid;
     Triangulation<2> tmp_tria_buffer;
     Triangulation<2> tmp_rectangle;
@@ -103,44 +103,44 @@ void test ()
     const double cell_size_x=0.1;
     const double cell_size_y=0.1;
     const double lenght = solid_cells_x*cell_size_x,
-		  height= static_cast<double>(h_cells*cell_size_y),
-	      h_distance=static_cast<double>(cell_size_x*inflow_cells),
-	      v_distance=static_cast<double>(cell_size_y*v_space_cells),
-	       solid_top=static_cast<double>(v_distance+solid_cells_y*cell_size_y),
-	    total_length=(inflow_cells+solid_cells_x+outflow_cells)*cell_size_x;
+                 height= static_cast<double>(h_cells*cell_size_y),
+                 h_distance=static_cast<double>(cell_size_x*inflow_cells),
+                 v_distance=static_cast<double>(cell_size_y*v_space_cells),
+                 solid_top=static_cast<double>(v_distance+solid_cells_y*cell_size_y),
+                 total_length=(inflow_cells+solid_cells_x+outflow_cells)*cell_size_x;
 
 
     std::vector< std::vector< double > > step_sizes(2);
     //----------------INFLOW ---------------
-    for(unsigned int i =0; i<inflow_cells; ++i)
+    for (unsigned int i =0; i<inflow_cells; ++i)
       step_sizes[0].push_back(cell_size_x);
-    for(unsigned int i =0; i<h_cells; ++i)
+    for (unsigned int i =0; i<h_cells; ++i)
       step_sizes[1].push_back(cell_size_y);
 
     GridGenerator::subdivided_hyper_rectangle(tmp_tria_fluid,
-					      step_sizes,
-					      Point<2>(0,0),
-					      Point<2>(h_distance,height),
-					      false);
+                                              step_sizes,
+                                              Point<2>(0,0),
+                                              Point<2>(h_distance,height),
+                                              false);
 
     //------------------------LOWER-------------
     step_sizes[0].clear();
     step_sizes[1].clear();
-    for(unsigned int i =0; i<solid_cells_x; ++i)
+    for (unsigned int i =0; i<solid_cells_x; ++i)
       step_sizes[0].push_back(cell_size_x);
-    for(unsigned int i =0; i<v_space_cells; ++i)
+    for (unsigned int i =0; i<v_space_cells; ++i)
       step_sizes[1].push_back(cell_size_y);
 
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
-					      step_sizes,
-					      Point<2>(h_distance,0),
-					      Point<2>(lenght+h_distance,v_distance),
-					      false);
+                                              step_sizes,
+                                              Point<2>(h_distance,0),
+                                              Point<2>(lenght+h_distance,v_distance),
+                                              false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
     GridGenerator::merge_triangulations(tmp_tria_buffer,
-					tmp_rectangle,
-					tmp_tria_fluid);
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
 
     tmp_tria_buffer.clear();
     tmp_rectangle.clear();
@@ -149,44 +149,44 @@ void test ()
 
 
     step_sizes[1].clear();
-    for(unsigned int i =0; i<(h_cells-v_space_cells-solid_cells_y); ++i)
+    for (unsigned int i =0; i<(h_cells-v_space_cells-solid_cells_y); ++i)
       step_sizes[1].push_back(cell_size_y);
 
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
-					      step_sizes,
-					      Point<2>(h_distance,solid_top),
-					      Point<2>(h_distance+lenght,height),
-					      false);
+                                              step_sizes,
+                                              Point<2>(h_distance,solid_top),
+                                              Point<2>(h_distance+lenght,height),
+                                              false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
     GridGenerator::merge_triangulations(tmp_tria_buffer,
-					tmp_rectangle,
-					tmp_tria_fluid);
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
     tmp_tria_buffer.clear();
     tmp_rectangle.clear();
     //
     //----------------------------outflow----------
     step_sizes[0].clear();
     step_sizes[1].clear();
-    for(unsigned int i =0; i<outflow_cells; ++i)
+    for (unsigned int i =0; i<outflow_cells; ++i)
       step_sizes[0].push_back(cell_size_x);
-    for(unsigned int i =0; i<h_cells; ++i)
+    for (unsigned int i =0; i<h_cells; ++i)
       step_sizes[1].push_back(cell_size_y);
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
-					      step_sizes,
-					      Point<2>(h_distance+lenght,0),
-					      Point<2>(total_length,height),
-					      false);
+                                              step_sizes,
+                                              Point<2>(h_distance+lenght,0),
+                                              Point<2>(total_length,height),
+                                              false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
     GridGenerator::merge_triangulations(tmp_tria_buffer,
-					tmp_rectangle,
-					tmp_tria_fluid);
+                                        tmp_rectangle,
+                                        tmp_tria_fluid);
 
     //-----------COPY to distributed
     fluid_triangulation.copy_triangulation(tmp_tria_fluid);
   }
-  
+
 
   fluid_triangulation.refine_global(1);
   //     ---------END GENERATING TRIA ------------
@@ -217,34 +217,34 @@ void test ()
     IndexSet locally_owned_dofs = handler.locally_owned_dofs();
     IndexSet locally_relevant_dofs = handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(handler,
-					    locally_relevant_dofs);
+                                            locally_relevant_dofs);
 
 
     PETScWrappers::MPI::Vector vector;
     vector.reinit(locally_owned_dofs,
-		  locally_relevant_dofs,
-		  mpi_communicator);
+                  locally_relevant_dofs,
+                  mpi_communicator);
 
     // ensure that all elements we can access locally are initially at
     // zero. check this first for the locally owned elements...
     for (unsigned int i=0; i<handler.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
-	Assert (vector(i) == 0,
-		ExcInternalError());
+        AssertThrow (vector(i) == 0,
+                     ExcInternalError());
     // ...end then also for the ghost elements
     for (unsigned int i=0; i<handler.n_dofs(); ++i)
       if (locally_relevant_dofs.is_element(i)
-	  &&
-	  !locally_owned_dofs.is_element(i))
-	Assert (vector(i) == 0,
-		ExcInternalError());
+          &&
+          !locally_owned_dofs.is_element(i))
+        AssertThrow (vector(i) == 0,
+                     ExcInternalError());
   }
 }
 
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {

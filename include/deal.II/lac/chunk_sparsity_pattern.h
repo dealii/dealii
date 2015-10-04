@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__chunk_sparsity_pattern_h
-#define __deal2__chunk_sparsity_pattern_h
+#ifndef dealii__chunk_sparsity_pattern_h
+#define dealii__chunk_sparsity_pattern_h
 
 
 #include <deal.II/base/config.h>
@@ -152,7 +152,7 @@ namespace ChunkSparsityPatternIterators
 
 
   /**
-   * STL conforming iterator walking over the elements of a sparsity pattern.
+   * Iterator that walks over the elements of a sparsity pattern.
    */
   class Iterator
   {
@@ -272,14 +272,14 @@ public:
    * Copy constructor. This constructor is only allowed to be called if the
    * matrix structure to be copied is empty. This is so in order to prevent
    * involuntary copies of objects for temporaries, which can use large
-   * amounts of computing time.  However, copy constructors are needed if yo
-   * want to use the STL data types on classes like this, e.g. to write such
+   * amounts of computing time. However, copy constructors are needed if one
+   * wants to place a ChunkSparsityPattern in a container, e.g., to write such
    * statements like <tt>v.push_back (ChunkSparsityPattern());</tt>, with
    * <tt>v</tt> a vector of ChunkSparsityPattern objects.
    *
    * Usually, it is sufficient to use the explicit keyword to disallow
-   * unwanted temporaries, but for the STL vectors, this does not work. Since
-   * copying a structure like this is not useful anyway because multiple
+   * unwanted temporaries, but this does not work for <tt>std::vector</tt>.
+   * Since copying a structure like this is not useful anyway because multiple
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
    */
@@ -481,13 +481,12 @@ public:
                   const size_type chunk_size);
 
   /**
-   * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Previous
-   * content of this object is lost, and the sparsity pattern is in compressed
-   * mode afterwards.
+   * Copy data from an object of type DynamicSparsityPattern. Previous content
+   * of this object is lost, and the sparsity pattern is in compressed mode
+   * afterwards.
    */
   template <typename SparsityType>
-  void copy_from (const SparsityType &csp,
+  void copy_from (const SparsityType &dsp,
                   const size_type     chunk_size);
 
   /**
@@ -622,7 +621,7 @@ public:
   bool stores_only_added_elements () const;
 
   /**
-   * STL-like iterator with the first entry of the matrix. The resulting
+   * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    */
@@ -634,7 +633,7 @@ public:
   iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals

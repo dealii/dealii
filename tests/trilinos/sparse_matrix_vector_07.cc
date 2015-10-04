@@ -51,17 +51,17 @@ void test (TrilinosWrappers::Vector &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (v(i) == i, ExcInternalError());
-      Assert (w(i) == i+1, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow (w(i) == i+1, ExcInternalError());
 
       double result = i+1;
       for (unsigned int j=0; j<m.m(); ++j)
         result -= (i+2*j)*j;
 
-      Assert (x(i) == result, ExcInternalError());
+      AssertThrow (x(i) == result, ExcInternalError());
     }
 
-  Assert (s == x.l2_norm(), ExcInternalError());
+  AssertThrow (s == x.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -75,7 +75,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

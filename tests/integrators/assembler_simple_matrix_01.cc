@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,10 @@ int main()
   MeshWorker::DoFInfo<2,2,double> info1b(dof1.block_info());
   MeshWorker::DoFInfo<2,2,double> info2b(dof2.block_info());
 
+  std::vector<FullMatrix<double> > matrices(2);
   MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass1;
+  ass1.initialize(matrices[0]);
+
   deallog.push("Single block");
   test(info1, ass1);
   deallog.pop();

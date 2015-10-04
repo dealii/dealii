@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ void test_real_to_unit_cell()
   // set the boundary indicator for
   // one face of the single cell
   triangulation.set_boundary (1, boundary);
-  triangulation.begin_active()->face(0)->set_boundary_indicator (1);
+  triangulation.begin_active()->face(0)->set_boundary_id (1);
 
   const unsigned int n_points = 5;
   std::vector< Point<dim> > unit_points(Utilities::fixed_power<dim>(n_points));
@@ -99,8 +99,8 @@ void test_real_to_unit_cell()
       // the same point again
       const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
       const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
-      Assert (unit_points[i].distance(p_unit) < 1e-10,
-              ExcInternalError());
+      AssertThrow (unit_points[i].distance(p_unit) < 1e-10,
+                   ExcInternalError());
     }
   deallog << "OK" << std::endl;
 }

@@ -1540,10 +1540,32 @@ namespace internal
               case 2:
                 break;
               default:
-                // a node must have one
-                // or two adjacent
-                // lines
-                AssertThrow (false, ExcInternalError());
+                // in 1d, a node must have one or two adjacent lines
+                if (spacedim==1)
+                  AssertThrow (false, ExcInternalError())
+                  else
+                    AssertThrow (false,
+                                 ExcMessage ("You have a vertex in your triangulation "
+                                             "at which more than two cells come together. "
+                                             "(For one dimensional triangulation, cells are "
+                                             "line segments.)"
+                                             "\n\n"
+                                             "This is not currently supported because the "
+                                             "Triangulation class makes the assumption that "
+                                             "every cell has zero or one neighbors behind "
+                                             "each face (here, behind each vertex), but in your "
+                                             "situation there would be more than one."
+                                             "\n\n"
+                                             "Support for this is not currently implemented. "
+                                             "If you need to work with triangulations where "
+                                             "more than two cells come together at a vertex, "
+                                             "duplicate the vertices once per cell (i.e., put "
+                                             "multiple vertices at the same physical location, "
+                                             "but using different vertex indices for each) "
+                                             "and then ensure continuity of the solution by "
+                                             "explicitly creating constraints that the degrees "
+                                             "of freedom at these vertices have the same "
+                                             "value, using the ConstraintMatrix class."));
               }
 
           // assert there are no more
@@ -1818,21 +1840,47 @@ namespace internal
              line!=triangulation.end_line(); ++line)
           {
             const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
-            // assert that every line has
-            // one or two adjacent cells
-            AssertThrow ((n_adj_cells >= 1) &&
-                         (n_adj_cells <= 2),
-                         ExcInternalError());
+
+            // assert that every line has one or two adjacent cells.
+            // this has to be the case for 2d triangulations in 2d.
+            // in higher dimensions, this may happen but is not
+            // implemented
+            if (spacedim==2)
+              AssertThrow ((n_adj_cells >= 1) &&
+                           (n_adj_cells <= 2),
+                           ExcInternalError())
+              else
+                AssertThrow ((n_adj_cells >= 1) &&
+                             (n_adj_cells <= 2),
+                             ExcMessage ("You have a line in your triangulation "
+                                         "at which more than two cells come together. "
+                                         "\n\n"
+                                         "This is not currently supported because the "
+                                         "Triangulation class makes the assumption that "
+                                         "every cell has zero or one neighbors behind "
+                                         "each face (here, behind each line), but in your "
+                                         "situation there would be more than one."
+                                         "\n\n"
+                                         "Support for this is not currently implemented. "
+                                         "If you need to work with triangulations where "
+                                         "more than two cells come together at a line, "
+                                         "duplicate the vertices once per cell (i.e., put "
+                                         "multiple vertices at the same physical location, "
+                                         "but using different vertex indices for each) "
+                                         "and then ensure continuity of the solution by "
+                                         "explicitly creating constraints that the degrees "
+                                         "of freedom at these lines have the same "
+                                         "value, using the ConstraintMatrix class."));
 
             // if only one cell: line is at
             // boundary -> give it the
             // boundary indicator zero by
             // default
             if (n_adj_cells == 1)
-              line->set_boundary_indicator (0);
+              line->set_boundary_id (0);
             else
               // interior line -> numbers::internal_face_boundary_id
-              line->set_boundary_indicator (numbers::internal_face_boundary_id);
+              line->set_boundary_id (numbers::internal_face_boundary_id);
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
@@ -1866,19 +1914,19 @@ namespace internal
 
             // assert that we only set
             // boundary info once
-            AssertThrow (! (line->boundary_indicator() != 0 &&
-                            line->boundary_indicator() != numbers::internal_face_boundary_id),
+            AssertThrow (! (line->boundary_id() != 0 &&
+                            line->boundary_id() != numbers::internal_face_boundary_id),
                          ExcMultiplySetLineInfoOfLine(line_vertices.first,
                                                       line_vertices.second));
 
             // Assert that only exterior lines
             // are given a boundary indicator
-            AssertThrow (! (line->boundary_indicator() == numbers::internal_face_boundary_id),
+            AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
                          ExcInteriorLineCantBeBoundary(line->vertex_index(0),
                                                        line->vertex_index(1),
                                                        boundary_line->boundary_id));
 
-            line->set_boundary_indicator (boundary_line->boundary_id);
+            line->set_boundary_id (boundary_line->boundary_id);
             line->set_manifold_id (boundary_line->manifold_id);
           }
 
@@ -2566,10 +2614,10 @@ namespace internal
             // boundary indicator zero by
             // default
             if (n_adj_cells == 1)
-              quad->set_boundary_indicator (0);
+              quad->set_boundary_id (0);
             else
               // interior quad -> numbers::internal_face_boundary_id
-              quad->set_boundary_indicator (numbers::internal_face_boundary_id);
+              quad->set_boundary_id (numbers::internal_face_boundary_id);
             // Manifold ids are set
             // independently of where
             // they are
@@ -2586,7 +2634,7 @@ namespace internal
         for (typename Triangulation<dim,spacedim>::line_iterator
              line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
           {
-            line->set_boundary_indicator (numbers::internal_face_boundary_id);
+            line->set_boundary_id (numbers::internal_face_boundary_id);
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
@@ -2612,7 +2660,7 @@ namespace internal
              quad=triangulation.begin_quad(); quad!=triangulation.end_quad(); ++quad)
           if (quad->at_boundary())
             for (unsigned int l=0; l<4; ++l)
-              quad->line(l)->set_boundary_indicator (0);
+              quad->line(l)->set_boundary_id (0);
 
         ///////////////////////////////////////
         // now set boundary indicators
@@ -2658,12 +2706,12 @@ namespace internal
             // boundary indicator to a
             // different than the
             // previously set value
-            if (line->boundary_indicator() != 0)
-              AssertThrow (line->boundary_indicator() == boundary_line->boundary_id,
+            if (line->boundary_id() != 0)
+              AssertThrow (line->boundary_id() == boundary_line->boundary_id,
                            ExcMessage ("Duplicate boundary lines are only allowed "
                                        "if they carry the same boundary indicator."));
 
-            line->set_boundary_indicator (boundary_line->boundary_id);
+            line->set_boundary_id (boundary_line->boundary_id);
             // Set manifold id if given
             line->set_manifold_id(boundary_line->manifold_id);
           }
@@ -2796,12 +2844,12 @@ namespace internal
             // boundary indicator to a
             // different than the
             // previously set value
-            if (quad->boundary_indicator() != 0)
-              AssertThrow (quad->boundary_indicator() == boundary_quad->boundary_id,
+            if (quad->boundary_id() != 0)
+              AssertThrow (quad->boundary_id() == boundary_quad->boundary_id,
                            ExcMessage ("Duplicate boundary quads are only allowed "
                                        "if they carry the same boundary indicator."));
 
-            quad->set_boundary_indicator (boundary_quad->boundary_id);
+            quad->set_boundary_id (boundary_quad->boundary_id);
             quad->set_manifold_id (boundary_quad->manifold_id);
           }
 
@@ -3425,7 +3473,7 @@ namespace internal
                             switch_1->line_orientation(2),
                             switch_1->line_orientation(3)
                           };
-                          const types::boundary_id switch_1_boundary_indicator=switch_1->boundary_indicator();
+                          const types::boundary_id switch_1_boundary_id=switch_1->boundary_id();
                           const unsigned int switch_1_user_index=switch_1->user_index();
                           const bool switch_1_user_flag=switch_1->user_flag_set();
 
@@ -3437,7 +3485,7 @@ namespace internal
                           switch_1->set_line_orientation(1, switch_2->line_orientation(1));
                           switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                           switch_1->set_line_orientation(3, switch_2->line_orientation(3));
-                          switch_1->set_boundary_indicator(switch_2->boundary_indicator());
+                          switch_1->set_boundary_id(switch_2->boundary_id());
                           switch_1->set_manifold_id(switch_2->manifold_id());
                           switch_1->set_user_index(switch_2->user_index());
                           if (switch_2->user_flag_set())
@@ -3453,7 +3501,7 @@ namespace internal
                           switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
                           switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                           switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
-                          switch_2->set_boundary_indicator(switch_1_boundary_indicator);
+                          switch_2->set_boundary_id(switch_1_boundary_id);
                           switch_2->set_manifold_id(switch_1->manifold_id());
                           switch_2->set_user_index(switch_1_user_index);
                           if (switch_1_user_flag)
@@ -3955,7 +4003,7 @@ namespace internal
             new_lines[l]->clear_user_data();
             new_lines[l]->clear_children();
             // interior line
-            new_lines[l]->set_boundary_indicator(numbers::internal_face_boundary_id);
+            new_lines[l]->set_boundary_id(numbers::internal_face_boundary_id);
             new_lines[l]->set_manifold_id(cell->manifold_id());
           }
 
@@ -4455,7 +4503,7 @@ namespace internal
                               line->set_user_flag ();
 //TODO[WB]: we overwrite the user_index here because we later on need
 // to find out which boundary object we have to ask to refine this
-// line. we can't use the boundary_indicator field because that can
+// line. we can't use the boundary_id field because that can
 // only be used for lines at the boundary of the domain, but we also
 // need a domain description for interior lines in the codim-1 case
                               if (spacedim > dim)
@@ -4463,7 +4511,7 @@ namespace internal
                                   if (line->at_boundary())
                                     // if possible honor boundary
                                     // indicator
-                                    line->set_user_index(line->boundary_indicator());
+                                    line->set_user_index(line->boundary_id());
                                   else
                                     // otherwise take manifold
                                     // description from the adjacent
@@ -4584,6 +4632,7 @@ namespace internal
                   // two child lines.  To this end, find a pair of
                   // unused lines
                   bool pair_found=false;
+                  (void)pair_found;
                   for (; next_unused_line!=endl; ++next_unused_line)
                     if (!next_unused_line->used() &&
                         !(++next_unused_line)->used())
@@ -4627,8 +4676,8 @@ namespace internal
                   children[0]->clear_user_flag();
                   children[1]->clear_user_flag();
 
-                  children[0]->set_boundary_indicator (line->boundary_indicator());
-                  children[1]->set_boundary_indicator (line->boundary_indicator());
+                  children[0]->set_boundary_id (line->boundary_id());
+                  children[1]->set_boundary_id (line->boundary_id());
 
                   children[0]->set_manifold_id (line->manifold_id());
                   children[1]->set_manifold_id (line->manifold_id());
@@ -5064,8 +5113,8 @@ namespace internal
                   children[0]->clear_user_flag();
                   children[1]->clear_user_flag();
 
-                  children[0]->set_boundary_indicator (line->boundary_indicator());
-                  children[1]->set_boundary_indicator (line->boundary_indicator());
+                  children[0]->set_boundary_id (line->boundary_id());
+                  children[1]->set_boundary_id (line->boundary_id());
 
                   children[0]->set_manifold_id (line->manifold_id());
                   children[1]->set_manifold_id (line->manifold_id());
@@ -5179,7 +5228,7 @@ namespace internal
                     new_line->clear_user_flag();
                     new_line->clear_user_data();
                     new_line->clear_children();
-                    new_line->set_boundary_indicator(quad->boundary_indicator());
+                    new_line->set_boundary_id(quad->boundary_id());
                     new_line->set_manifold_id(quad->manifold_id());
 
                     // child 0 and 1 of a line are switched if the
@@ -5240,7 +5289,7 @@ namespace internal
                         new_quads[i]->clear_user_flag();
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
-                        new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
+                        new_quads[i]->set_boundary_id (quad->boundary_id());
                         new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
@@ -5341,7 +5390,7 @@ namespace internal
 
                                 new_child[i]->set(internal::Triangulation::TriaObject<1>(old_child[i]->vertex_index(0),
                                                                                          old_child[i]->vertex_index(1)));
-                                new_child[i]->set_boundary_indicator(old_child[i]->boundary_indicator());
+                                new_child[i]->set_boundary_id(old_child[i]->boundary_id());
                                 new_child[i]->set_manifold_id(old_child[i]->manifold_id());
                                 new_child[i]->set_user_index(old_child[i]->user_index());
                                 if (old_child[i]->user_flag_set())
@@ -5429,7 +5478,7 @@ namespace internal
                               switch_1->line_orientation(2),
                               switch_1->line_orientation(3)
                             };
-                            const types::boundary_id switch_1_boundary_indicator=switch_1->boundary_indicator();
+                            const types::boundary_id switch_1_boundary_id=switch_1->boundary_id();
                             const unsigned int switch_1_user_index=switch_1->user_index();
                             const bool switch_1_user_flag=switch_1->user_flag_set();
                             const RefinementCase<dim-1> switch_1_refinement_case=switch_1->refinement_case();
@@ -5444,7 +5493,7 @@ namespace internal
                             switch_1->set_line_orientation(1, switch_2->line_orientation(1));
                             switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                             switch_1->set_line_orientation(3, switch_2->line_orientation(3));
-                            switch_1->set_boundary_indicator(switch_2->boundary_indicator());
+                            switch_1->set_boundary_id(switch_2->boundary_id());
                             switch_1->set_manifold_id(switch_2->manifold_id());
                             switch_1->set_user_index(switch_2->user_index());
                             if (switch_2->user_flag_set())
@@ -5467,7 +5516,7 @@ namespace internal
                             switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
                             switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                             switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
-                            switch_2->set_boundary_indicator(switch_1_boundary_indicator);
+                            switch_2->set_boundary_id(switch_1_boundary_id);
                             switch_2->set_manifold_id(switch_1->manifold_id());
                             switch_2->set_user_index(switch_1_user_index);
                             if (switch_1_user_flag)
@@ -5595,8 +5644,8 @@ namespace internal
                             children[0]->clear_user_flag();
                             children[1]->clear_user_flag();
 
-                            children[0]->set_boundary_indicator (middle_line->boundary_indicator());
-                            children[1]->set_boundary_indicator (middle_line->boundary_indicator());
+                            children[0]->set_boundary_id (middle_line->boundary_id());
+                            children[1]->set_boundary_id (middle_line->boundary_id());
 
                             children[0]->set_manifold_id (middle_line->manifold_id());
                             children[1]->set_manifold_id (middle_line->manifold_id());
@@ -5710,7 +5759,7 @@ namespace internal
                         new_lines[i]->clear_user_flag();
                         new_lines[i]->clear_user_data();
                         new_lines[i]->clear_children();
-                        new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
+                        new_lines[i]->set_boundary_id(quad->boundary_id());
                         new_lines[i]->set_manifold_id(quad->manifold_id());
                       }
 
@@ -5810,7 +5859,7 @@ namespace internal
                         new_quads[i]->clear_user_flag();
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
-                        new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
+                        new_quads[i]->set_boundary_id (quad->boundary_id());
                         new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
@@ -5922,7 +5971,7 @@ namespace internal
                       new_lines[i]->clear_user_data();
                       new_lines[i]->clear_children();
                       // interior line
-                      new_lines[i]->set_boundary_indicator(numbers::internal_face_boundary_id);
+                      new_lines[i]->set_boundary_id(numbers::internal_face_boundary_id);
                       // they inherit geometry description of the hex they belong to
                       new_lines[i]->set_manifold_id(hex->manifold_id());
                     }
@@ -5942,7 +5991,7 @@ namespace internal
                       new_quads[i]->clear_user_data();
                       new_quads[i]->clear_children();
                       // interior quad
-                      new_quads[i]->set_boundary_indicator (numbers::internal_face_boundary_id);
+                      new_quads[i]->set_boundary_id (numbers::internal_face_boundary_id);
                       // they inherit geometry description of the hex they belong to
                       new_quads[i]->set_manifold_id (hex->manifold_id());
                       // set all line orientation flags to true by
@@ -8879,20 +8928,20 @@ Triangulation<dim, spacedim>::get_manifold (const types::manifold_id m_number) c
 
 template <int dim, int spacedim>
 std::vector<types::boundary_id>
-Triangulation<dim, spacedim>::get_boundary_indicators () const
+Triangulation<dim, spacedim>::get_boundary_ids () const
 {
   // in 1d, we store a map of all used boundary indicators. use it for
   // our purposes
   if (dim == 1)
     {
-      std::vector<types::boundary_id> boundary_indicators;
+      std::vector<types::boundary_id> boundary_ids;
       for (std::map<unsigned int, types::boundary_id>::const_iterator
            p = vertex_to_boundary_id_map_1d->begin();
            p !=  vertex_to_boundary_id_map_1d->end();
            ++p)
-        boundary_indicators.push_back (p->second);
+        boundary_ids.push_back (p->second);
 
-      return boundary_indicators;
+      return boundary_ids;
     }
   else
     {
@@ -8901,11 +8950,22 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
       for (; cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->at_boundary(face))
-            b_ids.insert(cell->face(face)->boundary_indicator());
-      std::vector<types::boundary_id> boundary_indicators(b_ids.begin(), b_ids.end());
-      return boundary_indicators;
+            b_ids.insert(cell->face(face)->boundary_id());
+      std::vector<types::boundary_id> boundary_ids(b_ids.begin(), b_ids.end());
+      return boundary_ids;
     }
 }
+
+
+
+template <int dim, int spacedim>
+std::vector<types::boundary_id>
+Triangulation<dim, spacedim>::get_boundary_indicators () const
+{
+  return get_boundary_ids();
+}
+
+
 
 template <int dim, int spacedim>
 std::vector<types::manifold_id>
@@ -9014,6 +9074,7 @@ create_triangulation_compatibility (const std::vector<Point<spacedim> > &v,
 }
 
 
+
 template <int dim, int spacedim>
 void
 Triangulation<dim,spacedim>::
@@ -9042,8 +9103,11 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
       throw;
     }
 
+  // update our counts of the various elements of a triangulation, and set
+  // active_cell_indices of all cells
   internal::Triangulation::Implementation
   ::compute_number_cache (*this, levels.size(), number_cache);
+  reset_active_cell_indices ();
 
   // now verify that there are indeed no distorted cells. as per the
   // documentation of this class, we first collect all distorted cells
@@ -11438,9 +11502,10 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     Assert (satisfies_level1_at_vertex_rule (*this) == true,
             ExcInternalError());
 
-  // finally build up neighbor connectivity
-  // information
+  // finally build up neighbor connectivity information, and set
+  // active cell indices
   update_neighbors(*this);
+  reset_active_cell_indices ();
 
   // Inform all listeners about end of refinement.
   signals.post_refinement();
@@ -11448,6 +11513,26 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
   AssertThrow (cells_with_distorted_children.distorted_cells.size() == 0,
                cells_with_distorted_children);
 }
+
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim,spacedim>::reset_active_cell_indices ()
+{
+  unsigned int active_cell_index = 0;
+  for (raw_cell_iterator cell=begin_raw(); cell!=end(); ++cell)
+    if ((cell->used() == false) || cell->has_children())
+      cell->set_active_cell_index (numbers::invalid_unsigned_int);
+    else
+      {
+        cell->set_active_cell_index (active_cell_index);
+        ++active_cell_index;
+      }
+
+  Assert (active_cell_index == n_active_cells(), ExcInternalError());
+}
+
 
 
 template<int dim, int spacedim>

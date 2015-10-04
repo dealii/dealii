@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,7 +23,6 @@ SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
-
   #
   # Add rt to the link interface as well, boost/chrono needs it.
   #
@@ -33,7 +32,24 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
     SET(BOOST_LIBRARIES ${rt_LIBRARY})
   ENDIF()
 
+  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+
+  IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    #
+    # Bundled boost tries to (dl)open itself as a dynamic library on
+    # Windows. Disable this undesired behavior by exporting
+    # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
+    #
+    LIST(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
+    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
+  ENDIF()
+ENDMACRO()
+
+
+MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
+  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
 ENDMACRO()
 
 

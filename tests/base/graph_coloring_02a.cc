@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@
 
 template <int dim>
 std::vector<types::global_dof_index> get_conflict_indices_cfem(
-    typename DoFHandler<dim>::active_cell_iterator const &it)
+  typename DoFHandler<dim>::active_cell_iterator const &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
@@ -57,48 +57,48 @@ void check()
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active();
   for (; cell<dof_handler.end(); ++cell)
-  {
-    if ((cell->center()[0]==0.625)
-	&&
-	((dim < 2) || (cell->center()[1]==0.625))
-	&&
-	((dim < 3) || (cell->center()[2]==0.625)))
-    cell->set_refine_flag();
-  }
+    {
+      if ((cell->center()[0]==0.625)
+          &&
+          ((dim < 2) || (cell->center()[1]==0.625))
+          &&
+          ((dim < 3) || (cell->center()[2]==0.625)))
+        cell->set_refine_flag();
+    }
   triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
 
   // Create the coloring
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring(
-      GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
-        std_cxx11::function<std::vector<types::global_dof_index> (typename
-          DoFHandler<dim>::active_cell_iterator const &)> (&get_conflict_indices_cfem<dim>)));
+    GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
+                                       std_cxx11::function<std::vector<types::global_dof_index> (typename
+                                           DoFHandler<dim>::active_cell_iterator const &)> (&get_conflict_indices_cfem<dim>)));
 
   // verify that within each color, there is no conflict
   for (unsigned int color=0; color<coloring.size(); ++color)
     for (unsigned int i=0; i<coloring[color].size(); ++i)
       {
-	std::vector<types::global_dof_index>
-	  conflicts_i = get_conflict_indices_cfem<dim> (coloring[color][i]);
-	std::sort (conflicts_i.begin(), conflicts_i.end());
+        std::vector<types::global_dof_index>
+        conflicts_i = get_conflict_indices_cfem<dim> (coloring[color][i]);
+        std::sort (conflicts_i.begin(), conflicts_i.end());
 
-	for (unsigned int j=i+1; j<coloring[color].size(); ++j)
-	  {
-	    std::vector<types::global_dof_index>
-	      conflicts_j = get_conflict_indices_cfem<dim> (coloring[color][j]);
-	    std::sort (conflicts_j.begin(), conflicts_j.end());
+        for (unsigned int j=i+1; j<coloring[color].size(); ++j)
+          {
+            std::vector<types::global_dof_index>
+            conflicts_j = get_conflict_indices_cfem<dim> (coloring[color][j]);
+            std::sort (conflicts_j.begin(), conflicts_j.end());
 
-	    // compute intersection of index sets
-	    std::vector<types::global_dof_index>
-	      intersection (std::max (conflicts_i.size(), conflicts_j.size()));
-	    std::vector<types::global_dof_index>::iterator
-	      p = std::set_intersection (conflicts_i.begin(), conflicts_i.end(),
-					 conflicts_j.begin(), conflicts_j.end(),
-					 intersection.begin());
-	    // verify that there is no intersection
-	    Assert (p == intersection.begin(),
-		    ExcInternalError());
-	  }
+            // compute intersection of index sets
+            std::vector<types::global_dof_index>
+            intersection (std::max (conflicts_i.size(), conflicts_j.size()));
+            std::vector<types::global_dof_index>::iterator
+            p = std::set_intersection (conflicts_i.begin(), conflicts_i.end(),
+                                       conflicts_j.begin(), conflicts_j.end(),
+                                       intersection.begin());
+            // verify that there is no intersection
+            AssertThrow (p == intersection.begin(),
+                         ExcInternalError());
+          }
       }
 
   deallog << "OK" << std::endl;

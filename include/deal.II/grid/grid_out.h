@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_out_h
-#define __deal2__grid_out_h
+#ifndef dealii__grid_out_h
+#define dealii__grid_out_h
 
 
 
@@ -237,7 +237,7 @@ namespace GridOutFlags
 
     /**
      * Based on the vertices of the face and #n_boundary_face_points
-     * additional points a tensor product mesh (tranformed to the real space)
+     * additional points a tensor product mesh (transformed to the real space)
      * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
      * each boundary face.
      */
@@ -318,7 +318,7 @@ namespace GridOutFlags
     bool color_lines_on_user_flag;
 
     /**
-     * This is the number of points on a boundary face, that are ploted
+     * This is the number of points on a boundary face, that are plotted
      * additionally to the vertices of the face.
      *
      * This is used if the mapping used is not the standard @p MappingQ1
@@ -664,17 +664,18 @@ namespace GridOutFlags
     /// The factor determining the vertical distance between levels (default = 0.3)
     float level_height_factor;
 
-    /**
-     * Cell labeling (fixed order).
-     *
-     * The following booleans determine which properties of the cell shall be
-     * displayed as text in the middle of each cell.
-     */
-    bool label_level_number;    // default: true
-    bool label_cell_index;      // default: true
-    bool label_material_id;     // default: false
-    bool label_subdomain_id;    // default: false
-    bool label_level_subdomain_id;  // default: false
+    /// Scaling of the font for cell annotations. Defaults to 1.
+    float cell_font_scaling;
+    /// Write level number into each cell. Defaults to true
+    bool label_level_number;
+    /// Write cell index into each cell. Defaults to true
+    bool label_cell_index;
+    /// Write material id of each cell. Defaults to false
+    bool label_material_id;
+    /// Write subdomain id of each cell. Defaults to false
+    bool label_subdomain_id;
+    /// Write level subdomain id of each cell. Defaults to false
+    bool label_level_subdomain_id;
 
     /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
     bool draw_colorbar;
@@ -1172,7 +1173,7 @@ public:
   static std::string default_suffix (const OutputFormat output_format);
 
   /**
-   * Default suffix for the default output format selected throuw
+   * Default suffix for the default output format selected through
    * ParameterHandler.
    */
   std::string default_suffix () const;

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__data_out_faces_h
-#define __deal2__data_out_faces_h
+#ifndef dealii__data_out_faces_h
+#define dealii__data_out_faces_h
 
 
 #include <deal.II/base/config.h>

@@ -70,7 +70,7 @@ s#file:[ \t]*$#file :#g;
 
 # Handle commands such as @dealiiVideoLecture{20.5,33} by expanding it
 # into a note with some text
-if (m/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
+if (m/(\@dealiiVideoLecture\{([0-9\.]+)((, *[0-9\.]+ *)*)\})/)
 {
     $substext = $1;
 
@@ -81,6 +81,7 @@ if (m/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
     
     if (length($3) > 0)
     {
+        # if it is a list of lectures, also list the others.
 	$x = $3;
 	$x =~ s/^, *//g;
 	@otherlectures = split (',', "$x");
@@ -92,13 +93,13 @@ if (m/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
     }
 
     $text = $text . ". (All video lectures are also available <a href=\"http://www.math.tamu.edu/~bangerth/videos.html\">here</a>.)";
-    s/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/$text/;
+    s/(\@dealiiVideoLecture\{([0-9\.]+)((, *[0-9\.]+ *)*)\})/$text/;
 }
 
 
 # @dealiiVideoLectureSeeAlso works as above, but just expands into
 # regular text, no @note
-if (m/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
+if (m/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)((, *[0-9\.]+ *)*)\})/)
 {
     $substext = $1;
 
@@ -120,5 +121,5 @@ if (m/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
     }
 
     $text = $text . ".";
-    s/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)(, *[0-9\.]+ *)*\})/$text/;
+    s/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)((, *[0-9\.]+ *)*)\})/$text/;
 }

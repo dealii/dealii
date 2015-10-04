@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,42 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/function_time.h>
+#include <deal.II/base/function_time.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template<typename Number>
-FunctionTime<Number>::FunctionTime(const Number initial_time)
-  :
-  time(initial_time)
-{}
-
-
-
-template<typename Number>
-FunctionTime<Number>::~FunctionTime()
-{}
-
-
-
-template<typename Number>
-void
-FunctionTime<Number>::set_time (const Number new_time)
-{
-  time = new_time;
-}
-
-
-template<typename Number>
-void
-FunctionTime<Number>::advance_time (const Number delta_t)
-{
-  set_time (time+delta_t);
-}
-
-// Explicit instantiation
-template class FunctionTime<double>;
+// explicit instantiation
+#include "function_time.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

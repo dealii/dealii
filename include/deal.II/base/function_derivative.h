@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_derivative_h
-#define __deal2__function_derivative_h
+#ifndef dealii__function_derivative_h
+#define dealii__function_derivative_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
@@ -95,11 +95,9 @@ public:
                            const unsigned int              component = 0) const;
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined exactly
-   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
-   * type with a certain number of elements?), this is only an estimate.
-   * however often quite close to the true value.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 

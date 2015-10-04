@@ -21,7 +21,7 @@
 
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -39,6 +39,8 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 
+#include <deal.II/distributed/tria.h>
+
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>
@@ -46,6 +48,10 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/bandwidth.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/random.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <map>
@@ -53,16 +59,6 @@
 #include <cmath>
 #include <functional>
 
-
-// for whatever reason, the random_shuffle function used below needs
-// lrand48 to be declared when using -ansi as compiler flag (rather
-// than do so itself). however, inclusion of <cstdlib> or <stdlib.h>
-// does not help, so we declare that function ourselves. Since this
-// holds only for some compiler versions, do so conditionally on a
-// ./configure-time test
-#ifdef DEAL_II_DECLARE_LRAND48
-extern "C" long int lrand48 (void);
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -101,14 +97,14 @@ namespace DoFRenumbering
           if (use_constraints)
             DoFTools::make_hanging_node_constraints (dof_handler, constraints);
           constraints.close ();
-          CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                               dof_handler.n_dofs());
-          DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
+          DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                      dof_handler.n_dofs());
+          DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
           // submit the entries to the boost graph
-          for (unsigned int row=0; row<csp.n_rows(); ++row)
-            for (unsigned int col=0; col < csp.row_length(row); ++col)
-              add_edge (row, csp.column_number (row, col), graph);
+          for (unsigned int row=0; row<dsp.n_rows(); ++row)
+            for (unsigned int col=0; col < dsp.row_length(row); ++col)
+              add_edge (row, dsp.column_number (row, col), graph);
         }
 
         boosttypes::graph_traits<boosttypes::Graph>::vertex_iterator ui, ui_end;
@@ -255,6 +251,7 @@ namespace DoFRenumbering
                             const bool       reversed_numbering,
                             const bool       use_constraints)
     {
+      (void)use_constraints;
       Assert (use_constraints == false, ExcNotImplemented());
 
       // the following code is pretty
@@ -397,71 +394,70 @@ namespace DoFRenumbering
       DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
-    IndexSet locally_owned = dof_handler.locally_owned_dofs();
-    SparsityPattern sparsity;
+    const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
     // otherwise compute the Cuthill-McKee permutation
-    if (DH::dimension == 1)
-      {
-        sparsity.reinit (dof_handler.n_dofs(),
-                         dof_handler.n_dofs(),
-                         dof_handler.max_couplings_between_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, sparsity, constraints);
-        sparsity.compress();
-      }
-    else
-      {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs(),
-                                             dof_handler.locally_owned_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
-
-        // If the index set is not complete, need to get indices in local
-        // index space.
-        if (dof_handler.locally_owned_dofs().n_elements() !=
-            dof_handler.locally_owned_dofs().size())
-          {
-            // Create sparsity pattern from csp by transferring its indices to
-            // processor-local index space and doing Cuthill-McKee there
-            std::vector<unsigned int> row_lengths(locally_owned.n_elements());
-            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-              row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
-            sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
-                            row_lengths);
-            std::vector<types::global_dof_index> row_entries;
-            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-              {
-                const types::global_dof_index row = locally_owned.nth_index_in_set(i);
-                row_entries.resize(0);
-                for (CompressedSimpleSparsityPattern::row_iterator it =
-                       csp.row_begin(row); it != csp.row_end(row); ++it)
-                  if (*it != row && locally_owned.is_element(*it))
-                    row_entries.push_back(locally_owned.index_within_set(*it));
-                sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
-                                     true);
-              }
-            sparsity.compress();
-          }
-        else
-          sparsity.copy_from(csp);
-      }
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs(),
+                                locally_owned);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
     // constraints are not needed anymore
     constraints.clear ();
 
-    Assert(new_indices.size() == sparsity.n_rows(),
-           ExcDimensionMismatch(new_indices.size(),
-                                sparsity.n_rows()));
+    // If the index set is not complete, need to get indices in local index
+    // space.
+    if (locally_owned.n_elements() !=
+        locally_owned.size())
+      {
+        // Create sparsity pattern from dsp by transferring its indices to
+        // processor-local index space and doing Cuthill-McKee there
+        DynamicSparsityPattern sparsity(locally_owned.n_elements(),
+                                        locally_owned.n_elements());
+        std::vector<types::global_dof_index> row_entries;
+        for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+          {
+            const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+            row_entries.clear();
+            for (DynamicSparsityPattern::iterator it =
+                   dsp.begin(row); it != dsp.end(row); ++it)
+              if (it->column() != row && locally_owned.is_element(it->column()))
+                row_entries.push_back(locally_owned.index_within_set(it->column()));
+            sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
+                                 true);
+          }
 
-    SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
-                                          starting_indices);
+        // translate starting indices from global to local indices
+        std::vector<types::global_dof_index> local_starting_indices (starting_indices.size());
+        for (unsigned int i=0; i<starting_indices.size(); ++i)
+          {
+            Assert (locally_owned.is_element (starting_indices[i]),
+                    ExcMessage ("You specified global degree of freedom "
+                                + Utilities::int_to_string(starting_indices[i]) +
+                                " as a starting index, but this index is not among the "
+                                "locally owned ones on this processor."));
+            local_starting_indices[i] = locally_owned.index_within_set(starting_indices[i]);
+          }
 
-    if (reversed_numbering)
-      new_indices = Utilities::reverse_permutation (new_indices);
+        // then do the renumbering on the locally owned portion
+        AssertDimension(new_indices.size(), locally_owned.n_elements());
+        SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
+                                              local_starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
 
-    // convert indices back to global index space
-    for (std::size_t i=0; i<new_indices.size(); ++i)
-      new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
+        // convert indices back to global index space
+        for (std::size_t i=0; i<new_indices.size(); ++i)
+          new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
+      }
+    else
+      {
+        AssertDimension(new_indices.size(), dsp.n_rows());
+        SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
+                                              starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
+      }
   }
 
 
@@ -476,25 +472,12 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     // make the connection graph
-    SparsityPattern sparsity;
-    if (DH::dimension < 2)
-      {
-        sparsity.reinit (dof_handler.n_dofs(level),
-                         dof_handler.n_dofs(level),
-                         dof_handler.max_couplings_between_dofs());
-        MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
-        sparsity.compress();
-      }
-    else
-      {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
-                                             dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern (dof_handler, csp, level);
-        sparsity.copy_from (csp);
-      }
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
+                                dof_handler.n_dofs(level));
+    MGTools::make_sparsity_pattern (dof_handler, dsp, level);
 
-    std::vector<types::global_dof_index> new_indices(sparsity.n_rows());
-    SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
+    std::vector<types::global_dof_index> new_indices(dsp.n_rows());
+    SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
                                           starting_indices);
 
     if (reversed_numbering)
@@ -704,16 +687,14 @@ namespace DoFRenumbering
         if (is_level_operation)
           {
             //we are dealing with mg dofs, skip foreign level cells:
-            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
-                &&
-                (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain()))
+            if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
           {
             //we are dealing with active dofs, skip the loop if not locally
             // owned:
-            if (!cell->active() || !cell->is_locally_owned())
+            if (!cell->is_locally_owned())
               continue;
           }
         // on each cell: get dof indices
@@ -768,11 +749,11 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_components();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
@@ -868,7 +849,7 @@ namespace DoFRenumbering
     const types::global_dof_index result =
       compute_block_wise<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,
       typename DoFHandler<dim,spacedim>::level_cell_iterator>
-      (renumbering, start, end);
+      (renumbering, start, end, false);
     if (result == 0)
       return;
 
@@ -891,22 +872,22 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (hp::DoFHandler<dim> &dof_handler)
+  block_wise (hp::DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      hp::DoFHandler<dim>::invalid_dof_index);
+                                                      hp::DoFHandler<dim,spacedim>::invalid_dof_index);
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
+    typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
-    const typename hp::DoFHandler<dim>::level_cell_iterator
+    const typename hp::DoFHandler<dim,spacedim>::level_cell_iterator
     end = dof_handler.end();
 
     const types::global_dof_index result =
-      compute_block_wise<dim, dim, typename hp::DoFHandler<dim>::active_cell_iterator,
-      typename hp::DoFHandler<dim>::level_cell_iterator>(renumbering,
-                                                         start, end);
+      compute_block_wise<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,
+      typename hp::DoFHandler<dim,spacedim>::level_cell_iterator>(renumbering,
+          start, end, false);
 
     if (result == 0)
       return;
@@ -919,25 +900,25 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (DoFHandler<dim> &dof_handler, const unsigned int level)
+  block_wise (DoFHandler<dim,spacedim> &dof_handler, const unsigned int level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                                      DoFHandler<dim>::invalid_dof_index);
+                                                      DoFHandler<dim, spacedim>::invalid_dof_index);
 
-    typename DoFHandler<dim>::level_cell_iterator
+    typename DoFHandler<dim, spacedim>::level_cell_iterator
     start =dof_handler.begin(level);
-    typename DoFHandler<dim>::level_cell_iterator
+    typename DoFHandler<dim, spacedim>::level_cell_iterator
     end = dof_handler.end(level);
 
     const types::global_dof_index result =
-      compute_block_wise<dim, dim, typename DoFHandler<dim>::level_cell_iterator,
-      typename DoFHandler<dim>::level_cell_iterator>(
-        renumbering, start, end);
+      compute_block_wise<dim, spacedim, typename DoFHandler<dim, spacedim>::level_cell_iterator,
+      typename DoFHandler<dim, spacedim>::level_cell_iterator>(
+        renumbering, start, end, true);
 
     if (result == 0) return;
 
@@ -954,7 +935,8 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_block_wise (std::vector<types::global_dof_index> &new_indices,
                       const ITERATOR    &start,
-                      const ENDITERATOR &end)
+                      const ENDITERATOR &end,
+                      const bool is_level_operation)
   {
     const hp::FECollection<dim,spacedim>
     fe_collection (start->get_dof_handler().get_fe ());
@@ -998,20 +980,33 @@ namespace DoFRenumbering
     std::vector<std::vector<types::global_dof_index> >
     block_to_dof_map (fe_collection.n_blocks());
     for (ITERATOR cell=start; cell!=end; ++cell)
-      if (cell->is_locally_owned())
-        {
-          // on each cell: get dof indices
-          // and insert them into the global
-          // list using their component
-          const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
-          local_dof_indices.resize (dofs_per_cell);
-          cell->get_active_or_mg_dof_indices (local_dof_indices);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
-              block_to_dof_map[block_list[fe_index][i]].
-              push_back (local_dof_indices[i]);
-        }
+      {
+        if (is_level_operation)
+          {
+            //we are dealing with mg dofs, skip foreign level cells:
+            if (!cell->is_locally_owned_on_level())
+              continue;
+          }
+        else
+          {
+            //we are dealing with active dofs, skip the loop if not locally
+            // owned:
+            if (!cell->is_locally_owned())
+              continue;
+          }
+
+        // on each cell: get dof indices
+        // and insert them into the global
+        // list using their component
+        const unsigned int fe_index = cell->active_fe_index();
+        const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+        local_dof_indices.resize (dofs_per_cell);
+        cell->get_active_or_mg_dof_indices (local_dof_indices);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
+            block_to_dof_map[block_list[fe_index][i]].
+            push_back (local_dof_indices[i]);
+      }
 
     // now we've got all indices sorted
     // into buckets labeled by their
@@ -1041,11 +1036,11 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_blocks();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::distributed::Triangulation<dim,spacedim> *tria
-        = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+    if (const parallel::Triangulation<dim,spacedim> *tria
+        = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
@@ -1864,7 +1859,20 @@ namespace DoFRenumbering
     for (unsigned int i=0; i<n_dofs; ++i)
       new_indices[i] = i;
 
-    std::random_shuffle (new_indices.begin(), new_indices.end());
+    // shuffle the elements; the following is essentially the
+    // std::random_shuffle algorithm but uses a predictable
+    // random number generator
+    ::boost::mt19937 random_number_generator;
+    for (unsigned int i=1; i<n_dofs; ++i)
+      {
+        // get a random number between 0 and i (inclusive)
+        const unsigned int j
+          = ::boost::random::uniform_int_distribution<>(0, i)(random_number_generator);
+
+        // if possible, swap the elements
+        if (i != j)
+          std::swap (new_indices[i], new_indices[j]);
+      }
   }
 
 

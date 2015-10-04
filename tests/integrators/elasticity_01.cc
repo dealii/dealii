@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ void test_cell(const FEValuesBase<dim> &fev)
   cell_matrix(M,fev);
   {
     LogStream::Prefix pre("cell");
-    M.print(deallog,8);
+    M.print(deallog,12,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -58,7 +58,7 @@ void test_cell(const FEValuesBase<dim> &fev)
         u = 0.;
         u(i) = 1.;
         w = 0.;
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_gradients(u, indices, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(ugrad), true);
         cell_residual(w, fev, make_slice(ugrad));
         M.vmult(v,u);
         w.add(-1., v);
@@ -78,7 +78,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
   nitsche_matrix(M, fev, 17);
   {
     LogStream::Prefix pre("bdry");
-    M.print(deallog,8);
+    M.print(deallog,12,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -99,8 +99,8 @@ void test_boundary(const FEValuesBase<dim> &fev)
         u = 0.;
         u(i) = 1.;
         w = 0.;
-        fev.get_function_values(u, indices, uval, true);
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_values(u, indices, VectorSlice<std::vector<std::vector<double> > >(uval), true);
+        fev.get_function_gradients(u, indices, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(ugrad), true);
         nitsche_residual(w, fev, make_slice(uval), make_slice(ugrad), make_slice(null_val), 17);
         M.vmult(v,u);
         w.add(-1., v);
@@ -127,19 +127,19 @@ void test_face(const FEValuesBase<dim> &fev1,
 
   {
     LogStream::Prefix pre("M11");
-    M11.print(deallog,8);
+    M11.print(deallog,12,8);
   }
   {
     LogStream::Prefix pre("M12");
-    M12.print(deallog,8);
+    M12.print(deallog,12,8);
   }
   {
     LogStream::Prefix pre("M21");
-    M21.print(deallog,8);
+    M21.print(deallog,12,8);
   }
   {
     LogStream::Prefix pre("M22");
-    M22.print(deallog,8);
+    M22.print(deallog,12,8);
   }
 
   Vector<double> u1(n1), v1(n1), w1(n1);
@@ -163,8 +163,8 @@ void test_face(const FEValuesBase<dim> &fev1,
         u1(i1) = 1.;
         w1 = 0.;
         w2 = 0.;
-        fev1.get_function_values(u1, indices1, u1val, true);
-        fev1.get_function_gradients(u1, indices1, u1grad, true);
+        fev1.get_function_values(u1, indices1, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
+        fev1.get_function_gradients(u1, indices1, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(u1grad), true);
         ip_residual(w1, w2, fev1, fev2,
                     make_slice(u1val), make_slice(u1grad),
                     make_slice(nullval), make_slice(nullgrad),
@@ -177,8 +177,8 @@ void test_face(const FEValuesBase<dim> &fev1,
 
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(u1, indices2, u1val, true);
-        fev2.get_function_gradients(u1, indices2, u1grad, true);
+        fev2.get_function_values(u1, indices2, VectorSlice<std::vector<std::vector<double> > >(u1val), true);
+        fev2.get_function_gradients(u1, indices2, VectorSlice<std::vector<std::vector<Tensor<1,dim> > > >(u1grad), true);
         ip_residual(w1, w2, fev1, fev2,
                     make_slice(nullval), make_slice(nullgrad),
                     make_slice(u1val), make_slice(u1grad),
@@ -249,6 +249,7 @@ int main()
 {
   initlog();
   deallog.threshold_double(1.e-10);
+  deallog.precision(8);
 
   Triangulation<2> tr2;
   TestGrids::hypercube(tr2, 1);

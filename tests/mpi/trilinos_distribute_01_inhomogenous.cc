@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,9 +41,9 @@ void test()
     is.add_range (100*myid, 100*myid+100);
     vec.reinit (is, MPI_COMM_WORLD);
   }
-  Assert (vec.local_size() == 100, ExcInternalError());
-  Assert (vec.local_range().first == 100*myid, ExcInternalError());
-  Assert (vec.local_range().second == 100*myid+100, ExcInternalError());
+  AssertThrow (vec.local_size() == 100, ExcInternalError());
+  AssertThrow (vec.local_range().first == 100*myid, ExcInternalError());
+  AssertThrow (vec.local_range().second == 100*myid+100, ExcInternalError());
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
     vec(i) = i;
   vec.compress(VectorOperation::insert);
@@ -53,7 +53,7 @@ void test()
     double exact_l1 = 0;
     for (unsigned int i=0; i<vec.size(); ++i)
       exact_l1 += i;
-    Assert (vec.l1_norm() == exact_l1, ExcInternalError());
+    AssertThrow (vec.l1_norm() == exact_l1, ExcInternalError());
   }
 
 
@@ -98,12 +98,12 @@ void test()
 
   // verify correctness
   if (myid != 0)
-    Assert (vec(vec.local_range().first+10) == vec.local_range().first-25+1,
-            ExcInternalError());
+    AssertThrow (vec(vec.local_range().first+10) == vec.local_range().first-25+1,
+                 ExcInternalError());
 
   if (myid != n_processes-1)
-    Assert (vec(vec.local_range().first+90) == vec.local_range().first+105-1,
-            ExcInternalError());
+    AssertThrow (vec(vec.local_range().first+90) == vec.local_range().first+105-1,
+                 ExcInternalError());
 
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
     {
@@ -112,7 +112,7 @@ void test()
           (i != vec.local_range().first+90))
         {
           double val = vec(i);
-          Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
+          AssertThrow (std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
 
@@ -143,7 +143,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

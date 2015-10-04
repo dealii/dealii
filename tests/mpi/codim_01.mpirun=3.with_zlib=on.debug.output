@@ -1,0 +1,599 @@
+
+DEAL:0:2-3::Checksum: 339413295
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPoints>
+      <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
+    </PPoints>
+      <PDataArray type="Int32" Name="treeid" format="ascii"/>
+    </PCellData>
+    <PPointData>
+    </PPointData>
+    <Piece Source="file_0000.vtu"/>
+    <Piece Source="file_0001.vtu"/>
+    <Piece Source="file_0002.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="88" NumberOfCells="22">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+            7.96242177e-01   1.24999997e-03   5.00781229e-03
+            6.05945289e-01   1.24999997e-03   1.95304692e-01
+            8.43445301e-01   4.87499982e-02   5.30468766e-03
+            6.41867161e-01   4.87499982e-02   2.06882820e-01
+            5.95929682e-01   1.24999997e-03   2.05320314e-01
+            4.05632824e-01   1.24999997e-03   3.95617187e-01
+            6.31257832e-01   4.87499982e-02   2.17492193e-01
+            4.29679692e-01   4.87499982e-02   4.19070303e-01
+            8.45929682e-01   5.12499996e-02   5.32031246e-03
+            6.43757820e-01   5.12499996e-02   2.07492188e-01
+            8.93132806e-01   9.87500027e-02   5.61718736e-03
+            6.79679692e-01   9.87500027e-02   2.19070315e-01
+            6.33117199e-01   5.12499996e-02   2.18132809e-01
+            4.30945307e-01   5.12499996e-02   4.20304686e-01
+            6.68445289e-01   9.87500027e-02   2.30304688e-01
+            4.54992175e-01   9.87500027e-02   4.43757802e-01
+            3.95617187e-01   1.24999997e-03   4.05632824e-01
+            2.05320314e-01   1.24999997e-03   5.95929682e-01
+            4.19070303e-01   4.87499982e-02   4.29679692e-01
+            2.17492193e-01   4.87499982e-02   6.31257832e-01
+            1.95304692e-01   1.24999997e-03   6.05945289e-01
+            5.00781229e-03   1.24999997e-03   7.96242177e-01
+            2.06882820e-01   4.87499982e-02   6.41867161e-01
+            5.30468766e-03   4.87499982e-02   8.43445301e-01
+            4.20304686e-01   5.12499996e-02   4.30945307e-01
+            2.18132809e-01   5.12499996e-02   6.33117199e-01
+            4.43757802e-01   9.87500027e-02   4.54992175e-01
+            2.30304688e-01   9.87500027e-02   6.68445289e-01
+            2.07492188e-01   5.12499996e-02   6.43757820e-01
+            5.32031246e-03   5.12499996e-02   8.45929682e-01
+            2.19070315e-01   9.87500027e-02   6.79679692e-01
+            5.61718736e-03   9.87500027e-02   8.93132806e-01
+            8.91218722e-01   1.02499999e-01   1.12812500e-02
+            4.62531239e-01   1.02499999e-01   4.39968765e-01
+            9.85031247e-01   1.97500005e-01   1.24687497e-02
+            5.11218727e-01   1.97500005e-01   4.86281246e-01
+            4.39968765e-01   1.02499999e-01   4.62531239e-01
+            1.12812500e-02   1.02499999e-01   8.91218722e-01
+            4.86281246e-01   1.97500005e-01   5.11218727e-01
+            1.24687497e-02   1.97500005e-01   9.85031247e-01
+            9.85031247e-01  -1.97500005e-01   1.24687497e-02
+            5.11218727e-01  -1.97500005e-01   4.86281246e-01
+            8.91218722e-01  -1.02499999e-01   1.12812500e-02
+            4.62531239e-01  -1.02499999e-01   4.39968765e-01
+            4.86281246e-01  -1.97500005e-01   5.11218727e-01
+            1.24687497e-02  -1.97500005e-01   9.85031247e-01
+            4.39968765e-01  -1.02499999e-01   4.62531239e-01
+            1.12812500e-02  -1.02499999e-01   8.91218722e-01
+            8.86281252e-01  -9.74999964e-02   1.12187499e-02
+            4.59968746e-01  -9.74999964e-02   4.37531263e-01
+            7.92468727e-01  -2.49999994e-03   1.00312503e-02
+            4.11281258e-01  -2.49999994e-03   3.91218752e-01
+            4.37531263e-01  -9.74999964e-02   4.59968746e-01
+            1.12187499e-02  -9.74999964e-02   8.86281252e-01
+            3.91218752e-01  -2.49999994e-03   4.11281258e-01
+            1.00312503e-02  -2.49999994e-03   7.92468727e-01
+            9.89968777e-01   1.97500005e-01   1.25312498e-02
+            5.13781250e-01   1.97500005e-01   4.88718748e-01
+            1.08378124e+00   1.02499999e-01   1.37187503e-02
+            5.62468767e-01   1.02499999e-01   5.35031259e-01
+            4.88718748e-01   1.97500005e-01   5.13781250e-01
+            1.25312498e-02   1.97500005e-01   9.89968777e-01
+            5.35031259e-01   1.02499999e-01   5.62468767e-01
+            1.37187503e-02   1.02499999e-01   1.08378124e+00
+            1.08871877e+00   9.74999964e-02   1.37812505e-02
+            5.65031230e-01   9.74999964e-02   5.37468731e-01
+            1.18253124e+00   2.49999994e-03   1.49687501e-02
+            6.13718748e-01   2.49999994e-03   5.83781242e-01
+            5.37468731e-01   9.74999964e-02   5.65031230e-01
+            1.37812505e-02   9.74999964e-02   1.08871877e+00
+            5.83781242e-01   2.49999994e-03   6.13718748e-01
+            1.49687501e-02   2.49999994e-03   1.18253124e+00
+           -1.00312503e-02   2.49999994e-03   7.92468727e-01
+           -3.91218752e-01   2.49999994e-03   4.11281258e-01
+           -1.12187499e-02   9.74999964e-02   8.86281252e-01
+           -4.37531263e-01   9.74999964e-02   4.59968746e-01
+           -4.11281258e-01   2.49999994e-03   3.91218752e-01
+           -7.92468727e-01   2.49999994e-03   1.00312503e-02
+           -4.59968746e-01   9.74999964e-02   4.37531263e-01
+           -8.86281252e-01   9.74999964e-02   1.12187499e-02
+           -1.12812500e-02   1.02499999e-01   8.91218722e-01
+           -4.39968765e-01   1.02499999e-01   4.62531239e-01
+           -1.24687497e-02   1.97500005e-01   9.85031247e-01
+           -4.86281246e-01   1.97500005e-01   5.11218727e-01
+           -4.62531239e-01   1.02499999e-01   4.39968765e-01
+           -8.91218722e-01   1.02499999e-01   1.12812500e-02
+           -5.11218727e-01   1.97500005e-01   4.86281246e-01
+           -9.85031247e-01   1.97500005e-01   1.24687497e-02
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="ascii">
+          0 1 2 3
+          4 5 6 7
+          8 9 10 11
+          12 13 14 15
+          16 17 18 19
+          20 21 22 23
+          24 25 26 27
+          28 29 30 31
+          32 33 34 35
+          36 37 38 39
+          40 41 42 43
+          44 45 46 47
+          48 49 50 51
+          52 53 54 55
+          56 57 58 59
+          60 61 62 63
+          64 65 66 67
+          68 69 70 71
+          72 73 74 75
+          76 77 78 79
+          80 81 82 83
+          84 85 86 87
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="ascii">
+          4 8 12 16 20 24 28 32
+          36 40 44 48 52 56 60 64
+          68 72 76 80 84 88
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="ascii">
+          8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8
+          8 8
+        </DataArray>
+      </Cells>
+      <CellData Scalars="treeid,level,mpirank">
+        <DataArray type="Int32" Name="treeid" format="ascii">
+          0 0 0 0 0 0 0 0 0 0 1 1 1 1 2 2 2 2 3 3
+          3 3
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+          0 0
+        </DataArray>
+      </CellData>
+      <PointData>
+      </PointData>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
+
+DEAL:0:2-3::dofs 73
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="88" NumberOfCells="22" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAEAIAABACAAAKQEAAA==eNqVVUESgjAM5E9672/0TfoDnuApZwZ4gIMHHOXAyEHHDziQNkxTtmNyy1I2223Sts0ckzuf5ri4wke74DfBQ85f3x6vZD1Hr/De5XmKIsYnh3ji9ZXoUHoI6KFYj+yXwH4p1pnyKD0UdOR5ZL8UdFj1cD4q3wPv1encqgfxbNcbzf3A+SfpN87vgofc2g95nrXfYh3/69kt8U38YPzhdG7Vg3i2633hufhzo3x/rHPn+4L0nCIeX4d0fcTj65D22aonfw/0BO4fo56Ux9ch3edoHvfq3MJ/jL+8f6V8Px7meArO62qHeNCc5nk6hXdmPS14Lzgf1D3fmPUgHvSOIB/0OQUf8z7Ugse6Ux40d4gnXleK71Y9yIfgU3yfDGY9iAfN6Q9wul4M
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAGABAABgAQAAkQAAAA==eNoNw4dWAVAAANCnqaWiNGmXFS2R0NagVNb//4l7z7khhBBx0gmnnHbWGaPOueC8iy65bMwVV00Yd811N0y66ZY7brtryj3T7nvgkYcee+KZp2bMmjdnwXNLFr3w0muvvLFsxVur3nlvzboNH2z66JMvPvvqm++2/PDTtl92/Lbrj7/+2fPfvgNHDh0D8IIO9Q==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAFgAAABYAAAAPwAAAA==eNoNw5ESgEAUAMAHB0EQBMFBEAQHQRAEQXBwEAT9/5e0O7MpIjp7B0cns7OLq8XN3cPTy9tq8/H18wd+2AP1
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAABYAAAAWAAAACwAAAA==eNrj5MQGAAj7AMc=
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAMACAADAAgAADwAAAA==eNpjYBgFo2DoAgACwAAB    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
+DEAL:1:2-3::Checksum: 0
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="96" NumberOfCells="24">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+           -1.24687497e-02  -1.97500005e-01   9.85031247e-01
+           -4.86281246e-01  -1.97500005e-01   5.11218727e-01
+           -1.12812500e-02  -1.02499999e-01   8.91218722e-01
+           -4.39968765e-01  -1.02499999e-01   4.62531239e-01
+           -5.11218727e-01  -1.97500005e-01   4.86281246e-01
+           -9.85031247e-01  -1.97500005e-01   1.24687497e-02
+           -4.62531239e-01  -1.02499999e-01   4.39968765e-01
+           -8.91218722e-01  -1.02499999e-01   1.12812500e-02
+           -1.12187499e-02  -9.74999964e-02   8.86281252e-01
+           -4.37531263e-01  -9.74999964e-02   4.59968746e-01
+           -1.00312503e-02  -2.49999994e-03   7.92468727e-01
+           -3.91218752e-01  -2.49999994e-03   4.11281258e-01
+           -4.59968746e-01  -9.74999964e-02   4.37531263e-01
+           -8.86281252e-01  -9.74999964e-02   1.12187499e-02
+           -4.11281258e-01  -2.49999994e-03   3.91218752e-01
+           -7.92468727e-01  -2.49999994e-03   1.00312503e-02
+           -1.25312498e-02   1.97500005e-01   9.89968777e-01
+           -4.88718748e-01   1.97500005e-01   5.13781250e-01
+           -1.37187503e-02   1.02499999e-01   1.08378124e+00
+           -5.35031259e-01   1.02499999e-01   5.62468767e-01
+           -5.13781250e-01   1.97500005e-01   4.88718748e-01
+           -9.89968777e-01   1.97500005e-01   1.25312498e-02
+           -5.62468767e-01   1.02499999e-01   5.35031259e-01
+           -1.08378124e+00   1.02499999e-01   1.37187503e-02
+           -1.37812505e-02   9.74999964e-02   1.08871877e+00
+           -5.37468731e-01   9.74999964e-02   5.65031230e-01
+           -1.49687501e-02   2.49999994e-03   1.18253124e+00
+           -5.83781242e-01   2.49999994e-03   6.13718748e-01
+           -5.65031230e-01   9.74999964e-02   5.37468731e-01
+           -1.08871877e+00   9.74999964e-02   1.37812505e-02
+           -6.13718748e-01   2.49999994e-03   5.83781242e-01
+           -1.18253124e+00   2.49999994e-03   1.49687501e-02
+            1.00312503e-02   2.49999994e-03  -7.92468727e-01
+            3.91218752e-01   2.49999994e-03  -4.11281258e-01
+            1.12187499e-02   9.74999964e-02  -8.86281252e-01
+            4.37531263e-01   9.74999964e-02  -4.59968746e-01
+            4.11281258e-01   2.49999994e-03  -3.91218752e-01
+            7.92468727e-01   2.49999994e-03  -1.00312503e-02
+            4.59968746e-01   9.74999964e-02  -4.37531263e-01
+            8.86281252e-01   9.74999964e-02  -1.12187499e-02
+            1.12812500e-02   1.02499999e-01  -8.91218722e-01
+            4.39968765e-01   1.02499999e-01  -4.62531239e-01
+            1.24687497e-02   1.97500005e-01  -9.85031247e-01
+            4.86281246e-01   1.97500005e-01  -5.11218727e-01
+            4.62531239e-01   1.02499999e-01  -4.39968765e-01
+            8.91218722e-01   1.02499999e-01  -1.12812500e-02
+            5.11218727e-01   1.97500005e-01  -4.86281246e-01
+            9.85031247e-01   1.97500005e-01  -1.24687497e-02
+            1.24687497e-02  -1.97500005e-01  -9.85031247e-01
+            4.86281246e-01  -1.97500005e-01  -5.11218727e-01
+            1.12812500e-02  -1.02499999e-01  -8.91218722e-01
+            4.39968765e-01  -1.02499999e-01  -4.62531239e-01
+            5.11218727e-01  -1.97500005e-01  -4.86281246e-01
+            9.85031247e-01  -1.97500005e-01  -1.24687497e-02
+            4.62531239e-01  -1.02499999e-01  -4.39968765e-01
+            8.91218722e-01  -1.02499999e-01  -1.12812500e-02
+            1.12187499e-02  -9.74999964e-02  -8.86281252e-01
+            4.37531263e-01  -9.74999964e-02  -4.59968746e-01
+            1.00312503e-02  -2.49999994e-03  -7.92468727e-01
+            3.91218752e-01  -2.49999994e-03  -4.11281258e-01
+            4.59968746e-01  -9.74999964e-02  -4.37531263e-01
+            8.86281252e-01  -9.74999964e-02  -1.12187499e-02
+            4.11281258e-01  -2.49999994e-03  -3.91218752e-01
+            7.92468727e-01  -2.49999994e-03  -1.00312503e-02
+            1.25312498e-02   1.97500005e-01  -9.89968777e-01
+            4.88718748e-01   1.97500005e-01  -5.13781250e-01
+            1.37187503e-02   1.02499999e-01  -1.08378124e+00
+            5.35031259e-01   1.02499999e-01  -5.62468767e-01
+            5.13781250e-01   1.97500005e-01  -4.88718748e-01
+            9.89968777e-01   1.97500005e-01  -1.25312498e-02
+            5.62468767e-01   1.02499999e-01  -5.35031259e-01
+            1.08378124e+00   1.02499999e-01  -1.37187503e-02
+            1.37812505e-02   9.74999964e-02  -1.08871877e+00
+            5.37468731e-01   9.74999964e-02  -5.65031230e-01
+            1.49687501e-02   2.49999994e-03  -1.18253124e+00
+            5.83781242e-01   2.49999994e-03  -6.13718748e-01
+            5.65031230e-01   9.74999964e-02  -5.37468731e-01
+            1.08871877e+00   9.74999964e-02  -1.37812505e-02
+            6.13718748e-01   2.49999994e-03  -5.83781242e-01
+            1.18253124e+00   2.49999994e-03  -1.49687501e-02
+            1.18253124e+00  -2.49999994e-03   1.49687501e-02
+            6.13718748e-01  -2.49999994e-03   5.83781242e-01
+            1.08871877e+00  -9.74999964e-02   1.37812505e-02
+            5.65031230e-01  -9.74999964e-02   5.37468731e-01
+            5.83781242e-01  -2.49999994e-03   6.13718748e-01
+            1.49687501e-02  -2.49999994e-03   1.18253124e+00
+            5.37468731e-01  -9.74999964e-02   5.65031230e-01
+            1.37812505e-02  -9.74999964e-02   1.08871877e+00
+            1.08378124e+00  -1.02499999e-01   1.37187503e-02
+            5.62468767e-01  -1.02499999e-01   5.35031259e-01
+            9.89968777e-01  -1.97500005e-01   1.25312498e-02
+            5.13781250e-01  -1.97500005e-01   4.88718748e-01
+            5.35031259e-01  -1.02499999e-01   5.62468767e-01
+            1.37187503e-02  -1.02499999e-01   1.08378124e+00
+            4.88718748e-01  -1.97500005e-01   5.13781250e-01
+            1.25312498e-02  -1.97500005e-01   9.89968777e-01
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="ascii">
+          0 1 2 3
+          4 5 6 7
+          8 9 10 11
+          12 13 14 15
+          16 17 18 19
+          20 21 22 23
+          24 25 26 27
+          28 29 30 31
+          32 33 34 35
+          36 37 38 39
+          40 41 42 43
+          44 45 46 47
+          48 49 50 51
+          52 53 54 55
+          56 57 58 59
+          60 61 62 63
+          64 65 66 67
+          68 69 70 71
+          72 73 74 75
+          76 77 78 79
+          80 81 82 83
+          84 85 86 87
+          88 89 90 91
+          92 93 94 95
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="ascii">
+          4 8 12 16 20 24 28 32
+          36 40 44 48 52 56 60 64
+          68 72 76 80 84 88 92 96
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="ascii">
+          8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8
+          8 8 8 8
+        </DataArray>
+      </Cells>
+      <CellData Scalars="treeid,level,mpirank">
+        <DataArray type="Int32" Name="treeid" format="ascii">
+          4 4 4 4 5 5 5 5 6 6 6 6 7 7 7 7 8 8 8 8
+          9 9 9 9
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1 1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1 1 1
+        </DataArray>
+      </CellData>
+      <PointData>
+      </PointData>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
+
+DEAL:1:2-3::dofs 73
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="96" NumberOfCells="24" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAAAJAAAACQAAKAEAAA==eNqdVsENgzAQ604ZIHO2m/Dyu1I7ABIPUF+V+ghigYqSRIpTc4R8UEzrM47vwLl1Lf5C6we7l+f97bquOV47pPvbfsp42iue//UWr3jKOgmfm/Vsd0PE7yhVjISPzXoUT/n7hAcDH7HP0+H5WNfHb9cBJT4YPAHsg+KJdcA+n9PD/3tHv3o6v9636lE8sU6lm/z3wn8v/Kf8TSjxyeAJhOfcVjyxTsaF/wf11H0X+xL/+/24HsUT60j/KQ9I57Z/rl3OQcpFiQ+SJ+WO6yuelGvLf0uPyBvNm5wTnNNT89DcE/rz/IGYYxD9zjpRPq/iqeew4qHnteaPoed43lr1tOatNQ+i30Hvqdy3rXlQPPSeteaPoaeaPxDfCWjVo3ic+M75AgN1oUQ=
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAIABAACAAQAAnQAAAA==eNoNw4c2QgEAANCnSJJVRsmmYUV2SLISQigz/v8v3HvODYIg6DFsyF777Ddi1AEHjRl3yBGHHXXMpAnHnXDKSVOmzTjtjLPOO+eCiy675IpZ8+YsuOq6a2646ZZFty2564577nvogUeWPfHYUytWPfPcmpdeeOW1dW+8teG9dz7Y9MlHn2356otvtn2344effvvlj13//PUfAicR0Q==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAGAAAABgAAAAQgAAAA==eNoNw5ESgEAUAMAHQRAEQRAcBEEQBMFBcBAEQRAE/f9XtDuzVUTUNrZ29g4mRydnF1c3s7vFw9PL28fXzx+i4ASx
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAABgAAAAYAAAACwAAAA==eNrj5MQOAAqkANk=
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAAADAAAAAwAAFAAAAA==eNpjYACBD/YMo/QoPQJpAIIHcaE=    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
+
+DEAL:2:2-3::Checksum: 0
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="96" NumberOfCells="24">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+           -1.49687501e-02  -2.49999994e-03   1.18253124e+00
+           -5.83781242e-01  -2.49999994e-03   6.13718748e-01
+           -1.37812505e-02  -9.74999964e-02   1.08871877e+00
+           -5.37468731e-01  -9.74999964e-02   5.65031230e-01
+           -6.13718748e-01  -2.49999994e-03   5.83781242e-01
+           -1.18253124e+00  -2.49999994e-03   1.49687501e-02
+           -5.65031230e-01  -9.74999964e-02   5.37468731e-01
+           -1.08871877e+00  -9.74999964e-02   1.37812505e-02
+           -1.37187503e-02  -1.02499999e-01   1.08378124e+00
+           -5.35031259e-01  -1.02499999e-01   5.62468767e-01
+           -1.25312498e-02  -1.97500005e-01   9.89968777e-01
+           -4.88718748e-01  -1.97500005e-01   5.13781250e-01
+           -5.62468767e-01  -1.02499999e-01   5.35031259e-01
+           -1.08378124e+00  -1.02499999e-01   1.37187503e-02
+           -5.13781250e-01  -1.97500005e-01   4.88718748e-01
+           -9.89968777e-01  -1.97500005e-01   1.25312498e-02
+            1.49687501e-02  -2.49999994e-03  -1.18253124e+00
+            5.83781242e-01  -2.49999994e-03  -6.13718748e-01
+            1.37812505e-02  -9.74999964e-02  -1.08871877e+00
+            5.37468731e-01  -9.74999964e-02  -5.65031230e-01
+            6.13718748e-01  -2.49999994e-03  -5.83781242e-01
+            1.18253124e+00  -2.49999994e-03  -1.49687501e-02
+            5.65031230e-01  -9.74999964e-02  -5.37468731e-01
+            1.08871877e+00  -9.74999964e-02  -1.37812505e-02
+            1.37187503e-02  -1.02499999e-01  -1.08378124e+00
+            5.35031259e-01  -1.02499999e-01  -5.62468767e-01
+            1.25312498e-02  -1.97500005e-01  -9.89968777e-01
+            4.88718748e-01  -1.97500005e-01  -5.13781250e-01
+            5.62468767e-01  -1.02499999e-01  -5.35031259e-01
+            1.08378124e+00  -1.02499999e-01  -1.37187503e-02
+            5.13781250e-01  -1.97500005e-01  -4.88718748e-01
+            9.89968777e-01  -1.97500005e-01  -1.25312498e-02
+           -7.92468727e-01   2.49999994e-03  -1.00312503e-02
+           -4.11281258e-01   2.49999994e-03  -3.91218752e-01
+           -8.86281252e-01   9.74999964e-02  -1.12187499e-02
+           -4.59968746e-01   9.74999964e-02  -4.37531263e-01
+           -3.91218752e-01   2.49999994e-03  -4.11281258e-01
+           -1.00312503e-02   2.49999994e-03  -7.92468727e-01
+           -4.37531263e-01   9.74999964e-02  -4.59968746e-01
+           -1.12187499e-02   9.74999964e-02  -8.86281252e-01
+           -8.91218722e-01   1.02499999e-01  -1.12812500e-02
+           -4.62531239e-01   1.02499999e-01  -4.39968765e-01
+           -9.85031247e-01   1.97500005e-01  -1.24687497e-02
+           -5.11218727e-01   1.97500005e-01  -4.86281246e-01
+           -4.39968765e-01   1.02499999e-01  -4.62531239e-01
+           -1.12812500e-02   1.02499999e-01  -8.91218722e-01
+           -4.86281246e-01   1.97500005e-01  -5.11218727e-01
+           -1.24687497e-02   1.97500005e-01  -9.85031247e-01
+           -9.85031247e-01  -1.97500005e-01  -1.24687497e-02
+           -5.11218727e-01  -1.97500005e-01  -4.86281246e-01
+           -8.91218722e-01  -1.02499999e-01  -1.12812500e-02
+           -4.62531239e-01  -1.02499999e-01  -4.39968765e-01
+           -4.86281246e-01  -1.97500005e-01  -5.11218727e-01
+           -1.24687497e-02  -1.97500005e-01  -9.85031247e-01
+           -4.39968765e-01  -1.02499999e-01  -4.62531239e-01
+           -1.12812500e-02  -1.02499999e-01  -8.91218722e-01
+           -8.86281252e-01  -9.74999964e-02  -1.12187499e-02
+           -4.59968746e-01  -9.74999964e-02  -4.37531263e-01
+           -7.92468727e-01  -2.49999994e-03  -1.00312503e-02
+           -4.11281258e-01  -2.49999994e-03  -3.91218752e-01
+           -4.37531263e-01  -9.74999964e-02  -4.59968746e-01
+           -1.12187499e-02  -9.74999964e-02  -8.86281252e-01
+           -3.91218752e-01  -2.49999994e-03  -4.11281258e-01
+           -1.00312503e-02  -2.49999994e-03  -7.92468727e-01
+           -9.89968777e-01   1.97500005e-01  -1.25312498e-02
+           -5.13781250e-01   1.97500005e-01  -4.88718748e-01
+           -1.08378124e+00   1.02499999e-01  -1.37187503e-02
+           -5.62468767e-01   1.02499999e-01  -5.35031259e-01
+           -4.88718748e-01   1.97500005e-01  -5.13781250e-01
+           -1.25312498e-02   1.97500005e-01  -9.89968777e-01
+           -5.35031259e-01   1.02499999e-01  -5.62468767e-01
+           -1.37187503e-02   1.02499999e-01  -1.08378124e+00
+           -1.08871877e+00   9.74999964e-02  -1.37812505e-02
+           -5.65031230e-01   9.74999964e-02  -5.37468731e-01
+           -1.18253124e+00   2.49999994e-03  -1.49687501e-02
+           -6.13718748e-01   2.49999994e-03  -5.83781242e-01
+           -5.37468731e-01   9.74999964e-02  -5.65031230e-01
+           -1.37812505e-02   9.74999964e-02  -1.08871877e+00
+           -5.83781242e-01   2.49999994e-03  -6.13718748e-01
+           -1.49687501e-02   2.49999994e-03  -1.18253124e+00
+           -1.18253124e+00  -2.49999994e-03  -1.49687501e-02
+           -6.13718748e-01  -2.49999994e-03  -5.83781242e-01
+           -1.08871877e+00  -9.74999964e-02  -1.37812505e-02
+           -5.65031230e-01  -9.74999964e-02  -5.37468731e-01
+           -5.83781242e-01  -2.49999994e-03  -6.13718748e-01
+           -1.49687501e-02  -2.49999994e-03  -1.18253124e+00
+           -5.37468731e-01  -9.74999964e-02  -5.65031230e-01
+           -1.37812505e-02  -9.74999964e-02  -1.08871877e+00
+           -1.08378124e+00  -1.02499999e-01  -1.37187503e-02
+           -5.62468767e-01  -1.02499999e-01  -5.35031259e-01
+           -9.89968777e-01  -1.97500005e-01  -1.25312498e-02
+           -5.13781250e-01  -1.97500005e-01  -4.88718748e-01
+           -5.35031259e-01  -1.02499999e-01  -5.62468767e-01
+           -1.37187503e-02  -1.02499999e-01  -1.08378124e+00
+           -4.88718748e-01  -1.97500005e-01  -5.13781250e-01
+           -1.25312498e-02  -1.97500005e-01  -9.89968777e-01
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="ascii">
+          0 1 2 3
+          4 5 6 7
+          8 9 10 11
+          12 13 14 15
+          16 17 18 19
+          20 21 22 23
+          24 25 26 27
+          28 29 30 31
+          32 33 34 35
+          36 37 38 39
+          40 41 42 43
+          44 45 46 47
+          48 49 50 51
+          52 53 54 55
+          56 57 58 59
+          60 61 62 63
+          64 65 66 67
+          68 69 70 71
+          72 73 74 75
+          76 77 78 79
+          80 81 82 83
+          84 85 86 87
+          88 89 90 91
+          92 93 94 95
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="ascii">
+          4 8 12 16 20 24 28 32
+          36 40 44 48 52 56 60 64
+          68 72 76 80 84 88 92 96
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="ascii">
+          8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8
+          8 8 8 8
+        </DataArray>
+      </Cells>
+      <CellData Scalars="treeid,level,mpirank">
+        <DataArray type="Int32" Name="treeid" format="ascii">
+          10 10 10 10 11 11 11 11 12 12 12 12 13 13 13 13 14 14 14 14
+          15 15 15 15
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1 1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+          2 2 2 2
+        </DataArray>
+      </CellData>
+      <PointData>
+      </PointData>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
+
+DEAL:2:2-3::dofs 73
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="96" NumberOfCells="24" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAAAJAAAACQAAGAEAAA==eNqdVcENwzAIzE4dgDnbTfriXakdoFIfifKK1EerLFClNo4AXxzCxzJKjgMO03XaTn+bKZ0ja/9Icr+cF7tyOr+UzoG1f4A4OQ6b8B3CyXGKv/5fm4/+/pZxPtnfs/b3dIyPx8lxjF94TCCfJ9v7477YW+KWfJL/Vfz67nHq8SZGOKbOJDyifEwdCNSt9CPKB+GYvpd+oL6APtp8GeTLmqfHATrkbZxV56D+TT7H9LafT1Rv6B0A7wajuQNzyginHm9mhAPemTCfqN6ifKJ6i86jyZdAvqR57p/HbZx13kH9m3yO6W0/n6jekN/uW4tT16HsJad/hyN7Huxfh6P3anP/Qj7bOpR96/Qf5ONxZM/bufsBt7upBg==
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAIABAACAAQAAnQAAAA==eNoNw4c2QgEAANCnSJJVRsmmYUV2SLISQigz/v8v3HvODYIg6DFsyF777Ddi1AEHjRl3yBGHHXXMpAnHnXDKSVOmzTjtjLPOO+eCiy675IpZ8+YsuOq6a2646ZZFty2564577nvogUeWPfHYUytWPfPcmpdeeOW1dW+8teG9dz7Y9MlHn2356otvtn2344effvvlj13//PUfAicR0Q==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAGAAAABgAAAAQgAAAA==eNoNw5ESgEAUAMAHQRAEQRAcBEEQBMFBcBAEQRAE/f9XtDuzVUTUNrZ29g4mRydnF1c3s7vFw9PL28fXzx+i4ASx
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAABgAAAAYAAAACwAAAA==eNrj5MQOAAqkANk=
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAAADAAAAAwAAEwAAAA==eNpjYAADB4ZRepQegTQAvQ0YAQ==    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+

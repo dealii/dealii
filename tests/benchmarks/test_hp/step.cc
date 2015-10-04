@@ -117,20 +117,20 @@ private:
 
   Triangulation<dim>   triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    hp::DoFHandler<dim>      hpdof_handler;
-    FE_Q<dim> fe;
-    hp::FECollection<dim> hpfe;
+  DoFHandler<dim>      dof_handler;
+  hp::DoFHandler<dim>      hpdof_handler;
+  FE_Q<dim> fe;
+  hp::FECollection<dim> hpfe;
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
   ConstraintMatrix     constraints;
-    TimerOutput                               computing_timer;
+  TimerOutput                               computing_timer;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
-    
+
   Vector<double>       solution;
   Vector<double>       system_rhs;
 };
@@ -204,15 +204,15 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 template <int dim>
 Step6<dim>::Step6 ()
   :
-		dof_handler (triangulation),
-		hpdof_handler (triangulation),
-		fe (3),
-		computing_timer (std::cout,
-                     TimerOutput::summary,
-                     TimerOutput::wall_times)
- 
+  dof_handler (triangulation),
+  hpdof_handler (triangulation),
+  fe (3),
+  computing_timer (std::cout,
+                   TimerOutput::summary,
+                   TimerOutput::wall_times)
+
 {
-   hpfe.push_back (FE_Q<dim>(3));
+  hpfe.push_back (FE_Q<dim>(3));
 }
 
 
@@ -307,13 +307,13 @@ Step6<dim>::~Step6 ()
 template <int dim>
 void Step6<dim>::setup_system ()
 {
-    computing_timer.enter_section ("distribute");
+  computing_timer.enter_section ("distribute");
   dof_handler.distribute_dofs (fe);
-    computing_timer.exit_section ("distribute");
+  computing_timer.exit_section ("distribute");
 
-    computing_timer.enter_section ("distribute_hp");
+  computing_timer.enter_section ("distribute_hp");
   hpdof_handler.distribute_dofs (hpfe);
-    computing_timer.exit_section ("distribute_hp");
+  computing_timer.exit_section ("distribute_hp");
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
@@ -330,16 +330,16 @@ void Step6<dim>::setup_system ()
   // from computations on the previous mesh before the last adaptive
   // refinement):
   constraints.clear ();
-				   //computing_timer.enter_section ("hanging");
+  //computing_timer.enter_section ("hanging");
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
-				   //computing_timer.exit_section ("hanging");
-/*  constraints.clear ();
-    computing_timer.enter_section ("hanging_hp");
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           constraints);
-    computing_timer.exit_section ("hanging_hp");
-*/
+  //computing_timer.exit_section ("hanging");
+  /*  constraints.clear ();
+      computing_timer.enter_section ("hanging_hp");
+    DoFTools::make_hanging_node_constraints (dof_handler,
+                                             constraints);
+      computing_timer.exit_section ("hanging_hp");
+  */
 
   // Now we are ready to interpolate the ZeroFunction to our boundary with
   // indicator 0 (the whole boundary) and store the resulting constraints in
@@ -429,29 +429,29 @@ void Step6<dim>::assemble_system ()
 {
   system_matrix = 0;
   const QGauss<dim>  qformula(fe.degree+1);
-  
+
   FEValues<dim> fe_values (fe, qformula,
                            update_values    |  update_gradients |
                            update_quadrature_points  |  update_JxW_values);
 
   FullMatrix<double>   cell_matrix;
-  
+
   Vector<double>       cell_rhs;
-  
+
 
   std::vector<unsigned int> local_dof_indices;
-  
+
 
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values;
 
-typename DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
-     cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       cell_matrix = 0;
       cell_rhs.reinit (dofs_per_cell);
       cell_rhs = 0;
@@ -459,8 +459,8 @@ typename DoFHandler<dim>::active_cell_iterator
       fe_values.reinit (cell);
 
       coefficient_values.resize(fe_values.n_quadrature_points);
-      
-	coefficient.value_list (fe_values.get_quadrature_points(),
+
+      coefficient.value_list (fe_values.get_quadrature_points(),
                               coefficient_values);
 
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
@@ -502,18 +502,18 @@ void Step6<dim>::assemble_system_hp ()
   //  const QGauss<dim>  quadrature_formula(3);
   hp::QCollection<dim> qformulas;
   qformulas.push_back(QGauss<dim>(fe.degree+1));
-  
+
   hp::FEValues<dim> hp_fe_values (hpfe, qformulas,
-                           update_values    |  update_gradients |
-                           update_quadrature_points  |  update_JxW_values);
+                                  update_values    |  update_gradients |
+                                  update_quadrature_points  |  update_JxW_values);
 
   FullMatrix<double>   cell_matrix;
-  
+
   Vector<double>       cell_rhs;
-  
+
 
   std::vector<unsigned int> local_dof_indices;
-  
+
 
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values;
@@ -523,11 +523,11 @@ void Step6<dim>::assemble_system_hp ()
   endc = hpdof_handler.end();
   for (; cell!=endc; ++cell)
     {
-    hp_fe_values.reinit (cell);
-    const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+      hp_fe_values.reinit (cell);
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
 
       const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
-     cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       cell_matrix = 0;
       cell_rhs.reinit (dofs_per_cell);
       cell_rhs = 0;
@@ -535,8 +535,8 @@ void Step6<dim>::assemble_system_hp ()
       //  fe_values.reinit (cell);
 
       coefficient_values.resize(fe_values.n_quadrature_points);
-      
-	coefficient.value_list (fe_values.get_quadrature_points(),
+
+      coefficient.value_list (fe_values.get_quadrature_points(),
                               coefficient_values);
 
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
@@ -672,10 +672,10 @@ void Step6<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  for (unsigned int i=0;i<triangulation.n_active_cells();++i)
+  for (unsigned int i=0; i<triangulation.n_active_cells(); ++i)
     estimated_error_per_cell (i)=i*1.0;
-  
-  /*  
+
+  /*
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       QGauss<dim-1>(3),
                                       typename FunctionMap<dim>::type(),
@@ -790,7 +790,7 @@ void Step6<dim>::run ()
                 << std::endl;
 
       std::cout << "setup" << std::endl;
-      
+
 //    computing_timer.enter_section ("setup");
       setup_system ();
 //    computing_timer.exit_section ("setup");
@@ -818,7 +818,7 @@ void Step6<dim>::run ()
 
       std::cout << "solve" << std::endl;
 
-				       solve ();
+      solve ();
       //      output_results (cycle);
       std::cout << "done" << std::endl;
     }

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2014 by the deal.II authors
+ * Copyright (C) 2010 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -28,7 +28,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -36,7 +36,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -316,8 +316,7 @@ namespace Step38
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
   {
-    static HyperBallBoundary<dim,spacedim> surface_description;
-    triangulation.set_boundary (0, surface_description);
+    static SphericalManifold<dim,spacedim> surface_description;
 
     {
       Triangulation<spacedim> volume_mesh;
@@ -329,6 +328,9 @@ namespace Step38
       GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
                                             boundary_ids);
     }
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_manifold (0, surface_description);
+
     triangulation.refine_global(4);
 
     std::cout << "Surface mesh has " << triangulation.n_active_cells()
@@ -341,9 +343,9 @@ namespace Step38
               << " degrees of freedom."
               << std::endl;
 
-    CompressedSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    sparsity_pattern.copy_from (csp);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
 

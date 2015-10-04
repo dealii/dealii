@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <fstream>
@@ -45,15 +47,15 @@ void test (Vector &vector)
   std::vector<typename Vector::value_type> values1 (indices.size());
   vector.extract_subvector_to (indices, values1);
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    Assert (values1[j] == 2*j, ExcInternalError());
+    AssertThrow (values1[j] == 2*j, ExcInternalError());
 
   // do the same with the version of the function that takes iterators
   std::vector<typename Vector::value_type> values2 (indices.size());
   vector.extract_subvector_to (indices.begin(),
-			       indices.end(),
-			       values2.begin());
+                               indices.end(),
+                               values2.begin());
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    Assert (values2[j] == 2*j, ExcInternalError());
+    AssertThrow (values2[j] == 2*j, ExcInternalError());
 
   // done
   if (myid==0)
@@ -64,7 +66,7 @@ void test (Vector &vector)
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   {
     {
@@ -76,7 +78,7 @@ int main (int argc, char **argv)
 
     {
       deallog.push("PETSc");
-      PETScWrappers::Vector v(17);
+      PETScWrappers::MPI::Vector v(MPI_COMM_SELF, 17, 17);
       test (v);
       deallog.pop();
     }
@@ -102,11 +104,11 @@ int main (int argc, char **argv)
 
     {
       deallog.push("PETSc");
-      PETScWrappers::BlockVector v(3);
-      v.block(0).reinit(7);
-      v.block(1).reinit(5);
-      v.block(2).reinit(3);
-      v.collect_sizes();
+      std::vector<PETScWrappers::MPI::BlockVector::size_type> sizes(3);
+      sizes[0] = 7;
+      sizes[1] = 5;
+      sizes[2] = 3;
+      PETScWrappers::MPI::BlockVector v(sizes, MPI_COMM_SELF, sizes);
       test (v);
       deallog.pop();
     }

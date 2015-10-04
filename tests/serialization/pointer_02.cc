@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ void test ()
 
     verify (p1, p2);
 
-    Assert (p1 != p2, ExcInternalError());
+    AssertThrow (p1 != p2, ExcInternalError());
 
     delete p1;
     delete p2;
@@ -92,7 +92,7 @@ void test ()
   // a pointer to a new object, leaving the
   // original object pointed to as a memory
   // leak. assert that this behavior persists
-  Assert (objects_destroyed == 2, ExcInternalError());
+  AssertThrow (objects_destroyed == 2, ExcInternalError());
 }
 
 

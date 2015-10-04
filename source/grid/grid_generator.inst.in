@@ -29,6 +29,30 @@ namespace GridGenerator
       hyper_cube<deal_II_dimension, deal_II_space_dimension> (
 	Triangulation<deal_II_dimension, deal_II_space_dimension> &, const double, const double, const bool);
     
+    template void
+      subdivided_hyper_cube<deal_II_dimension, deal_II_space_dimension> (
+      Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int, const double, const double);
+
+
+  template void
+    subdivided_hyper_rectangle<deal_II_dimension, deal_II_space_dimension>
+    (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+     const std::vector<unsigned int>&,
+     const Point<deal_II_space_dimension>&,
+     const Point<deal_II_space_dimension>&,
+     const bool);
+
+  template void
+    hyper_cross<deal_II_dimension, deal_II_space_dimension>
+    (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+     const std::vector<unsigned int> &, const bool);
+  
+  template void
+    cheese<deal_II_dimension, deal_II_space_dimension>
+    (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+     const std::vector<unsigned int> &);
+  
     template
       void
       merge_triangulations
@@ -46,7 +70,7 @@ namespace GridGenerator
     template
       void
       create_triangulation_with_removed_cells (const Triangulation<deal_II_dimension, deal_II_space_dimension> &input_triangulation,
-                                               const std::set<typename Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator> &cells_to_remove,
+                                               const std::set<Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator> &cells_to_remove,
                                                Triangulation<deal_II_dimension, deal_II_space_dimension>       &result);
       
 #endif
@@ -80,20 +104,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 for (deal_II_dimension : DIMENSIONS)
 {
 namespace GridGenerator \{  
-  template void
-    subdivided_hyper_cube<deal_II_dimension> (
-      Triangulation<deal_II_dimension> &,
-      const unsigned int, const double, const double);
-  
-
-
-  template void
-    subdivided_hyper_rectangle<deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const std::vector<unsigned int>&,
-     const Point<deal_II_dimension>&,
-     const Point<deal_II_dimension>&,
-     bool);
   
   template
     void
@@ -104,6 +114,11 @@ namespace GridGenerator \{
       const Point<deal_II_dimension>                &,
       const bool                       );
   
+    template void
+      simplex<deal_II_dimension> (
+	Triangulation<deal_II_dimension, deal_II_dimension> &,
+	const std::vector<Point<deal_II_dimension> >&);
+    
     template void
       parallelepiped<deal_II_dimension> (
 	Triangulation<deal_II_dimension>&,

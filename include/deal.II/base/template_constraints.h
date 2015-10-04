@@ -13,14 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__template_constraints_h
-#define __deal2__template_constraints_h
+#ifndef dealii__template_constraints_h
+#define dealii__template_constraints_h
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/complex_overloads.h>
 
 #include <complex>
-
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -352,7 +353,7 @@ template <typename T, typename U>
 struct ProductType
 {
 #ifdef DEAL_II_WITH_CXX11
-  typedef decltype(T() * U()) type;
+  typedef decltype(std::declval<T>() * std::declval<U>()) type;
 #endif
 };
 
@@ -436,13 +437,37 @@ struct ProductType<int,float>
   typedef float type;
 };
 
+template <>
+struct ProductType<double, unsigned int>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<unsigned int, double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,unsigned int>
+{
+  typedef float type;
+};
+
+template <>
+struct ProductType<unsigned int,float>
+{
+  typedef float type;
+};
 
 #endif
 
-
 // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
-// other than T. Consequently, even with C++11, we need the following
-// specializations:
+// other than T (not even in C++11, or C++14). We provide our own overloads
+// in base/complex_overloads.h, but in order for them to work, we have to
+// manually specify all products we want to allow:
+
 template <typename T>
 struct ProductType<std::complex<T>,std::complex<T> >
 {
@@ -572,9 +597,6 @@ template <typename T> struct EnableIfScalar<std::complex<T> >
 {
   typedef std::complex<T> type;
 };
-
-
-
 
 
 // --------------- inline functions -----------------

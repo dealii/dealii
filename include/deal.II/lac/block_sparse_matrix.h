@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_h
-#define __deal2__block_sparse_matrix_h
+#ifndef dealii__block_sparse_matrix_h
+#define dealii__block_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -73,7 +73,7 @@ public:
   typedef typename BaseClass::const_iterator  const_iterator;
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**
@@ -529,4 +529,4 @@ precondition_Jacobi (Vector<number2>       &dst,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // __deal2__block_sparse_matrix_h
+#endif    // dealii__block_sparse_matrix_h

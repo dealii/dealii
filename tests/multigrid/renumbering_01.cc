@@ -55,7 +55,7 @@ void check()
   DoFRenumbering::component_wise (mgdof);
   for (unsigned int l=0; l<tr.n_levels(); ++l)
     DoFRenumbering::component_wise (mgdof, l);
-    
+
 
   typename DoFHandler<dim>::level_cell_iterator
   cell = mgdof.begin_mg(),
@@ -85,14 +85,20 @@ void check()
       // dof index
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         for (unsigned int j=i+1; j<fe.dofs_per_cell; ++j)
-          if (fe.system_to_component_index(i).first <
-              fe.system_to_component_index(j).first)
-            Assert (mg_dof_indices[i] < mg_dof_indices[j],
-                    ExcInternalError())
+          {
+            if (fe.system_to_component_index(i).first <
+                fe.system_to_component_index(j).first)
+              {
+                AssertThrow (mg_dof_indices[i] < mg_dof_indices[j],
+                             ExcInternalError());
+              }
             else if (fe.system_to_component_index(i).first >
                      fe.system_to_component_index(j).first)
-              Assert (mg_dof_indices[i] > mg_dof_indices[j],
-                      ExcInternalError());
+              {
+                AssertThrow (mg_dof_indices[i] > mg_dof_indices[j],
+                             ExcInternalError());
+              }
+          }
     }
 }
 

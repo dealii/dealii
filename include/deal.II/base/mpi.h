@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mpi_h
-#define __deal2__mpi_h
+#ifndef dealii__mpi_h
+#define dealii__mpi_h
 
 #include <deal.II/base/config.h>
 #include <vector>
@@ -45,9 +45,20 @@ namespace MPI
   static const unsigned int MIN = 0;
   static const unsigned int SUM = 0;
 }
+static const int MPI_MIN = 0;
+static const int MPI_MAX = 0;
+static const int MPI_SUM = 0;
 #endif
 
 DEAL_II_NAMESPACE_OPEN
+
+
+//Forward type declarations to allow MPI sums over tensorial types
+template <int rank, int dim, typename Number> class Tensor;
+template <int rank, int dim, typename Number> class SymmetricTensor;
+
+//Forward type declaration to allow MPI sums over Vector<number> type
+template <typename Number> class Vector;
 
 
 namespace Utilities
@@ -118,13 +129,12 @@ namespace Utilities
      * of @p t. This function corresponds to the <code>MPI_Allreduce</code>
      * function, i.e. all processors receive the result of this operation.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      *
      * @note This function is only implemented for certain template arguments
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
@@ -161,6 +171,41 @@ namespace Utilities
               std::vector<T> &sums);
 
     /**
+     * Like the previous function, but take the sums over the elements of a
+     * Vector<T>.
+     *
+     * Input and output vectors may be the same.
+     */
+    template <typename T>
+    inline
+    void sum (const Vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              Vector<T> &sums);
+
+
+    /**
+     * Perform an MPI sum of the entries of a symmetric tensor.
+     *
+     * @relates SymmetricTensor
+     */
+    template <int rank, int dim, typename Number>
+    inline
+    SymmetricTensor<rank,dim,Number>
+    sum (const SymmetricTensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator);
+
+    /**
+     * Perform an MPI sum of the entries of a tensor.
+     *
+     * @relates Tensor
+     */
+    template <int rank, int dim, typename Number>
+    inline
+    Tensor<rank,dim,Number>
+    sum (const Tensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator);
+
+    /**
      * Return the maximum over all processors of the value @p t. This function
      * is collective over all processors given in the communicator. If deal.II
      * is not configured for use of MPI, this function simply returns the
@@ -168,13 +213,12 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      *
      * @note This function is only implemented for certain template arguments
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
@@ -212,6 +256,57 @@ namespace Utilities
               std::vector<T> &maxima);
 
     /**
+     * Return the minimum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If deal.II
+     * is not configured for use of MPI, this function simply returns the
+     * value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive the
+     * result of this operation.
+     *
+     * @note Sometimes, not all processors need a result and in that case one
+     * would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the result
+     * everywhere.
+     *
+     * @note This function is only implemented for certain template arguments
+     * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
+     */
+    template <typename T>
+    T min (const T &t,
+           const MPI_Comm &mpi_communicator);
+
+    /**
+     * Like the previous function, but take the minima over the elements of an
+     * array of length N. In other words, the i-th element of the results
+     * array is the minimum of the i-th entries of the input arrays from each
+     * processor.
+     *
+     * Input and output arrays may be the same.
+     */
+    template <typename T, unsigned int N>
+    inline
+    void min (const T (&values)[N],
+              const MPI_Comm &mpi_communicator,
+              T (&minima)[N]);
+
+    /**
+     * Like the previous function, but take the minimum over the elements of a
+     * std::vector. In other words, the i-th element of the results array is
+     * the minimum over the i-th entries of the input arrays from each
+     * processor.
+     *
+     * Input and output vectors may be the same.
+     */
+    template <typename T>
+    inline
+    void min (const std::vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              std::vector<T> &minima);
+
+
+    /**
      * Data structure to store the result of min_max_avg().
      */
     struct MinMaxAvg
@@ -232,13 +327,12 @@ namespace Utilities
      * mpi_communicator . Each processor's value is given in @p my_value and
      * the result will be returned. The result is available on all machines.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      */
     MinMaxAvg
     min_max_avg (const double my_value,
@@ -389,6 +483,119 @@ namespace Utilities
         return MPI_LONG_DOUBLE;
       }
 #endif
+
+      template <typename T>
+      inline
+      T all_reduce (const MPI_Op &mpi_op,
+                    const T &t,
+                    const MPI_Comm &mpi_communicator)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            T output;
+            MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                           &output, 1, internal::mpi_type_id(&t), mpi_op,
+                           mpi_communicator);
+            return output;
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            return t;
+          }
+      }
+
+      template <typename T, unsigned int N>
+      inline
+      void all_reduce (const MPI_Op &mpi_op,
+                       const T (&values)[N],
+                       const MPI_Comm &mpi_communicator,
+                       T (&output)[N])
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            MPI_Allreduce ((&values[0] != &output[0]
+                            ?
+                            const_cast<void *>(static_cast<const void *>(&values[0]))
+                            :
+                            MPI_IN_PLACE),
+                           &output[0], N, internal::mpi_type_id(values), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            for (unsigned int i=0; i<N; ++i)
+              output[i] = values[i];
+          }
+      }
+
+      template <typename T>
+      inline
+      void all_reduce (const MPI_Op &mpi_op,
+                       const std::vector<T> &values,
+                       const MPI_Comm       &mpi_communicator,
+                       std::vector<T>       &output)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            output.resize (values.size());
+            MPI_Allreduce ((&values[0] != &output[0]
+                            ?
+                            const_cast<void *>(static_cast<const void *>(&values[0]))
+                            :
+                            MPI_IN_PLACE),
+                           &output[0], values.size(), internal::mpi_type_id((T *)0), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            output = values;
+          }
+      }
+
+      template <typename T>
+      inline
+      void all_reduce (const MPI_Op    &mpi_op,
+                       const Vector<T> &values,
+                       const MPI_Comm  &mpi_communicator,
+                       Vector<T>  &output)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            if (values.begin() != output.begin())
+              output.reinit (values.size());
+
+            MPI_Allreduce ((values.begin() != output.begin()
+                            ?
+                            const_cast<void *>(static_cast<const void *>(values.begin()))
+                            :
+                            MPI_IN_PLACE),
+                           output.begin(), values.size(), internal::mpi_type_id((T *)0), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            output = values;
+          }
+      }
+
+
+
     }
 
 
@@ -397,21 +604,7 @@ namespace Utilities
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          T sum;
-          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                         &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
-                         mpi_communicator);
-          return sum;
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          return t;
-        }
+      return internal::all_reduce(MPI_SUM, t, mpi_communicator);
     }
 
 
@@ -421,24 +614,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          MPI_Allreduce ((&values[0] != &sums[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          for (unsigned int i=0; i<N; ++i)
-            sums[i] = values[i];
-        }
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
 
@@ -448,47 +624,69 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &sums)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          sums.resize (values.size());
-          MPI_Allreduce ((&values[0] != &sums[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          sums = values;
-        }
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
+    template <typename T>
+    inline
+    void sum (const Vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              Vector<T> &sums)
+    {
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+    }
+
+
+    template <int rank, int dim, typename Number>
+    inline
+    Tensor<rank,dim,Number>
+    sum (const Tensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator)
+    {
+      const unsigned int n_entries = Tensor<rank,dim,Number>::n_independent_components;
+      Number entries[ Tensor<rank,dim,Number>::n_independent_components ];
+
+      for (unsigned int i=0; i< n_entries; ++i)
+        entries[i] = local[ local.unrolled_to_component_indices(i) ];
+
+      Number global_entries[ Tensor<rank,dim,Number>::n_independent_components ];
+      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
+
+      Tensor<rank,dim,Number> global;
+      for (unsigned int i=0; i< n_entries; ++i)
+        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
+
+      return global;
+    }
+
+    template <int rank, int dim, typename Number>
+    inline
+    SymmetricTensor<rank,dim,Number>
+    sum (const SymmetricTensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator)
+    {
+      const unsigned int n_entries = SymmetricTensor<rank,dim,Number>::n_independent_components;
+      Number entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
+
+      for (unsigned int i=0; i< n_entries; ++i)
+        entries[i] = local[ local.unrolled_to_component_indices(i) ];
+
+      Number global_entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
+      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
+
+      SymmetricTensor<rank,dim,Number> global;
+      for (unsigned int i=0; i< n_entries; ++i)
+        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
+
+      return global;
+    }
 
     template <typename T>
     inline
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          T sum;
-          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                         &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
-                         mpi_communicator);
-          return sum;
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          return t;
-        }
+      return internal::all_reduce(MPI_MAX, t, mpi_communicator);
     }
 
 
@@ -498,24 +696,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          MPI_Allreduce ((&values[0] != &maxima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          for (unsigned int i=0; i<N; ++i)
-            maxima[i] = values[i];
-        }
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -525,24 +706,36 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &maxima)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          maxima.resize (values.size());
-          MPI_Allreduce ((&values[0] != &maxima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          maxima = values;
-        }
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
+    }
+
+
+    template <typename T>
+    inline
+    T min (const T &t,
+           const MPI_Comm &mpi_communicator)
+    {
+      return internal::all_reduce(MPI_MIN, t, mpi_communicator);
+    }
+
+
+    template <typename T, unsigned int N>
+    inline
+    void min (const T (&values)[N],
+              const MPI_Comm &mpi_communicator,
+              T (&minima)[N])
+    {
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
+    }
+
+
+    template <typename T>
+    inline
+    void min (const std::vector<T> &values,
+              const MPI_Comm       &mpi_communicator,
+              std::vector<T>       &minima)
+    {
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }
 
 

@@ -48,7 +48,7 @@ void test (Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   m.Tvmult_add (w, v);
@@ -58,7 +58,7 @@ void test (Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result+result, ExcInternalError());
+      AssertThrow (w(i) == result+result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -73,7 +73,7 @@ int main (int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

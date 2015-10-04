@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,19 +41,19 @@ void test()
   vec.block(0).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.block(1).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.collect_sizes();
-  Assert (vec.block(0).local_size() == 100, ExcInternalError());
-  Assert (vec.block(0).local_range().first == 100*myid, ExcInternalError());
-  Assert (vec.block(0).local_range().second == 100*myid+100, ExcInternalError());
-  Assert (vec.block(1).local_size() == 100, ExcInternalError());
-  Assert (vec.block(1).local_range().first == 100*myid, ExcInternalError());
-  Assert (vec.block(1).local_range().second == 100*myid+100, ExcInternalError());
+  AssertThrow (vec.block(0).local_size() == 100, ExcInternalError());
+  AssertThrow (vec.block(0).local_range().first == 100*myid, ExcInternalError());
+  AssertThrow (vec.block(0).local_range().second == 100*myid+100, ExcInternalError());
+  AssertThrow (vec.block(1).local_size() == 100, ExcInternalError());
+  AssertThrow (vec.block(1).local_range().first == 100*myid, ExcInternalError());
+  AssertThrow (vec.block(1).local_range().second == 100*myid+100, ExcInternalError());
 
   IndexSet locally_owned (vec.size());
   locally_owned.add_range (100*myid, 100*myid+100);
   locally_owned.add_range (vec.block(0).size()+100*myid,
                            vec.block(0).size()+100*myid+100);
-  Assert (vec.locally_owned_elements() == locally_owned,
-          ExcInternalError());
+  AssertThrow (vec.locally_owned_elements() == locally_owned,
+               ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -62,7 +62,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

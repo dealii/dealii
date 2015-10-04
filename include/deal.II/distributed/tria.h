@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__distributed_tria_h
-#define __deal2__distributed_tria_h
+#ifndef dealii__distributed_tria_h
+#define dealii__distributed_tria_h
 
 
 #include <deal.II/base/config.h>
@@ -25,6 +25,8 @@
 
 #include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/std_cxx11/tuple.h>
+
+#include <deal.II/distributed/tria_base.h>
 
 #include <set>
 #include <vector>
@@ -228,9 +230,9 @@ namespace parallel
      * dealii::Triangulation::execute_coarsening_and_refinement multiple times
      * and this function needs to know about boundaries. In other words, it is
      * <i>not</i> enough to just set boundary indicators on newly created
-     * faces only <i>after</i> calling distributed::parallel::Triangulation::e
-     * xecute_coarsening_and_refinement: it actually has to happen while that
-     * function is still running.
+     * faces only <i>after</i> calling
+     * <tt>distributed::parallel::Triangulation::execute_coarsening_and_refinement</tt>:
+     * it actually has to happen while that function is still running.
      *
      * The way to do this is by writing a function that sets boundary
      * indicators and that will be called by the dealii::Triangulation class.
@@ -242,7 +244,7 @@ namespace parallel
      *     #include <deal.II/base/std_cxx11/bind.h>
      *
      *     template <int dim>
-     *     void set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation)
+     *     void set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation)
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -255,7 +257,7 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&set_boundary_indicators<dim>,
+     *         (std_cxx11::bind (&set_boundary_ids<dim>,
      *                           std_cxx11::ref(coarse_grid)));
      *
      *     }
@@ -267,16 +269,16 @@ namespace parallel
      * argument but permanently fix this one argument to a reference to the
      * coarse grid triangulation. After each refinement step, the
      * triangulation will then call the object so created which will in turn
-     * call <code>set_boundary_indicators<dim></code> with the reference to
-     * the coarse grid as argument.
+     * call <code>set_boundary_ids<dim></code> with the reference to the
+     * coarse grid as argument.
      *
      * This approach can be generalized. In the example above, we have used a
      * global function that will be called. However, sometimes it is necessary
      * that this function is in fact a member function of the class that
      * generates the mesh, for example because it needs to access run-time
      * parameters. This can be achieved as follows: assuming the
-     * <code>set_boundary_indicators()</code> function has been declared as a
-     * (non-static, but possibly private) member function of the
+     * <code>set_boundary_ids()</code> function has been declared as a (non-
+     * static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
      *     #include <deal.II/base/std_cxx11/bind.h>
@@ -284,7 +286,7 @@ namespace parallel
      *     template <int dim>
      *     void
      *     MyClass<dim>::
-     *     set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation) const
+     *     set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation) const
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -297,21 +299,20 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_indicators,
+     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_ids,
      *                           std_cxx11::cref(*this),
      *                           std_cxx11::ref(coarse_grid)));
      *     }
      * @endcode
-     * Here, like any other member function,
-     * <code>set_boundary_indicators</code> implicitly takes a pointer or
-     * reference to the object it belongs to as first argument.
-     * <code>std::bind</code> again creates an object that can be called like
-     * a global function with no arguments, and this object in turn calls
-     * <code>set_boundary_indicators</code> with a pointer to the current
+     * Here, like any other member function, <code>set_boundary_ids</code>
+     * implicitly takes a pointer or reference to the object it belongs to as
+     * first argument. <code>std::bind</code> again creates an object that can
+     * be called like a global function with no arguments, and this object in
+     * turn calls <code>set_boundary_ids</code> with a pointer to the current
      * object and a reference to the triangulation to work on. Note that
      * because the <code>create_coarse_mesh</code> function is declared as
      * <code>const</code>, it is necessary that the
-     * <code>set_boundary_indicators</code> function is also declared
+     * <code>set_boundary_ids</code> function is also declared
      * <code>const</code>.
      *
      * <b>Note:</b>For reasons that have to do with the way the
@@ -325,7 +326,7 @@ namespace parallel
      * @ingroup distributed
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
     public:
       /**
@@ -368,24 +369,37 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
 
       /**
-       * Generic settings for distributed Triangulations. If
-       * mesh_reconstruction_after_repartitioning is set, the deal.II mesh
-       * will be reconstructed from the coarse mesh every time a repartioning
-       * in p4est happens. This can be a bit more expensive, but guarantees
-       * the same memory layout and therefore cell ordering in the deal.II
-       * mesh. As assembly is done in the deal.II cell ordering, this flag is
-       * required to get reproducible behaviour after snapshot/resume.
-       *
-       * The flag construct_multigrid_hierarchy needs to be set to use the
-       * geometric multigrid functionality. This option requires additional
-       * computation and communication. Note: geometric multigrid is still a
-       * work in progress.
+       * Configuration flags for distributed Triangulations to be set in the
+       * constructor. Settings can be combined using bitwise OR.
        */
       enum Settings
       {
+        /**
+         * Default settings, other options are disabled.
+         */
         default_setting = 0x0,
+        /**
+         * If set, the deal.II mesh will be reconstructed from the coarse mesh
+         * every time a repartioning in p4est happens. This can be a bit more
+         * expensive, but guarantees the same memory layout and therefore cell
+         * ordering in the deal.II mesh. As assembly is done in the deal.II
+         * cell ordering, this flag is required to get reproducible behaviour
+         * after snapshot/resume.
+         */
         mesh_reconstruction_after_repartitioning = 0x1,
-        construct_multigrid_hierarchy = 0x2
+        /**
+         * This flags needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and
+         * communication. Note: geometric multigrid is still a work in
+         * progress.
+         */
+        construct_multigrid_hierarchy = 0x2,
+        /**
+         * Setting this flag will disable automatic repartioning of the cells
+         * after a refinement cycle. It can be executed manually by calling
+         * repartition().
+         */
+        no_automatic_repartitioning = 0x4
       };
 
 
@@ -463,11 +477,93 @@ namespace parallel
        * this-@>locally_owned_subdomain()</code>), refinement and coarsening
        * flags are only respected for those locally owned cells. Flags may be
        * set on other cells as well (and may often, in fact, if you call
-       * dealii::Triangulation::prepare_coarsening_and_refinement) but will be
+       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will be
        * largely ignored: the decision to refine the global mesh will only be
        * affected by flags set on locally owned cells.
+       *
+       * @note This function by default partitions the mesh in such a way
+       *   that the number of cells on all processors is roughly equal,
+       *   i.e., it is not possible to "weigh" cells that are more expensive
+       *   to compute on than others. This is because these weights would apply
+       *   to the current set of cells, which will then be refined and
+       *   coarsened into a separate set of cells, which will only then be
+       *   partitioned between processors. In other words, the weights for
+       *   cells you could attach before calling this function will no
+       *   longer be the set of cells that will ultimately be partitioned.
+       *   If you want to set weights for partitioning, you need to create
+       *   your triangulation object by passing the
+       *   parallel::distributed::Triangulation::no_automatic_repartitioning
+       *   flag to the constructor, which ensures that calling the current
+       *   function only refines and coarsens the triangulation, but doesn't
+       *   partition it. You would then call the current function, in a second
+       *   step compute and use cell weights when partitioning the mesh upon
+       *   calling repartition() with a non-default argument.
        */
       virtual void execute_coarsening_and_refinement ();
+
+      /**
+       * Manually repartition the active cells between processors. Normally
+       * this repartitioning will happen automatically when calling
+       * execute_coarsening_and_refinement() (or refine_global()) unless the
+       * @p no_automatic_repartitioning is set in the constructor. Setting the
+       * flag and then calling repartition() gives the same result.
+       *
+       * If you want to transfer data (using SolutionTransfer or manually with
+       * register_data_attach() and notify_ready_to_unpack()), you need to set
+       * it up twice: once when calling execute_coarsening_and_refinement(),
+       * which will handle coarsening and refinement but obviously won't ship
+       * any data between processors, and a second time when calling
+       * repartition().  Here, no coarsening and refinement will be done but
+       * information will be packed and shipped to different processors. In
+       * other words, you probably want to treat a call to repartition() in
+       * the same way as execute_coarsening_and_refinement() with respect to
+       * dealing with data movement (SolutionTransfer, etc.).
+       *
+       * @param weights_per_cell A vector of weights that indicates how
+       *   "expensive" computations are on each of the active cells. If
+       *   left at its default value, this function will partition the
+       *   mesh in such a way that it has roughly equal numbers of cells
+       *   on all processors. If the argument is specified, then the mesh
+       *   is partitioned so that the sum of weights of the cells owned
+       *   by each processor is roughly equal. The size of the vector
+       *   needs to equal the number of active cells of the current
+       *   triangulation (i.e., must be equal to
+       *   <code>triangulation.n_active_cells()</code>) and be in the order
+       *   in which one encounters these cells in a loop over all cells (in
+       *   the same way as vectors of refinement indicators are interpreted
+       *   in namespace GridRefinement). In other words, the element of this
+       *   vector that corresponds to a given cell has index
+       *   <code>cell-@>active_cell_index()</code>. Of the elements of this
+       *   vector, only those that correspond to <i>locally owned</i>
+       *   active cells are actually considered. You can set the rest
+       *   to arbitrary values.
+       *
+       * @note The only requirement on the weights is that every cell's
+       *   weight is positive and that the sum over all weights on all
+       *   processors can be formed using a 64-bit integer. Beyond that,
+       *   it is your choice how you want to interpret the weights. A
+       *   common approach is to consider the weights proportional to
+       *   the cost of doing computations on a cell, e.g., by summing
+       *   the time for assembly and solving. In practice, determining
+       *   this cost is of course not trivial since we don't solve on
+       *   isolated cells, but on the entire mesh. In such cases, one
+       *   could, for example, choose the weight equal to the number
+       *   of unknowns per cell (in the context of hp finite element
+       *   methods), or using a heuristic that estimates the cost on
+       *   each cell depending on whether, for example, one has to
+       *   run some expensive algorithm on some cells but not others
+       *   (such as forming boundary integrals during the assembly
+       *   only on cells that are actually at the boundary, or computing
+       *   expensive nonlinear terms only on some cells but not others,
+       *   e.g., in the elasto-plastic problem in step-42). In any
+       *   case, the scaling does not matter: you can choose the weights
+       *   equal to the number of unknowns on each cell, or equal to ten
+       *   times the number of unknowns -- because only their relative
+       *   size matters in partitioning, both choices will lead to the
+       *   same mesh.
+       */
+      void repartition (const std::vector<unsigned int> &weights_per_cell
+                        = std::vector<unsigned int>());
 
       /**
        * When vertices have been moved locally, for example using code like
@@ -524,49 +620,6 @@ namespace parallel
       void
       communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
 
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
-
-      /**
-       * Return the number of active cells in the triangulation that are
-       * locally owned, i.e. that have a subdomain_id equal to
-       * locally_owned_subdomain(). Note that there may be more active cells
-       * in the triangulation stored on the present processor, such as for
-       * example ghost cells, or cells further away from the locally owned
-       * block of cells but that are needed to ensure that the triangulation
-       * that stores this processor's set of active cells still remains
-       * balanced with respect to the 2:1 size ratio of adjacent cells.
-       *
-       * As a consequence of the remark above, the result of this function is
-       * always smaller or equal to the result of the function with the same
-       * name in the ::Triangulation base class, which includes the active
-       * ghost and artificial cells (see also
-       * @ref GlossArtificialCell
-       * and
-       * @ref GlossGhostCell).
-       */
-      unsigned int n_locally_owned_active_cells () const;
-
-      /**
-       * Return the sum over all processors of the number of active cells
-       * owned by each processor. This equals the overall number of active
-       * cells in the distributed triangulation.
-       */
-      virtual types::global_dof_index n_global_active_cells () const;
-
-      /**
-       * Returns the global maximum level. This may be bigger than the number
-       * dealii::Triangulation::n_levels() (a function in this class's base
-       * class) returns if the current processor only stores cells in parts of
-       * the domain that are not very refined, but if other processors store
-       * cells in more deeply refined parts of the domain.
-       */
-      virtual unsigned int n_global_levels () const;
 
       /**
        * Returns true if the triangulation has hanging nodes.
@@ -585,20 +638,6 @@ namespace parallel
        */
       virtual
       bool has_hanging_nodes() const;
-
-      /**
-       * Return the number of active cells owned by each of the MPI processes
-       * that contribute to this triangulation. The element of this vector
-       * indexed by locally_owned_subdomain() equals the result of
-       * n_locally_owned_active_cells().
-       */
-      const std::vector<unsigned int> &
-      n_locally_owned_active_cells_per_processor () const;
-
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-      MPI_Comm get_communicator () const;
 
       /**
        * Return the local memory consumption in bytes.
@@ -770,8 +809,6 @@ namespace parallel
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
        *
-       * @todo At the moment just default orientation is implemented.
-       *
        * @note Before this function can be used the Triangulation has to be
        * initialized and must not be refined. Calling this function more than
        * once is possible, but not recommended: The function destroys and
@@ -784,12 +821,13 @@ namespace parallel
 
 
     private:
+
       /**
-       * MPI communicator to be used for the triangulation. We create a unique
-       * communicator for this class, which is a duplicate of the one passed
-       * to the constructor.
+       * Override the function to update the number cache so we can fill
+       * data like @p level_ghost_owners.
+       *
        */
-      MPI_Comm mpi_communicator;
+      virtual void update_number_cache ();
 
       /**
        * store the Settings.
@@ -797,29 +835,9 @@ namespace parallel
       Settings settings;
 
       /**
-       * The subdomain id to be used for the current processor.
-       */
-      types::subdomain_id my_subdomain;
-
-      /**
        * A flag that indicates whether the triangulation has actual content.
        */
       bool triangulation_has_content;
-
-      /**
-       * A structure that contains some numbers about the distributed
-       * triangulation.
-       */
-      struct NumberCache
-      {
-        std::vector<unsigned int> n_locally_owned_active_cells;
-        types::global_dof_index   n_global_active_cells;
-        unsigned int              n_global_levels;
-
-        NumberCache();
-      };
-
-      NumberCache number_cache;
 
       /**
        * A data structure that holds the connectivity between trees. Since
@@ -927,12 +945,6 @@ namespace parallel
        */
       void copy_local_forest_to_triangulation ();
 
-
-      /**
-       * Update the number_cache variable after mesh creation or refinement.
-       */
-      void update_number_cache ();
-
       /**
        * Internal function notifying all registered classes to attach their
        * data before repartitioning occurs. Called from
@@ -960,7 +972,7 @@ namespace parallel
      * all this class does is throw an exception.
      */
     template <int spacedim>
-    class Triangulation<1,spacedim> : public dealii::Triangulation<1,spacedim>
+    class Triangulation<1,spacedim> : public dealii::parallel::Triangulation<1,spacedim>
     {
     public:
       /**
@@ -973,19 +985,6 @@ namespace parallel
        * Destructor.
        */
       virtual ~Triangulation ();
-
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-      MPI_Comm get_communicator () const;
-
-      /**
-       * Return the sum over all processors of the number of active cells
-       * owned by each processor. This equals the overall number of active
-       * cells in the distributed triangulation.
-       */
-      types::global_dof_index n_global_active_cells () const;
-      virtual unsigned int n_global_levels () const;
 
       /**
        * Returns a permutation vector for the order the coarse cells are
@@ -1031,14 +1030,6 @@ namespace parallel
        */
       void
       communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
-
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see
@@ -1095,7 +1086,7 @@ namespace parallel
      * actually be created if we don't have p4est available.
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
     private:
       /**
@@ -1103,27 +1094,6 @@ namespace parallel
        */
       Triangulation ();
 
-    public:
-
-      /**
-       * Destructor.
-       */
-      virtual ~Triangulation ();
-
-      /**
-       * Return the subdomain id of those cells that are owned by the current
-       * processor. All cells in the triangulation that do not have this
-       * subdomain id are either owned by another processor or have children
-       * that only exist on other processors.
-       */
-      types::subdomain_id locally_owned_subdomain () const;
-
-      /**
-       * Return the MPI communicator used by this triangulation.
-       */
-#ifdef DEAL_II_WITH_MPI
-      MPI_Comm get_communicator () const;
-#endif
     };
   }
 }

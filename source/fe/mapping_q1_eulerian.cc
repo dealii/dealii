@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,9 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -36,73 +40,75 @@ MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 
 
 template <int dim, class EulerVectorType, int spacedim>
-void
+std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               std::vector<Point<spacedim> > &a) const
+get_vertices
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  // The assertions can not be in the constructor, since this would
+  // require to call dof_handler.distribute_dofs(fe) *before* the mapping
+  // object is constructed, which is not necessarily what we want.
 
-  // The assertions can not be in the
-  // constructor, since this would
-  // require to call
-  // dof_handler.distribute_dofs(fe)
-  // *before* the mapping object is
-  // constructed, which is not
-  // necessarily what we want.
-
-//TODO: Only one of these two assertions should be relevant
+  //TODO: Only one of these two assertions should be relevant
   AssertDimension (spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
-  AssertDimension(shiftmap_dof_handler->get_fe().n_components(), spacedim);
+  AssertDimension (shiftmap_dof_handler->get_fe().n_components(), spacedim);
 
   AssertDimension (shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
-  // cast the
-  // Triangulation<dim>::cell_iterator
-  // into a
-  // DoFHandler<dim>::cell_iterator
-  // which is necessary for access to
+  // cast the Triangulation<dim>::cell_iterator into a
+  // DoFHandler<dim>::cell_iterator which is necessary for access to
   // DoFCellAccessor::get_dof_values()
   typename DoFHandler<dim,spacedim>::cell_iterator dof_cell (*cell, shiftmap_dof_handler);
 
-  // We require the cell to be active
-  // since we can only then get nodal
+  // We require the cell to be active since we can only then get nodal
   // values for the shifts
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
-  // for Q1 elements, the number of
-  // support points should equal the
-  // number of vertices
-  a.resize(GeometryInfo<dim>::vertices_per_cell);
-
-  // now get the values of the shift
-  // vectors at the vertices
+  // now get the values of the shift vectors at the vertices
   Vector<double> mapping_values (shiftmap_dof_handler->get_fe().dofs_per_cell);
   dof_cell->get_dof_values (*euler_transform_vectors, mapping_values);
-
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     {
       Point<spacedim> shift_vector;
 
-      // pick out the value of the
-      // shift vector at the present
-      // vertex. since vertex dofs
-      // are always numbered first,
-      // we can access them easily
+      // pick out the value of the shift vector at the present
+      // vertex. since vertex dofs are always numbered first, we can
+      // access them easily
       for (unsigned int j=0; j<spacedim; ++j)
         shift_vector[j] = mapping_values(i*spacedim+j);
 
-      // compute new support point by
-      // old (reference) value and
-      // added shift
-      a[i] = cell->vertex(i) + shift_vector;
+      // compute new support point by old (reference) value and added
+      // shift
+      vertices[i] = cell->vertex(i) + shift_vector;
     }
+  return vertices;
 }
 
 
 
+template<int dim, class EulerVectorType, int spacedim>
+std::vector<Point<spacedim> >
+MappingQ1Eulerian<dim,EulerVectorType,spacedim>::
+compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
+  const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  vertices = this->get_vertices(cell);
+
+  std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    a[i] = vertices[i];
+
+  return a;
+}
+
+
+
+
+
 template <int dim, class EulerVectorType, int spacedim>
-Mapping<dim,spacedim> *
+MappingQ1Eulerian<dim,EulerVectorType,spacedim> *
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
 {
   return new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(*this);
@@ -111,27 +117,26 @@ MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
 
 
 template<int dim, class EulerVectorType, int spacedim>
-void
-MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Quadrature<dim>                                     &q,
-  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-  std::vector<Point<spacedim> >                             &quadrature_points,
-  std::vector<double>                                       &JxW_values,
-  std::vector< DerivativeForm<1,dim,spacedim>   >              &jacobians,
-  std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
-  std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &normal_vectors,
-  CellSimilarity::Similarity                           &cell_similarity) const
+CellSimilarity::Similarity
+MappingQ1Eulerian<dim,EulerVectorType,spacedim>::
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const CellSimilarity::Similarity                           ,
+                const Quadrature<dim>                                     &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
-  // disable any previously detected
-  // similarity and then enter the
-  // respective function of the base class.
-  cell_similarity = CellSimilarity::invalid_next_cell;
-  MappingQ1<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
-                                           quadrature_points, JxW_values, jacobians,
-                                           jacobian_grads, inverse_jacobians,
-                                           normal_vectors, cell_similarity);
+  // call the function of the base class, but ignoring
+  // any potentially detected cell similarity between
+  // the current and the previous cell
+  MappingQ1<dim,spacedim>::fill_fe_values (cell,
+                                           CellSimilarity::invalid_next_cell,
+                                           quadrature,
+                                           internal_data,
+                                           output_data);
+  // also return the updated flag since any detected
+  // similarity wasn't based on the mapped field, but
+  // the original vertices which are meaningless
+  return CellSimilarity::invalid_next_cell;
 }
 
 

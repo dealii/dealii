@@ -85,6 +85,19 @@ print_matrix (const FullMatrix<number> &m)
 {
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
+      // make sure we also respect output thresholds on floats
+      deallog << i << ' ' << j << ' ' << (double)m(i,j)
+              << std::endl;
+}
+
+
+
+template <typename number>
+void
+print_matrix (const FullMatrix<std::complex<number> > &m)
+{
+  for (unsigned int i=0; i<m.m(); ++i)
+    for (unsigned int j=0; j<m.n(); ++j)
       deallog << i << ' ' << j << ' ' << m(i,j)
               << std::endl;
 }
@@ -103,6 +116,20 @@ print_vector (const Vector<number> &v)
 template <typename number>
 void
 display_matrix(FullMatrix<number> M)
+{
+  deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
+  for (unsigned int i=0; i<M.m(); i++)
+    {
+      // make sure we also respect output thresholds on floats
+      for (unsigned int j=0; j<M.n(); j++)
+        deallog<<(double)M(i,j)<<" ";
+      deallog<<std::endl;
+    }
+}
+
+template <typename number>
+void
+display_matrix(FullMatrix<std::complex<number> > M)
 {
   deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
   for (unsigned int i=0; i<M.m(); i++)
@@ -135,6 +162,8 @@ main()
       deallog.threshold_double(1.e-7);
 
       check<double> ();
+
+      deallog.threshold_double(1.e-5);
       check<float> ();
 
       return 0;
@@ -163,4 +192,3 @@ main()
       return 1;
     };
 }
-

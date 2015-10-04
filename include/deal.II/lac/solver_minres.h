@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_minres_h
-#define __deal2__solver_minres_h
+#ifndef dealii__solver_minres_h
+#define dealii__solver_minres_h
 
 
 #include <deal.II/base/config.h>
@@ -255,7 +255,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   *u[1] -= *m[0];
   // Precondition is applied.
   // The preconditioner has to be
-  // positiv definite and symmetric
+  // positive definite and symmetric
 
   // M v = u[1]
   precondition.vmult (v,*u[1]);
@@ -291,7 +291,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       *m[0] = v;
 
       // precondition: solve M v = u[2]
-      // Preconditioner has to be positiv
+      // Preconditioner has to be positive
       // definite and symmetric.
       precondition.vmult(v,*u[2]);
 

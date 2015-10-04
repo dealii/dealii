@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,7 +102,7 @@ void test ()
 
       PETScWrappers::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+        AssertThrow (*p1 == i, ExcInternalError());
 
       Assert (p1 == v1.end(), ExcInternalError());
 
@@ -112,7 +112,7 @@ void test ()
 
       // check backwards
       for (unsigned int i=0; i<v1.size(); ++i, --p1)
-        Assert (*p1 == v1.size()-i-1, ExcInternalError());
+        AssertThrow (*p1 == v1.size()-i-1, ExcInternalError());
 
       // if we came thus far,
       // everything is alright
@@ -132,7 +132,7 @@ void test ()
 
       PETScWrappers::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+        AssertThrow (*p1 == i, ExcInternalError());
 
       Assert (p1 == v1.end(), ExcInternalError());
 
@@ -145,7 +145,7 @@ void test ()
         {
           const double val = *p1;
           const double ref = v1.size()-i-1;
-          Assert (val==ref, ExcInternalError());
+          AssertThrow (val==ref, ExcInternalError());
         };
 
       // if we came thus far,
@@ -308,7 +308,7 @@ void test ()
         {
           const PETScWrappers::BlockVector::iterator p = (v1.begin()+i);
           for (unsigned int j=0; j<v1.size(); ++j)
-            Assert (p[(signed)j-(signed)i] == j, ExcInternalError());
+            AssertThrow (p[(signed)j-(signed)i] == j, ExcInternalError());
         };
 
       // if we came thus far,
@@ -332,7 +332,7 @@ int main (int argc,char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         test ();
       }

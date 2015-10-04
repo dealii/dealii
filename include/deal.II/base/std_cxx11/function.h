@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx11_function_h
-#define __deal2__std_cxx11_function_h
+#ifndef dealii__std_cxx11_function_h
+#define dealii__std_cxx11_function_h
 
 
 #include <deal.II/base/config.h>

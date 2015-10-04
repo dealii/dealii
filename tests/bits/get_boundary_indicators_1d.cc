@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 
-// Check if Triangulation<1>::get_boundary_indicators() works for 1d grids.
+// Check if Triangulation<1>::get_boundary_ids() works for 1d grids.
 
 
 int main ()
@@ -30,7 +30,7 @@ int main ()
 
   Triangulation<1>   triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  const std::vector<types::boundary_id> indicators = triangulation.get_boundary_indicators();
+  const std::vector<types::boundary_id> indicators = triangulation.get_boundary_ids();
   for (unsigned int i=0; i<indicators.size(); ++i)
     deallog << int (indicators[i]) << std::endl;
 

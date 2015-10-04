@@ -356,7 +356,10 @@ TimerOutput::enter_subsection (const std::string &section_name)
           // create a new timer for this section. the second argument
           // will ensure that we have an MPI barrier before starting
           // and stopping a timer, and this ensures that we get the
-          // maximum run time for this section over all processors
+          // maximum run time for this section over all processors.
+          // The mpi_communicator from TimerOutput is passed to the
+          // Timer here, so this Timer will collect timing information
+          // among all processes inside mpi_communicator.
           sections[section_name].timer = Timer(mpi_communicator, true);
         }
 #endif
@@ -403,12 +406,12 @@ TimerOutput::leave_subsection (const std::string &section_name)
   sections[actual_section_name].total_wall_time
   += sections[actual_section_name].timer.wall_time();
 
-  // get cpu time. on MPI systems, add the local contributions. we
-  // could do that also in the Timer class itself, but we didn't
-  // initialize the Timers here according to that
-  double cpu_time = sections[actual_section_name].timer();
-  sections[actual_section_name].total_cpu_time
-  += Utilities::MPI::sum (cpu_time, mpi_communicator);
+  // Get cpu time. On MPI systems, if constructed with an mpi_communicator
+  // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
+  // processors among the provided mpi_communicator. Therefore, no
+  // communication is needed here.
+  const double cpu_time = sections[actual_section_name].timer();
+  sections[actual_section_name].total_cpu_time += cpu_time;
 
   // in case we have to print out something, do that here...
   if ((output_frequency == every_call || output_frequency == every_call_and_summary)
@@ -464,7 +467,8 @@ TimerOutput::print_summary () const
            i = sections.begin(); i!=sections.end(); ++i)
         check_time += i->second.total_cpu_time;
 
-      if (check_time > total_cpu_time)
+      const double time_gap = check_time-total_cpu_time;
+      if (time_gap > 0.0)
         total_cpu_time = check_time;
 
       // generate a nice table
@@ -502,19 +506,20 @@ TimerOutput::print_summary () const
           out_stream << i->second.total_cpu_time << "s |";
           out_stream << std::setw(10);
           out_stream << std::setprecision(2);
-          double value = i->second.total_cpu_time/total_cpu_time * 100;
-          if (!numbers::is_finite(value))
-            value = 0.0;
-          out_stream << value << "% |";
+          if (total_cpu_time != 0)
+            out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
+          else
+            out_stream << 0.0 << "% |";
         }
       out_stream << std::endl
                  << "+---------------------------------+-----------+"
                  << "------------+------------+\n"
                  << std::endl;
 
-      if (check_time > total_cpu_time)
+      if (time_gap > 0.0)
         out_stream << std::endl
-                   << "Note: The sum of counted times is larger than the total time.\n"
+                   << "Note: The sum of counted times is " << time_gap
+                   << " seconds larger than the total time.\n"
                    << "(Timer function may have introduced too much overhead, or different\n"
                    << "section timers may have run at the same time.)" << std::endl;
     }

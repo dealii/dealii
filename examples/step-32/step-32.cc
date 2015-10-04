@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2014 by the deal.II authors
+ * Copyright (C) 2008 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -50,6 +50,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -326,13 +327,12 @@ namespace Step32
   // distinguish between <code>struct</code>s and <code>class</code>es).
   //
   // Regarding the Scratch objects, each struct is equipped with a constructor
-  // that creates an FEValues object for a @ref FiniteElement "finite
-  // element", a @ref Quadrature "quadrature formula", the @ref Mapping
-  // "mapping" that describes the interpolation of curved boundaries, and some
-  // @ref UpdateFlags "update flags".  Moreover, we manually implement a copy
-  // constructor (since the FEValues class is not copyable by itself), and
-  // provide some additional vector fields that are used to hold intermediate
-  // data during the computation of local contributions.
+  // that creates an @ref FEValues object using the @ref FiniteElement,
+  // Quadrature, @ref Mapping (which describes the interpolation of curved
+  // boundaries), and @ref UpdateFlags instances. Moreover, we manually
+  // implement a copy constructor (since the FEValues class is not copyable by
+  // itself), and provide some additional vector fields that are used to hold
+  // intermediate data during the computation of local contributions.
   //
   // Let us start with the scratch arrays and, specifically, the one used for
   // assembly of the Stokes preconditioner:
@@ -860,22 +860,19 @@ namespace Step32
     // - In a bit of naming confusion, you will notice below that some of the
     // variables from namespace TrilinosWrappers are taken from namespace
     // TrilinosWrappers::MPI (such as the right hand side vectors) whereas
-    // others are not (such as the various matrices). For the matrices, we
-    // happen to use the same class names for %parallel and sequential data
-    // structures, i.e., all matrices will actually be considered %parallel
-    // below. On the other hand, for vectors, only those from namespace
-    // TrilinosWrappers::MPI are actually distributed. In particular, we will
-    // frequently have to query velocities and temperatures at arbitrary
-    // quadrature points; consequently, rather than importing ghost
-    // information of a vector whenever we need access to degrees of freedom
-    // that are relevant locally but owned by another processor, we solve
-    // linear systems in %parallel but then immediately initialize a vector
-    // including ghost entries of the solution for further processing. The
-    // various <code>*_solution</code> vectors are therefore filled
-    // immediately after solving their respective linear system in %parallel
-    // and will always contain values for all @ref GlossLocallyRelevantDof
-    // "locally relevant degrees of freedom"; the fully distributed vectors
-    // that we obtain from the solution process and that only ever contain the
+    // others are not (such as the various matrices). This is due to legacy
+    // reasons. We will frequently have to query velocities
+    // and temperatures at arbitrary quadrature points; consequently, rather
+    // than importing ghost information of a vector whenever we need access
+    // to degrees of freedom that are relevant locally but owned by another
+    // processor, we solve linear systems in %parallel but then immediately
+    // initialize a vector including ghost entries of the solution for further
+    // processing. The various <code>*_solution</code> vectors are therefore
+    // filled immediately after solving their respective linear system in
+    // %parallel and will always contain values for all
+    // @ref GlossLocallyRelevantDof "locally relevant degrees of freedom";
+    // the fully distributed vectors that we obtain from the solution process
+    // and that only ever contain the
     // @ref GlossLocallyOwnedDof "locally owned degrees of freedom" are
     // destroyed immediately after the solution process and after we have
     // copied the relevant values into the member variable vectors.
@@ -1711,9 +1708,12 @@ namespace Step32
 
     std::vector<double> rhs_values(n_q_points);
 
-    TrilinosWrappers::MPI::Vector
-    rhs (temperature_mass_matrix.row_partitioner()),
-        solution (temperature_mass_matrix.row_partitioner());
+    IndexSet row_temp_matrix_partitioning(temperature_mass_matrix.n());
+    row_temp_matrix_partitioning.add_range(temperature_mass_matrix.local_range().first,
+                                           temperature_mass_matrix.local_range().second);
+    TrilinosWrappers::MPI::Vector rhs (row_temp_matrix_partitioning),
+                     solution (row_temp_matrix_partitioning);
+
 
     const EquationData::TemperatureInitialValues<dim> initial_temperature;
 
@@ -1803,7 +1803,7 @@ namespace Step32
   // is that the matrices we want to set up are distributed across multiple
   // processors. Since we still want to build up the sparsity pattern first
   // for efficiency reasons, we could continue to build the <i>entire</i>
-  // sparsity pattern as a BlockCompressedSimpleSparsityPattern, as we did in
+  // sparsity pattern as a BlockDynamicSparsityPattern, as we did in
   // step-31. However, that would be inefficient: every processor would build
   // the same sparsity pattern, but only initialize a small part of the matrix
   // using it. It also violates the principle that every processor should only
@@ -3393,7 +3393,7 @@ namespace Step32
     locally_relevant_joint_solution = joint_solution;
 
     Postprocessor postprocessor (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                                 stokes_solution.block(1).minimal_value());
+                                 stokes_solution.block(1).min());
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (joint_dof_handler);
@@ -3538,6 +3538,11 @@ namespace Step32
       tmp[1] = &(distributed_temp2);
       temperature_trans.interpolate(tmp);
 
+      // enforce constraints to make the interpolated solution conforming on
+      // the new mesh:
+      temperature_constraints.distribute(distributed_temp1);
+      temperature_constraints.distribute(distributed_temp2);
+
       temperature_solution     = distributed_temp1;
       old_temperature_solution = distributed_temp2;
     }
@@ -3551,6 +3556,12 @@ namespace Step32
       stokes_tmp[1] = &(old_distributed_stokes);
 
       stokes_trans.interpolate (stokes_tmp);
+
+      // enforce constraints to make the interpolated solution conforming on
+      // the new mesh:
+      stokes_constraints.distribute(distributed_stokes);
+      stokes_constraints.distribute(old_distributed_stokes);
+
       stokes_solution     = distributed_stokes;
       old_stokes_solution = old_distributed_stokes;
     }
@@ -3567,7 +3578,16 @@ namespace Step32
   // step-31. We use a different mesh now (a GridGenerator::hyper_shell
   // instead of a simple cube geometry), and use the
   // <code>project_temperature_field()</code> function instead of the library
-  // function <code>VectorTools::project</code>, the rest is as before.
+  // function <code>VectorTools::project</code>.
+  // In this example, however, we define both a SphericalManifold() and a
+  // HyperShellBoundary() object to describe the geometry of the domain.
+  // The reason we do so here, is because we want to impose no normal flux
+  // boundary conditions, and they require knowledge of the normals to a boundary,
+  // which a SphericalManifold() alone cannot compute. Consequently, we set
+  // all manifold indicators of cells and adjacent edges to zero, then overwrite
+  // the manifold indicators of all boundary objects by one. We then associate
+  // a SphericalManifold object with the former, and the HyperShellBoundary
+  // object that can also provide normal vectors with the latter.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
@@ -3577,9 +3597,12 @@ namespace Step32
                                 EquationData::R1,
                                 (dim==3) ? 96 : 12,
                                 true);
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_all_manifold_ids_on_boundary(1);
+    static SphericalManifold<dim> manifold;
     static HyperShellBoundary<dim> boundary;
-    triangulation.set_boundary (0, boundary);
-    triangulation.set_boundary (1, boundary);
+    triangulation.set_manifold (0, manifold);
+    triangulation.set_manifold (1, boundary);
 
     global_Omega_diameter = GridTools::diameter (triangulation);
 

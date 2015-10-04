@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_faces_h
-#define __deal2__dof_faces_h
+#ifndef dealii__dof_faces_h
+#define dealii__dof_faces_h
 
 
 #include <deal.II/base/config.h>
@@ -77,7 +77,7 @@ namespace internal
 
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would
-     * be vertices, which are treted separately, don't do anything.
+     * be vertices, which are treated separately, don't do anything.
      *
      * @author Tobias Leicht, 2006
      */

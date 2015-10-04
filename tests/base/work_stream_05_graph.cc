@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,8 @@ struct CopyData
 
 
 void worker (const std::vector<unsigned int>::iterator &i,
-	     ScratchData &,
-	     CopyData &ad)
+             ScratchData &,
+             CopyData &ad)
 {
   ad.computed = *i * 2;
 }
@@ -75,10 +75,10 @@ void test ()
     v.push_back (i);
 
   WorkStream::run (GraphColoring::make_graph_coloring (v.begin(), v.end(),
-						       std_cxx11::function<std::vector<types::global_dof_index>
-									   (const std::vector<unsigned int>::iterator &)>
-						       (&conflictor)),
-		   &worker, &copier,
+                                                       std_cxx11::function<std::vector<types::global_dof_index>
+                                                       (const std::vector<unsigned int>::iterator &)>
+                                                       (&conflictor)),
+                   &worker, &copier,
                    ScratchData(),
                    CopyData());
 
@@ -88,13 +88,13 @@ void test ()
     {
       const unsigned int ad_computed = v[i] * 2;
       for (unsigned int j=0; j<5; ++j)
-	comp((ad_computed+j) % result.size()) += ad_computed;
+        comp((ad_computed+j) % result.size()) += ad_computed;
     }
 
 
   // and compare
   for (unsigned int i=0; i<result.size(); ++i)
-    Assert (result(i) == comp(i), ExcInternalError());
+    AssertThrow (result(i) == comp(i), ExcInternalError());
 
   for (unsigned int i=0; i<result.size(); ++i)
     deallog << result(i) << std::endl;

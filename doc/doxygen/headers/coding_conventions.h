@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,6 +59,10 @@ style guidelines outlined in this page.</p>
 <li> %Function which set a bit or flag should start with <code>set_*</code>;
   functions which clear bits of flags should be named <code>clear_*</code>.
   Example: CellIterator::set_refine_flag().</li>
+
+<li> Traditional logical operators should be used instead of their English
+  equivalents (i.e., use <code>&&</code>, <code>||</code>, and <code>!</code>
+  instead of <code>and</code>, <code>or</code>, and <code>not</code>).
 
 <li> In the implementation files, after each function, at least three
   empty lines are expected to
@@ -124,7 +128,7 @@ style guidelines outlined in this page.</p>
   use lowercase letters and underscores to separate words.
   The only exception are the iterator typedefs in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
-  to make the connection to the STL classes clear.</li>
+  to make the connection to the standard library container classes clear.</li>
 
 <li> For classes with multiple template arguments, the dimension is usually
   put before the data type specifier, i.e., we use Point<dim,number> and not

@@ -54,7 +54,7 @@ void test ()
   std::vector<IndexSet> relevant = partitioning;
   relevant[0].add_index(0);
   relevant[1].add_range(0,numproc);
-  
+
   typename LA::MPI::BlockVector v_2(partitioning, MPI_COMM_WORLD);
 
   {
@@ -68,16 +68,16 @@ void test ()
   {
     deal_II_exceptions::disable_abort_on_exception();
     try
-      {	
-	typename LA::MPI::BlockVector x=v_1;
-	x=v_2; // error
+      {
+        typename LA::MPI::BlockVector x=v_1;
+        x=v_2; // error
       }
     catch (const ExceptionBase &e)
       {
-	deallog << "Exception: " << e.get_exc_name() << std::endl;
+        deallog << "Exception: " << e.get_exc_name() << std::endl;
       }
   }
-  
+
   // done
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -87,7 +87,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
   {
     deallog.push("PETSc");

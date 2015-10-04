@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,17 +41,17 @@ void test (const unsigned int chunk_size)
   ChunkSparseMatrix<double>::const_iterator k = A.begin(),
                                             j = ++A.begin();
 
-  Assert (k < j, ExcInternalError());
-  Assert (j > k, ExcInternalError());
+  AssertThrow (k < j, ExcInternalError());
+  AssertThrow (j > k, ExcInternalError());
 
-  Assert (!(j < k), ExcInternalError());
-  Assert (!(k > j), ExcInternalError());
+  AssertThrow (!(j < k), ExcInternalError());
+  AssertThrow (!(k > j), ExcInternalError());
 
-  Assert (k != j, ExcInternalError());
-  Assert (!(k == j), ExcInternalError());
+  AssertThrow (k != j, ExcInternalError());
+  AssertThrow (!(k == j), ExcInternalError());
 
-  Assert (k == k, ExcInternalError());
-  Assert (!(k != k), ExcInternalError());
+  AssertThrow (k == k, ExcInternalError());
+  AssertThrow (!(k != k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

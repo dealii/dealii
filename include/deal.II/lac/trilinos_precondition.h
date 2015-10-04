@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_precondition_h
-#define __deal2__trilinos_precondition_h
+#ifndef dealii__trilinos_precondition_h
+#define dealii__trilinos_precondition_h
 
 
 #include <deal.II/base/config.h>
@@ -27,6 +27,7 @@
 #  include <deal.II/lac/trilinos_vector_base.h>
 #  include <deal.II/lac/parallel_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
@@ -37,11 +38,7 @@
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
-
-#  if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-#  include <MueLu.hpp>
-#  include <Teuchos_RCP.hpp>
-#  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // forward declarations
 class Ifpack_Preconditioner;
@@ -156,6 +153,14 @@ namespace TrilinosWrappers
                          const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
+     * Return a reference to the underlaying Trilinos Epetra_Operator.
+     * So you can use the preconditioner with unwrapped Trilinos solver.
+     *
+     * Calling this function from an uninitialized object will cause an exception.
+     */
+    Epetra_Operator &trilinos_operator() const;
+
+    /**
      * Exception.
      */
     DeclException1 (ExcNonMatchingMaps,
@@ -166,7 +171,6 @@ namespace TrilinosWrappers
                     << ". Check preconditioner and matrix setup.");
 
     friend class SolverBase;
-    friend class PreconditionStokes;
 
   protected:
     /**
@@ -930,7 +934,7 @@ namespace TrilinosWrappers
      * <li> @p ilu_fill: This specifies the amount of additional fill-in
      * elements besides the original sparse matrix structure. If $k$ is @p
      * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of the
-     * result of the Gaussian elemination. This is known as ILU($k$) in the
+     * result of the Gaussian elimination. This is known as ILU($k$) in the
      * literature.  When @p fill is large, the preconditioner comes closer to
      * a (direct) sparse LU decomposition. Note, however, that this will
      * drastically increase the memory requirement, especially when the
@@ -956,6 +960,8 @@ namespace TrilinosWrappers
      * will increase communication and storage cost. According to the IFPACK
      * documentation, an overlap of 1 is often effective and values of more
      * than 3 are rarely needed.
+     *
+     * </ul>
      */
     struct AdditionalData
     {
@@ -1009,7 +1015,7 @@ namespace TrilinosWrappers
    * serial and in parallel, depending on the matrix it is based on. In
    * general, an incomplete factorization does not take all fill-in elements
    * that would appear in a full factorization (that is the basis for a direct
-   * solve). For the ILU-T precondtioner, the parameter <tt>ilut_drop</tt>
+   * solve). For the ILU-T preconditioner, the parameter <tt>ilut_drop</tt>
    * lets the user specify which elements should be dropped (i.e., should not
    * be part of the incomplete decomposition). Trilinos calculates first the
    * complete factorization for one row, and then skips those elements that
@@ -1519,7 +1525,7 @@ namespace TrilinosWrappers
      * remained the same. What this function does is taking the already
      * generated coarsening structure, computing the AMG prolongation and
      * restriction according to a smoothed aggregation strategy and then
-     * building the whole multilevel hiearchy. This function can be
+     * building the whole multilevel hierarchy. This function can be
      * considerably faster than the initialize function, since the coarsening
      * pattern is usually the most difficult thing to do when setting up the
      * AMG ML preconditioner.
@@ -1546,7 +1552,7 @@ namespace TrilinosWrappers
 
 
 
-#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#if defined(DOXYGEN) || DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
@@ -1570,8 +1576,8 @@ namespace TrilinosWrappers
 
     /**
      * A data structure that is used to control details of how the algebraic
-     * multigrid is set up. The flags detailed in here are then passed to
-     * the Trilinos MueLu implementation. A structure of the current type are
+     * multigrid is set up. The flags detailed in here are then passed to the
+     * Trilinos MueLu implementation. A structure of the current type are
      * passed to the constructor of PreconditionAMGMueLu.
      */
     struct AdditionalData
@@ -1594,8 +1600,8 @@ namespace TrilinosWrappers
       /**
        * Determines whether the AMG preconditioner should be optimized for
        * elliptic problems (MueLu option smoothed aggregation SA, using a
-       * Chebyshev smoother) or for non-elliptic problems (MueLu option
-       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
+       * Chebyshev smoother) or for non-elliptic problems (MueLu option non-
+       * symmetric smoothed aggregation NSSA, smoother is SSOR with
        * underrelaxation).
        */
       bool elliptic;
@@ -1657,37 +1663,37 @@ namespace TrilinosWrappers
       bool output_details;
 
       /**
-       * Determines which smoother to use for the AMG cycle. Possibilities
-       * for smoother_type are the following:
+       * Determines which smoother to use for the AMG cycle. Possibilities for
+       * smoother_type are the following:
        * <ul>
-       *   <li>  "Aztec" </li>
-       *   <li>  "IFPACK" </li>
-       *   <li>  "Jacobi" </li>
-       *   <li>  "ML symmetric Gauss-Seidel" </li>
-       *   <li>  "symmetric Gauss-Seidel" </li>
-       *   <li>  "ML Gauss-Seidel" </li>
-       *   <li>  "Gauss-Seidel" </li>
-       *   <li>  "block Gauss-Seidel" </li>
-       *   <li>  "symmetric block Gauss-Seidel" </li>
-       *   <li>  "Chebyshev" </li>
-       *   <li>  "MLS" </li>
-       *   <li>  "Hiptmair" </li>
-       *   <li>  "Amesos-KLU" </li>
-       *   <li>  "Amesos-Superlu" </li>
-       *   <li>  "Amesos-UMFPACK" </li>
-       *   <li>  "Amesos-Superludist" </li>
-       *   <li>  "Amesos-MUMPS" </li>
-       *   <li>  "user-defined" </li>
-       *   <li>  "SuperLU" </li>
-       *   <li>  "IFPACK-Chebyshev" </li>
-       *   <li>  "self" </li>
-       *   <li>  "do-nothing" </li>
-       *   <li>  "IC" </li>
-       *   <li>  "ICT" </li>
-       *   <li>  "ILU" </li>
-       *   <li>  "ILUT" </li>
-       *   <li>  "Block Chebyshev" </li>
-       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * <li>  "Aztec" </li>
+       * <li>  "IFPACK" </li>
+       * <li>  "Jacobi" </li>
+       * <li>  "ML symmetric Gauss-Seidel" </li>
+       * <li>  "symmetric Gauss-Seidel" </li>
+       * <li>  "ML Gauss-Seidel" </li>
+       * <li>  "Gauss-Seidel" </li>
+       * <li>  "block Gauss-Seidel" </li>
+       * <li>  "symmetric block Gauss-Seidel" </li>
+       * <li>  "Chebyshev" </li>
+       * <li>  "MLS" </li>
+       * <li>  "Hiptmair" </li>
+       * <li>  "Amesos-KLU" </li>
+       * <li>  "Amesos-Superlu" </li>
+       * <li>  "Amesos-UMFPACK" </li>
+       * <li>  "Amesos-Superludist" </li>
+       * <li>  "Amesos-MUMPS" </li>
+       * <li>  "user-defined" </li>
+       * <li>  "SuperLU" </li>
+       * <li>  "IFPACK-Chebyshev" </li>
+       * <li>  "self" </li>
+       * <li>  "do-nothing" </li>
+       * <li>  "IC" </li>
+       * <li>  "ICT" </li>
+       * <li>  "ILU" </li>
+       * <li>  "ILUT" </li>
+       * <li>  "Block Chebyshev" </li>
+       * <li>  "IFPACK-Block Chebyshev" </li>
        * </ul>
        */
       const char *smoother_type;
@@ -1715,7 +1721,8 @@ namespace TrilinosWrappers
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
-     * function above, this function uses an object of type Epetra_CrsMatrixCrs.
+     * function above, this function uses an object of type
+     * Epetra_CrsMatrixCrs.
      */
     void initialize (const Epetra_CrsMatrix &matrix,
                      const AdditionalData   &additional_data = AdditionalData());
@@ -1726,8 +1733,8 @@ namespace TrilinosWrappers
      * format specified in TrilinosWrappers::SparseMatrix.
      *
      * This function is similar to the one above, but allows the user to set
-     * most of the options of the Trilinos ML preconditioner. In order to find out
-     * about all the options for ML, we refer to the <a
+     * most of the options of the Trilinos ML preconditioner. In order to find
+     * out about all the options for ML, we refer to the <a
      * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
      * guide</a>. Not all ML options have a corresponding MueLu option.
      */
@@ -1952,6 +1959,14 @@ namespace TrilinosWrappers
     const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
+  }
+
+  inline
+  Epetra_Operator &
+  PreconditionBase::trilinos_operator () const
+  {
+    AssertThrow (preconditioner, ExcMessage("Trying to dereference a null pointer."));
+    return (*preconditioner);
   }
 
 #endif

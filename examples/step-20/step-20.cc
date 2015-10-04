@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2014 by the deal.II authors
+ * Copyright (C) 2005 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -327,18 +327,41 @@ namespace Step20
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise (dof_handler);
 
-    // The next thing is that we want to figure out the sizes of these blocks,
+    // The next thing is that we want to figure out the sizes of these blocks
     // so that we can allocate an appropriate amount of space. To this end, we
-    // call the <code>DoFTools::count_dofs_per_component</code> function that
+    // call the DoFTools::count_dofs_per_component() function that
     // counts how many shape functions are non-zero for a particular vector
-    // component. We have <code>dim+1</code> vector components, and we have to
-    // use the knowledge that for Raviart-Thomas elements all shape functions
-    // are nonzero in all components. In other words, the number of velocity
-    // shape functions equals the number of overall shape functions that are
-    // nonzero in the zeroth vector component. On the other hand, the number
+    // component. We have <code>dim+1</code> vector components, and
+    // DoFTools::count_dofs_per_component() will count how many shape functions
+    // belong to each of these components.
+    //
+    // There is one problem here. As described in the documentation of that
+    // function, it <i>wants</i> to put the number of $x$-velocity shape
+    // functions into <code>dofs_per_component[0]</code>, the number of
+    // $y$-velocity shape functions into <code>dofs_per_component[1]</code>
+    // (and similar in 3d), and the number of pressure shape functions into
+    // <code>dofs_per_component[dim]</code>. But, the Raviart-Thomas element
+    // is special in that it is non-@ref GlossPrimitive "primitive", i.e.,
+    // for Raviart-Thomas elements all velocity shape functions
+    // are nonzero in all components. In other words, the function cannot
+    // distinguish between $x$ and $y$ velocity functions because there
+    // <i>is</i> no such distinction. It therefore puts the overall number
+    // of velocity into each of <code>dofs_per_component[c]</code>,
+    // $0\le c\le \text{dim}$. On the other hand, the number
     // of pressure variables equals the number of shape functions that are
-    // nonzero in the dim-th component. Let us compute these numbers and then
-    // create some nice output with that:
+    // nonzero in the dim-th component.
+    //
+    // Using this knowledge, we can get the number of velocity shape
+    // functions from any of the first <code>dim</code> elements of
+    // <code>dofs_per_component</code>, and then use this below to initialize
+    // the vector and matrix block sizes, as well as create output.
+    //
+    // @note If you find this concept difficult to understand, you may
+    // want to consider using the function DoFTools::count_dofs_per_block()
+    // instead, as we do in the corresponding piece of code in step-22.
+    // You might also want to read up on the difference between
+    // @ref GlossBlock "blocks" and @ref GlossComponent "components"
+    // in the glossary.
     std::vector<types::global_dof_index> dofs_per_component (dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
     const unsigned int n_u = dofs_per_component[0],
@@ -358,25 +381,25 @@ namespace Step20
     // The next task is to allocate a sparsity pattern for the matrix that we
     // will create. We use a compressed sparsity pattern like in the previous
     // steps, but as <code>system_matrix</code> is a block matrix we use the
-    // class <code>BlockCompressedSparsityPattern</code> instead of just
-    // <code>CompressedSparsityPattern</code>. This block sparsity pattern has
+    // class <code>BlockDynamicSparsityPattern</code> instead of just
+    // <code>DynamicSparsityPattern</code>. This block sparsity pattern has
     // four blocks in a $2 \times 2$ pattern. The blocks' sizes depend on
     // <code>n_u</code> and <code>n_p</code>, which hold the number of velocity
     // and pressure variables. In the second step we have to instruct the block
     // system to update its knowledge about the sizes of the blocks it manages;
-    // this happens with the <code>c_sparsity.collect_sizes ()</code> call.
-    BlockCompressedSparsityPattern c_sparsity(2, 2);
-    c_sparsity.block(0, 0).reinit (n_u, n_u);
-    c_sparsity.block(1, 0).reinit (n_p, n_u);
-    c_sparsity.block(0, 1).reinit (n_u, n_p);
-    c_sparsity.block(1, 1).reinit (n_p, n_p);
-    c_sparsity.collect_sizes ();
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    // this happens with the <code>dsp.collect_sizes ()</code> call.
+    BlockDynamicSparsityPattern dsp(2, 2);
+    dsp.block(0, 0).reinit (n_u, n_u);
+    dsp.block(1, 0).reinit (n_p, n_u);
+    dsp.block(0, 1).reinit (n_u, n_p);
+    dsp.block(1, 1).reinit (n_p, n_p);
+    dsp.collect_sizes ();
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
     // We use the compressed block sparsity pattern in the same way as the
     // non-block version to create the sparsity pattern and then the system
     // matrix:
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit (sparsity_pattern);
 
     // Then we have to resize the solution and right hand side vectors in

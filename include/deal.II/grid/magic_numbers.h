@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__magic_numbers_h
-#define __deal2__magic_numbers_h
+#ifndef dealii__magic_numbers_h
+#define dealii__magic_numbers_h
 
 #include <deal.II/base/config.h>
 

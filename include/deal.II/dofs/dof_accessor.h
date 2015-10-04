@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_accessor_h
-#define __deal2__dof_accessor_h
+#ifndef dealii__dof_accessor_h
+#define dealii__dof_accessor_h
 
 
 #include <deal.II/base/config.h>
@@ -151,7 +151,7 @@ namespace internal
  * <h3>Generic loops and the third template argument</h3>
  *
  * Many loops look very similar, whether they operate on the active dofs of
- * the active cells of the Triangulation or on the level dodfs of a single
+ * the active cells of the Triangulation or on the level dofs of a single
  * level or the whole grid hierarchy. In order to use polymorphism in such
  * loops, they access degrees of freedom through the function
  * get_active_or_mg_dof_indices(), which changes behavior according to the
@@ -294,7 +294,7 @@ public:
    */
 
   /**
-   * Return an iterator pointing to the the @p c-th child.
+   * Return an iterator pointing to the @p c-th child.
    */
   TriaIterator<DoFAccessor<structdim,DH, level_dof_access> >
   child (const unsigned int c) const;
@@ -798,7 +798,9 @@ public:
    */
 
   /**
-   * Return an iterator pointing to the the @p c-th child.
+   * Return an invalid iterator of a type that represents pointing to a child
+   * of the current object. The object is invalid because points (as
+   * represented by the current class) do not have children.
    */
   TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access > >
   child (const unsigned int c) const;

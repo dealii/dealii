@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__parameter_handler_h
-#define __deal2__parameter_handler_h
+#ifndef dealii__parameter_handler_h
+#define dealii__parameter_handler_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -28,7 +29,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -595,20 +595,19 @@ namespace Patterns
   /**
    * This class is much like the Selection class, but it allows the input to
    * be a comma-separated list of values which each have to be given in the
-   * constructor argument. Alternatively, it could be viewed as a
-   * specialization of the List class. For example, if the string to the
-   * constructor was <tt>"ucd|gmv|eps"</tt>, then the following would be legal
-   * input: <tt>eps</tt>, <tt>gmv</tt>. You may give an arbitrarily long list
-   * of values, where there may be as many spaces around commas as you like.
-   * However, commas are not allowed inside the values given to the
-   * constructor.
+   * constructor argument. The input is allowed to be empty or contain values
+   * more than once and have an arbitrary number of spaces around commas. Of
+   * course commas are not allowed inside the values given to the constructor.
+   *
+   * For example, if the string to the constructor was <tt>"ucd|gmv|eps"</tt>,
+   * then the following would be legal inputs: "eps", "gmv, eps",
+   * or "".
    */
   class MultipleSelection : public PatternBase
   {
   public:
     /**
-     * Constructor. Take the given parameter as the specification of valid
-     * strings.
+     * Constructor. @p seq is a list of valid options separated by "|".
      */
     MultipleSelection (const std::string &seq);
 
@@ -1008,8 +1007,8 @@ namespace Patterns
  *       set Nonlinear method = Gradient
  *       # this is a comment
  *       subsection Linear solver
- *         set Solver                        = CG
- *         set Maxmimum number of iterations = 30
+ *         set Solver                       = CG
+ *         set Maximum number of iterations = 30
  *       end
  *     end
  *     ...                       # other stuff
@@ -1025,6 +1024,9 @@ namespace Patterns
  * the MultipleParameterLoop class.
  *
  * Comments starting with \# are skipped.
+ *
+ * Continuation lines are allowed by means of the character <tt>\\</tt>,
+ * which must be the last character of the line.
  *
  * We propose to use the following scheme to name entries: start the first
  * word with a capital letter and use lowercase letters further on. The same
@@ -1141,7 +1143,7 @@ namespace Patterns
  * parameters at the beginning of a log file, since this way input and output
  * are together in one file which makes matching at a later time easier.
  * Additionally, the function also print those entries which have not been
- * modified in the input file und are thus set to default values; since
+ * modified in the input file and are thus set to default values; since
  * default values may change in the process of program development, you cannot
  * know the values of parameters not specified in the input file.
  *
@@ -1386,7 +1388,7 @@ namespace Patterns
  *
  * <h3>Representation of Parameters</h3>
  *
- * Here is some more internal information about the repesentation of
+ * Here is some more internal information about the representation of
  * parameters:
  *
  * Logically, parameters and the nested sections they are arranged in can be
@@ -1648,7 +1650,54 @@ public:
                       const std::string           &documentation = std::string());
 
   /**
-   * Enter a subsection; if not yet existent, declare it.
+   * Create an alias for an existing entry. This provides a way to refer to a
+   * parameter in the input file using an alternate name. The alias will be in
+   * the current section, and the referenced entry needs to be an existing
+   * entry in the current section.
+   *
+   * The primary purpose of this function is to allow for a backward
+   * compatible way of changing names in input files of applications for which
+   * backward compatibility is important. This can be achieved by changing the
+   * name of the parameter in the call to declare_entry(), and then creating
+   * an alias that maps the old name to the new name. This way, old input
+   * files can continue to refer to parameters under the old name, and they
+   * will automatically be mapped to the new parameter name.
+   *
+   * It is valid to set the same parameter multiple times in an input file.
+   * The value that will ultimately be chosen in such cases is simply the last
+   * value set. This rule also applies to aliases, where the final value of a
+   * parameter is the last value set either through the current name of the
+   * parameter or through any of its possible multiple aliases. For example,
+   * if you have an input file that looks like
+   * @code
+   *   set parm1       = 1
+   *   set parm1_alias = 2
+   * @endcode
+   * where <code>parm1_alias</code> is an alias declared via
+   * @code
+   *   prm.declare_alias ("parm1", "parm1_alias");
+   * @endcode
+   * then the final value for the parameter called <code>parm1</code> will be
+   * 2, not 1.
+   *
+   * @param existing_entry_name The name of an existing parameter in the
+   * current section that the alias should refer to.
+   * @param alias_name An alternate name for the parameter referenced by the
+   * first argument.
+   * @param alias_is_deprecated If true, mark the alias as deprecated. This
+   * will then be listed in the description of the alias if you call
+   * print_parameters(), and you will get a warning on the screen when reading
+   * an input file that contains this deprecated alias. The purpose of this
+   * argument is to be able to allow the use of an old name for a parameter
+   * (see above) but make it clear that this old name will eventually be
+   * removed.
+   */
+  void declare_alias (const std::string &existing_entry_name,
+                      const std::string &alias_name,
+                      const bool         alias_is_deprecated = false);
+
+  /**
+   * Enter a subsection. If it does not yet exist, create it.
    */
   void enter_subsection (const std::string &subsection);
 
@@ -1768,7 +1817,7 @@ public:
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
    * subsections under it.
    *
-   * In <tt>Text</tt> format, the output contains the same information but in
+   * In <tt>LaTeX</tt> format, the output contains the same information but in
    * a format so that the resulting file can be input into a latex document
    * such as a manual for the code for which this object handles run-time
    * parameters. The various sections of parameters are then represented by
@@ -1887,12 +1936,6 @@ public:
   DeclException1 (ExcEntryUndeclared,
                   std::string,
                   << "You can't ask for entry <" << arg1 << "> you have not yet declared");
-  /**
-   * Exception
-   */
-  DeclException1 (ExcConversionError,
-                  std::string,
-                  << "Error when trying to convert the following string: " << arg1);
   //@}
 private:
   /**
@@ -1909,7 +1952,7 @@ private:
    * than having to include all of the property_tree stuff from boost. This
    * works around a problem with gcc 4.5.
    */
-  std::auto_ptr<boost::property_tree::ptree> entries;
+  std_cxx11::unique_ptr<boost::property_tree::ptree> entries;
 
   /**
    * A list of patterns that are used to describe the parameters of this
@@ -1927,11 +1970,6 @@ private:
    * Unmangle a string into its original form.
    */
   static std::string demangle (const std::string &s);
-
-  /**
-   * Return whether a given node is a parameter node or a subsection node.
-   */
-  static bool is_parameter_node (const boost::property_tree::ptree &);
 
   /**
    * Path of presently selected subsections; empty list means top level
@@ -2033,8 +2071,9 @@ private:
  *         HelperClass ();
  *
  *         virtual void create_new (const unsigned int run_no);
- *         virtual void declare_parameters (ParameterHandler &prm);
  *         virtual void run (ParameterHandler &prm);
+ *
+ *         static void declare_parameters (ParameterHandler &prm);
  *       private:
  *         Problem *p;
  *     };
@@ -2050,8 +2089,6 @@ private:
  *
  *
  *     void HelperClass::declare_parameters (ParameterHandler &prm) {
- *                                         // entries of the problem class
- *                                 // note: must be static member!
  *       Problem::declare_parameters (prm);
  *     }
  *
@@ -2063,13 +2100,13 @@ private:
  *
  *
  *
- *     void main () {
+ *     int main () {
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
- *
- *       h.declare_parameters (prm);
+ *       HelperClass::declare_parameters (prm);
  *       prm.read_input ("prmtest.prm");
  *       prm.loop (h);
+ *       return 0;
  *     }
  *   @endcode
  *
@@ -2208,12 +2245,6 @@ public:
     virtual void create_new (const unsigned int run_no) = 0;
 
     /**
-     * This should declare parameters and call the <tt>declare_parameters</tt>
-     * function of the problem class.
-     */
-    virtual void declare_parameters (ParameterHandler &prm) = 0;
-
-    /**
      * Get the parameters and run any necessary action.
      */
     virtual void run (ParameterHandler &prm) = 0;
@@ -2327,7 +2358,7 @@ private:
 
     /**
      * List of entry values constructed out of what was given in the input
-     * file (that is stored in EntryValue.
+     * file.
      */
     std::vector<std::string> different_values;
 
@@ -2362,7 +2393,7 @@ private:
   /**
    * Traverse the section currently set by
    * enter_subsection()/leave_subsection() and see which of the entries are
-   * variante/array entries. Then fill the multiple_choices variable using
+   * variant or array entries. Then fill the multiple_choices variable using
    * this information.
    */
   void init_branches_current_section ();

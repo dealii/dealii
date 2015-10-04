@@ -31,7 +31,7 @@
 #include <deal.II/base/std_cxx11/array.h>
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -58,19 +58,23 @@
 // linear solvers as well as for automatic differentiation. These are in the
 // following include files.
 //
-// Since deal.II provides interfaces to the basic Trilinos matrices, vectors,
+// Since deal.II provides interfaces to the basic Trilinos matrices,
 // preconditioners and solvers, we include them similarly as deal.II linear
 // algebra structures.
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 
 
 // Sacado is the automatic differentiation package within Trilinos, which is
 // used to find the Jacobian for a fully implicit Newton iteration:
+// Trilinos::Sacado (at least until version 11.10.2) package will trigger
+// warnings when compiling this file. Since we are not responsible for this,
+// we just suppress the warning by wrapping the <code>#include</code>
+// directive into a pair of macros that simply suppress these warnings:
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Sacado.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // And this again is C++:
 #include <iostream>
@@ -172,43 +176,28 @@ namespace Step33
     // = \frac{|\rho \mathbf v|^2}{2\rho}$ (note that the independent
     // variables contain the momentum components $\rho v_i$, not the
     // velocities $v_i$).
-    //
-    // There is one slight problem: We will need to call the following
-    // functions with input arguments of type
-    // <code>std::vector@<number@></code> and
-    // <code>Vector@<number@></code>. The problem is that the former has an
-    // access operator <code>operator[]</code> whereas the latter, for
-    // historical reasons, has <code>operator()</code>. We wouldn't be able to
-    // write the function in a generic way if we were to use one or the other
-    // of these. Fortunately, we can use the following trick: instead of
-    // writing <code>v[i]</code> or <code>v(i)</code>, we can use
-    // <code>*(v.begin() + i)</code>, i.e. we generate an iterator that points
-    // to the <code>i</code>th element, and then dereference it. This works
-    // for both kinds of vectors -- not the prettiest solution, but one that
-    // works.
-    template <typename Number, typename InputVector>
+    template <typename InputVector>
     static
-    Number
+    typename InputVector::value_type
     compute_kinetic_energy (const InputVector &W)
     {
-      Number kinetic_energy = 0;
+      typename InputVector::value_type kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
-        kinetic_energy += *(W.begin()+first_momentum_component+d) *
-                          *(W.begin()+first_momentum_component+d);
-      kinetic_energy *= 1./(2 * *(W.begin() + density_component));
+        kinetic_energy += W[first_momentum_component+d] *
+                          W[first_momentum_component+d];
+      kinetic_energy *= 1./(2 * W[density_component]);
 
       return kinetic_energy;
     }
 
 
-    template <typename Number, typename InputVector>
+    template <typename InputVector>
     static
-    Number
+    typename InputVector::value_type
     compute_pressure (const InputVector &W)
     {
       return ((gas_gamma-1.0) *
-              (*(W.begin() + energy_component) -
-               compute_kinetic_energy<Number>(W)));
+              (W[energy_component] - compute_kinetic_energy(W)));
     }
 
 
@@ -228,15 +217,17 @@ namespace Step33
     // use the automatic differentiation type here.  Similarly, we will call
     // the function with different input vector data types, so we templatize
     // on it as well:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
     void compute_flux_matrix (const InputVector &W,
-                              std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
+                              std_cxx11::array <std_cxx11::array
+                              <typename InputVector::value_type, dim>,
+                              EulerEquations<dim>::n_components > &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
       // correspond to the momentum terms:
-      const Number pressure = compute_pressure<Number> (W);
+      const typename InputVector::value_type pressure = compute_pressure(W);
 
       for (unsigned int d=0; d<dim; ++d)
         {
@@ -267,15 +258,19 @@ namespace Step33
     // numerical flux function to enforce boundary conditions.  This routine
     // is the basic Lax-Friedrich's flux with a stabilization parameter
     // $\alpha$. It's form has also been given already in the introduction:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
-    void numerical_normal_flux (const Point<dim>                   &normal,
+    void numerical_normal_flux (const Tensor<1,dim>                &normal,
                                 const InputVector                  &Wplus,
                                 const InputVector                  &Wminus,
                                 const double                        alpha,
-                                std_cxx11::array < Number, n_components> &normal_flux)
+                                std_cxx11::array
+                                <typename InputVector::value_type, n_components>
+                                &normal_flux)
     {
-      std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
+      std_cxx11::array
+      <std_cxx11::array <typename InputVector::value_type, dim>,
+      EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -300,10 +295,12 @@ namespace Step33
     // \right)^T$, shown here for the 3d case. More specifically, we will
     // consider only $\mathbf g=(0,0,-1)^T$ in 3d, or $\mathbf g=(0,-1)^T$ in
     // 2d. This naturally leads to the following function:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 std_cxx11::array < Number, n_components> &forcing)
+                                 std_cxx11::array
+                                 <typename InputVector::value_type, n_components>
+                                 &forcing)
     {
       const double gravity = -1.0;
 
@@ -377,7 +374,7 @@ namespace Step33
     static
     void
     compute_Wminus (const BoundaryKind  (&boundary_kind)[n_components],
-                    const Point<dim>     &normal_vector,
+                    const Tensor<1,dim>  &normal_vector,
                     const DataVector     &Wplus,
                     const Vector<double> &boundary_values,
                     const DataVector     &Wminus)
@@ -642,7 +639,7 @@ namespace Step33
           computed_quantities[q](d)
             = uh[q](first_momentum_component+d) / density;
 
-        computed_quantities[q](dim) = compute_pressure<double> (uh[q]);
+        computed_quantities[q](dim) = compute_pressure (uh[q]);
 
         if (do_schlieren_plot == true)
           computed_quantities[q](dim+1) = duh[q][density_component] *
@@ -1401,11 +1398,11 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::setup_system ()
   {
-    CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                                dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit (dsp);
   }
 
 
@@ -1490,7 +1487,7 @@ namespace Step33
                                   dof_indices,
                                   std::vector<types::global_dof_index>(),
                                   true,
-                                  cell->face(face_no)->boundary_indicator(),
+                                  cell->face(face_no)->boundary_id(),
                                   cell->face(face_no)->diameter());
             }
 
@@ -1605,10 +1602,6 @@ namespace Step33
                 }
             }
       }
-
-    // After all this assembling, notify the Trilinos matrix object that the
-    // matrix is done:
-    system_matrix.compress(VectorOperation::add);
   }
 
 
@@ -2116,9 +2109,9 @@ namespace Step33
       case Parameters::Solver::direct:
       {
         SolverControl solver_control (1,0);
-        TrilinosWrappers::SolverDirect direct (solver_control,
-                                               parameters.output ==
-                                               Parameters::Solver::verbose);
+        TrilinosWrappers::SolverDirect::AdditionalData data (
+          parameters.output == Parameters::Solver::verbose);
+        TrilinosWrappers::SolverDirect direct (solver_control, data);
 
         direct.solve (system_matrix, newton_update, right_hand_side);
 
@@ -2153,9 +2146,9 @@ namespace Step33
       // const_cast.
       case Parameters::Solver::gmres:
       {
-        Epetra_Vector x(View, system_matrix.domain_partitioner(),
+        Epetra_Vector x(View, system_matrix.trilinos_matrix().DomainMap(),
                         newton_update.begin());
-        Epetra_Vector b(View, system_matrix.range_partitioner(),
+        Epetra_Vector b(View, system_matrix.trilinos_matrix().RangeMap(),
                         right_hand_side.begin());
 
         AztecOO solver;

@@ -31,10 +31,10 @@
 template <typename T, typename U, typename CompareType>
 void check()
 {
-  Assert (typeid(T() * U()) == typeid(CompareType),
-	  ExcInternalError());
-  Assert (typeid(T() * U()) == typeid(CompareType),
-	  ExcInternalError());
+  AssertThrow (typeid(T() * U()) == typeid(CompareType),
+               ExcInternalError());
+  AssertThrow (typeid(T() * U()) == typeid(CompareType),
+               ExcInternalError());
 }
 
 
@@ -63,6 +63,6 @@ int main()
 
   check<SymmetricTensor<2,1,float>,std::complex<float>,SymmetricTensor<2,1,std::complex<float> > >();
   check<std::complex<float>,SymmetricTensor<2,1,float>,SymmetricTensor<2,1,std::complex<float> > >();
-  
+
   deallog << "OK" << std::endl;
 }

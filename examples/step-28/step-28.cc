@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -31,6 +31,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
@@ -592,11 +593,10 @@ namespace Step28
 
     system_matrix.clear ();
 
-    sparsity_pattern.reinit (n_dofs, n_dofs,
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    hanging_node_constraints.condense (sparsity_pattern);
-    sparsity_pattern.compress ();
+    DynamicSparsityPattern dsp(n_dofs, n_dofs);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    hanging_node_constraints.condense (dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
 
@@ -1106,9 +1106,14 @@ namespace Step28
 
     triangulation.execute_coarsening_and_refinement ();
     dof_handler.distribute_dofs (fe);
+    this->setup_linear_system ();
 
     solution.reinit (dof_handler.n_dofs());
     soltrans.interpolate(solution_old, solution);
+
+    // enforce constraints to make the interpolated solution conforming on
+    // the new mesh:
+    hanging_node_constraints.distribute(solution);
 
     solution_old.reinit (dof_handler.n_dofs());
     solution_old = solution;
@@ -1644,7 +1649,12 @@ namespace Step28
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
-          initialize_problem();
+          {
+            initialize_problem();
+            for (unsigned int group=0; group<parameters.n_groups; ++group)
+              energy_groups[group]->setup_linear_system ();
+          }
+
         else
           {
             refine_grid ();
@@ -1652,8 +1662,6 @@ namespace Step28
               energy_groups[group]->solution *= k_eff;
           }
 
-        for (unsigned int group=0; group<parameters.n_groups; ++group)
-          energy_groups[group]->setup_linear_system ();
 
         std::cout << "   Numbers of active cells:       ";
         for (unsigned int group=0; group<parameters.n_groups; ++group)

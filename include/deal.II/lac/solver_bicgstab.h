@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_bicgstab_h
-#define __deal2__solver_bicgstab_h
+#ifndef dealii__solver_bicgstab_h
+#define dealii__solver_bicgstab_h
 
 
 #include <deal.II/base/config.h>
@@ -90,10 +90,11 @@ public:
      * The default is to perform an exact residual computation and breakdown
      * parameter 1e-10.
      */
+    explicit
     AdditionalData(const bool   exact_residual = true,
-                   const double breakdown      = 1.e-10) :
-      exact_residual(exact_residual),
-      breakdown(breakdown)
+                   const double breakdown      = 1.e-10)
+      : exact_residual(exact_residual),
+        breakdown(breakdown)
     {}
     /**
      * Flag for exact computation of residual.
@@ -376,7 +377,10 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
           startup = false;
         }
       else
-        p.sadd(beta, 1., r, -beta*omega, v);
+        {
+          p.sadd(beta, 1., r);
+          p.add(-beta*omega, v);
+        }
 
       precondition.vmult(y,p);
       A.vmult(v,y);

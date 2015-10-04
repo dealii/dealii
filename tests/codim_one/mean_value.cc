@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,7 @@ void test()
                                                        x, 0);
   // we have a symmetric domain and a symmetric function. the result
   // should be close to zero
-  Assert (std::fabs(mean) < 1e-15, ExcInternalError());
+  AssertThrow (std::fabs(mean) < 1e-15, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

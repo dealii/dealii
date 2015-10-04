@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,7 @@ invert<3,double> (const SymmetricTensor<4,3,double> &t)
   for (unsigned int i=0; i<N; ++i)
     diagonal_sum += std::fabs(tmp.data[i][i]);
   const double typical_diagonal_element = diagonal_sum/N;
+  (void)typical_diagonal_element;
 
   unsigned int p[N];
   for (unsigned int i=0; i<N; ++i)

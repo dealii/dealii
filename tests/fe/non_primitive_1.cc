@@ -319,16 +319,16 @@ test ()
   // written out a little bit, only
   // write every so-many-th element
   SparseMatrix<double>::const_iterator p1 = A1.begin(),
-				       p2 = A2.begin(),
-				       p3 = A3.begin();
+                                       p2 = A2.begin(),
+                                       p3 = A3.begin();
   for (unsigned int i=0; i<A1.n_nonzero_elements(); ++i, ++p1, ++p2, ++p3)
     {
       if (i % (dim*dim*dim) == 0)
         deallog << i << ' ' << p1->value() << std::endl;
-      Assert (p1->value() == p2->value(),
-              ExcInternalError());
-      Assert (p1->value() == p3->value(),
-              ExcInternalError());
+      AssertThrow (std::abs(p1->value() - p2->value())<1e-15,
+                   ExcInternalError());
+      AssertThrow (std::abs(p1->value() - p3->value())<1e-15,
+                   ExcInternalError());
     };
 }
 

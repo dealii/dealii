@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,9 +33,9 @@ void test ()
   // iterator
   {
     BlockVector<double>::const_iterator i=v.begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // same, but create iterator in a different
@@ -43,17 +43,17 @@ void test ()
   {
     BlockVector<double>::const_iterator
     i=const_cast<const BlockVector<double>&>(v).begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
     BlockVector<double>::iterator i = v.begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
@@ -68,9 +68,9 @@ void test ()
   // and read again
   {
     BlockVector<double>::iterator i = v.begin();
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
     ++i;
-    Assert (*i == 3, ExcInternalError());
+    AssertThrow (*i == 3, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

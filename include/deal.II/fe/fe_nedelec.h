@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_nedelec_h
-#define __deal2__fe_nedelec_h
+#ifndef dealii__fe_nedelec_h
+#define dealii__fe_nedelec_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/tensor_base.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
@@ -73,48 +73,6 @@ template <int dim, int spacedim> class MappingQ;
  * dimensions, the definition of the node values relies on consistently
  * oriented faces in 3D. Therefore, care should be taken on complicated
  * meshes.
- *
- * <h3>Restriction on transformations</h3>
- *
- * In some sense, the implementation of this element is not complete, but you
- * will rarely notice. Here is the fact: since the element is vector-valued
- * already on the unit cell, the Jacobian matrix (or its inverse) is needed
- * already to generate the values of the shape functions on the cells in real
- * space. This is in contrast to most other elements, where you only need the
- * Jacobian for the gradients. Thus, to generate the gradients of Nédélec
- * shape functions, one would need to have the derivatives of the inverse of
- * the Jacobian matrix.
- *
- * Basically, the Nédélec shape functions can be understood as the gradients
- * of scalar shape functions on the real cell. They are thus the inverse
- * Jacobian matrix times the gradients of scalar shape functions on the unit
- * cell. The gradient of Nédélec shape functions is then, by the product
- * rule, the sum of first the derivative (with respect to true coordinates) of
- * the inverse Jacobian times the gradient (in unit coordinates) of the scalar
- * shape function, plus second the inverse Jacobian times the derivative (in
- * true coordinates) of the gradient (in unit coordinates) of the scalar shape
- * functions. Note that each of the derivatives in true coordinates can be
- * expressed as inverse Jacobian times gradient in unit coordinates.
- *
- * The problem is the derivative of the inverse Jacobian. This rank-3 tensor
- * can actually be computed (and we did so in very early versions of the
- * library), but is a large task and very time consuming, so we dropped it.
- * Since it is not available, we simply drop this first term.
- *
- * What this means for the present case: first the computation of gradients of
- * Nédélec shape functions is wrong in general. Second, in the following two
- * cases you will not notice this:
- *
- * - If the cell is a parallelogram, then the usual bi-/trilinear mapping is
- * in fact affine. In that case, the gradient of the Jacobian vanishes and the
- * gradient of the shape functions is computed exactly, since the first term
- * is zero.
- *
- * - With the Nédélec elements, you will usually want to compute the curl,
- * not the general derivative tensor. However, the curl of the Jacobian
- * vanishes, so for the curl of shape functions the first term is irrelevant,
- * and the curl will always be computed correctly even on cells that are not
- * parallelograms.
  *
  *
  * <h3>Interpolation</h3>

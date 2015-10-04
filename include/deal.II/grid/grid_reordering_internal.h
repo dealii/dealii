@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_reordering_internal_h
-#define __deal2__grid_reordering_internal_h
+#ifndef dealii__grid_reordering_internal_h
+#define dealii__grid_reordering_internal_h
 
 
 #include <deal.II/base/config.h>
@@ -38,7 +38,7 @@ namespace internal
   {
 
     /**
-     * Check whether a given arrangement of cells is already consisten. If
+     * Check whether a given arrangement of cells is already consistent. If
      * this is the case, then we skip the reordering pass.
      *
      * This function works by looping over all cells, checking whether one of
@@ -81,7 +81,7 @@ namespace internal
       static const int EdgeToNode[4][2];
 
       /**
-       * The edges comin into each node, in anti-clockwise order {
+       * The edges common to each node, in anti-clockwise order {
        * {3,0},{0,1},{1,2},{2,3} }
        */
       static const int NodeToEdge[4][2];
@@ -207,7 +207,7 @@ namespace internal
       void build_graph (const std::vector<CellData<2> > &inquads);
 
       /**
-       * Orient the internal data into deal.II format The orientation algorith
+       * Orient the internal data into deal.II format The orientation algorithm
        * is as follows
        *
        * 1) Find an unoriented quad (A)
@@ -218,7 +218,7 @@ namespace internal
        *
        * 4) if opposite side to (s) of (B) is unoriented orient it
        *
-       * 5) repeat 3) and 4) until side-hoppong fails (we've reached a
+       * 5) repeat 3) and 4) until side-hopping fails (we've reached a
        * boundary) or (s) has already been oriented (we've closed a loop or
        * unoriented sides).
        *
@@ -371,7 +371,7 @@ namespace internal
                  const unsigned int n1);
 
       /**
-       * Need a partial ordering for the STL
+       * Need a partial ordering for sorting algorithms
        */
       bool operator< (const CheapEdge &e2) const;
     };
@@ -616,9 +616,9 @@ namespace internal
       bool orient_next_unoriented_edge ();
 
       /**
-       * Return whether the cell is consistenty oriented at present (i.e. only
-       * considering those edges that are already oriented. This is a sanity
-       * check that should be called from inside an assert macro.
+       * Return whether the cell is consistently oriented at present (i.e.
+       * only considering those edges that are already oriented. This is
+       * a sanity check that should be called from inside an assert macro.
        */
       bool cell_is_consistent (const unsigned int cell_num) const;
 

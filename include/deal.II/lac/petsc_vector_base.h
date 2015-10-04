@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_vector_base_h
-#define __deal2__petsc_vector_base_h
+#ifndef dealii__petsc_vector_base_h
+#define dealii__petsc_vector_base_h
 
 
 #include <deal.II/base/config.h>
@@ -137,6 +137,19 @@ namespace PETScWrappers
       const VectorReference &operator /= (const PetscScalar &s) const;
 
       /**
+       * Return the real part of the value of the referenced element.
+       */
+      PetscReal real () const;
+
+      /**
+       * Return the imaginary part of the value of the referenced element.
+       *
+       * @note This operation is not defined for real numbers and an exception
+       * is thrown.
+       */
+      PetscReal imag () const;
+
+      /**
        * Convert the reference to an actual value, i.e. return the value of
        * the referenced element of the vector.
        */
@@ -209,7 +222,7 @@ namespace PETScWrappers
    *
    * The interface of this class is modeled after the existing Vector class in
    * deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since PETSc only supports a single scalar type
+   * exchangeable. However, since PETSc only supports a single scalar type
    * (either double, float, or a complex data type), it is not templated, and
    * only works with whatever your PETSc installation has defined the data
    * type @p PetscScalar to.
@@ -259,6 +272,12 @@ namespace PETScWrappers
      * Destructor
      */
     virtual ~VectorBase ();
+
+    /**
+     * Release all memory and return to a state just like after having called
+     * the default constructor.
+     */
+    virtual void clear ();
 
     /**
      * Compress the underlying representation of the PETSc object, i.e. flush
@@ -377,8 +396,7 @@ namespace PETScWrappers
     operator [] (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
      *
      * Exactly the same as operator().
      */
@@ -438,6 +456,8 @@ namespace PETScWrappers
     /**
      * Return the scalar product of two vectors. The vectors must have the
      * same size.
+     *
+     * For complex valued vector, this gives$\left(v^\ast,vec\right)$.
      */
     PetscScalar operator * (const VectorBase &vec) const;
 
@@ -496,8 +516,10 @@ namespace PETScWrappers
     /**
      * Normalize vector by dividing by the $l_2$-norm of the vector. Return
      * the vector norm before normalization.
+     *
+     * This function is deprecated.
      */
-    real_type normalize () const;
+    real_type normalize () const DEAL_II_DEPRECATED;
 
     /**
      * Return the value of the vector element with the largest negative value.
@@ -511,33 +533,43 @@ namespace PETScWrappers
 
     /**
      * Replace every element in a vector with its absolute value.
+     *
+     * This function is deprecated.
      */
-    VectorBase &abs ();
+    VectorBase &abs () DEAL_II_DEPRECATED;
 
     /**
      * Conjugate a vector.
+     *
+     * This function is deprecated.
      */
-    VectorBase &conjugate ();
+    VectorBase &conjugate () DEAL_II_DEPRECATED;
 
     /**
      * A collective piecewise multiply operation on <code>this</code> vector
-     * with itself. TODO: The model for this function should be similer to add
+     * with itself. TODO: The model for this function should be similar to add
      * ().
+     *
+     * This function is deprecated.
      */
-    VectorBase &mult ();
+    VectorBase &mult () DEAL_II_DEPRECATED;
 
     /**
      * Same as above, but a collective piecewise multiply operation of
      * <code>this</code> vector with <b>v</b>.
+     *
+     * This function is deprecated.
      */
-    VectorBase &mult (const VectorBase &v);
+    VectorBase &mult (const VectorBase &v) DEAL_II_DEPRECATED;
 
     /**
      * Same as above, but a collective piecewise multiply operation of
      * <b>u</b> with <b>v</b>.
+     *
+     * This function is deprecated.
      */
     VectorBase &mult (const VectorBase &u,
-                      const VectorBase &v);
+                      const VectorBase &v) DEAL_II_DEPRECATED;
 
     /**
      * Return whether the vector contains only elements with value zero. This
@@ -577,12 +609,14 @@ namespace PETScWrappers
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void add (const PetscScalar s);
+    void add (const PetscScalar s) DEAL_II_DEPRECATED;
 
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
+     *
+     * @deprecated Use the <tt>operator +=</tt> instead.
      */
-    void add (const VectorBase &V);
+    void add (const VectorBase &V) DEAL_II_DEPRECATED;
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
@@ -610,16 +644,20 @@ namespace PETScWrappers
 
     /**
      * Scaling and multiple addition.
+     *
+     * This function is deprecated.
      */
     void sadd (const PetscScalar s,
                const PetscScalar a,
                const VectorBase     &V,
                const PetscScalar b,
-               const VectorBase     &W);
+               const VectorBase     &W) DEAL_II_DEPRECATED;
 
     /**
      * Scaling and multiple addition. <tt>*this = s*(*this)+a*V + b*W +
      * c*X</tt>.
+     *
+     * This function is deprecated.
      */
     void sadd (const PetscScalar s,
                const PetscScalar a,
@@ -627,7 +665,7 @@ namespace PETScWrappers
                const PetscScalar b,
                const VectorBase     &W,
                const PetscScalar c,
-               const VectorBase     &X);
+               const VectorBase     &X) DEAL_II_DEPRECATED;
 
     /**
      * Scale each element of this vector by the corresponding element in the
@@ -643,9 +681,11 @@ namespace PETScWrappers
 
     /**
      * Assignment <tt>*this = a*V + b*W</tt>.
+     *
+     * This function is deprecated.
      */
     void equ (const PetscScalar a, const VectorBase &V,
-              const PetscScalar b, const VectorBase &W);
+              const PetscScalar b, const VectorBase &W) DEAL_II_DEPRECATED;
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let
@@ -658,7 +698,7 @@ namespace PETScWrappers
      * attempt is made to catch such situations.
      */
     void ratio (const VectorBase &a,
-                const VectorBase &b);
+                const VectorBase &b) DEAL_II_DEPRECATED;
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector
@@ -724,7 +764,7 @@ namespace PETScWrappers
 
     /**
      * Denotes if this vector has ghost indices associated with it. This means
-     * that at least one of the processes in a parallel programm has at least
+     * that at least one of the processes in a parallel program has at least
      * one ghost index.
      */
     bool ghosted;
@@ -997,9 +1037,34 @@ namespace PETScWrappers
 
       return *this;
     }
-  }
 
 
+
+    inline
+    PetscReal
+    VectorReference::real () const
+    {
+#ifndef PETSC_USE_COMPLEX
+      return static_cast<PetscScalar>(*this);
+#else
+      return PetscRealPart (static_cast<PetscScalar>(*this));
+#endif
+    }
+
+
+
+    inline
+    PetscReal
+    VectorReference::imag () const
+    {
+#ifndef PETSC_USE_COMPLEX
+      return PetscReal (0);
+#else
+      return PetscImaginaryPart (static_cast<PetscScalar>(*this));
+#endif
+    }
+
+  } // namespace internal
 
   inline
   bool

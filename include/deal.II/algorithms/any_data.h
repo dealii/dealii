@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__any_data_h
-#define __deal2__any_data_h
+#ifndef dealii__any_data_h
+#define dealii__any_data_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/named_data.h>
 
 #include <boost/any.hpp>
 #include <vector>
@@ -49,7 +48,7 @@ public:
   void add(type entry, const std::string &name);
 
   /**
-   * @brief Merge the data of another NamedData to the end of this object.
+   * @brief Merge the data of another AnyData to the end of this object.
    */
   void merge(const AnyData &other);
 
@@ -150,7 +149,7 @@ public:
   /**
    * @brief Find index of a named object
    *
-   * Try to find the objecty and return its index in the list. Throw an
+   * Try to find the object and return its index in the list. Throw an
    * exception if the object has not been found.
    */
   unsigned int find(const std::string &name) const;
@@ -158,7 +157,7 @@ public:
   /**
    * @brief Try to find index of a named object
    *
-   * Try to find the objecty and return its index in the list. returns
+   * Try to find the object and return its index in the list. returns
    * numbers::invalid_unsigned_int if the name was not found.
    */
   unsigned int try_find(const std::string &name) const;
@@ -170,10 +169,6 @@ public:
   /// List the contents to a stream
   template <class STREAM>
   void list (STREAM &os) const;
-
-  /// Conversion from old NamedData
-  template <typename type>
-  AnyData(const NamedData<type> &);
 
   /// An entry with this name does not exist in the AnyData object.
   DeclException1(ExcNameNotFound, std::string,
@@ -203,15 +198,6 @@ private:
 inline
 AnyData::AnyData()
 {}
-
-
-template <typename type>
-inline
-AnyData::AnyData(const NamedData<type> &other)
-{
-  for (unsigned int i=0; i<other.size(); ++i)
-    add(other(i), other.name(i));
-}
 
 
 unsigned int

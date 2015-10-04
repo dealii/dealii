@@ -323,7 +323,7 @@ whose errors satisfy
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   >
   \alpha_1
-  \displaystyle{\max_{\footnotesize \begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
+  \displaystyle{\max_{\begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}
 @f}
 and coarsen the cells where
@@ -331,7 +331,7 @@ and coarsen the cells where
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   <
   \alpha_2
-  \displaystyle{\max_{\footnotesize \begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
+  \displaystyle{\max_{\begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}.
 @f}
 We chose $\alpha_1=0.3$ and $\alpha_2=0.01$ in the code. Note that this will,

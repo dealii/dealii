@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,8 +69,8 @@ void check_this (Triangulation<3> &tria)
                 const unsigned int our_face_no=neighbor_child->neighbor_of_coarser_neighbor(neighbor_neighbor).first;
                 const unsigned int our_subface_no=neighbor_child->neighbor_of_coarser_neighbor(neighbor_neighbor).second;
 
-                Assert (our_face_no==face_no, ExcInternalError());
-                Assert (our_subface_no==subface_no, ExcInternalError());
+                AssertThrow (our_face_no==face_no, ExcInternalError());
+                AssertThrow (our_subface_no==subface_no, ExcInternalError());
                 deallog << "from coarse to fine and back: OK" <<std::endl;
               }
           else if (cell->neighbor(face_no)->level()<cell->level())
@@ -82,7 +82,7 @@ void check_this (Triangulation<3> &tria)
               // try to find the way back to our cell
               const DoFHandler<3>::active_cell_iterator our_cell=cell->neighbor(face_no)->neighbor_child_on_subface(neighbor_face_no,
                                                                  neighbor_subface_no);
-              Assert (our_cell==cell, ExcInternalError());
+              AssertThrow (our_cell==cell, ExcInternalError());
               deallog << "from fine to coarse and back: OK" <<std::endl;
             }
         }

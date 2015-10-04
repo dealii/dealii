@@ -9,7 +9,6 @@
 from __future__ import print_function
 import textwrap
 import sys
-import string
 wrapper = textwrap.TextWrapper()
 
 # take an array of lines and wrap them to 78 columns and let each line start
@@ -18,6 +17,7 @@ def wrap_block(lines, startwith):
     longline = " ".join(lines)
     wrapper.initial_indent = startwith
     wrapper.subsequent_indent = startwith
+    wrapper.break_long_words = False
     wrapper.width = 78
     return wrapper.wrap(longline)
 
@@ -72,19 +72,19 @@ def format_block(lines, infostr=""):
 
     if lines[0].strip()!="/**":
         #print ("%s warning code block not starting in separate line"%infostr, file=sys.stderr)
-        idx = string.find(lines[0],"/**")
+        idx = lines[0].find("/**")
         temp = [lines[0][0:idx+3], lines[0][idx+3:]]
         temp.extend(lines[1:])
         lines = temp
     if lines[-1].strip()!="*/":
         #print ("%s warning code block not ending in separate line"%infostr, file=sys.stderr)
-        idx = string.find(lines[-1],"*/")
+        idx = lines[-1].find("*/")
         temp = lines[0:-1]
         temp.append(lines[-1][0:idx])
         temp.append(lines[-1][idx:])
         lines = temp
 
-    idx = string.find(lines[0],"/**")
+    idx = lines[0].find("/**")
     start = lines[0][:idx]+" * "
     
     out = [lines[0].rstrip()]
@@ -412,6 +412,16 @@ lineI = [" /**", \
          "  */"]
 assert(format_block(lineI)==lineI)
 
+# do not break $very_long_formula_without_spacing$:
+longtext = "blabla"*20
+lineI = [" /**", \
+         "  * a $" + longtext + "$", \
+         "  */"]
+lineO = [" /**", \
+         "  * a", \
+         "  * $" + longtext + "$", \
+         "  */"]
+assert(format_block(lineI)==lineO)
 
 
 

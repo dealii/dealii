@@ -981,8 +981,7 @@ namespace
     const Tensor<1,3> v01 = accessor.vertex(1) - accessor.vertex(0);
     const Tensor<1,3> v02 = accessor.vertex(2) - accessor.vertex(0);
 
-    Tensor<1,3> normal;
-    cross_product(normal, v01, v02);
+    Tensor<1,3> normal = cross_product_3d(v01, v02);
 
     const Tensor<1,3> v03 = accessor.vertex(3) - accessor.vertex(0);
 
@@ -1004,8 +1003,7 @@ namespace
     // the face is planar. then its area is 1/2 of the norm of the
     // cross product of the two diagonals
     const Tensor<1,3> v12 = accessor.vertex(2) - accessor.vertex(1);
-    Tensor<1,3> twice_area;
-    cross_product(twice_area, v03, v12);
+    Tensor<1,3> twice_area = cross_product_3d(v03, v12);
     return 0.5 * twice_area.norm();
   }
 
@@ -1111,6 +1109,7 @@ measure () const
 template <>
 double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 {
+  (void)axis;
   Assert (axis == 0, ExcIndexRange (axis, 0, 1));
 
   return this->diameter();
@@ -1120,6 +1119,7 @@ double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 template <>
 double TriaAccessor<1,1,2>::extent_in_direction(const unsigned int axis) const
 {
+  (void)axis;
   Assert (axis == 0, ExcIndexRange (axis, 0, 1));
 
   return this->diameter();
@@ -1531,6 +1531,18 @@ CellAccessor<dim, spacedim>::set_direction_flag (const bool new_direction_flag) 
 
 template <int dim, int spacedim>
 void
+CellAccessor<dim, spacedim>::set_active_cell_index (const unsigned int active_cell_index)
+{
+  // set the active cell index. allow setting it also for non-active (and unused)
+  // cells to allow resetting the index after refinement
+  this->tria->levels[this->present_level]->active_cell_indices[this->present_index]
+    = active_cell_index;
+}
+
+
+
+template <int dim, int spacedim>
+void
 CellAccessor<dim, spacedim>::set_parent (const unsigned int parent_index)
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1553,6 +1565,18 @@ parent_index () const
   // the same
   return this->tria->levels[this->present_level]->parents[this->present_index / 2];
 }
+
+
+
+template <int dim, int spacedim>
+unsigned int
+CellAccessor<dim, spacedim>::
+active_cell_index () const
+{
+  Assert (this->has_children()==false, TriaAccessorExceptions::ExcCellNotActive());
+  return this->tria->levels[this->present_level]->active_cell_indices[this->present_index];
+}
+
 
 
 template <int dim, int spacedim>
@@ -1765,19 +1789,12 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const TriaIterator<CellAccessor<3, spacedim> >
       neighbor_cell = this->neighbor(neighbor);
 
-      // usually, on regular patches of
-      // the grid, this cell is just on
-      // the opposite side of the
-      // neighbor that the neighbor is of
-      // this cell. for example in 2d, if
-      // we want to know the
-      // neighbor_of_neighbor if
-      // neighbor==1 (the right
-      // neighbor), then we will get 0
-      // (the left neighbor) in most
-      // cases. look up this relationship
-      // in the table provided by
-      // GeometryInfo and try it
+      // usually, on regular patches of the grid, this cell is just on the
+      // opposite side of the neighbor that the neighbor is of this cell.
+      // for example in 2d, if we want to know the neighbor_of_neighbor if
+      // neighbor==1 (the right neighbor), then we will get 0 (the left
+      // neighbor) in most cases. look up this relationship in the table
+      // provided by GeometryInfo and try it
       const unsigned int face_no_guess
         = GeometryInfo<3>::opposite_face[neighbor];
 
@@ -1786,57 +1803,55 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 
       if (face_guess->has_children())
         for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
-          if (face_guess->child_index(subface_no)==this_face_index)
-            // call a helper function, that
-            // translates the current subface
-            // number to a subface number for
-            // the current FaceRefineCase
-            return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
-          else if (face_guess->child(subface_no)->has_children())
-            for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
-              if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
-                // call a helper function, that
-                // translates the current subface
-                // number and subsubface number to
-                // a subface number for the current
-                // FaceRefineCase
-                return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+          {
+            if (face_guess->child_index(subface_no)==this_face_index)
+              // call a helper function, that translates the current
+              // subface number to a subface number for the current
+              // FaceRefineCase
+              return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
 
+            if (face_guess->child(subface_no)->has_children())
+              for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
+                if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
+                  // call a helper function, that translates the current
+                  // subface number and subsubface number to a subface
+                  // number for the current FaceRefineCase
+                  return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+          }
 
-
-      // if the guess was false, then
-      // we need to loop over all faces
-      // and subfaces and find the
-      // number the hard way
+      // if the guess was false, then we need to loop over all faces and
+      // subfaces and find the number the hard way
       for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
         {
-          if (face_no!=face_no_guess)
+          if (face_no==face_no_guess)
+            continue;
+
+          const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
+            =neighbor_cell->face(face_no);
+
+          if (!face->has_children())
+            continue;
+
+          for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
             {
-              const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
-                =neighbor_cell->face(face_no);
-              if (face->has_children())
-                for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-                  if (face->child_index(subface_no)==this_face_index)
-                    // call a helper function, that
-                    // translates the current subface
-                    // number to a subface number for
-                    // the current FaceRefineCase
-                    return std::make_pair (face_no, translate_subface_no(face, subface_no));
-                  else if (face->child(subface_no)->has_children())
-                    for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
-                      if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
-                        // call a helper function, that
-                        // translates the current subface
-                        // number and subsubface number to
-                        // a subface number for the current
-                        // FaceRefineCase
-                        return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
+              if (face->child_index(subface_no)==this_face_index)
+                // call a helper function, that translates the current
+                // subface number to a subface number for the current
+                // FaceRefineCase
+                return std::make_pair (face_no, translate_subface_no(face, subface_no));
+
+              if (face->child(subface_no)->has_children())
+                for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
+                  if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
+                    // call a helper function, that translates the current
+                    // subface number and subsubface number to a subface
+                    // number for the current FaceRefineCase
+                    return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
             }
         }
 
-      // we should never get here,
-      // since then we did not find
-      // our way back...
+      // we should never get here, since then we did not find our way
+      // back...
       Assert (false, ExcInternalError());
       return std::make_pair (numbers::invalid_unsigned_int,
                              numbers::invalid_unsigned_int);
@@ -2260,13 +2275,7 @@ neighbor_child_on_subface (const unsigned int face,
 
 
 
-// Remark: The explicit instantiations for "TriaAccessor" were moved
-// to the top of this source file. The reason is a slightly buggy version
-// of the Apple gcc v.3.3.
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
-
 // explicit instantiations
 #include "tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

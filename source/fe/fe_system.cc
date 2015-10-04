@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,12 +45,10 @@ namespace
 
 
 template <int dim, int spacedim>
-FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements,
-                                                   const bool         compute_hessians)
+FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements)
   :
-  compute_hessians (compute_hessians),
   base_fe_datas(n_base_elements),
-  base_fe_values_datas(n_base_elements)
+  base_fe_output_objects(n_base_elements)
 {}
 
 
@@ -64,14 +62,7 @@ FESystem<dim,spacedim>::InternalData::~InternalData()
       {
         delete base_fe_datas[i];
         base_fe_datas[i] = 0;
-      };
-
-  for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
-    if (base_fe_values_datas[i])
-      {
-        delete base_fe_values_datas[i];
-        base_fe_values_datas[i] = 0;
-      };
+      }
 }
 
 
@@ -102,41 +93,13 @@ InternalData::set_fe_data (const unsigned int base_no,
 
 
 template <int dim, int spacedim>
-FEValuesData<dim,spacedim> &
+internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
 FESystem<dim,spacedim>::
-InternalData::get_fe_values_data (const unsigned int base_no) const
+InternalData::get_fe_output_object (const unsigned int base_no) const
 {
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  return *base_fe_values_datas[base_no];
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-InternalData::set_fe_values_data (const unsigned int base_no,
-                                  FEValuesData<dim,spacedim> *ptr)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  base_fe_values_datas[base_no]=ptr;
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-InternalData::delete_fe_values_data (const unsigned int base_no)
-{
-  Assert(base_no<base_fe_values_datas.size(),
-         ExcIndexRange(base_no,0,base_fe_values_datas.size()));
-  Assert(base_fe_values_datas[base_no]!=0, ExcInternalError());
-  delete base_fe_values_datas[base_no];
-  base_fe_values_datas[base_no]=0;
+  Assert(base_no<base_fe_output_objects.size(),
+         ExcIndexRange(base_no,0,base_fe_output_objects.size()));
+  return base_fe_output_objects[base_no];
 }
 
 
@@ -524,6 +487,96 @@ FESystem<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 
 
 template <int dim, int spacedim>
+Tensor<3,dim>
+FESystem<dim,spacedim>::shape_3rd_derivative (const unsigned int i,
+                                              const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (this->is_primitive(i),
+          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
+
+  return (base_element(this->system_to_base_table[i].first.first)
+          .shape_3rd_derivative(this->system_to_base_table[i].second, p));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FESystem<dim,spacedim>::shape_3rd_derivative_component (const unsigned int i,
+                                                        const Point<dim> &p,
+                                                        const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (component < this->n_components(),
+          ExcIndexRange (component, 0, this->n_components()));
+
+  // if this value is supposed to be zero, then return right away...
+  if (this->nonzero_components[i][component] == false)
+    return Tensor<3,dim>();
+
+  // ...otherwise: first find out to which of the base elements this desired
+  // component belongs, and which component within this base element it is
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
+
+  // then get value from base element. note that that will throw an error
+  // should the respective shape function not be primitive; thus, there is no
+  // need to check this here
+  return (base_element(base).
+          shape_3rd_derivative_component(this->system_to_base_table[i].second,
+                                         p,
+                                         component_in_base));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FESystem<dim,spacedim>::shape_4th_derivative (const unsigned int i,
+                                              const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (this->is_primitive(i),
+          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
+
+  return (base_element(this->system_to_base_table[i].first.first)
+          .shape_4th_derivative(this->system_to_base_table[i].second, p));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FESystem<dim,spacedim>::shape_4th_derivative_component (const unsigned int i,
+                                                        const Point<dim> &p,
+                                                        const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  Assert (component < this->n_components(),
+          ExcIndexRange (component, 0, this->n_components()));
+
+  // if this value is supposed to be zero, then return right away...
+  if (this->nonzero_components[i][component] == false)
+    return Tensor<4,dim>();
+
+  // ...otherwise: first find out to which of the base elements this desired
+  // component belongs, and which component within this base element it is
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
+
+  // then get value from base element. note that that will throw an error
+  // should the respective shape function not be primitive; thus, there is no
+  // need to check this here
+  return (base_element(base).
+          shape_4th_derivative_component(this->system_to_base_table[i].second,
+                                         p,
+                                         component_in_base));
+}
+
+
+
+template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::get_interpolation_matrix (
   const FiniteElement<dim,spacedim> &x_source_fe,
@@ -827,100 +880,52 @@ FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     out |= base_element(base_no).update_each(flags);
 
-  // second derivatives are handled
-  // by the top-level finite element,
-  // rather than by the base elements
-  // since it is generated by finite
-  // differencing. if second
-  // derivatives are requested, we
-  // therefore have to set the
-  // respective flag since the base
-  // elements don't have them
-  if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
-
   return out;
 }
 
 
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
                                   const Mapping<dim,spacedim>    &mapping,
                                   const Quadrature<dim> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements(),
-                                        flags & update_hessians);
+  InternalData *data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
-  UpdateFlags sub_flags = flags;
-  // if second derivatives through
-  // finite differencing are required,
-  // then initialize some objects for
-  // that
-  if (data->compute_hessians)
-    {
-      // delete
-      // update_hessians
-      // from flags list
-      sub_flags = UpdateFlags (sub_flags ^ update_hessians);
-      data->initialize_2nd (this, mapping, quadrature);
-    }
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
-  // get data objects from each of
-  // the base elements and store them
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        get_data_tasks[base_no].return_value();
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
-
-      // make sure that *we* compute
-      // second derivatives, base
-      // elements should not do it
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
-
-      // The FEValuesData @p{data}
-      // given to the
-      // @p{fill_fe_values} function
-      // includes the FEValuesDatas
-      // of the FESystem. Here the
-      // FEValuesDatas @p{*base_data}
-      // needs to be created that
-      // later will be given to the
-      // @p{fill_fe_values} functions
-      // of the base
-      // elements. @p{base_data->initialize}
-      // cannot be called earlier as
-      // in the @p{fill_fe_values}
-      // function called for the
-      // first cell. This is because
-      // the initialize function
-      // needs the update flags as
-      // argument.
-      //
-      // The pointers @p{base_data}
-      // are stored into the
-      // FESystem::InternalData
-      // @p{data}, similar to the
-      // storing of the
-      // @p{base_fe_data}s.
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -931,46 +936,47 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 // that get_face_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_face_data (
   const UpdateFlags      flags_,
   const Mapping<dim,spacedim>    &mapping,
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements(),
-                                        flags & update_hessians);
+  InternalData *data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
-  UpdateFlags sub_flags = flags;
-  if (data->compute_hessians)
-    {
-      sub_flags = UpdateFlags (sub_flags ^ update_hessians);
-      data->initialize_2nd (this, mapping, QProjector<dim>::project_to_all_faces(quadrature));
-    }
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_face_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_face_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        get_data_tasks[base_no].return_value();
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
-
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
-
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -983,46 +989,47 @@ FESystem<dim,spacedim>::get_face_data (
 // that get_subface_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FESystem<dim,spacedim>::get_subface_data (
   const UpdateFlags      flags_,
   const Mapping<dim,spacedim>    &mapping,
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements(),
-                                        flags & update_hessians);
+  InternalData *data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
-  UpdateFlags sub_flags = flags;
-  if (data->compute_hessians)
-    {
-      sub_flags = UpdateFlags (sub_flags ^ update_hessians);
-      data->initialize_2nd (this, mapping, QProjector<dim>::project_to_all_subfaces(quadrature));
-    }
+  // get data objects from each of the base elements and store
+  // them. do the creation of these objects in parallel as their
+  // creation may be expensive (because we precompute a bunch of
+  // things)
+  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
+  get_data_tasks (this->n_base_elements());
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
+                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_subface_data,
+                                                     std_cxx11::cref(base_element(base_no)),
+                                                     std_cxx11::cref(flags),
+                                                     std_cxx11::cref(mapping),
+                                                     std_cxx11::cref(quadrature))));
 
+  // then wait for each of these calls to finish in turn and initialize
+  // these objects
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
-        base_element(base_no).get_subface_data(sub_flags, mapping, quadrature);
-
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
-        (base_fe_data_base);
-      Assert (base_fe_data != 0, ExcInternalError());
+        get_data_tasks[base_no].return_value();
 
+      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+        = data->get_fe_output_object(base_no);
+      base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
+                                        flags | base_fe_data->update_flags);
+
+      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
-
-      Assert (!(base_fe_data->update_each & update_hessians),
-              ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_hessians),
-              ExcInternalError());
-
-      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
-      data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
                        data->update_each;
@@ -1033,34 +1040,38 @@ FESystem<dim,spacedim>::get_subface_data (
 
 template <int dim, int spacedim>
 void
-FESystem<dim,spacedim>::fill_fe_values (
-  const Mapping<dim,spacedim>                      &mapping,
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Quadrature<dim>                            &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-  FEValuesData<dim,spacedim>                       &data,
-  CellSimilarity::Similarity                  &cell_similarity) const
+FESystem<dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const Quadrature<dim>                            &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
+                const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
+                const CellSimilarity::Similarity                  cell_similarity) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
-               quadrature, cell_similarity, mapping_data, fe_data, data);
+               quadrature, cell_similarity, mapping_internal, fe_data,
+               mapping_data, output_data);
 }
 
 
 
 template <int dim, int spacedim>
 void
-FESystem<dim,spacedim>::fill_fe_face_values (
-  const Mapping<dim,spacedim>                   &mapping,
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int                    face_no,
-  const Quadrature<dim-1>              &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-  FEValuesData<dim,spacedim>                    &data) const
+FESystem<dim,spacedim>::
+fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                     const unsigned int                    face_no,
+                     const Quadrature<dim-1>              &quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
+                     const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
-                CellSimilarity::none, mapping_data, fe_data, data);
+                CellSimilarity::none, mapping_internal, fe_data,
+                mapping_data, output_data);
 }
 
 
@@ -1068,18 +1079,20 @@ FESystem<dim,spacedim>::fill_fe_face_values (
 
 template <int dim, int spacedim>
 void
-FESystem<dim,spacedim>::fill_fe_subface_values (
-  const Mapping<dim,spacedim>                      &mapping,
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int                                face_no,
-  const unsigned int                                sub_no,
-  const Quadrature<dim-1>                          &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-  FEValuesData<dim,spacedim>                       &data) const
+FESystem<dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim>                      &mapping,
+                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const unsigned int                                face_no,
+                        const unsigned int                                sub_no,
+                        const Quadrature<dim-1>                          &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
+                        const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, sub_no, quadrature,
-                CellSimilarity::none, mapping_data, fe_data, data);
+                CellSimilarity::none, mapping_internal, fe_data,
+                mapping_data, output_data);
 }
 
 
@@ -1087,25 +1100,171 @@ FESystem<dim,spacedim>::fill_fe_subface_values (
 template <int dim, int spacedim>
 template <int dim_1>
 void
-FESystem<dim,spacedim>::compute_fill (
-  const Mapping<dim,spacedim>                      &mapping,
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int                                face_no,
-  const unsigned int                                sub_no,
-  const Quadrature<dim_1>                          &quadrature,
-  CellSimilarity::Similarity                   cell_similarity,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-  FEValuesData<dim,spacedim>                       &data) const
+FESystem<dim,spacedim>::
+compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
+                       const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+                       CellSimilarity::Similarity>       cell_and_similarity,
+                       const std::pair<unsigned int, unsigned int>       face_sub_no,
+                       const Quadrature<dim_1>                          &quadrature,
+                       const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
+                       const unsigned int                                base_no,
+                       const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+                       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
+  const typename Triangulation<dim,spacedim>::cell_iterator cell            = cell_and_similarity.first;
+  const CellSimilarity::Similarity                          cell_similarity = cell_and_similarity.second;
+
+  const InternalData &fe_data = static_cast<const InternalData &> (*mapping_and_fe_internal.second);
   const unsigned int n_q_points = quadrature.size();
 
+  const FiniteElement<dim,spacedim> &
+  base_fe      = base_element(base_no);
+  typename FiniteElement<dim,spacedim>::InternalDataBase &
+  base_fe_data = fe_data.get_fe_data(base_no);
+  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+  base_data    = fe_data.get_fe_output_object(base_no);
+
+  // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
+  // dim_1==dim-1 and dim_1=dim. Hence the following workaround
+  const Quadrature<dim>   *cell_quadrature = 0;
+  const Quadrature<dim-1> *face_quadrature = 0;
+
+  // static cast to the common base class of quadrature being either
+  // Quadrature<dim> or Quadrature<dim-1>:
+  const Subscriptor *quadrature_base_pointer = &quadrature;
+
+  if (face_sub_no.first==invalid_face_number)
+    {
+      Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
+      Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
+              ExcInternalError());
+
+      cell_quadrature
+        = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+    }
+  else
+    {
+      Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
+      Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
+              ExcInternalError());
+
+      face_quadrature
+        = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
+    }
+
+
+  // Make sure that in the case of fill_fe_values the data is only
+  // copied from base_data to data if base_data is changed. therefore
+  // use fe_fe_data.current_update_flags()
+  //
+  // for the case of fill_fe_(sub)face_values the data needs to be
+  // copied from base_data to data on each face, therefore use
+  // base_fe_data.update_flags.
+  if (face_sub_no.first==invalid_face_number)
+    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, *mapping_and_fe_internal.first,
+                           base_fe_data, mapping_data, base_data, cell_similarity);
+  else if (face_sub_no.second==invalid_face_number)
+    base_fe.fill_fe_face_values(mapping, cell, face_sub_no.first,
+                                *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, mapping_data, base_data);
+  else
+    base_fe.fill_fe_subface_values(mapping, cell, face_sub_no.first, face_sub_no.second,
+                                   *face_quadrature, *mapping_and_fe_internal.first, base_fe_data, mapping_data, base_data);
+
+  // now data has been generated, so copy it. we used to work by
+  // looping over all base elements (i.e. this outer loop), then over
+  // multiplicity, then over the shape functions from that base
+  // element, but that requires that we can infer the global number of
+  // a shape function from its number in the base element. for that we
+  // had the component_to_system_table.
+  //
+  // however, this does of course no longer work since we have
+  // non-primitive elements. so we go the other way round: loop over
+  // all shape functions of the composed element, and here only treat
+  // those shape functions that belong to a given base element
+  //TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
+  const UpdateFlags base_flags(dim_1==dim ?
+                               base_fe_data.current_update_flags() :
+                               base_fe_data.update_flags);
+
+  // if the current cell is just a translation of the previous one,
+  // the underlying data has not changed, and we don't even need to
+  // enter this section
+  if (cell_similarity != CellSimilarity::translation)
+    for (unsigned int system_index=0; system_index<this->dofs_per_cell;
+         ++system_index)
+      if (this->system_to_base_table[system_index].first.first == base_no)
+        {
+          const unsigned int
+          base_index = this->system_to_base_table[system_index].second;
+          Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
+
+          // now copy. if the shape function is primitive, then there
+          // is only one value to be copied, but for non-primitive
+          // elements, there might be more values to be copied
+          //
+          // so, find out from which index to take this one value, and
+          // to which index to put
+          unsigned int out_index = 0;
+          for (unsigned int i=0; i<system_index; ++i)
+            out_index += this->n_nonzero_components(i);
+          unsigned int in_index = 0;
+          for (unsigned int i=0; i<base_index; ++i)
+            in_index += base_fe.n_nonzero_components(i);
+
+          // then loop over the number of components to be copied
+          Assert (this->n_nonzero_components(system_index) ==
+                  base_fe.n_nonzero_components(base_index),
+                  ExcInternalError());
+          for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+            {
+              if (base_flags & update_values)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  output_data.shape_values[out_index+s][q] =
+                    base_data.shape_values(in_index+s,q);
+
+              if (base_flags & update_gradients)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  output_data.shape_gradients[out_index+s][q] =
+                    base_data.shape_gradients[in_index+s][q];
+
+              if (base_flags & update_hessians)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  output_data.shape_hessians[out_index+s][q] =
+                    base_data.shape_hessians[in_index+s][q];
+
+              if (base_flags & update_3rd_derivatives)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  output_data.shape_3rd_derivatives[out_index+s][q] =
+                    base_data.shape_3rd_derivatives[in_index+s][q];
+
+            }
+        }
+}
+
+
+
+template <int dim, int spacedim>
+template <int dim_1>
+void
+FESystem<dim,spacedim>::
+compute_fill (const Mapping<dim,spacedim>                      &mapping,
+              const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+              const unsigned int                                face_no,
+              const unsigned int                                sub_no,
+              const Quadrature<dim_1>                          &quadrature,
+              const CellSimilarity::Similarity                 ,
+              const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+              const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+              const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+              internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+{
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // Either dim_1==dim
   // (fill_fe_values) or dim_1==dim-1
@@ -1116,185 +1275,25 @@ FESystem<dim,spacedim>::compute_fill (
                           fe_data.update_flags);
 
 
-  if (flags & (update_values | update_gradients))
+  if (flags & (update_values | update_gradients
+               | update_hessians | update_3rd_derivatives ))
     {
-      if (fe_data.is_first_cell())
-        {
-          // Initialize the FEValuesDatas for the base elements.  Originally
-          // this was the task of FEValues::FEValues() but the latter
-          // initializes the FEValuesDatas only of the FESystem, not of the
-          // FEValuesDatas needed by the base elements (and: how should it
-          // know of their existence, after all).
-          for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-            {
-              // Pointer needed to get the update flags of the base element
-              typename Mapping<dim,spacedim>::InternalDataBase &
-              base_fe_data = fe_data.get_fe_data(base_no);
-
-              // compute update flags ...
-              const UpdateFlags base_update_flags
-                = mapping_data.update_flags | base_fe_data.update_flags;
-
-              // Initialize the FEValuesDatas for the base elements.
-              FEValuesData<dim,spacedim> &base_data=fe_data.get_fe_values_data(base_no);
-              const FiniteElement<dim,spacedim> &base_fe=base_element(base_no);
-              base_data.initialize (n_q_points, base_fe, base_update_flags);
-            }
-        }
-
-      // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
-      // dim_1==dim-1 and dim_1=dim. Hence the following workaround
-      const Quadrature<dim>   *cell_quadrature = 0;
-      const Quadrature<dim-1> *face_quadrature = 0;
-
-      // static cast to the common base class of quadrature being either
-      // Quadrature<dim> or Quadrature<dim-1>:
-      const Subscriptor *quadrature_base_pointer = &quadrature;
-
-      if (face_no==invalid_face_number)
-        {
-          Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
-          Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
-                  ExcInternalError());
-
-          cell_quadrature
-            = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
-        }
-      else
-        {
-          Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
-          Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
-                  ExcInternalError());
-
-          face_quadrature
-            = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
-        }
-
       // let base elements update the necessary data
+      Threads::TaskGroup<> task_group;
       for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-        {
-          const FiniteElement<dim,spacedim> &
-          base_fe      = base_element(base_no);
-          typename FiniteElement<dim,spacedim>::InternalDataBase &
-          base_fe_data = fe_data.get_fe_data(base_no);
-          FEValuesData<dim,spacedim> &
-          base_data    = fe_data.get_fe_values_data(base_no);
-
-          //TODO: Think about a smarter alternative Copy quadrature
-          // points. These are required for computing the determinant in the
-          // FEPolyTensor class. The determinant is one ingredient of the
-          // Piola transformation, which is applied to correctly map the RT
-          // space from the reference element to the global coordinate system.
-          if (cell_similarity != CellSimilarity::translation)
-            base_data.JxW_values = data.JxW_values;
-
-
-          // Make sure that in the case of fill_fe_values the data is only
-          // copied from base_data to data if base_data is changed. therefore
-          // use fe_fe_data.current_update_flags()
-          //
-          // for the case of fill_fe_(sub)face_values the data needs to be
-          // copied from base_data to data on each face, therefore use
-          // base_fe_data.update_flags.
-          if (face_no==invalid_face_number)
-            base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_data,
-                                   base_fe_data, base_data, cell_similarity);
-          else if (sub_no==invalid_face_number)
-            base_fe.fill_fe_face_values(mapping, cell, face_no,
-                                        *face_quadrature, mapping_data, base_fe_data, base_data);
-          else
-            base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
-                                           *face_quadrature, mapping_data, base_fe_data, base_data);
-
-          // now data has been generated, so copy it. we used to work by
-          // looping over all base elements (i.e. this outer loop), then over
-          // multiplicity, then over the shape functions from that base
-          // element, but that requires that we can infer the global number of
-          // a shape function from its number in the base element. for that we
-          // had the component_to_system_table.
-          //
-          // however, this does of course no longer work since we have
-          // non-primitive elements. so we go the other way round: loop over
-          // all shape functions of the composed element, and here only treat
-          // those shape functions that belong to a given base element
-//TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
-          const UpdateFlags base_flags(dim_1==dim ?
-                                       base_fe_data.current_update_flags() :
-                                       base_fe_data.update_flags);
-
-          // if the current cell is just a translation of the previous one,
-          // the underlying data has not changed, and we don't even need to
-          // enter this section
-          if (cell_similarity != CellSimilarity::translation)
-            for (unsigned int system_index=0; system_index<this->dofs_per_cell;
-                 ++system_index)
-              if (this->system_to_base_table[system_index].first.first == base_no)
-                {
-                  const unsigned int
-                  base_index = this->system_to_base_table[system_index].second;
-                  Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
-
-                  // now copy. if the shape function is primitive, then there
-                  // is only one value to be copied, but for non-primitive
-                  // elements, there might be more values to be copied
-                  //
-                  // so, find out from which index to take this one value, and
-                  // to which index to put
-                  unsigned int out_index = 0;
-                  for (unsigned int i=0; i<system_index; ++i)
-                    out_index += this->n_nonzero_components(i);
-                  unsigned int in_index = 0;
-                  for (unsigned int i=0; i<base_index; ++i)
-                    in_index += base_fe.n_nonzero_components(i);
-
-                  // then loop over the number of components to be copied
-                  Assert (this->n_nonzero_components(system_index) ==
-                          base_fe.n_nonzero_components(base_index),
-                          ExcInternalError());
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    {
-                      if (base_flags & update_values)
-                        for (unsigned int q=0; q<n_q_points; ++q)
-                          data.shape_values[out_index+s][q] =
-                            base_data.shape_values(in_index+s,q);
-
-                      if (base_flags & update_gradients)
-                        for (unsigned int q=0; q<n_q_points; ++q)
-                          data.shape_gradients[out_index+s][q]=
-                            base_data.shape_gradients[in_index+s][q];
-
-                      // _we_ handle computation of second derivatives, so the
-                      // base elements should not have computed them!
-                      Assert (!(base_flags & update_hessians),
-                              ExcInternalError());
-                    };
-                };
-        };
-    }
-
-  if (fe_data.compute_hessians && cell_similarity != CellSimilarity::translation)
-    {
-      unsigned int offset = 0;
-      if (face_no != invalid_face_number)
-        {
-          if (sub_no == invalid_face_number)
-            offset=QProjector<dim>::DataSetDescriptor
-                   ::face(face_no,
-                          cell->face_orientation(face_no),
-                          cell->face_flip(face_no),
-                          cell->face_rotation(face_no),
-                          n_q_points);
-          else
-            offset=QProjector<dim>::DataSetDescriptor
-                   ::subface(face_no, sub_no,
-                             cell->face_orientation(face_no),
-                             cell->face_flip(face_no),
-                             cell->face_rotation(face_no),
-                             n_q_points,
-                             cell->subface_case(face_no));
-        }
-
-      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+        task_group
+        += Threads::new_task (std_cxx11::function<void ()>(std_cxx11::bind (&FESystem<dim,spacedim>::template compute_fill_one_base<dim_1>,
+                                                           this,
+                                                           std_cxx11::cref(mapping),
+                                                           std::make_pair(cell, CellSimilarity::none),
+                                                           std::make_pair(face_no, sub_no),
+                                                           std_cxx11::cref(quadrature),
+                                                           std::make_pair(&mapping_internal,
+                                                               &fedata),
+                                                           base_no,
+                                                           std_cxx11::ref(mapping_data),
+                                                           std_cxx11::ref(output_data))));
+      task_group.join_all();
     }
 }
 
@@ -1845,6 +1844,13 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
     if (multiplicities[i]>0)
       this->base_to_block_indices.push_back( multiplicities[i] );
 
+  std::vector<Threads::Task<FiniteElement<dim,spacedim>*> > clone_base_elements;
+
+  for (unsigned int i=0; i<fes.size(); i++)
+    if (multiplicities[i]>0)
+      clone_base_elements.push_back (Threads::new_task (&FiniteElement<dim,spacedim>::clone,
+                                                        *fes[i]));
+
   unsigned int ind=0;
   for (unsigned int i=0; i<fes.size(); i++)
     {
@@ -1852,7 +1858,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
         {
           base_elements[ind] =
             std::make_pair (std_cxx11::shared_ptr<const FiniteElement<dim,spacedim> >
-                            (fes[i]->clone()),
+                            (clone_base_elements[ind].return_value()),
                             multiplicities[i]);
           ++ind;
         }
@@ -2423,12 +2429,6 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
                              .compare_for_face_domination (fe_sys_other->base_element(b)));
           domination = domination & base_domination;
         }
-
-      // if we've gotten here, then we've either found a winner or either
-      // element is fine being dominated
-      Assert (domination !=
-              FiniteElementDomination::neither_element_dominates,
-              ExcInternalError());
 
       return domination;
     }

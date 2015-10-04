@@ -26,15 +26,10 @@
 SET(ZLIB_DIR "" CACHE PATH "An optional hint to a ZLIB installation")
 SET_IF_EMPTY(ZLIB_DIR "$ENV{ZLIB_DIR}")
 
-#
-# Houston, we have a problem: CMake ships its own FindZLIB.cmake module.
-# Unfortunately we want to call DEAL_II_PACKAGE_HANDLE. Therefore, use the
-# original find module and do a dummy call to DEAL_II_PACKAGE_HANDLE:
-#
-
 IF(NOT "${ZLIB_DIR}" STREQUAL "")
   SET(ZLIB_ROOT ${ZLIB_DIR})
 ENDIF()
+# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(ZLIB)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)

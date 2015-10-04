@@ -16,7 +16,7 @@
 
 
 // test get_name()
- 
+
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
@@ -34,7 +34,7 @@ template <int dim>
 void test(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
 }
 
 
@@ -67,7 +67,7 @@ main()
     test(fe);
   }
 
-  
+
 
   return 0;
 }

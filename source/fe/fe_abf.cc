@@ -337,7 +337,7 @@ FE_ABF<dim>::initialize_restriction()
 
       for (unsigned int sub=0; sub<GeometryInfo<dim>::max_children_per_face; ++sub)
         {
-          // The weight fuctions for
+          // The weight functions for
           // the coarse face are
           // evaluated on the subface
           // only.
@@ -357,7 +357,7 @@ FE_ABF<dim>::initialize_restriction()
           // when building the shape
           // functions, these weights
           // are equal to the
-          // corresponding shpe
+          // corresponding shape
           // functions.
           for (unsigned int k=0; k<n_face_points; ++k)
             for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
@@ -459,43 +459,6 @@ FE_ABF<dim>::get_dpo_vector (const unsigned int rt_order)
   dpo[dim]   = interior_dofs;
 
   return dpo;
-}
-
-
-
-template <int dim>
-UpdateFlags
-FE_ABF<dim>::update_once (const UpdateFlags) const
-{
-  // even the values have to be
-  // computed on the real cell, so
-  // nothing can be done in advance
-  return update_default;
-}
-
-
-
-template <int dim>
-UpdateFlags
-FE_ABF<dim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-
-
-  if (flags & update_values)
-    out |= update_values             | update_covariant_transformation
-           | update_piola
-           | update_JxW_values;
-  if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation
-           | update_piola
-           | update_JxW_values;
-  //TODO: Set update flags appropriately and figure out, how the second
-  // derivatives for the RT elements can be computed correctly.
-  if (flags & update_hessians)
-    out |= update_hessians | update_contravariant_transformation;
-
-  return out;
 }
 
 //---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,10 +82,10 @@ void check_this (Triangulation<3> &tria)
 
             // make sure, that both ways yield
             // the same result
-            Assert (neighbor_child ==
-                    cell->neighbor_child_on_subface (face_no,
-                                                     subface_no),
-                    ExcInternalError());
+            AssertThrow (neighbor_child ==
+                         cell->neighbor_child_on_subface (face_no,
+                                                          subface_no),
+                         ExcInternalError());
           }
 }
 

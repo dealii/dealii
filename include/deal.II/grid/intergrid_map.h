@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__intergrid_map_h
-#define __deal2__intergrid_map_h
+#ifndef dealii__intergrid_map_h
+#define dealii__intergrid_map_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
@@ -74,7 +74,7 @@ DEAL_II_NAMESPACE_OPEN
  * Note that this class could in principle be based on the C++
  * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data
  * format which is more effective both in terms of computing time for access
- * as well as with regard to memory consumpion.
+ * as well as with regard to memory consumption.
  *
  *
  * <h3>Usage</h3>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_parser_h
-#define __deal2__function_parser_h
+#ifndef dealii__function_parser_h
+#define dealii__function_parser_h
 
 
 #include <deal.II/base/config.h>

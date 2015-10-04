@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__auto_derivative_function_h
-#define __deal2__auto_derivative_function_h
+#ifndef dealii__auto_derivative_function_h
+#define dealii__auto_derivative_function_h
 
 
 #include <deal.II/base/exceptions.h>
@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * The following example of an user defined function overloads and implements
  * only the value() function but not the gradient() function. If the
  * gradient() function is invoked then the gradient function implemented by
- * the AutoDerivativeFunction is called, where the latter function imployes
+ * the AutoDerivativeFunction is called, where the latter function employs
  * numerical difference quotients.
  *
  * @code
@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Furthermore note, that an object of this class does <b>not</b> represent
  * the derivative of a function, like FunctionDerivative, that gives a
- * directional derivate by calling the value() function. In fact, this class
+ * directional derivative by calling the value() function. In fact, this class
  * (the AutoDerivativeFunction class) can substitute the Function class as
  * base class for user defined classes. This class implements the gradient()
  * functions for automatic computation of numerical difference quotients and

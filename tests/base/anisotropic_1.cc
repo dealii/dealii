@@ -42,9 +42,11 @@ void check_poly(const Point<dim> &x,
   std::vector<double> values1 (n), values2 (n);
   std::vector<Tensor<1,dim> > gradients1(n), gradients2(n);
   std::vector<Tensor<2,dim> > second1(n), second2(n);
+  std::vector<Tensor<3,dim> > third1(n), third2(n);
+  std::vector<Tensor<4,dim> > fourth1(n), fourth2(n);
 
-  p.compute (x, values1, gradients1, second1);
-  q.compute (x, values2, gradients2, second2);
+  p.compute (x, values1, gradients1, second1, third1, fourth1);
+  q.compute (x, values2, gradients2, second2, third2, fourth2);
 
   for (unsigned int k=0; k<n; ++k)
     {
@@ -62,11 +64,11 @@ void check_poly(const Point<dim> &x,
                 << val2 << std::endl;
 
       // Check if compute_grad is ok
-      Tensor<1,dim> grad1 = p.compute_grad(k,x);
+      Tensor<1,dim> grad1 = p.template compute_derivative<1>(k,x);
       if (grad1 != gradients1[k])
         deallog << 'P' << k << ": gradients differ " << grad1 << " != "
                 << gradients1[k] << std::endl;
-      Tensor<1,dim> grad2 = q.compute_grad(k,x);
+      Tensor<1,dim> grad2 = q.template compute_derivative<1>(k,x);
       if (grad2 != gradients2[k])
         deallog << 'Q' << k << ": gradients differ " << grad1 << " != "
                 << gradients2[k] << std::endl;
@@ -75,17 +77,43 @@ void check_poly(const Point<dim> &x,
                 << grad2 << std::endl;
 
       // Check if compute_grad_grad is ok
-      Tensor<2,dim> grad_grad1 = p.compute_grad_grad(k,x);
+      Tensor<2,dim> grad_grad1 = p.template compute_derivative<2>(k,x);
       if (grad_grad1 != second1[k])
         deallog << 'P' << k << ": second derivatives differ " << grad_grad1 << " != "
                 << second1[k] << std::endl;
-      Tensor<2,dim> grad_grad2 = q.compute_grad_grad(k,x);
+      Tensor<2,dim> grad_grad2 = q.template compute_derivative<2>(k,x);
       if (grad_grad2 != second2[k])
         deallog << 'Q' << k << ": second derivatives differ " << grad_grad2 << " != "
                 << second2[k] << std::endl;
       if (grad_grad2 != grad_grad1)
         deallog << "PQ" << k << ": second derivatives differ " << grad_grad1 << " != "
                 << grad_grad2 << std::endl;
+
+      // Check if third derivative is ok
+      Tensor<3,dim> third_derivative1 = p.template compute_derivative<3>(k,x);
+      if (third_derivative1 != third1[k])
+        deallog << 'P' << k << ": third derivatives differ " << third_derivative1 << " != "
+                << third1[k] << std::endl;
+      Tensor<3,dim> third_derivative2 = q.template compute_derivative<3>(k,x);
+      if (third_derivative2 != third2[k])
+        deallog << 'Q' << k << ": third derivatives differ " << third_derivative2 << " != "
+                << third2[k] << std::endl;
+      if (third_derivative2 != third_derivative1)
+        deallog << "PQ" << k << ": third derivatives differ " << third_derivative1 << " != "
+                << third_derivative2 << std::endl;
+
+      // Check if third derivative is ok
+      Tensor<4,dim> fourth_derivative1 = p.template compute_derivative<4>(k,x);
+      if (fourth_derivative1 != fourth1[k])
+        deallog << 'P' << k << ": fourth derivatives differ " << fourth_derivative1 << " != "
+                << fourth1[k] << std::endl;
+      Tensor<4,dim> fourth_derivative2 = q.template compute_derivative<4>(k,x);
+      if (fourth_derivative2 != fourth2[k])
+        deallog << 'Q' << k << ": fourth derivatives differ " << fourth_derivative2 << " != "
+                << fourth2[k] << std::endl;
+      if (fourth_derivative2 != fourth_derivative1)
+        deallog << "PQ" << k << ": fourth derivatives differ " << fourth_derivative1 << " != "
+                << fourth_derivative2 << std::endl;
 
 
       // finally output values,
@@ -107,6 +135,17 @@ void check_poly(const Point<dim> &x,
       for (unsigned int d1=0; d1<dim; ++d1)
         for (unsigned int d2=0; d2<dim; ++d2)
           deallog << second1[k][d1][d2] << '\t';
+      deallog << "\t3rd\t";
+      for (unsigned int d1=0; d1<dim; ++d1)
+        for (unsigned int d2=0; d2<dim; ++d2)
+          for (unsigned int d3=0; d3<dim; ++d3)
+            deallog << third1[k][d1][d2][d3] << '\t';
+      deallog << "\t4th\t";
+      for (unsigned int d1=0; d1<dim; ++d1)
+        for (unsigned int d2=0; d2<dim; ++d2)
+          for (unsigned int d3=0; d3<dim; ++d3)
+            for (unsigned int d4=0; d4<dim; ++d4)
+              deallog << fourth1[k][d1][d2][d3][d4] << '\t';
       deallog << std::endl;
     }
   deallog << std::endl;

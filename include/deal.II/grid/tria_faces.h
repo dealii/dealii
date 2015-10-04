@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_faces_h
-#define __deal2__tria_faces_h
+#ifndef dealii__tria_faces_h
+#define dealii__tria_faces_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/grid/tria_object.h>
@@ -151,7 +151,7 @@ namespace internal
 
     template <class Archive>
     void
-    TriaFaces<1>::serialize (Archive &ar,
+    TriaFaces<1>::serialize (Archive &,
                              const unsigned int)
     {}
 

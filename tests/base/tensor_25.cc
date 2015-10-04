@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,16 +36,16 @@ void check ()
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
         {
-          Assert (TableIndices<3>(i,j,k)
-                  ==
-                  T::unrolled_to_component_indices (i*dim*dim+j*dim+k),
-                  ExcInternalError());
-          Assert (T::component_to_unrolled_index(TableIndices<3>(i,j,k))
-                  ==
-                  i*dim*dim+j*dim+k,
-                  ExcInternalError());
-          Assert (t[TableIndices<3>(i,j,k)] == t[i][j][k],
-                  ExcInternalError());
+          AssertThrow (TableIndices<3>(i,j,k)
+                       ==
+                       T::unrolled_to_component_indices (i*dim*dim+j*dim+k),
+                       ExcInternalError());
+          AssertThrow (T::component_to_unrolled_index(TableIndices<3>(i,j,k))
+                       ==
+                       i*dim*dim+j*dim+k,
+                       ExcInternalError());
+          AssertThrow (t[TableIndices<3>(i,j,k)] == t[i][j][k],
+                       ExcInternalError());
         }
   deallog << "OK" << std::endl;
 }

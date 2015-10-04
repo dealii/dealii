@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__data_component_interpretation_h
-#define __deal2__data_component_interpretation_h
+#ifndef dealii__data_component_interpretation_h
+#define dealii__data_component_interpretation_h
 
 
 

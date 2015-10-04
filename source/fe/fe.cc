@@ -35,83 +35,61 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-const double FiniteElement<dim,spacedim>::fd_step_length = 1.0e-6;
-
-
-template <int dim, int spacedim>
-void
-FiniteElement<dim,spacedim>::
-InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
-                                  const Mapping<dim,spacedim>       &mapping,
-                                  const Quadrature<dim>    &quadrature)
-{
-  // if we shall compute second
-  // derivatives, then we do so by
-  // finite differencing the
-  // gradients. that we do by
-  // evaluating the gradients of
-  // shape values at points shifted
-  // star-like a little in each
-  // coordinate direction around each
-  // quadrature point.
-  //
-  // therefore generate 2*dim (the
-  // number of evaluation points)
-  // FEValues objects with slightly
-  // shifted positions
-  std::vector<Point<dim> > diff_points (quadrature.size());
-
-  differences.resize(2*dim);
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      Tensor<1,dim> shift;
-      shift[d] = fd_step_length;
-
-      // generate points and FEValues
-      // objects shifted in
-      // plus-direction. note that
-      // they only need to compute
-      // gradients, not more
-      for (unsigned int i=0; i<diff_points.size(); ++i)
-        diff_points[i] = quadrature.point(i) + shift;
-      const Quadrature<dim> plus_quad (diff_points, quadrature.get_weights());
-      differences[d] = new FEValues<dim,spacedim> (mapping, *element,
-                                                   plus_quad, update_gradients);
-
-      // now same in minus-direction
-      for (unsigned int i=0; i<diff_points.size(); ++i)
-        diff_points[i] = quadrature.point(i) - shift;
-      const Quadrature<dim> minus_quad (diff_points, quadrature.get_weights());
-      differences[d+dim] = new FEValues<dim,spacedim> (mapping, *element,
-                                                       minus_quad, update_gradients);
-    }
-}
-
+FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
+  update_flags(update_default),
+  update_once(update_default),
+  update_each(update_default),
+  first_cell(true)
+{}
 
 
 
 template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
+{}
+
+
+
+template <int dim, int spacedim>
+std::size_t
+FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption () const
 {
-  for (unsigned int i=0; i<differences.size (); ++i)
-    if (differences[i] != 0)
-      {
-        // delete pointer and set it
-        // to zero to avoid
-        // inadvertent use
-        delete differences[i];
-        differences[i] = 0;
-      };
+  return sizeof(*this);
+}
+
+
+
+template <int dim, int spacedim>
+UpdateFlags
+FiniteElement<dim,spacedim>::InternalDataBase::current_update_flags () const
+{
+  if (first_cell)
+    {
+      Assert (update_flags==(update_once|update_each),
+              ExcInternalError());
+      return update_flags;
+    }
+  else
+    return update_each;
+}
+
+
+
+template <int dim, int spacedim>
+void
+FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ()
+{
+  first_cell = false;
 }
 
 
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::FiniteElement (
-  const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &r_i_a_f,
-  const std::vector<ComponentMask> &nonzero_c)
+FiniteElement<dim,spacedim>::
+FiniteElement (const FiniteElementData<dim> &fe_data,
+               const std::vector<bool> &r_i_a_f,
+               const std::vector<ComponentMask> &nonzero_c)
   :
   FiniteElementData<dim> (fe_data),
   adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
@@ -123,40 +101,21 @@ FiniteElement<dim,spacedim>::FiniteElement (
   face_system_to_base_table(this->dofs_per_face),
   component_to_base_table (this->components,
                            std::make_pair(std::make_pair(0U, 0U), 0U)),
-  restriction_is_additive_flags(r_i_a_f),
-  nonzero_components (nonzero_c)
+
+  // Special handling of vectors of length one: in this case, we
+  // assume that all entries were supposed to be equal
+  restriction_is_additive_flags(r_i_a_f.size() == 1
+                                ?
+                                std::vector<bool> (fe_data.dofs_per_cell, r_i_a_f[0])
+                                :
+                                r_i_a_f),
+  nonzero_components (nonzero_c.size() == 1
+                      ?
+                      std::vector<ComponentMask> (fe_data.dofs_per_cell, nonzero_c[0])
+                      :
+                      nonzero_c),
+  n_nonzero_components_table (compute_n_nonzero_components(nonzero_components))
 {
-  // Special handling of vectors of
-  // length one: in this case, we
-  // assume that all entries were
-  // supposed to be equal.
-
-//TODO: Do the following in a better way by expanding these arrays in the member initializer section above
-  // Normally, we should be careful
-  // with const_cast, but since this
-  // is the constructor and we do it
-  // here only, we are fine.
-  unsigned int ndofs = this->dofs_per_cell;
-  if (restriction_is_additive_flags.size() == 1 && ndofs > 1)
-    {
-      std::vector<bool> &aux
-        = const_cast<std::vector<bool>&> (restriction_is_additive_flags);
-      aux.resize(ndofs, restriction_is_additive_flags[0]);
-    }
-
-  if (nonzero_components.size() == 1 && ndofs > 1)
-    {
-      std::vector<ComponentMask> &aux
-        = const_cast<std::vector<ComponentMask>&> (nonzero_components);
-      aux.resize(ndofs, nonzero_components[0]);
-    }
-
-  // These used to be initialized in
-  // the constructor, but here we
-  // have the possibly corrected
-  // nonzero_components vector.
-  const_cast<std::vector<unsigned int>&>
-  (n_nonzero_components_table) = compute_n_nonzero_components(nonzero_components);
   this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
                                       n_nonzero_components_table.end(),
                                       std::bind2nd(std::not_equal_to<unsigned int>(),
@@ -179,7 +138,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
               ExcInternalError());
       Assert (n_nonzero_components_table[i] <= this->n_components(),
               ExcInternalError());
-    };
+    }
 
   // initialize some tables in the default way, i.e. if there is only one
   // (vector-)component; if the element is not primitive, leave these tables
@@ -203,7 +162,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
   base_to_block_indices.reinit(1,1);
 
   // initialize the restriction and prolongation matrices. the default
-  // contructur of FullMatrix<dim> initializes them with size zero
+  // constructor of FullMatrix<dim> initializes them with size zero
   prolongation.resize(RefinementCase<dim>::isotropic_refinement);
   restriction.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref=RefinementCase<dim>::cut_x;
@@ -294,6 +253,52 @@ FiniteElement<dim,spacedim>::shape_grad_grad_component (const unsigned int,
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FiniteElement<dim,spacedim>::shape_3rd_derivative (const unsigned int,
+                                                   const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<3,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<3,dim>
+FiniteElement<dim,spacedim>::shape_3rd_derivative_component (const unsigned int,
+    const Point<dim> &,
+    const unsigned int) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<3,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FiniteElement<dim,spacedim>::shape_4th_derivative (const unsigned int,
+                                                   const Point<dim> &) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<4,dim> ();
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<4,dim>
+FiniteElement<dim,spacedim>::shape_4th_derivative_component (const unsigned int,
+    const Point<dim> &,
+    const unsigned int) const
+{
+  AssertThrow(false, ExcUnitShapeValuesDoNotExist());
+  return Tensor<4,dim> ();
 }
 
 
@@ -821,6 +826,7 @@ template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim,spacedim>::constraints (const internal::SubfaceCase<dim> &subface_case) const
 {
+  (void)subface_case;
   Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic,
           ExcMessage("Constraints for this element are only implemented "
                      "for the case that faces are refined isotropically "
@@ -1211,199 +1217,6 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 
 
 
-template<>
-void
-FiniteElement<1,2>::compute_2nd (
-  const Mapping<1,2> &,
-  const Triangulation<1,2>::cell_iterator &,
-  const unsigned int,
-  Mapping<1,2>::InternalDataBase &,
-  InternalDataBase &,
-  FEValuesData<1,2> &) const
-{
-
-  Assert(false, ExcNotImplemented());
-}
-
-
-template<>
-void
-FiniteElement<1,3>::compute_2nd (
-  const Mapping<1,3> &,
-  const Triangulation<1,3>::cell_iterator &,
-  const unsigned int,
-  Mapping<1,3>::InternalDataBase &,
-  InternalDataBase &,
-  FEValuesData<1,3> &) const
-{
-
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template<>
-void
-FiniteElement<2,3>::compute_2nd (
-  const Mapping<2,3> &,
-  const Triangulation<2,3>::cell_iterator &,
-  const unsigned int,
-  Mapping<2,3>::InternalDataBase &,
-  InternalDataBase &,
-  FEValuesData<2,3> &) const
-{
-
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <int dim, int spacedim>
-void
-FiniteElement<dim,spacedim>::compute_2nd (
-  const Mapping<dim,spacedim>                   &mapping,
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int offset,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-  InternalDataBase                     &fe_internal,
-  FEValuesData<dim,spacedim>                    &data) const
-{
-  Assert ((fe_internal.update_each | fe_internal.update_once)
-          & update_hessians,
-          ExcInternalError());
-
-  // there is nothing to do if there are no degrees of freedom (e.g., in an
-  // FE_Nothing)
-  if (this->dofs_per_cell == 0)
-    return;
-
-// make sure we have as many entries as there are nonzero components
-//  Assert (data.shape_hessians.size() ==
-//          std::accumulate (n_nonzero_components_table.begin(),
-//                        n_nonzero_components_table.end(),
-//                        0U),
-//        ExcInternalError());
-  // Number of quadrature points
-  const unsigned int n_q_points = data.shape_hessians[0].size();
-
-  // first reinit the fe_values
-  // objects used for the finite
-  // differencing stuff
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      fe_internal.differences[d]->reinit(cell);
-      fe_internal.differences[d+dim]->reinit(cell);
-      Assert(offset <= fe_internal.differences[d]->n_quadrature_points - n_q_points,
-             ExcIndexRange(offset, 0, fe_internal.differences[d]->n_quadrature_points
-                           - n_q_points));
-    }
-
-  // collection of difference
-  // quotients of gradients in each
-  // direction (first index) and at
-  // all q-points (second index)
-  std::vector<std::vector<Tensor<1,dim> > >
-  diff_quot (spacedim, std::vector<Tensor<1,dim> > (n_q_points));
-  std::vector<Tensor<1,spacedim> > diff_quot2 (n_q_points);
-
-  // for all nonzero components of
-  // all shape functions at all
-  // quadrature points and difference
-  // quotients in all directions:
-  unsigned int total_index = 0;
-  for (unsigned int shape_index=0; shape_index<this->dofs_per_cell; ++shape_index)
-    for (unsigned int n=0; n<n_nonzero_components(shape_index); ++n, ++total_index)
-      {
-        for (unsigned int d1=0; d1<dim; ++d1)
-          for (unsigned int q=0; q<n_q_points; ++q)
-            {
-              // get gradient at points
-              // shifted slightly to
-              // the right and to the
-              // left in the present
-              // coordinate direction
-              //
-              // note that things
-              // might be more
-              // difficult if the
-              // shape function has
-              // more than one
-              // non-zero component,
-              // so find out about
-              // the actual component
-              // if necessary
-              Tensor<1,spacedim> right, left;
-              if (is_primitive(shape_index))
-                {
-                  right = fe_internal.differences[d1]->shape_grad(shape_index, q+offset);
-                  left  = fe_internal.differences[d1+dim]->shape_grad(shape_index, q+offset);
-                }
-              else
-                {
-                  // get the
-                  // component index
-                  // of the n-th
-                  // nonzero
-                  // compoment
-                  unsigned int component=0;
-                  for (unsigned int nonzero_comp=0; component<this->n_components();
-                       ++component)
-                    if (nonzero_components[shape_index][component] == true)
-                      {
-                        ++nonzero_comp;
-                        // check
-                        // whether we
-                        // have found
-                        // the
-                        // component
-                        // we are
-                        // looking
-                        // for. note
-                        // that
-                        // nonzero_comp
-                        // is 1-based
-                        // by the way
-                        // we compute
-                        // it
-                        if (nonzero_comp == n+1)
-                          break;
-                      }
-                  Assert (component < this->n_components(),
-                          ExcInternalError());
-
-                  right = fe_internal.differences[d1]
-                          ->shape_grad_component(shape_index, q+offset, component);
-                  left  = fe_internal.differences[d1+dim]
-                          ->shape_grad_component(shape_index, q+offset, component);
-                };
-
-              // compute the second
-              // derivative from a
-              // symmetric difference
-              // approximation
-              for (unsigned int d=0; d<spacedim; ++d)
-                diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
-            }
-
-        // up to now we still have
-        // difference quotients on the
-        // unit cell, so transform it
-        // to something on the real
-        // cell
-        for (unsigned int d=0; d<spacedim; ++d)
-          {
-            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
-
-            for (unsigned int q=0; q<n_q_points; ++q)
-              for (unsigned int d1=0; d1<spacedim; ++d1)
-                data.shape_hessians[total_index][q][d][d1]
-                  = diff_quot2[q][d1];
-          }
-      }
-}
-
-
-
 template <int dim, int spacedim>
 std::vector<unsigned int>
 FiniteElement<dim,spacedim>::compute_n_nonzero_components (
@@ -1420,7 +1233,7 @@ FiniteElement<dim,spacedim>::compute_n_nonzero_components (
 /*------------------------------- FiniteElement ----------------------*/
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
                                             const Mapping<dim,spacedim>      &mapping,
                                             const Quadrature<dim-1> &quadrature) const
@@ -1432,7 +1245,7 @@ FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
 
 
 template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
                                                const Mapping<dim,spacedim>      &mapping,
                                                const Quadrature<dim-1> &quadrature) const
@@ -1447,6 +1260,7 @@ template <int dim, int spacedim>
 const FiniteElement<dim,spacedim> &
 FiniteElement<dim,spacedim>::base_element(const unsigned int index) const
 {
+  (void)index;
   Assert (index==0, ExcIndexRange(index,0,1));
   // This function should not be
   // called for a system element

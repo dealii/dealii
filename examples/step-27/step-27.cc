@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2014 by the deal.II authors
+ * Copyright (C) 2006 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -46,11 +46,11 @@
 #include <deal.II/numerics/error_estimator.h>
 
 // These are the new files we need. The first one provides an alternative to
-// the usual SparsityPattern class and the CompressedSparsityPattern class
+// the usual SparsityPattern class and the DynamicSparsityPattern class
 // already discussed in step-11 and step-18. The last two provide <i>hp</i>
 // versions of the DoFHandler and FEValues classes as described in the
 // introduction of this program.
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -212,10 +212,10 @@ namespace Step27
                                               constraints);
     constraints.close ();
 
-    CompressedSetSparsityPattern csp (dof_handler.n_dofs(),
-                                      dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
-    sparsity_pattern.copy_from (csp);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
   }

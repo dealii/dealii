@@ -48,12 +48,12 @@ void test ()
 
   FESystem<dim> fe(FE_Nothing<dim>(),1, FE_Q<dim>(1),1);
 
-  deallog << "n support points: " << fe.get_unit_support_points().size() << std::endl;  
+  deallog << "n support points: " << fe.get_unit_support_points().size() << std::endl;
 
-  
+
   DoFHandler<dim>      dof_handler (triangulation);
 
-  dof_handler.distribute_dofs (fe);  
+  dof_handler.distribute_dofs (fe);
   deallog << "   Number of active cells:       "
           << triangulation.n_active_cells()
           << std::endl
@@ -61,12 +61,12 @@ void test ()
           << dof_handler.n_dofs()
           << std::endl;
 
-  
+
   Vector<double> solution(dof_handler.n_dofs());
 
   VectorTools::interpolate(dof_handler,
-                             ZeroFunction<dim>(2),
-                             solution);
+                           ZeroFunction<dim>(2),
+                           solution);
 
   deallog << "l2_norm = " << solution.l2_norm() << std::endl;
 }

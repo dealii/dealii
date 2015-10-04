@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_accessor_h
-#define __deal2__tria_accessor_h
+#ifndef dealii__tria_accessor_h
+#define dealii__tria_accessor_h
 
 
 #include <deal.II/base/config.h>
@@ -253,7 +253,7 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Dimensionality of the object that the thing represented by this accessopr
+   * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
@@ -449,7 +449,7 @@ protected:
 
   /**
    * Used to store the index of the element presently pointed to on the level
-   * presentl used.
+   * presently used.
    */
   int present_index;
 
@@ -628,6 +628,13 @@ public:
    */
 
   /**
+   * Pointer to the @p ith vertex bounding this object. Throw an exception if
+   * <code>dim=1</code>.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+  vertex_iterator (const unsigned int i) const;
+
+  /**
    * Return the global index of i-th vertex of the current object. The
    * convention regarding the numbering of vertices is laid down in the
    * documentation of the GeometryInfo class.
@@ -761,7 +768,7 @@ public:
    * direction. @p true indicates, that the line is oriented from vertex 0 to
    * vertex 1, whereas it is the other way around otherwise. In 1d and 2d,
    * this is always @p true, but in 3d it may be different, see the respective
-   * discussion in the documentation of the GeometryInfo classe.
+   * discussion in the documentation of the GeometryInfo class.
    *
    * This function is really only for internal use in the library unless you
    * absolutely know what this is all about.
@@ -797,7 +804,7 @@ public:
    * If the present cell is not refined, one is returned.
    *
    * If one considers a triangulation as a forest where the root of each tree
-   * are the coarse mesh cells and nodes have descendents (the children of a
+   * are the coarse mesh cells and nodes have descendants (the children of a
    * cell), then this function returns the number of terminal nodes in the
    * sub-tree originating from the current object; consequently, if the
    * current object is not further refined, the answer is one.
@@ -866,7 +873,7 @@ public:
    */
 
   /**
-   * Boundary indicator of this object.
+   * Return the boundary indicator of this object.
    *
    * If the return value is the special value
    * numbers::internal_face_boundary_id, then this object is in the interior
@@ -875,19 +882,27 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  types::boundary_id boundary_indicator () const;
+  types::boundary_id boundary_id () const;
 
   /**
-   * Set the boundary indicator. The same applies as for the
-   * <tt>boundary_indicator()</tt> function.
+   * Return the boundary indicator of this object.
    *
-   * Note that it only sets the boundary object of the current object itself,
+   * @deprecated This spelling of the function name is deprecated. Use
+   * boundary_id() instead.
+   */
+  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
+
+  /**
+   * Set the boundary indicator of the current object. The same applies as for
+   * the boundary_id() function.
+   *
+   * This function only sets the boundary object of the current object itself,
    * not the indicators of the ones that bound it. For example, in 3d, if this
    * function is called on a face, then the boundary indicator of the 4 edges
    * that bound the face remain unchanged. If you want to set the boundary
    * indicators of face and edges at the same time, use the
-   * set_all_boundary_indicators() function. You can see the result of not
-   * using the correct function in the results section of step-49.
+   * set_all_boundary_ids() function. You can see the result of not using the
+   * correct function in the results section of step-49.
    *
    * @warning You should never set the boundary indicator of an interior face
    * (a face not at the boundary of the domain), or set set the boundary
@@ -906,18 +921,26 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_boundary_indicator (const types::boundary_id) const;
+  void set_boundary_id (const types::boundary_id) const;
 
   /**
-   * Do as set_boundary_indicator() but also set the boundary indicators of
-   * the objects that bound the current object. For example, in 3d, if
-   * set_boundary_indicator() is called on a face, then the boundary indicator
-   * of the 4 edges that bound the face remain unchanged. In contrast, if you
-   * call the current function, the boundary indicators of face and edges are
-   * all set to the given value.
+   * Set the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_boundary_id() instead.
+   */
+  void set_boundary_indicator (const types::boundary_id) const DEAL_II_DEPRECATED;
+
+  /**
+   * Do as set_boundary_id() but also set the boundary indicators of the
+   * objects that bound the current object. For example, in 3d, if
+   * set_boundary_id() is called on a face, then the boundary indicator of the
+   * 4 edges that bound the face remain unchanged. In contrast, if you call
+   * the current function, the boundary indicators of face and edges are all
+   * set to the given value.
    *
    * This function is useful if you set boundary indicators of faces in 3d (in
-   * 2d, the function does the same as set_boundary_indicator()) and you do so
+   * 2d, the function does the same as set_boundary_id()) and you do so
    * because you want a curved boundary object to represent the part of the
    * boundary that corresponds to the current face. In that case, the
    * Triangulation class needs to figure out where to put new vertices upon
@@ -938,7 +961,15 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_all_boundary_indicators (const types::boundary_id) const;
+  void set_all_boundary_ids (const types::boundary_id) const;
+
+  /**
+   * Set the boundary indicator of this object and all that bound it.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_all_boundary_ids() instead.
+   */
+  void set_all_boundary_indicators (const types::boundary_id) const DEAL_II_DEPRECATED;
 
   /**
    * Return whether this object is at the boundary. Obviously, the use of this
@@ -1099,7 +1130,7 @@ public:
   /**
    * Access the value of the user pointer. It is in the responsibility of the
    * user to make sure that the pointer points to something useful. You should
-   * use the new style cast operator to maintain a minimum of typesafety, e.g.
+   * use the new style cast operator to maintain a minimum of type safety, e.g.
    *
    * @note User pointers and user indices are mutually exclusive. Therefore,
    * you can only use one of them, unless you call
@@ -1257,8 +1288,8 @@ public:
    * Center of the object. The center of an object is defined to be the
    * average of the locations of the vertices. If required, the user may ask
    * this function to return the average of the point according to the
-   * underlyinging Manifold object, by setting to true the optional parameter
-   * @p respect_manifold.
+   * underlying Manifold object, by setting to true the optional parameter @p
+   * respect_manifold.
    *
    * When the geometry of a TriaAccessor is not flat, or when part of the
    * bounding objects of this TriaAccessor are not flat, the result given by
@@ -1353,7 +1384,7 @@ private:
    *
    * This function is only for internal use in the library. Setting this flag
    * to any other value than the one that the triangulation has already set is
-   * bound to bring you desaster.
+   * bound to bring you disaster.
    */
   void set_face_orientation (const unsigned int face,
                              const bool         orientation) const;
@@ -1444,19 +1475,350 @@ private:
 
 
 /**
- * Closure class to stop induction of classes. Should never be called and thus
- * produces an error when created.
+ * Specialization of <code>TriaAccessor<structdim, dim, spacedim></code>.
+ * This class represent vertices in a triangulation of dimensionality
+ * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a triangulation
+ * of quads, and 3 for a triangulation of hexes) that is embedded in a space of
+ * dimensionality <code>spacedim</code> (for <code>spacedim==dim</code> the
+ * triangulation represents a domain in ${\mathbb R}^\text{dim}$, for
+ * <code>spacedim@>dim</code> the triangulation is of a manifold embedded in
+ * a higher dimensional space).
  *
- * @ingroup grid
+ * @ingroup Accessors
+ * @author Bruno Turcksin, 2015
  */
 template<int dim, int spacedim>
 class TriaAccessor<0, dim, spacedim>
 {
-private:
+public:
   /**
-   * Constructor. Made private to make sure that this class can't be used.
+   * Dimension of the space the object represented by this accessor lives in.
+   * For example, if this accessor represents a quad that is part of a two-
+   * dimensional surface in four-dimensional space, then this value is four.
    */
-  TriaAccessor ();
+  static const unsigned int space_dimension = spacedim;
+
+  /**
+   * Dimensionality of the object that the thing represented by this accessopr
+   * is part of. For example, if this accessor represents a line that is part
+   * of a hexahedron, then this value will be three.
+   */
+  static const unsigned int dimension = dim;
+
+  /**
+   * Dimensionality of the current object represented by this accessor. For
+   * example, if it is line (irrespective of whether it is part of a quad or
+   * hex, and what dimension we are in), then this value equals 1.
+   */
+  static const unsigned int structure_dimension = 0;
+
+  /**
+   * Pointer to internal data.
+   */
+  typedef void AccessorData;
+
+  /**
+   * Constructor. The second argument is the global index of the vertex we point to.
+   */
+  TriaAccessor (const Triangulation<dim,spacedim> *tria,
+                const unsigned int    vertex_index);
+
+  /**
+   * Constructor. This constructor exists in order to maintain interface
+   * compatibility with the other accessor classes. @p index can be used to set
+   * the global index of the vertex we point to.
+   */
+  TriaAccessor (const Triangulation<dim,spacedim> *tria  = NULL,
+                const int                          level = 0,
+                const int                          index = 0,
+                const AccessorData                     * = 0);
+
+  /**
+   * Constructor. Should never be called and thus produces an error.
+   */
+  template <int structdim2, int dim2, int spacedim2>
+  TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
+
+  /**
+   * Constructor. Should never be called and thus produces an error.
+   */
+  template <int structdim2, int dim2, int spacedim2>
+  TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
+
+  /**
+   * Return the state of the iterator. Since an iterator to points can not be
+   * incremented or decremented, its state remains constant, and in particular
+   * equal to IteratorState::valid.
+   */
+  static IteratorState::IteratorStates state ();
+
+  /**
+   * Level of this object. Vertices have no level, so this function always
+   * returns zero.
+   */
+  static int level ();
+
+  /**
+   * Index of this object. Returns the global index of the vertex this object
+   * points to.
+   */
+  int index () const;
+
+  /**
+   * @name Advancement of iterators
+   */
+  /**
+   * @{
+   */
+  /**
+   * This operator advances the iterator to the next element. For points, this
+   * operation is not defined, so you can't iterate over point iterators.
+   */
+  void operator ++ () const;
+
+  /**
+   * This operator moves the iterator to the previous element. For points,
+   * this operation is not defined, so you can't iterate over point iterators.
+   */
+  void operator -- () const;
+  /**
+   * Compare for equality.
+   */
+  bool operator == (const TriaAccessor &) const;
+
+  /**
+   * Compare for inequality.
+   */
+  bool operator != (const TriaAccessor &) const;
+
+  /**
+   * @}
+   */
+
+
+  /**
+   * @name Accessing sub-objects
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Return the global index of i-th vertex of the current object. If @p i is
+   * zero, this returns the index of the current point to which this object
+   * refers. Otherwise, it throws an exception.
+   *
+   * Note that the returned value is only the index of the geometrical vertex.
+   * It has nothing to do with possible degrees of freedom associated with it.
+   * For this, see the @p DoFAccessor::vertex_dof_index functions.
+   *
+   * @note Despite the name, the index returned here is only global in the
+   * sense that it is specific to a particular Triangulation object or, in the
+   * case the triangulation is actually of type
+   * parallel::distributed::Triangulation, specific to that part of the
+   * distributed triangulation stored on the current processor.
+   */
+  unsigned int vertex_index (const unsigned int i = 0) const;
+
+  /**
+   * Return a reference to the @p ith vertex. If i is zero, this returns a
+   * reference to the current point to which this object refers. Otherwise, it
+   * throws an exception.
+   */
+  Point<spacedim> &vertex (const unsigned int i = 0) const;
+
+  /**
+   * Pointer to the @p ith line bounding this object. Will point to an invalid
+   * object.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  static line (const unsigned int);
+
+  /**
+   * Line index of the @p ith line bounding this object. Throws an exception.
+   */
+  static unsigned int line_index (const unsigned int i);
+
+  /**
+   * Pointer to the @p ith quad bounding this object.
+   */
+  static
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  quad (const unsigned int i);
+
+  /**
+   * Quad index of the @p ith quad bounding this object. Throws an excption.
+   */
+  static unsigned int quad_index (const unsigned int i);
+
+  /**
+   * @}
+   */
+
+
+  /**
+   * @name Geometric information about an object
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Diameter of the object. This function always returns zero.
+   */
+  double diameter () const;
+
+  /**
+   * Length of an object in the direction of the given axis, specified in the
+   * local coordinate system. See the documentation of GeometryInfo for the
+   * meaning and enumeration of the local axes.
+   *
+   * This function always returns zero.
+   */
+  double extent_in_direction (const unsigned int axis) const;
+
+  /**
+   * Return the center of this object, which of course coincides with the
+   * location of the vertex this object refers to. The parameters
+   * @p respect_manifold and @p use_laplace_transformation are not used. They
+   * are there to provide the same interface as
+   * <code>TriaAccessor<structdim,dim,spacedim></code>.
+   */
+  Point<spacedim> center (const bool respect_manifold=false,
+                          const bool use_laplace_transformation=false) const;
+
+  /**
+   * Compute the dim-dimensional measure of the object. For a dim-dimensional
+   * cell in dim-dimensional space, this equals its volume. On the other hand,
+   * for a 2d cell in 3d space, or if the current object pointed to is a 2d
+   * face of a 3d cell in 3d space, then the function computes the area the
+   * object occupies. For a one-dimensional object, return its length. For a
+   * zero-dimensional object, return zero.
+   */
+  double measure () const;
+  /**
+   * @}
+   */
+
+  /**
+   * @name Orientation of sub-objects
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_orientation (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_flip (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool face_rotation (const unsigned int face);
+
+  /**
+   * @brief Always return false
+   */
+  static bool line_orientation (const unsigned int line);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Accessing children
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Test whether the object has children. Always false.
+   */
+  static bool has_children ();
+
+  /**
+   * Return the number of immediate children of this object. This is always
+   * zero.
+   */
+  static unsigned int n_children();
+
+  /**
+   * Compute and return the number of active descendants of this objects.
+   * Always zero.
+   */
+  static unsigned int number_of_children ();
+
+  /**
+   * Return the number of times that this object is refined. Always 0.
+   */
+  static unsigned int max_refinement_depth ();
+
+  /**
+   * @brief Return an invalid object.
+   */
+  static
+  TriaIterator<TriaAccessor<0,dim,spacedim> >
+  child (const unsigned int);
+
+  /**
+   * @brief Return an invalid object.
+   */
+  static
+  TriaIterator<TriaAccessor<0,dim,spacedim> >
+  isotropic_child (const unsigned int);
+
+  /**
+   * Always return no refinement.
+   */
+  static
+  RefinementCase<0> refinement_case ();
+
+  /**
+   * @brief Returns -1
+   */
+  static
+  int child_index (const unsigned int i);
+
+  /**
+   * @brief Returns -1
+   */
+  static
+  int isotropic_child_index (const unsigned int i);
+  /**
+   * @}
+   */
+
+  /**
+   * Return whether the vertex pointed to here is used.
+   */
+  bool used () const;
+
+protected:
+  /**
+   * Copy operator. Since this is only called from iterators, do not return
+   * anything, since the iterator will return itself.
+   *
+   * This method is protected, since it is only to be called from the iterator
+   * class.
+   */
+  void copy_from (const TriaAccessor &);
+
+  /**
+   * Pointer to the triangulation we operate on.
+   */
+  const Triangulation<dim,spacedim> *tria;
+
+  /**
+   * The global vertex index of the vertex this object corresponds to.
+   */
+  unsigned int  global_vertex_index;
 };
 
 
@@ -1467,6 +1829,7 @@ private:
  * example, you can't iterate from one such point to the next. Point also
  * don't have children, and they don't have neighbors.
  *
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 2010
  */
 template <int spacedim>
@@ -1481,7 +1844,7 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Dimensionality of the object that the thing represented by this accessopr
+   * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
@@ -1550,9 +1913,6 @@ public:
   /**
    * Copy operator. Since this is only called from iterators, do not return
    * anything, since the iterator will return itself.
-   *
-   * This method is protected, since it is only to be called from the iterator
-   * class.
    */
   void copy_from (const TriaAccessor &);
 
@@ -1638,7 +1998,7 @@ public:
   Point<spacedim> &vertex (const unsigned int i = 0) const;
 
   /**
-   * Return the center of this object, which of course co-incides with the
+   * Return the center of this object, which of course coincides with the
    * location of the vertex this object refers to.
    */
   Point<spacedim> center () const;
@@ -1698,7 +2058,15 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  types::boundary_id boundary_indicator () const;
+  types::boundary_id boundary_id () const;
+
+  /**
+   * Return the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * boundary_id() instead.
+   */
+  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
 
   /**
    * Return the manifold indicator of this object.
@@ -1813,7 +2181,7 @@ public:
 
   /**
    * Set the boundary indicator. The same applies as for the
-   * <tt>boundary_indicator()</tt> function.
+   * <tt>boundary_id()</tt> function.
    *
    * @warning You should never set the boundary indicator of an interior face
    * (a face not at the boundary of the domain), or set set the boundary
@@ -1833,7 +2201,15 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_boundary_indicator (const types::boundary_id);
+  set_boundary_id (const types::boundary_id);
+
+  /**
+   * Set the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_boundary_id() instead.
+   */
+  void set_boundary_indicator (const types::boundary_id) DEAL_II_DEPRECATED;
 
   /**
    * Set the manifold indicator of this vertex. This does nothing so far since
@@ -1847,8 +2223,8 @@ public:
   /**
    * Set the boundary indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
-   * vertex, there are no lower-dimensional obejct and this function is
-   * equivalent to calling set_boundary_indicator with the same argument.
+   * vertex, there are no lower-dimensional object and this function is
+   * equivalent to calling set_boundary_id() with the same argument.
    *
    * @ingroup boundary
    *
@@ -1856,20 +2232,27 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_all_boundary_indicators (const types::boundary_id);
+  set_all_boundary_ids (const types::boundary_id);
+
+  /**
+   * Set the boundary indicator of this object and all that bound it.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_all_boundary_ids() instead.
+   */
+  void set_all_boundary_indicators (const types::boundary_id) DEAL_II_DEPRECATED;
 
   /**
    * Set the manifold indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
-   * vertex, there are no lower-dimensional obejct and this function is
-   * equivalent to calling set_manifold_indicator with the same argument.
+   * vertex, there are no lower-dimensional object and this function is
+   * equivalent to calling set_manifold_id() with the same argument.
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-
   void
   set_all_manifold_ids (const types::manifold_id);
   /**
@@ -2129,10 +2512,10 @@ public:
    * refined: <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,
    * subface_no)==cell</tt>. In 3D, a coarser neighbor can still be refined.
    * In that case subface_no denotes the child index of the neighbors face
-   * that relates to our face: <tt>cell->neighbor(neighbor)->face(face_no)->ch
-   * ild(subface_no)==cell->face(neighbor)</tt>. This case in 3d and how it
-   * can happen is discussed in the introduction of the step-30 tutorial
-   * program.
+   * that relates to our face:
+   * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
+   * This case in 3d and how it can happen is discussed in the introduction of
+   * the step-30 tutorial program.
    *
    * This function is impossible for <tt>dim==1</tt>.
    */
@@ -2403,11 +2786,38 @@ public:
   bool direction_flag () const;
 
   /**
-   * Index of the parent of this cell within the level of the triangulation to
-   * which the parent cell belongs. The level of the parent is of course one
-   * lower than that of the present cell. If the parent does not exist (i.e.,
-   * if the object is at the coarsest level of the mesh hierarchy), an
-   * exception is generated.
+   * Return the how many-th active cell the current cell is (assuming the
+   * current cell is indeed active). This is useful, for example, if you are
+   * accessing the elements of a vector with as many entries as there are
+   * active cells. Such vectors are used for estimating the error on each cell
+   * of a triangulation, for specifying refinement criteria passed to the
+   * functions in GridRefinement, and for generating cell-wise output.
+   *
+   * The function throws an exception if the current cell is not active.
+   *
+   * @note If the triangulation this function is called on is of type
+   * parallel::distributed::Triangulation, then active cells may be locally
+   * owned, ghost cells, or artificial (see
+   * @ref GlossLocallyOwnedCell,
+   * @ref GlossGhostCell,
+   * and
+   * @ref GlossArtificialCell).
+   * This function counts over all of them, including ghost and artificial
+   * active cells. This implies that the index returned by this function
+   * uniquely identifies a cell within the triangulation on a single processor,
+   * but does not uniquely identify the cell among the (parts of the)
+   * triangulation that is shared among processors. If you would like to identify
+   * active cells across processors, you need to consider the CellId of a cell
+   * returned by CellAccessor::id().
+   */
+  unsigned int active_cell_index () const;
+
+  /**
+   * Return the index of the parent of this cell within the level of the
+   * triangulation to which the parent cell belongs. The level of the parent
+   * is of course one lower than that of the present cell. If the parent does
+   * not exist (i.e., if the object is at the coarsest level of the mesh
+   * hierarchy), an exception is generated.
    */
   int parent_index () const;
 
@@ -2555,7 +2965,7 @@ public:
    * works for parallel triangulations. See the documentation of the CellId
    * class for more information.
    *
-   * @note This operation takes O(level) time to compute. In most practicaly
+   * @note This operation takes O(level) time to compute. In most practical
    * cases, the number of levels of a triangulation will depend
    * logarithmically on the number of cells in the triangulation.
    */
@@ -2593,7 +3003,7 @@ protected:
    * neighbor_of_coarser_neighbor() function should be call. If you'd like to
    * know only the <code>face_no</code> which is required to get back from the
    * neighbor to the present cell then simply use the neighbor_face_no()
-   * function which can be used for coarser as well as noncoarser neighbors.
+   * function which can be used for coarser as well as non-coarser neighbors.
    */
   unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
 
@@ -2608,6 +3018,12 @@ protected:
 
 
 private:
+  /**
+   * Set the active cell index of a cell. This is done at the end of
+   * refinement.
+   */
+  void set_active_cell_index (const unsigned int active_cell_index);
+
   /**
    * Set the parent of a cell.
    */
@@ -2725,7 +3141,7 @@ CellAccessor<dim,spacedim>::id() const
   CellAccessor<dim,spacedim> ptr = *this;
   while (ptr.level()>0)
     {
-      // find the 'v'st child of our parent we are
+      // determine which child we are
       unsigned char v=-1;
       for (unsigned int c=0; c<ptr.parent()->n_children(); ++c)
         {

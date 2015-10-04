@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__relaxation_block_templates_h
-#define __deal2__relaxation_block_templates_h
+#ifndef dealii__relaxation_block_templates_h
+#define dealii__relaxation_block_templates_h
 
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/full_matrix.h>
@@ -79,6 +79,7 @@ void
 RelaxationBlock<MATRIX,inverse_type>::clear ()
 {
   A = 0;
+  additional_data = 0;
   PreconditionBlockBase<inverse_type>::clear ();
 }
 

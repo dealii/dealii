@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,8 @@ void test()
         {
           if (cell->subdomain_id() != (unsigned int)myid)
             {
-              Assert (cell->is_ghost() || cell->is_artificial(),
-                      ExcInternalError());
+              AssertThrow (cell->is_ghost() || cell->is_artificial(),
+                           ExcInternalError());
               continue;
             }
 
@@ -81,21 +81,21 @@ void test()
             {
               if (cell->at_boundary(n))
                 continue;
-              Assert (cell->neighbor(n).state() == IteratorState::valid,
-                      ExcInternalError());
+              AssertThrow (cell->neighbor(n).state() == IteratorState::valid,
+                           ExcInternalError());
 
-              Assert( cell->neighbor(n)->level() == cell->level(),
-                      ExcInternalError());
+              AssertThrow ( cell->neighbor(n)->level() == cell->level(),
+                            ExcInternalError());
 
-              Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
-              Assert( cell->neighbor(n)->subdomain_id()< numprocs, ExcInternalError());
+              AssertThrow (!cell->neighbor(n)->has_children(), ExcInternalError() );
+              AssertThrow ( cell->neighbor(n)->subdomain_id()< numprocs, ExcInternalError());
 
               // all neighbors of
               // locally owned cells
               // must be ghosts but
               // can't be artificial
-              Assert (cell->neighbor(n)->is_ghost(), ExcInternalError());
-              Assert (!cell->neighbor(n)->is_artificial(), ExcInternalError());
+              AssertThrow (cell->neighbor(n)->is_ghost(), ExcInternalError());
+              AssertThrow (!cell->neighbor(n)->is_artificial(), ExcInternalError());
             }
 
 
@@ -113,7 +113,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

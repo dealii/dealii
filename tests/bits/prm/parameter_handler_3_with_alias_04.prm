@@ -1,0 +1,5 @@
+subsection Testing
+  set string list = a, b, c
+  set int         = 3
+  set int_alias   = 4
+end

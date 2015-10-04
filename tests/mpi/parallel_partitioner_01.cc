@@ -83,32 +83,32 @@ void test ()
   // processors
   if (myid == 0)
     {
-      Assert (v.is_ghost_entry (13) == false, ExcInternalError());
+      AssertThrow (v.is_ghost_entry (13) == false, ExcInternalError());
     }
   else
     {
-      Assert (v.is_ghost_entry (13) == true, ExcInternalError());
+      AssertThrow (v.is_ghost_entry (13) == true, ExcInternalError());
     }
 
   // count that 27 is ghost nowhere
-  Assert (v.is_ghost_entry (27) == false, ExcInternalError());
+  AssertThrow (v.is_ghost_entry (27) == false, ExcInternalError());
   if (myid == 0)
     {
-      Assert (v.in_local_range (27) == true, ExcInternalError());
+      AssertThrow (v.in_local_range (27) == true, ExcInternalError());
     }
   else
     {
-      Assert (v.in_local_range (27) == false, ExcInternalError());
+      AssertThrow (v.in_local_range (27) == false, ExcInternalError());
     }
 
   // element with number set is ghost
   if (myid == 1)
     {
-      Assert (v.is_ghost_entry (set) == false, ExcInternalError());
+      AssertThrow (v.is_ghost_entry (set) == false, ExcInternalError());
     }
   else
     {
-      Assert (v.is_ghost_entry (set) == true, ExcInternalError());
+      AssertThrow (v.is_ghost_entry (set) == true, ExcInternalError());
     }
 
   if (myid == 0)
@@ -119,7 +119,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

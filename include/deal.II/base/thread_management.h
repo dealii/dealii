@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__thread_management_h
-#define __deal2__thread_management_h
+#ifndef dealii__thread_management_h
+#define dealii__thread_management_h
 
 
 #include <deal.II/base/config.h>
@@ -68,7 +68,7 @@ namespace Threads
    * management and synchronization classes instead when running in single-
    * thread mode. Specifically, the new_thread() functions only call the
    * function but wait for it to return instead of running in on another
-   * thread, and the mutices do nothing really. The only reason to provide
+   * thread, and the mutexes do nothing really. The only reason to provide
    * such a function is that the program can be compiled both in MT and non-MT
    * mode without difference.
    *
@@ -219,8 +219,8 @@ namespace Threads
      */
     DeclException1 (ExcBarrierSizeNotUseful,
                     int,
-                    << "In single-thread mode, other barrier sizes than 1 are not "
-                    << "useful. You gave " << arg1);
+                    << "In single-thread mode, barrier sizes other than 1 are not "
+                    << "useful. You gave " << arg1 << ".");
 
     //@}
   };
@@ -2957,9 +2957,7 @@ namespace Threads
     {
       // create a task descriptor and tell it to queue itself up with
       // the scheduling system
-      task_descriptor =
-        std_cxx11::shared_ptr<internal::TaskDescriptor<RT> >
-        (new internal::TaskDescriptor<RT>(function_object));
+      task_descriptor.reset (new internal::TaskDescriptor<RT>(function_object));
       task_descriptor->queue_task ();
     }
 
@@ -3058,7 +3056,10 @@ namespace Threads
     /**
      * Exception
      */
-    DeclException0 (ExcNoTask);
+    DeclExceptionMsg (ExcNoTask,
+                      "The current object is not associated with a task that "
+                      "can be joined. It may have been detached, or you "
+                      "may have already joined it in the past.");
     //@}
   private:
     /**
@@ -4024,6 +4025,6 @@ namespace Threads
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef __deal2__thread_management_h
+// end of #ifndef dealii__thread_management_h
 #endif
 //---------------------------------------------------------------------------

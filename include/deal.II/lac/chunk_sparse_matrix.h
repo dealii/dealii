@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__chunk_sparse_matrix_h
-#define __deal2__chunk_sparse_matrix_h
+#ifndef dealii__chunk_sparse_matrix_h
+#define dealii__chunk_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -263,17 +263,12 @@ namespace ChunkSparseMatrixIterators
      */
     template <typename, bool>
     friend class Iterator;
-
-    /**
-     * Make the inner reference class a friend if the compiler has a bug and
-     * requires this.
-     */
   };
 
 
 
   /**
-   * STL conforming iterator for constant and non-constant matrices.
+   * Iterator for constant and non-constant matrices.
    *
    * The first template argument denotes the underlying numeric type, the
    * second the constness of the matrix.
@@ -415,7 +410,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 
@@ -431,19 +427,18 @@ public:
   typedef typename numbers::NumberTraits<number>::real_type real_type;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator cannot change the values of the
-   * matrix.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator cannot change the values of the matrix.
    */
   typedef
   ChunkSparseMatrixIterators::Iterator<number,true>
   const_iterator;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator @em can change the values of the
-   * matrix, but of course can't change the sparsity pattern as this is fixed
-   * once a sparse matrix is attached to it.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator @em can change the values of the matrix, but of
+   * course can't change the sparsity pattern as this is fixed once a sparse
+   * matrix is attached to it.
    */
   typedef
   ChunkSparseMatrixIterators::Iterator<number,false>
@@ -465,7 +460,7 @@ public:
   };
 
   /**
-   * @name Constructors and initalization.
+   * @name Constructors and initialization.
    */
 //@{
   /**
@@ -584,13 +579,13 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -692,12 +687,15 @@ public:
   void symmetrize ();
 
   /**
-   * Copy the given matrix to this one.  The operation throws an error if the
-   * sparsity patterns of the two involved matrices do not point to the same
-   * object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
-   * <tt>operator =</tt>, since this may lead to unwanted usage, e.g. in copy
-   * arguments to functions, which should really be arguments by reference.
+   * Copy the matrix given as argument into the current object.
+   *
+   * Copying matrices is an expensive operation that we do not want to happen
+   * by accident through compiler generated code for <code>operator=</code>.
+   * (This would happen, for example, if one accidentally declared a function
+   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
+   * The functionality of copying matrices is implemented in this member function
+   * instead. All copy operations of objects of this type therefore require an
+   * explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
@@ -1095,8 +1093,8 @@ public:
 //@{
 
   /**
-   * STL-like iterator with the first entry of the matrix. This is the version
-   * for constant matrices.
+   * Iterator starting at first entry of the matrix. This is the version for
+   * constant matrices.
    *
    * Note that due to the layout in ChunkSparseMatrix, iterating over matrix
    * entries is considerably slower than for a sparse matrix, as the iterator
@@ -1116,7 +1114,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of the matrix. This is the version
+   * Iterator starting at the first entry of the matrix. This is the version
    * for non-constant matrices.
    *
    * Note that due to the layout in ChunkSparseMatrix, iterating over matrix
@@ -1137,7 +1135,7 @@ public:
   iterator end ();
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the
    * version for constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
@@ -1169,7 +1167,7 @@ public:
   const_iterator end (const unsigned int r) const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the
    * version for non-constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
@@ -1328,7 +1326,7 @@ private:
 
   /**
    * Allocated size of #val. This can be larger than the actually used part if
-   * the size of the matrix was reduced somewhen in the past by associating a
+   * the size of the matrix was reduced sometime in the past by associating a
    * sparsity pattern with a smaller size to this object, using the reinit()
    * function.
    */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ namespace
    * others get a pair of zeros.
    */
   template <typename number>
-  std::pair<double,double>
+  std::pair<number,number>
   compute_global_min_and_max_at_root (const Vector<number> &criteria,
                                       MPI_Comm              mpi_communicator)
   {
@@ -153,25 +153,22 @@ namespace
   void
   get_locally_owned_indicators (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                                 const Vector &criteria,
-                                dealii::Vector<float> &locally_owned_indicators)
+                                dealii::Vector<typename Vector::value_type> &locally_owned_indicators)
   {
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
 
-    unsigned int active_index = 0;
     unsigned int owned_index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = tria.begin_active();
-         cell != tria.end(); ++cell, ++active_index)
+         cell != tria.end(); ++cell)
       if (cell->subdomain_id() == tria.locally_owned_subdomain())
         {
           locally_owned_indicators(owned_index)
-            = criteria(active_index);
+            = criteria(cell->active_cell_index());
           ++owned_index;
         }
     Assert (owned_index == tria.n_locally_owned_active_cells(),
-            ExcInternalError());
-    Assert ((active_index == tria.Triangulation<dim,spacedim>::n_active_cells()),
             ExcInternalError());
   }
 
@@ -261,22 +258,23 @@ namespace
      */
     template <typename number>
     number
-    master_compute_threshold (const Vector<number> &criteria,
-                              const std::pair<double,double> global_min_and_max,
-                              const unsigned int    n_target_cells,
-                              MPI_Comm              mpi_communicator)
+    compute_threshold (const Vector<number> &criteria,
+                       const std::pair<double,double> global_min_and_max,
+                       const unsigned int    n_target_cells,
+                       MPI_Comm              mpi_communicator)
     {
       double interesting_range[2] = { global_min_and_max.first,
                                       global_min_and_max.second
                                     };
       adjust_interesting_range (interesting_range);
 
+      const unsigned int master_mpi_rank = 0;
       unsigned int iteration = 0;
 
       do
         {
           MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
+                     master_mpi_rank, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
             return interesting_range[0];
@@ -284,8 +282,7 @@ namespace
           const double test_threshold
             = (interesting_range[0] > 0
                ?
-               std::sqrt(interesting_range[0] *
-                         interesting_range[1])
+               std::sqrt(interesting_range[0] * interesting_range[1])
                :
                (interesting_range[0] + interesting_range[1]) / 2);
 
@@ -302,7 +299,7 @@ namespace
 
           unsigned int total_count;
           MPI_Reduce (&my_count, &total_count, 1, MPI_UNSIGNED,
-                      MPI_SUM, 0, mpi_communicator);
+                      MPI_SUM, master_mpi_rank, mpi_communicator);
 
           // now adjust the range. if
           // we have to many cells, we
@@ -311,7 +308,10 @@ namespace
           // the lower half. if we have
           // hit the right number, then
           // set the range to the exact
-          // value
+          // value.
+          // slave nodes also update their own interesting_range, however
+          // their results are not significant since the values will be
+          // overwritten by MPI_Bcast from the master node in next loop.
           if (total_count > n_target_cells)
             interesting_range[0] = test_threshold;
           else if (total_count < n_target_cells)
@@ -337,53 +337,8 @@ namespace
       Assert (false, ExcInternalError());
       return -1;
     }
-
-
-    /**
-     * The corresponding function to
-     * the one above, to be run on the
-     * slaves.
-     */
-    template <typename number>
-    number
-    slave_compute_threshold (const Vector<number> &criteria,
-                             MPI_Comm              mpi_communicator)
-    {
-      do
-        {
-          double interesting_range[2] = { -1, -1 };
-          MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
-
-          if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
-
-          // count how many elements
-          // there are that are bigger
-          // than the following trial
-          // threshold
-          const double test_threshold
-            = (interesting_range[0] > 0
-               ?
-               std::exp((std::log(interesting_range[0]) +
-                         std::log(interesting_range[1])) / 2)
-               :
-               (interesting_range[0] + interesting_range[1]) / 2);
-          unsigned int
-          my_count = std::count_if (criteria.begin(),
-                                    criteria.end(),
-                                    std::bind2nd (std::greater<double>(),
-                                                  test_threshold));
-
-          MPI_Reduce (&my_count, 0, 1, MPI_UNSIGNED,
-                      MPI_SUM, 0, mpi_communicator);
-        }
-      while (true);
-
-      Assert (false, ExcInternalError());
-      return -1;
-    }
   }
+
 
 
 
@@ -397,38 +352,52 @@ namespace
      */
     template <typename number>
     number
-    master_compute_threshold (const Vector<number> &criteria,
-                              const std::pair<double,double> global_min_and_max,
-                              const double          target_error,
-                              MPI_Comm              mpi_communicator)
+    compute_threshold (const Vector<number> &criteria,
+                       const std::pair<double,double> global_min_and_max,
+                       const double          target_error,
+                       MPI_Comm              mpi_communicator)
     {
       double interesting_range[2] = { global_min_and_max.first,
                                       global_min_and_max.second
                                     };
       adjust_interesting_range (interesting_range);
 
+      const unsigned int master_mpi_rank = 0;
       unsigned int iteration = 0;
 
       do
         {
           MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
+                     master_mpi_rank, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
+            {
+              // so we have found our threshold. since we adjust
+              // the range at the top of the function to be slightly
+              // larger than the actual extremes of the refinement
+              // criteria values, we can end up in a situation where
+              // the threshold is in fact larger than the maximal
+              // refinement indicator. in such cases, we get no
+              // refinement at all. thus, cap the threshold by the
+              // actual largest value
+              double final_threshold =  std::min (interesting_range[0],
+                                                  global_min_and_max.second);
+              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                         master_mpi_rank, mpi_communicator);
+
+              return final_threshold;
+            }
 
           const double test_threshold
             = (interesting_range[0] > 0
                ?
-               std::exp((std::log(interesting_range[0]) +
-                         std::log(interesting_range[1])) / 2)
+               std::sqrt(interesting_range[0] * interesting_range[1])
                :
                (interesting_range[0] + interesting_range[1]) / 2);
 
-          // accumulate the error of those
-          // our own elements above this
-          // threshold and then add to it the
-          // number for all the others
+          // accumulate the error of those our own elements above this
+          // threshold and then add to it the number for all the
+          // others
           double my_error = 0;
           for (unsigned int i=0; i<criteria.size(); ++i)
             if (criteria(i) > test_threshold)
@@ -436,16 +405,15 @@ namespace
 
           double total_error;
           MPI_Reduce (&my_error, &total_error, 1, MPI_DOUBLE,
-                      MPI_SUM, 0, mpi_communicator);
+                      MPI_SUM, master_mpi_rank, mpi_communicator);
 
-          // now adjust the range. if
-          // we have to many cells, we
-          // take the upper half of the
-          // previous range, otherwise
-          // the lower half. if we have
-          // hit the right number, then
-          // set the range to the exact
-          // value
+          // now adjust the range. if we have to many cells, we take
+          // the upper half of the previous range, otherwise the lower
+          // half. if we have hit the right number, then set the range
+          // to the exact value.
+          // slave nodes also update their own interesting_range, however
+          // their results are not significant since the values will be
+          // overwritten by MPI_Bcast from the master node in next loop.
           if (total_error > target_error)
             interesting_range[0] = test_threshold;
           else if (total_error < target_error)
@@ -453,77 +421,19 @@ namespace
           else
             interesting_range[0] = interesting_range[1] = test_threshold;
 
-          // terminate the iteration
-          // after 10 go-arounds. this
-          // is necessary because
-          // oftentimes error
-          // indicators on cells have
-          // exactly the same value,
-          // and so there may not be a
-          // particular value that cuts
-          // the indicators in such a
-          // way that we can achieve
-          // the desired number of
-          // cells. using a max of 10
-          // iterations means that we
-          // terminate the iteration
-          // after 10 steps if the
-          // indicators were perfectly
-          // badly distributed, and we
-          // make at most a mistake of
-          // 1/2^10 in the number of
-          // cells flagged if
-          // indicators are perfectly
-          // equidistributed
+          // terminate the iteration after 25 go-arounds. this is
+          // necessary because oftentimes error indicators on cells
+          // have exactly the same value, and so there may not be a
+          // particular value that cuts the indicators in such a way
+          // that we can achieve the desired number of cells. using a
+          // max of 25 iterations means that we terminate the
+          // iteration after 25 steps if the indicators were perfectly
+          // badly distributed, and we make at most a mistake of
+          // 1/2^25 in the number of cells flagged if indicators are
+          // perfectly equidistributed
           ++iteration;
           if (iteration == 25)
             interesting_range[0] = interesting_range[1] = test_threshold;
-        }
-      while (true);
-
-      Assert (false, ExcInternalError());
-      return -1;
-    }
-
-
-    /**
-     * The corresponding function to
-     * the one above, to be run on the
-     * slaves.
-     */
-    template <typename number>
-    number
-    slave_compute_threshold (const Vector<number> &criteria,
-                             MPI_Comm              mpi_communicator)
-    {
-      do
-        {
-          double interesting_range[2] = { -1, -1 };
-          MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     0, mpi_communicator);
-
-          if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
-
-          // count how many elements
-          // there are that are bigger
-          // than the following trial
-          // threshold
-          const double test_threshold
-            = (interesting_range[0] > 0
-               ?
-               std::exp((std::log(interesting_range[0]) +
-                         std::log(interesting_range[1])) / 2)
-               :
-               (interesting_range[0] + interesting_range[1]) / 2);
-
-          double my_error = 0;
-          for (unsigned int i=0; i<criteria.size(); ++i)
-            if (criteria(i) > test_threshold)
-              my_error += criteria(i);
-
-          MPI_Reduce (&my_error, 0, 1, MPI_DOUBLE,
-                      MPI_SUM, 0, mpi_communicator);
         }
       while (true);
 
@@ -546,9 +456,12 @@ namespace parallel
       refine_and_coarsen_fixed_number (
         parallel::distributed::Triangulation<dim,spacedim> &tria,
         const Vector                &criteria,
-        const double                top_fraction_of_cells,
-        const double                bottom_fraction_of_cells)
+        const double                 top_fraction_of_cells,
+        const double                 bottom_fraction_of_cells,
+        const unsigned int           max_n_cells)
       {
+        Assert (criteria.size() == tria.n_active_cells(),
+                ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
         Assert ((top_fraction_of_cells>=0) && (top_fraction_of_cells<=1),
                 dealii::GridRefinement::ExcInvalidParameterValue());
         Assert ((bottom_fraction_of_cells>=0) && (bottom_fraction_of_cells<=1),
@@ -558,11 +471,18 @@ namespace parallel
         Assert (criteria.is_non_negative (),
                 dealii::GridRefinement::ExcNegativeCriteria());
 
+        const std::pair<double, double> adjusted_fractions =
+          dealii::GridRefinement::adjust_refine_and_coarsen_number_fraction<dim> (
+            tria.n_global_active_cells(),
+            max_n_cells,
+            top_fraction_of_cells,
+            bottom_fraction_of_cells);
+
         // first extract from the
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -576,74 +496,41 @@ namespace parallel
         // need it here, but it's a
         // collective communication
         // call
-        const std::pair<double,double> global_min_and_max
+        const std::pair<typename Vector::value_type,typename Vector::value_type> global_min_and_max
           = compute_global_min_and_max_at_root (locally_owned_indicators,
                                                 mpi_communicator);
 
-        // from here on designate a
-        // master and slaves
-        double top_threshold, bottom_threshold;
-        if (Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
-          {
-            // this is the master
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedNumber::
-                master_compute_threshold (locally_owned_indicators,
-                                          global_min_and_max,
-                                          static_cast<unsigned int>
-                                          (top_fraction_of_cells *
-                                           tria.n_global_active_cells()),
-                                          mpi_communicator);
 
-            // compute bottom
-            // threshold only if
-            // necessary. otherwise
-            // use a threshold lower
-            // than the smallest
-            // value we have locally
-            if (bottom_fraction_of_cells > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedNumber::
-                  master_compute_threshold (locally_owned_indicators,
-                                            global_min_and_max,
-                                            static_cast<unsigned int>
-                                            ((1-bottom_fraction_of_cells) *
-                                             tria.n_global_active_cells()),
-                                            mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
-          }
+        double top_threshold, bottom_threshold;
+        top_threshold =
+          RefineAndCoarsenFixedNumber::
+          compute_threshold (locally_owned_indicators,
+                             global_min_and_max,
+                             static_cast<unsigned int>
+                             (adjusted_fractions.first *
+                              tria.n_global_active_cells()),
+                             mpi_communicator);
+
+        // compute bottom
+        // threshold only if
+        // necessary. otherwise
+        // use a threshold lower
+        // than the smallest
+        // value we have locally
+        if (adjusted_fractions.second > 0)
+          bottom_threshold =
+            RefineAndCoarsenFixedNumber::
+            compute_threshold (locally_owned_indicators,
+                               global_min_and_max,
+                               static_cast<unsigned int>
+                               ((1-adjusted_fractions.second) *
+                                tria.n_global_active_cells()),
+                               mpi_communicator);
         else
           {
-            // this is a slave
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedNumber::
-                slave_compute_threshold (locally_owned_indicators,
-                                         mpi_communicator);
-            // compute bottom
-            // threshold only if
-            // necessary
-            if (bottom_fraction_of_cells > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedNumber::
-                  slave_compute_threshold (locally_owned_indicators,
-                                           mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
+            bottom_threshold = *std::min_element (criteria.begin(),
+                                                  criteria.end());
+            bottom_threshold -= std::fabs(bottom_threshold);
           }
 
         // now refine the mesh
@@ -659,6 +546,8 @@ namespace parallel
         const double                top_fraction_of_error,
         const double                bottom_fraction_of_error)
       {
+        Assert (criteria.size() == tria.n_active_cells(),
+                ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
         Assert ((top_fraction_of_error>=0) && (top_fraction_of_error<=1),
                 dealii::GridRefinement::ExcInvalidParameterValue());
         Assert ((bottom_fraction_of_error>=0) && (bottom_fraction_of_error<=1),
@@ -672,7 +561,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -693,73 +582,33 @@ namespace parallel
         const double total_error
           = compute_global_sum (locally_owned_indicators,
                                 mpi_communicator);
-
-        // from here on designate a
-        // master and slaves
         double top_threshold, bottom_threshold;
-        if (Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
-          {
-            // this is the master
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedFraction::
-                master_compute_threshold (locally_owned_indicators,
-                                          global_min_and_max,
-                                          top_fraction_of_error *
-                                          total_error,
-                                          mpi_communicator);
-
-            // compute bottom
-            // threshold only if
-            // necessary. otherwise
-            // use a threshold lower
-            // than the smallest
-            // value we have locally
-            if (bottom_fraction_of_error > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedFraction::
-                  master_compute_threshold (locally_owned_indicators,
-                                            global_min_and_max,
-                                            (1-bottom_fraction_of_error) *
-                                            total_error,
-                                            mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
-          }
+        top_threshold =
+          RefineAndCoarsenFixedFraction::
+          compute_threshold (locally_owned_indicators,
+                             global_min_and_max,
+                             top_fraction_of_error *
+                             total_error,
+                             mpi_communicator);
+        // compute bottom
+        // threshold only if
+        // necessary. otherwise
+        // use a threshold lower
+        // than the smallest
+        // value we have locally
+        if (bottom_fraction_of_error > 0)
+          bottom_threshold =
+            RefineAndCoarsenFixedFraction::
+            compute_threshold (locally_owned_indicators,
+                               global_min_and_max,
+                               (1-bottom_fraction_of_error) *
+                               total_error,
+                               mpi_communicator);
         else
           {
-            // this is a slave
-            // processor
-            top_threshold
-              =
-                RefineAndCoarsenFixedFraction::
-                slave_compute_threshold (locally_owned_indicators,
-                                         mpi_communicator);
-
-            // compute bottom
-            // threshold only if
-            // necessary. otherwise
-            // use a threshold lower
-            // than the smallest
-            // value we have locally
-            if (bottom_fraction_of_error > 0)
-              bottom_threshold
-                =
-                  RefineAndCoarsenFixedFraction::
-                  slave_compute_threshold (locally_owned_indicators,
-                                           mpi_communicator);
-            else
-              {
-                bottom_threshold = *std::min_element (criteria.begin(),
-                                                      criteria.end());
-                bottom_threshold -= std::fabs(bottom_threshold);
-              }
+            bottom_threshold = *std::min_element (criteria.begin(),
+                                                  criteria.end());
+            bottom_threshold -= std::fabs(bottom_threshold);
           }
 
         // now refine the mesh

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,6 +123,7 @@ namespace FETools
                                                      endc1 = dof1.end();
     typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
                                                      endc2 = dof2.end();
+    (void)endc2;
 
     std::vector<types::global_dof_index> dofs;
     dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
@@ -150,7 +151,7 @@ namespace FETools
           // for continuous elements on
           // grids with hanging nodes we
           // need hanging node
-          // constraints. Consequentely,
+          // constraints. Consequently,
           // if there are no constraints
           // then hanging nodes are not
           // allowed.
@@ -221,7 +222,8 @@ namespace FETools
     for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
-          Assert(touch_count(i)!=0, ExcInternalError());
+          Assert(touch_count(i) != typename OutVector::value_type(),
+                 ExcInternalError());
           u2(i) /= touch_count(i);
         }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,12 +45,12 @@ void test (PETScWrappers::Vector &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (v(i) == i, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
 
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -67,7 +67,7 @@ int main (int argc, char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         PETScWrappers::Vector v (100);
         PETScWrappers::Vector w (100);

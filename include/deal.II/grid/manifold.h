@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_manifold_h
-#define __deal2__tria_manifold_h
+#ifndef dealii__tria_manifold_h
+#define dealii__tria_manifold_h
 
 
 /*----------------------------   manifold.h     ---------------------------*/
@@ -65,7 +65,7 @@ namespace Manifolds
  * unlike almost all other cases in the library, we here interpret the points
  * in the quadrature object to be in real space, not on the reference cell.)
  *
- * Internaly, the get_new_point() function calls the project_to_manifold()
+ * Internally, the get_new_point() function calls the project_to_manifold()
  * function after computing the weighted average of the quadrature points.
  * This allows end users to only overload project_to_manifold() for simple
  * situations.
@@ -73,7 +73,7 @@ namespace Manifolds
  * Should a finer control be necessary, then get_new_point() can be
  * overloaded.
  *
- * FlatManifold is the specialization from which StraigthBoundary is derived,
+ * FlatManifold is the specialization from which StraightBoundary is derived,
  * where the project_to_manifold() function is the identity.
  *
  * @ingroup manifold
@@ -242,8 +242,9 @@ public:
    * has zero length, then no periodicity is computed in that direction.
    * Whenever a function that tries to compute averages is called, an
    * exception will be thrown if one of the points which you are using for the
-   * average lies outside the periodicity box. The return points are garanteed
-   * to lie in the perodicity box plus or minus tolerance*periodicity.norm().
+   * average lies outside the periodicity box. The return points are
+   * guaranteed to lie in the periodicity box plus or minus
+   * tolerance*periodicity.norm().
    */
   FlatManifold (const Point<spacedim> periodicity=Point<spacedim>(),
                 const double tolerance=1e-10);
@@ -565,7 +566,7 @@ namespace Manifolds
                          hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
             wp[j] = 1.0/12.0;
           }
-        // Overwrited the weights with 1/np if we don't want to use
+        // Overwrite the weights with 1/np if we don't want to use
         // laplace vectors.
         if (with_laplace == false)
           std::fill(wp.begin(), wp.end(), 1.0/np);

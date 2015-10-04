@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__identity_matrix_h
-#define __deal2__identity_matrix_h
+#ifndef dealii__identity_matrix_h
+#define dealii__identity_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -71,7 +71,7 @@ class IdentityMatrix
 {
 public:
   /**
-   * Declate type for container size.
+   * Declare type for container size.
    */
   typedef types::global_dof_index size_type;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_iterators_h
-#define __deal2__dof_iterators_h
+#ifndef dealii__dof_iterators_h
+#define dealii__dof_iterators_h
 
 #include <deal.II/base/config.h>
 
@@ -172,4 +172,4 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__dof_iterator_selector_h
+#endif // dealii__dof_iterator_selector_h

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -430,6 +430,7 @@ get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim,spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
@@ -457,6 +458,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim, spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
@@ -615,7 +617,7 @@ FE_DGQ<dim, spacedim>::hp_constraints_are_implemented () const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -630,7 +632,7 @@ hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+hp_line_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -645,7 +647,7 @@ hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) const
+hp_quad_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -659,7 +661,7 @@ hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) con
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const
+FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this is a discontinuous element, so by definition there will
   // be no constraints wherever this element comes together with
@@ -809,25 +811,61 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
       }
 
   if (equidistant == true)
-    namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
-  else
     {
-
-      // Check whether the support points come from QGaussLobatto.
-      const QGaussLobatto<1> points_gl(this->degree+1);
-      bool gauss_lobatto = true;
-      for (unsigned int j=0; j<=this->degree; j++)
-        if (points[j] != points_gl.point(j)(0))
-          {
-            gauss_lobatto = false;
-            break;
-          }
-      if (gauss_lobatto == true)
-        namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
-      else
-        namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+      namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+      return namebuf.str();
     }
 
+  // Check whether the support points come from QGaussLobatto.
+  const QGaussLobatto<1> points_gl(this->degree+1);
+  bool gauss_lobatto = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_gl.point(j)(0))
+      {
+        gauss_lobatto = false;
+        break;
+      }
+
+  if (gauss_lobatto == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
+  // Check whether the support points come from QGauss.
+  const QGauss<1> points_g(this->degree+1);
+  bool gauss = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_g.point(j)(0))
+      {
+        gauss = false;
+        break;
+      }
+
+  if (gauss == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGauss(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
+  // Check whether the support points come from QGauss.
+  const QGaussLog<1> points_glog(this->degree+1);
+  bool gauss_log = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_glog.point(j)(0))
+      {
+        gauss_log = false;
+        break;
+      }
+
+  if (gauss_log == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLog(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
+  // All guesses exhausted
+  namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree+1 << "))";
   return namebuf.str();
 }
 

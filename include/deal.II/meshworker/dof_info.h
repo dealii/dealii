@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_dof_info_h
-#define __deal2__mesh_worker_dof_info_h
+#ifndef dealii__mesh_worker_dof_info_h
+#define dealii__mesh_worker_dof_info_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/quadrature_lib.h>

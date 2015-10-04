@@ -39,7 +39,7 @@ void check (Triangulation<2> &tria)
 {
   MappingQ<2> map(3);  // Let's take a higher order mapping
 
-  Point<2> p (1./3., 1./2.);
+  Point<2> p (1./3., 1./2.-1e-10); // avoid ambiguity for hypercube mesh
 
   std::pair<Triangulation<2>::active_cell_iterator, Point<2> >
   cell = GridTools::find_active_cell_around_point (map, tria, p);
@@ -78,6 +78,3 @@ int main ()
     check (coarse_grid);
   }
 }
-
-
-

@@ -36,7 +36,7 @@ void test(std::ostream & /*out*/)
 
   GridIn<dim> gi;
   gi.attach_triangulation (tr);
-  std::ifstream in (SOURCE_DIR "/../deal.II/grid_in/2d.inp");
+  std::ifstream in (SOURCE_DIR "/../grid/grid_in/2d.inp");
   gi.read_ucd (in);
 
   write_vtk(tr, "1");
@@ -45,7 +45,7 @@ void test(std::ostream & /*out*/)
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);

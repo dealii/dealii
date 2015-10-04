@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,16 +36,16 @@ int main ()
   t2[0] = 84;
   t2[1] = 42;
 
-  Assert (t1 == t2, ExcInternalError());
-  Assert (t1[0] == t2[0], ExcInternalError());
-  Assert (t1[1] == t2[1], ExcInternalError());
+  AssertThrow (t1 == t2, ExcInternalError());
+  AssertThrow (t1[0] == t2[0], ExcInternalError());
+  AssertThrow (t1[1] == t2[1], ExcInternalError());
 
-  Assert (! (t1 != t2), ExcInternalError());
+  AssertThrow (! (t1 != t2), ExcInternalError());
 
   t2.sort();
-  Assert (t1 != t2, ExcInternalError());
-  Assert (t1[0] == t2[1], ExcInternalError());
-  Assert (t1[1] == t2[0], ExcInternalError());
+  AssertThrow (t1 != t2, ExcInternalError());
+  AssertThrow (t1[0] == t2[1], ExcInternalError());
+  AssertThrow (t1[1] == t2[0], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

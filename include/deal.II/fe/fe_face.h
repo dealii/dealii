@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_face_h
-#define __deal2__fe_face_h
+#ifndef dealii__fe_face_h
+#define dealii__fe_face_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
@@ -227,56 +227,98 @@ public:
   get_constant_modes () const;
 
 protected:
+  /*
+   * NOTE: The following functions have their definitions inlined into the class declaration
+   * because we otherwise run into a compiler error with MS Visual Studio.
+   */
+
+
   virtual
-  typename Mapping<1,spacedim>::InternalDataBase *
+  typename FiniteElement<1,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
-            const Mapping<1,spacedim> &mapping,
-            const Quadrature<1> &quadrature) const ;
+            const Mapping<1,spacedim> &/*mapping*/,
+            const Quadrature<1> &/*quadrature*/) const
+  {
+    return new typename FiniteElement<1, spacedim>::InternalDataBase;
+  }
 
-  typename Mapping<1,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags,
-                 const Mapping<1,spacedim> &mapping,
-                 const Quadrature<0> &quadrature) const ;
+  typename FiniteElement<1,spacedim>::InternalDataBase *
+  get_face_data(const UpdateFlags update_flags,
+                const Mapping<1,spacedim> &/*mapping*/,
+                const Quadrature<0> &quadrature) const
+  {
+    // generate a new data object and initialize some fields
+    typename FiniteElement<1,spacedim>::InternalDataBase *data =
+      new typename FiniteElement<1,spacedim>::InternalDataBase;
 
-  typename Mapping<1,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags,
-                    const Mapping<1,spacedim> &mapping,
-                    const Quadrature<0> &quadrature) const ;
+    // check what needs to be initialized only once and what on every
+    // cell/face/subface we visit
+    data->update_once = update_once(update_flags);
+    data->update_each = update_each(update_flags);
+    data->update_flags = data->update_once | data->update_each;
 
-  virtual void
-  fill_fe_values (const Mapping<1,spacedim>                           &mapping,
+    const UpdateFlags flags(data->update_flags);
+    const unsigned int n_q_points = quadrature.size();
+    AssertDimension(n_q_points, 1);
+    (void)n_q_points;
+
+    // No derivatives of this element are implemented.
+    if (flags & update_gradients || flags & update_hessians)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+    return data;
+  }
+
+  typename FiniteElement<1,spacedim>::InternalDataBase *
+  get_subface_data(const UpdateFlags update_flags,
+                   const Mapping<1,spacedim> &mapping,
+                   const Quadrature<0> &quadrature) const
+  {
+    return get_face_data(update_flags, mapping, quadrature);
+  }
+
+  virtual
+  void
+  fill_fe_values (const Mapping<1,spacedim>                              &mapping,
                   const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                  const Quadrature<1>                                 &quadrature,
-                  typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
-                  typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
-                  FEValuesData<1,spacedim>                            &data,
-                  CellSimilarity::Similarity                       &cell_similarity) const;
+                  const Quadrature<1>                                     &quadrature,
+                  const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
+                  const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
+                  const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
+                  internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data,
+                  const CellSimilarity::Similarity                          cell_similarity) const;
 
-  virtual void
-  fill_fe_face_values (const Mapping<1,spacedim> &mapping,
+  virtual
+  void
+  fill_fe_face_values (const Mapping<1,spacedim>                               &mapping,
                        const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                       const unsigned int                    face_no,
-                       const Quadrature<0>                &quadrature,
-                       typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
-                       typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
-                       FEValuesData<1,spacedim> &data) const ;
+                       const unsigned int                                         face_no,
+                       const Quadrature<0>                                   &quadrature,
+                       const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
+                       const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
+                       const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
+                       internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
 
-  virtual void
-  fill_fe_subface_values (const Mapping<1,spacedim> &mapping,
+  virtual
+  void
+  fill_fe_subface_values (const Mapping<1,spacedim>                               &mapping,
                           const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                          const unsigned int                    face_no,
-                          const unsigned int                    sub_no,
-                          const Quadrature<0>                &quadrature,
-                          typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
-                          typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
-                          FEValuesData<1,spacedim> &data) const ;
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         sub_no,
+                          const Quadrature<0>                                   &quadrature,
+                          const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
+                          const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
+                          const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
+                          internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
 
 
   /**
    * Determine the values that need to be computed on the unit cell to be able
    * to compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this function, refer to the documentation in
+   * For the purpose of this function, refer to the documentation in
    * FiniteElement.
    *
    * This class assumes that shape functions of this FiniteElement do
@@ -292,7 +334,7 @@ protected:
    * Determine the values that need to be computed on every cell to be able to
    * compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this function, refer to the documentation in
+   * For the purpose of this function, refer to the documentation in
    * FiniteElement.
    *
    * This class assumes that shape functions of this FiniteElement do

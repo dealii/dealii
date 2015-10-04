@@ -27,7 +27,7 @@ void test()
   constraints.add_line(1);
   constraints.add_entry(1,2,1.);
   constraints.add_entry(1,3,1.);
-  
+
   constraints.add_line(3);
   constraints.add_entry(3,4,1.);
   constraints.add_entry(3,5,1.);
@@ -42,7 +42,7 @@ void test()
   indices[1] = 2;
   indices[2] = 3;
   indices[3] = 5;
-  
+
   constraints.resolve_indices(indices);
 
   for (unsigned int i=0; i<indices.size(); ++i)

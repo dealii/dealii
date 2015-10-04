@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_templates_h
-#define __deal2__block_sparse_matrix_templates_h
+#ifndef dealii__block_sparse_matrix_templates_h
+#define dealii__block_sparse_matrix_templates_h
 
 
 #include <deal.II/base/config.h>

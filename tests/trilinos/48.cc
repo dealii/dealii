@@ -46,10 +46,10 @@ void test (TrilinosWrappers::Vector &v,
   const double eps=typeid(TrilinosScalar)==typeid(double) ? 1e-14 : 1e-5;
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i+1., ExcInternalError());
-      Assert (x(i) == i+2., ExcInternalError());
-      Assert (std::fabs(v(i) - (i+1.)/(i+2.)) < eps*v(i),
-              ExcInternalError());
+      AssertThrow (w(i) == i+1., ExcInternalError());
+      AssertThrow (x(i) == i+2., ExcInternalError());
+      AssertThrow (std::fabs(v(i) - (i+1.)/(i+2.)) < eps*v(i),
+                   ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -64,7 +64,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
 
   try

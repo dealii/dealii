@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -146,8 +146,8 @@ void test()
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
         //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
-        Assert (idx == solution (idx), ExcInternalError());
-        Assert (2*idx == solution2 (idx), ExcInternalError());
+        AssertThrow (idx == solution (idx), ExcInternalError());
+        AssertThrow (2*idx == solution2 (idx), ExcInternalError());
       }
 
     double norm = solution.l1_norm();
@@ -173,7 +173,7 @@ void test()
 
 int main (int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

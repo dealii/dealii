@@ -17,7 +17,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -542,6 +542,7 @@ namespace MGTools
     const unsigned int       level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
+    (void)n_dofs;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -575,6 +576,7 @@ namespace MGTools
     const unsigned int level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
+    (void)n_dofs;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -647,6 +649,8 @@ namespace MGTools
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
+    (void)fine_dofs;
+    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
 
@@ -708,6 +712,8 @@ namespace MGTools
     const FiniteElement<dim> &fe = dof.get_fe();
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     const unsigned int n_comp = fe.n_components();
+    (void)n_dofs;
+    (void)n_comp;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -885,12 +891,15 @@ namespace MGTools
   {
     const FiniteElement<dim> &fe = dof.get_fe();
     const unsigned int n_comp = fe.n_components();
+    (void)n_comp;
 
     Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
             ExcIndexRange(level, 1, dof.get_tria().n_global_levels()));
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
+    (void)fine_dofs;
+    (void)coarse_dofs;
 
     // Matrix maps from fine level to coarse level
 
@@ -1090,6 +1099,7 @@ namespace MGTools
       = *std::max_element (target_block.begin(),
                            target_block.end());
     const unsigned int n_target_blocks = max_block + 1;
+    (void)n_target_blocks;
 
     for (unsigned int l=0; l<n_levels; ++l)
       AssertDimension (dofs_per_block[l].size(), n_target_blocks);
@@ -1183,6 +1193,7 @@ namespace MGTools
 
     const unsigned int n_levels = dof.get_tria().n_global_levels();
 
+    (void)n_levels;
 
 
     const unsigned int n_components = DoFTools::n_components(dof);
@@ -1219,7 +1230,7 @@ namespace MGTools
                 {
                   const typename DoFHandler<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
-                  const types::boundary_id bi = face->boundary_indicator();
+                  const types::boundary_id bi = face->boundary_id();
                   // Face is listed in
                   // boundary map
                   if (function_map.find(bi) != function_map.end())
@@ -1276,7 +1287,7 @@ namespace MGTools
                   }
 
                 typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
-                const types::boundary_id boundary_component = face->boundary_indicator();
+                const types::boundary_id boundary_component = face->boundary_id();
                 if (function_map.find(boundary_component) != function_map.end())
                   // face is of the right component
                   {

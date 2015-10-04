@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -23,7 +23,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -215,16 +215,16 @@ namespace Step12
     dof_handler.distribute_dofs (fe);
 
     // We start by generating the sparsity pattern. To this end, we first fill
-    // an intermediate object of type CompressedSparsityPattern with the
+    // an intermediate object of type DynamicSparsityPattern with the
     // couplings appearing in the system. After building the pattern, this
     // object is copied to <code>sparsity_pattern</code> and can be discarded.
 
     // To build the sparsity pattern for DG discretizations, we can call the
     // function analogue to DoFTools::make_sparsity_pattern, which is called
     // DoFTools::make_flux_sparsity_pattern:
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_flux_sparsity_pattern (dof_handler, c_sparsity);
-    sparsity_pattern.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
     // Finally, we set up the structure of all components of the linear
     // system.
@@ -357,7 +357,7 @@ namespace Step12
     Vector<double> &local_vector = dinfo.vector(0).block(0);
 
     const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+    const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
 
     std::vector<double> g(fe_v.n_quadrature_points);
 
@@ -421,7 +421,7 @@ namespace Step12
     // solution and the right hand side does not receive any contributions.
 
     const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+    const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
 
     for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
       {

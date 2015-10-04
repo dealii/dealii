@@ -29,6 +29,7 @@
 # original find module and do a dummy call to DEAL_II_PACKAGE_HANDLE:
 #
 
+# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(BZip2)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)

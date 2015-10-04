@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__slepc_spectral_transformation_h
-#define __deal2__slepc_spectral_transformation_h
+#ifndef dealii__slepc_spectral_transformation_h
+#define dealii__slepc_spectral_transformation_h
 
 
 #include <deal.II/base/config.h>
@@ -55,7 +55,7 @@ namespace SLEPcWrappers
    *  eigensolver.solve (A, B, lambda, x, size_of_spectrum);
    * @endcode
    *
-   * @note These options can also be set at the commandline.
+   * @note These options can also be set at the command line.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009, 2013
@@ -164,7 +164,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -211,7 +211,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -259,7 +259,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -308,7 +308,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };

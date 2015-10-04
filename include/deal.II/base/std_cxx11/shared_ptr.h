@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx11_shared_ptr_h
-#define __deal2__std_cxx11_shared_ptr_h
+#ifndef dealii__std_cxx11_shared_ptr_h
+#define dealii__std_cxx11_shared_ptr_h
 
 
 #include <deal.II/base/config.h>

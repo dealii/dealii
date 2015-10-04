@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,10 +42,10 @@ void test (Vector<std::complex<double> > &v)
 
   // check that the entries are ok
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert (((pattern[i] == true) && (v(i) == std::complex<double> (i+1., i+2.)*5./4.))
-            ||
-            ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
-            ExcInternalError());
+    AssertThrow (((pattern[i] == true) && (v(i) == std::complex<double> (i+1., i+2.)*5./4.))
+                 ||
+                 ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
