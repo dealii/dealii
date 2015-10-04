@@ -626,7 +626,7 @@ namespace Step50
         boundary_constraints[level].close ();
 
         boundary_interface_constraints[level]
-	  .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices()[ (level)]);
+        .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices()[ (level)]);
         boundary_interface_constraints[level].close ();
       }
 
@@ -719,9 +719,9 @@ namespace Step50
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      /** old HEAD:
-		  if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
-		  || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j])) */
+              /** old HEAD:
+              if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
+              || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j])) */
               if ( !(interface_dofs_on_level.is_element(local_dof_indices[i])==true &&
                      interface_dofs_on_level.is_element(local_dof_indices[j])==false))
                 cell_matrix(i,j) = 0;
@@ -864,7 +864,7 @@ namespace Step50
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
-    
+
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
@@ -923,7 +923,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
-    
+
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     TrilinosWrappers::MPI::Vector temp_solution;
@@ -941,7 +941,7 @@ namespace Step50
                                        estimated_error_per_cell,
                                        0.3, 0.0);
 
-    
+
     triangulation.prepare_coarsening_and_refinement ();
     triangulation.execute_coarsening_and_refinement ();
   }
@@ -1005,8 +1005,8 @@ namespace Step50
         std::ofstream visit_master (visit_master_filename.c_str());
         data_out.write_visit_record (visit_master, filenames);
 
-	std::cout << "wrote " << pvtu_master_filename << std::endl;
-	
+        std::cout << "wrote " << pvtu_master_filename << std::endl;
+
       }
   }
 
@@ -1059,10 +1059,10 @@ namespace Step50
         solve ();
         output_results (cycle);
 
-	TrilinosWrappers::MPI::Vector temp = solution;
-	system_matrix.residual(temp,solution,system_rhs);
-	constraints.set_zero(temp);
-	deallog << "residual " << temp.l2_norm() << std::endl;
+        TrilinosWrappers::MPI::Vector temp = solution;
+        system_matrix.residual(temp,solution,system_rhs);
+        constraints.set_zero(temp);
+        deallog << "residual " << temp.l2_norm() << std::endl;
       }
   }
 }

@@ -195,9 +195,9 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
-       for (IT i= copy_indices_global_mine[level].begin();
-            i != copy_indices_global_mine[level].end(); ++i)
-         dst_level(i->second) = src(i->first);
+      for (IT i= copy_indices_global_mine[level].begin();
+           i != copy_indices_global_mine[level].end(); ++i)
+        dst_level(i->second) = src(i->first);
 
       dst_level.compress(VectorOperation::insert);
 #ifdef DEBUG_OUTPUT

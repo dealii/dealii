@@ -247,15 +247,15 @@ const std::vector<std::set<types::global_dof_index> > &
 MGConstrainedDoFs::get_boundary_indices () const
 {
   if (boundary_indices_old.size()!=boundary_indices.size())
-  {
-    boundary_indices_old.resize(boundary_indices.size());
-    for (unsigned int l=0;l<boundary_indices.size(); ++l)
-      {
-        std::vector<types::global_dof_index> tmp;
-        boundary_indices[l].fill_index_vector(tmp);
-        boundary_indices_old[l].insert(tmp.begin(), tmp.end());
-      }
-  }
+    {
+      boundary_indices_old.resize(boundary_indices.size());
+      for (unsigned int l=0; l<boundary_indices.size(); ++l)
+        {
+          std::vector<types::global_dof_index> tmp;
+          boundary_indices[l].fill_index_vector(tmp);
+          boundary_indices_old[l].insert(tmp.begin(), tmp.end());
+        }
+    }
   return boundary_indices_old;
 }
 

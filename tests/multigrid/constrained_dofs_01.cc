@@ -42,24 +42,24 @@
 
 using namespace std;
 
-  std::string id_to_string(const CellId &id)
-  {
-    std::ostringstream ss;
-    ss << id;
-    return ss.str();
-  }
+std::string id_to_string(const CellId &id)
+{
+  std::ostringstream ss;
+  ss << id;
+  return ss.str();
+}
 
 template <int dim>
 void setup_tria(parallel::distributed::Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
       if (id_to_string(cell->id()) == "0_2:11")
-	cell->set_refine_flag();
+        cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
 }
@@ -83,49 +83,50 @@ void check_fe(FiniteElement<dim> &fe)
   dofh.distribute_mg_dofs(fe);
 
   MGConstrainedDoFs                    mg_constrained_dofs_ref;
-  { // reorder
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_SELF,
-                                               Triangulation<dim>::none,
-                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  setup_tria(tr);
+  {
+    // reorder
+    parallel::distributed::Triangulation<dim> tr(MPI_COMM_SELF,
+                                                 Triangulation<dim>::none,
+                                                 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+    setup_tria(tr);
 
-  DoFHandler<dim> dofhref(tr);
-  dofhref.distribute_dofs(fe);
-  dofhref.distribute_mg_dofs(fe);
+    DoFHandler<dim> dofhref(tr);
+    dofhref.distribute_dofs(fe);
+    dofhref.distribute_mg_dofs(fe);
 
-  //std::map<std::string,std::vector<types::global_dof_index> > dofmap;
-  std::map<std::string,std::vector<types::global_dof_index> > mgdofmap;
+    //std::map<std::string,std::vector<types::global_dof_index> > dofmap;
+    std::map<std::string,std::vector<types::global_dof_index> > mgdofmap;
 
-  for (typename DoFHandler<dim>::level_cell_iterator cell = dofhref.begin();
-       cell != dofhref.end(); ++cell)
-    {
-      if (!cell->is_locally_owned_on_level())
-	continue;
+    for (typename DoFHandler<dim>::level_cell_iterator cell = dofhref.begin();
+         cell != dofhref.end(); ++cell)
+      {
+        if (!cell->is_locally_owned_on_level())
+          continue;
 
-      std::vector<types::global_dof_index> &d = mgdofmap[id_to_string(cell->id())];
-      d.resize(fe.dofs_per_cell);
-      cell->get_mg_dof_indices(d);
-    }
+        std::vector<types::global_dof_index> &d = mgdofmap[id_to_string(cell->id())];
+        d.resize(fe.dofs_per_cell);
+        cell->get_mg_dof_indices(d);
+      }
 
-  for (typename DoFHandler<dim>::level_cell_iterator cell = dofh.begin();
-       cell != dofh.end(); ++cell)
-    {
-      if (cell->level_subdomain_id()==numbers::artificial_subdomain_id)
-	continue;
-      
-      std::vector<types::global_dof_index> &renumbered = mgdofmap[id_to_string(cell->id())];
-      cell->set_mg_dof_indices(renumbered);
-      cell->update_cell_dof_indices_cache();
-    }
-  
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
-  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  mg_constrained_dofs_ref.initialize(dofhref, dirichlet_boundary);
+    for (typename DoFHandler<dim>::level_cell_iterator cell = dofh.begin();
+         cell != dofh.end(); ++cell)
+      {
+        if (cell->level_subdomain_id()==numbers::artificial_subdomain_id)
+          continue;
+
+        std::vector<types::global_dof_index> &renumbered = mgdofmap[id_to_string(cell->id())];
+        cell->set_mg_dof_indices(renumbered);
+        cell->update_cell_dof_indices_cache();
+      }
+
+    typename FunctionMap<dim>::type      dirichlet_boundary;
+    ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+    mg_constrained_dofs_ref.initialize(dofhref, dirichlet_boundary);
   }
-  
-  
-  
+
+
+
   MGConstrainedDoFs                    mg_constrained_dofs;
 
   typename FunctionMap<dim>::type      dirichlet_boundary;
@@ -141,25 +142,25 @@ void check_fe(FiniteElement<dim> &fe)
       IndexSet rei = mg_constrained_dofs.get_refinement_edge_indices (level);
       deallog << "get_refinement_edge_indices:" << std::endl;
       rei.print(deallog);
-      
+
       IndexSet bi = mg_constrained_dofs.get_boundary_indices (level);
       deallog << "get_boundary_indices:" << std::endl;
       bi.print(deallog);
 
       IndexSet relevant;
       DoFTools::extract_locally_relevant_mg_dofs (dofh,
-                relevant, level);
+                                                  relevant, level);
       deallog << "relevant:" << std::endl;
       relevant.print(deallog);
 
       // the indexsets should be the same when run in parallel (on the
       // relevant subset):
       deallog << ((rei == (relevant & mg_constrained_dofs_ref.get_refinement_edge_indices(level)))
-		  ?"ok ":"FAIL ")
-	      << ((bi == (relevant & mg_constrained_dofs_ref.get_boundary_indices(level)))
-		  ?"ok ":"FAIL ")
-	      << std::endl;
-      
+                  ?"ok ":"FAIL ")
+              << ((bi == (relevant & mg_constrained_dofs_ref.get_boundary_indices(level)))
+                  ?"ok ":"FAIL ")
+              << std::endl;
+
 
     }
 }
@@ -180,7 +181,7 @@ void check()
 }
 
 int main(int argc, char *argv[])
-{ 
+{
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll log;
 

@@ -48,45 +48,45 @@
 
 using namespace std;
 
-  std::string id_to_string(const CellId &id)
-  {
-    std::ostringstream ss;
-    ss << id;
-    return ss.str();
-  }
+std::string id_to_string(const CellId &id)
+{
+  std::ostringstream ss;
+  ss << id;
+  return ss.str();
+}
 
 template <int dim>
 void setup_tria(parallel::distributed::Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  
+
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
       if (id_to_string(cell->id()) == "0_2:03"
-	  || id_to_string(cell->id()) == "0_2:00"
-	  || id_to_string(cell->id()) == "0_2:01"
-	  || id_to_string(cell->id()) == "0_2:12")
-	cell->set_refine_flag();
+          || id_to_string(cell->id()) == "0_2:00"
+          || id_to_string(cell->id()) == "0_2:01"
+          || id_to_string(cell->id()) == "0_2:12")
+        cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
       if (id_to_string(cell->id()) == "0_3:032"
-      || id_to_string(cell->id()) == "0_3:000")
-	cell->set_refine_flag();
+          || id_to_string(cell->id()) == "0_3:000")
+        cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
-  
+
 
   for (typename parallel::distributed::Triangulation<dim>::cell_iterator cell = tr.begin();
        cell != tr.end(); ++cell)
     {
       deallog << "cell=" << cell->id()
-	      << " level_subdomain_id=" << cell->level_subdomain_id()
-	      << std::endl;
+              << " level_subdomain_id=" << cell->level_subdomain_id()
+              << std::endl;
     }
 }
 
@@ -103,7 +103,7 @@ void check_fe(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
                                                Triangulation<dim>::none,
                                                parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   setup_tria(tr);
@@ -113,14 +113,14 @@ void check_fe(FiniteElement<dim> &fe)
       DataOut<dim> data_out;
       Vector<float> subdomain (tr.n_active_cells());
       for (unsigned int i=0; i<subdomain.size(); ++i)
-	subdomain(i) = tr.locally_owned_subdomain();
+        subdomain(i) = tr.locally_owned_subdomain();
       data_out.attach_triangulation (tr);
       data_out.add_data_vector (subdomain, "subdomain");
       data_out.build_patches (0);
       const std::string filename = ("solution." +
-				    Utilities::int_to_string
-				    (tr.locally_owned_subdomain(), 4) +
-				    ".vtu");
+                                    Utilities::int_to_string
+                                    (tr.locally_owned_subdomain(), 4) +
+                                    ".vtu");
       std::ofstream output (filename.c_str());
       data_out.write_vtu (output);
     }
@@ -136,7 +136,7 @@ void check_fe(FiniteElement<dim> &fe)
   ConstraintMatrix hanging_node_constraints;
   IndexSet locally_relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh,
-                                             locally_relevant_set);
+                                           locally_relevant_set);
   hanging_node_constraints.reinit (locally_relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, hanging_node_constraints);
   hanging_node_constraints.close();
@@ -149,14 +149,14 @@ void check_fe(FiniteElement<dim> &fe)
   for (unsigned int level=u.min_level(); level<=u.max_level(); ++level)
     {
       u[level].reinit(dofh.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
-      for (unsigned int i=0;i<dofh.locally_owned_mg_dofs(level).n_elements();++i)
-	{
-	  unsigned int index = dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
-	  u[level][index] = 1.0;//1000+level*100+index;
-	}
+      for (unsigned int i=0; i<dofh.locally_owned_mg_dofs(level).n_elements(); ++i)
+        {
+          unsigned int index = dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
+          u[level][index] = 1.0;//1000+level*100+index;
+        }
       u[level].compress(VectorOperation::insert);
     }
-  
+
   vector_t v;
   v.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   v = 0.;
@@ -164,11 +164,11 @@ void check_fe(FiniteElement<dim> &fe)
   hanging_node_constraints.distribute(v);
 
   {
-    for (unsigned int i=0;i<dofh.locally_owned_dofs().n_elements();++i)
+    for (unsigned int i=0; i<dofh.locally_owned_dofs().n_elements(); ++i)
       {
-	unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
-	if (abs(v[index] - 1.0)>1e-5)
-	  deallog << "ERROR: index=" << index << " is equal to " << v[index] << std::endl;
+        unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
+        if (abs(v[index] - 1.0)>1e-5)
+          deallog << "ERROR: index=" << index << " is equal to " << v[index] << std::endl;
       }
   }
   deallog << "ok" << std::endl;
@@ -190,7 +190,7 @@ void check()
 }
 
 int main(int argc, char *argv[])
-{ 
+{
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll log;
 

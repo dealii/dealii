@@ -284,7 +284,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // We keep track in the bitfield dof_touched which global dof has
   // been processed already (on the current level). This is the same as
   // the multigrid running in serial.
-  
+
   struct dof_pair
   {
     unsigned int level;
@@ -293,7 +293,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
     dof_pair(unsigned int level, unsigned int global_dof_index, unsigned int level_dof_index)
       :
-        level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
+      level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
     {}
 
     dof_pair()
@@ -303,7 +303,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // map cpu_index -> vector of data
   // that will be copied into copy_indices_level_mine
   std::vector<dof_pair> send_data_temp;
-  
+
   copy_indices.resize(n_levels);
   copy_indices_global_mine.resize(n_levels);
   copy_indices_level_mine.resize(n_levels);
@@ -355,12 +355,12 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               if (global_mine && level_mine)
                 {
                   copy_indices[level].push_back(
-                  std::make_pair (global_dof_indices[i], level_dof_indices[i]));
+                    std::make_pair (global_dof_indices[i], level_dof_indices[i]));
                 }
-              else if(global_mine)
+              else if (global_mine)
                 {
                   copy_indices_global_mine[level].push_back(
-                  std::make_pair (global_dof_indices[i], level_dof_indices[i]));
+                    std::make_pair (global_dof_indices[i], level_dof_indices[i]));
 
                   //send this to the owner of the level_dof:
                   send_data_temp.push_back(dof_pair(level, global_dof_indices[i], level_dof_indices[i]));
@@ -374,7 +374,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             }
         }
     }
-  
+
   const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
     (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
      (&mg_dof.get_tria()));
@@ -386,6 +386,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // neighbors, so we communicate with every other process. Searching the
       // owner for every single DoF becomes quite inefficient. Please fix
       // this, Timo.
+
       std::vector<unsigned int> neighbors;
       std::map<int, std::vector<dof_pair> > send_data;
 
@@ -394,13 +395,13 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
         // come from Triangulation
         int n_proc = Utilities::MPI::n_mpi_processes(tria->get_communicator());
         int myid = tria->locally_owned_subdomain();
-        for (unsigned int i=0;i<n_proc;++i)
+        for (unsigned int i=0; i<n_proc; ++i)
           if (i!=myid)
             neighbors.push_back(i);
       }
 
       // * find owners of the level dofs and insert into send_data accordingly
-      for(typename std::vector<dof_pair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
+      for (typename std::vector<dof_pair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
         {
           for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
             {
@@ -419,7 +420,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
           {
             requests.push_back(MPI_Request());
             unsigned int dest = *it;
-            std::vector<dof_pair> & data = send_data[dest];
+            std::vector<dof_pair> &data = send_data[dest];
             if (data.size())
               MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
             else
@@ -440,8 +441,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             if (len==0)
               {
                 int err = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                                       tria->get_communicator(), &status);
-                Assert(err==MPI_SUCCESS, ExcInternalError());
+                                   tria->get_communicator(), &status);
+                AssertThrow(err==MPI_SUCCESS, ExcInternalError());
                 continue;
               }
 
@@ -451,14 +452,14 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
             void *ptr = &receive[0];
             int err = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                                   tria->get_communicator(), &status);
-            Assert(err==MPI_SUCCESS, ExcInternalError());
+                               tria->get_communicator(), &status);
+            AssertThrow(err==MPI_SUCCESS, ExcInternalError());
 
             for (unsigned int i=0; i<receive.size(); ++i)
               {
                 copy_indices_level_mine[receive[i].level].push_back(
-                      std::pair<unsigned int, unsigned int> (receive[i].global_dof_index, receive[i].level_dof_index)
-                      );
+                  std::pair<unsigned int, unsigned int> (receive[i].global_dof_index, receive[i].level_dof_index)
+                );
               }
           }
       }

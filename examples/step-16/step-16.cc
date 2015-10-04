@@ -658,8 +658,8 @@ int main (int argc, char *argv[])
   try
     {
       using namespace Step16;
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
-                                                      numbers::invalid_unsigned_int);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
+                                                          numbers::invalid_unsigned_int);
 
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
