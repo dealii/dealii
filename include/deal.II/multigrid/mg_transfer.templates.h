@@ -186,8 +186,6 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
-      int myid=-1;
-      MPI_Comm_rank (MPI_COMM_WORLD, &myid);
 #endif
 
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator IT;
@@ -206,7 +204,6 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 #endif
       if (!first)
         {
-          //if (level<2)
           restrict_and_add (level+1, dst[level], dst[level+1]);
 #ifdef DEBUG_OUTPUT
           std::cout << "copy_to_mg restr&add " << level << " " << dst_level.l2_norm() << std::endl;
@@ -227,10 +224,6 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   OutVector                     &dst,
   const MGLevelObject<VECTOR> &src) const
 {
-#ifdef DEBUG_OUTPUT
-  int myid=-1;
-  MPI_Comm_rank (MPI_COMM_WORLD, &myid);
-#endif
   // For non-DG: degrees of
   // freedom in the refinement
   // face may need special
