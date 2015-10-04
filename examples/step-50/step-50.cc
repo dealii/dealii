@@ -625,8 +625,12 @@ namespace Step50
 
         boundary_constraints[level].close ();
 
+	boundary_interface_constraints[level].reinit(dofset);
+	// compute indices that are refinement edge and boundary (aka refinement_edge_boundary_indices):
+	IndexSet idxset = mg_constrained_dofs.get_refinement_edge_indices(level) & mg_constrained_dofs.get_boundary_indices(level);
+	
         boundary_interface_constraints[level]
-        .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices()[ (level)]);
+        .add_lines (idxset);
         boundary_interface_constraints[level].close ();
       }
 
