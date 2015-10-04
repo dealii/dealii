@@ -132,6 +132,26 @@ namespace parallel
      */
     types::subdomain_id locally_owned_subdomain () const;
 
+    /**
+     * Returns a set of MPI ranks of the processors that have at least one
+     * ghost cell adjacent to the cells of the local processor. In other
+     * words, this is the set of subdomain_id() for all ghost cells.
+     *
+     * @note: If @p i is contained in the list of processor @p j, then @p j
+     * will also be contained in the list of processor @p i.
+     **/
+    const std::set<unsigned int> &ghost_owners () const;
+
+    /**
+     * Returns a set of MPI ranks of the processors that have at least one
+     * level ghost cell adjacent to our cells used in geometric multigrid. In
+     * other words, this is the set of level_subdomain_id() for all level
+     * ghost cells.
+     *
+     * @note: If @p i is contained in the list of processor @p j, then @p j
+     * will also be contained in the list of processor @p i.
+     **/
+    const std::set<unsigned int> &level_ghost_owners () const;
 
   protected:
     /**
@@ -142,24 +162,48 @@ namespace parallel
     MPI_Comm mpi_communicator;
 
     /**
-     * The subdomain id to be used for the current processor.
+     * The subdomain id to be used for the current processor. This is the MPI
+     * rank.
      */
     types::subdomain_id my_subdomain;
 
     /**
-     * total number of subdomains.
+     * The total number of subdomains (or the size of the MPI communicator).
      */
     types::subdomain_id n_subdomains;
 
     /**
-     * A structure that contains some numbers about the distributed
+     * A structure that contains information about the distributed
      * triangulation.
      */
     struct NumberCache
     {
+      /**
+       *  This vector stores the number of locally owned active cells per MPI
+       *  rank.
+       */
       std::vector<unsigned int> n_locally_owned_active_cells;
+      /**
+       * The total number of active cells (sum of
+       * @p n_locally_owned_active_cells).
+       */
       types::global_dof_index   n_global_active_cells;
+      /**
+       * The global number of levels computed as the maximum number of levels
+       * taken over all MPI ranks, so <tt>n_levels()<=n_global_levels =
+       * max(n_levels() on proc i)</tt>.
+       */
       unsigned int              n_global_levels;
+      /**
+       * A set containing the subdomain_id (MPI rank) of the owners of the
+       * ghost cells on this processor.
+       */
+      std::set<unsigned int> ghost_owners;
+      /**
+       * A set containing the MPI ranks of the owners of the level ghost cells
+       * on this processor (for all levels).
+       */
+      std::set<unsigned int> level_ghost_owners;
 
       NumberCache();
     };
@@ -169,7 +213,7 @@ namespace parallel
     /**
      * Update the number_cache variable after mesh creation or refinement.
      */
-    void update_number_cache ();
+    virtual void update_number_cache ();
 
 
   };

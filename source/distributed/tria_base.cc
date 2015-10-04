@@ -151,6 +151,9 @@ namespace parallel
                number_cache.n_locally_owned_active_cells.end(),
                0);
 
+    number_cache.ghost_owners.clear ();
+    number_cache.level_ghost_owners.clear ();
+
     if (this->n_levels() == 0)
       {
         // Skip communication done below if we do not have any cells
@@ -162,6 +165,19 @@ namespace parallel
         number_cache.n_global_levels = 0;
         return;
       }
+
+
+    {
+      // find ghost owners
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell = this->begin_active();
+           cell != this->end();
+           ++cell)
+        if (cell->is_ghost())
+          number_cache.ghost_owners.insert(cell->subdomain_id());
+
+      Assert(number_cache.ghost_owners.size() < Utilities::MPI::n_mpi_processes(mpi_communicator), ExcInternalError());
+    }
 
     if (this->n_levels() > 0)
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
@@ -205,8 +221,25 @@ namespace parallel
     return my_subdomain;
   }
 
+  template <int dim, int spacedim>
+  const std::set<unsigned int> &
+  Triangulation<dim,spacedim>::
+  ghost_owners () const
+  {
+    return number_cache.ghost_owners;
+  }
 
-}
+  template <int dim, int spacedim>
+  const std::set<unsigned int> &
+  Triangulation<dim,spacedim>::
+  level_ghost_owners () const
+  {
+    return number_cache.level_ghost_owners;
+  }
+
+} // end namespace parallel
+
+
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
