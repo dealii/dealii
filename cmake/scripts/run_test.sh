@@ -77,7 +77,7 @@ diff() {
   # Pick up main comparison file and all variants. A valid variant name is
   # of the form [...].output.[STRING]
   #
-  for file in "${COMPARISON_FILE}" "${COMPARISON_FILE}".*; do
+  for file in "${COMPARISON_FILE}"*; do
     # determine variant name (empty string for main comparison file):
     variant=${file#*.output}
 
