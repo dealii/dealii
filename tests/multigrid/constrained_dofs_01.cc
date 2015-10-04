@@ -42,13 +42,6 @@
 
 using namespace std;
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 template <int dim>
 void setup_tria(parallel::distributed::Triangulation<dim> &tr)
 {
@@ -58,7 +51,7 @@ void setup_tria(parallel::distributed::Triangulation<dim> &tr)
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
-      if (id_to_string(cell->id()) == "0_2:11")
+      if (cell->id().to_string() == "0_2:11")
         cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
@@ -103,7 +96,7 @@ void check_fe(FiniteElement<dim> &fe)
         if (!cell->is_locally_owned_on_level())
           continue;
 
-        std::vector<types::global_dof_index> &d = mgdofmap[id_to_string(cell->id())];
+        std::vector<types::global_dof_index> &d = mgdofmap[cell->id().to_string()];
         d.resize(fe.dofs_per_cell);
         cell->get_mg_dof_indices(d);
       }
@@ -114,7 +107,7 @@ void check_fe(FiniteElement<dim> &fe)
         if (cell->level_subdomain_id()==numbers::artificial_subdomain_id)
           continue;
 
-        std::vector<types::global_dof_index> &renumbered = mgdofmap[id_to_string(cell->id())];
+        std::vector<types::global_dof_index> &renumbered = mgdofmap[cell->id().to_string()];
         cell->set_mg_dof_indices(renumbered);
         cell->update_cell_dof_indices_cache();
       }

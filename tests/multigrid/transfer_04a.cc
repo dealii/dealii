@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check mg transfer in parallel, especially communication of copy_indices
+// check mg transfer in parallel
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -49,23 +49,22 @@ template <int dim>
 void setup_tria(parallel::distributed::Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
-  tr.refine_global(2);
+  tr.refine_global(1);
 
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
-      if (cell->id().to_string() == "0_2:03"
-          || cell->id().to_string() == "0_2:00"
-          || cell->id().to_string() == "0_2:01"
-          || cell->id().to_string() == "0_2:12")
+      if (cell->id().to_string() != "0_1:3")
         cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
+
   for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
        cell != tr.end(); ++cell)
     {
-      if (cell->id().to_string() == "0_3:032"
-          || cell->id().to_string() == "0_3:000")
+      if (cell->id().to_string() == "0_2:00"
+          || cell->id().to_string() == "0_2:01"
+          || cell->id().to_string() == "0_2:02")
         cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
@@ -99,41 +98,40 @@ void check_fe(FiniteElement<dim> &fe)
   setup_tria(tr);
 
   if (false)
-    {
-      DataOut<dim> data_out;
-      Vector<float> subdomain (tr.n_active_cells());
-      for (unsigned int i=0; i<subdomain.size(); ++i)
-        subdomain(i) = tr.locally_owned_subdomain();
-      data_out.attach_triangulation (tr);
-      data_out.add_data_vector (subdomain, "subdomain");
-      data_out.build_patches (0);
-      const std::string filename = ("solution." +
-                                    Utilities::int_to_string
-                                    (tr.locally_owned_subdomain(), 4) +
-                                    ".vtu");
-      std::ofstream output (filename.c_str());
-      data_out.write_vtu (output);
-    }
+  {
+    DataOut<dim> data_out;
+    Vector<float> subdomain (tr.n_active_cells());
+    for (unsigned int i=0; i<subdomain.size(); ++i)
+      subdomain(i) = tr.locally_owned_subdomain();
+    data_out.attach_triangulation (tr);
+    data_out.add_data_vector (subdomain, "subdomain");
+    data_out.build_patches (0);
+    const std::string filename = ("solution." +
+                                  Utilities::int_to_string
+                                  (tr.locally_owned_subdomain(), 4) +
+                                  ".vtu");
+    std::ofstream output (filename.c_str());
+    data_out.write_vtu (output);
+
+  }
+
+
+  ZeroFunction<dim> zero;
+  typename FunctionMap<dim>::type fmap;
+  fmap.insert(std::make_pair(0, &zero));
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs(fe);
   typedef TrilinosWrappers::MPI::Vector vector_t;
+  {
 
-  MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dofh);
 
-  ConstraintMatrix hanging_node_constraints;
-  IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs (dofh,
-                                           locally_relevant_set);
-  hanging_node_constraints.reinit (locally_relevant_set);
-  DoFTools::make_hanging_node_constraints (dofh, hanging_node_constraints);
-  hanging_node_constraints.close();
 
-  MGTransferPrebuilt<vector_t> transfer(hanging_node_constraints, mg_constrained_dofs);
+  }
+  MGTransferPrebuilt<vector_t> transfer;
   transfer.build_matrices(dofh);
-  //transfer.print_indices(deallog.get_file_stream());
+  transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels()-1);
   for (unsigned int level=u.min_level(); level<=u.max_level(); ++level)
@@ -142,7 +140,7 @@ void check_fe(FiniteElement<dim> &fe)
       for (unsigned int i=0; i<dofh.locally_owned_mg_dofs(level).n_elements(); ++i)
         {
           unsigned int index = dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
-          u[level][index] = 1.0;//1000+level*100+index;
+          u[level][index] = 1;//1000+level*100+index;
         }
       u[level].compress(VectorOperation::insert);
     }
@@ -151,16 +149,15 @@ void check_fe(FiniteElement<dim> &fe)
   v.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   v = 0.;
   transfer.copy_from_mg(dofh, v, u);
-  hanging_node_constraints.distribute(v);
 
   {
     for (unsigned int i=0; i<dofh.locally_owned_dofs().n_elements(); ++i)
       {
         unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
-        if (abs(v[index] - 1.0)>1e-5)
-          deallog << "ERROR: index=" << index << " is equal to " << v[index] << std::endl;
+        deallog << v[index] << " ";
       }
   }
+  //v.print(deallog.get_file_stream());
   deallog << "ok" << std::endl;
 }
 
