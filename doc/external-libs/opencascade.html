@@ -37,11 +37,15 @@ It is a good practice to build in a separate directory:
 <pre>
 mkdir build
 cd build
-cmake -DOCE_INSTALL_PREFIX=/path/to/where/you/want/oce ..
+cmake -D OCE_INSTALL_PREFIX=/path/to/where/you/want/oce \
+      -D OCE_TESTING=OFF \
+      -D OCE_VISUALISATION=OFF \
+      -D OCE_DISABLE_X11=ON \
+      ..
 make install
 </pre>
 
-The default options are good for the deal.II library.
+This will turn off some packages we don't need. The default package options also work, though.
 
     <h2>Interfacing <acronym>deal.II</acronym>
       to <acronym>OpenCASCADE</acronym></h2>
