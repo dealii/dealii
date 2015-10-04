@@ -382,28 +382,15 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
   if (tria)
     {
-      // TODO: This is a gigantic hack. We don't have a list of all our ghost
-      // neighbors, so we communicate with every other process. Searching the
-      // owner for every single DoF becomes quite inefficient. Please fix
-      // this, Timo.
-
-      std::vector<unsigned int> neighbors;
+      // TODO: Searching the owner for every single DoF becomes quite
+      // inefficient. Please fix this, Timo.
+      std::set<unsigned int> neighbors = tria->level_ghost_owners();
       std::map<int, std::vector<dof_pair> > send_data;
-
-      {
-        // TODO: replace this with the minimum ghost neighbor list that should
-        // come from Triangulation
-        int n_proc = Utilities::MPI::n_mpi_processes(tria->get_communicator());
-        int myid = tria->locally_owned_subdomain();
-        for (unsigned int i=0; i<n_proc; ++i)
-          if (i!=myid)
-            neighbors.push_back(i);
-      }
 
       // * find owners of the level dofs and insert into send_data accordingly
       for (typename std::vector<dof_pair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
         {
-          for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+          for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
             {
               if (mg_dof.locally_owned_mg_dofs_per_processor(dofpair->level)[*it].is_element(dofpair->level_dof_index))
                 {
@@ -416,7 +403,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // * send
       std::vector<MPI_Request> requests;
       {
-        for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+        for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
           {
             requests.push_back(MPI_Request());
             unsigned int dest = *it;
@@ -431,7 +418,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // * receive
       {
         typename std::vector<dof_pair> receive;
-        for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+        for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
           {
             MPI_Status status;
             int len;
