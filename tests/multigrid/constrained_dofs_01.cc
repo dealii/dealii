@@ -140,6 +140,22 @@ void check_fe(FiniteElement<dim> &fe)
       deallog << "get_boundary_indices:" << std::endl;
       bi.print(deallog);
 
+      {
+	// check that refinement_edge_boundary_indices (deprecated) is really
+	// the intersection of the sets above:
+	IndexSet intersect = rei & bi;
+	std::vector<bool> ref = mg_constrained_dofs.get_refinement_edge_boundary_indices()[level];
+
+	unsigned int idx = 0;
+	for (std::vector<bool>::iterator it = ref.begin(); it != ref.end(); ++it, ++idx)
+	  {
+	    if ((*it == true) != intersect.is_element(idx))
+	      deallog << "mismatch idx=" << idx << " "
+		      << (*it == true) << " " << intersect.is_element(idx) << std::endl;
+	  }
+      }
+      
+      
       IndexSet relevant;
       DoFTools::extract_locally_relevant_mg_dofs (dofh,
                                                   relevant, level);

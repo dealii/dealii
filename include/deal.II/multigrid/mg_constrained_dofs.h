@@ -307,8 +307,10 @@ MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
       for (unsigned int l=0; l<n_levels; ++l)
         {
           refinement_edge_boundary_indices_old[l].resize(refinement_edge_indices[l].size());
-          for (types::global_dof_index idx=0; idx<refinement_edge_indices[l].size(); ++idx)
-            refinement_edge_boundary_indices_old[l][idx] = this->is_boundary_index(l, idx);
+          for (IndexSet::ElementIterator it = refinement_edge_indices[l].begin();
+               it != refinement_edge_indices[l].end();
+               ++it)
+            refinement_edge_boundary_indices_old[l][*it] = this->is_boundary_index(l, *it);
         }
     }
 
