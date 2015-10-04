@@ -276,7 +276,7 @@ void Step4<dim>::solve ()
     check_solver_within_range(
       solver.solve (system_matrix, solution, system_rhs,
                     preconditioner),
-      solver_control.last_step(), 31, 33);
+      solver_control.last_step(), 31, 34);
   }
   deallog.pop();
 
@@ -290,7 +290,7 @@ void Step4<dim>::solve ()
     check_solver_within_range(
       solver.solve (system_matrix, solution, system_rhs,
                     preconditioner),
-      solver_control.last_step(), 24, 38);
+      solver_control.last_step(), 24, 40);
   }
   deallog.pop();
   deallog << std::endl;
