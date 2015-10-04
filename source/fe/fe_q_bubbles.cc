@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
@@ -54,31 +55,32 @@ namespace FE_Q_Bubbles_Helper
       // Initialize quadrature formula on fine cells
       MappingQ1<dim, spacedim> mapping;
 
-      Quadrature<dim> *q_fine;
+      std_cxx11::unique_ptr<Quadrature<dim> > q_fine;
       Quadrature<1> q_dummy(std::vector<Point<1> >(1), std::vector<double> (1,1.));
       switch (dim)
         {
         case 1:
           if (spacedim==1)
-            q_fine = new QGauss<dim> (degree+1);
+            q_fine.reset(new QGauss<dim> (degree+1));
           else if (spacedim==2)
-            q_fine = new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy);
+            q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy));
           else
-            q_fine = new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy, q_dummy);
+            q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy, q_dummy));
           break;
         case 2:
           if (spacedim==2)
-            q_fine = new QGauss<dim> (degree+1);
+            q_fine.reset(new QGauss<dim> (degree+1));
           else
-            q_fine = new QAnisotropic<dim>(QGauss<1>(degree+1), QGauss<1>(degree+1), q_dummy);
+            q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), QGauss<1>(degree+1), q_dummy));
           break;
         case 3:
-          q_fine = new QGauss<dim> (degree+1);
+          q_fine.reset(new QGauss<dim> (degree+1));
           break;
         default:
           AssertThrow(false, ExcInternalError());
         }
 
+      Assert(q_fine.get() != NULL, ExcInternalError());
       const unsigned int nq = q_fine->size();
 
       // loop over all possible refinement cases
