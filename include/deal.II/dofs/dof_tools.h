@@ -740,7 +740,7 @@ namespace DoFTools
    * elements of the other vector components of the finite element fields on
    * the fine grid are not touched.
    *
-   * Triangulation of the fine grid can be distributed. When called in parallel, 
+   * Triangulation of the fine grid can be distributed. When called in parallel,
    * each process has to have a copy of the coarse grid. In this case, function
    * returns transfer representation for a set of locally owned cells.
    *
