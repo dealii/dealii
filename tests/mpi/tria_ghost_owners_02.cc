@@ -96,7 +96,7 @@ void test()
       bool is_subset = std::includes(level_ghost_owners.begin(), level_ghost_owners.end(), ghost_owners.begin(), ghost_owners.end());
       Assert(is_subset, ExcInternalError());
 
-      Vector<float> indicators (tr.dealii::Triangulation<dim>::n_active_cells());
+      Vector<float> indicators (tr.n_active_cells());
       std::set<unsigned int> neighbors;
       {
         for (typename Triangulation<dim>::active_cell_iterator
