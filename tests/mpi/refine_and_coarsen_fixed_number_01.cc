@@ -49,7 +49,7 @@ void test()
                                             sub, Point<2>(0,0), Point<2>(1,1));
   tr.refine_global (1);
 
-  Vector<float> indicators (tr.dealii::Triangulation<2>::n_active_cells());
+  Vector<float> indicators (tr.n_active_cells());
   {
     unsigned int cell_index = 0;
     unsigned int my_cell_index = 0;
