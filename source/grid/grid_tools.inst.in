@@ -104,6 +104,10 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
     compute_ghost_cell_halo_layer (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
   template
+  std::map<unsigned int,types::global_vertex_index>
+  compute_local_to_global_vertex_index_map(const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
+
+  template
     std::list<std::pair<parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator, parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator> >
     get_finest_common_cells (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_1,
                                const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_2);

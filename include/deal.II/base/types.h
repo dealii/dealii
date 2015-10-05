@@ -41,6 +41,12 @@ namespace types
    */
   typedef unsigned int subdomain_id;
 
+  /**
+   * The type used for global indices of vertices.
+   */
+  typedef unsigned long long int global_vertex_index;
+#  define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
    * The type used for global indices of degrees of freedom. While in
