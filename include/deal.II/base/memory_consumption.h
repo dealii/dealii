@@ -22,10 +22,6 @@
 #include <deal.II/base/std_cxx11/type_traits.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
 
-// unfortunately, boost::enable_if_c, not boost::enable_if, is equivalent to
-// std::enable_if
-#include <boost/utility/enable_if.hpp>
-
 #include <string>
 #include <complex>
 #include <vector>
@@ -100,7 +96,7 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  typename boost::enable_if_c<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  typename std_cxx11::enable_if<std_cxx11::is_fundamental<T>::value, std::size_t>::type
   memory_consumption (const T &t);
 
   /**
@@ -111,7 +107,7 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  typename boost::enable_if_c<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
+  typename std_cxx11::enable_if<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
   memory_consumption (const T &t);
 
   /**
@@ -248,7 +244,7 @@ namespace MemoryConsumption
 {
   template <typename T>
   inline
-  typename boost::enable_if_c<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  typename std_cxx11::enable_if<std_cxx11::is_fundamental<T>::value, std::size_t>::type
   memory_consumption(const T &)
   {
     return sizeof(T);
@@ -380,7 +376,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  typename boost::enable_if_c<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
+  typename std_cxx11::enable_if<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
   memory_consumption (const T &t)
   {
     return t.memory_consumption();
