@@ -2286,31 +2286,31 @@ namespace internal
                   // first push forward the j-components
                   for (unsigned int i=0; i<spacedim; ++i)
                     for (unsigned int j=0; j<spacedim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          {
-                            tmp[i][j][l] = result[i][0][l] *
-                                           data.covariant[point][j][0];
-                            for (unsigned int jr=1; jr<dim; ++jr)
-                              {
-                                tmp[i][j][l] += result[i][jr][l] *
-                                                data.covariant[point][j][jr];
-                              }
-                          }
+                      for (unsigned int l=0; l<dim; ++l)
+                        {
+                          tmp[i][j][l] = result[i][0][l] *
+                                         data.covariant[point][j][0];
+                          for (unsigned int jr=1; jr<dim; ++jr)
+                            {
+                              tmp[i][j][l] += result[i][jr][l] *
+                                              data.covariant[point][j][jr];
+                            }
+                        }
 
                   // now, pushing forward the l-components
                   for (unsigned int i=0; i<spacedim; ++i)
                     for (unsigned int j=0; j<spacedim; ++j)
-                        for (unsigned int l=0; l<spacedim; ++l)
-                          {
-                            jacobian_pushed_forward_grads[point][i][j][l] = tmp[i][j][0] *
-                                                                            data.covariant[point][l][0];
-                            for (unsigned int lr=1; lr<dim; ++lr)
-                              {
-                                jacobian_pushed_forward_grads[point][i][j][l] += tmp[i][j][lr] *
-                                                                                data.covariant[point][l][lr];
-                              }
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        {
+                          jacobian_pushed_forward_grads[point][i][j][l] = tmp[i][j][0] *
+                                                                          data.covariant[point][l][0];
+                          for (unsigned int lr=1; lr<dim; ++lr)
+                            {
+                              jacobian_pushed_forward_grads[point][i][j][l] += tmp[i][j][lr] *
+                                                                               data.covariant[point][l][lr];
+                            }
 
-                          }
+                        }
                 }
             }
         }
