@@ -1380,24 +1380,6 @@ namespace
   }
 
 
-
-
-
-  /**
-   * Implementation of transform_real_to_unit_cell for other values of
-   * dim, spacedim
-   */
-  Point<1>
-  do_transform_real_to_unit_cell_internal
-  (const Triangulation<1,3>::cell_iterator &,
-   const Point<3> &,
-   const Point<1> &,
-   MappingQGeneric<1,3>::InternalData &)
-  {
-    Assert (false, ExcNotImplemented());
-    return Point<1>();
-  }
-
 }
 
 
@@ -1549,6 +1531,18 @@ transform_real_to_unit_cell_internal
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
   return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
+}
+
+template<>
+Point<1>
+MappingQGeneric<1, 3>::
+transform_real_to_unit_cell_internal
+(const Triangulation<1, 3>::cell_iterator &,
+ const Point<3> &,
+ const Point<1> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Point<1>();
 }
 
 
