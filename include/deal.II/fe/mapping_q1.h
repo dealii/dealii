@@ -81,7 +81,7 @@ public:
 template <int dim, int spacedim=dim>
 struct StaticMappingQ1
 {
-  static MappingQ1<dim, spacedim> mapping;
+  static MappingQGeneric<dim, spacedim> mapping;
 };
 
 

@@ -453,11 +453,12 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
     else
       n_postprocessor_outputs[dataset] = 0;
 
-  const MappingQ1<dimension, space_dimension> mapping;
   internal::DataOutRotation::ParallelData<dimension, space_dimension>
   thread_data (n_datasets,
                n_subdivisions, n_patches_per_circle,
-               n_postprocessor_outputs, mapping, this->get_finite_elements(),
+               n_postprocessor_outputs,
+               StaticMappingQ1<dimension,space_dimension>::mapping,
+               this->get_finite_elements(),
                update_flags);
   std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >
   new_patches (n_patches_per_circle);

@@ -1013,6 +1013,17 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spaced
 
 
 
+
+template<int dim, int spacedim>
+Mapping<dim,spacedim> *
+MappingQGeneric<dim,spacedim>::clone () const
+{
+  return new MappingQGeneric<dim,spacedim>(*this);
+}
+
+
+
+
 template<int dim, int spacedim>
 unsigned int
 MappingQGeneric<dim,spacedim>::get_degree() const

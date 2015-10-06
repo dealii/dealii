@@ -33,6 +33,7 @@ MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                    const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
   :
+  MappingQGeneric<dim,spacedim>(1),
   euler_transform_vectors(&euler_transform_vectors),
   shiftmap_dof_handler(&shiftmap_dof_handler)
 {}
@@ -128,11 +129,11 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between
   // the current and the previous cell
-  MappingQ1<dim,spacedim>::fill_fe_values (cell,
-                                           CellSimilarity::invalid_next_cell,
-                                           quadrature,
-                                           internal_data,
-                                           output_data);
+  MappingQGeneric<dim,spacedim>::fill_fe_values (cell,
+                                                 CellSimilarity::invalid_next_cell,
+                                                 quadrature,
+                                                 internal_data,
+                                                 output_data);
   // also return the updated flag since any detected
   // similarity wasn't based on the mapped field, but
   // the original vertices which are meaningless

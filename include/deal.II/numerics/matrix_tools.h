@@ -242,7 +242,7 @@ namespace MatrixCreator
 
   /**
    * Calls the create_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
@@ -279,7 +279,7 @@ namespace MatrixCreator
 
   /**
    * Calls the create_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim> &dof,
@@ -373,7 +373,7 @@ namespace MatrixCreator
 
   /**
    * Calls the create_boundary_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
@@ -438,7 +438,7 @@ namespace MatrixCreator
 
   /**
    * Calls the create_laplace_matrix() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,
@@ -474,7 +474,7 @@ namespace MatrixCreator
 
   /**
    * Calls the create_laplace_matrix() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,

@@ -413,7 +413,7 @@ namespace VectorTools
 
   /**
    * Calls the @p interpolate() function above with
-   * <tt>mapping=MappingQ1@<dim>@()</tt>.
+   * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
    */
   template <class VECTOR, class DH>
   void interpolate (const DH              &dof,
@@ -605,7 +605,7 @@ namespace VectorTools
 
   /**
    * Calls the project() function above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class VECTOR, int spacedim>
   void project (const DoFHandler<dim,spacedim>    &dof,
@@ -741,7 +741,7 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>. The same comments apply as for the
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>. The same comments apply as for the
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    *
@@ -759,7 +759,7 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>. The same comments apply as for the
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>. The same comments apply as for the
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    */
@@ -862,7 +862,7 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>. The same comments apply as for the
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>. The same comments apply as for the
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    *
@@ -882,7 +882,7 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>. The same comments apply as for the
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>. The same comments apply as for the
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    *
@@ -953,7 +953,7 @@ namespace VectorTools
 
   /**
    * Calls the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void project_boundary_values (const DoFHandler<dim,spacedim>    &dof,
@@ -975,7 +975,7 @@ namespace VectorTools
 
   /**
    * Calls the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void project_boundary_values (const hp::DoFHandler<dim,spacedim>    &dof,
@@ -1032,7 +1032,7 @@ namespace VectorTools
 
   /**
    * Calls the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    *
    * @ingroup constraints
    */
@@ -1604,7 +1604,7 @@ namespace VectorTools
 
   /**
    * Calls the create_right_hand_side() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_right_hand_side (const DoFHandler<dim,spacedim> &dof,
@@ -1647,7 +1647,7 @@ namespace VectorTools
 
   /**
    * Calls the create_point_source_vector() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
@@ -1700,7 +1700,7 @@ namespace VectorTools
 
   /**
    * Calls the create_point_source_vector() function for vector-valued finite
-   * elements, see above, with <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * elements, see above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
@@ -1749,7 +1749,7 @@ namespace VectorTools
 
   /**
    * Calls the create_boundary_right_hand_side() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -1916,7 +1916,7 @@ namespace VectorTools
 
   /**
    * Calls the integrate_difference() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void integrate_difference (const DoFHandler<dim,spacedim> &dof,
@@ -1944,7 +1944,7 @@ namespace VectorTools
 
   /**
    * Calls the integrate_difference() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void integrate_difference (const hp::DoFHandler<dim,spacedim> &dof,
@@ -2335,7 +2335,7 @@ namespace VectorTools
 
   /**
    * Calls the other compute_mean_value() function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, int spacedim>
   double compute_mean_value (const DoFHandler<dim,spacedim> &dof,

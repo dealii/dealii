@@ -647,7 +647,7 @@ void PointValueHistory<dim>
       // we now have a point to query,
       // need to know what cell it is in
       Point <dim> requested_location = point->requested_location;
-      typename DoFHandler<dim>::active_cell_iterator cell = GridTools::find_active_cell_around_point (MappingQ1<dim>(), *dof_handler, requested_location).first;
+      typename DoFHandler<dim>::active_cell_iterator cell = GridTools::find_active_cell_around_point (StaticMappingQ1<dim>::mapping, *dof_handler, requested_location).first;
 
 
       fe_values.reinit (cell);
@@ -1139,7 +1139,7 @@ void PointValueHistory<dim>
       // we now have a point to query,
       // need to know what cell it is in
       Point <dim> requested_location = point->requested_location;
-      typename DoFHandler<dim>::active_cell_iterator cell = GridTools::find_active_cell_around_point (MappingQ1<dim>(), *dof_handler, requested_location).first;
+      typename DoFHandler<dim>::active_cell_iterator cell = GridTools::find_active_cell_around_point (StaticMappingQ1<dim>::mapping, *dof_handler, requested_location).first;
       fe_values.reinit (cell);
 
       evaluation_points = fe_values.get_quadrature_points();
