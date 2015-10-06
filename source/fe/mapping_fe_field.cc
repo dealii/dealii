@@ -685,6 +685,7 @@ namespace internal
 
           if (cell_similarity != CellSimilarity::translation)
             {
+              double tmp[spacedim][spacedim][spacedim];
               for (unsigned int point=0; point<n_q_points; ++point)
                 {
                   const Tensor<2,dim> *second =
@@ -700,25 +701,36 @@ namespace internal
                           for (unsigned int l=0; l<dim; ++l)
                             result[fe_to_real[comp_k]][j][l] += (second[k][j][l]
                                                                  * data.local_dof_values[k]);
-
-                      // pushing forward the derivative coordinates
-                      for (unsigned int i=0; i<spacedim; ++i)
-                        for (unsigned int j=0; j<spacedim; ++j)
-                          for (unsigned int l=0; l<spacedim; ++l)
-                            {
-                              jacobian_pushed_forward_grads[point][i][j][l] = result[i][0][0] *
-                                                                              data.covariant[point][j][0] *
-                                                                              data.covariant[point][l][0];
-                              for (unsigned int jr=0; jr<dim; ++jr)
-                                {
-                                  const unsigned int lr_start = jr==0? 1:0;
-                                  for (unsigned int lr=lr_start; lr<dim; ++lr)
-                                    jacobian_pushed_forward_grads[point][i][j][l] += result[i][jr][lr] *
-                                                                                     data.covariant[point][j][jr] *
-                                                                                     data.covariant[point][l][lr];
-                                }
-                            }
                     }
+
+                  // first push forward the j-components
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        {
+                          tmp[i][j][l] = result[i][0][l] *
+                                         data.covariant[point][j][0];
+                          for (unsigned int jr=1; jr<dim; ++jr)
+                            {
+                              tmp[i][j][l] += result[i][jr][l] *
+                                              data.covariant[point][j][jr];
+                            }
+                        }
+
+                  // now, pushing forward the l-components
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        {
+                          jacobian_pushed_forward_grads[point][i][j][l] = tmp[i][j][0] *
+                                                                          data.covariant[point][l][0];
+                          for (unsigned int lr=1; lr<dim; ++lr)
+                            {
+                              jacobian_pushed_forward_grads[point][i][j][l] += tmp[i][j][lr] *
+                                                                               data.covariant[point][l][lr];
+                            }
+
+                        }
                 }
             }
         }
@@ -801,6 +813,7 @@ namespace internal
 
           if (cell_similarity != CellSimilarity::translation)
             {
+              double tmp[spacedim][spacedim][spacedim][spacedim];
               for (unsigned int point=0; point<n_q_points; ++point)
                 {
                   const Tensor<3,dim> *third =
@@ -819,28 +832,49 @@ namespace internal
                                                                       * data.local_dof_values[k]);
                     }
 
-                  // pushing forward the derivative coordinates
+                  // push forward the j-coordinate
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<dim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          {
+                            jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                              = result[i][0][l][m]*
+                                data.covariant[point][j][0];
+                            for (unsigned int jr=1; jr<dim; ++jr)
+                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                              += result[i][jr][l][m]*
+                                 data.covariant[point][j][jr];
+                          }
+
+                  // push forward the l-coordinate
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<spacedim; ++j)
+                      for (unsigned int l=0; l<spacedim; ++l)
+                        for (unsigned int m=0; m<dim; ++m)
+                          {
+                            tmp[i][j][l][m]
+                              = jacobian_pushed_forward_2nd_derivatives[point][i][j][0][m]*
+                                data.covariant[point][l][0];
+                            for (unsigned int lr=1; lr<dim; ++lr)
+                              tmp[i][j][l][m]
+                              += jacobian_pushed_forward_2nd_derivatives[point][i][j][lr][m]*
+                                 data.covariant[point][l][lr];
+                          }
+
+                  // push forward the m-coordinate
                   for (unsigned int i=0; i<spacedim; ++i)
                     for (unsigned int j=0; j<spacedim; ++j)
                       for (unsigned int l=0; l<spacedim; ++l)
                         for (unsigned int m=0; m<spacedim; ++m)
                           {
                             jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                              = result[i][0][0][0] *
-                                data.covariant[point][j][0] *
-                                data.covariant[point][l][0] *
+                              = tmp[i][j][l][0]*
                                 data.covariant[point][m][0];
-                            for (unsigned int jr=0; jr<dim; ++jr)
-                              for (unsigned int lr=0; lr<dim; ++lr)
-                                {
-                                  const unsigned int mr_start = (jr+lr==0)? 1:0;
-                                  for (unsigned int mr=mr_start; mr<dim; ++mr)
-                                    jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                                    += result[i][jr][lr][mr] *
-                                       data.covariant[point][j][jr] *
-                                       data.covariant[point][l][lr]*
-                                       data.covariant[point][m][mr];
-                                }
+                            for (unsigned int mr=1; mr<dim; ++mr)
+                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                              += tmp[i][j][l][mr]*
+                                 data.covariant[point][m][mr];
                           }
                 }
             }
@@ -928,6 +962,7 @@ namespace internal
 
         if (cell_similarity != CellSimilarity::translation)
           {
+            double tmp[spacedim][spacedim][spacedim][spacedim][spacedim];
             for (unsigned int point=0; point<n_q_points; ++point)
               {
                 const Tensor<4,dim> *fourth =
@@ -948,31 +983,66 @@ namespace internal
                                   * data.local_dof_values[k]);
                   }
 
-                // pushing forward the derivative coordinates
+                // push-forward the j-coordinate
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    for (unsigned int l=0; l<dim; ++l)
+                      for (unsigned int m=0; m<dim; ++m)
+                        for (unsigned int n=0; n<dim; ++n)
+                          {
+                            tmp[i][j][l][m][n] = result[i][0][l][m][n] *
+                                                 data.covariant[point][j][0];
+                            for (unsigned int jr=1; jr<dim; ++jr)
+                              tmp[i][j][l][m][n] += result[i][jr][l][m][n] *
+                                                    data.covariant[point][j][jr];
+                          }
+
+                // push-forward the l-coordinate
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    for (unsigned int l=0; l<spacedim; ++l)
+                      for (unsigned int m=0; m<dim; ++m)
+                        for (unsigned int n=0; n<dim; ++n)
+                          {
+                            jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                              = tmp[i][j][0][m][n] *
+                                data.covariant[point][l][0];
+                            for (unsigned int lr=1; lr<dim; ++lr)
+                              jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                              += tmp[i][j][lr][m][n] *
+                                 data.covariant[point][l][lr];
+                          }
+
+                // push-forward the m-coordinate
                 for (unsigned int i=0; i<spacedim; ++i)
                   for (unsigned int j=0; j<spacedim; ++j)
                     for (unsigned int l=0; l<spacedim; ++l)
                       for (unsigned int m=0; m<spacedim; ++m)
                         for (unsigned int n=0; n<dim; ++n)
                           {
-                            jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                              = result[i][0][0][0][0] *
-                                data.covariant[point][j][0] *
-                                data.covariant[point][l][0] *
+                            tmp[i][j][l][m][n]
+                              = jacobian_pushed_forward_3rd_derivatives[point][i][j][l][0][n] *
                                 data.covariant[point][m][0];
-                            for (unsigned int jr=0; jr<dim; ++jr)
-                              for (unsigned int lr=0; lr<dim; ++lr)
-                                for (unsigned int mr=0; mr<dim; ++mr)
-                                  {
-                                    const unsigned int nr_start = (jr+lr+mr==0)? 1:0;
-                                    for (unsigned int nr=nr_start; nr<dim; ++nr)
-                                      jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                                      += result[i][jr][lr][mr][nr] *
-                                         data.covariant[point][j][jr] *
-                                         data.covariant[point][l][lr]*
-                                         data.covariant[point][m][mr]*
-                                         data.covariant[point][n][nr];
-                                  }
+                            for (unsigned int mr=1; mr<dim; ++mr)
+                              tmp[i][j][l][m][n]
+                              += jacobian_pushed_forward_3rd_derivatives[point][i][j][l][mr][n] *
+                                 data.covariant[point][m][mr];
+                          }
+
+                // push-forward the n-coordinate
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<spacedim; ++j)
+                    for (unsigned int l=0; l<spacedim; ++l)
+                      for (unsigned int m=0; m<spacedim; ++m)
+                        for (unsigned int n=0; n<spacedim; ++n)
+                          {
+                            jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                              = tmp[i][j][l][m][0] *
+                                data.covariant[point][n][0];
+                            for (unsigned int nr=1; nr<dim; ++nr)
+                              jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                              += tmp[i][j][l][m][nr] *
+                                 data.covariant[point][n][nr];
                           }
               }
           }
