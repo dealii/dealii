@@ -367,7 +367,13 @@ inconvenience this causes.
 
 <ol>
 
-  <li> Added: DoFTools::locally_relevant_dofs_per_subdomain can be used
+  <li> New: GridIn::read_unv() can now read more element codes that
+  are used in typical meshes.
+  <br>
+  (Aslan Kosakian, 2015/10/06)
+  </li>
+
+  <li> New: DoFTools::locally_relevant_dofs_per_subdomain() can be used
   to extract an IndexSet of locally relevant DoFs for a Triangulation
   partitioned using METIS or with a parallel::shared::Triangulation .
   <br>
