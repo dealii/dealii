@@ -176,12 +176,18 @@ namespace Step42
 
   // @sect4{ConstitutiveLaw::get_stress_strain_tensor}
 
-  // This is the principal component of the constitutive law. It projects the
-  // deviatoric part of the stresses in a quadrature point back to the yield
-  // stress (i.e., the original yield stress $\sigma_0$ plus the term that
-  // describes linear isotropic hardening).  We need this function to calculate
-  // the nonlinear residual in PlasticityContactProblem::residual_nl_system. The
-  // computations follow the formulas laid out in the introduction.
+  // This is the principal component of the constitutive law. It
+  // computes the fourth order symmetric tensor that relates the
+  // strain to the stress according to the projection given above,
+  // when evaluated at a particular strain point. We need this
+  // function to calculate the nonlinear residual in
+  // <code>PlasticityContactProblem::residual_nl_system()</code> where
+  // we multiply this tensor with the strain given in a quadrature
+  // point. The computations follow the formulas laid out in the
+  // introduction. In comparing the formulas there with the
+  // implementation below, recall that $C_\mu : \varepsilon = \tau_D$
+  // and that $C_\kappa : \varepsilon = \kappa
+  // \text{trace}(\varepsilon) I = \frac 13 \text{trace}(\tau) I$.
   //
   // The function returns whether the quadrature point is plastic to allow for
   // some statistics downstream on how many of the quadrature points are
