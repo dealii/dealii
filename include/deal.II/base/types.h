@@ -45,6 +45,11 @@ namespace types
    * The type used for global indices of vertices.
    */
   typedef unsigned long long int global_vertex_index;
+
+  /**
+   * An identifier that denotes the MPI type associated with
+   * types::global_vertex_index.
+   */
 #  define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
 
 #ifdef DEAL_II_WITH_64BIT_INDICES

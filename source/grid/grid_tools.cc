@@ -1646,7 +1646,8 @@ next_cell:
     std::map<unsigned int,types::global_vertex_index> local_to_global_vertex_index;
 
     typedef typename Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
-    std::vector<std::set<active_cell_iterator> > vertex_to_cell = vertex_to_cell_map(triangulation);
+    const std::vector<std::set<active_cell_iterator> > vertex_to_cell =
+      vertex_to_cell_map(triangulation);
 
     // Create a local index for the locally "owned" vertices
     types::global_vertex_index next_index = 0;
@@ -1669,7 +1670,6 @@ next_cell:
                 typename std::set<active_cell_iterator>::iterator
                 adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin(),
                 end_adj_cell = vertex_to_cell[cell->vertex_index(i)].end();
-                bool can_be_recv = false;
                 for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
                   lowest_subdomain_id = std::min(lowest_subdomain_id,
                                                  (*adjacent_cell)->subdomain_id());
@@ -1679,12 +1679,12 @@ next_cell:
                   {
                     // Check that the vertex we are working on a vertex that has not be
                     // dealt with yet
-                    if (used_vertex_index.count(cell->vertex_index(i))==0)
+                    if (used_vertex_index.find(cell->vertex_index(i))==used_vertex_index.end())
                       {
                         // Set the local index
                         local_to_global_vertex_index[cell->vertex_index(i)] = next_index++;
 
-                        // Store the informations that will be send to the adjacent cells
+                        // Store the information that will be sent to the adjacent cells
                         // on other subdomains
                         adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin();
                         std::vector<types::subdomain_id> subdomain_ids;
@@ -1693,7 +1693,7 @@ next_cell:
                             {
                               std::tuple<types::subdomain_id,types::global_vertex_index>
                               tmp((*adjacent_cell)->subdomain_id(), cell->vertex_index(i));
-                              if (vertices_added.count(tmp)==0)
+                              if (vertices_added.find(tmp)==vertices_added.end())
                                 {
                                   vertices_to_send[(*adjacent_cell)->subdomain_id()].push_back(
                                     std::tuple<types::global_vertex_index,types::global_vertex_index,
@@ -1744,9 +1744,7 @@ next_cell:
           }
       }
     // Get the size of the largest CellID string
-    MPI_Allreduce(MPI_IN_PLACE, &max_cellid_size, 1, MPI_UNSIGNED, MPI_MAX,
-                  triangulation.get_communicator());
-
+    max_cellid_size = Utilities::MPI::max(max_cellid_size, triangulation.get_communicator());
 
     // Make indices global by getting the number of vertices owned by each
     // processors and shifting the indices accordingly
@@ -1768,10 +1766,9 @@ next_cell:
     // resize string. This is done in two messages so that types are not mixed
 
     // Send the first message
-    types::global_vertex_index **vertices_send_buffers;
-    vertices_send_buffers = new types::global_vertex_index* [vertices_to_send.size()];
-    MPI_Request *first_requests;
-    first_requests = new MPI_Request[vertices_to_send.size()];
+    std::vector<std::vector<types::global_vertex_index> > vertices_send_buffers(
+      vertices_to_send.size());
+    std::vector<MPI_Request> first_requests(vertices_to_send.size());
     typename std::map<types::subdomain_id,
              std::vector<std::tuple<types::global_vertex_index,
              types::global_vertex_index,std::string> > >::iterator
@@ -1783,7 +1780,7 @@ next_cell:
         int destination = vert_to_send_it->first;
         const unsigned int n_vertices = vert_to_send_it->second.size();
         const int buffer_size = 2*n_vertices;
-        vertices_send_buffers[i] = new types::global_dof_index [buffer_size];
+        vertices_send_buffers[i].resize(buffer_size);
 
         // fill the buffer
         for (unsigned int j=0; j<n_vertices; ++j)
@@ -1794,13 +1791,13 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(vertices_send_buffers[i],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+        MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
                   destination, 0, triangulation.get_communicator(), &first_requests[i]);
       }
 
     // Receive the first message
-    types::global_vertex_index **vertices_recv_buffers;
-    vertices_recv_buffers = new types::global_vertex_index* [vertices_to_recv.size()];
+    std::vector<std::vector<types::global_vertex_index> > vertices_recv_buffers(
+      vertices_to_recv.size());
     typename std::map<types::subdomain_id,std::set<unsigned int> >::iterator
     vert_to_recv_it = vertices_to_recv.begin(),
     vert_to_recv_end = vertices_to_recv.end();
@@ -1809,18 +1806,17 @@ next_cell:
         int source = vert_to_recv_it->first;
         const unsigned int n_vertices = vert_to_recv_it->second.size();
         const int buffer_size = 2*n_vertices;
-        vertices_recv_buffers[i] = new types::global_dof_index[buffer_size];
+        vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(vertices_recv_buffers[i],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+        MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
                  source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
       }
 
 
     // Send second message
-    char **cellids_send_buffers = new char *[vertices_to_send.size()];
-    MPI_Request *second_requests;
-    second_requests = new MPI_Request[vertices_to_send.size()];
+    std::vector<std::vector<char> > cellids_send_buffers(vertices_to_send.size());
+    std::vector<MPI_Request> second_requests(vertices_to_send.size());
     vert_to_send_it = vertices_to_send.begin();
     for (unsigned int i=0; vert_to_send_it!=vert_to_send_end;
          ++vert_to_send_it, ++i)
@@ -1828,7 +1824,7 @@ next_cell:
         int destination = vert_to_send_it->first;
         const unsigned int n_vertices = vert_to_send_it->second.size();
         const int buffer_size = max_cellid_size*n_vertices;
-        cellids_send_buffers[i] = new char [buffer_size];
+        cellids_send_buffers[i].resize(buffer_size);
 
         // fill the buffer
         unsigned int pos = 0;
@@ -1847,22 +1843,22 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(cellids_send_buffers[i],buffer_size,MPI_CHAR,
+        MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
                   destination, 0, triangulation.get_communicator(), &second_requests[i]);
       }
 
     // Receive the second message
-    char **cellids_recv_buffers = new char *[vertices_to_recv.size()];
+    std::vector<std::vector<char> > cellids_recv_buffers(vertices_to_recv.size());
     vert_to_recv_it = vertices_to_recv.begin();
     for (unsigned int i=0; vert_to_recv_it!=vert_to_recv_end; ++vert_to_recv_it, ++i)
       {
         int source = vert_to_recv_it->first;
         const unsigned int n_vertices = vert_to_recv_it->second.size();
         const int buffer_size = max_cellid_size*n_vertices;
-        cellids_recv_buffers[i] = new char[buffer_size];
+        cellids_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(cellids_recv_buffers[i],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+        MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
                  source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
       }
 
@@ -1902,34 +1898,6 @@ next_cell:
               }
           }
       }
-
-    // Free the buffers used to send the messages
-    for (unsigned int i=0; i<vertices_to_send.size(); ++i)
-      {
-        delete [] vertices_send_buffers[i];
-        delete [] cellids_send_buffers[i];
-      }
-    delete [] vertices_send_buffers;
-    vertices_send_buffers = NULL;
-    delete [] first_requests;
-    first_requests = NULL;
-    delete [] cellids_send_buffers;
-    cellids_send_buffers = NULL;
-    delete [] second_requests;
-    second_requests = NULL;
-
-
-    // Free the buffers used to receive the messages
-    for (unsigned int i=0; i<vertices_to_recv.size(); ++i)
-      {
-        delete [] vertices_recv_buffers[i];
-        delete [] cellids_recv_buffers[i];
-      }
-    delete [] vertices_recv_buffers;
-    delete [] cellids_recv_buffers;
-    vertices_recv_buffers = NULL;
-    cellids_recv_buffers = NULL;
-
 
     return local_to_global_vertex_index;
   }
