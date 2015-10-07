@@ -466,7 +466,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       AssertThrow((type == 11)||(type == 44)||(type == 94)||(type == 115), ExcUnknownElementType(type));
 
-      if( (((type == 44)||(type == 94))&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
+      if ( (((type == 44)||(type == 94))&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
         {
           cells.push_back(CellData<dim>());
 
@@ -503,7 +503,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
           no_line++;
         }
-      else if( ((type == 44)||(type == 94)) && (dim == 3) ) // boundary quad
+      else if ( ((type == 44)||(type == 94)) && (dim == 3) ) // boundary quad
         {
           subcelldata.boundary_quads.push_back(CellData<2>());
 
@@ -525,7 +525,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
                      ExcMessage ("Unknown element label <"
                                  + Utilities::int_to_string(type)
                                  + "> when running in dim="
-                                 + Utilities::int_to_string(dim)));      
+                                 + Utilities::int_to_string(dim)));
     }
 
 // note that so far all materials and bcs are explicitly set to 0
