@@ -211,7 +211,7 @@ protected:
    * as the MappingQ1 class. Consequently, it inherits from
    * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
    */
-  class InternalData : public MappingQ1<dim,spacedim>::InternalData
+  class InternalData : public MappingQGeneric<dim,spacedim>::InternalData
   {
   public:
     /**
@@ -237,7 +237,7 @@ protected:
      * A pointer to a structure to store the information for the pure
      * $Q_1$ mapping that is, by default, used on all interior cells.
      */
-    std_cxx11::unique_ptr<typename MappingQ1<dim,spacedim>::InternalData> mapping_q1_data;
+    std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_q1_data;
   };
 
 protected:
@@ -313,7 +313,7 @@ protected:
    *   our own Q1 mapping here, rather than simply resorting to
    *   StaticMappingQ1::mapping.
    */
-  std_cxx11::unique_ptr<const MappingQ1<dim,spacedim> > q1_mapping;
+  std_cxx11::unique_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
 
   /**
    * Declare other MappingQ classes friends.

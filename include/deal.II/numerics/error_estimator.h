@@ -341,7 +341,7 @@ public:
 
   /**
    * Calls the @p estimate function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                &dof,
@@ -385,7 +385,7 @@ public:
 
   /**
    * Calls the @p estimate function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                    &dof,
@@ -578,7 +578,7 @@ public:
 
   /**
    * Calls the @p estimate function, see above, with
-   * <tt>mapping=MappingQ1<1>()</tt>.
+   * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH   &dof,
@@ -620,7 +620,7 @@ public:
 
   /**
    * Calls the @p estimate function, see above, with
-   * <tt>mapping=MappingQ1<1>()</tt>.
+   * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH       &dof,

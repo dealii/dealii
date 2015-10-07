@@ -70,7 +70,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                               (dim != spacedim)),
   // create a Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
-  q1_mapping (new MappingQ1<dim,spacedim>())
+  q1_mapping (new MappingQGeneric<dim,spacedim>(1))
 {}
 
 
@@ -82,7 +82,7 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
   // clone the Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
-  q1_mapping (mapping.q1_mapping->clone())
+  q1_mapping (dynamic_cast<MappingQGeneric<dim,spacedim>*>(mapping.q1_mapping->clone()))
 {}
 
 

@@ -188,7 +188,7 @@ namespace DerivativeApproximation
 
   /**
    * Calls the @p interpolate function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, template <int, int> class DH, class InputVector, int spacedim>
   void
@@ -224,7 +224,7 @@ namespace DerivativeApproximation
 
   /**
    * Calls the @p interpolate function, see above, with
-   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, template <int, int> class DH, class InputVector, int spacedim>
   void
@@ -260,7 +260,7 @@ namespace DerivativeApproximation
                                 const unsigned int                            component = 0);
 
   /**
-   * Same as above, with <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * Same as above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <class DH, int dim, int spacedim, class InputVector, int order>
   void

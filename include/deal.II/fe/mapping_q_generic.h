@@ -106,6 +106,10 @@ public:
    */
   MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping);
 
+  // for documentation, see the Mapping base class
+  virtual
+  Mapping<dim,spacedim> *clone () const;
+
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.

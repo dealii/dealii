@@ -312,8 +312,7 @@ public:
                const AdditionalData    additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but with mapping @p
-   * MappingQ1.
+   * Initializes the data structures. Same as above, but using a $Q_1$ mapping.
    */
   template <typename DH, typename Quadrature>
   void reinit (const DH               &dof_handler,
@@ -368,8 +367,7 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but with mapping @p
-   * MappingQ1.
+   * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
    */
   template <typename DH, typename Quadrature>
   void reinit (const std::vector<const DH *>               &dof_handler,
@@ -392,8 +390,7 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but with mapping @p
-   * MappingQ1.
+   * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
    */
   template <typename DH, typename Quadrature>
   void reinit (const std::vector<const DH *>               &dof_handler,
@@ -1472,7 +1469,6 @@ reinit(const DH               &dof_handler,
        const Quad             &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  MappingQ1<dim>                       mapping;
   std::vector<const DH *>               dof_handlers;
   std::vector<const ConstraintMatrix *> constraints;
   std::vector<Quad>          quads;
@@ -1484,7 +1480,7 @@ reinit(const DH               &dof_handler,
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handlers, additional_data.level_mg_handler);
-  reinit(mapping, dof_handlers,constraints, locally_owned_sets, quads,
+  reinit(StaticMappingQ1<dim>::mapping, dof_handlers,constraints, locally_owned_sets, quads,
          additional_data);
 }
 
@@ -1524,11 +1520,10 @@ reinit(const std::vector<const DH *>               &dof_handler,
        const std::vector<Quad>                    &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  MappingQ1<dim> mapping;
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(mapping, dof_handler,constraint,locally_owned_set,
+  reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,locally_owned_set,
          static_cast<const std::vector<Quadrature<1> >&>(quad),
          additional_data);
 }
@@ -1543,13 +1538,12 @@ reinit(const std::vector<const DH *>               &dof_handler,
        const Quad                                 &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  MappingQ1<dim> mapping;
   std::vector<Quad> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
+  reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,locally_owned_set, quads,
          additional_data);
 }
 

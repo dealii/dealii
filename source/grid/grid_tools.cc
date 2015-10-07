@@ -668,10 +668,8 @@ namespace GridTools
                      Triangulation<dim> &triangulation,
                      const Function<dim> *coefficient)
   {
-    // first provide everything that is
-    // needed for solving a Laplace
+    // first provide everything that is needed for solving a Laplace
     // equation.
-    MappingQ1<dim> mapping_q1;
     FE_Q<dim> q1(1);
 
     DoFHandler<dim> dof_handler(triangulation);
@@ -690,7 +688,7 @@ namespace GridTools
 
     QGauss<dim> quadrature(4);
 
-    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
+    MatrixCreator::create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
 
     // set up the boundary values for
     // the laplace problem
@@ -1337,7 +1335,7 @@ next_cell:
                     best_cell     = std::make_pair(*cell, p_cell);
                   }
               }
-            catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+            catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
               {
                 // ok, the transformation
                 // failed presumably
@@ -1463,7 +1461,7 @@ next_cell:
                         best_cell     = std::make_pair(*cell, p_cell);
                       }
                   }
-                catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+                catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
                   {
                     // ok, the transformation
                     // failed presumably

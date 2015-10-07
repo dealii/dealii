@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,7 +93,7 @@ namespace hp
      * this function is called.
      */
     template<int dim, int spacedim>
-    MappingQ1<dim,spacedim> &
+    MappingQGeneric<dim,spacedim> &
     get_static_mapping_q1()
     {
       static MappingQ1<dim,spacedim> mapping;
