@@ -464,9 +464,9 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       in >> type >> dummy >> dummy >> dummy >> dummy;
 
-      AssertThrow((type == 11)||(type == 44)||(type == 115), ExcUnknownElementType(type));
+      AssertThrow((type == 11)||(type == 44)||(type == 94)||(type == 115), ExcUnknownElementType(type));
 
-      if ( ((type == 44)&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
+      if ( (((type == 44)||(type == 94))&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
         {
           cells.push_back(CellData<dim>());
 
@@ -503,7 +503,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
           no_line++;
         }
-      else if ( (type == 44) && (dim == 3) ) // boundary quad
+      else if ( ((type == 44)||(type == 94)) && (dim == 3) ) // boundary quad
         {
           subcelldata.boundary_quads.push_back(CellData<2>());
 
@@ -520,11 +520,17 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
           no_quad++;
         }
+      else
+        AssertThrow (false,
+                     ExcMessage ("Unknown element label <"
+                                 + Utilities::int_to_string(type)
+                                 + "> when running in dim="
+                                 + Utilities::int_to_string(dim)));
     }
 
 // note that so far all materials and bcs are explicitly set to 0
 // if we do not need more info on materials and bcs - this is end of file
-// if we do - section 2467 comes
+// if we do - section 2467 or 2477 comes
 
   in >> tmp; // tmp can be either -1 or end-of-file
 
@@ -533,10 +539,10 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
       AssertThrow(in, ExcIO());
       in >> tmp;
 
-      AssertThrow(tmp == 2467, ExcUnknownSectionType(tmp)); // section 2467 describes (materials - first and bcs - second) or (bcs - first and materials - second) - sequence depends on which group is created first
+      AssertThrow((tmp == 2467)||(tmp == 2477), ExcUnknownSectionType(tmp)); // section 2467 (2477) describes (materials - first and bcs - second) or (bcs - first and materials - second) - sequence depends on which group is created first
       // http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm/
 
-      while (tmp != -1) // we do until reach end of 2467
+      while (tmp != -1) // we do until reach end of 2467 or 2477
         {
           int n_entities; // number of entities in group
           int id;         // id is either material or bc
