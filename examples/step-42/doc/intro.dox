@@ -169,6 +169,8 @@ condition:
   \left\{ \mathbf u\in V: \mathbf n \cdot \mathbf u\leq g \text{ on } \Gamma_C \right\}.
 @f}
 
+In the actual code, we will use the abbreviation $\gamma=\dfrac{\gamma^{\text{iso}}}{2\mu + \gamma^{\text{iso}}}$.
+
 Given this formulation, we will apply two techniques:
 - Run a Newton method to iterate out the nonlinearity in the projector.
 - Run an active set method for the contact condition, in much the same
