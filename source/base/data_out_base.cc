@@ -1605,6 +1605,21 @@ namespace DataOutBase
 
 
 
+  GnuplotFlags::GnuplotFlags ()
+  {
+    space_dimension_labels.push_back("x");
+    space_dimension_labels.push_back("y");
+    space_dimension_labels.push_back("z");
+  }
+
+
+
+  GnuplotFlags::GnuplotFlags (const std::vector<std::string> &labels)
+    : space_dimension_labels(labels)
+  {}
+
+
+
   PovrayFlags::PovrayFlags (const bool smooth,
                             const bool bicubic_patch,
                             const bool external_data)
@@ -2909,7 +2924,7 @@ namespace DataOutBase
   void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
                       const std::vector<std::string>          &data_names,
                       const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
-                      const GnuplotFlags                      &/*flags*/,
+                      const GnuplotFlags                      &flags,
                       std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
@@ -2947,20 +2962,11 @@ namespace DataOutBase
           << "#" << '\n'
           << "# ";
 
-      switch (spacedim)
+      AssertThrow(spacedim <= flags.space_dimension_labels.size(),
+                  GnuplotFlags::ExcNotEnoughSpaceDimensionLabels());
+      for (unsigned int spacedim_n=0; spacedim_n<spacedim; ++spacedim_n)
         {
-        case 1:
-          out << "<x> ";
-          break;
-        case 2:
-          out << "<x> <y> ";
-          break;
-        case 3:
-          out << "<x> <y> <z> ";
-          break;
-
-        default:
-          Assert (false, ExcNotImplemented());
+          out << '<' << flags.space_dimension_labels.at(spacedim_n) << "> ";
         }
 
       for (unsigned int i=0; i<data_names.size(); ++i)
