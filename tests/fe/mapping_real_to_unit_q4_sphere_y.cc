@@ -76,7 +76,7 @@ void test_real_to_unit_cell()
   // reference coordinate system of
   // the cell
   const Point<dim> p (-3.56413e+06, 1.74215e+06, 2.14762e+06);
-  MappingQ1<dim> map;
+  MappingQGeneric<dim> map(1);
   Triangulation<dim >::active_cell_iterator
   cell = triangulation.begin_active();
 
