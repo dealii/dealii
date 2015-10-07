@@ -1582,8 +1582,10 @@ public:
                 const unsigned int        first_selected_component = 0);
 
   /**
-   * Constructor for the reduced functionality. Similar as the other
-   * constructor but uses MappingQ1 implicitly.
+   * Constructor for the reduced functionality. This constructor is equivalent
+   * to the other one except
+   * that it makes the object use a $Q_1$ mapping (i.e., an object of
+   * type MappingQGeneric(1)) implicitly.
    */
   FEEvaluation (const FiniteElement<dim> &fe,
                 const Quadrature<1>      &quadrature,

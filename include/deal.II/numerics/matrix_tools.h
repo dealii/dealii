@@ -91,12 +91,12 @@ namespace TrilinosWrappers
  *
  * <h3>Conventions for all functions</h3>
  *
- * There exist two versions of each function. One with a Mapping argument and
- * one without. If a code uses a mapping different from MappingQ1 the
- * functions <em>with</em> mapping argument should be used. Code that uses
- * only MappingQ1 may also use the functions <em>without</em> Mapping
- * argument. Each of these latter functions create a MappingQ1 object and just
- * call the respective functions with that object as mapping argument.
+ * There exist two versions of almost all functions, one that takes an
+ * explicit Mapping argument and one that does not. The second one generally
+ * calls the first with an implicit $Q_1$ argument (i.e., with an argument of
+ * kind MappingQGeneric(1)). If your intend your code to use a different
+ * mapping than a (bi-/tri-)linear one, then you need to call the
+ * functions <b>with</b> mapping argument should be used.
  *
  * All functions take a sparse matrix object to hold the matrix to be created.
  * The functions assume that the matrix is initialized with a sparsity pattern
