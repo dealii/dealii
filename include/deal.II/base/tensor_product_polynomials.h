@@ -135,7 +135,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @tparam order derivative of the <tt>i</tt>th tensor
+   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -145,6 +145,8 @@ public:
    * several times.  Instead use the compute() function, see above, with
    * the size of the appropriate parameter set to n() to get the point value
    * of all tensor polynomials all at once and in a much more efficient way.
+   *
+   * @tparam order The derivative order.
    */
   template <int order>
   Tensor<order,dim> compute_derivative (const unsigned int i,
@@ -288,7 +290,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @tparam order derivative of the <tt>i</tt>th tensor
+   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -298,6 +300,8 @@ public:
    * several times.  Instead use the compute() function, see above, with
    * the size of the appropriate parameter set to n() to get the point value
    * of all tensor polynomials all at once and in a much more efficient way.
+   *
+   * @tparam order The derivative order.
    */
   template <int order>
   Tensor<order,dim> compute_derivative (const unsigned int i,

@@ -1394,7 +1394,9 @@ operator / (const Tensor<rank,dim,Number> &t,
 
 
 /**
- * Addition of two tensors of general @tparam rank.
+ * Addition of two tensors of general rank.
+ *
+ * @tparam rank The rank of both tensors.
  *
  * @relates Tensor
  */
@@ -1413,7 +1415,9 @@ operator+ (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
 
 
 /**
- * Subtraction of two tensors of general @tparam rank.
+ * Subtraction of two tensors of general rank.
+ *
+ * @tparam rank The rank of both tensors.
  *
  * @relates Tensor
  */

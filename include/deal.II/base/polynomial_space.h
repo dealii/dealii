@@ -154,10 +154,12 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @tparam order derivative of the <tt>i</tt>th
-   * polynomial at unit point <tt>p</tt>.
+   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
+   * at unit point <tt>p</tt>.
    *
    * Consider using compute() instead.
+   *
+   * @tparam order The order of the derivative.
    */
   template <int order>
   Tensor<order,dim> compute_derivative (const unsigned int i,
