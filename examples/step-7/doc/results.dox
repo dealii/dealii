@@ -14,7 +14,9 @@ here:
 
 
 Secondly, the program writes tables not only to disk, but also to the
-screen while running:
+screen while running. The output looks like the following (recall that
+columns labeled as "<code>H1</code>" actually show the $H^1$ <i>semi-</i>norm
+of the error, not the full $H^1$ norm):
 
 
 @code
@@ -174,7 +176,7 @@ cycle cells dofs     L2        H1      Linfty
 One can see the error reduction upon grid refinement, and for the
 cases where global refinement was performed, also the convergence
 rates can be seen. The linear and quadratic convergence rates of Q1
-and Q2 elements in the $H^1$ norm can clearly be seen, as
+and Q2 elements in the $H^1$ semi-norm can clearly be seen, as
 are the quadratic and cubic rates in the $L_2$ norm.
 
 
