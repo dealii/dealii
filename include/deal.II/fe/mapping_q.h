@@ -18,7 +18,6 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -208,8 +207,13 @@ protected:
    * member variables are marked as 'mutable'.
    *
    * The current class uses essentially the same fields for storage
-   * as the MappingQ1 class. Consequently, it inherits from
-   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
+   * as the MappingQGeneric class. Consequently, it inherits from
+   * MappingQGeneric::InternalData, rather than from Mapping::InternalDataBase.
+   * The principal difference to MappingQGeneric::InternalData is that
+   * MappingQ switches between $Q_1$ and $Q_p$ mappings depending
+   * on the cell we are on, so the internal data object needs to
+   * also store a pointer to an InternalData object that pertains
+   * to a $Q_1$ mapping.
    */
   class InternalData : public MappingQGeneric<dim,spacedim>::InternalData
   {

@@ -326,8 +326,8 @@ public:
    * triangulation).
    *
    * For example, implementations in derived classes return @p true for
-   * MappingQ, MappingQ1, MappingCartesian, but @p false for MappingQEulerian,
-   * MappingQ1Eulerian, and MappingFEField.
+   * MappingQ, MappingQGeneric, MappingCartesian, but @p false for
+   * MappingQEulerian, MappingQ1Eulerian, and MappingFEField.
    */
   virtual
   bool preserves_vertex_locations () const = 0;

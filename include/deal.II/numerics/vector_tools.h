@@ -59,18 +59,13 @@ class ConstraintMatrix;
  * projections of continuous functions to the finite element space and other
  * operations.
  *
- * @note There exist two versions of almost each function. One with a Mapping
- * argument and one without. If a code uses a mapping different from MappingQ1
- * the functions <b>with</b> mapping argument should be used. Code that uses
- * only MappingQ1 may also use the functions without Mapping argument. Each of
- * these latter functions create a MappingQ1 object and just call the
- * respective functions with that object as mapping argument. The functions
- * without Mapping argument still exist to ensure backward compatibility.
- * Nevertheless it is advised to change the user's codes to store a specific
- * Mapping object and to use the functions that take this Mapping object as
- * argument. This gives the possibility to easily extend the user codes to
- * work also on mappings of higher degree, this just by exchanging MappingQ1
- * by, for example, a MappingQ or another Mapping object of interest.
+ * @note There exist two versions of almost all functions, one that takes an
+ * explicit Mapping argument and one that does not. The second one generally
+ * calls the first with an implicit $Q_1$ argument (i.e., with an argument of
+ * kind MappingQGeneric(1)). If your intend your code to use a different
+ * mapping than a (bi-/tri-)linear one, then you need to call the
+ * functions <b>with</b> mapping argument should be used.
+ *
  *
  * <h3>Description of operations</h3>
  *
@@ -638,7 +633,7 @@ namespace VectorTools
 
   /**
    * Calls the project() function above, with a collection of
-   * MappingQ1@<dim@>() objects.
+   * $Q_1$ mapping objects, i.e., with hp::StaticMappingQ1::mapping_collection.
    */
   template <int dim, class VECTOR, int spacedim>
   void project (const hp::DoFHandler<dim,spacedim>    &dof,
@@ -1386,7 +1381,7 @@ namespace VectorTools
    * @image html no_normal_flux_1.png
    * </p>
    *
-   * Here, we have two cells that use a bilinear mapping (i.e. MappingQ1).
+   * Here, we have two cells that use a bilinear mapping (i.e., MappingQGeneric(1)).
    * Consequently, for each of the cells, the normal vector is perpendicular
    * to the straight edge. If the two edges at the top and right are meant to
    * approximate a curved boundary (as indicated by the dashed line), then
