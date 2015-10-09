@@ -163,7 +163,7 @@ namespace Step7
   //
   // The actual classes are declared in the following. Note that in order to
   // compute the error of the numerical solution against the continuous one in
-  // the L2 and H1 norms, we have to provide value and gradient of the exact
+  // the L2 and H1 (semi-)norms, we have to provide value and gradient of the exact
   // solution. This is more than we have done in previous examples, where all
   // we provided was the value at one or a list of points. Fortunately, the
   // Function class also has virtual functions for the gradient, so we can
@@ -833,7 +833,7 @@ namespace Step7
   // @sect4{HelmholtzProblem::process_solution}
 
   // Finally we want to process the solution after it has been computed. For
-  // this, we integrate the error in various norms, and we generate tables
+  // this, we integrate the error in various (semi-)norms, and we generate tables
   // that will later be used to display the convergence against the continuous
   // solution in a nice format.
   template <int dim>
@@ -871,7 +871,11 @@ namespace Step7
 
     // By same procedure we get the H1 semi-norm. We re-use the
     // <code>difference_per_cell</code> vector since it is no longer used
-    // after computing the <code>L2_error</code> variable above.
+    // after computing the <code>L2_error</code> variable above. The global
+    // $H^1$ semi-norm error is then computed by taking the sum of squares
+    // of the errors on each individual cell, and then the square root of
+    // it -- an operation that conveniently again coincides with taking
+    // the $l_2$ norm of the vector of error indicators.
     VectorTools::integrate_difference (dof_handler,
                                        solution,
                                        Solution<dim>(),
