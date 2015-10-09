@@ -45,7 +45,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
                                  OutputVector         &values,
                                  const unsigned int fe_index) const
 {
-  if (!this->has_children())
+  if (!this->has_children() && !this->is_artificial ())
     {
       if ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
            (this->dof_handler)

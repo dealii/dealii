@@ -34,6 +34,9 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#ifdef DEAL_II_WITH_MPI
+#include <deal.II/lac/parallel_vector.h>
+#endif
 
 #include <algorithm>
 #include <numeric>
@@ -2500,7 +2503,11 @@ namespace DoFTools
       {
         unsigned int                         dofs_per_cell;
         std::vector<types::global_dof_index> parameter_dof_indices;
+#ifdef DEAL_II_WITH_MPI
+        std::vector<dealii::parallel::distributed::Vector<double> > global_parameter_representation;
+#else
         std::vector<dealii::Vector<double> > global_parameter_representation;
+#endif
       };
     }
 
@@ -2568,7 +2575,6 @@ namespace DoFTools
 
         // vector to hold the representation of a single degree of freedom
         // on the coarse grid (for the selected fe) on the fine grid
-        const types::global_dof_index n_fine_dofs = weight_mapping.size();
 
         copy_data.dofs_per_cell = coarse_fe.dofs_per_cell;
         copy_data.parameter_dof_indices.resize(copy_data.dofs_per_cell);
@@ -2577,11 +2583,9 @@ namespace DoFTools
         // parameter grid cell
         cell->get_dof_indices (copy_data.parameter_dof_indices);
 
-        // reset the output array to a pristine state
-        copy_data.global_parameter_representation.clear ();
-
         // loop over all dofs on this cell and check whether they are
         // interesting for us
+        unsigned int pos = 0;
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
           if (coarse_fe.system_to_component_index(local_dof).first
               ==
@@ -2591,15 +2595,19 @@ namespace DoFTools
               const unsigned int local_parameter_dof
                 = coarse_fe.system_to_component_index(local_dof).second;
 
-              copy_data.global_parameter_representation.push_back(
-                dealii::Vector<double> (n_fine_dofs));
+              copy_data.global_parameter_representation[local_dof] = 0.;
 
               // distribute the representation of
               // @p{local_parameter_dof} on the parameter grid cell
               // @p{cell} to the global data space
               coarse_to_fine_grid_map[cell]->
               set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
-                                               copy_data.global_parameter_representation.back());
+                                               copy_data.global_parameter_representation[pos]);
+
+#ifdef DEAL_II_WITH_MPI
+              copy_data.global_parameter_representation[pos].update_ghost_values ();
+#endif
+              ++pos;
             }
       }
 
@@ -2615,7 +2623,8 @@ namespace DoFTools
                                     const unsigned int                                      coarse_component,
                                     const FiniteElement<dim,spacedim>                      &coarse_fe,
                                     const std::vector<types::global_dof_index>             &weight_mapping,
-                                    std::vector<std::map<types::global_dof_index, float> > &weights)
+                                    std::vector<std::map<types::global_dof_index, float> > &weights,
+                                    bool is_called_in_parallel)
       {
         unsigned int pos = 0;
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
@@ -2660,7 +2669,10 @@ namespace DoFTools
                       }
                   }
                 else
-                  Assert (copy_data.global_parameter_representation[pos](i) == 0,
+                  // Note that when this function operates with distributed
+                  // fine grid, this assertion is switched off since the
+                  // condition does not necessarily hold
+                  Assert (copy_data.global_parameter_representation[pos](i) == 0 || is_called_in_parallel,
                           ExcInternalError());
               ++pos;
             }
@@ -2687,6 +2699,47 @@ namespace DoFTools
         Assembler::Scratch scratch;
         Assembler::CopyData<dim,spacedim> copy_data;
 
+        unsigned int n_interesting_dofs = 0;
+        for (unsigned int local_dof=0; local_dof<coarse_grid.get_fe().dofs_per_cell; ++local_dof)
+          if (coarse_grid.get_fe().system_to_component_index(local_dof).first
+              ==
+              coarse_component)
+            ++n_interesting_dofs;
+
+        copy_data.global_parameter_representation.resize(n_interesting_dofs);
+
+        bool is_called_in_parallel = false;
+        for (size_t i=0; i<copy_data.global_parameter_representation.size(); ++i)
+          {
+#ifdef DEAL_II_WITH_MPI
+            MPI_Comm communicator = MPI_COMM_SELF;
+            try
+              {
+                const typename dealii::parallel::Triangulation<dim, spacedim> &tria =
+                  dynamic_cast<const typename dealii::parallel::Triangulation<dim, spacedim>&>
+                  (coarse_to_fine_grid_map.get_destination_grid().get_tria ());
+                communicator = tria.get_communicator ();
+                is_called_in_parallel = true;
+              }
+            catch (std::bad_cast &exp)
+              {
+                // Nothing bad happened: the user used serial Triangulation
+              }
+
+            IndexSet locally_owned_dofs, locally_relevant_dofs;
+            DoFTools::extract_locally_owned_dofs
+            (coarse_to_fine_grid_map.get_destination_grid (), locally_owned_dofs);
+            DoFTools::extract_locally_relevant_dofs
+            (coarse_to_fine_grid_map.get_destination_grid (), locally_relevant_dofs);
+
+            copy_data.global_parameter_representation[i].reinit
+            (locally_owned_dofs, locally_relevant_dofs, communicator);
+#else
+            const types::global_dof_index n_fine_dofs = weight_mapping.size();
+            copy_data.global_parameter_representation[i].resize (n_fine_dofs);
+#endif
+          }
+
         WorkStream::run(coarse_grid.begin_active(),
                         coarse_grid.end(),
                         std_cxx11::bind(&compute_intergrid_weights_3<dim,spacedim>,
@@ -2703,7 +2756,8 @@ namespace DoFTools
                                         coarse_component,
                                         std_cxx11::cref(coarse_grid.get_fe()),
                                         std_cxx11::cref(weight_mapping),
-                                        std_cxx11::ref(weights)),
+                                        std_cxx11::ref(weights),
+                                        is_called_in_parallel),
                         scratch,
                         copy_data);
       }
@@ -2832,12 +2886,13 @@ namespace DoFTools
             for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell=fine_grid.begin_active();
                  cell!=fine_grid.end(); ++cell)
-              {
-                cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
-                  if (fine_fe.system_to_component_index(i).first == fine_component)
-                    dof_is_interesting[local_dof_indices[i]] = true;
-              };
+              if (cell->is_locally_owned ())
+                {
+                  cell->get_dof_indices (local_dof_indices);
+                  for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
+                    if (fine_fe.system_to_component_index(i).first == fine_component)
+                      dof_is_interesting[local_dof_indices[i]] = true;
+                };
 
             n_parameters_on_fine_grid = std::count (dof_is_interesting.begin(),
                                                     dof_is_interesting.end(),
@@ -2859,18 +2914,19 @@ namespace DoFTools
             for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell=fine_grid.begin_active();
                  cell != fine_grid.end(); ++cell)
-              {
-                cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
-                  // if this DoF is a parameter dof and has not yet been
-                  // numbered, then do so
-                  if ((fine_fe.system_to_component_index(i).first == fine_component) &&
-                      (weight_mapping[local_dof_indices[i]] == numbers::invalid_dof_index))
-                    {
-                      weight_mapping[local_dof_indices[i]] = next_free_index;
-                      ++next_free_index;
-                    };
-              };
+              if (cell->is_locally_owned ())
+                {
+                  cell->get_dof_indices (local_dof_indices);
+                  for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
+                    // if this DoF is a parameter dof and has not yet been
+                    // numbered, then do so
+                    if ((fine_fe.system_to_component_index(i).first == fine_component) &&
+                        (weight_mapping[local_dof_indices[i]] == numbers::invalid_dof_index))
+                      {
+                        weight_mapping[local_dof_indices[i]] = next_free_index;
+                        ++next_free_index;
+                      };
+                };
 
             Assert (next_free_index == n_parameters_on_fine_grid,
                     ExcInternalError());

@@ -1,0 +1,10 @@
+DEAL:0:2d::Checking in 2 space dimensions
+DEAL:0:2d::---------------------------------------
+DEAL:0:2d::# dofs = 40
+DEAL:0:2d::sum(weights) = 40
+DEAL:0:2d::OK
+DEAL:0:3d::Checking in 3 space dimensions
+DEAL:0:3d::---------------------------------------
+DEAL:0:3d::# dofs = 176
+DEAL:0:3d::sum(weights) = 176
+DEAL:0:3d::OK
