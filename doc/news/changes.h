@@ -367,6 +367,12 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Improved: DoFTools::compute_intergrid_transfer_representation 
+  can now be used with a fine grid given by a parallel::Triangulation.
+  <br>
+  (Alexander Grayver, 2015/10/09)
+  </li>
+
   <li> New: GridIn::read_unv() can now read more element codes that
   are used in typical meshes.
   <br>
