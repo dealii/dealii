@@ -2623,7 +2623,8 @@ namespace DoFTools
                                     const unsigned int                                      coarse_component,
                                     const FiniteElement<dim,spacedim>                      &coarse_fe,
                                     const std::vector<types::global_dof_index>             &weight_mapping,
-                                    std::vector<std::map<types::global_dof_index, float> > &weights)
+                                    std::vector<std::map<types::global_dof_index, float> > &weights,
+                                    bool is_called_in_parallel)
       {
         unsigned int pos = 0;
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
@@ -2667,9 +2668,12 @@ namespace DoFTools
                         weights[wi][wj] = copy_data.global_parameter_representation[pos](i);
                       }
                   }
-              //else
-              //  Assert (copy_data.global_parameter_representation[pos](i) == 0,
-              //          ExcInternalError());
+                else
+                  // Note that when this function operates with distributed
+                  // fine grid, this assertion is switched off since the
+                  // condition does not necessarily hold
+                  Assert (copy_data.global_parameter_representation[pos](i) == 0 || is_called_in_parallel,
+                          ExcInternalError());
               ++pos;
             }
 
@@ -2704,6 +2708,7 @@ namespace DoFTools
 
         copy_data.global_parameter_representation.resize(n_interesting_dofs);
 
+        bool is_called_in_parallel = false;
         for (size_t i=0; i<copy_data.global_parameter_representation.size(); ++i)
           {
 #ifdef DEAL_II_WITH_MPI
@@ -2714,6 +2719,7 @@ namespace DoFTools
                   dynamic_cast<const typename dealii::parallel::Triangulation<dim, spacedim>&>
                   (coarse_to_fine_grid_map.get_destination_grid().get_tria ());
                 communicator = tria.get_communicator ();
+                is_called_in_parallel = true;
               }
             catch (std::bad_cast &exp)
               {
@@ -2750,7 +2756,8 @@ namespace DoFTools
                                         coarse_component,
                                         std_cxx11::cref(coarse_grid.get_fe()),
                                         std_cxx11::cref(weight_mapping),
-                                        std_cxx11::ref(weights)),
+                                        std_cxx11::ref(weights),
+                                        is_called_in_parallel),
                         scratch,
                         copy_data);
       }
