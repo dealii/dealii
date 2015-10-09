@@ -107,7 +107,7 @@ void test (const Triangulation<dim> &tr,
 
   VectorFunction<dim> fe_function;
 
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
 
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (mapping, fe, quadrature,

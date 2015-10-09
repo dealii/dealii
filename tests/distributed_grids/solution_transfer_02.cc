@@ -63,7 +63,7 @@ template<int dim>
 void test(std::ostream & /*out*/)
 {
   MyFunction<dim> func;
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);

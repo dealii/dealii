@@ -151,7 +151,7 @@ void derivatives()
   FE_DGQ<dim> fe(2);
   DoFHandler<dim> dof_handler(tria);
   Vector<double> solution;
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   QMidpoint<dim> q_midpoint;
   FEValues<dim> fe_values(mapping, fe, q_midpoint, update_q_points);
 

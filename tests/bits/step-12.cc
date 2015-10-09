@@ -340,7 +340,7 @@ private:
   void output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
-  const MappingQ1<dim> mapping;
+  const MappingQGeneric<dim> mapping(1);
 
   FE_DGQ<dim>          fe;
   DoFHandler<dim>      dof_handler;

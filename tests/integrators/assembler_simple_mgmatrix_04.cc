@@ -113,7 +113,7 @@ void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
 
   mg.set_zero();
 
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   UpdateFlags update_flags = update_values | update_gradients | update_hessians;

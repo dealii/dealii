@@ -188,7 +188,7 @@ private:
   void refine_local ();
 
   Triangulation<dim>   triangulation;
-  const MappingQ1<dim> mapping;
+  const MappingQGeneric<dim> mapping(1);
   FESystem<dim>        fe;
   DoFHandler<dim>    mg_dof_handler_renumbered;
 

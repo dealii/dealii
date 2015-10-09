@@ -65,7 +65,7 @@ namespace Advection
 
   private:
 
-    const MappingQ1<dim> mapping;
+    const MappingQGeneric<dim> mapping(1);
 
     void setup_system ();
 

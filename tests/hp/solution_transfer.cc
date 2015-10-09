@@ -80,7 +80,7 @@ void transfer(std::ostream &out)
   hp::DoFHandler<dim> dgq_dof_handler(tria);
   Vector<double> q_solution;
   Vector<double> dgq_solution;
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
 
   // refine a few cells
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),

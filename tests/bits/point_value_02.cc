@@ -112,7 +112,7 @@ check ()
 
   FE_Q<dim> element(3);
   DoFHandler<dim> dof(tria);
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   dof.distribute_dofs(element);
 
   // test with two different functions: one
