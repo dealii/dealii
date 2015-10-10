@@ -340,7 +340,7 @@ private:
   void output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
-  const MappingQGeneric<dim> mapping(1);
+  const MappingQGeneric<dim> mapping;
 
   FE_DGQ<dim>          fe;
   DoFHandler<dim>      dof_handler;
@@ -362,7 +362,7 @@ private:
 template <int dim>
 DGMethod<dim>::DGMethod ()
   :
-  mapping (),
+  mapping (1),
   fe (1),
   dof_handler (triangulation),
   quadrature (4),

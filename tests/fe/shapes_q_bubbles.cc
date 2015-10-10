@@ -28,7 +28,7 @@
 template<int dim>
 void plot_FE_Q_Bubbles_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_Q_Bubbles<dim> q1(1);
   plot_shape_functions(m, q1, "Q1_Bubbles");

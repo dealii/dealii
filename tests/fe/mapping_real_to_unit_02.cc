@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,7 @@ void test2()
   GridGenerator::hyper_ball (triangulation);
   triangulation.set_boundary (0, boundary_description);
   triangulation.refine_global (1);
-  MappingQ1< dim > mapping;
+  MappingQGeneric<dim> mapping(1);
 
 
   Point<dim> p(-0.27999999999999992, -0.62999999999999989);

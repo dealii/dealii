@@ -65,7 +65,7 @@ namespace Advection
 
   private:
 
-    const MappingQGeneric<dim> mapping(1);
+    const MappingQGeneric<dim> mapping;
 
     void setup_system ();
 
@@ -109,7 +109,7 @@ namespace Advection
   template <int dim>
   AdvectionProblem<dim>::AdvectionProblem ()
     :
-    mapping(),
+    mapping(1),
     wavespeed(1.0),
     dof_handler (triangulation),
     fe (FE_DGQ<dim>(0), 1),// p=0, and solving for a scalar

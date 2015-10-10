@@ -28,7 +28,7 @@
 template<int dim>
 void plot_FE_TraceQ_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_TraceQ<dim> tq1(1);
   FE_TraceQ<dim> tq2(2);

@@ -27,7 +27,7 @@
 template<int dim>
 void plot_FE_DGP_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_DGP<dim> p1(1);
   plot_shape_functions(m, p1, "DGP1");
