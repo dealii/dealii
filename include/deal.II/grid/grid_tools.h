@@ -643,6 +643,22 @@ namespace GridTools
   std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
+  /**
+   * Compute a globally unique index for each vertex and hanging node associated
+   * with a locally owned active cell. The vertices of a ghost cell that are
+   * hanging nodes of a locally owned cells have a global index. However, the
+   * other vertices of the cells that do not <i>touch</i> an active cell do not
+   * have a global index on this processor.
+   *
+   * The key of the map is the local index of the vertex and the value is the
+   * global index. The indices need to be recomputed after refinement or
+   * coarsening and may be different.
+   */
+  template <int dim, int spacedim>
+  std::map<unsigned int, types::global_vertex_index>
+  compute_local_to_global_vertex_index_map(
+    const parallel::distributed::Triangulation<dim,spacedim> &triangulation);
+
 
   /*@}*/
   /**
