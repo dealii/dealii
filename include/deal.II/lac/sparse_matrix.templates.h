@@ -638,7 +638,7 @@ SparseMatrix<number>::set (const size_type  row,
                            const bool       elide_zero_values)
 {
   Assert (cols != 0, ExcNotInitialized());
-  Assert (row < m(), ExcInvalidIndex1(row));
+  AssertIndexRange(row, m());
 
   // First, search all the indices to find
   // out which values we actually need to

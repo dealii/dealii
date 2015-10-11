@@ -1303,12 +1303,6 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidIndex1,
-                  int,
-                  << "The index " << arg1 << " is not in the allowed range.");
-  /**
-   * Exception
-   */
   DeclException0 (ExcDifferentChunkSparsityPatterns);
   /**
    * Exception
@@ -1580,7 +1574,7 @@ number ChunkSparseMatrix<number>::diag_element (const size_type i) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (m() == n(),  ExcNotQuadratic());
-  Assert (i<m(), ExcInvalidIndex1(i));
+  AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal of the chunk sparsity pattern

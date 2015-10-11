@@ -1527,12 +1527,6 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidIndex1,
-                  int,
-                  << "The index " << arg1 << " is not in the allowed range.");
-  /**
-   * Exception
-   */
   DeclExceptionMsg (ExcDifferentSparsityPatterns,
                     "When copying one sparse matrix into another, "
                     "or when adding one sparse matrix to another, "
@@ -1884,7 +1878,7 @@ number SparseMatrix<number>::diag_element (const size_type i) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (m() == n(),  ExcNotQuadratic());
-  Assert (i<m(), ExcInvalidIndex1(i));
+  AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
@@ -1899,7 +1893,7 @@ number &SparseMatrix<number>::diag_element (const size_type i)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (m() == n(),  ExcNotQuadratic());
-  Assert (i<m(), ExcInvalidIndex1(i));
+  AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
