@@ -1508,8 +1508,22 @@ public:
    */
   DeclException2 (ExcInvalidIndex,
                   int, int,
-                  << "The entry with index <" << arg1 << ',' << arg2
-                  << "> does not exist.");
+                  << "You are trying to access the matrix entry with index <"
+                  << arg1 << ',' << arg2
+                  << ">, but this entry does not exist in the sparsity pattern"
+                  "of this matrix."
+                  "\n\n"
+                  "The most common cause for this problem is that you used "
+                  "a method to build the sparsity pattern that did not "
+                  "(completely) take into account all of the entries you "
+                  "will later try to write into. An example would be "
+                  "building a sparsity pattern that does not include "
+                  "the entries you will write into due to constraint "
+                  "on degrees of freedom such as handing nodes or periodic "
+                  "boundary conditions. In such cases, building the "
+                  "sparsity pattern will succeed, but you will get errors "
+                  "such as the current one at one point or other when "
+                  "trying to write into the entries of the matrix.");
   /**
    * Exception
    */
