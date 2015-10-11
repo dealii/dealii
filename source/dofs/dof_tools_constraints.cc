@@ -2526,8 +2526,7 @@ namespace DoFTools
         const unsigned int                                                     coarse_component,
         const FiniteElement<dim,spacedim>                                     &coarse_fe,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> >                 &coarse_to_fine_grid_map,
-        const std::vector<dealii::Vector<double> >                            &parameter_dofs,
-        const std::vector<types::global_dof_index>                            &weight_mapping)
+        const std::vector<dealii::Vector<double> >                            &parameter_dofs)
       {
         // for each cell on the parameter grid: find out which degrees of
         // freedom on the fine grid correspond in which way to the degrees
@@ -2749,8 +2748,7 @@ namespace DoFTools
                                         coarse_component,
                                         std_cxx11::cref(coarse_grid.get_fe()),
                                         std_cxx11::cref(coarse_to_fine_grid_map),
-                                        std_cxx11::cref(parameter_dofs),
-                                        std_cxx11::cref(weight_mapping)),
+                                        std_cxx11::cref(parameter_dofs)),
                         std_cxx11::bind(&copy_intergrid_weights_3<dim,spacedim>,
                                         std_cxx11::_1,
                                         coarse_component,
