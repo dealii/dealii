@@ -44,19 +44,9 @@ namespace LinearAlgebra
   class VectorSpaceVector
   {
   public:
+    typedef Number                                            value_type;
     typedef types::global_dof_index                           size_type;
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
-
-    /**
-     * Imports all the elements present in the vector's IndexSet from the input
-     * vector @p read_write_vector.
-     */
-    virtual VectorSpaceVector<Number> &operator= (const ReadWriteVector<Number> &read_write_vector) = 0;
-
-    /**
-     * Copies the data and the IndexSet of the input vector @p in_vector.
-     */
-    virtual VectorSpaceVector<Number> &operator= (const VectorSpaceVector<Number> &in_vector) = 0;
 
     /**
      * Multiply the entire vector by a fixed factor.
@@ -69,6 +59,21 @@ namespace LinearAlgebra
     virtual VectorSpaceVector<Number> &operator/= (const Number factor) = 0;
 
     /**
+     * Add the vector @p V to the present one.
+     */
+    virtual VectorSpaceVector<Number> &operator+= (const VectorSpaceVector<Number> &V) = 0;
+
+    /**
+     * Subtract the vector @p V from the present one.
+     */
+    virtual VectorSpaceVector<Number> &operator-= (const VectorSpaceVector<Number> &V) = 0;
+
+    /**
+     * Return the scalar product of two vectors.
+     */
+    virtual Number operator* (const VectorSpaceVector<Number> &V) = 0;
+
+    /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     virtual void add(const Number a, const VectorSpaceVector<Number> &V) = 0;
@@ -76,7 +81,7 @@ namespace LinearAlgebra
     /**
      * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
      */
-    virtual void add(const Number a, const VectorSpaceVector<Number> &VW,
+    virtual void add(const Number a, const VectorSpaceVector<Number> &V,
                      const Number b, const VectorSpaceVector<Number> &W) = 0;
 
     /**
