@@ -157,7 +157,7 @@ public:
  *
  * The class is poorly named since the proper name of the quadrature formula
  * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer results from the fact that its original authors's poor English
+ * misnomer results from the fact that its original authors' poor English
  * language skills led them to translate the name incorrectly from the German
  * "Trapezregel".
  *

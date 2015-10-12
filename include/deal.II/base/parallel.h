@@ -390,7 +390,7 @@ namespace parallel
    * @endcode
    *
    * Note how we use the <code>std_cxx11::bind</code> function to convert
-   * <code>mat_vec_on_subranged</code> from a function that takes 5 arguments
+   * <code>mat_vec_on_subranges</code> from a function that takes 5 arguments
    * to one taking 2 by binding the remaining arguments (the modifiers
    * <code>std_cxx11::ref</code> and <code>std_cxx11::cref</code> make sure
    * that the enclosed variables are actually passed by reference and constant

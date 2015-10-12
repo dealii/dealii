@@ -94,7 +94,7 @@ class XDMFEntry;
  * example, you may have higher order elements and printing the values at the
  * vertices only is not enough. For this reason, we not only provide writing
  * the data on the vertices only, but the data is organizes as a tensor
- * product grid on each cell. The parameter <tt>n_subdivision</tt>, which is
+ * product grid on each cell. The parameter <tt>n_subdivisions</tt>, which is
  * given for each patch separately, denotes how often the cell is to be
  * divided for output; for example, <tt>n_subdivisions==1</tt> yields no
  * subdivision of the cell, <tt>n_subdivisions==2</tt> will produce a grid of
@@ -226,7 +226,7 @@ namespace DataOutBase
    *
    * See the general documentation of the DataOutBase class for more
    * information on its contents and purposes.  In the case of two dimensions,
-   * the next picture is an example of <tt>n_subdivision</tt> = 4 because the
+   * the next picture is an example of <tt>n_subdivisions</tt> = 4 because the
    * number of (sub)cells within each patch is equal to
    * <tt>2<sup>dim</sup></tt>.
    *

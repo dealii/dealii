@@ -194,7 +194,7 @@ public:
   project_to_all_children (const Quadrature<dim>  &quadrature);
 
   /**
-   * Project the onedimensional rule <tt>quadrature</tt> to the straight line
+   * Project the one dimensional rule <tt>quadrature</tt> to the straight line
    * connecting the points <tt>p1</tt> and <tt>p2</tt>.
    */
   static
