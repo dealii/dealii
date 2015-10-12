@@ -162,7 +162,7 @@ DEAL_II_NAMESPACE_OPEN
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
  * "blocks" using a defaulted argument to the various
- * DoFRenumber::component_wise() functions (see
+ * DoFRenumbering::component_wise() functions (see
  * @ref GlossComponent
  * vs
  * @ref GlossBlock
@@ -182,8 +182,8 @@ DEAL_II_NAMESPACE_OPEN
  * On the other hand, if you really want to use block structure reported by
  * the finite element itself (a case that is often the case if you have finite
  * elements that have multiple vector components, e.g. the FE_RaviartThomas or
- * FE_Nedelec elements) then you can use the DoFRenumber::block_wise instead
- * of the DoFRenumbering::component_wise functions.
+ * FE_Nedelec elements) then you can use the DoFRenumbering::block_wise
+ * instead of the DoFRenumbering::component_wise functions.
  *
  *
  * <h3>Cell-wise numbering</h3>
