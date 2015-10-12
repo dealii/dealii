@@ -254,7 +254,7 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
       {
         if (max_to_mark!=numbers::invalid_unsigned_int && marked>=max_to_mark)
           break;
-        marked++;
+        ++marked;
         cell->set_refine_flag();
       }
 }
