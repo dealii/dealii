@@ -248,9 +248,10 @@ public:
 
   /**
    * Maximum number of levels to be printed on the console. This function
-   * allows to restrict console output to the upmost levels of iterations.
-   * Only output with less than <tt>n</tt> prefixes is printed. By calling
-   * this function with <tt>n=0</tt>, no console output will be written.
+   * allows one to restrict console output to the highest levels of
+   * iterations. Only output with less than <tt>n</tt> prefixes is
+   * printed. By calling this function with <tt>n=0</tt>, no console output
+   * will be written.
    *
    * The previous value of this parameter is returned.
    */
