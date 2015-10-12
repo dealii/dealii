@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,10 +17,28 @@
 # Configuration for mpi support:
 #
 
+MACRO(FEATURE_MPI_FIND_EXTERNAL var)
+  FIND_PACKAGE(MPI)
+
+  IF(MPI_FOUND)
+    SET(${var} TRUE)
+
+    IF(NOT MPI_HAVE_MPI_SEEK_SET)
+      MESSAGE(STATUS
+        "Could not find a sufficient MPI version: "
+        "Your MPI implementation must define MPI_SEEK_SET.")
+      SET(MPI_ADDITIONAL_ERROR_STRING
+        "Your MPI implementation must define MPI_SEEK_SET.")
+      SET(${var} FALSE)
+    ENDIF()
+  ENDIF()
+ENDMACRO()
+
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
-    "Please ensure that an mpi library is installed on your computer\n"
+    ${MPI_ADDITIONAL_ERROR_STRING}
+    "\nPlease ensure that an mpi library is installed on your computer\n"
     "and set CMAKE_CXX_COMPILER to the appropriate mpi wrappers:\n"
     "    $ CXX=\".../mpicxx\" cmake <...>\n"
     "    $ cmake -DCMAKE_CXX_COMPILER=\".../mpicxx\" <...>\n"

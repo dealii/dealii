@@ -23,6 +23,7 @@
 #   MPI_LINKER_FLAGS
 #   MPI_VERSION
 #   OMPI_VERSION
+#   MPI_HAVE_MPI_SEEK_SET
 #
 
 #
@@ -86,6 +87,27 @@ IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
 ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
+#
+# Older versions of MPI may not have MPI_SEEK_SET, which we
+# require. Strangely, unlike MPICH, OpenMPI needs the correct link libraries
+# for this to compile, not *just* the correct include directories.
+#
+
+CLEAR_CMAKE_REQUIRED()
+SET(CMAKE_REQUIRED_FLAGS ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
+SET(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+SET(CMAKE_REQUIRED_LIBRARIES ${MPI_LIBRARIES})
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <mpi.h>
+  #ifndef MPI_SEEK_SET
+  #  error
+  #endif
+  int main() {}
+  "
+  MPI_HAVE_MPI_SEEK_SET
+  )
+RESET_CMAKE_REQUIRED()
 
 #
 # Manually assemble some version information:
@@ -162,5 +184,6 @@ DEAL_II_PACKAGE_HANDLE(MPI
     MPI_LIB
     MPI_LIBRARY
     MPI_MPI_H
+    MPI_HAVE_MPI_SEEK_SET
   )
 
