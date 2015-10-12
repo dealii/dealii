@@ -114,7 +114,7 @@ public:
 
   /**
    * Computes the volume element associated with the jacobian of the
-   * tranformation F. That is to say if $DF$ is square, it computes
+   * transformation F. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt(\det(DF^{t} * DF))$.
    */
   double determinant () const;

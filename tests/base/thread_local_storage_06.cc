@@ -43,10 +43,10 @@ X initializer ()
   return x;
 }
 
-X fourty_two = initializer();
+X forty_two = initializer();
 
 
-Threads::ThreadLocalStorage<X> tls_data(fourty_two);
+Threads::ThreadLocalStorage<X> tls_data(forty_two);
 
 
 void execute (Threads::Mutex &m)

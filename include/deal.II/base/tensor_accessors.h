@@ -61,7 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  *   };
  * @endcode
  *
- * This namespace provides primitves for access, reordering and contraction
+ * This namespace provides primitives for access, reordering and contraction
  * of such objects.
  *
  * @ingroup geomprimitives
@@ -124,7 +124,7 @@ namespace TensorAccessors
   /**
    * This class provides a local typedef @p value_type that is equal to
    * the typedef <code>value_type</code> after @p deref_steps
-   * recursive dereferenciations via ```operator[](unsigned int)```.
+   * recursive dereferences via ```operator[](unsigned int)```.
    * Further, constness is preserved via the ValueType
    * type trait, i.e., if T is const, ReturnType<rank, T>::value_type
    * will also be const.
@@ -165,7 +165,7 @@ namespace TensorAccessors
    * The purpose of this reordering facility is to be able to contract over
    * an arbitrary index of two (ore more) tensors:
    *  - reorder the indices in mind to the end of the tensors
-   *  - use belows contract function that contracts the _last_ elements of
+   *  - use the contract function below that contracts the _last_ elements of
    *    tensors.
    *
    * @note This function returns an internal class object consisting of an
@@ -355,12 +355,12 @@ namespace TensorAccessors
     };
 
 
-    // TODO: Is there a possibility ot just have the following block of
+    // TODO: Is there a possibility to just have the following block of
     // explanation on an internal page in doxygen? If, yes. Doxygen
     // wizards, your call!
 
     // -------------------------------------------------------------------------
-    // Implemenation of helper classes for reordered_index_view
+    // Implementation of helper classes for reordered_index_view
     // -------------------------------------------------------------------------
 
     // OK. This is utterly brutal template magic. Therefore, we will not
@@ -371,7 +371,7 @@ namespace TensorAccessors
     //
     // Our task is to reorder access to a tensor object where a specified
     // index is moved to the end. Thus we want to construct an object
-    // <code>reorderd</code> out of a <code>tensor</code> where the
+    // <code>reordered</code> out of a <code>tensor</code> where the
     // following access patterns are equivalent:
     // @code
     //   tensor    [i_0]...[i_index-1][i_index][i_index+1]...[i_n]
@@ -535,7 +535,7 @@ namespace TensorAccessors
 
 
     // -------------------------------------------------------------------------
-    // Implemenation of helper classes for extract
+    // Implementation of helper classes for extract
     // -------------------------------------------------------------------------
 
     // Straightforward recursion implemented by specializing ExtractHelper
@@ -574,10 +574,10 @@ namespace TensorAccessors
 
 
     // -------------------------------------------------------------------------
-    // Implemenation of helper classes for contract
+    // Implementation of helper classes for contract
     // -------------------------------------------------------------------------
 
-    // Straightforwad recursive pattern:
+    // Straightforward recursive pattern:
     //
     // As long as rank_1 > no_contr, assign indices from the left tensor to
     // result. This builds up the first part of the nested outer loops:
@@ -692,7 +692,7 @@ namespace TensorAccessors
 
 
     // -------------------------------------------------------------------------
-    // Implemenation of helper classes for contract3
+    // Implementation of helper classes for contract3
     // -------------------------------------------------------------------------
 
     // Fully contract three tensorial objects

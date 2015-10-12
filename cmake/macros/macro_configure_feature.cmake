@@ -45,7 +45,7 @@
 #
 # FEATURE_${feature}_FIND_EXTERNAL(var)   (a macro)
 #    which should set var to TRUE if all dependencies for the feature are
-#    fullfilled. In this case all necessary variables for
+#    fulfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
 #    If not defined, FIND_PACKAGE(${feature}) is called.
@@ -189,7 +189,7 @@ MACRO(CONFIGURE_FEATURE _feature)
      DEAL_II_WITH_${_feature})
 
     #
-    # Are all dependencies fullfilled?
+    # Are all dependencies fulfilled?
     #
     SET(_dependencies_ok TRUE)
     FOREACH(_dependency ${FEATURE_${_feature}_DEPENDS})
