@@ -46,7 +46,7 @@ void test()
   tria.execute_coarsening_and_refinement();
 
 
-  std::map<unsigned int, types::global_dof_index> local_to_global_id =
+  std::map<unsigned int, types::global_vertex_index> local_to_global_id =
     GridTools::compute_local_to_global_vertex_index_map(tria);
 
   std::vector<types::global_vertex_index> vertex_global_index;
@@ -66,13 +66,13 @@ void test()
         }
     }
   std::sort(vertex_global_index.begin(),vertex_global_index.end());
-  std::vector<types::global_dof_index>::iterator it;
+  std::vector<types::global_vertex_index>::iterator it;
   it = std::unique(vertex_global_index.begin(),vertex_global_index.end());
   vertex_global_index.resize(it-vertex_global_index.begin());
 
   if (rank==0)
     {
-      std::vector<types::global_dof_index> reference;
+      std::vector<types::global_vertex_index> reference;
       for (unsigned int i=0; i<31; ++i)
         reference.push_back(i);
       for (unsigned int i=0; i<vertex_global_index.size(); ++i)
@@ -80,7 +80,7 @@ void test()
     }
   if (rank==1)
     {
-      std::vector<types::global_dof_index> reference;
+      std::vector<types::global_vertex_index> reference;
       reference.push_back(14);
       reference.push_back(18);
       reference.push_back(19);
