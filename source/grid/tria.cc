@@ -12102,7 +12102,7 @@ namespace
                 // natural to use the union. however, intersection is
                 // the less aggressive tactic and favours a smaller
                 // number of refined cells over an intensive
-                // smoothing. this way we try not to loose too much of
+                // smoothing. this way we try not to lose too much of
                 // the effort we put in anisotropic refinement
                 // indicators due to overly aggressive smoothing...
                 directional_cell_refinement_case

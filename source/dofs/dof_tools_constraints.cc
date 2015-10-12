@@ -1300,7 +1300,7 @@ namespace DoFTools
                     // This requires usage of find_least_face_dominating_fe()
                     // with fe_indices of sub-faces and the mother face.
                     // Note that the last solution covers the first two scenarios,
-                    // thus we stick with it assuming that we won't loose much time/efficiency.
+                    // thus we stick with it assuming that we won't lose much time/efficiency.
                     const unsigned int dominating_fe_index = fe_collection.find_least_face_dominating_fe(fe_ind_face_subface);
                     AssertThrow(dominating_fe_index != numbers::invalid_unsigned_int,
                                 ExcMessage("Could not find a least face dominating FE."));

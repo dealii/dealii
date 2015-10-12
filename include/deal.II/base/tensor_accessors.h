@@ -163,7 +163,7 @@ namespace TensorAccessors
    * fairly general tensorial types @p T.
    *
    * The purpose of this reordering facility is to be able to contract over
-   * an arbitrary index of two (ore more) tensors:
+   * an arbitrary index of two (or more) tensors:
    *  - reorder the indices in mind to the end of the tensors
    *  - use the contract function below that contracts the _last_ elements of
    *    tensors.
