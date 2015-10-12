@@ -4385,6 +4385,8 @@ namespace internal
                           right_neighbor->set_neighbor (nbnb, second_child);
                         }
                     }
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(cell);
                 }
           }
 
@@ -4742,6 +4744,8 @@ namespace internal
                                               internal::int2type<dim>(),
                                               internal::int2type<spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back (cell);
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(cell);
                 }
           }
 
@@ -8354,6 +8358,9 @@ namespace internal
 
                   // note that the refinement flag was already cleared
                   // at the beginning of this loop
+
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(hex);
                 }
           }
 
@@ -8751,7 +8758,7 @@ Triangulation (const MeshSmoothing smooth_grid,
         = new std::map<unsigned int, types::manifold_id>();
     }
 
-  // connect the any_change signal to the other signals
+  // connect the any_change signal to the other top level signals
   signals.create.connect (signals.any_change);
   signals.post_refinement.connect (signals.any_change);
   signals.clear.connect (signals.any_change);

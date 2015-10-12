@@ -1921,6 +1921,7 @@ public:
     boost::signals2::signal<void ()> create;
     boost::signals2::signal<void ()> pre_refinement;
     boost::signals2::signal<void ()> post_refinement;
+    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
     boost::signals2::signal<void (const Triangulation<dim, spacedim> &original_tria)> copy;
     boost::signals2::signal<void ()> clear;
     boost::signals2::signal<void ()> any_change;
