@@ -30,25 +30,10 @@ SET(_src
   matrix_lib.cc
   matrix_out.cc
   parallel_vector.cc
-  petsc_block_sparse_matrix.cc
-  petsc_full_matrix.cc
-  petsc_matrix_base.cc
-  petsc_matrix_free.cc
-  petsc_parallel_block_sparse_matrix.cc
-  petsc_parallel_block_vector.cc
-  petsc_parallel_sparse_matrix.cc
-  petsc_parallel_vector.cc
-  petsc_precondition.cc
-  petsc_solver.cc
-  petsc_sparse_matrix.cc
-  petsc_vector_base.cc
-  petsc_vector.cc
   precondition_block.cc
   precondition_block_ez.cc
   relaxation_block.cc
   read_write_vector.cc
-  slepc_solver.cc
-  slepc_spectral_transformation.cc
   solver.cc
   solver_control.cc
   sparse_decomposition.cc
@@ -63,17 +48,6 @@ SET(_src
   sparsity_tools.cc
   swappable_vector.cc
   tridiagonal_matrix.cc
-  trilinos_block_sparse_matrix.cc
-  trilinos_block_vector.cc
-  trilinos_parallel_block_vector.cc
-  trilinos_precondition.cc
-  trilinos_precondition_ml.cc
-  trilinos_precondition_muelu.cc
-  trilinos_solver.cc
-  trilinos_sparse_matrix.cc
-  trilinos_sparsity_pattern.cc
-  trilinos_vector_base.cc
-  trilinos_vector.cc
   vector.cc
   vector_memory.cc
   vector_view.cc
@@ -93,12 +67,66 @@ SET(_inst
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
-  trilinos_sparse_matrix.inst.in
-  trilinos_vector_base.inst.in
   vector.inst.in
   vector_memory.inst.in
   vector_view.inst.in
   )
+
+# Add PETSc wrapper files. If PETSc has not been found,
+# then these files should be empty and there is no need
+# to even look at them
+IF(DEAL_II_WITH_PETSC)
+  SET(_src
+    ${_src}
+    petsc_block_sparse_matrix.cc
+    petsc_full_matrix.cc
+    petsc_matrix_base.cc
+    petsc_matrix_free.cc
+    petsc_parallel_block_sparse_matrix.cc
+    petsc_parallel_block_vector.cc
+    petsc_parallel_sparse_matrix.cc
+    petsc_parallel_vector.cc
+    petsc_precondition.cc
+    petsc_solver.cc
+    petsc_sparse_matrix.cc
+    petsc_vector_base.cc
+    petsc_vector.cc
+  )
+ENDIF()
+
+# Same for SLEPc
+IF(DEAL_II_WITH_SLEPC)
+  SET(_src
+    ${_src}
+    slepc_solver.cc
+    slepc_spectral_transformation.cc
+  )
+ENDIF()
+
+# Also add Trilinos wrapper files
+IF(DEAL_II_WITH_TRILINOS)
+  SET(_src
+    ${_src}
+    trilinos_block_sparse_matrix.cc
+    trilinos_block_vector.cc
+    trilinos_parallel_block_vector.cc
+    trilinos_precondition.cc
+    trilinos_precondition_ml.cc
+    trilinos_precondition_muelu.cc
+    trilinos_solver.cc
+    trilinos_sparse_matrix.cc
+    trilinos_sparsity_pattern.cc
+    trilinos_vector_base.cc
+    trilinos_vector.cc
+  )
+  SET(_inst
+    ${_inst}
+    trilinos_sparse_matrix.inst.in
+    trilinos_vector_base.inst.in
+  )
+ENDIF()
+
+
 
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
