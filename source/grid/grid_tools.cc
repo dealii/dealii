@@ -1643,6 +1643,18 @@ next_cell:
   {
     std::map<unsigned int,types::global_vertex_index> local_to_global_vertex_index;
 
+#ifndef DEAL_II_WITH_MPI
+
+    // without MPI, this function doesn't make sense because on cannot
+    // use parallel::distributed::Triangulation in any meaninful
+    // way
+    (void)triangulation;
+    Assert (false, ExcMessage ("This function does not make any sense "
+                               "for parallel::distributed::Triangulation "
+                               "objects if you do not have MPI enabled."));
+
+#else
+
     typedef typename Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
     const std::vector<std::set<active_cell_iterator> > vertex_to_cell =
       vertex_to_cell_map(triangulation);
@@ -1650,7 +1662,7 @@ next_cell:
     // Create a local index for the locally "owned" vertices
     types::global_vertex_index next_index = 0;
     unsigned int max_cellid_size = 0;
-    std::set<std_cxx11::tuple<types::subdomain_id,types::global_vertex_index> > vertices_added;
+    std::set<std::pair<types::subdomain_id,types::global_vertex_index> > vertices_added;
     std::map<types::subdomain_id,std::set<unsigned int> > vertices_to_recv;
     std::map<types::subdomain_id,std::vector<std_cxx11::tuple<types::global_vertex_index,
         types::global_vertex_index,std::string> > > vertices_to_send;
@@ -1689,7 +1701,7 @@ next_cell:
                         for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
                           if ((*adjacent_cell)->subdomain_id()!=cell->subdomain_id())
                             {
-                              std_cxx11::tuple<types::subdomain_id,types::global_vertex_index>
+                              std::pair<types::subdomain_id,types::global_vertex_index>
                               tmp((*adjacent_cell)->subdomain_id(), cell->vertex_index(i));
                               if (vertices_added.find(tmp)==vertices_added.end())
                                 {
@@ -1741,6 +1753,7 @@ next_cell:
               }
           }
       }
+
     // Get the size of the largest CellID string
     max_cellid_size = Utilities::MPI::max(max_cellid_size, triangulation.get_communicator());
 
@@ -1783,9 +1796,9 @@ next_cell:
         // fill the buffer
         for (unsigned int j=0; j<n_vertices; ++j)
           {
-            vertices_send_buffers[i][2*j] = std::get<0>(vert_to_send_it->second[j]);
+            vertices_send_buffers[i][2*j] = std_cxx11::get<0>(vert_to_send_it->second[j]);
             vertices_send_buffers[i][2*j+1] =
-              local_to_global_vertex_index[std::get<1>(vert_to_send_it->second[j])];
+              local_to_global_vertex_index[std_cxx11::get<1>(vert_to_send_it->second[j])];
           }
 
         // Send the message
@@ -1828,7 +1841,7 @@ next_cell:
         unsigned int pos = 0;
         for (unsigned int j=0; j<n_vertices; ++j)
           {
-            std::string cell_id = std::get<2>(vert_to_send_it->second[j]);
+            std::string cell_id = std_cxx11::get<2>(vert_to_send_it->second[j]);
             for (unsigned int k=0; k<max_cellid_size; ++k, ++pos)
               {
                 if (k<cell_id.size())
@@ -1896,6 +1909,7 @@ next_cell:
               }
           }
       }
+#endif
 
     return local_to_global_vertex_index;
   }
