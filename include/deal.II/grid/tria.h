@@ -1689,9 +1689,9 @@ public:
   std::vector<types::manifold_id> get_manifold_ids() const;
 
   /**
-   * Copy a triangulation. This operation is not cheap, so you should be
-   * careful with using this. We do not implement this function as a copy
-   * constructor, since it makes it easier to maintain collections of
+   * Copy @p old_tria to this triangulation. This operation is not cheap, so you
+   * should be careful with using this. We do not implement this function as a
+   * copy constructor, since it makes it easier to maintain collections of
    * triangulations if you can assign them values later on.
    *
    * Keep in mind that this function also copies the pointer to the boundary
