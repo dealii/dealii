@@ -1650,9 +1650,9 @@ next_cell:
     // Create a local index for the locally "owned" vertices
     types::global_vertex_index next_index = 0;
     unsigned int max_cellid_size = 0;
-    std::set<std::tuple<types::subdomain_id,types::global_vertex_index> > vertices_added;
+    std::set<std_cxx11::tuple<types::subdomain_id,types::global_vertex_index> > vertices_added;
     std::map<types::subdomain_id,std::set<unsigned int> > vertices_to_recv;
-    std::map<types::subdomain_id,std::vector<std::tuple<types::global_vertex_index,
+    std::map<types::subdomain_id,std::vector<std_cxx11::tuple<types::global_vertex_index,
         types::global_vertex_index,std::string> > > vertices_to_send;
     active_cell_iterator cell = triangulation.begin_active(),
                          endc = triangulation.end();
@@ -1689,12 +1689,12 @@ next_cell:
                         for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
                           if ((*adjacent_cell)->subdomain_id()!=cell->subdomain_id())
                             {
-                              std::tuple<types::subdomain_id,types::global_vertex_index>
+                              std_cxx11::tuple<types::subdomain_id,types::global_vertex_index>
                               tmp((*adjacent_cell)->subdomain_id(), cell->vertex_index(i));
                               if (vertices_added.find(tmp)==vertices_added.end())
                                 {
                                   vertices_to_send[(*adjacent_cell)->subdomain_id()].push_back(
-                                    std::tuple<types::global_vertex_index,types::global_vertex_index,
+                                    std_cxx11::tuple<types::global_vertex_index,types::global_vertex_index,
                                     std::string> (i,cell->vertex_index(i),
                                                   cell->id().to_string()));
                                   if (cell->id().to_string().size() > max_cellid_size)
@@ -1768,7 +1768,7 @@ next_cell:
       vertices_to_send.size());
     std::vector<MPI_Request> first_requests(vertices_to_send.size());
     typename std::map<types::subdomain_id,
-             std::vector<std::tuple<types::global_vertex_index,
+             std::vector<std_cxx11::tuple<types::global_vertex_index,
              types::global_vertex_index,std::string> > >::iterator
              vert_to_send_it = vertices_to_send.begin(),
              vert_to_send_end = vertices_to_send.end();
