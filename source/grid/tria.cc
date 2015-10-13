@@ -11669,11 +11669,15 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   if (levels.size() >= 2)
     for (cell = last(); cell!=endc; --cell)
       if (cell->level()<=static_cast<int>(levels.size()-2) && cell->user_flag_set())
-        // use a separate function,
-        // since this is dimension
-        // specific
-        internal::Triangulation::Implementation
-        ::delete_children (*this, cell, line_cell_count, quad_cell_count);
+        {
+          // inform all listeners that cell coarsening is going to happen
+          signals.pre_coarsening_on_cell(cell);
+          // use a separate function,
+          // since this is dimension
+          // specific
+          internal::Triangulation::Implementation
+          ::delete_children (*this, cell, line_cell_count, quad_cell_count);
+        }
 
   // re-compute number of lines and
   // quads

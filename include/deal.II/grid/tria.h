@@ -1921,6 +1921,13 @@ public:
     boost::signals2::signal<void ()> create;
     boost::signals2::signal<void ()> pre_refinement;
     boost::signals2::signal<void ()> post_refinement;
+    /**
+     * @note the signal parameter @p cell is correspond to the new active cell
+     * after coarsening is done rather than a current active cell.
+     * In another word, all children of @p cell will be deleted after coarsening
+     * and @p cell will become the new active cell then.
+     */
+    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> pre_coarsening_on_cell;
     boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
     boost::signals2::signal<void (const Triangulation<dim, spacedim> &original_tria)> copy;
     boost::signals2::signal<void ()> clear;
