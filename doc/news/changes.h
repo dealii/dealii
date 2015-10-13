@@ -367,6 +367,12 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: GridGenerator::subdivided_parallelepiped() produced
+  invalid, unconnected meshes and wrong boundary indicators.
+  <br>
+  (Timo Heister, 2015/10/13)
+  </li>
+
   <li> Improved: DoFTools::compute_intergrid_transfer_representation 
   can now be used with a fine grid given by a parallel::Triangulation.
   <br>
