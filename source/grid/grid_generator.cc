@@ -765,77 +765,20 @@ namespace GridGenerator
 
 
 
-// Parallelepiped implementation in 1d, 2d, and 3d. @note The
-// implementation in 1d is similar to hyper_rectangle(), and in 2d is
-// similar to parallelogram().
-//
-// The GridReordering::reorder_grid is made use of towards the end of
-// this function. Thus the triangulation is explicitly constructed for
-// all dim here since it is slightly different in that respect
-// (cf. hyper_rectangle(), parallelogram()).
   template<int dim>
   void
   parallelepiped (Triangulation<dim>  &tria,
                   const Point<dim>   (&corners) [dim],
                   const bool           colorize)
   {
-    // Check that none of the user defined vertices overlap
+    unsigned int n_subdivisions [dim];
     for (unsigned int i=0; i<dim; ++i)
-      for (unsigned int j=i+1; j<dim; ++j)
-        Assert ((corners[i]!=corners[j]),
-                ExcMessage ("Invalid distance between corner points of parallelepiped."));
+      n_subdivisions[i] = 1;
 
-    // Note: vertex[0] is the origin and is initialised as so here:
-    std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
-
-    switch (dim)
-      {
-      // A line (1d parallelepiped)
-      case 1:
-        vertices[1] = corners[0];
-        break;
-
-      // A parallelogram (2d parallelepiped)
-      case 2:
-        // assign corners to vertices:
-        vertices[1] = corners[0];
-        vertices[2] = corners[1];
-
-        // compose the remaining vertex:
-        vertices[3] = vertices[1] + vertices[2];
-        break;
-
-      // A parallelepiped (3d parallelepiped)
-      case 3:
-        // assign corners to vertices:
-        vertices[1] = corners[0];
-        vertices[2] = corners[1];
-        vertices[4] = corners[2];
-
-        // compose the remaining vertices:
-        vertices[3] = vertices[1] + vertices[2];
-        vertices[5] = vertices[1] + vertices[4];
-        vertices[6] = vertices[2] + vertices[4];
-        vertices[7] = vertices[1] + vertices[2] + vertices[4];
-        break;
-
-      default:
-        Assert (false, ExcNotImplemented());
-      }
-
-    // Prepare cell data and wipe material identity
-    std::vector<CellData<dim> > cells (1);
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      cells[0].vertices[i] = i;
-    cells[0].material_id = 0;
-
-    // Check ordering of vertices and create triangulation
-    GridReordering<dim>::reorder_cells (cells);
-    tria.create_triangulation (vertices, cells, SubCellData());
-
-    // Finally assign boundary indicators according to hyper_rectangle
-    if (colorize)
-      colorize_hyper_rectangle (tria);
+    // and call the function below
+    subdivided_parallelepiped (tria, n_subdivisions,
+                               corners,
+                               colorize);
   }
 
   template<int dim>
@@ -857,6 +800,14 @@ namespace GridGenerator
                                colorize);
   }
 
+  // Parallelepiped implementation in 1d, 2d, and 3d. @note The
+  // implementation in 1d is similar to hyper_rectangle(), and in 2d is
+  // similar to parallelogram().
+  //
+  // The GridReordering::reorder_grid is made use of towards the end of
+  // this function. Thus the triangulation is explicitly constructed for
+  // all dim here since it is slightly different in that respect
+  // (cf. hyper_rectangle(), parallelogram()).
   template<int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
