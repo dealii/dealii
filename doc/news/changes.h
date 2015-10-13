@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: Two cell level signals are added to class Triangulation, namely
+  pre_coarsening_on_cell and post_refinement_on_cell.
+  <br>
+  (Lei Qiao, 2015/10/22)
+  </li>
+
   <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
   ghost cells. Similarly ::level_ghost_owners() for level ghosts.
   <br>
