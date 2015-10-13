@@ -1,0 +1,61 @@
+
+DEAL:1d-1d::n_signal_create : 1
+DEAL:1d-1d::n_signal_pre_refinement : 3
+DEAL:1d-1d::n_signal_post_refinement : 3
+DEAL:1d-1d::n_signal_pre_coarsening_on_cell : 2
+DEAL:1d-1d::n_signal_post_refinement_on_cell : 3
+DEAL:1d-1d::n_signal_copy : 1
+DEAL:1d-1d::n_signal_clear : 1
+DEAL:1d-1d::n_signal_any_change : 5
+DEAL::
+DEAL::
+DEAL:1d-2d::n_signal_create : 1
+DEAL:1d-2d::n_signal_pre_refinement : 3
+DEAL:1d-2d::n_signal_post_refinement : 3
+DEAL:1d-2d::n_signal_pre_coarsening_on_cell : 2
+DEAL:1d-2d::n_signal_post_refinement_on_cell : 3
+DEAL:1d-2d::n_signal_copy : 1
+DEAL:1d-2d::n_signal_clear : 1
+DEAL:1d-2d::n_signal_any_change : 5
+DEAL::
+DEAL::
+DEAL:1d-3d::n_signal_create : 1
+DEAL:1d-3d::n_signal_pre_refinement : 3
+DEAL:1d-3d::n_signal_post_refinement : 3
+DEAL:1d-3d::n_signal_pre_coarsening_on_cell : 2
+DEAL:1d-3d::n_signal_post_refinement_on_cell : 3
+DEAL:1d-3d::n_signal_copy : 1
+DEAL:1d-3d::n_signal_clear : 1
+DEAL:1d-3d::n_signal_any_change : 5
+DEAL::
+DEAL::
+DEAL:2d-2d::n_signal_create : 1
+DEAL:2d-2d::n_signal_pre_refinement : 3
+DEAL:2d-2d::n_signal_post_refinement : 3
+DEAL:2d-2d::n_signal_pre_coarsening_on_cell : 4
+DEAL:2d-2d::n_signal_post_refinement_on_cell : 5
+DEAL:2d-2d::n_signal_copy : 1
+DEAL:2d-2d::n_signal_clear : 1
+DEAL:2d-2d::n_signal_any_change : 5
+DEAL::
+DEAL::
+DEAL:2d-3d::n_signal_create : 1
+DEAL:2d-3d::n_signal_pre_refinement : 3
+DEAL:2d-3d::n_signal_post_refinement : 3
+DEAL:2d-3d::n_signal_pre_coarsening_on_cell : 4
+DEAL:2d-3d::n_signal_post_refinement_on_cell : 5
+DEAL:2d-3d::n_signal_copy : 1
+DEAL:2d-3d::n_signal_clear : 1
+DEAL:2d-3d::n_signal_any_change : 5
+DEAL::
+DEAL::
+DEAL:3d-3d::n_signal_create : 1
+DEAL:3d-3d::n_signal_pre_refinement : 3
+DEAL:3d-3d::n_signal_post_refinement : 3
+DEAL:3d-3d::n_signal_pre_coarsening_on_cell : 8
+DEAL:3d-3d::n_signal_post_refinement_on_cell : 9
+DEAL:3d-3d::n_signal_copy : 1
+DEAL:3d-3d::n_signal_clear : 1
+DEAL:3d-3d::n_signal_any_change : 5
+DEAL::
+DEAL::
