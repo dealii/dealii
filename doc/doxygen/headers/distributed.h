@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -131,6 +131,33 @@
  * result from forming the union of cells each of the processes own,
  * i.e. from the overlap of the turquoise, green, yellow and red
  * areas, disregarding the blue areas.
+ *
+ * @note The decomposition of this "real" mesh into the pieces stored
+ *   by each processes is provided by the <a href="http://www.p4est.org">p4est</a>
+ *   library. p4est stores the complete mesh in a distributed data structure
+ *   called a parallel forest (thus the name). A parallel forest consists of
+ *   quad-trees (in 2d) or oct-trees (in 3d) originating in each
+ *   coarse mesh cell and representing the refinement structure
+ *   from parent cells to their four (in 2d) or eight (in 3d)
+ *   children. Internally, this parallel forest is represented by
+ *   a (distributed) linear array of cells that corresponds to a
+ *   depth-first traverse of each tree, and each process then stores
+ *   a contiguous section of this linear array of cells. This results
+ *   in partitions such as the one shown above that are not optimal
+ *   in the sense that they do not minimize the length of the
+ *   interface between subdomains (and consequently do not minimize
+ *   the amount of communication) but that in practice are very
+ *   good and can be manipulated with exceedingly fast algorithms.
+ *   The efficiency of storing and manipulating cells in this way
+ *   therefore often outweighs the loss in optimality of communication.
+ *   (The individual subdomains resulting from this method of
+ *   partitioning may also sometimes consist of disconnected
+ *   parts, such as shown at the top right. However, it can be
+ *   proven that each subdomain consists of at most two disconnected
+ *   pieces; see C. Burstedde, T. Isaac: "Morton curve segments produce
+ *   no more than two distinct face-connected subdomains",
+ *   <a href="http://arxiv.org/abs/1505.05055>arXiv 1505.05055</a>,
+ *   2015.)
  *
  *
  * <h4>Distributed degree of freedom handler</h4>
