@@ -983,11 +983,26 @@ namespace GridGenerator
       }
 
     // Create triangulation
+    // reorder the cells to ensure that they satisfy the convention for
+    // edge and face directions
+    GridReordering<dim>::reorder_cells(cells, true);
     tria.create_triangulation (points, cells, SubCellData());
 
     // Finally assign boundary indicators according to hyper_rectangle
     if (colorize)
-      colorize_hyper_rectangle (tria);
+      {
+        typename Triangulation<dim>::active_cell_iterator
+        cell = tria.begin_active(),
+        endc = tria.end();
+        for (; cell!=endc; ++cell)
+          {
+            for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+              {
+                if (cell->face(face)->at_boundary())
+                  cell->face(face)->set_boundary_id(face);
+              }
+          }
+      }
   }
 
 
