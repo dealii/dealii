@@ -2735,7 +2735,7 @@ namespace DoFTools
             (locally_owned_dofs, locally_relevant_dofs, communicator);
 #else
             const types::global_dof_index n_fine_dofs = weight_mapping.size();
-            copy_data.global_parameter_representation[i].resize (n_fine_dofs);
+            copy_data.global_parameter_representation[i].reinit (n_fine_dofs);
 #endif
           }
 
