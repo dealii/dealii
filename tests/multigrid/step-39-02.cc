@@ -356,7 +356,7 @@ namespace Step39
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>        triangulation;
-    const MappingQ1<dim>      mapping;
+    const MappingQGeneric<dim>      mapping;
     const FiniteElement<dim> &fe;
     DoFHandler<dim>           dof_handler;
 
@@ -379,7 +379,7 @@ namespace Step39
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(const FiniteElement<dim> &fe)
     :
-    mapping(),
+    mapping(1),
     fe(fe),
     dof_handler(triangulation),
     estimates(1)

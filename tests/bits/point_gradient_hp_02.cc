@@ -146,12 +146,12 @@ check ()
   fe.push_back (FE_Q<dim>(5));
 
   hp::MappingCollection<dim> mapping_1;
-  mapping_1.push_back(MappingQ1<dim>());
-  mapping_1.push_back(MappingQ1<dim>());
-  mapping_1.push_back(MappingQ1<dim>());
+  mapping_1.push_back(MappingQGeneric<dim>(1));
+  mapping_1.push_back(MappingQGeneric<dim>(1));
+  mapping_1.push_back(MappingQGeneric<dim>(1));
 
   hp::MappingCollection<dim> mapping_2;
-  mapping_2.push_back(MappingQ1<dim>());
+  mapping_2.push_back(MappingQGeneric<dim>(1));
 
   hp::DoFHandler<dim> dof_handler (tria);
 

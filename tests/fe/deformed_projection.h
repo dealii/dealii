@@ -730,7 +730,7 @@ void check (const FiniteElement<2> &fe)
                                                hn_constraints);
       hn_constraints.close ();
 
-      MappingQ1<2> map_default;
+      MappingQGeneric<2> map_default(1);
 
       project (map_default, *dof_handler, hn_constraints,
                QGauss<2> (6), TestMap1<2>(2),

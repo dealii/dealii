@@ -37,7 +37,7 @@ void dim2_grid ()
 
   const Point<2> testp (.5, -.5);  //test point
 
-  MappingQ1<2> mapping;
+  MappingQGeneric<2> mapping(1);
 
   deallog<<"Check project for 2D cube from (-1,-1), to (1,1)."<<std::endl;
 
@@ -64,7 +64,7 @@ void dim3_grid ()
 
   const Point<3> testp (.5, -.5, 0);  //test point
 
-  MappingQ1<3> mapping;
+  MappingQGeneric<3> mapping(1);
 
   deallog<<"Check project for 3D cube from (-1,-1,-1) to (1,1,1)."<<std::endl;
 
@@ -94,7 +94,7 @@ void dim3_parallelepiped_grid ()
 
   const Point<3> testp (1, 1, 1);  //test point
 
-  MappingQ1<3> mapping;
+  MappingQGeneric<3> mapping(1);
 
   deallog<<"Check project for 3D parallelepiped with vectors (2, 0, 0), (0, 2, 0), and (0, 1, 2)."<<std::endl;
   Triangulation<3>::active_cell_iterator

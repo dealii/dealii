@@ -183,7 +183,7 @@ void LaplaceProblem<dim>::setup_system ()
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   VectorTools::interpolate_boundary_values (mapping,
                                             mg_dof_handler,
                                             dirichlet_boundary,

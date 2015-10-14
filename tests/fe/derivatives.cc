@@ -81,7 +81,7 @@ plot_derivatives(Mapping<dim> &mapping,
 template<int dim>
 void plot_FE_Q_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
   FE_Q<dim> q1(1);
   plot_derivatives(m, q1, "Q1");
 //  plot_face_shape_functions(m, q1, "Q1");
@@ -112,7 +112,7 @@ void plot_FE_Q_shape_functions()
 template<int dim>
 void plot_FE_DGQ_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
   FE_DGQ<dim> q1(1);
   plot_derivatives(m, q1, "DGQ1");
 //  plot_face_shape_functions(m, q1, "DGQ1");
@@ -164,7 +164,7 @@ main()
 
 
   // FESystem test.
-  MappingQ1<2> m;
+  MappingQGeneric<2> m(1);
   FESystem<2> q2_q3(FE_Q<2>(2), 1,
                     FE_Q<2>(3), 1);
 //  plot_derivatives(m, q2_q3, "Q2_Q3");

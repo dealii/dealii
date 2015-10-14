@@ -27,7 +27,7 @@
 template<int dim>
 void plot_FE_DGPNonparametric_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_DGPNonparametric<dim> p0(0);
   plot_shape_functions(m, p0, "DGPNonparametric0");

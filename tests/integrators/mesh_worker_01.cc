@@ -132,7 +132,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   local.cells = true;
   local.faces = false;
 
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   info_box.initialize_gauss_quadrature(1, 1, 1);

@@ -27,7 +27,7 @@
 template<int dim>
 void plot_FE_DGPMonomial_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_DGPMonomial<dim> p1(1);
   plot_shape_functions(m, p1, "DGPMonomial1");

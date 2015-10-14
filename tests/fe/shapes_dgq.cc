@@ -27,7 +27,7 @@
 template<int dim>
 void plot_FE_DGQ_shape_functions()
 {
-  MappingQ1<dim> m;
+  MappingQGeneric<dim> m(1);
 
   FE_DGQ<dim> q1(1);
   plot_shape_functions(m, q1, "DGQ1");

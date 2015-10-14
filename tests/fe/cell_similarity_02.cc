@@ -67,7 +67,7 @@ void test (const Triangulation<dim> &tr)
   FE_Q<dim> fe(2);
   deallog << "FE=" << fe.get_name() << std::endl;
 
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   deallog << "Mapping=Q1" << std::endl;
 
 

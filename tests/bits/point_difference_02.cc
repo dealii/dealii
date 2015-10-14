@@ -111,7 +111,7 @@ template <int dim>
 void
 check ()
 {
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   Triangulation<dim> tria;
   make_mesh (tria);
 

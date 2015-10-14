@@ -146,7 +146,7 @@ void mapping_test()
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string> mapping_strings;
 
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   std::string mapping_name = "MappingQ1";
 
   Triangulation<dim> tria;
