@@ -24,10 +24,13 @@
 #  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
-// in boost, the placeholders _1, _2, ... are in the global namespace. in
-// C++0x, they are in namespace std::placeholders, which makes them awkward to
-// use. import them into the deal.II::std_cxx11 namespace instead and do them
-// same below if we use boost instead.
+// In boost, the placeholders _1, _2, ... are in the global namespace. In
+// C++11, they are in namespace std::placeholders, which makes them awkward to
+// use. Import them into the dealii::std_cxx11 namespace instead and do them
+// same below if we use boost instead. Namespace 'placeholders' is also defined
+// in dealii::std_cxx11 namespace to make code C++ standard compatible.
+// That is to say, if std::something works with C++11 standard,
+// then dealii::std_cxx11::something should also work.
 namespace std_cxx11
 {
   using namespace std::placeholders;
@@ -35,6 +38,8 @@ namespace std_cxx11
   using std::ref;
   using std::cref;
   using std::reference_wrapper;
+
+  namespace placeholders = std::placeholders;
 }
 DEAL_II_NAMESPACE_CLOSE
 
@@ -61,6 +66,19 @@ namespace std_cxx11
   using ::_7;
   using ::_8;
   using ::_9;
+
+  namespace placeholders
+  {
+    using ::_1;
+    using ::_2;
+    using ::_3;
+    using ::_4;
+    using ::_5;
+    using ::_6;
+    using ::_7;
+    using ::_8;
+    using ::_9;
+  }
 }
 DEAL_II_NAMESPACE_CLOSE
 
