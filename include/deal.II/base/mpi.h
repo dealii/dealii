@@ -19,16 +19,7 @@
 #include <deal.II/base/config.h>
 #include <vector>
 
-#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
-// mpi.h included through deal.II/base/config.h
-
-// Check whether <mpi.h> is a suitable include for us (if MPI_SEEK_SET is not
-// defined, we'll die anyway):
-#  ifndef MPI_SEEK_SET
-#    error "The buildsystem included an insufficient mpi.h header that does not export MPI_SEEK_SET"
-#  endif
-
-#else
+#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
 // without MPI, we would still like to use
 // some constructs with MPI data
 // types. Therefore, create some dummies
