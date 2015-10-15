@@ -21,6 +21,7 @@
 #include <deal.II/base/types.h>
 
 #include <cmath>
+#include <cstdlib>
 #include <complex>
 
 DEAL_II_NAMESPACE_OPEN
