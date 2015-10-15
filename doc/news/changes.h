@@ -257,14 +257,14 @@ inconvenience this causes.
   - FunctionTime
   - Function
   - TensorFunction
-
   <br>
-  <em>Classes with fixed interface that now fully support complex number
-  types (pure template classes without explicit instantiations in the
-  library):</em>
+  <em>Classes and functions with fixed interface that now fully support
+  complex number types (without explicit instantiations in the library -
+  make sure to include the correct header):</em>
   - LinearOperator
   - PackagedOperation
   - Tensor
+  - GridTools::integrate_difference
   <br>
   (Matthias Maier, 2015/08/25 - XXX)
   </li>
