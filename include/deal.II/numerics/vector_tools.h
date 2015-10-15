@@ -1898,57 +1898,57 @@ namespace VectorTools
    * the documentation of the namespace, OutVector only Vector<double> and
    * Vector<float>.
    */
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const Mapping<dim,spacedim>    &mapping,
-                             const DoFHandler<dim,spacedim> &dof,
-                             const InVector                 &fe_function,
-                             const Function<spacedim,double>       &exact_solution,
-                             OutVector                      &difference,
-                             const Quadrature<dim>          &q,
-                             const NormType                 &norm,
-                             const Function<spacedim,double>       *weight = 0,
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
+  void integrate_difference (const Mapping<dim,spacedim>      &mapping,
+                             const DoFHandler<dim,spacedim>   &dof,
+                             const InVector                   &fe_function,
+                             const Function<spacedim, Number> &exact_solution,
+                             OutVector                        &difference,
+                             const Quadrature<dim>            &q,
+                             const NormType                   &norm,
+                             const Function<spacedim, Number> *weight = 0,
                              const double exponent = 2.);
 
   /**
    * Calls the integrate_difference() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void integrate_difference (const DoFHandler<dim,spacedim> &dof,
-                             const InVector                 &fe_function,
-                             const Function<spacedim,double>       &exact_solution,
-                             OutVector                      &difference,
-                             const Quadrature<dim>          &q,
-                             const NormType                 &norm,
-                             const Function<spacedim,double>       *weight = 0,
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
+  void integrate_difference (const DoFHandler<dim,spacedim>   &dof,
+                             const InVector                   &fe_function,
+                             const Function<spacedim, Number> &exact_solution,
+                             OutVector                        &difference,
+                             const Quadrature<dim>            &q,
+                             const NormType                   &norm,
+                             const Function<spacedim, Number> *weight = 0,
                              const double exponent = 2.);
 
   /**
    * Same as above for hp.
    */
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void integrate_difference (const hp::MappingCollection<dim,spacedim> &mapping,
                              const hp::DoFHandler<dim,spacedim>        &dof,
                              const InVector                            &fe_function,
-                             const Function<spacedim,double>                  &exact_solution,
+                             const Function<spacedim, Number>          &exact_solution,
                              OutVector                                 &difference,
                              const hp::QCollection<dim>                &q,
                              const NormType                            &norm,
-                             const Function<spacedim,double>                  *weight = 0,
+                             const Function<spacedim, Number>          *weight = 0,
                              const double exponent = 2.);
 
   /**
    * Calls the integrate_difference() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void integrate_difference (const hp::DoFHandler<dim,spacedim> &dof,
                              const InVector                     &fe_function,
-                             const Function<spacedim,double>           &exact_solution,
+                             const Function<spacedim, Number>   &exact_solution,
                              OutVector                          &difference,
                              const hp::QCollection<dim>         &q,
                              const NormType                     &norm,
-                             const Function<spacedim,double>           *weight = 0,
+                             const Function<spacedim, Number>   *weight = 0,
                              const double exponent = 2.);
 
   /**
