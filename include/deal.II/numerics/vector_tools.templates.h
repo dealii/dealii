@@ -6097,15 +6097,15 @@ namespace VectorTools
     // avoid compiling inner function for many vector types when we always
     // really do the same thing by putting the main work into this helper
     // function
-    template <int dim, int spacedim, typename Number>
+    template <int dim, int spacedim, typename Number, typename Number2>
     double
-    integrate_difference_inner (const Function<spacedim>   &exact_solution,
-                                const NormType              &norm,
-                                const Function<spacedim>    *weight,
-                                const UpdateFlags            update_flags,
-                                const double                 exponent,
-                                const unsigned int           n_components,
-                                IDScratchData<dim,spacedim,Number> &data)
+    integrate_difference_inner (const Function<spacedim, Number2>    &exact_solution,
+                                const NormType                       &norm,
+                                const Function<spacedim, Number2>    *weight,
+                                const UpdateFlags                    update_flags,
+                                const double                         exponent,
+                                const unsigned int                   n_components,
+                                IDScratchData<dim, spacedim, Number> &data)
     {
       const bool fe_is_system = (n_components != 1);
       const dealii::FEValues<dim, spacedim> &fe_values  = data.x_fe_values.get_present_fe_values ();
@@ -6352,26 +6352,25 @@ namespace VectorTools
 
 
 
-    template <int dim, class InVector, class OutVector, class DH, int spacedim>
+    template <int dim, class InVector, class OutVector, class DH, int spacedim, class Number>
     static
     void
     do_integrate_difference (const dealii::hp::MappingCollection<dim,spacedim> &mapping,
-                             const DH              &dof,
-                             const InVector        &fe_function,
-                             const Function<spacedim>   &exact_solution,
-                             OutVector             &difference,
-                             const dealii::hp::QCollection<dim> &q,
-                             const NormType &norm,
-                             const Function<spacedim>   *weight,
-                             const double           exponent_1)
+                             const DH                                          &dof,
+                             const InVector                                    &fe_function,
+                             const Function<spacedim, Number>                  &exact_solution,
+                             OutVector                                         &difference,
+                             const dealii::hp::QCollection<dim>                &q,
+                             const NormType                                    &norm,
+                             const Function<spacedim, Number>                  *weight,
+                             const double exponent_1)
     {
-      typedef typename InVector::value_type Number;
       // we mark the "exponent" parameter to this function "const" since it is
       // strictly incoming, but we need to set it to something different later
       // on, if necessary, so have a read-write version of it:
       double exponent = exponent_1;
 
-      const unsigned int        n_components = dof.get_fe().n_components();
+      const unsigned int n_components = dof.get_fe().n_components();
 
       if (weight!=0)
         {
@@ -6446,9 +6445,14 @@ namespace VectorTools
               fe_values.get_function_gradients (fe_function, data.function_grads);
 
             difference(cell->active_cell_index()) =
-              integrate_difference_inner<dim,spacedim,typename InVector::value_type> (exact_solution, norm, weight,
-                  update_flags, exponent,
-                  n_components, data);
+                integrate_difference_inner<dim, spacedim, typename InVector::value_type>(
+                    exact_solution,
+                    norm,
+                    weight,
+                    update_flags,
+                    exponent,
+                    n_components,
+                    data);
           }
         else
           // the cell is a ghost cell or is artificial. write a zero into the
@@ -6461,82 +6465,101 @@ namespace VectorTools
 
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void
-  integrate_difference (const Mapping<dim, spacedim>    &mapping,
-                        const DoFHandler<dim,spacedim> &dof,
-                        const InVector        &fe_function,
-                        const Function<spacedim>   &exact_solution,
-                        OutVector             &difference,
-                        const Quadrature<dim> &q,
-                        const NormType        &norm,
-                        const Function<spacedim>   *weight,
-                        const double           exponent)
+  integrate_difference (const Mapping<dim, spacedim>     &mapping,
+                        const DoFHandler<dim,spacedim>   &dof,
+                        const InVector                   &fe_function,
+                        const Function<spacedim, Number> &exact_solution,
+                        OutVector                        &difference,
+                        const Quadrature<dim>            &q,
+                        const NormType                   &norm,
+                        const Function<spacedim, Number> *weight,
+                        const double exponent)
   {
-    internal
-    ::do_integrate_difference (hp::MappingCollection<dim,spacedim>(mapping),
-                               dof, fe_function, exact_solution,
-                               difference, hp::QCollection<dim>(q),
-                               norm, weight, exponent);
+    internal::do_integrate_difference(
+        hp::MappingCollection<dim, spacedim>(mapping),
+        dof,
+        fe_function,
+        exact_solution,
+        difference,
+        hp::QCollection<dim>(q),
+        norm,
+        weight,
+        exponent);
   }
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void
-  integrate_difference (const DoFHandler<dim,spacedim>    &dof,
-                        const InVector           &fe_function,
-                        const Function<spacedim>      &exact_solution,
-                        OutVector                &difference,
-                        const Quadrature<dim>    &q,
-                        const NormType           &norm,
-                        const Function<spacedim>      *weight,
-                        const double              exponent)
+  integrate_difference (const DoFHandler<dim,spacedim>   &dof,
+                        const InVector                   &fe_function,
+                        const Function<spacedim, Number> &exact_solution,
+                        OutVector                        &difference,
+                        const Quadrature<dim>            &q,
+                        const NormType                   &norm,
+                        const Function<spacedim, Number> *weight,
+                        const double exponent)
   {
-    internal
-    ::do_integrate_difference(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
-                              dof, fe_function, exact_solution,
-                              difference, hp::QCollection<dim>(q),
-                              norm, weight, exponent);
+    internal::do_integrate_difference(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof,
+        fe_function,
+        exact_solution,
+        difference,
+        hp::QCollection<dim>(q),
+        norm,
+        weight,
+        exponent);
   }
 
 
-
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void
-  integrate_difference (const dealii::hp::MappingCollection<dim,spacedim>    &mapping,
-                        const dealii::hp::DoFHandler<dim,spacedim> &dof,
-                        const InVector        &fe_function,
-                        const Function<spacedim>   &exact_solution,
-                        OutVector             &difference,
-                        const dealii::hp::QCollection<dim> &q,
-                        const NormType        &norm,
-                        const Function<spacedim>   *weight,
-                        const double           exponent)
+  integrate_difference (const dealii::hp::MappingCollection<dim,spacedim> &mapping,
+                        const dealii::hp::DoFHandler<dim,spacedim>        &dof,
+                        const InVector                                    &fe_function,
+                        const Function<spacedim, Number>                  &exact_solution,
+                        OutVector                                         &difference,
+                        const dealii::hp::QCollection<dim>                &q,
+                        const NormType                                    &norm,
+                        const Function<spacedim, Number>                  *weight,
+                        const double exponent)
   {
-    internal
-    ::do_integrate_difference (hp::MappingCollection<dim,spacedim>(mapping),
-                               dof, fe_function, exact_solution,
-                               difference, q,
-                               norm, weight, exponent);
+    internal::do_integrate_difference(
+        hp::MappingCollection<dim, spacedim>(mapping),
+        dof,
+        fe_function,
+        exact_solution,
+        difference,
+        q,
+        norm,
+        weight,
+        exponent);
   }
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, class Number>
   void
-  integrate_difference (const dealii::hp::DoFHandler<dim,spacedim>    &dof,
-                        const InVector           &fe_function,
-                        const Function<spacedim>      &exact_solution,
-                        OutVector                &difference,
-                        const dealii::hp::QCollection<dim>    &q,
-                        const NormType           &norm,
-                        const Function<spacedim>      *weight,
-                        const double              exponent)
+  integrate_difference (const dealii::hp::DoFHandler<dim,spacedim> &dof,
+                        const InVector                             &fe_function,
+                        const Function<spacedim, Number>           &exact_solution,
+                        OutVector                                  &difference,
+                        const dealii::hp::QCollection<dim>         &q,
+                        const NormType                             &norm,
+                        const Function<spacedim, Number>           *weight,
+                        const double exponent)
   {
-    internal
-    ::do_integrate_difference(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
-                              dof, fe_function, exact_solution,
-                              difference, q,
-                              norm, weight, exponent);
+    internal::do_integrate_difference(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof,
+        fe_function,
+        exact_solution,
+        difference,
+        q,
+        norm,
+        weight,
+        exponent);
   }
 
 
