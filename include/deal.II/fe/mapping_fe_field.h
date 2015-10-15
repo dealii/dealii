@@ -489,7 +489,7 @@ private:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> > euler_vector;
+  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,VECTOR,DH> > euler_vector;
 
   /**
    * A FiniteElement object which is only needed in 3D, since it knows how to
@@ -498,13 +498,13 @@ private:
    * prevent construction in 1D and 2D, but since memory and time requirements
    * are not particularly high this seems unnecessary at the moment.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VECTOR,DH> > fe;
 
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> > euler_dof_handler;
+  SmartPointer<const DH,MappingFEField<dim,spacedim,VECTOR,DH> > euler_dof_handler;
 
 private:
   /**
