@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2013 by the deal.II authors
+## Copyright (C) 2006 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,10 +24,11 @@ while ( m!^/\*!  ||  m!\s*\*! || m/^$/ ) {
     $_ = <>;
 }
 
-# have two states, in which the program can be:
-# comment-mode and program-mode
+# have three states, in which the program can be:
+# comment-mode, program-mode and skip-mode
 $comment_mode = 0;
 $program_mode = 1;
+$skip_mode    = 2;
 $state =  $comment_mode;
 
 print " * \n";
@@ -40,56 +41,76 @@ do {
 
     s/\t/        /g;
 
-    if (($state == $program_mode) && m!^\s*//!)
+    # We shall skip something...
+    if (($state != $skip_mode) && m!^\s*//\s*\@cond SKIP!)
     {
-	$state = $comment_mode;
-	print " * \@endcode\n";
-	print " * \n";
+        # Cleanly close @code segments in program mode:
+        if ($state == $program_mode)
+        {
+            print " * \@endcode\n";
+            print " * \n";
+        }
+        $state = $skip_mode;
+    }
+    elsif (($state == $program_mode) && m!^\s*//!)
+    {
+        print " * \@endcode\n";
+        print " * \n";
+        $state = $comment_mode;
     }
     # if in comment mode and no comment line: toggle state.
     # don't do so, if only a blank line
     elsif (($state == $comment_mode) && !m!^\s*//! && !m!^\s*$!)
     {
-	$state = $program_mode;
-	print " * \n";
-	print " * \@code\n";
+        print " * \n";
+        print " * \@code\n";
+        $state = $program_mode;
     }
 
     if ($state == $comment_mode)
     {
-	# in comment mode: first skip leading whitespace and
-	# comment // signs
-	s!\s*//\s*(.*)\n!$1!;
+        # in comment mode: first skip leading whitespace and
+        # comment // signs
+        s!\s*//\s*(.*)\n!$1!;
 
-	# second, replace section headers, and generate addressable
-	# anchor
-	if ( /\@sect/ ) {
-	   s!\@sect(\d)\{(.*)\}\s*$!<h$1>$2</h$1>!g;
-	   $sect_name = $2;
+        # second, replace section headers, and generate addressable
+        # anchor
+        if ( /\@sect/ ) {
+           s!\@sect(\d)\{(.*)\}\s*$!<h$1>$2</h$1>!g;
+           $sect_name = $2;
 
-	   # for the anchor, use the name of the section but discard
-	   # everything except for letters, numbers, and underscores
-	   $sect_name =~ s/[^a-zA-Z0-9_]//g;
+           # for the anchor, use the name of the section but discard
+           # everything except for letters, numbers, and underscores
+           $sect_name =~ s/[^a-zA-Z0-9_]//g;
 
-	   $_ = "\n * <a name=\"$sect_name\"></a> \n * $_";
-	}
+           $_ = "\n * <a name=\"$sect_name\"></a> \n * $_";
+        }
 
-	# finally print this line
-	print " * $_\n";
+        # finally print this line
+        print " * $_\n";
 
-	# if empty line, introduce paragraph break
-	print " * \n" if  $_ =~ m!^\s*$!;
+        # if empty line, introduce paragraph break
+        print " * \n" if  $_ =~ m!^\s*$!;
     }
-    else
+    elsif ($state == $program_mode)
     {
         # in program mode, output the program line. the only thing we need
-	# to do is to avoid $ signs because that confuses doxygen. since
-	# we don't want formulas rendered in the program text anyway,
-	# simply replace them by spaces (it would be nice to suppress their
-	# meaning somehow, but I don't know how...)
-	s/\$//g;
+        # to do is to avoid $ signs because that confuses doxygen. since
+        # we don't want formulas rendered in the program text anyway,
+        # simply replace them by spaces (it would be nice to suppress their
+        # meaning somehow, but I don't know how...)
+        s/\$//g;
 
-	print " * $_";
+        print " * $_";
+    }
+    elsif ($state == $skip_mode)
+    {
+        # This is the end of a @cond - @endcond block, so back to
+        # comment_mode:
+        if (m!^\s*//\s*\@endcond!)
+        {
+            $state = $comment_mode;
+        }
     }
 } while (<>);
 

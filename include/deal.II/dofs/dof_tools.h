@@ -947,7 +947,7 @@ namespace DoFTools
    *
    * @see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
-   * for further information.
+   * and step-45 for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
