@@ -1658,52 +1658,6 @@ namespace internal
 
         }
 
-        /**
-         * Return a vector in which,
-         * for every vertex index, we
-         * mark whether a locally owned
-         * cell is adjacent.
-         */
-        template <int dim, int spacedim>
-        std::vector<bool>
-        mark_locally_active_vertices (const parallel::distributed::Triangulation<dim,spacedim> &triangulation)
-        {
-          std::vector<bool> locally_active_vertices (triangulation.n_vertices(),
-                                                     false);
-
-          for (typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-               cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
-            if (cell->subdomain_id() == triangulation.locally_owned_subdomain())
-              for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-                locally_active_vertices[cell->vertex_index(v)] = true;
-
-          return locally_active_vertices;
-        }
-
-        /**
-         * Return a vector in which,
-         * for every vertex index, we
-         * mark whether a locally owned
-         * cell is adjacent.
-         */
-        template <int dim, int spacedim>
-        std::vector<bool>
-        mark_locally_active_vertices_on_level (const parallel::distributed::Triangulation<dim,spacedim> &triangulation, unsigned int level)
-        {
-          std::vector<bool> locally_active_vertices (triangulation.n_vertices(),
-                                                     false);
-
-          if (level<triangulation.n_levels())
-            for (typename dealii::Triangulation<dim,spacedim>::cell_iterator
-                 cell = triangulation.begin(level);
-                 cell != triangulation.end(level); ++cell)
-              if (cell->level_subdomain_id() == triangulation.locally_owned_subdomain())
-                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-                  locally_active_vertices[cell->vertex_index(v)] = true;
-
-          return locally_active_vertices;
-        }
 
 
         template <int spacedim>
@@ -1761,7 +1715,6 @@ namespace internal
                vertices_with_ghost_neighbors,
                needs_to_get_cells);
             }
-
 
 
           //sending
@@ -1995,7 +1948,6 @@ namespace internal
                  needs_to_get_cells,
                  level);
               }
-
 
 
           //sending
@@ -2397,6 +2349,7 @@ namespace internal
       }
 
 
+
       template <int dim, int spacedim>
       void
       ParallelDistributed<dim, spacedim>::
@@ -2571,34 +2524,21 @@ namespace internal
                     cell->set_user_flag();
               }
 
-            //mark the vertices we are interested
-            //in, i.e. belonging to own and marked cells
+            //mark the vertices we are interested in, i.e. belonging to own
+            //and marked cells
             const std::vector<bool> locally_active_vertices
-              = mark_locally_active_vertices_on_level (*tr, level);
+              = tr->mark_locally_active_vertices_on_level (level);
 
-            // add each ghostcells'
-            // subdomain to the vertex and
-            // keep track of interesting
-            // neighbors
+            // add each ghostcells' subdomain to the vertex and keep track of
+            // interesting neighbors
             std::map<unsigned int, std::set<dealii::types::subdomain_id> >
             vertices_with_ghost_neighbors;
-            if (level < tr->n_levels())
-              for (typename DoFHandler<dim,spacedim>::level_cell_iterator
-                   cell = dof_handler.begin(level);
-                   cell != dof_handler.end(level); ++cell)
-                if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
-                    && cell->level_subdomain_id() != tr->locally_owned_subdomain())
-                  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-                    if (locally_active_vertices[cell->vertex_index(v)])
-                      vertices_with_ghost_neighbors[cell->vertex_index(v)]
-                      .insert (cell->level_subdomain_id());
+            tr->fill_level_vertices_with_ghost_neighbors(level,
+                                                         vertices_with_ghost_neighbors);
 
-
-            /* Send and receive cells. After this,
-            only the local cells are marked,
-            that received new data. This has to
-            be communicated in a second
-            communication step. */
+            // Send and receive cells. After this, only the local cells are
+            // marked, that received new data. This has to be communicated in
+            // a second communication step.
 
             communicate_mg_dof_indices_on_marked_cells( dof_handler,
                                                         vertices_with_ghost_neighbors,
