@@ -149,11 +149,11 @@ namespace
    * or not), extract those that pertain to
    * locally owned cells.
    */
-  template <int dim, int spacedim, class Vector>
+  template <int dim, int spacedim, typename VectorType>
   void
   get_locally_owned_indicators (const parallel::distributed::Triangulation<dim,spacedim> &tria,
-                                const Vector &criteria,
-                                dealii::Vector<typename Vector::value_type> &locally_owned_indicators)
+                                const VectorType &criteria,
+                                dealii::Vector<typename VectorType::value_type> &locally_owned_indicators)
   {
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
@@ -222,12 +222,12 @@ namespace
    * locally own as appropriate for
    * coarsening or refinement.
    */
-  template <int dim, int spacedim, class Vector>
+  template <int dim, int spacedim, typename VectorType>
   void
   mark_cells (parallel::distributed::Triangulation<dim,spacedim> &tria,
-              const Vector &criteria,
-              const double top_threshold,
-              const double bottom_threshold)
+              const VectorType                                   &criteria,
+              const double                                        top_threshold,
+              const double                                        bottom_threshold)
   {
     dealii::GridRefinement::refine (tria, criteria, top_threshold);
     dealii::GridRefinement::coarsen (tria, criteria, bottom_threshold);
@@ -451,14 +451,14 @@ namespace parallel
   {
     namespace GridRefinement
     {
-      template <int dim, class Vector, int spacedim>
+      template <int dim, typename VectorType, int spacedim>
       void
-      refine_and_coarsen_fixed_number (
-        parallel::distributed::Triangulation<dim,spacedim> &tria,
-        const Vector                &criteria,
-        const double                 top_fraction_of_cells,
-        const double                 bottom_fraction_of_cells,
-        const unsigned int           max_n_cells)
+      refine_and_coarsen_fixed_number
+      (parallel::distributed::Triangulation<dim,spacedim> &tria,
+       const VectorType                                   &criteria,
+       const double                                        top_fraction_of_cells,
+       const double                                        bottom_fraction_of_cells,
+       const unsigned int                                  max_n_cells)
       {
         Assert (criteria.size() == tria.n_active_cells(),
                 ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
@@ -482,7 +482,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<typename Vector::value_type>
+        dealii::Vector<typename VectorType::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -496,7 +496,7 @@ namespace parallel
         // need it here, but it's a
         // collective communication
         // call
-        const std::pair<typename Vector::value_type,typename Vector::value_type> global_min_and_max
+        const std::pair<typename VectorType::value_type,typename VectorType::value_type> global_min_and_max
           = compute_global_min_and_max_at_root (locally_owned_indicators,
                                                 mpi_communicator);
 
@@ -538,13 +538,13 @@ namespace parallel
       }
 
 
-      template <int dim, class Vector, int spacedim>
+      template <int dim, typename VectorType, int spacedim>
       void
-      refine_and_coarsen_fixed_fraction (
-        parallel::distributed::Triangulation<dim,spacedim> &tria,
-        const Vector                &criteria,
-        const double                top_fraction_of_error,
-        const double                bottom_fraction_of_error)
+      refine_and_coarsen_fixed_fraction
+      (parallel::distributed::Triangulation<dim,spacedim> &tria,
+       const VectorType                                   &criteria,
+       const double                                        top_fraction_of_error,
+       const double                                        bottom_fraction_of_error)
       {
         Assert (criteria.size() == tria.n_active_cells(),
                 ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
@@ -561,7 +561,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<typename Vector::value_type>
+        dealii::Vector<typename VectorType::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,

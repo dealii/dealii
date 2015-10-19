@@ -543,12 +543,12 @@ namespace VectorTools
 
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class Vector>
+            class VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
-                                 const Vector            &u1,
+                                 const VectorType        &u1,
                                  const DH<dim, spacedim> &dof2,
-                                 Vector                  &u2)
+                                 VectorType              &u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
            ExcMessage ("The two containers must represent triangulations that "
@@ -567,13 +567,13 @@ namespace VectorTools
 
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class Vector>
+            class VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
-                                 const Vector            &u1,
+                                 const VectorType        &u1,
                                  const DH<dim, spacedim> &dof2,
                                  const ConstraintMatrix  &constraints,
-                                 Vector                  &u2)
+                                 VectorType              &u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
            ExcMessage ("The two containers must represent triangulations that "
@@ -607,12 +607,12 @@ namespace VectorTools
 
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class Vector>
+            class VectorType>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
-                                 const Vector                           &u1,
+                                 const VectorType                       &u1,
                                  const ConstraintMatrix                 &constraints,
-                                 Vector                                 &u2)
+                                 VectorType                             &u2)
   {
     const DH<dim, spacedim> &dof1 = intergridmap.get_source_grid();
     const DH<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
@@ -750,7 +750,7 @@ namespace VectorTools
      * Generic implementation of the project() function
      */
     template <int dim, int spacedim,
-              class Vector,
+              class VectorType,
               template <int,int> class DH,
               template <int,int> class M_or_MC,
               template <int> class Q_or_QC>
@@ -759,7 +759,7 @@ namespace VectorTools
                      const ConstraintMatrix   &constraints,
                      const Q_or_QC<dim>       &quadrature,
                      const Function<spacedim> &function,
-                     Vector                   &vec_result,
+                     VectorType               &vec_result,
                      const bool                enforce_zero_boundary,
                      const Q_or_QC<dim-1>  &q_boundary,
                      const bool                project_to_boundary_first)

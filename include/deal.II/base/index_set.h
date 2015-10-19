@@ -295,8 +295,8 @@ public:
    * Vector, BlockVector, but also std::vector@<bool@>, std::vector@<int@>,
    * and std::vector@<double@>.
    */
-  template <typename Vector>
-  void fill_binary_vector (Vector &vector) const;
+  template <typename VectorType>
+  void fill_binary_vector (VectorType &vector) const;
 
   /**
    * Outputs a text representation of this IndexSet to the given stream. Used
