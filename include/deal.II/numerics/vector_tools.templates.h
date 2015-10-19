@@ -6907,9 +6907,6 @@ namespace VectorTools
     hp_fe_values.reinit(cell_point.first);
     const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
 
-    // then use this to get the gradients of
-    // the given fe_function at this point
-    typedef typename InVector::value_type Number;
     std::vector<std::vector<Tensor<1, dim, Number> > >
     u_gradient(1, std::vector<Tensor<1, dim, Number> > (fe.n_components()));
     fe_values.get_function_gradients(fe_function, u_gradient);
