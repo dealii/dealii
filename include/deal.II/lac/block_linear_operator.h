@@ -35,9 +35,9 @@ class BlockLinearOperator;
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_operator(const BlockMatrix &matrix);
+block_operator(const BlockMatrixType &matrix);
 
 template <size_t m, size_t n,
           typename Range = BlockVector<double>,
@@ -66,9 +66,9 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_diagonal_operator(const BlockMatrix &block_matrix);
+block_diagonal_operator(const BlockMatrixType &block_matrix);
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range>
@@ -388,9 +388,9 @@ namespace internal
  */
 template <typename Range,
           typename Domain,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_operator(const BlockMatrix &block_matrix)
+block_operator(const BlockMatrixType &block_matrix)
 {
   typedef typename BlockLinearOperator<Range, Domain>::BlockType BlockType;
 
@@ -502,9 +502,9 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
  */
 template <typename Range,
           typename Domain,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_diagonal_operator(const BlockMatrix &block_matrix)
+block_diagonal_operator(const BlockMatrixType &block_matrix)
 {
   typedef typename BlockLinearOperator<Range, Domain>::BlockType BlockType;
 
