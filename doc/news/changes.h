@@ -324,7 +324,6 @@ inconvenience this causes.
   (Daniel Shapero, 2015/08/12)
   </li>
 
-
   <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
   with vanishing mean values of jumps across faces.
   <br>
@@ -367,13 +366,20 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: Ghost cells for the multigrid levels in
+  parallel::distributed::Triangulation are now correctly created also for
+  periodic boundary conditions.
+  <br>
+  (Martin Kronbichler, 2015/10/18)
+  </li>
+
   <li> Fixed: GridGenerator::subdivided_parallelepiped() produced
   invalid, unconnected meshes and wrong boundary indicators.
   <br>
   (Timo Heister, 2015/10/13)
   </li>
 
-  <li> Improved: DoFTools::compute_intergrid_transfer_representation 
+  <li> Improved: DoFTools::compute_intergrid_transfer_representation
   can now be used with a fine grid given by a parallel::Triangulation.
   <br>
   (Alexander Grayver, 2015/10/09)

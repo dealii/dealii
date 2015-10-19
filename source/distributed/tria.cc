@@ -2585,6 +2585,8 @@ namespace parallel
       coarse_cell_to_p4est_tree_permutation.resize (0);
       p4est_tree_to_coarse_cell_permutation.resize (0);
 
+      periodic_face_pairs_level_0.clear();
+
       dealii::Triangulation<dim,spacedim>::clear ();
 
       this->update_number_cache ();
@@ -3337,7 +3339,7 @@ namespace parallel
           // -1. Note that we do not fill other cells we could figure out the
           // same way, because we might accidentally set an id for a cell that
           // is not a ghost cell.
-          for (unsigned int lvl=this->n_levels(); lvl>0;)
+          for (unsigned int lvl=this->n_levels(); lvl>0; )
             {
               --lvl;
               for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
@@ -3356,20 +3358,8 @@ namespace parallel
           //step 2: make sure all the neighbors to our level_cells exist. Need
           //to look up in p4est...
           std::vector<std::vector<bool> > marked_vertices(this->n_levels());
-
-          for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
-            {
-              marked_vertices[lvl].resize(this->n_vertices(), false);
-
-              for (typename dealii::Triangulation<dim,spacedim>::cell_iterator
-                   cell = this->begin(lvl);
-                   cell != this->end(lvl); ++cell)
-                if (cell->level_subdomain_id() == this->locally_owned_subdomain())
-                  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-                    marked_vertices[lvl][cell->vertex_index(v)] = true;
-            }
-
-
+          for (unsigned int lvl=0; lvl < this->n_levels(); ++lvl)
+            marked_vertices[lvl] = mark_locally_active_vertices_on_level(lvl);
 
           for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(0); cell!=this->end(0); ++cell)
             {
@@ -4195,6 +4185,171 @@ namespace parallel
     }
 
 
+
+    namespace
+    {
+      /**
+       * ensures that if one of the two vertices on a periodic face is marked
+       * as active (i.e., belonging to an owned level cell), also the other
+       * one is active
+       */
+      template <typename ITERATOR>
+      void
+      mark_periodic_vertices_recursively(const GridTools::PeriodicFacePair<ITERATOR> &periodic,
+                                         const int target_level,
+                                         std::vector<bool> &active_vertices_on_level)
+      {
+        if (periodic.cell[0]->level() > target_level)
+          return;
+
+        // for hanging nodes there is nothing to do since we are interested in
+        // the connections on the same level...
+        if (periodic.cell[0]->level() < target_level &&
+            periodic.cell[0]->has_children() &&
+            periodic.cell[1]->has_children())
+          {
+            // copy orientations etc. from parent to child
+            GridTools::PeriodicFacePair<ITERATOR> periodic_child = periodic;
+
+            // find appropriate pairs of child elements
+            for (unsigned int cf=0; cf<periodic.cell[0]->face(periodic.face_idx[0])->n_children(); ++cf)
+              {
+                unsigned int c=0;
+                for (; c<periodic.cell[0]->n_children(); ++c)
+                  {
+                    if (periodic.cell[0]->child(c)->face(periodic.face_idx[0]) ==
+                        periodic.cell[0]->face(periodic.face_idx[0])->child(cf))
+                      break;
+                  }
+                Assert(c < periodic.cell[0]->n_children(),
+                       ExcMessage("Face child not found"));
+                periodic_child.cell[0] = periodic.cell[0]->child(c);
+                periodic_child.face_idx[0] = periodic.face_idx[0];
+
+                c=0;
+                for (; c<periodic.cell[1]->n_children(); ++c)
+                  {
+                    if (periodic.cell[1]->child(c)->face(periodic.face_idx[1]) ==
+                        periodic.cell[1]->face(periodic.face_idx[1])->child(cf))
+                      break;
+                  }
+                Assert(c < periodic.cell[1]->n_children(),
+                       ExcMessage("Face child not found"));
+                periodic_child.cell[1] = periodic.cell[1]->child(c);
+                periodic_child.face_idx[1] = periodic.face_idx[1];
+
+                // recursive call into children
+                mark_periodic_vertices_recursively (periodic_child, target_level,
+                                                    active_vertices_on_level);
+              }
+            return;
+          }
+
+        if (periodic.cell[0]->level() != target_level)
+          return;
+
+        // TODO: fix non-standard orientation
+        Assert(periodic.orientation[0] == true &&
+               periodic.orientation[1] == false &&
+               periodic.orientation[2] == false,
+               ExcNotImplemented());
+
+        for (unsigned int v=0; v<GeometryInfo<ITERATOR::AccessorType::dimension-1>::vertices_per_cell; ++v)
+          if (active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)] ||
+              active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)])
+            active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)]
+              = active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)]
+                = true;
+      }
+
+
+
+      /**
+       * ensures that always both vertices over a periodic face are identified
+       * together
+       */
+      template <typename ITERATOR>
+      void
+      set_periodic_ghost_neighbors_recursively(const GridTools::PeriodicFacePair<ITERATOR> &periodic,
+                                               const int target_level,
+                                               std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors)
+      {
+        if (periodic.cell[0]->level() > target_level)
+          return;
+
+        // for hanging nodes there is nothing to do since we are interested in
+        // the connections on the same level...
+        if (periodic.cell[0]->level() < target_level &&
+            periodic.cell[0]->has_children() &&
+            periodic.cell[1]->has_children())
+          {
+            // copy orientations etc. from parent to child
+            GridTools::PeriodicFacePair<ITERATOR> periodic_child = periodic;
+
+            // find appropriate pairs of child elements
+            for (unsigned int cf=0; cf<periodic.cell[0]->face(periodic.face_idx[0])->n_children(); ++cf)
+              {
+                unsigned int c=0;
+                for (; c<periodic.cell[0]->n_children(); ++c)
+                  {
+                    if (periodic.cell[0]->child(c)->face(periodic.face_idx[0]) ==
+                        periodic.cell[0]->face(periodic.face_idx[0])->child(cf))
+                      break;
+                  }
+                Assert(c < periodic.cell[0]->n_children(),
+                       ExcMessage("Face child not found"));
+                periodic_child.cell[0] = periodic.cell[0]->child(c);
+                periodic_child.face_idx[0] = periodic.face_idx[0];
+
+                c=0;
+                for (; c<periodic.cell[1]->n_children(); ++c)
+                  {
+                    if (periodic.cell[1]->child(c)->face(periodic.face_idx[1]) ==
+                        periodic.cell[1]->face(periodic.face_idx[1])->child(cf))
+                      break;
+                  }
+                Assert(c < periodic.cell[1]->n_children(),
+                       ExcMessage("Face child not found"));
+                periodic_child.cell[1] = periodic.cell[1]->child(c);
+                periodic_child.face_idx[1] = periodic.face_idx[1];
+
+                // recursive call into children
+                set_periodic_ghost_neighbors_recursively (periodic_child, target_level,
+                                                          vertices_with_ghost_neighbors);
+              }
+            return;
+          }
+
+        if (periodic.cell[0]->level() != target_level)
+          return;
+
+        // TODO: fix non-standard orientation
+        Assert(periodic.orientation[0] == true &&
+               periodic.orientation[1] == false &&
+               periodic.orientation[2] == false,
+               ExcNotImplemented());
+
+        for (unsigned int v=0; v<GeometryInfo<ITERATOR::AccessorType::dimension-1>::vertices_per_cell; ++v)
+          {
+            const unsigned int
+            idx0 = periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v),
+            idx1 = periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v);
+            if (vertices_with_ghost_neighbors.find(idx0) !=
+                vertices_with_ghost_neighbors.end())
+              vertices_with_ghost_neighbors[idx1].
+              insert(vertices_with_ghost_neighbors[idx0].begin(),
+                     vertices_with_ghost_neighbors[idx0].end());
+            if (vertices_with_ghost_neighbors.find(idx1) !=
+                vertices_with_ghost_neighbors.end())
+              vertices_with_ghost_neighbors[idx0].
+              insert(vertices_with_ghost_neighbors[idx1].begin(),
+                     vertices_with_ghost_neighbors[idx1].end());
+          }
+      }
+    }
+
+
+
     /**
      * Determine the neighboring subdomains that are adjacent to each vertex.
      * This is achieved via the p4est_iterate/p8est_iterate tool
@@ -4238,6 +4393,58 @@ namespace parallel
 
       sc_array_destroy (fg.subids);
     }
+
+
+
+    /**
+     * Determine the neighboring subdomains that are adjacent to each vertex
+     * on the given multigrid level
+     */
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::
+    fill_level_vertices_with_ghost_neighbors
+    (const unsigned int level,
+     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors)
+    {
+      const std::vector<bool> locally_active_vertices =
+        mark_locally_active_vertices_on_level(level);
+      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+        if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
+            && cell->level_subdomain_id() != this->locally_owned_subdomain())
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            if (locally_active_vertices[cell->vertex_index(v)])
+              vertices_with_ghost_neighbors[cell->vertex_index(v)]
+              .insert (cell->level_subdomain_id());
+
+      for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
+        set_periodic_ghost_neighbors_recursively(periodic_face_pairs_level_0[i],
+                                                 level, vertices_with_ghost_neighbors);
+    }
+
+
+
+    template<int dim, int spacedim>
+    std::vector<bool>
+    Triangulation<dim,spacedim>
+    ::mark_locally_active_vertices_on_level (const unsigned int level) const
+    {
+      Assert (dim>1, ExcNotImplemented());
+
+      std::vector<bool> marked_vertices(this->n_vertices(), false);
+      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+        if (cell->level_subdomain_id() == this->locally_owned_subdomain())
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            marked_vertices[cell->vertex_index(v)] = true;
+
+      for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
+        mark_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
+                                           level, marked_vertices);
+
+      return marked_vertices;
+    }
+
 
 
     template<int dim, int spacedim>
@@ -4376,6 +4583,10 @@ namespace parallel
           // cells
           AssertThrow (false, ExcInternalError());
         }
+
+      periodic_face_pairs_level_0.insert(periodic_face_pairs_level_0.end(),
+                                         periodicity_vector.begin(),
+                                         periodicity_vector.end());
 
 #else
       Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
@@ -4602,6 +4813,26 @@ namespace parallel
      &/*vertices_with_ghost_neighbors*/)
     {
       Assert (false, ExcNotImplemented());
+    }
+
+    template <int spacedim>
+    void
+    Triangulation<1,spacedim>::
+    fill_level_vertices_with_ghost_neighbors
+    (const unsigned int /*level*/,
+     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &/*vertices_with_ghost_neighbors*/)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+    template <int spacedim>
+    std::vector<bool>
+    Triangulation<1,spacedim>::
+    mark_locally_active_vertices_on_level (const unsigned int) const
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<bool>();
     }
   }
 }
