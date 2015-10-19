@@ -6426,7 +6426,7 @@ namespace VectorTools
         }
 
       dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
-      IDScratchData<dim,spacedim,typename InVector::value_type> data(mapping, fe_collection, q, update_flags);
+      IDScratchData<dim,spacedim, Number> data(mapping, fe_collection, q, update_flags);
 
       // loop over all cells
       for (typename DH::active_cell_iterator cell = dof.begin_active();
@@ -6446,9 +6446,9 @@ namespace VectorTools
               fe_values.get_function_gradients (fe_function, data.function_grads);
 
             difference(cell->active_cell_index()) =
-              integrate_difference_inner<dim,spacedim,typename InVector::value_type> (exact_solution, norm, weight,
-                  update_flags, exponent,
-                  n_components, data);
+              integrate_difference_inner<dim,spacedim, Number> (exact_solution, norm, weight,
+                                                                update_flags, exponent,
+                                                                n_components, data);
           }
         else
           // the cell is a ghost cell or is artificial. write a zero into the
