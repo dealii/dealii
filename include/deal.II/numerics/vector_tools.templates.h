@@ -6541,13 +6541,13 @@ namespace VectorTools
 
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_difference (const DoFHandler<dim,spacedim> &dof,
-                    const InVector        &fe_function,
-                    const Function<spacedim>   &exact_function,
-                    Vector<double>        &difference,
-                    const Point<spacedim>      &point)
+                    const VectorType               &fe_function,
+                    const Function<spacedim>       &exact_function,
+                    Vector<double>                 &difference,
+                    const Point<spacedim>          &point)
   {
     point_difference(StaticMappingQ1<dim>::mapping,
                      dof,
@@ -6558,16 +6558,16 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_difference (const Mapping<dim, spacedim>    &mapping,
+  point_difference (const Mapping<dim, spacedim>   &mapping,
                     const DoFHandler<dim,spacedim> &dof,
-                    const InVector        &fe_function,
-                    const Function<spacedim>   &exact_function,
-                    Vector<double>        &difference,
-                    const Point<spacedim>      &point)
+                    const VectorType               &fe_function,
+                    const Function<spacedim>       &exact_function,
+                    Vector<double>                 &difference,
+                    const Point<spacedim>          &point)
   {
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(difference.size() == fe.n_components(),
@@ -6604,12 +6604,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value)
+               const VectorType               &fe_function,
+               const Point<spacedim>          &point,
+               Vector<double>                 &value)
   {
 
     point_value (StaticMappingQ1<dim,spacedim>::mapping,
@@ -6620,12 +6620,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value)
+               const VectorType                   &fe_function,
+               const Point<spacedim>              &point,
+               Vector<double>                     &value)
   {
     point_value(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                 dof,
@@ -6635,11 +6635,11 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point)
+               const VectorType               &fe_function,
+               const Point<spacedim>          &point)
   {
     return point_value (StaticMappingQ1<dim,spacedim>::mapping,
                         dof,
@@ -6648,11 +6648,11 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point)
+               const VectorType                   &fe_function,
+               const Point<spacedim>              &point)
   {
     return point_value(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                        dof,
@@ -6661,15 +6661,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_value (const Mapping<dim, spacedim>    &mapping,
+  point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value)
+               const VectorType               &fe_function,
+               const Point<spacedim>          &point,
+               Vector<double>                 &value)
   {
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6702,15 +6702,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
-               const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point,
-               Vector<double>        &value)
+  point_value (const hp::MappingCollection<dim, spacedim> &mapping,
+               const hp::DoFHandler<dim,spacedim>         &dof,
+               const VectorType                           &fe_function,
+               const Point<spacedim>                      &point,
+               Vector<double>                             &value)
   {
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6742,12 +6742,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
-  point_value (const Mapping<dim, spacedim>    &mapping,
+  point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point)
+               const VectorType               &fe_function,
+               const Point<spacedim>          &point)
   {
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
@@ -6759,12 +6759,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
-  point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
-               const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector        &fe_function,
-               const Point<spacedim>      &point)
+  point_value (const hp::MappingCollection<dim, spacedim> &mapping,
+               const hp::DoFHandler<dim,spacedim>         &dof,
+               const VectorType                           &fe_function,
+               const Point<spacedim>                      &point)
   {
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
@@ -6777,12 +6777,12 @@ namespace VectorTools
 
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_gradient (const DoFHandler<dim,spacedim>    &dof,
-                  const InVector                    &fe_function,
-                  const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradients)
+  point_gradient (const DoFHandler<dim,spacedim> &dof,
+                  const VectorType               &fe_function,
+                  const Point<spacedim>          &point,
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradients)
   {
 
     point_gradient (StaticMappingQ1<dim,spacedim>::mapping,
@@ -6793,12 +6793,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradients)
+                  const VectorType                   &fe_function,
+                  const Point<spacedim>              &point,
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradients)
   {
     point_gradient(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                    dof,
@@ -6808,11 +6808,11 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point)
+                  const VectorType               &fe_function,
+                  const Point<spacedim>          &point)
   {
     return point_gradient (StaticMappingQ1<dim,spacedim>::mapping,
                            dof,
@@ -6821,11 +6821,11 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point)
+                  const VectorType                   &fe_function,
+                  const Point<spacedim>              &point)
   {
     return point_gradient(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                           dof,
@@ -6834,13 +6834,13 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_gradient (const Mapping<dim, spacedim>    &mapping,
+  point_gradient (const Mapping<dim, spacedim>   &mapping,
                   const DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradient)
+                  const VectorType               &fe_function,
+                  const Point<spacedim>          &point,
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradient)
   {
     const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -6867,7 +6867,7 @@ namespace VectorTools
 
     // then use this to get the gradients of
     // the given fe_function at this point
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     std::vector<std::vector<Tensor<1, dim, Number> > >
     u_gradient(1, std::vector<Tensor<1, dim, Number> > (fe.n_components()));
     fe_values.get_function_gradients(fe_function, u_gradient);
@@ -6876,15 +6876,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
-  point_gradient (const hp::MappingCollection<dim, spacedim>    &mapping,
-                  const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradient)
+  point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
+                  const hp::DoFHandler<dim,spacedim>         &dof,
+                  const VectorType                           &fe_function,
+                  const Point<spacedim>                      &point,
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradient)
   {
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(gradient.size() == fe.n_components(),
@@ -6915,17 +6915,17 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
-  point_gradient (const Mapping<dim, spacedim>    &mapping,
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
+  point_gradient (const Mapping<dim, spacedim>   &mapping,
                   const DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point)
+                  const VectorType               &fe_function,
+                  const Point<spacedim>          &point)
   {
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    std::vector<Tensor<1, dim, typename InVector::value_type> > gradient(1);
+    std::vector<Tensor<1, dim, typename VectorType::value_type> > gradient(1);
     point_gradient (mapping, dof, fe_function, point, gradient);
 
     return gradient[0];
@@ -6933,17 +6933,17 @@ namespace VectorTools
 
 
 
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
-  point_gradient (const hp::MappingCollection<dim, spacedim>    &mapping,
-                  const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector        &fe_function,
-                  const Point<spacedim>      &point)
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
+  point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
+                  const hp::DoFHandler<dim,spacedim>         &dof,
+                  const VectorType                           &fe_function,
+                  const Point<spacedim>                      &point)
   {
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    std::vector<Tensor<1, dim, typename InVector::value_type> > gradient(1);
+    std::vector<Tensor<1, dim, typename VectorType::value_type> > gradient(1);
     point_gradient (mapping, dof, fe_function, point, gradient);
 
     return gradient[0];
@@ -7020,15 +7020,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
-  compute_mean_value (const Mapping<dim, spacedim>    &mapping,
+  compute_mean_value (const Mapping<dim, spacedim>   &mapping,
                       const DoFHandler<dim,spacedim> &dof,
-                      const Quadrature<dim> &quadrature,
-                      const InVector        &v,
-                      const unsigned int     component)
+                      const Quadrature<dim>          &quadrature,
+                      const VectorType               &v,
+                      const unsigned int             component)
   {
-    typedef typename InVector::value_type Number;
+    typedef typename VectorType::value_type Number;
     Assert (v.size() == dof.n_dofs(),
             ExcDimensionMismatch (v.size(), dof.n_dofs()));
     Assert (component < dof.get_fe().n_components(),
@@ -7087,20 +7087,20 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   compute_mean_value (const DoFHandler<dim,spacedim> &dof,
-                      const Quadrature<dim> &quadrature,
-                      const InVector        &v,
-                      const unsigned int     component)
+                      const Quadrature<dim>          &quadrature,
+                      const VectorType               &v,
+                      const unsigned int             component)
   {
     return compute_mean_value(StaticMappingQ1<dim,spacedim>::mapping, dof, quadrature, v, component);
   }
 
 
   template<class DH, class VECTOR>
-  void get_position_vector(const DH &dh,
-                           VECTOR &vector,
+  void get_position_vector(const DH            &dh,
+                           VECTOR              &vector,
                            const ComponentMask &mask)
   {
     AssertDimension(vector.size(), dh.n_dofs());
