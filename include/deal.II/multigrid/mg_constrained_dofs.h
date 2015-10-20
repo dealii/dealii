@@ -87,6 +87,8 @@ public:
   /**
    * Return the indices of dofs for each level that are subject to boundary
    * constraints.
+   *
+   * @deprecated: use get_boundary_indices(const unsigned int) instead.
    */
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const DEAL_II_DEPRECATED;
