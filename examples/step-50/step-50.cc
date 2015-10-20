@@ -18,21 +18,11 @@
  */
 
 
-// parallel geometric multigrid. work in progress!
+// @note: This a work in progress example of parallel geometric
+// multigrid. Some parts are still in heavy development.
 
-// As discussed in the introduction, most of
-// this program is copied almost verbatim
-// from step-6, which itself is only a slight
-// modification of step-5. Consequently, a
-// significant part of this program is not
-// new if you've read all the material up to
-// step-6, and we won't comment on that part
-// of the functionality that is
-// unchanged. Rather, we will focus on those
-// aspects of the program that have to do
-// with the multigrid functionality which
-// forms the new aspect of this tutorial
-// program.
+// This program is a parallel version of step-16 with a slightly different
+// problem setup.
 
 // @sect3{Include files}
 
@@ -74,23 +64,6 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
 
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_precondition.h>
-
-// These, now, are the include necessary for
-// the multilevel methods. The first two
-// declare classes that allow us to enumerate
-// degrees of freedom not only on the finest
-// mesh level, but also on intermediate
-// levels (that's what the MGDoFHandler class
-// does) as well as allow to access this
-// information (iterators and accessors over
-// these cells).
-//
-// The rest of the include files deals with
-// the mechanics of multigrid as a linear
-// operator (solver or preconditioner).
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
@@ -98,6 +71,20 @@
 #include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
+
+
+#include <deal.II/lac/generic_linear_algebra.h>
+
+// #define USE_PETSC_LA PETSc is not quite supported yet
+
+namespace LA
+{
+#ifdef USE_PETSC_LA
+  using namespace dealii::LinearAlgebraPETSc;
+#else
+  using namespace dealii::LinearAlgebraTrilinos;
+#endif
+}
 
 // This is C++:
 #include <iostream>
@@ -113,13 +100,8 @@ namespace Step50
 
   // @sect3{The <code>LaplaceProblem</code> class template}
 
-  // This main class is basically the same
-  // class as in step-6. As far as member
-  // functions is concerned, the only addition
-  // is the <code>assemble_multigrid</code>
-  // function that assembles the matrices that
-  // correspond to the discrete operators on
-  // intermediate levels:
+  // This main class is very similar to step-16, except that we are storing a
+  // parallel Triangulation and parallel versions of matrices and vectors.
   template <int dim>
   class LaplaceProblem
   {
@@ -137,23 +119,15 @@ namespace Step50
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
-    DoFHandler<dim>    mg_dof_handler;
+      DoFHandler<dim>    mg_dof_handler;
 
-    typedef TrilinosWrappers::SparseMatrix matrix_t;
-    typedef TrilinosWrappers::MPI::Vector vector_t;
+      typedef LA::MPI::SparseMatrix matrix_t;
+    typedef LA::MPI::Vector vector_t;
 
     matrix_t system_matrix;
 
     IndexSet locally_relevant_set;
 
-    // We need an additional object for the
-    // hanging nodes constraints. They are
-    // handed to the transfer object in the
-    // multigrid. Since we call a condense
-    // inside the multigrid these constraints
-    // are not allowed to be inhomogeneous so
-    // we store them in different ConstraintMatrix
-    // objects.
     ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
@@ -162,45 +136,12 @@ namespace Step50
 
     const unsigned int degree;
 
-    // The following four objects are the
-    // only additional member variables,
-    // compared to step-6. They first three
-    // represent the
-    // operators that act on individual
-    // levels of the multilevel hierarchy,
-    // rather than on the finest mesh as do
-    // the objects above while the last object
-    // stores information about the boundary
-    // indices on each level and information
-    // about indices lying on a refinement
-    // edge between two different refinement
-    // levels.
-    //
-    // To facilitate having objects on each
-    // level of a multilevel hierarchy,
-    // deal.II has the MGLevelObject class
-    // template that provides storage for
-    // objects on each level. What we need
-    // here are matrices on each level, which
-    // implies that we also need sparsity
-    // patterns on each level. As outlined in
-    // the @ref mg_paper, the operators
-    // (matrices) that we need are actually
-    // twofold: one on the interior of each
-    // level, and one at the interface
-    // between each level and that part of
-    // the domain where the mesh is
-    // coarser. In fact, we will need the
-    // latter in two versions: for the
-    // direction from coarse to fine mesh and
-    // from fine to coarse. Fortunately,
-    // however, we here have a self-adjoint
-    // problem for which one of these is the
-    // transpose of the other, and so we only
-    // have to build one; we choose the one
-    // from coarse to fine.
+      // Finally we are storing the various parallel multigrid matrices. Our
+      // problem is self-adjoint, so the interface matrices are the transpose
+      // of each other, so we only need to compute/store them once.
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
+      // 
     MGConstrainedDoFs                    mg_constrained_dofs;
   };
 
@@ -312,15 +253,9 @@ namespace Step50
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
 
-
-
-
     DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
                                              locally_relevant_set);
 
-
-    //solution.reinit (mg_dof_handler.n_dofs());
-    //system_rhs.reinit (mg_dof_handler.n_dofs());
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
@@ -357,9 +292,6 @@ namespace Step50
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
-
-    //check(constraints);
-    //check(hanging_node_constraints);
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
@@ -572,15 +504,6 @@ namespace Step50
 
     // <code>setup_system()</code>.
     // of type IndexSet on each level (get_refinement_edge_indices(),
-    // get_refinement_edge_boundary_indices()).
-
-
-    //    std::vector<std::vector<bool> > interface_dofs
-//      = mg_constrained_dofs.get_refinement_edge_indices ();
-//    std::vector<std::vector<bool> > boundary_interface_dofs
-//      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
-
-
 
     // The indices just identified will later be used to decide where
     // the assembled value has to be added into on each level.  On the
@@ -607,7 +530,6 @@ namespace Step50
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));
-
 
         boundary_constraints[level].close ();
       }
@@ -768,7 +690,6 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-
     // Create the object that deals with the transfer between
     // different refinement levels. We need to pass it the hanging
     // node constraints.
@@ -780,16 +701,12 @@ namespace Step50
     // argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
-
     matrix_t &coarse_matrix = mg_matrices[0];
-    //coarse_matrix.copy_from (mg_matrices[0]);
-    //MGCoarseGridHouseholder<double,vector_t> coarse_grid_solver;
-    //coarse_grid_solver.initialize (coarse_matrix);
 
     SolverControl coarse_solver_control (1000, 1e-10, false, false);
-    SolverGMRES<vector_t> coarse_solver(coarse_solver_control);
+    SolverCG<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity id;
-    MGCoarseGridLACIteration<SolverGMRES<vector_t>,vector_t> coarse_grid_solver(coarse_solver,
+    MGCoarseGridLACIteration<SolverCG<vector_t>,vector_t> coarse_grid_solver(coarse_solver,
         coarse_matrix,
         id);
 
@@ -824,7 +741,7 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef TrilinosWrappers::PreconditionJacobi Smoother;
+    typedef LA::MPI::PreconditionJacobi Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
@@ -859,9 +776,6 @@ namespace Step50
     //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-
-
-
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
@@ -870,10 +784,10 @@ namespace Step50
     // get about solving the linear system in
     // the usual way:
     SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
-    SolverGMRES<vector_t>    cg (solver_control);
+    SolverCG<vector_t> solver (solver_control);
 
     if (false)
-      {
+      {/*
         // code to optionally compare to Trilinos ML
         TrilinosWrappers::PreconditionAMG prec;
 
@@ -887,12 +801,12 @@ namespace Step50
 
         prec.initialize (system_matrix,
                          Amg_data);
-        cg.solve (system_matrix, solution, system_rhs,
-                  prec);
+        solver.solve (system_matrix, solution, system_rhs, prec);
+       */
       }
     else
       {
-        cg.solve (system_matrix, solution, system_rhs,
+        solver.solve (system_matrix, solution, system_rhs,
                   preconditioner);
       }
 
@@ -924,7 +838,7 @@ namespace Step50
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-    TrilinosWrappers::MPI::Vector temp_solution;
+    LA::MPI::Vector temp_solution;
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
@@ -949,14 +863,14 @@ namespace Step50
   {
     DataOut<dim> data_out;
 
-    TrilinosWrappers::MPI::Vector temp_solution;
+    LA::MPI::Vector temp_solution;
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
 
-    TrilinosWrappers::MPI::Vector temp = solution;
+    LA::MPI::Vector temp = solution;
     system_matrix.residual(temp,solution,system_rhs);
-    TrilinosWrappers::MPI::Vector res_ghosted = temp_solution;
+    LA::MPI::Vector res_ghosted = temp_solution;
     res_ghosted = temp;
 
     data_out.attach_dof_handler (mg_dof_handler);
@@ -1054,7 +968,7 @@ namespace Step50
         solve ();
         output_results (cycle);
 
-        TrilinosWrappers::MPI::Vector temp = solution;
+        LA::MPI::Vector temp = solution;
         system_matrix.residual(temp,solution,system_rhs);
         constraints.set_zero(temp);
         deallog << "residual " << temp.l2_norm() << std::endl;
