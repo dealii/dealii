@@ -119,9 +119,9 @@ namespace Step50
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
-      DoFHandler<dim>    mg_dof_handler;
+    DoFHandler<dim>    mg_dof_handler;
 
-      typedef LA::MPI::SparseMatrix matrix_t;
+    typedef LA::MPI::SparseMatrix matrix_t;
     typedef LA::MPI::Vector vector_t;
 
     matrix_t system_matrix;
@@ -136,12 +136,12 @@ namespace Step50
 
     const unsigned int degree;
 
-      // Finally we are storing the various parallel multigrid matrices. Our
-      // problem is self-adjoint, so the interface matrices are the transpose
-      // of each other, so we only need to compute/store them once.
+    // Finally we are storing the various parallel multigrid matrices. Our
+    // problem is self-adjoint, so the interface matrices are the transpose
+    // of each other, so we only need to compute/store them once.
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
-      // 
+    //
     MGConstrainedDoFs                    mg_constrained_dofs;
   };
 
@@ -787,27 +787,28 @@ namespace Step50
     SolverCG<vector_t> solver (solver_control);
 
     if (false)
-      {/*
-        // code to optionally compare to Trilinos ML
-        TrilinosWrappers::PreconditionAMG prec;
+      {
+        /*
+         // code to optionally compare to Trilinos ML
+         TrilinosWrappers::PreconditionAMG prec;
 
-        TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-        //    Amg_data.constant_modes = constant_modes;
-        Amg_data.elliptic = true;
-        Amg_data.higher_order_elements = true;
-        Amg_data.smoother_sweeps = 2;
-        Amg_data.aggregation_threshold = 0.02;
-        // Amg_data.symmetric = true;
+         TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+         //    Amg_data.constant_modes = constant_modes;
+         Amg_data.elliptic = true;
+         Amg_data.higher_order_elements = true;
+         Amg_data.smoother_sweeps = 2;
+         Amg_data.aggregation_threshold = 0.02;
+         // Amg_data.symmetric = true;
 
-        prec.initialize (system_matrix,
-                         Amg_data);
-        solver.solve (system_matrix, solution, system_rhs, prec);
-       */
+         prec.initialize (system_matrix,
+                          Amg_data);
+         solver.solve (system_matrix, solution, system_rhs, prec);
+        */
       }
     else
       {
         solver.solve (system_matrix, solution, system_rhs,
-                  preconditioner);
+                      preconditioner);
       }
 
     constraints.distribute (solution);
