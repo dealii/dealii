@@ -295,20 +295,14 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   std::vector<std::vector<bool> > interface_dofs
     = mg_constrained_dofs.get_refinement_edge_indices ();
-  std::vector<std::vector<bool> > boundary_interface_dofs
-    = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
   std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
-  std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
+  ConstraintMatrix empty_constraints;
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
       boundary_constraints[level].add_lines (interface_dofs[level]);
       boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
       boundary_constraints[level].close ();
-
-      boundary_interface_constraints[level]
-      .add_lines (boundary_interface_dofs[level]);
-      boundary_interface_constraints[level].close ();
     }
 
   typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
@@ -382,13 +376,38 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       // (in the <code>solve()</code>
       // function) be able to just pass the
       // transpose matrix where necessary.
+      const unsigned int lvl = cell->level();
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int j=0; j<dofs_per_cell; ++j)
-          if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
-                 interface_dofs[cell->level()][local_dof_indices[j]]==false))
-            cell_matrix(i,j) = 0;
+          if (interface_dofs[lvl][local_dof_indices[i]]   // at_refinement_edge(i)
+              &&
+              !interface_dofs[lvl][local_dof_indices[j]]   // !at_refinement_edge(j)
+              &&
+              (
+                (!mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                 &&
+                 !mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[j])
+                ) // ( !boundary(i) && !boundary(j) )
+                ||
+                (
+                  mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                  &&
+                  local_dof_indices[i]==local_dof_indices[j]
+                ) // ( boundary(i) && boundary(j) && i==j )
+              )
+             )
+            {
+              // do nothing, so add entries to interface matrix
+            }
+          else
+            {
+              cell_matrix(i,j) = 0;
+              std::cout << i << " " << j << "\n";
+            }
 
-      boundary_interface_constraints[cell->level()]
+
+      empty_constraints
       .distribute_local_to_global (cell_matrix,
                                    local_dof_indices,
                                    mg_interface_matrices[cell->level()]);
@@ -584,7 +603,7 @@ void LaplaceProblem<dim>::run ()
       assemble_multigrid ();
 
       solve ();
-//      output_results (cycle);
+      output_results (cycle);
     }
 }
 

@@ -103,19 +103,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 
 // The last step is as in all
 // previous programs:
 namespace Step50
 {
   using namespace dealii;
-
-
-
-
-
 
 
   // @sect3{The <code>LaplaceProblem</code> class template}
@@ -240,7 +233,7 @@ namespace Step50
                                   const unsigned int) const
   {
     if (p.square() < 0.5*0.5)
-      return 20;
+      return 5;
     else
       return 1;
   }
@@ -304,13 +297,6 @@ namespace Step50
   {
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
       deallog.depth_console(0);
-  }
-
-  std::string id_to_string(const CellId &id)
-  {
-    std::ostringstream ss;
-    ss << id;
-    return ss.str();
   }
 
 
@@ -613,7 +599,7 @@ namespace Step50
     // freedom at once can be done using
     // ConstraintMatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
+    ConstraintMatrix empty_constraints;
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
         IndexSet dofset;
@@ -624,14 +610,6 @@ namespace Step50
 
 
         boundary_constraints[level].close ();
-
-	boundary_interface_constraints[level].reinit(dofset);
-	// compute indices that are refinement edge and boundary (aka refinement_edge_boundary_indices):
-	IndexSet idxset = mg_constrained_dofs.get_refinement_edge_indices(level) & mg_constrained_dofs.get_boundary_indices(level);
-	
-        boundary_interface_constraints[level]
-        .add_lines (idxset);
-        boundary_interface_constraints[level].close ();
       }
 
     // Now that we're done with most of our preliminaries, let's start
@@ -719,18 +697,37 @@ namespace Step50
 
           const IndexSet &interface_dofs_on_level
             = mg_constrained_dofs.get_refinement_edge_indices(cell->level());
-
+          const unsigned int lvl = cell->level();
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              /** old HEAD:
-              if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
-              || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j])) */
-              if ( !(interface_dofs_on_level.is_element(local_dof_indices[i])==true &&
-                     interface_dofs_on_level.is_element(local_dof_indices[j])==false))
-                cell_matrix(i,j) = 0;
+              if (interface_dofs_on_level.is_element(local_dof_indices[i])   // at_refinement_edge(i)
+                  &&
+                  !interface_dofs_on_level.is_element(local_dof_indices[j])   // !at_refinement_edge(j)
+                  &&
+                  (
+                    (!mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                     &&
+                     !mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[j])
+                    ) // ( !boundary(i) && !boundary(j) )
+                    ||
+                    (
+                      mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                      &&
+                      local_dof_indices[i]==local_dof_indices[j]
+                    ) // ( boundary(i) && boundary(j) && i==j )
+                  )
+                 )
+                {
+                  // do nothing, so add entries to interface matrix
+                }
+              else
+                {
+                  cell_matrix(i,j) = 0;
+                }
 
-          boundary_interface_constraints[cell->level()]
+
+          empty_constraints
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
                                        mg_interface_matrices[cell->level()]);
@@ -875,8 +872,6 @@ namespace Step50
     SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
     SolverGMRES<vector_t>    cg (solver_control);
 
-    //solution = 0;
-
     if (false)
       {
         // code to optionally compare to Trilinos ML
@@ -927,7 +922,6 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
-
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     TrilinosWrappers::MPI::Vector temp_solution;
@@ -945,8 +939,6 @@ namespace Step50
                                        estimated_error_per_cell,
                                        0.3, 0.0);
 
-
-    triangulation.prepare_coarsening_and_refinement ();
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -1055,7 +1047,6 @@ namespace Step50
                   << (level == triangulation.n_global_levels()-1
                       ? ")" : ", ");
         deallog << std::endl;
-
 
         assemble_system ();
         assemble_multigrid ();
