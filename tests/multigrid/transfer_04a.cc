@@ -98,22 +98,22 @@ void check_fe(FiniteElement<dim> &fe)
   setup_tria(tr);
 
   if (false)
-  {
-    DataOut<dim> data_out;
-    Vector<float> subdomain (tr.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
-      subdomain(i) = tr.locally_owned_subdomain();
-    data_out.attach_triangulation (tr);
-    data_out.add_data_vector (subdomain, "subdomain");
-    data_out.build_patches (0);
-    const std::string filename = ("solution." +
-                                  Utilities::int_to_string
-                                  (tr.locally_owned_subdomain(), 4) +
-                                  ".vtu");
-    std::ofstream output (filename.c_str());
-    data_out.write_vtu (output);
+    {
+      DataOut<dim> data_out;
+      Vector<float> subdomain (tr.n_active_cells());
+      for (unsigned int i=0; i<subdomain.size(); ++i)
+        subdomain(i) = tr.locally_owned_subdomain();
+      data_out.attach_triangulation (tr);
+      data_out.add_data_vector (subdomain, "subdomain");
+      data_out.build_patches (0);
+      const std::string filename = ("solution." +
+                                    Utilities::int_to_string
+                                    (tr.locally_owned_subdomain(), 4) +
+                                    ".vtu");
+      std::ofstream output (filename.c_str());
+      data_out.write_vtu (output);
 
-  }
+    }
 
 
   ZeroFunction<dim> zero;
