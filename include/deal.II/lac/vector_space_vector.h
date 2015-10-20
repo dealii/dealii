@@ -16,15 +16,16 @@
 #ifndef dealii__vector_space_vector_h
 #define dealii__vector_space_vector_h
 
-DEAL_II_NAMESPACE_OPEN
-
+#include <deal.II/base/config.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
   template <typename Number>
-  class ReadWriteVector<Number>;
+  class ReadWriteVector;
 
   class IndexSet;
 
@@ -40,7 +41,7 @@ namespace LinearAlgebra
    *
    * @author Bruno Turcksin, 2015.
    */
-  template <Number>
+  template <typename Number>
   class VectorSpaceVector
   {
   public:
