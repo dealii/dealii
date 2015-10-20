@@ -35,8 +35,8 @@ template<int dim>
 inline void
 plot_shape_functions(const unsigned int degree)
 {
-  FE_BDM<dim> fe_rt(degree);
-  deallog.push(fe_rt.get_name());
+  FE_BDM<dim> fe_bdm(degree);
+  deallog.push(fe_bdm.get_name());
 
   const unsigned int div=2;
   for (unsigned int mz=0; mz<=((dim>2) ? div : 0) ; ++mz)
@@ -52,22 +52,22 @@ plot_shape_functions(const unsigned int degree)
             // values contain
             // quadrature point and one
             // vector of dim entries
-            // for each chape function
+            // for each shape function
             deallog << "value " << p;
-            for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
+            for (unsigned int i=0; i<fe_bdm.dofs_per_cell; ++i)
               {
                 for (unsigned int c=0; c<dim; ++c)
-                  deallog << " " << fe_rt.shape_value_component(i,p,c);
+                  deallog << " " << fe_bdm.shape_value_component(i,p,c);
                 deallog << "  ";
               }
             deallog << std::endl << "grad "  << p;
-            for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
+            for (unsigned int i=0; i<fe_bdm.dofs_per_cell; ++i)
               {
                 for (unsigned int c=0; c<dim; ++c)
                   {
                     deallog << ' ';
                     for (unsigned int d=0; d<dim; ++d)
-                      deallog << ' ' << fe_rt.shape_grad_component(i,p,c)[d];
+                      deallog << ' ' << fe_bdm.shape_grad_component(i,p,c)[d];
                   }
               }
             deallog << std::endl;

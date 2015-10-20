@@ -188,7 +188,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
               // p(t) = t^(i+1)
               monomials[i+1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree()-i-1].value(unit_point(d), monovalk[d]);
+              monomials[degree()-i].value(unit_point(d), monovalk[d]);
             }
           if (values.size() != 0)
             {
@@ -218,9 +218,9 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
               grads[start][1][0] = 0.;
               grads[start][1][1] = -monovali[1][1] * monovalk[2][0];
               grads[start][1][2] = -monovali[1][0] * monovalk[2][1];
-              grads[start+2][2][0] = 0.;
-              grads[start+2][2][1] = 0.;
-              grads[start+2][2][2] = 0.;
+              grads[start][2][0] = 0.;
+              grads[start][2][1] = 0.;
+              grads[start][2][2] = 0.;
 
               grads[start+1][1][1] = monovali[2][1] * monovalk[0][0];
               grads[start+1][1][2] = unit_point(1) * monovali[2][2] * monovalk[0][0];
