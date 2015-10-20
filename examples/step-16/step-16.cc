@@ -653,13 +653,11 @@ namespace Step16
 // @sect3{The main() function}
 //
 // This is again the same function as in step-6:
-int main (int argc, char *argv[])
+int main ()
 {
   try
     {
       using namespace Step16;
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
-                                                          numbers::invalid_unsigned_int);
 
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
