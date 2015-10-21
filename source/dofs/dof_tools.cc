@@ -992,7 +992,7 @@ namespace DoFTools
                                endc = dof_handler.end(level);
     for (; cell!=endc; ++cell)
       {
-        types::subdomain_id id = cell->level_subdomain_id();
+        const types::subdomain_id id = cell->level_subdomain_id();
 
         // skip artificial and own cells (only look at ghost cells)
         if (id == dof_handler.get_tria().locally_owned_subdomain()
