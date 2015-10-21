@@ -288,10 +288,12 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   struct dof_pair
   {
     unsigned int level;
-    unsigned int global_dof_index;
-    unsigned int level_dof_index;
+    types::global_dof_index global_dof_index;
+    types::global_dof_index level_dof_index;
 
-    dof_pair(unsigned int level, unsigned int global_dof_index, unsigned int level_dof_index)
+    dof_pair(unsigned int level,
+             types::global_dof_index global_dof_index,
+             types::global_dof_index level_dof_index)
       :
       level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
     {}
@@ -344,7 +346,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               if (mg_constrained_dofs != 0
                   && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
                 continue;
-              unsigned int global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
+              types::global_dof_index global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
               //skip if we did this global dof already (on this or a coarser level)
               if (dof_touched[global_idx])
                 continue;
@@ -445,7 +447,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             for (unsigned int i=0; i<receive.size(); ++i)
               {
                 copy_indices_level_mine[receive[i].level].push_back(
-                  std::pair<unsigned int, unsigned int> (receive[i].global_dof_index, receive[i].level_dof_index)
+                  std::make_pair (receive[i].global_dof_index, receive[i].level_dof_index)
                 );
               }
           }
