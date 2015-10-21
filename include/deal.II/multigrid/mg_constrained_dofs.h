@@ -94,7 +94,10 @@ public:
   get_boundary_indices () const DEAL_II_DEPRECATED;
 
   /**
-   * Return the indices of dofs for each level that are subject to boundary constraints.
+   * Return the indices of level dofs on the given level that are subject to
+   * Dirichlet boundary conditions (as set by the @p function_map parameter in
+   * initialize()).  The indices are restricted to the set of locally relevant
+   * level dofs.
    */
   const IndexSet &
   get_boundary_indices (const unsigned int level) const;
