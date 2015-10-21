@@ -608,10 +608,7 @@ namespace Step33
 
     if (do_schlieren_plot == true)
       Assert (duh.size() == n_quadrature_points,
-              ExcInternalError())
-      else
-        Assert (duh.size() == 0,
-                ExcInternalError());
+              ExcInternalError());
 
     Assert (computed_quantities.size() == n_quadrature_points,
             ExcInternalError());
