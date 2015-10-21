@@ -147,23 +147,26 @@ private:
   std::vector<IndexSet> boundary_indices;
 
   /**
-   * old data structure only filled on demand
+   * Old data structure that is only filled on demand from @p boundary_indices
+   * for deprecated get_boundary_indices().
    */
   mutable std::vector<std::set<types::global_dof_index> > boundary_indices_old;
 
   /**
-   * The degrees of freedom on the refinement edge between a level and coarser
-   * cells.
+   * The degrees of freedom on a given level that live on the refinement edge
+   * between the level and cells on a coarser level.
    */
   std::vector<IndexSet> refinement_edge_indices;
 
   /**
-   * old data structure only filled on demand
+   * Old data structure that is only filled on demand for deprecated
+   * get_refinement_edge_boundary_indices().
    */
   mutable std::vector<std::vector<bool> > refinement_edge_boundary_indices_old;
 
   /**
-   * old data structure only filled on demand
+   * Old data structure that is only filled on demand for deprecated
+   * get_refinement_edge_indices().
    */
   mutable std::vector<std::vector<bool> > refinement_edge_indices_old;
 };
