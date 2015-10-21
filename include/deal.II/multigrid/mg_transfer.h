@@ -249,6 +249,12 @@ public:
 private:
 
   /**
+   * Internal function to @p fill copy_indices*. Called by build_matrices().
+   */
+  template <int dim, int spacedim>
+  void fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
+
+  /**
    * Sizes of the multi-level vectors.
    */
   std::vector<types::global_dof_index> sizes;

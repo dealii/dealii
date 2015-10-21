@@ -276,7 +276,40 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-  // * Now we are filling the variables copy_indices*, which are essentially
+  fill_and_communicate_copy_indices(mg_dof);
+}
+
+namespace
+{
+  /**
+   * Internal data structure that is used in the MPI communication in fill_and_communicate_copy_indices().
+   * It represents an entry in the copy_indices* map, that associates a level dof index with a global dof index.
+   */
+  struct DoFPair
+  {
+    unsigned int level;
+    types::global_dof_index global_dof_index;
+    types::global_dof_index level_dof_index;
+
+    DoFPair(const unsigned int level,
+            const types::global_dof_index global_dof_index,
+            const types::global_dof_index level_dof_index)
+      :
+      level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
+    {}
+
+    DoFPair()
+    {}
+  };
+}
+
+template <class VECTOR>
+template <int dim, int spacedim>
+void
+MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
+  const DoFHandler<dim,spacedim> &mg_dof)
+{
+  // Now we are filling the variables copy_indices*, which are essentially
   // maps from global to mgdof for each level stored as a std::vector of
   // pairs. We need to split this map on each level depending on the ownership
   // of the global and mgdof, so that we later not access non-local elements
@@ -285,33 +318,18 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // been processed already (on the current level). This is the same as
   // the multigrid running in serial.
 
-  struct dof_pair
-  {
-    unsigned int level;
-    types::global_dof_index global_dof_index;
-    types::global_dof_index level_dof_index;
-
-    dof_pair(unsigned int level,
-             types::global_dof_index global_dof_index,
-             types::global_dof_index level_dof_index)
-      :
-      level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
-    {}
-
-    dof_pair()
-    {}
-  };
-
   // map cpu_index -> vector of data
   // that will be copied into copy_indices_level_mine
-  std::vector<dof_pair> send_data_temp;
+  std::vector<DoFPair> send_data_temp;
 
+  const unsigned int n_levels = mg_dof.get_tria().n_global_levels();
   copy_indices.resize(n_levels);
   copy_indices_global_mine.resize(n_levels);
   copy_indices_level_mine.resize(n_levels);
   IndexSet globally_relevant;
   DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
 
+  const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
 
@@ -365,7 +383,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                     std::make_pair (global_dof_indices[i], level_dof_indices[i]));
 
                   //send this to the owner of the level_dof:
-                  send_data_temp.push_back(dof_pair(level, global_dof_indices[i], level_dof_indices[i]));
+                  send_data_temp.push_back(DoFPair(level, global_dof_indices[i], level_dof_indices[i]));
                 }
               else
                 {
@@ -387,10 +405,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // TODO: Searching the owner for every single DoF becomes quite
       // inefficient. Please fix this, Timo.
       std::set<unsigned int> neighbors = tria->level_ghost_owners();
-      std::map<int, std::vector<dof_pair> > send_data;
+      std::map<int, std::vector<DoFPair> > send_data;
 
       // * find owners of the level dofs and insert into send_data accordingly
-      for (typename std::vector<dof_pair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
+      for (typename std::vector<DoFPair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
         {
           for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
             {
@@ -409,7 +427,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
           {
             requests.push_back(MPI_Request());
             unsigned int dest = *it;
-            std::vector<dof_pair> &data = send_data[dest];
+            std::vector<DoFPair> &data = send_data[dest];
             if (data.size())
               MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
             else
@@ -419,8 +437,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
       // * receive
       {
-        typename std::vector<dof_pair> receive;
-        for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+        std::vector<DoFPair> receive_buffer;
+        for (unsigned int counter=0; counter<neighbors.size(); ++counter)
           {
             MPI_Status status;
             int len;
@@ -435,25 +453,25 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                 continue;
               }
 
-            int count = len / sizeof(dof_pair);
-            Assert(count * sizeof(dof_pair) == len, ExcInternalError());
-            receive.resize(count);
+            int count = len / sizeof(DoFPair);
+            Assert(count * sizeof(DoFPair) == len, ExcInternalError());
+            receive_buffer.resize(count);
 
-            void *ptr = &receive[0];
+            void *ptr = &receive_buffer[0];
             int err = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                                tria->get_communicator(), &status);
             AssertThrow(err==MPI_SUCCESS, ExcInternalError());
 
-            for (unsigned int i=0; i<receive.size(); ++i)
+            for (unsigned int i=0; i<receive_buffer.size(); ++i)
               {
-                copy_indices_level_mine[receive[i].level].push_back(
-                  std::make_pair (receive[i].global_dof_index, receive[i].level_dof_index)
+                copy_indices_level_mine[receive_buffer[i].level].push_back(
+                  std::make_pair (receive_buffer[i].global_dof_index, receive_buffer[i].level_dof_index)
                 );
               }
           }
       }
 
-      // * wait
+      // * wait for all MPI_Isend to complete
       if (requests.size() > 0)
         {
           MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
@@ -473,7 +491,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
     std::sort(copy_indices_global_mine[level].begin(), copy_indices_global_mine[level].end(), compare);
 #endif
 }
-
 
 template <class VECTOR>
 void
