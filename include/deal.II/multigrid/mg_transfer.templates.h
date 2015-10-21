@@ -188,20 +188,26 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator IT;
-      for (IT i= copy_indices[level].begin();
+      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+
+      // first copy local unknowns
+      for (dof_pair_iterator i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
-      for (IT i= copy_indices_global_mine[level].begin();
+      // Do the same for the indices where the global index is local,
+      // but the local index is not
+      for (dof_pair_iterator i= copy_indices_global_mine[level].begin();
            i != copy_indices_global_mine[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
       dst_level.compress(VectorOperation::insert);
+
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
       std::cout << "copy_to_mg dst " << level << " " << dst_level.l2_norm() << std::endl;
 #endif
+
       if (!first)
         {
           restrict_and_add (level+1, dst[level], dst[level+1]);
@@ -234,21 +240,22 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   dst = 0;
   for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
-      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator IT;
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
       std::cout << "copy_from_mg src " << level << " " << src[level].l2_norm() << std::endl;
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
+      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+
       // First copy all indices local to this process
-      for (IT i= copy_indices[level].begin();
+      for (dof_pair_iterator i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
         dst(i->first) = src[level](i->second);
 
       // Do the same for the indices where the level index is local,
       // but the global index is not
-      for (IT i= copy_indices_level_mine[level].begin();
+      for (dof_pair_iterator i= copy_indices_level_mine[level].begin();
            i != copy_indices_level_mine[level].end(); ++i)
         dst(i->first) = src[level](i->second);
 
@@ -286,14 +293,16 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   // functions
   for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
-      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator IT;
-      for (IT i= copy_indices[level].begin();
+      typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+
+      // First add all indices local to this process
+      for (dof_pair_iterator i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
         dst(i->first) += src[level](i->second);
 
       // Do the same for the indices where the level index is local,
       // but the global index is not
-      for (IT i= copy_indices_level_mine[level].begin();
+      for (dof_pair_iterator i= copy_indices_level_mine[level].begin();
            i != copy_indices_level_mine[level].end(); ++i)
         dst(i->first) += src[level](i->second);
     }
