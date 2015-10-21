@@ -526,7 +526,7 @@ namespace Step50
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_mg_dofs (mg_dof_handler, dofset, level);
+        DoFTools::extract_locally_relevant_mg_dofs (mg_dof_handler, level, dofset);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));

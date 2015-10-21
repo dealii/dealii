@@ -237,7 +237,8 @@ template
 void
 DoFTools::extract_locally_relevant_mg_dofs<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> & dof_handler,
- IndexSet & dof_set, unsigned int level);
+ const unsigned int level,
+ IndexSet & dof_set);
 
 template
 void

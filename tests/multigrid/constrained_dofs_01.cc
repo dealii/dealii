@@ -158,7 +158,8 @@ void check_fe(FiniteElement<dim> &fe)
 
       IndexSet relevant;
       DoFTools::extract_locally_relevant_mg_dofs (dofh,
-                                                  relevant, level);
+                                                  level,
+                                                  relevant);
       deallog << "relevant:" << std::endl;
       relevant.print(deallog);
 
