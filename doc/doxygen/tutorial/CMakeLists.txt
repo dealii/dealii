@@ -14,6 +14,11 @@
 ## ---------------------------------------------------------------------
 
 
+
+FILE(GLOB _deal_ii_steps
+  ${CMAKE_SOURCE_DIR}/examples/step-*
+  )
+
 #
 # Define target for the tutorial. It depends on the
 # file tutorial.h built via the next target below, as well
@@ -31,13 +36,13 @@ ADD_CUSTOM_TARGET(tutorial)
 # Describe how to build tutorial.h:
 #
 
-file(GLOB DEAL_II_STEPS_BUILDSON
+file(GLOB _deal_ii_steps_buildson
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
   )
-file(GLOB DEAL_II_STEPS_KIND
+file(GLOB _deal_ii_steps_kind
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
   )
-file(GLOB DEAL_II_STEPS_TOOLTIP
+file(GLOB _deal_ii_steps_tooltip
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
 
@@ -47,13 +52,13 @@ ADD_CUSTOM_COMMAND(
   ARGS
     ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
-    ${DEAL_II_STEPS}
+    ${_deal_ii_steps}
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
-    ${DEAL_II_STEPS}
-    ${DEAL_II_STEPS_BUILDSON}
-    ${DEAL_II_STEPS_KIND}
-    ${DEAL_II_STEPS_TOOLTIP}
+    ${_deal_ii_steps}
+    ${_deal_ii_steps_kind}
+    ${_deal_ii_steps_tooltip}
+    ${_deal_ii_steps_buildson}
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
   )
 ADD_CUSTOM_TARGET(build_tutorial_h
@@ -65,7 +70,7 @@ ADD_DEPENDENCIES(tutorial build_tutorial_h)
 # Prepare the steps for documentation generation
 #
 
-FOREACH(_step ${DEAL_II_STEPS})
+FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
   ADD_CUSTOM_COMMAND(
