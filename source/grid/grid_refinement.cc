@@ -385,7 +385,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
 
   if (refine_cells || coarsen_cells)
     {
-      dealii::Vector<typename VectorType::value_type> tmp (criteria);
+      Vector<typename VectorType::value_type> tmp (criteria);
       if (refine_cells)
         {
           std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
@@ -426,7 +426,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   // error, which is what we have to sum
   // up and compare with
   // @p{fraction_of_error*total_error}.
-  dealii::Vector<typename VectorType::value_type> tmp;
+  Vector<typename VectorType::value_type> tmp;
   tmp = criteria;
   const double total_error = tmp.l1_norm();
 
@@ -435,7 +435,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   std::sort (tmp.begin(), tmp.end(), std::greater<double>());
 
   // compute thresholds
-  typename dealii::Vector<typename VectorType::value_type>::const_iterator
+  typename Vector<typename VectorType::value_type>::const_iterator
   pp=tmp.begin();
   for (double sum=0;
        (sum<top_fraction*total_error) && (pp!=(tmp.end()-1));
@@ -444,7 +444,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   double top_threshold = ( pp != tmp.begin () ?
                            (*pp+*(pp-1))/2 :
                            *pp );
-  typename dealii::Vector<typename VectorType::value_type>::const_iterator
+  typename Vector<typename VectorType::value_type>::const_iterator
   qq=(tmp.end()-1);
   for (double sum=0;
        (sum<bottom_fraction*total_error) && (qq!=tmp.begin());

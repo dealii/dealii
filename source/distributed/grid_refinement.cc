@@ -153,7 +153,7 @@ namespace
   void
   get_locally_owned_indicators (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                                 const VectorType &criteria,
-                                dealii::Vector<typename VectorType::value_type> &locally_owned_indicators)
+                                Vector<typename VectorType::value_type> &locally_owned_indicators)
   {
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
@@ -482,7 +482,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<typename VectorType::value_type>
+        Vector<typename VectorType::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -561,7 +561,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<typename VectorType::value_type>
+        Vector<typename VectorType::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,

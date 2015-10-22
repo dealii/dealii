@@ -623,7 +623,7 @@ namespace VectorTools
     Assert(u2.size()==dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(),dof2.n_dofs()));
 
-    dealii::Vector<typename Vector::value_type> cache;
+    Vector<typename VectorType::value_type> cache;
 
     // Looping over the finest common
     // mesh, this means that source and
@@ -780,7 +780,7 @@ namespace VectorTools
         constraints_and_b_v_are_compatible(constraints, boundary_values);
 
       // set up mass matrix and right hand side
-      dealii::Vector<double> vec (dof.n_dofs());
+      Vector<double> vec (dof.n_dofs());
       SparsityPattern sparsity;
       {
         DynamicSparsityPattern dsp (dof.n_dofs(), dof.n_dofs());
@@ -790,7 +790,7 @@ namespace VectorTools
         sparsity.copy_from (dsp);
       }
       SparseMatrix<double> mass_matrix (sparsity);
-      dealii::Vector<double> tmp (mass_matrix.n());
+      Vector<double> tmp (mass_matrix.n());
 
       // If the constraint matrix does not conflict with the given boundary
       // values (i.e., it either does not contain boundary values or it contains
@@ -1721,7 +1721,7 @@ namespace VectorTools
               // of the number of
               // components of the
               // function
-              dealii::Vector<double> function_values (fe.n_components());
+              Vector<double> function_values (fe.n_components());
               if (fe.n_components() == 1)
                 function_values(0)
                   = boundary_function.value (cell->vertex(direction));
@@ -1793,7 +1793,7 @@ namespace VectorTools
       // points. have two arrays for scalar and vector functions to use the
       // more efficient one respectively
       std::vector<double>          dof_values_scalar;
-      std::vector<dealii::Vector<double> > dof_values_system;
+      std::vector<Vector<double> > dof_values_system;
       dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
       dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
 
@@ -1906,7 +1906,7 @@ namespace VectorTools
                       // allocating temporary if possible
                       if (dof_values_system.size() < fe.dofs_per_face)
                         dof_values_system.resize (fe.dofs_per_face,
-                                                  dealii::Vector<double>(fe.n_components()));
+                                                  Vector<double>(fe.n_components()));
                       else
                         dof_values_system.resize (fe.dofs_per_face);
 
@@ -6028,17 +6028,17 @@ namespace VectorTools
       void resize_vectors (const unsigned int n_q_points,
                            const unsigned int n_components);
 
-      std::vector<dealii::Vector<Number> > function_values;
+      std::vector<Vector<Number> > function_values;
       std::vector<std::vector<Tensor<1,spacedim,Number> > > function_grads;
       std::vector<double> weight_values;
-      std::vector<dealii::Vector<double> > weight_vectors;
+      std::vector<Vector<double> > weight_vectors;
 
-      std::vector<dealii::Vector<Number> > psi_values;
+      std::vector<Vector<Number> > psi_values;
       std::vector<std::vector<Tensor<1,spacedim,Number> > > psi_grads;
       std::vector<Number> psi_scalar;
 
       std::vector<double>         tmp_values;
-      std::vector<dealii::Vector<double> > tmp_vector_values;
+      std::vector<Vector<double> > tmp_vector_values;
       std::vector<Tensor<1,spacedim> > tmp_gradients;
       std::vector<std::vector<Tensor<1,spacedim> > > tmp_vector_gradients;
 
@@ -6071,23 +6071,23 @@ namespace VectorTools
                                                         const unsigned int n_components)
     {
       function_values.resize (n_q_points,
-                              dealii::Vector<Number>(n_components));
+                              Vector<Number>(n_components));
       function_grads.resize (n_q_points,
                              std::vector<Tensor<1,spacedim,Number> >(n_components));
 
       weight_values.resize (n_q_points);
       weight_vectors.resize (n_q_points,
-                             dealii::Vector<double>(n_components));
+                             Vector<double>(n_components));
 
       psi_values.resize (n_q_points,
-                         dealii::Vector<Number>(n_components));
+                         Vector<Number>(n_components));
       psi_grads.resize (n_q_points,
                         std::vector<Tensor<1,spacedim,Number> >(n_components));
       psi_scalar.resize (n_q_points);
 
       tmp_values.resize (n_q_points);
       tmp_vector_values.resize (n_q_points,
-                                dealii::Vector<double>(n_components));
+                                Vector<double>(n_components));
       tmp_gradients.resize (n_q_points);
       tmp_vector_gradients.resize (n_q_points,
                                    std::vector<Tensor<1,spacedim> >(n_components));
