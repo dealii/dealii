@@ -8889,6 +8889,39 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::man
 
 
 template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
+    const types::manifold_id m_number)
+{
+  bool boundary_found = false;
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    {
+      // loop on faces
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary() && cell->face(f)->boundary_id()==b_id)
+          {
+            boundary_found = true;
+            cell->face(f)->set_manifold_id(m_number);
+          }
+
+      // loop on edges if dim >= 3
+      if (dim>=3)
+        for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+          if (cell->line(e)->at_boundary() && cell->line(e)->boundary_id()==b_id)
+            {
+              boundary_found = true;
+              cell->line(e)->set_manifold_id(m_number);
+            }
+    }
+
+  Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
+}
+
+
+template <int dim, int spacedim>
 const Boundary<dim,spacedim> &
 Triangulation<dim, spacedim>::get_boundary (const types::manifold_id m_number) const
 {
