@@ -34,17 +34,20 @@ IF(NOT DOXYGEN_FOUND)
     )
 ENDIF()
 
+########################################################################
 #
-# A glob. I'm sorry
+# Process the tutorial files into inputs for doxygen
 #
-file(GLOB DEAL_II_STEPS
-  ${CMAKE_SOURCE_DIR}/examples/step-*
-  )
+########################################################################
 
+ADD_SUBDIRECTORY(tutorial)
+
+
+########################################################################
 #
-# Prepare the example steps for doxygen:
+# Set up all of the other input pieces we want to give to doxygen
 #
-ADD_SUBDIRECTORY(tutorial) # uses ${DEAL_II_STEPS}
+########################################################################
 
 #
 # Prepare auxiliary files for doxygen:
@@ -119,7 +122,11 @@ LIST(APPEND _doxygen_depend
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
-FOREACH(_step ${DEAL_II_STEPS})
+
+FILE(GLOB _deal_ii_steps
+  ${CMAKE_SOURCE_DIR}/examples/step-*
+  )
+FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
   LIST(APPEND _doxygen_depend
     ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
@@ -139,9 +146,12 @@ FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
   )
 
+########################################################################
 #
 # And, finally, call doxygen:
 #
+########################################################################
+
 ADD_CUSTOM_COMMAND(
   OUTPUT
     ${CMAKE_BINARY_DIR}/doxygen.log
