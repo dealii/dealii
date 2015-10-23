@@ -479,9 +479,8 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
         }
     }
 
-  // If we are in debugging mode, we order the copy indices, so we get
-  // more reliable output for regression texts
-#ifdef DEBUG
+  // Sort the indices. This will produce more reliable debug output for regression texts
+  // and likely won't hurt performance even in release mode.
   std::less<std::pair<types::global_dof_index, types::global_dof_index> > compare;
   for (unsigned int level=0; level<copy_indices.size(); ++level)
     std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
@@ -489,7 +488,6 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
     std::sort(copy_indices_level_mine[level].begin(), copy_indices_level_mine[level].end(), compare);
   for (unsigned int level=0; level<copy_indices_global_mine.size(); ++level)
     std::sort(copy_indices_global_mine[level].begin(), copy_indices_global_mine[level].end(), compare);
-#endif
 }
 
 template <class VECTOR>
