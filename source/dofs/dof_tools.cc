@@ -971,9 +971,9 @@ namespace DoFTools
 
   template <class DH>
   void
-  extract_locally_relevant_mg_dofs (const DH &dof_handler,
-                                    const unsigned int level,
-                                    IndexSet &dof_set)
+  extract_locally_relevant_level_dofs (const DH &dof_handler,
+                                       const unsigned int level,
+                                       IndexSet &dof_set)
   {
     // collect all the locally owned dofs
     dof_set = dof_handler.locally_owned_mg_dofs(level);
