@@ -156,12 +156,12 @@ private:
   /**
    * The dimension of the range space.
    */
-  size_type _m;
+  size_type n_rows;
 
   /**
    * The dimension of the domain space.
    */
-  size_type _n;
+  size_type n_columns;
 };
 
 
@@ -283,12 +283,12 @@ private:
   /**
    * The dimension of the range space.
    */
-  size_type _m;
+  size_type n_rows;
 
   /**
    * The dimension of the domain space.
    */
-  size_type _n;
+  size_type n_columns;
 };
 
 
@@ -982,8 +982,8 @@ private:
 inline
 PreconditionIdentity::PreconditionIdentity ()
   :
-  _m (0),
-  _n (0)
+  n_rows (0),
+  n_columns (0)
 {}
 
 template <class MATRIX>
@@ -992,8 +992,8 @@ PreconditionIdentity::initialize (
   const MATRIX &matrix,
   const PreconditionIdentity::AdditionalData &)
 {
-  _m = matrix.m();
-  _n = matrix.n();
+  n_rows = matrix.m();
+  n_columns = matrix.n();
 }
 
 
@@ -1032,15 +1032,15 @@ PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 inline typename PreconditionIdentity::size_type
 PreconditionIdentity::m () const
 {
-  Assert(_m != 0, ExcNotInitialized());
-  return _m;
+  Assert(n_rows != 0, ExcNotInitialized());
+  return n_rows;
 }
 
 inline typename PreconditionIdentity::size_type
 PreconditionIdentity::n () const
 {
-  Assert(_n != 0, ExcNotInitialized());
-  return _n;
+  Assert(n_columns != 0, ExcNotInitialized());
+  return n_columns;
 }
 
 //---------------------------------------------------------------------------
@@ -1057,8 +1057,8 @@ inline
 PreconditionRichardson::PreconditionRichardson ()
   :
   relaxation(0),
-  _m (0),
-  _n (0)
+  n_rows (0),
+  n_columns (0)
 {
   AdditionalData add_data;
   relaxation=add_data.relaxation;
@@ -1082,8 +1082,8 @@ PreconditionRichardson::initialize (
   const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
-  _m = matrix.m();
-  _n = matrix.n();
+  n_rows = matrix.m();
+  n_columns = matrix.n();
 }
 
 
@@ -1123,15 +1123,15 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 inline typename PreconditionRichardson::size_type
 PreconditionRichardson::m () const
 {
-  Assert(_m != 0, ExcNotInitialized());
-  return _m;
+  Assert(n_rows != 0, ExcNotInitialized());
+  return n_rows;
 }
 
 inline typename PreconditionRichardson::size_type
 PreconditionRichardson::n () const
 {
-  Assert(_n != 0, ExcNotInitialized());
-  return _n;
+  Assert(n_columns != 0, ExcNotInitialized());
+  return n_columns;
 }
 
 //---------------------------------------------------------------------------
