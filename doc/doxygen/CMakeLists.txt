@@ -36,10 +36,15 @@ ENDIF()
 
 ########################################################################
 #
-# Process the tutorial files into inputs for doxygen
+# Process the tutorial and code-gallery files into inputs for doxygen
+#
+# The tutorial/CMakeLists.txt file is also responsible for building
+# the top-level tutorial pages that may link to the code gallery,
+# so we need to have the code gallery stuff in place first.
 #
 ########################################################################
 
+ADD_SUBDIRECTORY(code-gallery)
 ADD_SUBDIRECTORY(tutorial)
 
 
