@@ -641,6 +641,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
 
   return_op.vmult = [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
+    op.reinit_range_vector(v, /*bool fast =*/ false);
     solver.solve(op, v, u, preconditioner);
   };
 
@@ -650,7 +651,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
 
     Vector *v2 = vector_memory.alloc();
-    op.reinit_range_vector(*v2, /*bool fast =*/ true);
+    op.reinit_range_vector(*v2, /*bool fast =*/ false);
     solver.solve(op, *v2, u, preconditioner);
     v += *v2;
     vector_memory.free(v2);
@@ -659,6 +660,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
   return_op.Tvmult = [op, &solver, &preconditioner]( Vector &v, const
                                                      Vector &u)
   {
+    op.reinit_range_vector(v, /*bool fast =*/ false);
     solver.solve(transpose_operator(op), v, u, preconditioner);
   };
 
@@ -668,7 +670,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
 
     Vector *v2 = vector_memory.alloc();
-    op.reinit_range_vector(*v2, /*bool fast =*/ true);
+    op.reinit_range_vector(*v2, /*bool fast =*/ false);
     solver.solve(transpose_operator(op), *v2, u, preconditioner);
     v += *v2;
     vector_memory.free(v2);

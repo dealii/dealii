@@ -187,6 +187,17 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
 }
 
 
+// Exists for full compatibility with the LinearOperator class
+template <typename number>
+template <typename somenumber>
+void
+SparseMIC<number>::Tvmult (Vector<somenumber>       &dst,
+                           const Vector<somenumber> &src) const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+
 
 template <typename number>
 std::size_t
