@@ -33,7 +33,8 @@ my %style = (
  "fluids"         => ',height=.25,width=.25,fillcolor="yellow"',
  "solids"         => ',height=.25,width=.25,fillcolor="lightblue"',
  "time dependent" => ',height=.25,width=.25,fillcolor="blue"',
- "unfinished"     => ',height=.25,width=.25,style="dashed"'
+ "unfinished"     => ',height=.25,width=.25,style="dashed"',
+ "code-gallery"   => ',height=.08,width=.125,shape="circle"',
     );
 
 # Print a preamble setting common attributes
@@ -64,9 +65,6 @@ EOT
 my $step;
 foreach $step (@ARGV)
 {
-    my $number = $step;
-    $number =~ s/^.*-//;
-
     # read first line of tooltip file
     open TF, "$step/doc/tooltip"
         or die "Can't open tooltip file $step/doc/tooltip";
@@ -74,18 +72,41 @@ foreach $step (@ARGV)
     close TF;
     chop $tooltip;
 
-    printf "Step$number [label=\"$number\", URL=\"\\ref step_$number\", tooltip=\"$tooltip\"";
+    # read first line of 'kind' file if it is a step;
+    # otherwise assume it is a code gallery program. for
+    # each of them, output something for 'dot' to generate
+    # the dependencies graph from
+    if ($step =~ /step-/
+        &&
+        !($step =~ /code-gallery/))
+    {
+      open KF, "$step/doc/kind"
+          or die "Can't open kind file $step/doc/kind";
+      my $kind = <KF>;
+      chop $kind;
+      close KF;
 
+      die "Unknown kind '$kind' in file $step/doc/kind" if (! defined $style{$kind});
 
-    # read first line of 'kind' file
-    open KF, "$step/doc/kind"
-        or die "Can't open kind file $step/doc/kind";
-    my $kind = <KF>;
-    close KF;
-    chop $kind;
+      my $number = $step;
+      $number =~ s/^.*-//;
 
-    die "Unknown kind '$kind' in file $step/doc/kind" if (! defined $style{$kind});
-    print "$style{$kind}";
+      printf "Step$number [label=\"$number\", URL=\"\\ref step_$number\", tooltip=\"$tooltip\"";
+      print "$style{$kind}";
+    }
+    else
+    {
+      # get at the name of the program; also create something
+      # that can serve as a tag without using special characters
+      my $name = $step;
+      $name =~ s/^.*code-gallery\///;
+      my $tag = $name;
+      $tag =~ s/[^a-zA-Z]/_/g;
+
+      printf "code_gallery_$tag [label=\"\", URL=\"\\ref code_gallery_$tag\", tooltip=\"$tooltip\"";
+      my $kind = "code-gallery";
+      print "$style{$kind}";
+    }
 
     print "];\n";
 }
@@ -96,9 +117,6 @@ foreach $step (@ARGV)
 my $step;
 foreach $step (@ARGV)
 {
-    my $number = $step;
-    $number =~ s/^.*-//;
-
     # read first line of dependency file
     open BF, "$step/doc/builds-on"
         or die "Can't open builds-on file $step/doc/builds-on";
@@ -106,10 +124,28 @@ foreach $step (@ARGV)
     close BF;
     chop $buildson;
 
+    my $destination;
+    if ($step =~ /step-/
+        &&
+        !($step =~ /code-gallery/))
+    {
+      my $number = $step;
+      $number =~ s/^.*-//;
+      $destination = "Step$number";
+    }
+    else
+    {
+      my $name = $step;
+      $name =~ s/^.*code-gallery\///;
+      my $tag = $name;
+      $tag =~ s/[^a-zA-Z]/_/g;
+      $destination = "code_gallery_$tag";
+    }
+
     my $source;
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
-        print "$source -> Step$number\n";
+        print "$source -> $destination\n";
     }
 }
 

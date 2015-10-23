@@ -15,9 +15,21 @@
 
 
 
+# Collect all of the directory names for the tutorial programs
 FILE(GLOB _deal_ii_steps
   ${CMAKE_SOURCE_DIR}/examples/step-*
   )
+
+# Also collect the names of all code gallery projects. To
+# do so, find all 'author' files, then strip the last two
+# levels of these paths.
+#
+# For unclear reasons, the glob returns these files as
+# "/a/b/c/name//doc//author", so make sure we eat the
+# double slashes in the second step
+FILE(GLOB _code_gallery_names 
+     "${CMAKE_BINARY_DIR}/doc/doxygen/code-gallery/code-gallery/*/doc/author")
+STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
 #
 # Define target for the tutorial. It depends on the
@@ -53,13 +65,16 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps}
+    ${_code_gallery_names}
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
+    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
+    ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps}
     ${_deal_ii_steps_kind}
     ${_deal_ii_steps_tooltip}
     ${_deal_ii_steps_buildson}
-    ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
+    ${_code_gallery_names}
   )
 ADD_CUSTOM_TARGET(build_tutorial_h
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h)
