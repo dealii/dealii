@@ -8917,6 +8917,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::bou
             }
     }
 
+  (void)boundary_found;
   Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
