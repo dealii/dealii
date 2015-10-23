@@ -170,9 +170,9 @@ public:
       v += u;
     };
 
-    reinit_vector = [&u](Range &v, bool fast)
+    reinit_vector = [&u](Range &v, bool omit_zeroing_entries)
     {
-      v.reinit(u, fast);
+      v.reinit(u, omit_zeroing_entries);
     };
 
     return *this;
@@ -188,7 +188,7 @@ public:
   {
     Range result_vector;
 
-    reinit_vector(result_vector, /*bool fast=*/ true);
+    reinit_vector(result_vector, /*bool omit_zeroing_entries=*/ true);
     apply(result_vector);
 
     return result_vector;
@@ -267,7 +267,7 @@ public:
    * whether a fast initialization is done, i.e., if it is set to false the
    * content of the vector is set to 0.
    */
-  std::function<void(Range &v, bool fast)> reinit_vector;
+  std::function<void(Range &v, bool omit_zeroing_entries)> reinit_vector;
 };
 
 
@@ -532,9 +532,9 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is caught by reference
 
-  return_comp.reinit_vector = [&u](Range &x, bool fast)
+  return_comp.reinit_vector = [&u](Range &x, bool omit_zeroing_entries)
   {
-    x.reinit(u, fast);
+    x.reinit(u, omit_zeroing_entries);
   };
 
   return_comp.apply = [&u, &v](Range &x)
@@ -577,9 +577,9 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is catched by reference
 
-  return_comp.reinit_vector = [&u](Range &x, bool fast)
+  return_comp.reinit_vector = [&u](Range &x, bool omit_zeroing_entries)
   {
-    x.reinit(u, fast);
+    x.reinit(u, omit_zeroing_entries);
   };
 
   return_comp.apply = [&u, &v](Range &x)
@@ -753,7 +753,7 @@ operator*(const LinearOperator<Range, Domain> &op,
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
-    op.reinit_domain_vector(*i, /*bool fast =*/ true);
+    op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.vmult(v, *i);
@@ -766,7 +766,7 @@ operator*(const LinearOperator<Range, Domain> &op,
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
-    op.reinit_range_vector(*i, /*bool fast =*/ true);
+    op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.vmult_add(v, *i);
@@ -803,7 +803,7 @@ operator*(const PackagedOperation<Range> &comp,
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
-    op.reinit_range_vector(*i, /*bool fast =*/ true);
+    op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.Tvmult(v, *i);
@@ -816,7 +816,7 @@ operator*(const PackagedOperation<Range> &comp,
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
-    op.reinit_range_vector(*i, /*bool fast =*/ true);
+    op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.Tvmult_add(v, *i);

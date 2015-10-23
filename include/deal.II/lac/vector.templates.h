@@ -725,9 +725,9 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2> &v,
-                             const bool fast)
+                             const bool omit_zeroing_entries)
 {
-  reinit (v.size(), fast);
+  reinit (v.size(), omit_zeroing_entries);
 }
 
 

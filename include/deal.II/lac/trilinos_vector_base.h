@@ -264,7 +264,7 @@ namespace TrilinosWrappers
      * input vector.
      */
     void reinit (const VectorBase &v,
-                 const bool        fast = false);
+                 const bool        omit_zeroing_entries = false);
 
     /**
      * Compress the underlying representation of the Trilinos object, i.e.
@@ -1207,12 +1207,12 @@ namespace TrilinosWrappers
   inline
   void
   VectorBase::reinit (const VectorBase &v,
-                      const bool        fast)
+                      const bool        omit_zeroing_entries)
   {
     Assert (vector.get() != 0,
             ExcMessage("Vector has not been constructed properly."));
 
-    if (fast == false ||
+    if (omit_zeroing_entries == false ||
         vector_partitioner().SameAs(v.vector_partitioner())==false)
       vector.reset (new Epetra_FEVector(*v.vector));
 

@@ -237,20 +237,20 @@ namespace parallel
        * parallel distribution.
        */
       void reinit (const size_type size,
-                   const bool      fast = false);
+                   const bool      omit_zeroing_entries = false);
 
       /**
        * Uses the parallel layout of the input vector @p in_vector and
        * allocates memory for this vector. Recommended initialization function
        * when several vectors with the same layout should be created.
        *
-       * If the flag @p fast is set to false, the memory will be initialized
+       * If the flag @p omit_zeroing_entries is set to false, the memory will be initialized
        * with zero, otherwise the memory will be untouched (and the user must
        * make sure to fill it with reasonable data before using it).
        */
       template <typename Number2>
       void reinit(const Vector<Number2> &in_vector,
-                  const bool             fast = false);
+                  const bool             omit_zeroing_entries = false);
 
       /**
        * Initialize the vector. The local range is specified by @p

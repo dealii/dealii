@@ -55,7 +55,7 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit (const size_type size,
-                                   const bool      fast)
+                                   const bool      omit_zeroing_entries)
   {
     // check whether we need to reallocate
     resize_val(size);
@@ -63,7 +63,7 @@ namespace LinearAlgebra
     stored_elements = complete_index_set(size);
 
     // set entries to zero if so requested
-    if (fast == false)
+    if (omit_zeroing_entries == false)
       this->operator = (Number());
   }
 
@@ -73,13 +73,13 @@ namespace LinearAlgebra
   template <typename Number2>
   void
   ReadWriteVector<Number>::reinit (const ReadWriteVector<Number2> &v,
-                                   const bool             fast)
+                                   const bool             omit_zeroing_entries)
   {
     resize_val(v.n_elements());
 
     stored_elements = v.get_stored_elements();
 
-    if (fast == false)
+    if (omit_zeroing_entries == false)
       this->operator= (Number());
   }
 
@@ -88,7 +88,7 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit (const IndexSet &locally_stored_indices,
-                                   const bool      fast)
+                                   const bool      omit_zeroing_entries)
   {
     stored_elements = locally_stored_indices;
 
@@ -96,7 +96,7 @@ namespace LinearAlgebra
     resize_val(stored_elements.n_elements());
 
     // initialize to zero
-    if (fast == false)
+    if (omit_zeroing_entries == false)
       this->operator= (Number());
   }
 
