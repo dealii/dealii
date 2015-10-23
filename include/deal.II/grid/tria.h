@@ -1652,6 +1652,18 @@ public:
    */
   void set_all_manifold_ids_on_boundary (const types::manifold_id number);
 
+  /**
+   * Set the manifold_id of all boundary faces and edges with given
+   * boundary_id @p b_id to the given manifold_id @p number.
+   *
+   * @ingroup manifold
+   *
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
+                                         const types::manifold_id number);
+
 
   /**
    * Return a constant reference to a boundary object used for this
@@ -2830,6 +2842,18 @@ public:
    * @ingroup Exceptions
    */
   DeclException0 (ExcNonOrientableTriangulation);
+
+  /**
+   * Exception
+   *
+   * Requested boundary_id not found
+   *
+   * @ingroup Exceptions
+   */
+  DeclException1 (ExcBoundaryIdNotFound,
+                  types::boundary_id,
+                  << "The given boundary_id " << arg1
+                  << " is not defined in this Triangulation!");
 
   /*
    * @}
