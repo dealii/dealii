@@ -2601,10 +2601,6 @@ namespace DoFTools
               coarse_to_fine_grid_map[cell]->
               set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
                                                copy_data.global_parameter_representation[local_parameter_dof]);
-
-#ifdef DEAL_II_WITH_MPI
-              copy_data.global_parameter_representation[local_parameter_dof].update_ghost_values ();
-#endif
             }
       }
 
@@ -2759,6 +2755,11 @@ namespace DoFTools
                                         std_cxx11::ref(weights)),
                         scratch,
                         copy_data);
+
+#ifdef DEAL_II_WITH_MPI
+        for (size_t i=0; i<copy_data.global_parameter_representation.size(); ++i)
+          copy_data.global_parameter_representation[i].update_ghost_values ();
+#endif
       }
 
 
