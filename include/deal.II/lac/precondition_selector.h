@@ -87,13 +87,18 @@ template <class number> class SparseMatrix;
  * started (that is several times e.g. in a nonlinear iteration) this
  * preselected solver and preconditioner is called.
  *
- * @author Ralf Hartmann, 1999
+ * @author Ralf Hartmann, 1999; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <class MATRIX = SparseMatrix<double>,
           class VECTOR = dealii::Vector<double> >
 class PreconditionSelector : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef typename MATRIX::size_type size_type;
 
   /**
    * Constructor. @p omega denotes the damping parameter of the
@@ -114,10 +119,28 @@ public:
   void use_matrix(const MATRIX &M);
 
   /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   */
+  size_type n () const;
+
+  /**
    * Precondition procedure. Calls the preconditioning that was specified in
    * the constructor.
    */
   virtual void vmult (VECTOR &dst, const VECTOR &src) const;
+
+  /**
+   * Transpose precondition procedure. Calls the preconditioning that was
+   * specified in the constructor.
+   */
+  virtual void Tvmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
    * Get the names of all implemented preconditionings.
@@ -182,6 +205,25 @@ void PreconditionSelector<MATRIX,VECTOR>::use_matrix(const MATRIX &M)
   A=&M;
 }
 
+
+template <class MATRIX, class VECTOR>
+inline typename PreconditionSelector<MATRIX,VECTOR>::size_type
+PreconditionSelector<MATRIX,VECTOR>::m () const
+{
+  Assert(A!=0, ExcNoMatrixGivenToUse());
+  return A->m();
+}
+
+
+template <class MATRIX, class VECTOR>
+inline typename PreconditionSelector<MATRIX,VECTOR>::size_type
+PreconditionSelector<MATRIX,VECTOR>::n () const
+{
+  Assert(A!=0, ExcNoMatrixGivenToUse());
+  return A->n();
+}
+
+
 template <class MATRIX, class VECTOR>
 void PreconditionSelector<MATRIX,VECTOR>::vmult (VECTOR &dst,
                                                  const VECTOR &src) const
@@ -205,6 +247,36 @@ void PreconditionSelector<MATRIX,VECTOR>::vmult (VECTOR &dst,
       else if (preconditioning=="ssor")
         {
           A->precondition_SSOR(dst,src,omega);
+        }
+      else
+        Assert(false,ExcNotImplemented());
+    }
+}
+
+
+template <class MATRIX, class VECTOR>
+void PreconditionSelector<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
+                                                  const VECTOR &src) const
+{
+  if (preconditioning=="none")
+    {
+      dst=src;
+    }
+  else
+    {
+      Assert(A!=0, ExcNoMatrixGivenToUse());
+
+      if (preconditioning=="jacobi")
+        {
+          A->precondition_Jacobi(dst,src,omega); // Symmetric operation
+        }
+      else if (preconditioning=="sor")
+        {
+          A->precondition_TSOR(dst,src,omega);
+        }
+      else if (preconditioning=="ssor")
+        {
+          A->precondition_SSOR(dst,src,omega); // Symmetric operation
         }
       else
         Assert(false,ExcNotImplemented());

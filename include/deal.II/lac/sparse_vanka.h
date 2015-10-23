@@ -124,7 +124,8 @@ template <typename number> class SparseBlockVanka;
  * @ref Instantiations
  * in the manual).
  *
- * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000
+ * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000; extension for full
+ * compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template<typename number>
 class SparseVanka
@@ -134,6 +135,14 @@ public:
    * Declare type for container size.
    */
   typedef types::global_dof_index size_type;
+
+  /**
+   * Constructor. Does nothing.
+   *
+   * Call the initialize() function before using this object as preconditioner
+   * (vmult()).
+   */
+  SparseVanka ();
 
   /**
    * Constructor. Gets the matrix for preconditioning and a bit vector with
@@ -171,12 +180,82 @@ public:
   ~SparseVanka();
 
   /**
+    * Parameters for SparseVanka.
+    */
+  class AdditionalData
+  {
+  public:
+    /**
+     * Constructor. For the parameters' description, see below.
+     */
+    AdditionalData (const std::vector<bool> &selected,
+                    const bool               conserve_memory = false,
+                    const unsigned int       n_threads       = MultithreadInfo::n_threads());
+
+    /**
+     * Indices of those degrees of freedom that we shall work on.
+     */
+    const std::vector<bool> &selected;
+
+    /**
+     * Conserve memory flag.
+     */
+    const bool conserve_mem;
+
+    /**
+     * Number of threads to be used when building the inverses. Only relevant in
+     * multithreaded mode.
+     */
+    const unsigned int n_threads;
+  };
+
+
+  /**
+   * If the default constructor is used then this function needs to be called
+   * before an object of this class is used as preconditioner.
+   *
+   * For more detail about possible parameters, see the class documentation
+   * and the documentation of the SparseVanka::AdditionalData class.
+   *
+   * After this function is called the preconditioner is ready to be used
+   * (using the <code>vmult</code> function of derived classes).
+   */
+  void initialize (const SparseMatrix<number> &M,
+                   const AdditionalData       &additional_data);
+
+  /**
    * Do the preconditioning. This function takes the residual in @p src and
    * returns the resulting update vector in @p dst.
    */
   template<typename number2>
   void vmult (Vector<number2>       &dst,
               const Vector<number2> &src) const;
+
+  /**
+   * Apply transpose preconditioner. This function takes the residual in
+   * @p src  and returns the resulting update vector in @p dst.
+   */
+  template<typename number2>
+  void Tvmult (Vector<number2>       &dst,
+               const Vector<number2> &src) const;
+
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type n () const;
 
 protected:
   /**
@@ -220,24 +299,34 @@ private:
   /**
    * Conserve memory flag.
    */
-  const bool conserve_mem;
+  bool conserve_mem;
 
   /**
    * Indices of those degrees of freedom that we shall work on.
    */
-  const std::vector<bool> &selected;
+  const std::vector<bool> *selected;
 
   /**
    * Number of threads to be used when building the inverses. Only relevant in
    * multithreaded mode.
    */
-  const unsigned int n_threads;
+  unsigned int n_threads;
 
   /**
    * Array of inverse matrices, one for each degree of freedom. Only those
    * elements will be used that are tagged in @p selected.
    */
   mutable std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > > inverses;
+
+  /**
+   * The dimension of the range space.
+   */
+  size_type _m;
+
+  /**
+   * The dimension of the domain space.
+   */
+  size_type _n;
 
   /**
    * Compute the inverses of all selected diagonal elements.
@@ -479,6 +568,37 @@ private:
 };
 
 /*@}*/
+/* ---------------------------------- Inline functions ------------------- */
+
+#ifndef DOXYGEN
+
+template<typename number>
+inline typename SparseVanka<number>::size_type
+SparseVanka<number>::m () const
+{
+  Assert(_m != 0, ExcNotInitialized());
+  return _m;
+}
+
+template<typename number>
+inline typename SparseVanka<number>::size_type
+SparseVanka<number>::n () const
+{
+  Assert(_n != 0, ExcNotInitialized());
+  return _n;
+}
+
+template<typename number>
+template<typename number2>
+inline void
+SparseVanka<number>::Tvmult (Vector<number2>       &dst,
+                             const Vector<number2> &src) const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+#endif // DOXYGEN
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
