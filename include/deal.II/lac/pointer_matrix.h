@@ -232,7 +232,7 @@ private:
   /**
    * The pointer to the actual matrix.
    */
-  SmartPointer<const MATRIX,PointerMatrix<MATRIX,VECTOR> > mtrx;
+  SmartPointer<const MATRIX,PointerMatrix<MATRIX,VECTOR> > matrix;
 };
 
 
@@ -376,7 +376,7 @@ private:
   /**
    * The pointer to the actual matrix.
    */
-  SmartPointer<const MATRIX,PointerMatrixAux<MATRIX,VECTOR> > mtrx;
+  SmartPointer<const MATRIX,PointerMatrixAux<MATRIX,VECTOR> > matrix;
 };
 
 
@@ -511,7 +511,7 @@ private:
   /**
    * The pointer to the actual matrix.
    */
-  SmartPointer<const Vector<number>,PointerMatrixVector<number> > mtrx;
+  SmartPointer<const Vector<number>,PointerMatrixVector<number> > matrix;
 };
 
 
@@ -674,13 +674,13 @@ PointerMatrixBase<VECTOR>::~PointerMatrixBase ()
 
 template<class MATRIX, class VECTOR>
 PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const MATRIX *M)
-  : mtrx(M, typeid(*this).name())
+  : matrix(M, typeid(*this).name())
 {}
 
 
 template<class MATRIX, class VECTOR>
 PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const char *name)
-  : mtrx(0, name)
+  : matrix(0, name)
 {}
 
 
@@ -688,7 +688,7 @@ template<class MATRIX, class VECTOR>
 PointerMatrix<MATRIX, VECTOR>::PointerMatrix (
   const MATRIX *M,
   const char *name)
-  : mtrx(M, name)
+  : matrix(M, name)
 {}
 
 
@@ -696,7 +696,7 @@ template<class MATRIX, class VECTOR>
 inline void
 PointerMatrix<MATRIX, VECTOR>::clear ()
 {
-  mtrx = 0;
+  matrix = 0;
 }
 
 
@@ -704,7 +704,7 @@ template<class MATRIX, class VECTOR>
 inline const PointerMatrix<MATRIX, VECTOR> &
 PointerMatrix<MATRIX, VECTOR>::operator= (const MATRIX *M)
 {
-  mtrx = M;
+  matrix = M;
   return *this;
 }
 
@@ -713,9 +713,9 @@ template<class MATRIX, class VECTOR>
 inline bool
 PointerMatrix<MATRIX, VECTOR>::empty () const
 {
-  if (mtrx == 0)
+  if (matrix == 0)
     return true;
-  return mtrx->empty();
+  return matrix->empty();
 }
 
 template<class MATRIX, class VECTOR>
@@ -723,8 +723,8 @@ inline void
 PointerMatrix<MATRIX, VECTOR>::vmult (VECTOR &dst,
                                       const VECTOR &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->vmult (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->vmult (dst, src);
 }
 
 
@@ -733,8 +733,8 @@ inline void
 PointerMatrix<MATRIX, VECTOR>::Tvmult (VECTOR &dst,
                                        const VECTOR &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->Tvmult (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->Tvmult (dst, src);
 }
 
 
@@ -743,8 +743,8 @@ inline void
 PointerMatrix<MATRIX, VECTOR>::vmult_add (VECTOR &dst,
                                           const VECTOR &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->vmult_add (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->vmult_add (dst, src);
 }
 
 
@@ -753,8 +753,8 @@ inline void
 PointerMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
                                            const VECTOR &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->Tvmult_add (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->Tvmult_add (dst, src);
 }
 
 
@@ -762,8 +762,8 @@ template<class MATRIX, class VECTOR>
 inline typename PointerMatrix<MATRIX, VECTOR>::size_type
 PointerMatrix<MATRIX, VECTOR>::m () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->m();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->m();
 }
 
 
@@ -771,8 +771,8 @@ template<class MATRIX, class VECTOR>
 inline typename PointerMatrix<MATRIX, VECTOR>::size_type
 PointerMatrix<MATRIX, VECTOR>::n () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->n();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->n();
 }
 
 
@@ -784,7 +784,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   VectorMemory<VECTOR> *mem,
   const MATRIX *M)
   : mem(mem, typeid(*this).name()),
-    mtrx(M, typeid(*this).name())
+    matrix(M, typeid(*this).name())
 {
   if (mem == 0) mem = &my_memory;
 }
@@ -795,7 +795,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   VectorMemory<VECTOR> *mem,
   const char *name)
   : mem(mem, name),
-    mtrx(0, name)
+    matrix(0, name)
 {
   if (mem == 0) mem = &my_memory;
 }
@@ -807,7 +807,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   const MATRIX *M,
   const char *name)
   : mem(mem, name),
-    mtrx(M, name)
+    matrix(M, name)
 {
   if (mem == 0) mem = &my_memory;
 }
@@ -817,7 +817,7 @@ template<class MATRIX, class VECTOR>
 inline void
 PointerMatrixAux<MATRIX, VECTOR>::clear ()
 {
-  mtrx = 0;
+  matrix = 0;
 }
 
 
@@ -825,7 +825,7 @@ template<class MATRIX, class VECTOR>
 inline const PointerMatrixAux<MATRIX, VECTOR> &
 PointerMatrixAux<MATRIX, VECTOR>::operator= (const MATRIX *M)
 {
-  mtrx = M;
+  matrix = M;
   return *this;
 }
 
@@ -844,9 +844,9 @@ template<class MATRIX, class VECTOR>
 inline bool
 PointerMatrixAux<MATRIX, VECTOR>::empty () const
 {
-  if (mtrx == 0)
+  if (matrix == 0)
     return true;
-  return mtrx->empty();
+  return matrix->empty();
 }
 
 template<class MATRIX, class VECTOR>
@@ -857,8 +857,8 @@ PointerMatrixAux<MATRIX, VECTOR>::vmult (VECTOR &dst,
   if (mem == 0)
     mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->vmult (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->vmult (dst, src);
 }
 
 
@@ -870,8 +870,8 @@ PointerMatrixAux<MATRIX, VECTOR>::Tvmult (VECTOR &dst,
   if (mem == 0)
     mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
-  Assert (mtrx != 0, ExcNotInitialized());
-  mtrx->Tvmult (dst, src);
+  Assert (matrix != 0, ExcNotInitialized());
+  matrix->Tvmult (dst, src);
 }
 
 
@@ -883,10 +883,10 @@ PointerMatrixAux<MATRIX, VECTOR>::vmult_add (VECTOR &dst,
   if (mem == 0)
     mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   VECTOR *v = mem->alloc();
   v->reinit(dst);
-  mtrx->vmult (*v, src);
+  matrix->vmult (*v, src);
   dst += *v;
   mem->free(v);
 }
@@ -900,10 +900,10 @@ PointerMatrixAux<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
   if (mem == 0)
     mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   VECTOR *v = mem->alloc();
   v->reinit(dst);
-  mtrx->Tvmult (*v, src);
+  matrix->Tvmult (*v, src);
   dst += *v;
   mem->free(v);
 }
@@ -913,8 +913,8 @@ template<class MATRIX, class VECTOR>
 inline typename PointerMatrixAux<MATRIX, VECTOR>::size_type
 PointerMatrixAux<MATRIX, VECTOR>::m () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->m();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->m();
 }
 
 
@@ -922,8 +922,8 @@ template<class MATRIX, class VECTOR>
 inline typename PointerMatrixAux<MATRIX, VECTOR>::size_type
 PointerMatrixAux<MATRIX, VECTOR>::n () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->n();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->n();
 }
 
 
@@ -932,13 +932,13 @@ PointerMatrixAux<MATRIX, VECTOR>::n () const
 
 template<typename number>
 PointerMatrixVector<number>::PointerMatrixVector (const Vector<number> *M)
-  : mtrx(M, typeid(*this).name())
+  : matrix(M, typeid(*this).name())
 {}
 
 
 template<typename number>
 PointerMatrixVector<number>::PointerMatrixVector (const char *name)
-  : mtrx(0, name)
+  : matrix(0, name)
 {}
 
 
@@ -946,7 +946,7 @@ template<typename number>
 PointerMatrixVector<number>::PointerMatrixVector (
   const Vector<number> *M,
   const char *name)
-  : mtrx(M, name)
+  : matrix(M, name)
 {}
 
 
@@ -954,7 +954,7 @@ template<typename number>
 inline void
 PointerMatrixVector<number>::clear ()
 {
-  mtrx = 0;
+  matrix = 0;
 }
 
 
@@ -962,7 +962,7 @@ template<typename number>
 inline const PointerMatrixVector<number> &
 PointerMatrixVector<number>::operator= (const Vector<number> *M)
 {
-  mtrx = M;
+  matrix = M;
   return *this;
 }
 
@@ -971,9 +971,9 @@ template<typename number>
 inline bool
 PointerMatrixVector<number>::empty () const
 {
-  if (mtrx == 0)
+  if (matrix == 0)
     return true;
-  return mtrx->empty();
+  return matrix->empty();
 }
 
 template<typename number>
@@ -982,10 +982,10 @@ PointerMatrixVector<number>::vmult (
   Vector<number> &dst,
   const Vector<number> &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
 
-  dst(0) = *mtrx * src;
+  dst(0) = *matrix * src;
 }
 
 
@@ -995,10 +995,10 @@ PointerMatrixVector<number>::Tvmult (
   Vector<number> &dst,
   const Vector<number> &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
 
-  dst.equ (src(0), *mtrx);
+  dst.equ (src(0), *matrix);
 }
 
 
@@ -1008,10 +1008,10 @@ PointerMatrixVector<number>::vmult_add (
   Vector<number> &dst,
   const Vector<number> &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
 
-  dst(0) += *mtrx * src;
+  dst(0) += *matrix * src;
 }
 
 
@@ -1021,10 +1021,10 @@ PointerMatrixVector<number>::Tvmult_add (
   Vector<number> &dst,
   const Vector<number> &src) const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
+  Assert (matrix != 0, ExcNotInitialized());
   Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
 
-  dst.add (src(0), *mtrx);
+  dst.add (src(0), *matrix);
 }
 
 
@@ -1032,8 +1032,8 @@ template<typename number>
 inline typename PointerMatrixVector<number>::size_type
 PointerMatrixVector<number>::m () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->m();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->m();
 }
 
 
@@ -1041,8 +1041,8 @@ template<typename number>
 inline typename PointerMatrixVector<number>::size_type
 PointerMatrixVector<number>::n () const
 {
-  Assert (mtrx != 0, ExcNotInitialized());
-  return mtrx->n();
+  Assert (matrix != 0, ExcNotInitialized());
+  return matrix->n();
 }
 
 
