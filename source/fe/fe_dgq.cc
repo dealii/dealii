@@ -812,7 +812,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   if (equidistant == true)
     {
-      namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+      namebuf << "FE_DGQ<" << Utilities::dim_string(dim,spacedim) << ">(" << this->degree << ")";
       return namebuf.str();
     }
 
@@ -828,7 +828,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   if (gauss_lobatto == true)
     {
-      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+      namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QGaussLobatto(" << this->degree+1 << "))";
       return namebuf.str();
     }
 
@@ -844,7 +844,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   if (gauss == true)
     {
-      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGauss(" << this->degree+1 << "))";
+      namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QGauss(" << this->degree+1 << "))";
       return namebuf.str();
     }
 
@@ -860,12 +860,12 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   if (gauss_log == true)
     {
-      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLog(" << this->degree+1 << "))";
+      namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QGaussLog(" << this->degree+1 << "))";
       return namebuf.str();
     }
 
   // All guesses exhausted
-  namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree+1 << "))";
+  namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QUnknownNodes(" << this->degree+1 << "))";
   return namebuf.str();
 }
 
