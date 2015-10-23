@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II Authors
+## Copyright (C) 2012 - 2015 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,11 +15,30 @@
 
 
 #
-# Prepare tutorial.h:
+# Define target for the tutorial. It depends on the
+# file tutorial.h built via the next target below, as well
+# as the various files we create from the tutorial 
+# directories below that. These dependencies are added
+# below the respective targets.
+#
+# This file uses the DEAL_II_STEPS variable set in
+# ../CMakeLists.txt.
+#
+
+ADD_CUSTOM_TARGET(tutorial)
+
+#
+# Describe how to build tutorial.h:
 #
 
 file(GLOB DEAL_II_STEPS_BUILDSON
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  )
+file(GLOB DEAL_II_STEPS_KIND
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
+  )
+file(GLOB DEAL_II_STEPS_TOOLTIP
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
 
 ADD_CUSTOM_COMMAND(
@@ -33,16 +52,14 @@ ADD_CUSTOM_COMMAND(
   DEPENDS
     ${DEAL_II_STEPS}
     ${DEAL_II_STEPS_BUILDSON}
+    ${DEAL_II_STEPS_KIND}
+    ${DEAL_II_STEPS_TOOLTIP}
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
   )
+ADD_CUSTOM_TARGET(build_tutorial_h
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h)
+ADD_DEPENDENCIES(tutorial build_tutorial_h)
 
-#
-# A target for the preparation of all the stuff happening in here...
-#
-
-ADD_CUSTOM_TARGET(tutorial
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
-  )
 
 #
 # Prepare the steps for documentation generation
