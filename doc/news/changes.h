@@ -183,6 +183,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: constrained_linear_operator() and constrained_right_hand_side()
+  implemented that provide a generic mechanism of applying constraints to a
+  LinearOperator. A detailed explanation with example code is given in the
+  @ref constraints module.
+  <br>
+  (Mauro Bardelloni, Matthias Maier, 2015/10/25 - 2015/12/27)
+  </li>
+
   <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
   been unified in behaviour, and now they allow to extract *all* elements of
   the IGES and STEP files instead of only the faces. This allows the
