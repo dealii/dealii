@@ -50,7 +50,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class VECTOR>
+    template <typename VectorType>
     class ResidualSimple
     {
     public:
@@ -115,7 +115,7 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,ResidualSimple<VECTOR> > constraints;
+      SmartPointer<const ConstraintMatrix,ResidualSimple<VectorType> > constraints;
     };
 
 
@@ -409,10 +409,10 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     class SystemSimple :
       private MatrixSimple<MATRIX>,
-      private ResidualSimple<VECTOR>
+      private ResidualSimple<VectorType>
     {
     public:
       /**
@@ -423,7 +423,7 @@ namespace MeshWorker
       /**
        * Store the two objects data is assembled into.
        */
-      void initialize(MATRIX &m, VECTOR &rhs);
+      void initialize(MATRIX &m, VectorType &rhs);
 
       /**
        * Initialize the constraints. After this function has been called with
@@ -462,16 +462,16 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class VECTOR>
+    template <typename VectorType>
     inline void
-    ResidualSimple<VECTOR>::initialize(AnyData &results)
+    ResidualSimple<VectorType>::initialize(AnyData &results)
     {
       residuals = results;
     }
 
-    template <class VECTOR>
+    template <typename VectorType>
     inline void
-    ResidualSimple<VECTOR>::initialize(const ConstraintMatrix &c)
+    ResidualSimple<VectorType>::initialize(const ConstraintMatrix &c)
     {
       constraints = &c;
     }
@@ -483,23 +483,23 @@ namespace MeshWorker
     {}
 
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualSimple<VECTOR>::initialize_info(DOFINFO &info, bool) const
+    ResidualSimple<VectorType>::initialize_info(DOFINFO &info, bool) const
     {
       info.initialize_vectors(residuals.size());
     }
 
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualSimple<VECTOR>::assemble(const DOFINFO &info)
+    ResidualSimple<VectorType>::assemble(const DOFINFO &info)
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
-          VECTOR *v = residuals.entry<VECTOR *>(k);
+          VectorType *v = residuals.entry<VectorType *>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info.vector(k).block(0).size(); ++i)
@@ -516,15 +516,15 @@ namespace MeshWorker
         }
     }
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualSimple<VECTOR>::assemble(const DOFINFO &info1,
-                                     const DOFINFO &info2)
+    ResidualSimple<VectorType>::assemble(const DOFINFO &info1,
+                                         const DOFINFO &info2)
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
-          VECTOR *v = residuals.entry<VECTOR *>(k);
+          VectorType *v = residuals.entry<VectorType *>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info1.vector(k).block(0).size(); ++i)
@@ -1097,63 +1097,63 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class MATRIX, class VECTOR>
-    SystemSimple<MATRIX,VECTOR>::SystemSimple(double t)
+    template <class MATRIX, typename VectorType>
+    SystemSimple<MATRIX,VectorType>::SystemSimple(double t)
       :
       MatrixSimple<MATRIX>(t)
     {}
 
 
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     inline void
-    SystemSimple<MATRIX,VECTOR>::initialize(MATRIX &m, VECTOR &rhs)
+    SystemSimple<MATRIX,VectorType>::initialize(MATRIX &m, VectorType &rhs)
     {
       AnyData data;
-      VECTOR *p = &rhs;
+      VectorType *p = &rhs;
       data.add(p, "right hand side");
 
       MatrixSimple<MATRIX>::initialize(m);
-      ResidualSimple<VECTOR>::initialize(data);
+      ResidualSimple<VectorType>::initialize(data);
     }
 
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     inline void
-    SystemSimple<MATRIX,VECTOR>::initialize(const ConstraintMatrix &c)
+    SystemSimple<MATRIX,VectorType>::initialize(const ConstraintMatrix &c)
     {
       MatrixSimple<MATRIX>::initialize(c);
-      ResidualSimple<VECTOR>::initialize(c);
+      ResidualSimple<VectorType>::initialize(c);
     }
 
 
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VECTOR>::initialize_info(DOFINFO &info,
-                                                 bool face) const
+    SystemSimple<MATRIX,VectorType>::initialize_info(DOFINFO &info,
+                                                     bool    face) const
     {
       MatrixSimple<MATRIX>::initialize_info(info, face);
-      ResidualSimple<VECTOR>::initialize_info(info, face);
+      ResidualSimple<VectorType>::initialize_info(info, face);
     }
 
 
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VECTOR>::assemble(const DOFINFO &info)
+    SystemSimple<MATRIX,VectorType>::assemble(const DOFINFO &info)
     {
       MatrixSimple<MATRIX>::assemble(info);
-      ResidualSimple<VECTOR>::assemble(info);
+      ResidualSimple<VectorType>::assemble(info);
     }
 
 
-    template <class MATRIX, class VECTOR>
+    template <class MATRIX, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VECTOR>::assemble(const DOFINFO &info1,
-                                          const DOFINFO &info2)
+    SystemSimple<MATRIX,VectorType>::assemble(const DOFINFO &info1,
+                                              const DOFINFO &info2)
     {
       MatrixSimple<MATRIX>::assemble(info1, info2);
-      ResidualSimple<VECTOR>::assemble(info1, info2);
+      ResidualSimple<VectorType>::assemble(info1, info2);
     }
   }
 }

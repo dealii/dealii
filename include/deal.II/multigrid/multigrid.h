@@ -330,7 +330,7 @@ private:
    */
   unsigned int debug;
 
-  template<int dim, class VECTOR2, class TRANSFER> friend class PreconditionMG;
+  template<int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
 };
 
 
@@ -368,35 +368,35 @@ public:
    *
    * This is the operator used by LAC iterative solvers.
    */
-  template<class VECTOR2>
-  void vmult (VECTOR2       &dst,
-              const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void vmult (OtherVectorType       &dst,
+              const OtherVectorType &src) const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
-  template<class VECTOR2>
-  void vmult_add (VECTOR2       &dst,
-                  const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void vmult_add (OtherVectorType       &dst,
+                  const OtherVectorType &src) const;
 
   /**
    * Tranposed preconditioning operator.
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class VECTOR2>
-  void Tvmult (VECTOR2       &dst,
-               const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void Tvmult (OtherVectorType       &dst,
+               const OtherVectorType &src) const;
 
   /**
    * Tranposed preconditioning operator.
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class VECTOR2>
-  void Tvmult_add (VECTOR2       &dst,
-                   const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void Tvmult_add (OtherVectorType       &dst,
+                   const OtherVectorType &src) const;
 
 private:
   /**
@@ -491,11 +491,11 @@ PreconditionMG<dim, VectorType, TRANSFER>::empty () const
 }
 
 template<int dim, typename VectorType, class TRANSFER>
-template<class VECTOR2>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult (
-  VECTOR2 &dst,
-  const VECTOR2 &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult
+(OtherVectorType       &dst,
+ const OtherVectorType &src) const
 {
   transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
@@ -509,11 +509,11 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult (
 
 
 template<int dim, typename VectorType, class TRANSFER>
-template<class VECTOR2>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult_add (
-  VECTOR2 &dst,
-  const VECTOR2 &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
+(OtherVectorType       &dst,
+ const OtherVectorType &src) const
 {
   transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
@@ -526,22 +526,22 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add (
 
 
 template<int dim, typename VectorType, class TRANSFER>
-template<class VECTOR2>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult (
-  VECTOR2 &,
-  const VECTOR2 &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
+(OtherVectorType       &,
+ const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 template<int dim, typename VectorType, class TRANSFER>
-template<class VECTOR2>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add (
-  VECTOR2 &,
-  const VECTOR2 &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add
+(OtherVectorType       &,
+ const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }

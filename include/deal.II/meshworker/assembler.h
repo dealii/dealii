@@ -103,7 +103,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class VECTOR>
+    template <typename VectorType>
     class ResidualLocalBlocksToGlobalBlocks
     {
     public:
@@ -143,8 +143,8 @@ namespace MeshWorker
       /**
        * Assemble a single local residual into the global.
        */
-      void assemble(VECTOR &global,
-                    const BlockVector<double> &local,
+      void assemble(VectorType                                 &global,
+                    const BlockVector<double>                  &local,
                     const std::vector<types::global_dof_index> &dof);
 
       /**
@@ -156,12 +156,12 @@ namespace MeshWorker
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo,
-                   ResidualLocalBlocksToGlobalBlocks<VECTOR> > block_info;
+                   ResidualLocalBlocksToGlobalBlocks<VectorType> > block_info;
       /**
        * A pointer to the object containing constraints.
        */
       SmartPointer<const ConstraintMatrix,
-                   ResidualLocalBlocksToGlobalBlocks<VECTOR> > constraints;
+                   ResidualLocalBlocksToGlobalBlocks<VectorType> > constraints;
     };
 
 
@@ -493,39 +493,39 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class VECTOR>
+    template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(const BlockInfo *b,
-                                                          AnyData &m)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize(const BlockInfo *b,
+                                                              AnyData         &m)
     {
       block_info = b;
       residuals = m;
     }
 
-    template <class VECTOR>
+    template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize(
-      const ConstraintMatrix &c)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize
+    (const ConstraintMatrix &c)
     {
       constraints = &c;
     }
 
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::initialize_info(
-      DOFINFO &info, bool) const
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize_info
+    (DOFINFO &info, bool) const
     {
       info.initialize_vectors(residuals.size());
     }
 
-    template <class VECTOR>
+    template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::assemble(
-      VECTOR &global,
-      const BlockVector<double> &local,
-      const std::vector<types::global_dof_index> &dof)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
+    (VectorType                                 &global,
+     const BlockVector<double>                  &local,
+     const std::vector<types::global_dof_index> &dof)
     {
       if (constraints == 0)
         {
@@ -549,23 +549,23 @@ namespace MeshWorker
     }
 
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::assemble(
-      const DOFINFO &info)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
+    (const DOFINFO &info)
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
         assemble(*residuals(i), info.vector(i), info.indices);
     }
 
 
-    template <class VECTOR>
+    template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VECTOR>::assemble(
-      const DOFINFO &info1,
-      const DOFINFO &info2)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
+    (const DOFINFO &info1,
+     const DOFINFO &info2)
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
         {

@@ -101,8 +101,8 @@ public:
    * vectors given to this function have different type from the vectors used
    * by the inner solver.
    */
-  template <class VECTOR2>
-  void vmult (VECTOR2 &dst, const VECTOR2 &src) const;
+  template <class OtherVectorType>
+  void vmult (OtherVectorType &dst, const OtherVectorType &src) const;
 
   /**
    * The solver, which allows selection of the actual solver as well as
@@ -158,9 +158,9 @@ IterativeInverse<VectorType>::vmult (VectorType &dst, const VectorType &src) con
 
 
 template <typename VectorType>
-template <class VECTOR2>
+template <class OtherVectorType>
 inline void
-IterativeInverse<VectorType>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
+IterativeInverse<VectorType>::vmult (OtherVectorType &dst, const OtherVectorType &src) const
 {
   Assert(matrix.get() != 0, ExcNotInitialized());
   Assert(preconditioner.get() != 0, ExcNotInitialized());

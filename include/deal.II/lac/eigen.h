@@ -50,8 +50,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2000
  */
-template <class VECTOR = Vector<double> >
-class EigenPower : private Solver<VECTOR>
+template <typename VectorType = Vector<double> >
+class EigenPower : private Solver<VectorType>
 {
 public:
   /**
@@ -82,9 +82,9 @@ public:
   /**
    * Constructor.
    */
-  EigenPower (SolverControl &cn,
-              VectorMemory<VECTOR> &mem,
-              const AdditionalData &data=AdditionalData());
+  EigenPower (SolverControl            &cn,
+              VectorMemory<VectorType> &mem,
+              const AdditionalData     &data=AdditionalData());
 
   /**
    * Virtual destructor.
@@ -101,7 +101,7 @@ public:
   void
   solve (double       &value,
          const MATRIX &A,
-         VECTOR       &x);
+         VectorType   &x);
 
 protected:
   /**
@@ -133,8 +133,8 @@ protected:
  *
  * @author Guido Kanschat, 2000, 2003
  */
-template <class VECTOR = Vector<double> >
-class EigenInverse : private Solver<VECTOR>
+template <typename VectorType = Vector<double> >
+class EigenInverse : private Solver<VectorType>
 {
 public:
   /**
@@ -177,9 +177,9 @@ public:
   /**
    * Constructor.
    */
-  EigenInverse (SolverControl &cn,
-                VectorMemory<VECTOR> &mem,
-                const AdditionalData &data=AdditionalData());
+  EigenInverse (SolverControl            &cn,
+                VectorMemory<VectorType> &mem,
+                const AdditionalData     &data=AdditionalData());
 
 
   /**
@@ -198,7 +198,7 @@ public:
   void
   solve (double       &value,
          const MATRIX &A,
-         VECTOR       &x);
+         VectorType   &x);
 
 protected:
   /**
@@ -211,39 +211,39 @@ protected:
 //---------------------------------------------------------------------------
 
 
-template <class VECTOR>
-EigenPower<VECTOR>::EigenPower (SolverControl &cn,
-                                VectorMemory<VECTOR> &mem,
-                                const AdditionalData &data)
+template <class VectorType>
+EigenPower<VectorType>::EigenPower (SolverControl            &cn,
+                                    VectorMemory<VectorType> &mem,
+                                    const AdditionalData     &data)
   :
-  Solver<VECTOR>(cn, mem),
+  Solver<VectorType>(cn, mem),
   additional_data(data)
 {}
 
 
 
-template <class VECTOR>
-EigenPower<VECTOR>::~EigenPower ()
+template <class VectorType>
+EigenPower<VectorType>::~EigenPower ()
 {}
 
 
 
-template <class VECTOR>
+template <class VectorType>
 template <class MATRIX>
 void
-EigenPower<VECTOR>::solve (double       &value,
-                           const MATRIX &A,
-                           VECTOR       &x)
+EigenPower<VectorType>::solve (double       &value,
+                               const MATRIX &A,
+                               VectorType   &x)
 {
   SolverControl::State conv=SolverControl::iterate;
 
   deallog.push("Power method");
 
-  VECTOR *Vy = this->memory.alloc ();
-  VECTOR &y = *Vy;
+  VectorType *Vy = this->memory.alloc ();
+  VectorType &y = *Vy;
   y.reinit (x);
-  VECTOR *Vr = this->memory.alloc ();
-  VECTOR &r = *Vr;
+  VectorType *Vr = this->memory.alloc ();
+  VectorType &r = *Vr;
   r.reinit (x);
 
   double length = x.l2_norm ();
@@ -305,29 +305,29 @@ EigenPower<VECTOR>::solve (double       &value,
 
 //---------------------------------------------------------------------------
 
-template <class VECTOR>
-EigenInverse<VECTOR>::EigenInverse (SolverControl &cn,
-                                    VectorMemory<VECTOR> &mem,
-                                    const AdditionalData &data)
+template <class VectorType>
+EigenInverse<VectorType>::EigenInverse (SolverControl            &cn,
+                                        VectorMemory<VectorType> &mem,
+                                        const AdditionalData     &data)
   :
-  Solver<VECTOR>(cn, mem),
+  Solver<VectorType>(cn, mem),
   additional_data(data)
 {}
 
 
 
-template <class VECTOR>
-EigenInverse<VECTOR>::~EigenInverse ()
+template <class VectorType>
+EigenInverse<VectorType>::~EigenInverse ()
 {}
 
 
 
-template <class VECTOR>
+template <class VectorType>
 template <class MATRIX>
 void
-EigenInverse<VECTOR>::solve (double       &value,
-                             const MATRIX &A,
-                             VECTOR       &x)
+EigenInverse<VectorType>::solve (double       &value,
+                                 const MATRIX &A,
+                                 VectorType   &x)
 {
   deallog.push("Wielandt");
 
@@ -339,18 +339,18 @@ EigenInverse<VECTOR>::solve (double       &value,
   // Define solver
   ReductionControl inner_control (5000, 1.e-16, 1.e-5, false, false);
   PreconditionIdentity prec;
-  SolverGMRES<VECTOR>
+  SolverGMRES<VectorType>
   solver(inner_control, this->memory);
 
   // Next step for recomputing the shift
   unsigned int goal = additional_data.start_adaption;
 
   // Auxiliary vector
-  VECTOR *Vy = this->memory.alloc ();
-  VECTOR &y = *Vy;
+  VectorType *Vy = this->memory.alloc ();
+  VectorType &y = *Vy;
   y.reinit (x);
-  VECTOR *Vr = this->memory.alloc ();
-  VECTOR &r = *Vr;
+  VectorType *Vr = this->memory.alloc ();
+  VectorType &r = *Vr;
   r.reinit (x);
 
   double length = x.l2_norm ();

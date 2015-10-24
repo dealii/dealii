@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1998-2003
  */
-template<class VECTOR = dealii::Vector<double> >
+template<typename VectorType = dealii::Vector<double> >
 class VectorMemory : public Subscriptor
 {
 public:
@@ -84,13 +84,13 @@ public:
    * function should reset vectors to their proper size. The same holds for
    * the contents of vectors: they are unspecified.
    */
-  virtual VECTOR *alloc () = 0;
+  virtual VectorType *alloc () = 0;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
    * by the instance that called alloc() to get a pointer to it.
    */
-  virtual void free (const VECTOR *const) = 0;
+  virtual void free (const VectorType *const) = 0;
 
   /**
    * @addtogroup Exceptions
@@ -121,7 +121,7 @@ public:
     /**
      * Constructor, automatically allocating a vector from @p mem.
      */
-    Pointer(VectorMemory<VECTOR> &mem);
+    Pointer(VectorMemory<VectorType> &mem);
     /**
      * Destructor, automatically releasing the vector from the memory #pool.
      */
@@ -130,26 +130,26 @@ public:
     /**
      * Conversion to regular pointer.
      */
-    operator VECTOR *() const;
+    operator VectorType *() const;
 
     /**
      * Dereferencing operator.
      */
-    VECTOR &operator * () const;
+    VectorType &operator * () const;
 
     /**
      * Dereferencing operator.
      */
-    VECTOR *operator -> () const;
+    VectorType *operator -> () const;
   private:
     /**
      * The memory pool used.
      */
-    SmartPointer<VectorMemory<VECTOR>,Pointer> pool;
+    SmartPointer<VectorMemory<VectorType>,Pointer> pool;
     /**
      * The pointer to the vector.
      */
-    VECTOR *v;
+    VectorType *v;
   };
 };
 
@@ -162,8 +162,8 @@ public:
  * This class allocates and deletes vectors as needed from the global heap,
  * i.e. performs no specially adapted actions for memory management.
  */
-template<class VECTOR = dealii::Vector<double> >
-class PrimitiveVectorMemory : public VectorMemory<VECTOR>
+template<typename VectorType = dealii::Vector<double> >
+class PrimitiveVectorMemory : public VectorMemory<VectorType>
 {
 public:
   /**
@@ -180,9 +180,9 @@ public:
    * For the present class, calling this function will allocate a new vector
    * on the heap and returning a pointer to it.
    */
-  virtual VECTOR *alloc ()
+  virtual VectorType *alloc ()
   {
-    return new VECTOR();
+    return new VectorType();
   }
 
   /**
@@ -193,7 +193,7 @@ public:
    * For the present class, this means that the vector is returned to the
    * global heap.
    */
-  virtual void free (const VECTOR *const v)
+  virtual void free (const VectorType *const v)
   {
     delete v;
   }
@@ -225,8 +225,8 @@ public:
  *
  * @author Guido Kanschat, 1999, 2007
  */
-template<class VECTOR = dealii::Vector<double> >
-class GrowingVectorMemory : public VectorMemory<VECTOR>
+template<typename VectorType = dealii::Vector<double> >
+class GrowingVectorMemory : public VectorMemory<VectorType>
 {
 public:
   /**
@@ -256,7 +256,7 @@ public:
    * function should reset vectors to their proper size. The same holds for
    * the contents of vectors: they are unspecified.
    */
-  virtual VECTOR *alloc ();
+  virtual VectorType *alloc ();
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -265,7 +265,7 @@ public:
    * For the present class, this means retaining the vector for later reuse by
    * the alloc() method.
    */
-  virtual void free (const VECTOR *const);
+  virtual void free (const VectorType *const);
 
   /**
    * Release all vectors that are not currently in use.
@@ -282,7 +282,7 @@ private:
    * Type to enter into the array. First component will be a flag telling
    * whether the vector is used, second the vector itself.
    */
-  typedef std::pair<bool, VECTOR *> entry_type;
+  typedef std::pair<bool, VectorType *> entry_type;
 
   /**
    * The class providing the actual storage for the memory pool.
@@ -347,9 +347,9 @@ private:
 /* --------------------- inline functions ---------------------- */
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-VectorMemory<VECTOR>::Pointer::Pointer(VectorMemory<VECTOR> &mem)
+VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
   :
   pool(&mem, typeid(*this).name()), v(0)
 {
@@ -357,33 +357,33 @@ VectorMemory<VECTOR>::Pointer::Pointer(VectorMemory<VECTOR> &mem)
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-VectorMemory<VECTOR>::Pointer::~Pointer()
+VectorMemory<VectorType>::Pointer::~Pointer()
 {
   pool->free(v);
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-VectorMemory<VECTOR>::Pointer::operator VECTOR *() const
+VectorMemory<VectorType>::Pointer::operator VectorType *() const
 {
   return v;
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-VECTOR &VectorMemory<VECTOR>::Pointer::operator * () const
+VectorType &VectorMemory<VectorType>::Pointer::operator * () const
 {
   return *v;
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-VECTOR *VectorMemory<VECTOR>::Pointer::operator -> () const
+VectorType *VectorMemory<VectorType>::Pointer::operator -> () const
 {
   return v;
 }

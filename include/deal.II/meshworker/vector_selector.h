@@ -285,9 +285,9 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template <class VECTOR, int dim, int spacedim = dim>
+  template <typename VectorType, int dim, int spacedim = dim>
   class VectorData :
-    public VectorDataBase<dim, spacedim,typename VECTOR::value_type>
+    public VectorDataBase<dim, spacedim,typename VectorType::value_type>
   {
   public:
     /**
@@ -311,12 +311,12 @@ namespace MeshWorker
      * @note Make sure the VectorSelector base class was filled with
      * reasonable data before calling this function.
      */
-    void initialize(const VECTOR *, const std::string &name);
+    void initialize(const VectorType *, const std::string &name);
 
     virtual void fill(
-      std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
+      std::vector<std::vector<std::vector<typename VectorType::value_type> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,typename VectorType::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,typename VectorType::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -325,9 +325,9 @@ namespace MeshWorker
       const unsigned int size) const;
 
     virtual void mg_fill(
-      std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
+      std::vector<std::vector<std::vector<typename VectorType::value_type> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,typename VectorType::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,typename VectorType::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,
@@ -351,9 +351,9 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2010
    */
-  template <class VECTOR, int dim, int spacedim = dim>
+  template <typename VectorType, int dim, int spacedim = dim>
   class MGVectorData :
-    public VectorData<VECTOR, dim, spacedim>
+    public VectorData<VectorType, dim, spacedim>
   {
   public:
     /**
@@ -378,7 +378,7 @@ namespace MeshWorker
      * @note Make sure the VectorSelector base class was filled with
      * reasonable data before calling this function.
      */
-    void initialize(const MGLevelObject<VECTOR> *, const std::string &name);
+    void initialize(const MGLevelObject<VectorType> *, const std::string &name);
 
 
     /**

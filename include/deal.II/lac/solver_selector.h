@@ -94,14 +94,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Ralf Hartmann, 1999
  */
-template <class VECTOR = Vector<double> >
+template <typename VectorType = Vector<double> >
 class SolverSelector : public Subscriptor
 {
 public:
   /**
    * A typedef for the underlying vector type
    */
-  typedef VECTOR vector_type;
+  typedef VectorType vector_type;
 
   /**
    * Constructor, filling in default values
@@ -119,10 +119,10 @@ public:
    *
    */
   template<class Matrix, class Preconditioner>
-  void solve(const Matrix &A,
-             VECTOR &x,
-             const VECTOR &b,
-             const Preconditioner &precond) const;
+  void solve (const Matrix         &A,
+              VectorType           &x,
+              const VectorType     &b,
+              const Preconditioner &precond) const;
 
   /**
    * Select a new solver. Note that all solver names used in this class are
@@ -138,37 +138,37 @@ public:
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverRichardson<VECTOR>
+  void set_data(const typename SolverRichardson<VectorType>
                 ::AdditionalData &data);
 
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverCG<VECTOR>
+  void set_data(const typename SolverCG<VectorType>
                 ::AdditionalData &data);
 
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverMinRes<VECTOR>
+  void set_data(const typename SolverMinRes<VectorType>
                 ::AdditionalData &data);
 
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverBicgstab<VECTOR>
+  void set_data(const typename SolverBicgstab<VectorType>
                 ::AdditionalData &data);
 
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverGMRES<VECTOR>
+  void set_data(const typename SolverGMRES<VectorType>
                 ::AdditionalData &data);
 
   /**
    * Set the additional data. For more info see the @p Solver class.
    */
-  void set_data(const typename SolverFGMRES<VECTOR>
+  void set_data(const typename SolverFGMRES<VectorType>
                 ::AdditionalData &data);
 
   /**
@@ -190,7 +190,7 @@ protected:
    * Stores the @p SolverControl that is needed in the constructor of each @p
    * Solver class. This can be changed with @p set_control().
    */
-  SmartPointer< SolverControl, SolverSelector< VECTOR > >     control;
+  SmartPointer< SolverControl, SolverSelector< VectorType > > control;
 
   /**
    * Stores the name of the solver.
@@ -201,92 +201,92 @@ private:
   /**
    * Stores the additional data.
    */
-  typename SolverRichardson<VECTOR>::AdditionalData richardson_data;
+  typename SolverRichardson<VectorType>::AdditionalData richardson_data;
 
   /**
    * Stores the additional data.
    */
-  typename SolverCG<VECTOR>::AdditionalData cg_data;
+  typename SolverCG<VectorType>::AdditionalData cg_data;
 
   /**
    * Stores the additional data.
    */
-  typename SolverMinRes<VECTOR>::AdditionalData minres_data;
+  typename SolverMinRes<VectorType>::AdditionalData minres_data;
 
   /**
    * Stores the additional data.
    */
-  typename SolverBicgstab<VECTOR>::AdditionalData bicgstab_data;
+  typename SolverBicgstab<VectorType>::AdditionalData bicgstab_data;
 
   /**
    * Stores the additional data.
    */
-  typename SolverGMRES<VECTOR>::AdditionalData gmres_data;
+  typename SolverGMRES<VectorType>::AdditionalData gmres_data;
 
   /**
    * Stores the additional data.
    */
-  typename SolverFGMRES<VECTOR>::AdditionalData fgmres_data;
+  typename SolverFGMRES<VectorType>::AdditionalData fgmres_data;
 };
 
 /*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class VECTOR>
-SolverSelector<VECTOR>::SolverSelector()
+template <typename VectorType>
+SolverSelector<VectorType>::SolverSelector()
 {}
 
 
-template <class VECTOR>
-SolverSelector<VECTOR>::~SolverSelector()
+template <typename VectorType>
+SolverSelector<VectorType>::~SolverSelector()
 {}
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-SolverSelector<VECTOR>::select(const std::string &name)
+SolverSelector<VectorType>::select(const std::string &name)
 {
   solver_name = name;
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 template<class Matrix, class Preconditioner>
 void
-SolverSelector<VECTOR>::solve(const Matrix &A,
-                              VECTOR &x,
-                              const VECTOR &b,
-                              const Preconditioner &precond) const
+SolverSelector<VectorType>::solve (const Matrix         &A,
+                                   VectorType           &x,
+                                   const VectorType     &b,
+                                   const Preconditioner &precond) const
 {
   if (solver_name=="richardson")
     {
-      SolverRichardson<VECTOR> solver(*control, richardson_data);
+      SolverRichardson<VectorType> solver(*control, richardson_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="cg")
     {
-      SolverCG<VECTOR> solver(*control, cg_data);
+      SolverCG<VectorType> solver(*control, cg_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="minres")
     {
-      SolverMinRes<VECTOR> solver(*control, minres_data);
+      SolverMinRes<VectorType> solver(*control, minres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
-      SolverBicgstab<VECTOR> solver(*control, bicgstab_data);
+      SolverBicgstab<VectorType> solver(*control, bicgstab_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
-      SolverGMRES<VECTOR> solver(*control, gmres_data);
+      SolverGMRES<VectorType> solver(*control, gmres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="fgmres")
     {
-      SolverFGMRES<VECTOR> solver(*control, fgmres_data);
+      SolverFGMRES<VectorType> solver(*control, fgmres_data);
       solver.solve(A,x,b,precond);
     }
   else
@@ -294,64 +294,63 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_control(
-  SolverControl &ctrl)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_control (SolverControl &ctrl)
 {
   control=&ctrl;
 }
 
 
-template <class VECTOR>
-std::string SolverSelector<VECTOR>::get_solver_names()
+template <typename VectorType>
+std::string SolverSelector<VectorType>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres|fgmres|minres";
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverGMRES<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data
+(const typename SolverGMRES<VectorType>::AdditionalData &data)
 {
   gmres_data=data;
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverFGMRES<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data
+(const typename SolverFGMRES<VectorType>::AdditionalData &data)
 {
   fgmres_data=data;
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverRichardson<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data
+(const typename SolverRichardson<VectorType>::AdditionalData &data)
 {
   richardson_data=data;
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverCG<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data(
+  const typename SolverCG<VectorType>::AdditionalData &data)
 {
   cg_data=data;
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverMinRes<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data
+(const typename SolverMinRes<VectorType>::AdditionalData &data)
 {
   minres_data=data;
 }
 
 
-template <class VECTOR>
-void SolverSelector<VECTOR>::set_data(
-  const typename SolverBicgstab<VECTOR>::AdditionalData &data)
+template <typename VectorType>
+void SolverSelector<VectorType>::set_data
+(const typename SolverBicgstab<VectorType>::AdditionalData &data)
 {
   bicgstab_data=data;
 }

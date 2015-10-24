@@ -95,8 +95,8 @@ class PreconditionIdentity;
  *
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
-template <class VECTOR = Vector<double> >
-class SolverCG : public Solver<VECTOR>
+template <typename VectorType = Vector<double> >
+class SolverCG : public Solver<VectorType>
 {
 public:
   /**
@@ -156,9 +156,9 @@ public:
   /**
    * Constructor.
    */
-  SolverCG (SolverControl        &cn,
-            VectorMemory<VECTOR> &mem,
-            const AdditionalData &data = AdditionalData());
+  SolverCG (SolverControl            &cn,
+            VectorMemory<VectorType> &mem,
+            const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
@@ -178,8 +178,8 @@ public:
   template <class MATRIX, class PRECONDITIONER>
   void
   solve (const MATRIX         &A,
-         VECTOR               &x,
-         const VECTOR         &b,
+         VectorType           &x,
+         const VectorType     &b,
          const PRECONDITIONER &precondition);
 
   /**
@@ -227,9 +227,9 @@ protected:
    * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
-                             const VECTOR &x,
-                             const VECTOR &r,
-                             const VECTOR &d) const;
+                             const VectorType   &x,
+                             const VectorType   &r,
+                             const VectorType   &d) const;
 
   /**
    * Estimates the eigenvalues from diagonal and offdiagonal. Uses
@@ -251,9 +251,9 @@ protected:
    * Temporary vectors, allocated through the @p VectorMemory object at the
    * start of the actual solution process and deallocated at the end.
    */
-  VECTOR *Vr;
-  VECTOR *Vp;
-  VECTOR *Vz;
+  VectorType *Vr;
+  VectorType *Vp;
+  VectorType *Vz;
 
   /**
    * Within the iteration loop, the square of the residual vector is stored in
@@ -308,9 +308,9 @@ private:
 
 #ifndef DOXYGEN
 
-template <class VECTOR>
+template <typename VectorType>
 inline
-SolverCG<VECTOR>::AdditionalData::
+SolverCG<VectorType>::AdditionalData::
 AdditionalData (const bool log_coefficients,
                 const bool compute_condition_number,
                 const bool compute_all_condition_numbers,
@@ -324,9 +324,9 @@ AdditionalData (const bool log_coefficients,
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
-SolverCG<VECTOR>::AdditionalData::
+SolverCG<VectorType>::AdditionalData::
 AdditionalData ()
   :
   log_coefficients (false),
@@ -337,45 +337,45 @@ AdditionalData ()
 
 
 
-template <class VECTOR>
-SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
-                            VectorMemory<VECTOR> &mem,
-                            const AdditionalData &data)
+template <typename VectorType>
+SolverCG<VectorType>::SolverCG (SolverControl        &cn,
+                            VectorMemory<VectorType> &mem,
+                            const AdditionalData     &data)
   :
-  Solver<VECTOR>(cn,mem),
+  Solver<VectorType>(cn,mem),
   additional_data(data)
 {}
 
 
 
-template <class VECTOR>
-SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
-                            const AdditionalData &data)
+template <typename VectorType>
+SolverCG<VectorType>::SolverCG (SolverControl        &cn,
+                                const AdditionalData &data)
   :
-  Solver<VECTOR>(cn),
+  Solver<VectorType>(cn),
   additional_data(data)
 {}
 
 
 
-template <class VECTOR>
-SolverCG<VECTOR>::~SolverCG ()
+template <typename VectorType>
+SolverCG<VectorType>::~SolverCG ()
 {}
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 double
-SolverCG<VECTOR>::criterion()
+SolverCG<VectorType>::criterion()
 {
   return std::sqrt(res2);
 }
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-SolverCG<VECTOR>::cleanup()
+SolverCG<VectorType>::cleanup()
 {
   this->memory.free(Vr);
   this->memory.free(Vp);
@@ -385,25 +385,25 @@ SolverCG<VECTOR>::cleanup()
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-SolverCG<VECTOR>::print_vectors(const unsigned int,
-                                const VECTOR &,
-                                const VECTOR &,
-                                const VECTOR &) const
+SolverCG<VectorType>::print_vectors(const unsigned int,
+                                    const VectorType &,
+                                    const VectorType &,
+                                    const VectorType &) const
 {}
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline void
-SolverCG<VECTOR>::compute_eigs_and_cond(
-  const std::vector<double> &diagonal,
-  const std::vector<double> &offdiagonal,
-  const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
-  const boost::signals2::signal<void (double)> &cond_signal,
-  const bool log_eigenvalues,
-  const bool log_cond)
+SolverCG<VectorType>::compute_eigs_and_cond
+(const std::vector<double> &diagonal,
+ const std::vector<double> &offdiagonal,
+ const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
+ const boost::signals2::signal<void (double)>                      &cond_signal,
+ const bool                log_eigenvalues,
+ const bool                log_cond)
 {
   //Avoid computing eigenvalues unless they are needed.
   if (!cond_signal.empty()|| !eigenvalues_signal.empty()  || log_cond ||
@@ -452,13 +452,13 @@ SolverCG<VECTOR>::compute_eigs_and_cond(
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <class MATRIX, class PRECONDITIONER>
 void
-SolverCG<VECTOR>::solve (const MATRIX         &A,
-                         VECTOR               &x,
-                         const VECTOR         &b,
-                         const PRECONDITIONER &precondition)
+SolverCG<VectorType>::solve (const MATRIX         &A,
+                             VectorType           &x,
+                             const VectorType     &b,
+                             const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -490,9 +490,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   try
     {
       // define some aliases for simpler access
-      VECTOR &g = *Vr;
-      VECTOR &d = *Vz;
-      VECTOR &h = *Vp;
+      VectorType &g = *Vr;
+      VectorType &d = *Vz;
+      VectorType &h = *Vp;
       // resize the vectors, but do not set
       // the values since they'd be overwritten
       // soon anyway.
@@ -611,21 +611,21 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 boost::signals2::connection
-SolverCG<VECTOR>::connect_coefficients_slot(
-  const std_cxx11::function<void(double,double)> &slot)
+SolverCG<VectorType>::connect_coefficients_slot
+(const std_cxx11::function<void(double,double)> &slot)
 {
   return coefficients_signal.connect(slot);
 }
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 boost::signals2::connection
-SolverCG<VECTOR>::connect_condition_number_slot(
-  const std_cxx11::function<void(double)> &slot,
-  const bool every_iteration)
+SolverCG<VectorType>::connect_condition_number_slot
+(const std_cxx11::function<void(double)> &slot,
+ const bool                              every_iteration)
 {
   if (every_iteration)
     {
@@ -639,11 +639,11 @@ SolverCG<VECTOR>::connect_condition_number_slot(
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 boost::signals2::connection
-SolverCG<VECTOR>::connect_eigenvalues_slot(
-  const std_cxx11::function<void (const std::vector<double> &)> &slot,
-  const bool every_iteration)
+SolverCG<VectorType>::connect_eigenvalues_slot
+(const std_cxx11::function<void (const std::vector<double> &)> &slot,
+ const bool                                                    every_iteration)
 {
   if (every_iteration)
     {
