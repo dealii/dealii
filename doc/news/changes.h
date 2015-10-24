@@ -159,6 +159,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: constrained_linear_operator() and constrained_right_hand_side()
+  implemented that provide a generic mechanism of applying constraints to a
+  LinearOperator. A detailed explanation with example code is given in the
+  @ref constraints module.
+  <br>
+  (Mauro Bardelloni, Matthias Maier, 2015/10/25)
+  </li>
+
   <li> New: Two cell level signals are added to class Triangulation, namely
   pre_coarsening_on_cell and post_refinement_on_cell.
   <br>
