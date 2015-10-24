@@ -188,7 +188,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * constrained_right_hand_side() to build up the following modified system
  * of linear equations:
  * @f[
- *   (C^T \cdot A \cdot C + Id_c) x = C^T (b - A\,k)
+ *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
  * with a given (unconstrained) system matrix $A$, right hand side $b$, and
  * linear constraints $C$ with inhomogeneities $k$.
@@ -232,7 +232,7 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * constrained_right_hand_side() to build up the following modified system
  * of linear equations:
  * @f[
- *   (C^T \cdot A \cdot C + Id_c) x = C^T (b - A\,k)
+ *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
  * with a given (unconstrained) system matrix $A$, right hand side $b$, and
  * linear constraints $C$ with inhomogeneities $k$.

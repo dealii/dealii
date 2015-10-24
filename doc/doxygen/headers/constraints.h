@@ -444,7 +444,7 @@
  *
  * In this case we can solve the modified system
  * @f[
- *   (C^T \cdot A \cdot C + Id_c) \tilde x = C^T (b - A\,k)
+ *   (C^T A C + Id_c) \tilde x = C^T (b - A\,k)
  * @f]
  * instead [1]. Here, $A$ is a given (unconstrained) system matrix $A$ and
  * $b$ the corresponding right hand side of a system of linear equations
@@ -454,14 +454,13 @@
  * ConstraintMatrix::distribute() operation applied on a vector $x$ is the
  * operation
  * @f[
-    $x$ \leftarrow C\,x+k.
+    x \leftarrow C\,x+k.
  * @f]
  * And finally, $Id_c$ denotes the identity on the subspace of constrained
  * degrees of freedom.
  *
  * The corresponding solution of $A\,x=b$ that obeys boundary conditions is
- * then recovered by distributing constraints to $\tilde x$: $x=C\tilde
- * x+k$.
+ * then recovered by distributing constraints: $x=C\tilde x+k$.
  *
  * The whole system can be set up and solved with the following snippet of
  * code:
