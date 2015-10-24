@@ -43,11 +43,11 @@ template <int dim, int spacedim> class DoFHandler;
 
 namespace internal
 {
-  template <class VECTOR>
+  template <typename VectorType>
   struct MatrixSelector
   {
     typedef ::dealii::SparsityPattern Sparsity;
-    typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
+    typedef ::dealii::SparseMatrix<typename VectorType::value_type> Matrix;
 
     template <class DSP, class DH>
     static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DH &)
@@ -124,8 +124,8 @@ namespace internal
  * @author Wolfgang Bangerth, Guido Kanschat
  * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012
  */
-template <class VECTOR>
-class MGTransferPrebuilt : public MGTransferBase<VECTOR>
+template <typename VectorType>
+class MGTransferPrebuilt : public MGTransferBase<VectorType>
 {
 public:
   /**
@@ -161,13 +161,13 @@ public:
   template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &mg_dof);
 
-  virtual void prolongate (const unsigned int    to_level,
-                           VECTOR       &dst,
-                           const VECTOR &src) const;
+  virtual void prolongate (const unsigned int to_level,
+                           VectorType         &dst,
+                           const VectorType   &src) const;
 
-  virtual void restrict_and_add (const unsigned int    from_level,
-                                 VECTOR       &dst,
-                                 const VECTOR &src) const;
+  virtual void restrict_and_add (const unsigned int from_level,
+                                 VectorType         &dst,
+                                 const VectorType   &src) const;
 
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
@@ -176,8 +176,8 @@ public:
   template <int dim, class InVector, int spacedim>
   void
   copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
-              MGLevelObject<VECTOR> &dst,
-              const InVector &src) const;
+              MGLevelObject<VectorType>      &dst,
+              const InVector                 &src) const;
 
   /**
    * Transfer from multi-level vector to normal vector.
@@ -188,9 +188,9 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg (const DoFHandler<dim,spacedim> &mg_dof,
-                OutVector &dst,
-                const MGLevelObject<VECTOR> &src) const;
+  copy_from_mg (const DoFHandler<dim,spacedim>  &mg_dof,
+                OutVector                       &dst,
+                const MGLevelObject<VectorType> &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -199,9 +199,9 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg_add (const DoFHandler<dim,spacedim> &mg_dof,
-                    OutVector &dst,
-                    const MGLevelObject<VECTOR> &src) const;
+  copy_from_mg_add (const DoFHandler<dim,spacedim>  &mg_dof,
+                    OutVector                       &dst,
+                    const MGLevelObject<VectorType> &src) const;
 
   /**
    * If this object operates on BlockVector objects, we need to describe how
@@ -262,14 +262,14 @@ private:
   /**
    * Sparsity patterns for transfer matrices.
    */
-  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> >   prolongation_sparsities;
+  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> > prolongation_sparsities;
 
   /**
    * The actual prolongation matrix.  column indices belong to the dof indices
    * of the mother cell, i.e. the coarse level.  while row indices belong to
    * the child cell, i.e. the fine level.
    */
-  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> > prolongation_matrices;
+  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> > prolongation_matrices;
 
   /**
    * Mapping for the copy_to_mg() and copy_from_mg() functions. Here only
@@ -316,12 +316,12 @@ private:
   /**
    * The constraints of the global system.
    */
-  SmartPointer<const ConstraintMatrix, MGTransferPrebuilt<VECTOR> > constraints;
+  SmartPointer<const ConstraintMatrix, MGTransferPrebuilt<VectorType> > constraints;
   /**
    * The mg_constrained_dofs of the level systems.
    */
 
-  SmartPointer<const MGConstrainedDoFs, MGTransferPrebuilt<VECTOR> > mg_constrained_dofs;
+  SmartPointer<const MGConstrainedDoFs, MGTransferPrebuilt<VectorType> > mg_constrained_dofs;
 };
 
 

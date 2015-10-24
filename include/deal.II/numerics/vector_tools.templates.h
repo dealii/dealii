@@ -73,11 +73,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace VectorTools
 {
 
-  template <class VECTOR, int dim, int spacedim, template <int,int> class DH>
-  void interpolate (const Mapping<dim,spacedim>    &mapping,
-                    const DH<dim,spacedim>         &dof,
-                    const Function<spacedim>       &function,
-                    VECTOR                         &vec)
+  template <typename VectorType, int dim, int spacedim, template <int,int> class DH>
+  void interpolate (const Mapping<dim,spacedim> &mapping,
+                    const DH<dim,spacedim>      &dof,
+                    const Function<spacedim>    &function,
+                    VectorType                  &vec)
   {
     Assert (vec.size() == dof.n_dofs(),
             ExcDimensionMismatch (vec.size(), dof.n_dofs()));
@@ -269,10 +269,10 @@ namespace VectorTools
   }
 
 
-  template <class VECTOR, class DH>
-  void interpolate (const DH              &dof,
-                    const Function<DH::space_dimension>   &function,
-                    VECTOR                &vec)
+  template <typename VectorType, class DH>
+  void interpolate (const DH                            &dof,
+                    const Function<DH::space_dimension> &function,
+                    VectorType                          &vec)
   {
     interpolate(StaticMappingQ1<DH::dimension, DH::space_dimension>::mapping,
                 dof, function, vec);
@@ -332,12 +332,12 @@ namespace VectorTools
   }
 
 
-  template<typename VECTOR, typename DH>
+  template<typename VectorType, typename DH>
   void
   interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>                          &mapping,
                                    const DH                                                                   &dof,
                                    const std::map< types::material_id, const Function<DH::space_dimension>* > &function_map,
-                                   VECTOR                                                                     &dst,
+                                   VectorType                                                                 &dst,
                                    const ComponentMask                                                        &component_mask)
   {
     const unsigned int dim = DH::dimension;
@@ -541,9 +541,7 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim,
-            template <int,int> class DH,
-            class VectorType>
+  template <int dim, int spacedim, template <int,int> class DH, typename VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const VectorType        &u1,
@@ -565,9 +563,7 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim,
-            template <int,int> class DH,
-            class VectorType>
+  template <int dim, int spacedim, template <int,int> class DH, typename VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const VectorType        &u1,
@@ -605,9 +601,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, int spacedim,
-            template <int,int> class DH,
-            class VectorType>
+  template <int dim, int spacedim, template <int,int> class DH, typename VectorType>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
                                  const VectorType                       &u1,
@@ -682,10 +676,8 @@ namespace VectorTools
     /**
      * Compute the boundary values to be used in the project() functions.
      */
-    template <int dim, int spacedim,
-              template <int,int> class DH,
-              template <int,int> class M_or_MC,
-              template <int> class Q_or_QC>
+    template <int dim, int spacedim, template <int,int> class DH,
+              template <int,int> class M_or_MC, template <int> class Q_or_QC>
     void project_compute_b_v (const M_or_MC<dim, spacedim>   &mapping,
                               const DH<dim,spacedim> &dof,
                               const Function<spacedim> &function,
@@ -749,20 +741,17 @@ namespace VectorTools
     /**
      * Generic implementation of the project() function
      */
-    template <int dim, int spacedim,
-              class VectorType,
-              template <int,int> class DH,
-              template <int,int> class M_or_MC,
-              template <int> class Q_or_QC>
-    void do_project (const M_or_MC<dim, spacedim>   &mapping,
-                     const DH<dim,spacedim> &dof,
-                     const ConstraintMatrix   &constraints,
-                     const Q_or_QC<dim>       &quadrature,
-                     const Function<spacedim> &function,
-                     VectorType               &vec_result,
-                     const bool                enforce_zero_boundary,
-                     const Q_or_QC<dim-1>  &q_boundary,
-                     const bool                project_to_boundary_first)
+    template <int dim, int spacedim, typename VectorType, template <int,int> class DH,
+              template <int,int> class M_or_MC, template <int> class Q_or_QC>
+    void do_project (const M_or_MC<dim, spacedim> &mapping,
+                     const DH<dim,spacedim>       &dof,
+                     const ConstraintMatrix       &constraints,
+                     const Q_or_QC<dim>           &quadrature,
+                     const Function<spacedim>     &function,
+                     VectorType                   &vec_result,
+                     const bool                   enforce_zero_boundary,
+                     const Q_or_QC<dim-1>         &q_boundary,
+                     const bool                   project_to_boundary_first)
     {
       Assert (dof.get_fe().n_components() == function.n_components,
               ExcDimensionMismatch(dof.get_fe().n_components(),
@@ -842,16 +831,16 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VECTOR, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void project (const Mapping<dim, spacedim>   &mapping,
                 const DoFHandler<dim,spacedim> &dof,
-                const ConstraintMatrix   &constraints,
-                const Quadrature<dim>    &quadrature,
-                const Function<spacedim> &function,
-                VECTOR                   &vec_result,
-                const bool                enforce_zero_boundary,
-                const Quadrature<dim-1>  &q_boundary,
-                const bool                project_to_boundary_first)
+                const ConstraintMatrix         &constraints,
+                const Quadrature<dim>          &quadrature,
+                const Function<spacedim>       &function,
+                VectorType                     &vec_result,
+                const bool                     enforce_zero_boundary,
+                const Quadrature<dim-1>        &q_boundary,
+                const bool                     project_to_boundary_first)
   {
     do_project (mapping, dof, constraints, quadrature,
                 function, vec_result,
@@ -860,15 +849,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VECTOR, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void project (const DoFHandler<dim,spacedim> &dof,
-                const ConstraintMatrix   &constraints,
-                const Quadrature<dim>    &quadrature,
-                const Function<spacedim> &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary,
-                const Quadrature<dim-1>  &q_boundary,
-                const bool                project_to_boundary_first)
+                const ConstraintMatrix         &constraints,
+                const Quadrature<dim>          &quadrature,
+                const Function<spacedim>       &function,
+                VectorType                     &vec,
+                const bool                     enforce_zero_boundary,
+                const Quadrature<dim-1>        &q_boundary,
+                const bool                     project_to_boundary_first)
   {
     project(StaticMappingQ1<dim,spacedim>::mapping, dof, constraints, quadrature, function, vec,
             enforce_zero_boundary, q_boundary, project_to_boundary_first);
@@ -876,16 +865,16 @@ namespace VectorTools
 
 
 
-  template <int dim, class VECTOR, int spacedim>
-  void project (const hp::MappingCollection<dim, spacedim>   &mapping,
-                const hp::DoFHandler<dim,spacedim> &dof,
-                const ConstraintMatrix   &constraints,
-                const hp::QCollection<dim>    &quadrature,
-                const Function<spacedim> &function,
-                VECTOR                   &vec_result,
-                const bool                enforce_zero_boundary,
-                const hp::QCollection<dim-1>  &q_boundary,
-                const bool                project_to_boundary_first)
+  template <int dim, typename VectorType, int spacedim>
+  void project (const hp::MappingCollection<dim, spacedim> &mapping,
+                const hp::DoFHandler<dim,spacedim>         &dof,
+                const ConstraintMatrix                     &constraints,
+                const hp::QCollection<dim>                 &quadrature,
+                const Function<spacedim>                   &function,
+                VectorType                                 &vec_result,
+                const bool                                 enforce_zero_boundary,
+                const hp::QCollection<dim-1>               &q_boundary,
+                const bool                                 project_to_boundary_first)
   {
     do_project (mapping, dof, constraints, quadrature,
                 function, vec_result,
@@ -894,15 +883,15 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VECTOR, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void project (const hp::DoFHandler<dim,spacedim> &dof,
-                const ConstraintMatrix   &constraints,
-                const hp::QCollection<dim>    &quadrature,
-                const Function<spacedim> &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary,
-                const hp::QCollection<dim-1>  &q_boundary,
-                const bool                project_to_boundary_first)
+                const ConstraintMatrix             &constraints,
+                const hp::QCollection<dim>         &quadrature,
+                const Function<spacedim>           &function,
+                VectorType                         &vec,
+                const bool                         enforce_zero_boundary,
+                const hp::QCollection<dim-1>       &q_boundary,
+                const bool                         project_to_boundary_first)
   {
     project(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
             dof, constraints, quadrature, function, vec,
@@ -1661,8 +1650,7 @@ namespace VectorTools
     // faces are points and it is far
     // easier to simply work on
     // individual vertices
-    template <class DH,
-              template <int,int> class M_or_MC>
+    template <class DH, template <int,int> class M_or_MC>
     static inline
     void do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &,
                                          const DH                 &dof,
@@ -1744,9 +1732,7 @@ namespace VectorTools
     // dim_, it is clearly less specialized than the 1d function above and
     // whenever possible (i.e., if dim==1), the function template above
     // will be used
-    template <class DH,
-              template <int,int> class M_or_MC,
-              int dim_>
+    template <class DH, template <int,int> class M_or_MC, int dim_>
     static inline
     void
     do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &mapping,
@@ -2153,10 +2139,8 @@ namespace VectorTools
 
   namespace
   {
-    template <int dim, int spacedim,
-              template <int,int> class DH,
-              template <int,int> class M_or_MC,
-              template <int> class Q_or_QC>
+    template <int dim, int spacedim, template <int,int> class DH,
+              template <int,int> class M_or_MC, template <int> class Q_or_QC>
     void
     do_project_boundary_values (const M_or_MC<dim, spacedim>   &mapping,
                                 const DH<dim, spacedim> &dof,
@@ -6541,7 +6525,7 @@ namespace VectorTools
 
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_difference (const DoFHandler<dim,spacedim> &dof,
                     const VectorType               &fe_function,
@@ -6558,7 +6542,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_difference (const Mapping<dim, spacedim>   &mapping,
                     const DoFHandler<dim,spacedim> &dof,
@@ -6604,7 +6588,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -6620,7 +6604,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
@@ -6635,7 +6619,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -6648,7 +6632,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
@@ -6661,7 +6645,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
@@ -6702,7 +6686,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const hp::MappingCollection<dim, spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>         &dof,
@@ -6742,7 +6726,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
@@ -6759,7 +6743,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const hp::MappingCollection<dim, spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>         &dof,
@@ -6777,7 +6761,7 @@ namespace VectorTools
 
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const DoFHandler<dim,spacedim> &dof,
                   const VectorType               &fe_function,
@@ -6793,7 +6777,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const VectorType                   &fe_function,
@@ -6808,7 +6792,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
                   const VectorType               &fe_function,
@@ -6821,7 +6805,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const VectorType                   &fe_function,
@@ -6834,7 +6818,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const Mapping<dim, spacedim>   &mapping,
                   const DoFHandler<dim,spacedim> &dof,
@@ -6876,7 +6860,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>         &dof,
@@ -6915,7 +6899,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const Mapping<dim, spacedim>   &mapping,
                   const DoFHandler<dim,spacedim> &dof,
@@ -6933,7 +6917,7 @@ namespace VectorTools
 
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>         &dof,
@@ -6951,9 +6935,9 @@ namespace VectorTools
 
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   void
-  subtract_mean_value(VECTOR                  &v,
+  subtract_mean_value(VectorType              &v,
                       const std::vector<bool> &p_select)
   {
     if (p_select.size() == 0)
@@ -6978,7 +6962,7 @@ namespace VectorTools
         Assert(p_select.size() == n,
                ExcDimensionMismatch(p_select.size(), n));
 
-        typename VECTOR::value_type s = 0.;
+        typename VectorType::value_type s = 0.;
         unsigned int counter = 0;
         for (unsigned int i=0; i<n; ++i)
           if (p_select[i])
@@ -7020,7 +7004,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   compute_mean_value (const Mapping<dim, spacedim>   &mapping,
                       const DoFHandler<dim,spacedim> &dof,
@@ -7087,7 +7071,7 @@ namespace VectorTools
   }
 
 
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   compute_mean_value (const DoFHandler<dim,spacedim> &dof,
                       const Quadrature<dim>          &quadrature,
@@ -7098,9 +7082,9 @@ namespace VectorTools
   }
 
 
-  template<class DH, class VECTOR>
+  template<class DH, typename VectorType>
   void get_position_vector(const DH            &dh,
-                           VECTOR              &vector,
+                           VectorType          &vector,
                            const ComponentMask &mask)
   {
     AssertDimension(vector.size(), dh.n_dofs());

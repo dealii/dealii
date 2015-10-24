@@ -125,7 +125,7 @@ namespace Algorithms
    *
    * @author Guido Kanschat, 2010
    */
-  template <class VECTOR>
+  template <typename VectorType>
   class Operator : public OperatorBase
   {
   public:
@@ -138,10 +138,10 @@ namespace Algorithms
    *
    * @author Guido Kanschat, 2010
    */
-  template <class VECTOR>
+  template <typename VectorType>
   class OutputOperator : public Subscriptor
   {
-    OutputOperator(const OutputOperator<VECTOR> &);
+    OutputOperator(const OutputOperator<VectorType> &);
   public:
     OutputOperator ();
     /**
@@ -161,7 +161,7 @@ namespace Algorithms
     /**
      * Output all the vectors in AnyData.
      */
-    virtual OutputOperator<VECTOR> &operator<< (const AnyData &vectors);
+    virtual OutputOperator<VectorType> &operator<< (const AnyData &vectors);
 
   protected:
     unsigned int step;
@@ -169,10 +169,10 @@ namespace Algorithms
     std::ostream *os;
   };
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
   void
-  OutputOperator<VECTOR>::set_step (const unsigned int s)
+  OutputOperator<VectorType>::set_step (const unsigned int s)
   {
     step = s;
   }
@@ -183,10 +183,10 @@ namespace Algorithms
    *
    * @relates OutputOperator
    */
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  OutputOperator<VECTOR> &
-  operator<< (OutputOperator<VECTOR> &out, unsigned int step)
+  OutputOperator<VectorType> &
+  operator<< (OutputOperator<VectorType> &out, unsigned int step)
   {
     out.set_step(step);
     return out;

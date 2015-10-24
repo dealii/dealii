@@ -91,7 +91,7 @@ template <class number> class SparseMatrix;
  * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <class MATRIX = SparseMatrix<double>,
-          class VECTOR = dealii::Vector<double> >
+          typename VectorType = dealii::Vector<double> >
 class PreconditionSelector : public Subscriptor
 {
 public:
@@ -104,8 +104,8 @@ public:
    * Constructor. @p omega denotes the damping parameter of the
    * preconditioning.
    */
-  PreconditionSelector(const std::string                 &preconditioning,
-                       const typename VECTOR::value_type &omega=1.);
+  PreconditionSelector (const std::string                     &preconditioning,
+                        const typename VectorType::value_type &omega=1.);
 
   /**
    * Destructor.
@@ -134,13 +134,13 @@ public:
    * Precondition procedure. Calls the preconditioning that was specified in
    * the constructor.
    */
-  virtual void vmult (VECTOR &dst, const VECTOR &src) const;
+  virtual void vmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Transpose precondition procedure. Calls the preconditioning that was
    * specified in the constructor.
    */
-  virtual void Tvmult (VECTOR &dst, const VECTOR &src) const;
+  virtual void Tvmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Get the names of all implemented preconditionings.
@@ -171,62 +171,64 @@ private:
    * Matrix that is used for the matrix-builtin preconditioning function. cf.
    * also @p PreconditionUseMatrix.
    */
-  SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VECTOR> > A;
+  SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VectorType> > A;
 
   /**
    * Stores the damping parameter of the preconditioner.
    */
-  const typename VECTOR::value_type omega;
+  const typename VectorType::value_type omega;
 };
 
 /*@}*/
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class MATRIX, class VECTOR>
-PreconditionSelector<MATRIX,VECTOR>
-::PreconditionSelector(const std::string                 &preconditioning,
-                       const typename VECTOR::value_type &omega) :
+template <class MATRIX, typename VectorType>
+PreconditionSelector<MATRIX,VectorType>
+::PreconditionSelector(const std::string                     &preconditioning,
+                       const typename VectorType::value_type &omega) :
   preconditioning(preconditioning),
   omega(omega)  {}
 
 
-template <class MATRIX, class VECTOR>
-PreconditionSelector<MATRIX,VECTOR>::~PreconditionSelector()
+template <class MATRIX, typename VectorType>
+PreconditionSelector<MATRIX,VectorType>::~PreconditionSelector()
 {
   // release the matrix A
   A=0;
 }
 
 
-template <class MATRIX, class VECTOR>
-void PreconditionSelector<MATRIX,VECTOR>::use_matrix(const MATRIX &M)
+template <class MATRIX, typename VectorType>
+void PreconditionSelector<MATRIX,VectorType>::use_matrix(const MATRIX &M)
 {
   A=&M;
 }
 
+<<<<<<< fc87b7c22812a5fc7751b36c66b20e6fa54df72c
 
-template <class MATRIX, class VECTOR>
-inline typename PreconditionSelector<MATRIX,VECTOR>::size_type
-PreconditionSelector<MATRIX,VECTOR>::m () const
+template <class MATRIX, typename VectorType>
+inline typename PreconditionSelector<MATRIX,VectorType>::size_type
+PreconditionSelector<MATRIX,VectorType>::m () const
 {
   Assert(A!=0, ExcNoMatrixGivenToUse());
   return A->m();
 }
 
 
-template <class MATRIX, class VECTOR>
-inline typename PreconditionSelector<MATRIX,VECTOR>::size_type
-PreconditionSelector<MATRIX,VECTOR>::n () const
+template <class MATRIX, typename VectorType>
+inline typename PreconditionSelector<MATRIX,VectorType>::size_type
+PreconditionSelector<MATRIX,VectorType>::n () const
 {
   Assert(A!=0, ExcNoMatrixGivenToUse());
   return A->n();
 }
 
 
-template <class MATRIX, class VECTOR>
-void PreconditionSelector<MATRIX,VECTOR>::vmult (VECTOR &dst,
-                                                 const VECTOR &src) const
+
+template <class MATRIX, typename VectorType>
+void PreconditionSelector<MATRIX,VectorType>::vmult (VectorType       &dst,
+                                                     const VectorType &src) const
 {
   if (preconditioning=="none")
     {
@@ -254,9 +256,9 @@ void PreconditionSelector<MATRIX,VECTOR>::vmult (VECTOR &dst,
 }
 
 
-template <class MATRIX, class VECTOR>
-void PreconditionSelector<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
-                                                  const VECTOR &src) const
+template <class MATRIX, typename VectorType>
+void PreconditionSelector<MATRIX,VectorType>::Tvmult (VectorType       &dst,
+                                                      const VectorType &src) const
 {
   if (preconditioning=="none")
     {
@@ -284,8 +286,8 @@ void PreconditionSelector<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
 }
 
 
-template <class MATRIX, class VECTOR>
-std::string PreconditionSelector<MATRIX,VECTOR>::get_precondition_names()
+template <class MATRIX, typename VectorType>
+std::string PreconditionSelector<MATRIX,VectorType>::get_precondition_names()
 {
   return "none|jacobi|sor|ssor";
 }

@@ -638,10 +638,10 @@ public:
    * includes all of the usual vector types, but also IndexSet (see step-41
    * for a use of this).
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR                   &data,
+  template <class VectorType>
+  void add_data_vector (const VectorType               &data,
                         const std::vector<std::string> &names,
-                        const DataVectorType            type = type_automatic,
+                        const DataVectorType           type = type_automatic,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -661,10 +661,10 @@ public:
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR         &data,
+  template <class VectorType>
+  void add_data_vector (const VectorType     &data,
                         const std::string    &name,
-                        const DataVectorType  type = type_automatic,
+                        const DataVectorType type = type_automatic,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -682,9 +682,9 @@ public:
    * represents dof data, the data vector type argument present in the other
    * methods above is skipped.
    */
-  template <class VECTOR>
+  template <class VectorType>
   void add_data_vector (const DH                       &dof_handler,
-                        const VECTOR                   &data,
+                        const VectorType               &data,
                         const std::vector<std::string> &names,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
@@ -694,10 +694,10 @@ public:
    * This function is an abbreviation of the function above with only a scalar
    * @p dof_handler given and a single data name.
    */
-  template <class VECTOR>
-  void add_data_vector (const DH                       &dof_handler,
-                        const VECTOR                   &data,
-                        const std::string              &name,
+  template <class VectorType>
+  void add_data_vector (const DH          &dof_handler,
+                        const VectorType  &data,
+                        const std::string &name,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -729,8 +729,8 @@ public:
    * error by declaring the data postprocessor variable before the DataOut
    * variable as objects are destroyed in reverse order of declaration.
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR                           &data,
+  template <class VectorType>
+  void add_data_vector (const VectorType                             &data,
                         const DataPostprocessor<DH::space_dimension> &data_postprocessor);
 
   /**
@@ -739,9 +739,9 @@ public:
    * postprocessor can only read data from the given DoFHandler and solution
    * vector, not other solution vectors or DoFHandlers.
    */
-  template <class VECTOR>
-  void add_data_vector (const DH                               &dof_handler,
-                        const VECTOR                           &data,
+  template <class VectorType>
+  void add_data_vector (const DH                                     &dof_handler,
+                        const VectorType                             &data,
                         const DataPostprocessor<DH::space_dimension> &data_postprocessor);
 
   /**

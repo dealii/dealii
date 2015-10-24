@@ -35,8 +35,8 @@ namespace Algorithms
    * An output operator writing a separate file in each step and writing the
    * vectors as finite element functions with respect to a given DoFHandler.
    */
-  template <class VECTOR, int dim, int spacedim=dim>
-  class DoFOutputOperator : public OutputOperator<VECTOR>
+  template <typename VectorType, int dim, int spacedim=dim>
+  class DoFOutputOperator : public OutputOperator<VectorType>
   {
   public:
     /*
@@ -53,12 +53,12 @@ namespace Algorithms
     void parse_parameters(ParameterHandler &param);
     void initialize (const DoFHandler<dim, spacedim> &dof_handler);
 
-    virtual OutputOperator<VECTOR> &
+    virtual OutputOperator<VectorType> &
     operator << (const AnyData &vectors);
 
   private:
     SmartPointer<const DoFHandler<dim, spacedim>,
-                 DoFOutputOperator<VECTOR, dim, spacedim> > dof;
+                 DoFOutputOperator<VectorType, dim, spacedim> > dof;
 
     const std::string filename_base;
     const unsigned int digits;
@@ -66,9 +66,9 @@ namespace Algorithms
     DataOut<dim> out;
   };
 
-  template <class VECTOR, int dim, int spacedim>
+  template <typename VectorType, int dim, int spacedim>
   inline void
-  DoFOutputOperator<VECTOR, dim, spacedim>::initialize(const DoFHandler<dim, spacedim> &dof_handler)
+  DoFOutputOperator<VectorType, dim, spacedim>::initialize(const DoFHandler<dim, spacedim> &dof_handler)
   {
     dof = &dof_handler;
   }

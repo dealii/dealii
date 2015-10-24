@@ -37,8 +37,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
-template<class SOLVER, class VECTOR = Vector<double> >
-class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
+template<class SOLVER, class VectorType = Vector<double> >
+class MGCoarseGridLACIteration :  public MGCoarseGridBase<VectorType>
 {
 public:
   /**
@@ -77,9 +77,9 @@ public:
    * Implementation of the abstract function. Calls the solver method with
    * matrix, vectors and preconditioner.
    */
-  void operator() (const unsigned int   level,
-                   VECTOR       &dst,
-                   const VECTOR &src) const;
+  void operator() (const unsigned int level,
+                   VectorType         &dst,
+                   const VectorType   &src) const;
 
   /**
    * Sets the matrix. This gives the possibility to replace the matrix that
@@ -92,17 +92,17 @@ private:
   /**
    * Reference to the solver.
    */
-  SmartPointer<SOLVER,MGCoarseGridLACIteration<SOLVER,VECTOR> > solver;
+  SmartPointer<SOLVER,MGCoarseGridLACIteration<SOLVER,VectorType> > solver;
 
   /**
    * Reference to the matrix.
    */
-  PointerMatrixBase<VECTOR> *matrix;
+  PointerMatrixBase<VectorType> *matrix;
 
   /**
    * Reference to the preconditioner.
    */
-  PointerMatrixBase<VECTOR> *precondition;
+  PointerMatrixBase<VectorType> *precondition;
 };
 
 
@@ -117,8 +117,8 @@ private:
  *
  * @author Guido Kanschat, 2003, 2012
  */
-template<typename number = double, class VECTOR = Vector<number> >
-class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
+template<typename number = double, class VectorType = Vector<number> >
+class MGCoarseGridHouseholder : public MGCoarseGridBase<VectorType>
 {
 public:
   /**
@@ -131,9 +131,9 @@ public:
    */
   void initialize (const FullMatrix<number> &A);
 
-  void operator() (const unsigned int   level,
-                   VECTOR       &dst,
-                   const VECTOR &src) const;
+  void operator() (const unsigned int level,
+                   VectorType         &dst,
+                   const VectorType   &src) const;
 
 private:
   /**
@@ -150,8 +150,8 @@ private:
  *
  * @author Guido Kanschat, 2003, 2012
  */
-template<typename number = double, class VECTOR = Vector<number> >
-class MGCoarseGridSVD : public MGCoarseGridBase<VECTOR>
+template<typename number = double, class VectorType = Vector<number> >
+class MGCoarseGridSVD : public MGCoarseGridBase<VectorType>
 {
 public:
   /**
@@ -164,9 +164,9 @@ public:
    */
   void initialize (const FullMatrix<number> &A, const double threshold = 0);
 
-  void operator() (const unsigned int   level,
-                   VECTOR       &dst,
-                   const VECTOR &src) const;
+  void operator() (const unsigned int level,
+                   VectorType         &dst,
+                   const VectorType   &src) const;
 
   /**
    * Write the singular values to @p deallog.
@@ -187,8 +187,8 @@ private:
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
 
-template<class SOLVER, class VECTOR>
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+template<class SOLVER, class VectorType>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::MGCoarseGridLACIteration()
   :
   solver(0, typeid(*this).name()),
@@ -197,32 +197,32 @@ MGCoarseGridLACIteration<SOLVER, VECTOR>
 {}
 
 
-template<class SOLVER, class VECTOR>
+template<class SOLVER, class VectorType>
 template<class MATRIX, class PRECOND>
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::MGCoarseGridLACIteration(SOLVER &s,
                            const MATRIX  &m,
                            const PRECOND &p)
   :
   solver(&s, typeid(*this).name())
 {
-  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
-  precondition = new PointerMatrix<PRECOND, VECTOR>(&p);
+  matrix = new PointerMatrix<MATRIX, VectorType>(&m);
+  precondition = new PointerMatrix<PRECOND, VectorType>(&p);
 }
 
 
-template<class SOLVER, class VECTOR>
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+template<class SOLVER, class VectorType>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::~MGCoarseGridLACIteration()
 {
   clear();
 }
 
 
-template<class SOLVER, class VECTOR>
+template<class SOLVER, class VectorType>
 template<class MATRIX, class PRECOND>
 void
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::initialize(SOLVER &s,
              const MATRIX  &m,
              const PRECOND &p)
@@ -230,16 +230,16 @@ MGCoarseGridLACIteration<SOLVER, VECTOR>
   solver = &s;
   if (matrix)
     delete matrix;
-  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
+  matrix = new PointerMatrix<MATRIX, VectorType>(&m);
   if (precondition)
     delete precondition;
-  precondition = new PointerMatrix<PRECOND, VECTOR>(&p);
+  precondition = new PointerMatrix<PRECOND, VectorType>(&p);
 }
 
 
-template<class SOLVER, class VECTOR>
+template<class SOLVER, class VectorType>
 void
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::clear()
 {
   solver = 0;
@@ -252,12 +252,12 @@ MGCoarseGridLACIteration<SOLVER, VECTOR>
 }
 
 
-template<class SOLVER, class VECTOR>
+template<class SOLVER, class VectorType>
 void
-MGCoarseGridLACIteration<SOLVER, VECTOR>
-::operator() (const unsigned int    /* level */,
-              VECTOR       &dst,
-              const VECTOR &src) const
+MGCoarseGridLACIteration<SOLVER, VectorType>
+::operator() (const unsigned int /* level */,
+              VectorType         &dst,
+              const VectorType   &src) const
 {
   Assert(solver!=0, ExcNotInitialized());
   Assert(matrix!=0, ExcNotInitialized());
@@ -266,21 +266,21 @@ MGCoarseGridLACIteration<SOLVER, VECTOR>
 }
 
 
-template<class SOLVER, class VECTOR>
+template<class SOLVER, class VectorType>
 template<class MATRIX>
 void
-MGCoarseGridLACIteration<SOLVER, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VectorType>
 ::set_matrix(const MATRIX &m)
 {
   if (matrix)
     delete matrix;
-  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
+  matrix = new PointerMatrix<MATRIX, VectorType>(&m);
 }
 
 //---------------------------------------------------------------------------
 
-template<typename number, class VECTOR>
-MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
+template<typename number, class VectorType>
+MGCoarseGridHouseholder<number, VectorType>::MGCoarseGridHouseholder(
   const FullMatrix<number> *A)
 {
   if (A != 0) householder.initialize(*A);
@@ -288,9 +288,9 @@ MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
 
 
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 void
-MGCoarseGridHouseholder<number, VECTOR>::initialize(
+MGCoarseGridHouseholder<number, VectorType>::initialize(
   const FullMatrix<number> &A)
 {
   householder.initialize(A);
@@ -298,28 +298,28 @@ MGCoarseGridHouseholder<number, VECTOR>::initialize(
 
 
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 void
-MGCoarseGridHouseholder<number, VECTOR>::operator() (
+MGCoarseGridHouseholder<number, VectorType>::operator() (
   const unsigned int /*level*/,
-  VECTOR       &dst,
-  const VECTOR &src) const
+  VectorType         &dst,
+  const VectorType   &src) const
 {
   householder.least_squares(dst, src);
 }
 
 //---------------------------------------------------------------------------
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 inline
-MGCoarseGridSVD<number, VECTOR>::MGCoarseGridSVD()
+MGCoarseGridSVD<number, VectorType>::MGCoarseGridSVD()
 {}
 
 
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 void
-MGCoarseGridSVD<number, VECTOR>::initialize(
+MGCoarseGridSVD<number, VectorType>::initialize(
   const FullMatrix<number> &A,
   double threshold)
 {
@@ -329,20 +329,20 @@ MGCoarseGridSVD<number, VECTOR>::initialize(
 }
 
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 void
-MGCoarseGridSVD<number, VECTOR>::operator() (
+MGCoarseGridSVD<number, VectorType>::operator() (
   const unsigned int /*level*/,
-  VECTOR       &dst,
-  const VECTOR &src) const
+  VectorType         &dst,
+  const VectorType   &src) const
 {
   matrix.vmult(dst, src);
 }
 
 
-template<typename number, class VECTOR>
+template<typename number, class VectorType>
 void
-MGCoarseGridSVD<number, VECTOR>::log() const
+MGCoarseGridSVD<number, VectorType>::log() const
 {
   const unsigned int n = std::min(matrix.n_rows(), matrix.n_cols());
 

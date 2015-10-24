@@ -34,7 +34,7 @@ template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class SparseLUDecomposition;
 template <typename number> class SparseILU;
-template <class VECTOR> class VectorSlice;
+template <typename VectorType> class VectorSlice;
 
 namespace ChunkSparsityPatternIterators
 {

@@ -67,8 +67,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1999
  */
-template <class VECTOR = Vector<double> >
-class SolverQMRS : public Solver<VECTOR>
+template <typename VectorType = Vector<double> >
+class SolverQMRS : public Solver<VectorType>
 {
 public:
   /**
@@ -111,9 +111,9 @@ public:
   /**
    * Constructor.
    */
-  SolverQMRS (SolverControl &cn,
-              VectorMemory<VECTOR> &mem,
-              const AdditionalData &data=AdditionalData());
+  SolverQMRS (SolverControl            &cn,
+              VectorMemory<VectorType> &mem,
+              const AdditionalData     &data=AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
@@ -128,8 +128,8 @@ public:
   template<class MATRIX, class PRECONDITIONER>
   void
   solve (const MATRIX         &A,
-         VECTOR               &x,
-         const VECTOR         &b,
+         VectorType           &x,
+         const VectorType     &b,
          const PRECONDITIONER &precondition);
 
   /**
@@ -137,10 +137,10 @@ public:
    * vector, the residual and the update vector in each step. It can be used
    * for a graphical output of the convergence history.
    */
-  virtual void print_vectors(const unsigned int step,
-                             const VECTOR &x,
-                             const VECTOR &r,
-                             const VECTOR &d) const;
+  virtual void print_vectors (const unsigned int step,
+                              const VectorType   &x,
+                              const VectorType   &r,
+                              const VectorType   &d) const;
 protected:
   /**
    * Implementation of the computation of the norm of the residual.
@@ -151,19 +151,19 @@ protected:
    * Temporary vectors, allocated through the @p VectorMemory object at the
    * start of the actual solution process and deallocated at the end.
    */
-  VECTOR *Vv;
-  VECTOR *Vp;
-  VECTOR *Vq;
-  VECTOR *Vt;
-  VECTOR *Vd;
+  VectorType *Vv;
+  VectorType *Vp;
+  VectorType *Vq;
+  VectorType *Vt;
+  VectorType *Vd;
   /**
    * Iteration vector.
    */
-  VECTOR *Vx;
+  VectorType *Vx;
   /**
    * RHS vector.
    */
-  const VECTOR *Vb;
+  const VectorType *Vb;
 
   /**
    * Within the iteration loop, the square of the residual vector is stored in
@@ -214,62 +214,62 @@ private:
 
 #ifndef DOXYGEN
 
-template<class VECTOR>
-SolverQMRS<VECTOR>::IterationResult::IterationResult(const SolverControl::State state,
-                                                     const double               last_residual)
+template<class VectorType>
+SolverQMRS<VectorType>::IterationResult::IterationResult (const SolverControl::State state,
+                                                          const double               last_residual)
   :
   state (state),
   last_residual (last_residual)
 {}
 
 
-template<class VECTOR>
-SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
-                               VectorMemory<VECTOR> &mem,
-                               const AdditionalData &data)
+template<class VectorType>
+SolverQMRS<VectorType>::SolverQMRS (SolverControl            &cn,
+                                    VectorMemory<VectorType> &mem,
+                                    const AdditionalData     &data)
   :
-  Solver<VECTOR>(cn,mem),
+  Solver<VectorType>(cn,mem),
   additional_data(data)
 {}
 
 
 
-template<class VECTOR>
-SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
-                               const AdditionalData &data)
+template<class VectorType>
+SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
+                                   const AdditionalData &data)
   :
-  Solver<VECTOR>(cn),
+  Solver<VectorType>(cn),
   additional_data(data)
 {}
 
 
 
-template<class VECTOR>
+template<class VectorType>
 double
-SolverQMRS<VECTOR>::criterion()
+SolverQMRS<VectorType>::criterion()
 {
   return std::sqrt(res2);
 }
 
 
 
-template<class VECTOR>
+template<class VectorType>
 void
-SolverQMRS<VECTOR>::print_vectors(const unsigned int,
-                                  const VECTOR &,
-                                  const VECTOR &,
-                                  const VECTOR &) const
+SolverQMRS<VectorType>::print_vectors(const unsigned int,
+                                      const VectorType &,
+                                      const VectorType &,
+                                      const VectorType &) const
 {}
 
 
 
-template<class VECTOR>
+template<class VectorType>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverQMRS<VECTOR>::solve (const MATRIX         &A,
-                           VECTOR               &x,
-                           const VECTOR         &b,
-                           const PRECONDITIONER &precondition)
+SolverQMRS<VectorType>::solve (const MATRIX         &A,
+                               VectorType           &x,
+                               const VectorType     &b,
+                               const PRECONDITIONER &precondition)
 {
   deallog.push("QMRS");
 
@@ -321,11 +321,11 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 
 
 
-template<class VECTOR>
+template<class VectorType>
 template<class MATRIX, class PRECONDITIONER>
-typename SolverQMRS<VECTOR>::IterationResult
-SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
-                            const PRECONDITIONER &precondition)
+typename SolverQMRS<VectorType>::IterationResult
+SolverQMRS<VectorType>::iterate(const MATRIX         &A,
+                                const PRECONDITIONER &precondition)
 {
   /* Remark: the matrix A in the article is the preconditioned matrix.
    * Therefore, we have to precondition x before we compute the first residual.
@@ -336,13 +336,13 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
   SolverControl::State state = SolverControl::iterate;
 
   // define some aliases for simpler access
-  VECTOR &v  = *Vv;
-  VECTOR &p  = *Vp;
-  VECTOR &q  = *Vq;
-  VECTOR &t  = *Vt;
-  VECTOR &d  = *Vd;
-  VECTOR &x  = *Vx;
-  const VECTOR &b = *Vb;
+  VectorType &v  = *Vv;
+  VectorType &p  = *Vp;
+  VectorType &q  = *Vq;
+  VectorType &t  = *Vt;
+  VectorType &d  = *Vd;
+  VectorType &x  = *Vx;
+  const VectorType &b = *Vb;
 
   int  it=0;
 

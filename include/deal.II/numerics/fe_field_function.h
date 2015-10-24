@@ -161,7 +161,7 @@ namespace Functions
    */
   template <int dim,
             typename DH=DoFHandler<dim>,
-            typename VECTOR=Vector<double> >
+            typename VectorType=Vector<double> >
   class FEFieldFunction :  public Function<dim>
   {
   public:
@@ -174,7 +174,7 @@ namespace Functions
      * lay. Otherwise the standard Q1 mapping is used.
      */
     FEFieldFunction (const DH           &dh,
-                     const VECTOR       &data_vector,
+                     const VectorType   &data_vector,
                      const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping);
 
     /**
@@ -429,12 +429,12 @@ namespace Functions
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
+    SmartPointer<const DH,FEFieldFunction<dim, DH, VectorType> > dh;
 
     /**
      * A reference to the actual data vector.
      */
-    const VECTOR &data_vector;
+    const VectorType &data_vector;
 
     /**
      * A reference to the mapping being used.

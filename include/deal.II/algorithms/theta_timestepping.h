@@ -186,8 +186,8 @@ namespace Algorithms
    * @author Guido Kanschat
    * @date 2010
    */
-  template <class VECTOR>
-  class ThetaTimestepping : public Operator<VECTOR>
+  template <typename VectorType>
+  class ThetaTimestepping : public Operator<VectorType>
   {
   public:
     /**
@@ -195,8 +195,8 @@ namespace Algorithms
      * #op_implicit. For their meaning, see the description of those
      * variables.
      */
-    ThetaTimestepping (Operator<VECTOR> &op_explicit,
-                       Operator<VECTOR> &op_implicit);
+    ThetaTimestepping (Operator<VectorType> &op_explicit,
+                       Operator<VectorType> &op_implicit);
 
     /**
      * The timestepping scheme.
@@ -205,9 +205,9 @@ namespace Algorithms
      * AnyData objects used as input for the operators #op_explicit and
      * #op_implicit.
      *
-     * @param out in its first argument must contain a pointer to a `VECTOR`,
-     * which contains the initial value when the operator is called. It
-     * contains the final value when the operator returns.
+     * @param out in its first argument must contain a pointer to a VectorType
+     * instance, which contains the initial value when the operator is
+     * called. It contains the final value when the operator returns.
      */
     virtual void operator() (AnyData &out, const AnyData &in);
 
@@ -220,7 +220,7 @@ namespace Algorithms
      * Define an operator which will output the result in each step. Note that
      * no output will be generated without this.
      */
-    void set_output(OutputOperator<VECTOR> &output);
+    void set_output(OutputOperator<VectorType> &output);
 
     /**
      * Declare parameters in a parameter handler.
@@ -309,7 +309,7 @@ namespace Algorithms
      * vector, $M$ the mass matrix, $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
-    SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
+    SmartPointer<Operator<VectorType>, ThetaTimestepping<VectorType> > op_explicit;
 
     /**
      * The operator solving the implicit part of the scheme. It will receive
@@ -321,60 +321,60 @@ namespace Algorithms
      * the input data, <i>M</i> the mass matrix, <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
-    SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
+    SmartPointer<Operator<VectorType>, ThetaTimestepping<VectorType> > op_implicit;
 
     /**
      * The operator writing the output in each time step
      */
-    SmartPointer<OutputOperator<VECTOR>, ThetaTimestepping<VECTOR> > output;
+    SmartPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType> > output;
   };
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
   const TimestepData &
-  ThetaTimestepping<VECTOR>::explicit_data () const
+  ThetaTimestepping<VectorType>::explicit_data () const
   {
     return d_explicit;
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
   const TimestepData &
-  ThetaTimestepping<VECTOR>::implicit_data () const
+  ThetaTimestepping<VectorType>::implicit_data () const
   {
     return d_implicit;
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
   TimestepControl &
-  ThetaTimestepping<VECTOR>::timestep_control ()
+  ThetaTimestepping<VectorType>::timestep_control ()
   {
     return control;
   }
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR> &out)
+  void ThetaTimestepping<VectorType>::set_output (OutputOperator<VectorType> &out)
   {
     output = &out;
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  double ThetaTimestepping<VECTOR>::theta () const
+  double ThetaTimestepping<VectorType>::theta () const
   {
     return vtheta;
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  double ThetaTimestepping<VECTOR>::theta (double new_theta)
+  double ThetaTimestepping<VectorType>::theta (double new_theta)
   {
     const double tmp = vtheta;
     vtheta = new_theta;
@@ -382,9 +382,9 @@ namespace Algorithms
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  double ThetaTimestepping<VECTOR>::current_time () const
+  double ThetaTimestepping<VectorType>::current_time () const
   {
     return control.now();
   }

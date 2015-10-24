@@ -38,9 +38,9 @@ namespace mg
    * @author Guido Kanschat
    * @date 2002, 2010
    */
-  template <class VECTOR = Vector<double> >
+  template <typename VectorType = Vector<double> >
   class Matrix
-    : public MGMatrixBase<VECTOR>
+    : public MGMatrixBase<VectorType>
   {
   public:
     /**
@@ -66,19 +66,19 @@ namespace mg
     /**
      * Access matrix on a level.
      */
-    const PointerMatrixBase<VECTOR> &operator[] (unsigned int level) const;
+    const PointerMatrixBase<VectorType> &operator[] (unsigned int level) const;
 
-    virtual void vmult (const unsigned int level, VECTOR &dst, const VECTOR &src) const;
-    virtual void vmult_add (const unsigned int level, VECTOR &dst, const VECTOR &src) const;
-    virtual void Tvmult (const unsigned int level, VECTOR &dst, const VECTOR &src) const;
-    virtual void Tvmult_add (const unsigned int level, VECTOR &dst, const VECTOR &src) const;
+    virtual void vmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
+    virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
+    virtual void Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
+    virtual void Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
 
     /**
      * Memory used by this object.
      */
     std::size_t memory_consumption () const;
   private:
-    MGLevelObject<std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > > matrices;
+    MGLevelObject<std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > > matrices;
   };
 
 }
@@ -168,88 +168,87 @@ private:
 
 namespace mg
 {
-  template <class VECTOR>
+  template <typename VectorType>
   template <class MATRIX>
   inline
   void
-  Matrix<VECTOR>::initialize (const MGLevelObject<MATRIX> &p)
+  Matrix<VectorType>::initialize (const MGLevelObject<MATRIX> &p)
   {
     matrices.resize(p.min_level(), p.max_level());
     for (unsigned int level=p.min_level(); level <= p.max_level(); ++level)
-      matrices[level] = std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p[level], VECTOR()));
+      matrices[level] = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> >
+        (new_pointer_matrix_base(p[level], VectorType()));
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   template <class MATRIX>
   inline
-  Matrix<VECTOR>::Matrix (const MGLevelObject<MATRIX> &p)
+  Matrix<VectorType>::Matrix (const MGLevelObject<MATRIX> &p)
   {
     initialize(p);
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  Matrix<VECTOR>::Matrix ()
+  Matrix<VectorType>::Matrix ()
   {}
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
-  const PointerMatrixBase<VECTOR> &
-  Matrix<VECTOR>::operator[] (unsigned int level) const
+  const PointerMatrixBase<VectorType> &
+  Matrix<VectorType>::operator[] (unsigned int level) const
   {
     return *matrices[level];
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   void
-  Matrix<VECTOR>::vmult  (
-    const unsigned int level,
-    VECTOR &dst,
-    const VECTOR &src) const
+  Matrix<VectorType>::vmult (const unsigned int level,
+                             VectorType         &dst,
+                             const VectorType   &src) const
   {
     matrices[level]->vmult(dst, src);
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   void
-  Matrix<VECTOR>::vmult_add  (
-    const unsigned int level,
-    VECTOR &dst,
-    const VECTOR &src) const
+  Matrix<VectorType>::vmult_add (const unsigned int level,
+                                 VectorType         &dst,
+                                 const VectorType   &src) const
   {
     matrices[level]->vmult_add(dst, src);
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   void
-  Matrix<VECTOR>::Tvmult  (const unsigned int level,
-                           VECTOR &dst,
-                           const VECTOR &src) const
+  Matrix<VectorType>::Tvmult (const unsigned int level,
+                              VectorType         &dst,
+                              const VectorType   &src) const
   {
     matrices[level]->Tvmult(dst, src);
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   void
-  Matrix<VECTOR>::Tvmult_add  (const unsigned int level,
-                               VECTOR &dst,
-                               const VECTOR &src) const
+  Matrix<VectorType>::Tvmult_add (const unsigned int level,
+                                  VectorType         &dst,
+                                  const VectorType   &src) const
   {
     matrices[level]->Tvmult_add(dst, src);
   }
 
 
-  template <class VECTOR>
+  template <typename VectorType>
   inline
   std::size_t
-  Matrix<VECTOR>::memory_consumption () const
+  Matrix<VectorType>::memory_consumption () const
   {
     return sizeof(*this) + matrices->memory_consumption();
   }

@@ -64,8 +64,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Thomas Richter, 2000, Luca Heltai, 2006
  */
-template <class VECTOR = Vector<double> >
-class SolverMinRes : public Solver<VECTOR>
+template <class VectorType = Vector<double> >
+class SolverMinRes : public Solver<VectorType>
 {
 public:
   /**
@@ -79,9 +79,9 @@ public:
   /**
    * Constructor.
    */
-  SolverMinRes (SolverControl &cn,
-                VectorMemory<VECTOR> &mem,
-                const AdditionalData &data=AdditionalData());
+  SolverMinRes (SolverControl            &cn,
+                VectorMemory<VectorType> &mem,
+                const AdditionalData     &data=AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
@@ -101,8 +101,8 @@ public:
   template<class MATRIX, class PRECONDITIONER>
   void
   solve (const MATRIX         &A,
-         VECTOR               &x,
-         const VECTOR         &b,
+         VectorType           &x,
+         const VectorType     &b,
          const PRECONDITIONER &precondition);
 
   /**
@@ -127,17 +127,17 @@ protected:
    * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
-                             const VECTOR &x,
-                             const VECTOR &r,
-                             const VECTOR &d) const;
+                             const VectorType   &x,
+                             const VectorType   &r,
+                             const VectorType   &d) const;
 
   /**
    * Temporary vectors, allocated through the @p VectorMemory object at the
    * start of the actual solution process and deallocated at the end.
    */
-  VECTOR *Vu0, *Vu1, *Vu2;
-  VECTOR *Vm0, *Vm1, *Vm2;
-  VECTOR *Vv;
+  VectorType *Vu0, *Vu1, *Vu2;
+  VectorType *Vm0, *Vm1, *Vm2;
+  VectorType *Vv;
 
   /**
    * Within the iteration loop, the square of the residual vector is stored in
@@ -153,55 +153,55 @@ protected:
 
 #ifndef DOXYGEN
 
-template<class VECTOR>
-SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
-                                    VectorMemory<VECTOR> &mem,
-                                    const AdditionalData &)
+template<class VectorType>
+SolverMinRes<VectorType>::SolverMinRes (SolverControl            &cn,
+                                        VectorMemory<VectorType> &mem,
+                                        const AdditionalData     &)
   :
-  Solver<VECTOR>(cn,mem)
+  Solver<VectorType>(cn,mem)
 {}
 
 
 
-template<class VECTOR>
-SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
-                                    const AdditionalData &)
+template<class VectorType>
+SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
+                                        const AdditionalData &)
   :
-  Solver<VECTOR>(cn)
+  Solver<VectorType>(cn)
 {}
 
 
-template<class VECTOR>
-SolverMinRes<VECTOR>::~SolverMinRes ()
+template<class VectorType>
+SolverMinRes<VectorType>::~SolverMinRes ()
 {}
 
 
 
-template<class VECTOR>
+template<class VectorType>
 double
-SolverMinRes<VECTOR>::criterion()
+SolverMinRes<VectorType>::criterion()
 {
   return res2;
 }
 
 
-template<class VECTOR>
+template<class VectorType>
 void
-SolverMinRes<VECTOR>::print_vectors(const unsigned int,
-                                    const VECTOR &,
-                                    const VECTOR &,
-                                    const VECTOR &) const
+SolverMinRes<VectorType>::print_vectors(const unsigned int,
+                                        const VectorType &,
+                                        const VectorType &,
+                                        const VectorType &) const
 {}
 
 
 
-template<class VECTOR>
+template<class VectorType>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverMinRes<VECTOR>::solve (const MATRIX         &A,
-                             VECTOR               &x,
-                             const VECTOR         &b,
-                             const PRECONDITIONER &precondition)
+SolverMinRes<VectorType>::solve (const MATRIX         &A,
+                                 VectorType           &x,
+                                 const VectorType     &b,
+                                 const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -216,10 +216,10 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   Vm1  = this->memory.alloc();
   Vm2  = this->memory.alloc();
   // define some aliases for simpler access
-  typedef VECTOR *vecptr;
+  typedef VectorType *vecptr;
   vecptr u[3] = {Vu0, Vu1, Vu2};
   vecptr m[3] = {Vm0, Vm1, Vm2};
-  VECTOR &v   = *Vv;
+  VectorType &v   = *Vv;
   // resize the vectors, but do not set
   // the values since they'd be overwritten
   // soon anyway.

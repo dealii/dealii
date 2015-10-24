@@ -30,7 +30,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
-template <class VECTOR> class FilteredMatrixBlock;
+template <class VectorType> class FilteredMatrixBlock;
 
 
 /*! @addtogroup Matrix2
@@ -190,7 +190,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  *
  * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008
  */
-template <class VECTOR>
+template <typename VectorType>
 class FilteredMatrix : public Subscriptor
 {
 public:
@@ -210,8 +210,8 @@ public:
      * Constructor. Since we use accessors only for read access, a const
      * matrix pointer is sufficient.
      */
-    Accessor (const FilteredMatrix<VECTOR> *matrix,
-              const size_type               index);
+    Accessor (const FilteredMatrix<VectorType> *matrix,
+              const size_type                  index);
 
   public:
     /**
@@ -238,7 +238,7 @@ public:
     /**
      * The matrix accessed.
      */
-    const FilteredMatrix<VECTOR> *matrix;
+    const FilteredMatrix<VectorType> *matrix;
 
     /**
      * Current row number.
@@ -260,8 +260,8 @@ public:
     /**
      * Constructor.
      */
-    const_iterator(const FilteredMatrix<VECTOR> *matrix,
-                   const size_type index);
+    const_iterator(const FilteredMatrix<VectorType> *matrix,
+                   const size_type                  index);
 
     /**
      * Prefix increment.
@@ -412,28 +412,28 @@ public:
    * the second parameter to @p true to use a faster algorithm. Note: This
    * method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
-  void apply_constraints (VECTOR     &v,
-                          const bool  matrix_is_symmetric) const DEAL_II_DEPRECATED;
+  void apply_constraints (VectorType &v,
+                          const bool matrix_is_symmetric) const DEAL_II_DEPRECATED;
   /**
    * Apply the constraints to a right hand side vector. This needs to be done
    * before starting to solve with the filtered matrix.
    */
-  void apply_constraints (VECTOR     &v) const;
+  void apply_constraints (VectorType &v) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
    * multiplication with the stored matrix and post_filter() in that order.
    */
-  void vmult (VECTOR       &dst,
-              const VECTOR &src) const;
+  void vmult (VectorType       &dst,
+              const VectorType &src) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
    * transposed multiplication with the stored matrix and post_filter() in
    * that order.
    */
-  void Tvmult (VECTOR       &dst,
-               const VECTOR &src) const;
+  void Tvmult (VectorType       &dst,
+               const VectorType &src) const;
 
   /**
    * Adding matrix-vector multiplication.
@@ -442,8 +442,8 @@ public:
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
    * We excpect that in most cases this is the required behavior.
    */
-  void vmult_add (VECTOR       &dst,
-                  const VECTOR &src) const;
+  void vmult_add (VectorType       &dst,
+                  const VectorType &src) const;
 
   /**
    * Adding transpose matrix-vector multiplication:
@@ -452,8 +452,8 @@ public:
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
    * We excpect that in most cases this is the required behavior.
    */
-  void Tvmult_add (VECTOR       &dst,
-                   const VECTOR &src) const;
+  void Tvmult_add (VectorType       &dst,
+                   const VectorType &src) const;
 //@}
 
   /**
@@ -514,7 +514,7 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix.
    */
-  std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
+  std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > matrix;
 
   /**
    * Sorted list of pairs denoting the index of the variable and the value to
@@ -526,21 +526,21 @@ private:
    * Do the pre-filtering step, i.e. zero out those components that belong to
    * constrained degrees of freedom.
    */
-  void pre_filter (VECTOR &v) const;
+  void pre_filter (VectorType &v) const;
 
   /**
    * Do the postfiltering step, i.e. set constrained degrees of freedom to the
    * value of the input vector, as the matrix contains only ones on the
    * diagonal for these degrees of freedom.
    */
-  void post_filter (const VECTOR &in,
-                    VECTOR       &out) const;
+  void post_filter (const VectorType &in,
+                    VectorType       &out) const;
 
   friend class Accessor;
   /**
    * FilteredMatrixBlock accesses pre_filter() and post_filter().
    */
-  friend class FilteredMatrixBlock<VECTOR>;
+  friend class FilteredMatrixBlock<VectorType>;
 };
 
 /*@}*/
@@ -549,11 +549,11 @@ private:
 
 //--------------------------------Iterators--------------------------------------//
 
-template<class VECTOR>
+template<typename VectorType>
 inline
-FilteredMatrix<VECTOR>::Accessor::Accessor(
-  const FilteredMatrix<VECTOR> *matrix,
-  const size_type index)
+FilteredMatrix<VectorType>::Accessor::Accessor
+(const FilteredMatrix<VectorType> *matrix,
+ const size_type                   index)
   :
   matrix(matrix),
   index(index)
@@ -564,40 +564,40 @@ FilteredMatrix<VECTOR>::Accessor::Accessor(
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
 types::global_dof_index
-FilteredMatrix<VECTOR>::Accessor::row() const
+FilteredMatrix<VectorType>::Accessor::row() const
 {
   return matrix->constraints[index].first;
 }
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
 types::global_dof_index
-FilteredMatrix<VECTOR>::Accessor::column() const
+FilteredMatrix<VectorType>::Accessor::column() const
 {
   return matrix->constraints[index].first;
 }
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
 double
-FilteredMatrix<VECTOR>::Accessor::value() const
+FilteredMatrix<VectorType>::Accessor::value() const
 {
   return matrix->constraints[index].second;
 }
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::Accessor::advance()
+FilteredMatrix<VectorType>::Accessor::advance()
 {
   Assert (index < matrix->constraints.size(), ExcIteratorPastEnd());
   ++index;
@@ -606,21 +606,21 @@ FilteredMatrix<VECTOR>::Accessor::advance()
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
-FilteredMatrix<VECTOR>::const_iterator::const_iterator(
-  const FilteredMatrix<VECTOR> *matrix,
-  const size_type index)
+FilteredMatrix<VectorType>::const_iterator::const_iterator
+(const FilteredMatrix<VectorType> *matrix,
+ const size_type                   index)
   :
   accessor(matrix, index)
 {}
 
 
 
-template<class VECTOR>
+template<typename VectorType>
 inline
-typename FilteredMatrix<VECTOR>::const_iterator &
-FilteredMatrix<VECTOR>::const_iterator::operator++ ()
+typename FilteredMatrix<VectorType>::const_iterator &
+FilteredMatrix<VectorType>::const_iterator::operator++ ()
 {
   accessor.advance();
   return *this;
@@ -687,10 +687,10 @@ FilteredMatrix<number>::end () const
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 bool
-FilteredMatrix<VECTOR>::PairComparison::
+FilteredMatrix<VectorType>::PairComparison::
 operator () (const IndexValuePair &i1,
              const IndexValuePair &i2) const
 {
@@ -699,29 +699,29 @@ operator () (const IndexValuePair &i1,
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <class MATRIX>
 inline
 void
-FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
+FilteredMatrix<VectorType>::initialize (const MATRIX &m, bool ecs)
 {
-  matrix.reset (new_pointer_matrix_base(m, VECTOR()));
+  matrix.reset (new_pointer_matrix_base(m, VectorType()));
 
   expect_constrained_source = ecs;
 }
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
-FilteredMatrix<VECTOR>::FilteredMatrix ()
+FilteredMatrix<VectorType>::FilteredMatrix ()
 {}
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
-FilteredMatrix<VECTOR>::FilteredMatrix (const FilteredMatrix &fm)
+FilteredMatrix<VectorType>::FilteredMatrix (const FilteredMatrix &fm)
   :
   Subscriptor(),
   expect_constrained_source(fm.expect_constrained_source),
@@ -731,10 +731,10 @@ FilteredMatrix<VECTOR>::FilteredMatrix (const FilteredMatrix &fm)
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <class MATRIX>
 inline
-FilteredMatrix<VECTOR>::
+FilteredMatrix<VectorType>::
 FilteredMatrix (const MATRIX &m, bool ecs)
 {
   initialize (m, ecs);
@@ -742,10 +742,10 @@ FilteredMatrix (const MATRIX &m, bool ecs)
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
-FilteredMatrix<VECTOR> &
-FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
+FilteredMatrix<VectorType> &
+FilteredMatrix<VectorType>::operator = (const FilteredMatrix &fm)
 {
   matrix = fm.matrix;
   expect_constrained_source = fm.expect_constrained_source;
@@ -755,10 +755,10 @@ FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::add_constraint (const size_type index, const double value)
+FilteredMatrix<VectorType>::add_constraint (const size_type index, const double value)
 {
   // add new constraint to end
   constraints.push_back(IndexValuePair(index, value));
@@ -766,11 +766,11 @@ FilteredMatrix<VECTOR>::add_constraint (const size_type index, const double valu
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <class ConstraintList>
 inline
 void
-FilteredMatrix<VECTOR>::add_constraints (const ConstraintList &new_constraints)
+FilteredMatrix<VectorType>::add_constraints (const ConstraintList &new_constraints)
 {
   // add new constraints to end
   const size_type old_size = constraints.size();
@@ -788,10 +788,10 @@ FilteredMatrix<VECTOR>::add_constraints (const ConstraintList &new_constraints)
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::clear_constraints ()
+FilteredMatrix<VectorType>::clear_constraints ()
 {
   // swap vectors to release memory
   std::vector<IndexValuePair> empty;
@@ -800,10 +800,10 @@ FilteredMatrix<VECTOR>::clear_constraints ()
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::clear ()
+FilteredMatrix<VectorType>::clear ()
 {
   clear_constraints();
   matrix.reset();
@@ -811,25 +811,24 @@ FilteredMatrix<VECTOR>::clear ()
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::apply_constraints (
-  VECTOR     &v,
-  const bool  /* matrix_is_symmetric */) const
+FilteredMatrix<VectorType>::apply_constraints
+(VectorType &v,
+ const bool  /* matrix_is_symmetric */) const
 {
   apply_constraints(v);
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::apply_constraints (
-  VECTOR     &v) const
+FilteredMatrix<VectorType>::apply_constraints (VectorType &v) const
 {
-  GrowingVectorMemory<VECTOR> mem;
-  typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer tmp_vector(mem);
   tmp_vector->reinit(v);
   const_index_value_iterator       i = constraints.begin();
   const const_index_value_iterator e = constraints.end();
@@ -853,10 +852,10 @@ FilteredMatrix<VECTOR>::apply_constraints (
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::pre_filter (VECTOR &v) const
+FilteredMatrix<VectorType>::pre_filter (VectorType &v) const
 {
   // iterate over all constraints and
   // zero out value
@@ -868,11 +867,11 @@ FilteredMatrix<VECTOR>::pre_filter (VECTOR &v) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
-                                     VECTOR       &out) const
+FilteredMatrix<VectorType>::post_filter (const VectorType &in,
+                                         VectorType       &out) const
 {
   // iterate over all constraints and
   // set value correctly
@@ -887,15 +886,15 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
+FilteredMatrix<VectorType>::vmult (VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {
-      GrowingVectorMemory<VECTOR> mem;
-      VECTOR *tmp_vector = mem.alloc();
+      GrowingVectorMemory<VectorType> mem;
+      VectorType *tmp_vector = mem.alloc();
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -916,15 +915,15 @@ FilteredMatrix<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::Tvmult (VECTOR &dst, const VECTOR &src) const
+FilteredMatrix<VectorType>::Tvmult (VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {
-      GrowingVectorMemory<VECTOR> mem;
-      VECTOR *tmp_vector = mem.alloc();
+      GrowingVectorMemory<VectorType> mem;
+      VectorType *tmp_vector = mem.alloc();
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -945,15 +944,15 @@ FilteredMatrix<VECTOR>::Tvmult (VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::vmult_add (VECTOR &dst, const VECTOR &src) const
+FilteredMatrix<VectorType>::vmult_add (VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {
-      GrowingVectorMemory<VECTOR> mem;
-      VECTOR *tmp_vector = mem.alloc();
+      GrowingVectorMemory<VectorType> mem;
+      VectorType *tmp_vector = mem.alloc();
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -974,15 +973,15 @@ FilteredMatrix<VECTOR>::vmult_add (VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-FilteredMatrix<VECTOR>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
+FilteredMatrix<VectorType>::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {
-      GrowingVectorMemory<VECTOR> mem;
-      VECTOR *tmp_vector = mem.alloc();
+      GrowingVectorMemory<VectorType> mem;
+      VectorType *tmp_vector = mem.alloc();
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -1003,10 +1002,10 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 std::size_t
-FilteredMatrix<VECTOR>::memory_consumption () const
+FilteredMatrix<VectorType>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (matrix) +
           MemoryConsumption::memory_consumption (constraints));

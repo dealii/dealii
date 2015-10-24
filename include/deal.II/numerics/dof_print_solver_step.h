@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup output
  * @author Guido Kanschat, 2000
  */
-template<int dim, class SOLVER, class VECTOR = Vector<double> >
+template<int dim, class SOLVER, class VectorType = Vector<double> >
 class DoFPrintSolverStep : public SOLVER
 {
 public:
@@ -61,17 +61,17 @@ public:
    * produced for each iteration step.
    */
   DoFPrintSolverStep (SolverControl &control,
-                      VectorMemory<VECTOR> &mem,
-                      DataOut<dim> &data_out,
-                      const std::string &basename);
+                      VectorMemory<VectorType> &mem,
+                      DataOut<dim>             &data_out,
+                      const std::string        &basename);
 
   /**
    * Call-back function for the iterative method.
    */
   virtual void print_vectors (const unsigned int step,
-                              const VECTOR &x,
-                              const VECTOR &r,
-                              const VECTOR &d) const;
+                              const VectorType   &x,
+                              const VectorType   &r,
+                              const VectorType   &d) const;
 private:
   /**
    * Output object.
@@ -87,23 +87,24 @@ private:
 
 /* ----------------------- template functions --------------- */
 
-template<int dim, class SOLVER, class VECTOR>
-DoFPrintSolverStep<dim, SOLVER, VECTOR>::DoFPrintSolverStep (SolverControl &control,
-    VectorMemory<VECTOR> &mem,
-    DataOut<dim> &data_out,
-    const std::string &basename)
+template<int dim, class SOLVER, class VectorType>
+DoFPrintSolverStep<dim, SOLVER, VectorType>::DoFPrintSolverStep
+(SolverControl            &control,
+ VectorMemory<VectorType> &mem,
+ DataOut<dim>             &data_out,
+ const std::string        &basename)
   : SOLVER (control, mem),
     out (data_out),
     basename (basename)
 {}
 
 
-template<int dim, class SOLVER, class VECTOR>
+template<int dim, class SOLVER, class VectorType>
 void
-DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
-                                                        const VECTOR &x,
-                                                        const VECTOR &r,
-                                                        const VECTOR &d) const
+DoFPrintSolverStep<dim, SOLVER, VectorType>::print_vectors (const unsigned int step,
+                                                            const VectorType &x,
+                                                            const VectorType &r,
+                                                            const VectorType &d) const
 {
   out.clear_data_vectors();
   out.add_data_vector(x, "solution");

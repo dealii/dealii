@@ -63,15 +63,15 @@ namespace Algorithms
    *
    * @author Guido Kanschat, 2006, 2010
    */
-  template <class VECTOR>
-  class Newton : public Operator<VECTOR>
+  template <typename VectorType>
+  class Newton : public Operator<VectorType>
   {
   public:
     /**
      * Constructor, receiving the applications computing the residual and
      * solving the linear problem, respectively.
      */
-    Newton (Operator<VECTOR> &residual, Operator<VECTOR> &inverse_derivative);
+    Newton (Operator<VectorType> &residual, Operator<VectorType> &inverse_derivative);
 
     /**
      * Declare the parameters applicable to Newton's method.
@@ -86,7 +86,7 @@ namespace Algorithms
     /**
      * Initialize the pointer data_out for debugging.
      */
-    void initialize (OutputOperator<VECTOR> &output);
+    void initialize (OutputOperator<VectorType> &output);
 
     /**
      * The actual Newton iteration. The initial value is in <tt>out(0)</tt>,
@@ -112,18 +112,18 @@ namespace Algorithms
     /**
      * The operator computing the residual.
      */
-    SmartPointer<Operator<VECTOR>, Newton<VECTOR> > residual;
+    SmartPointer<Operator<VectorType>, Newton<VectorType> > residual;
 
     /**
      * The operator applying the inverse derivative to the residual.
      */
-    SmartPointer<Operator<VECTOR>, Newton<VECTOR> > inverse_derivative;
+    SmartPointer<Operator<VectorType>, Newton<VectorType> > inverse_derivative;
 
     /**
      * The operator handling the output in case the debug_vectors is true.
      * Call the initialize function first.
      */
-    SmartPointer<OutputOperator<VECTOR>, Newton<VECTOR> > data_out;
+    SmartPointer<OutputOperator<VectorType>, Newton<VectorType> > data_out;
 
     /**
      * This flag is set by the function assemble(), indicating that the matrix

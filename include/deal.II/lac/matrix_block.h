@@ -235,32 +235,32 @@ public:
    * No index computations are done, thus, the vectors need to have sizes
    * matching #matrix.
    */
-  template<class VECTOR>
-  void vmult (VECTOR &w, const VECTOR &v) const;
+  template<class VectorType>
+  void vmult (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in MATRIX.
    * No index computations are done, thus, the vectors need to have sizes
    * matching #matrix.
    */
-  template<class VECTOR>
-  void vmult_add (VECTOR &w, const VECTOR &v) const;
+  template<class VectorType>
+  void vmult_add (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in MATRIX.
    * No index computations are done, thus, the vectors need to have sizes
    * matching #matrix.
    */
-  template<class VECTOR>
-  void Tvmult (VECTOR &w, const VECTOR &v) const;
+  template<class VectorType>
+  void Tvmult (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in MATRIX.
    * No index computations are done, thus, the vectors need to have sizes
    * matching #matrix.
    */
-  template<class VECTOR>
-  void Tvmult_add (VECTOR &w, const VECTOR &v) const;
+  template<class VectorType>
+  void Tvmult_add (VectorType &w, const VectorType &v) const;
 
   /**
    * The memory used by this object.
@@ -767,40 +767,40 @@ MatrixBlock<MATRIX>::add (const size_type               row,
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class VectorType>
 inline
 void
-MatrixBlock<MATRIX>::vmult (VECTOR &w, const VECTOR &v) const
+MatrixBlock<MATRIX>::vmult (VectorType &w, const VectorType &v) const
 {
   matrix.vmult(w,v);
 }
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class VectorType>
 inline
 void
-MatrixBlock<MATRIX>::vmult_add (VECTOR &w, const VECTOR &v) const
+MatrixBlock<MATRIX>::vmult_add (VectorType &w, const VectorType &v) const
 {
   matrix.vmult_add(w,v);
 }
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class VectorType>
 inline
 void
-MatrixBlock<MATRIX>::Tvmult (VECTOR &w, const VECTOR &v) const
+MatrixBlock<MATRIX>::Tvmult (VectorType &w, const VectorType &v) const
 {
   matrix.Tvmult(w,v);
 }
 
 
 template <class MATRIX>
-template <class VECTOR>
+template <class VectorType>
 inline
 void
-MatrixBlock<MATRIX>::Tvmult_add (VECTOR &w, const VECTOR &v) const
+MatrixBlock<MATRIX>::Tvmult_add (VectorType &w, const VectorType &v) const
 {
   matrix.Tvmult_add(w,v);
 }

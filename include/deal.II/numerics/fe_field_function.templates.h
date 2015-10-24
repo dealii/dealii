@@ -31,10 +31,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
 
-  template <int dim, typename DH, typename VECTOR>
-  FEFieldFunction<dim, DH, VECTOR>::FEFieldFunction (const DH &mydh,
-                                                     const VECTOR &myv,
-                                                     const Mapping<dim> &mymapping)
+  template <int dim, typename DH, typename VectorType>
+  FEFieldFunction<dim, DH, VectorType>::FEFieldFunction (const DH           &mydh,
+                                                         const VectorType   &myv,
+                                                         const Mapping<dim> &mymapping)
     :
     Function<dim>(mydh.get_fe().n_components()),
     dh(&mydh, "FEFieldFunction"),
@@ -47,9 +47,9 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   set_active_cell(const typename DH::active_cell_iterator &newcell)
   {
     cell_hint.get() = newcell;
@@ -57,9 +57,9 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  void FEFieldFunction<dim, DH, VECTOR>::vector_value (const Point<dim> &p,
-                                                       Vector<double>   &values) const
+  template <int dim, typename DH, typename VectorType>
+  void FEFieldFunction<dim, DH, VectorType>::vector_value (const Point<dim> &p,
+                                                           Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
@@ -87,18 +87,18 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> >
-    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    std::vector< Vector<typename VectorType::value_type> >
+    vvalues (1, Vector<typename VectorType::value_type>(values.size()));
     fe_v.get_function_values(data_vector, vvalues);
     values = vvalues[0];
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   double
-  FEFieldFunction<dim, DH, VECTOR>::value (const Point<dim>   &p,
-                                           const unsigned int comp) const
+  FEFieldFunction<dim, DH, VectorType>::value (const Point<dim>   &p,
+                                               const unsigned int comp) const
   {
     Vector<double> values(n_components);
     vector_value(p, values);
@@ -107,9 +107,9 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   vector_gradient (const Point<dim>            &p,
                    std::vector<Tensor<1,dim> > &gradients) const
   {
@@ -143,17 +143,17 @@ namespace Functions
     // FIXME: we need a temp argument because get_function_values wants to put
     // its data into an object storing the correct scalar type, but this
     // function wants to return everything in a vector<double>
-    std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > > vgrads
-    (1,  std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components) );
+    std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > > vgrads
+    (1,  std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components) );
     fe_v.get_function_gradients(data_vector, vgrads);
     gradients = std::vector<Tensor<1,dim> >(vgrads[0].begin(), vgrads[0].end());
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   Tensor<1,dim>
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   gradient (const Point<dim>   &p,
             const unsigned int comp) const
   {
@@ -164,9 +164,9 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   vector_laplacian (const Point<dim> &p,
                     Vector<double>   &values) const
   {
@@ -196,16 +196,16 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> >
-    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    std::vector< Vector<typename VectorType::value_type> >
+    vvalues (1, Vector<typename VectorType::value_type>(values.size()));
     fe_v.get_function_laplacians(data_vector, vvalues);
     values = vvalues[0];
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  double FEFieldFunction<dim, DH, VECTOR>::laplacian
+  template <int dim, typename DH, typename VectorType>
+  double FEFieldFunction<dim, DH, VectorType>::laplacian
   (const Point<dim>   &p, const unsigned int  comp) const
   {
     Vector<double> lap(n_components);
@@ -217,9 +217,9 @@ namespace Functions
   // Now the list versions
   // ==============================
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   vector_value_list (const std::vector<Point< dim > >     &points,
                      std::vector< Vector<double> > &values) const
   {
@@ -252,7 +252,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_values(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
@@ -261,12 +261,12 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   value_list (const std::vector<Point< dim > > &points,
-              std::vector< double > &values,
-              const unsigned int  component) const
+              std::vector< double >            &values,
+              const unsigned int               component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -278,9 +278,9 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   vector_gradient_list (const std::vector<Point< dim > >     &points,
                         std::vector<
                         std::vector< Tensor<1,dim> > > &values) const
@@ -314,8 +314,8 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > >
-        vgrads (nq, std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components));
+        std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > >
+        vgrads (nq, std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components));
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
@@ -327,9 +327,9 @@ namespace Functions
       }
   }
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   gradient_list (const std::vector<Point< dim > > &points,
                  std::vector< Tensor<1,dim> > &values,
                  const unsigned int  component) const
@@ -344,9 +344,9 @@ namespace Functions
   }
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   vector_laplacian_list (const std::vector<Point< dim > >     &points,
                          std::vector< Vector<double> > &values) const
   {
@@ -379,16 +379,16 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_laplacians(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
   }
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   laplacian_list (const std::vector<Point< dim > > &points,
                   std::vector< double > &values,
                   const unsigned int  component) const
@@ -403,8 +403,8 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  unsigned int FEFieldFunction<dim, DH, VECTOR>::
+  template <int dim, typename DH, typename VectorType>
+  unsigned int FEFieldFunction<dim, DH, VectorType>::
   compute_point_locations(const std::vector<Point<dim> > &points,
                           std::vector<typename DH::active_cell_iterator > &cells,
                           std::vector<std::vector<Point<dim> > > &qpoints,
@@ -565,9 +565,9 @@ namespace Functions
   }
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DH, typename VectorType>
   boost::optional<Point<dim> >
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DH, VectorType>::
   get_reference_coordinates (const typename DH::active_cell_iterator &cell,
                              const Point<dim>                        &point) const
   {

@@ -40,9 +40,9 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Matrix2
  * @author Guido Kanschat, 2006
  */
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 class
-  TransposeMatrix : public PointerMatrixBase<VECTOR>
+  TransposeMatrix : public PointerMatrixBase<VectorType>
 {
 public:
   /**
@@ -86,118 +86,118 @@ public:
   /**
    * Matrix-vector product.
    */
-  virtual void vmult (VECTOR &dst,
-                      const VECTOR &src) const;
+  virtual void vmult (VectorType       &dst,
+                      const VectorType &src) const;
 
   /**
    * Transposed matrix-vector product.
    */
-  virtual void Tvmult (VECTOR &dst,
-                       const VECTOR &src) const;
+  virtual void Tvmult (VectorType       &dst,
+                       const VectorType &src) const;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void vmult_add (VECTOR &dst,
-                          const VECTOR &src) const;
+  virtual void vmult_add (VectorType       &dst,
+                          const VectorType &src) const;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void Tvmult_add (VECTOR &dst,
-                           const VECTOR &src) const;
+  virtual void Tvmult_add (VectorType       &dst,
+                           const VectorType &src) const;
 
 private:
   /**
    * The pointer to the actual matrix.
    */
-  SmartPointer<const MATRIX,TransposeMatrix<MATRIX,VECTOR> > m;
+  SmartPointer<const MATRIX,TransposeMatrix<MATRIX,VectorType> > m;
 };
 
 
 //----------------------------------------------------------------------//
 
 
-template<class MATRIX, class VECTOR>
-TransposeMatrix<MATRIX, VECTOR>::TransposeMatrix (const MATRIX *M)
+template<class MATRIX, typename VectorType>
+TransposeMatrix<MATRIX, VectorType>::TransposeMatrix (const MATRIX *M)
   : m(M)
 {}
 
 
-template<class MATRIX, class VECTOR>
-TransposeMatrix<MATRIX, VECTOR>::TransposeMatrix (const char *name)
+template<class MATRIX, typename VectorType>
+TransposeMatrix<MATRIX, VectorType>::TransposeMatrix (const char *name)
   : m(0, name)
 {}
 
 
-template<class MATRIX, class VECTOR>
-TransposeMatrix<MATRIX, VECTOR>::TransposeMatrix (
+template<class MATRIX, typename VectorType>
+TransposeMatrix<MATRIX, VectorType>::TransposeMatrix (
   const MATRIX *M,
   const char *name)
   : m(M, name)
 {}
 
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline void
-TransposeMatrix<MATRIX, VECTOR>::clear ()
+TransposeMatrix<MATRIX, VectorType>::clear ()
 {
   m = 0;
 }
 
 
-template<class MATRIX, class VECTOR>
-inline const TransposeMatrix<MATRIX, VECTOR> &
-TransposeMatrix<MATRIX, VECTOR>::operator= (const MATRIX *M)
+template<class MATRIX, typename VectorType>
+inline const TransposeMatrix<MATRIX, VectorType> &
+TransposeMatrix<MATRIX, VectorType>::operator= (const MATRIX *M)
 {
   m = M;
   return *this;
 }
 
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline bool
-TransposeMatrix<MATRIX, VECTOR>::empty () const
+TransposeMatrix<MATRIX, VectorType>::empty () const
 {
   if (m == 0)
     return true;
   return m->empty();
 }
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline void
-TransposeMatrix<MATRIX, VECTOR>::vmult (VECTOR &dst,
-                                        const VECTOR &src) const
+TransposeMatrix<MATRIX, VectorType>::vmult (VectorType       &dst,
+                                            const VectorType &src) const
 {
   Assert (m != 0, ExcNotInitialized());
   m->Tvmult (dst, src);
 }
 
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline void
-TransposeMatrix<MATRIX, VECTOR>::Tvmult (VECTOR &dst,
-                                         const VECTOR &src) const
+TransposeMatrix<MATRIX, VectorType>::Tvmult (VectorType       &dst,
+                                             const VectorType &src) const
 {
   Assert (m != 0, ExcNotInitialized());
   m->vmult (dst, src);
 }
 
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline void
-TransposeMatrix<MATRIX, VECTOR>::vmult_add (VECTOR &dst,
-                                            const VECTOR &src) const
+TransposeMatrix<MATRIX, VectorType>::vmult_add (VectorType       &dst,
+                                                const VectorType &src) const
 {
   Assert (m != 0, ExcNotInitialized());
   m->Tvmult_add (dst, src);
 }
 
 
-template<class MATRIX, class VECTOR>
+template<class MATRIX, typename VectorType>
 inline void
-TransposeMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
-                                             const VECTOR &src) const
+TransposeMatrix<MATRIX, VectorType>::Tvmult_add (VectorType       &dst,
+                                                 const VectorType &src) const
 {
   Assert (m != 0, ExcNotInitialized());
   m->vmult_add (dst, src);
