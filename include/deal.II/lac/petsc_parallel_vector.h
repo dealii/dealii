@@ -324,13 +324,13 @@ namespace PETScWrappers
        * @p communicator denotes the MPI communicator henceforth to be used
        * for this vector.
        *
-       * If @p fast is false, the vector is filled by zeros. Otherwise, the
+       * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
        * elements are left an unspecified state.
        */
       void reinit (const MPI_Comm  &communicator,
                    const size_type  N,
                    const size_type  local_size,
-                   const bool       fast = false);
+                   const bool       omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector @p v, and also take over
@@ -338,10 +338,10 @@ namespace PETScWrappers
        * The same applies as for the other @p reinit function.
        *
        * The elements of @p v are not copied, i.e. this function is the same
-       * as calling <tt>reinit(v.size(), v.local_size(), fast)</tt>.
+       * as calling <tt>reinit(v.size(), v.local_size(), omit_zeroing_entries)</tt>.
        */
       void reinit (const Vector &v,
-                   const bool    fast = false);
+                   const bool    omit_zeroing_entries = false);
 
       /**
        * Reinit as a vector without ghost elements. See the constructor with

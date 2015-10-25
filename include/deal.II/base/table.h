@@ -481,13 +481,15 @@ public:
   void reset_values ();
 
   /**
-   * Set the dimensions of this object to the sizes given in the argument, and
-   * newly allocate the required memory. If <tt>fast</tt> is set to
-   * <tt>false</tt>, previous content is deleted, otherwise the memory is not
-   * touched.
+   * Set the dimensions of this object to the sizes given in the
+   * argument, and newly allocate the required memory. If
+   * <tt>omit_default_initialization</tt> is set to <tt>false</tt>,
+   * all elements of the table are set to a default constructed object
+   * for the element type. Otherwise the memory is left in an
+   * uninitialized or otherwise undefined state.
    */
   void reinit (const TableIndices<N> &new_size,
-               const bool             fast = false);
+               const bool             omit_default_initialization = false);
 
   /**
    * Size of the table in direction <tt>i</tt>.
@@ -864,7 +866,7 @@ public:
    */
   void reinit (const unsigned int size1,
                const unsigned int size2,
-               const bool         fast = false);
+               const bool         omit_default_initialization = false);
 
   using TableBase<2,T>::reinit;
 
@@ -1525,7 +1527,7 @@ public:
    */
   void reinit (const unsigned int size1,
                const unsigned int size2,
-               const bool         fast = false);
+               const bool         omit_default_initialization = false);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1881,7 +1883,7 @@ template <int N, typename T>
 inline
 void
 TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
-                        const bool             fast)
+                        const bool             omit_default_initialization)
 {
   table_size = new_sizes;
 
@@ -1901,9 +1903,9 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
     }
 
   // if new size is nonzero: if necessary allocate additional memory, and if
-  // not fast resize, zero out all values)
+  // not fast resize, zero out all values/default initialize them)
   values.resize_fast (new_size);
-  if (!fast)
+  if (!omit_default_initialization)
     values.fill(T());
 }
 
@@ -2253,9 +2255,9 @@ inline
 void
 Table<2,T>::reinit (const unsigned int size1,
                     const unsigned int size2,
-                    const bool         fast)
+                    const bool         omit_default_initialization)
 {
-  this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2),fast);
+  this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2),omit_default_initialization);
 }
 
 
@@ -2402,9 +2404,9 @@ inline
 void
 TransposeTable<T>::reinit (const unsigned int size1,
                            const unsigned int size2,
-                           const bool         fast)
+                           const bool         omit_default_initialization)
 {
-  this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1),fast);
+  this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1), omit_default_initialization);
 }
 
 

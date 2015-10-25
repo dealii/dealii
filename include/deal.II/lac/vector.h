@@ -287,25 +287,25 @@ public:
    * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
    * standard library containers.
    *
-   * If @p fast is false, the vector is filled by zeros. Otherwise, the
+   * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
    * elements are left an unspecified state.
    *
    * This function is virtual in order to allow for derived classes to handle
    * memory separately.
    */
   virtual void reinit (const size_type N,
-                       const bool      fast=false);
+                       const bool      omit_zeroing_entries=false);
 
   /**
    * Change the dimension to that of the vector @p V. The same applies as for
    * the other @p reinit function.
    *
    * The elements of @p V are not copied, i.e.  this function is the same as
-   * calling <tt>reinit (V.size(), fast)</tt>.
+   * calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
    */
   template <typename Number2>
   void reinit (const Vector<Number2> &V,
-               const bool            fast=false);
+               const bool            omit_zeroing_entries=false);
 
   /**
    * Swap the contents of this vector and the other vector @p v. One could do
@@ -1074,7 +1074,8 @@ Vector<Number>::~Vector ()
 
 template <typename Number>
 inline
-void Vector<Number>::reinit (const size_type n, const bool fast)
+void Vector<Number>::reinit (const size_type n,
+                             const bool omit_zeroing_entries)
 {
   if (n==0)
     {
@@ -1091,7 +1092,7 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
       allocate();
     };
   vec_size = n;
-  if (fast == false)
+  if (omit_zeroing_entries == false)
     *this = static_cast<Number>(0);
 }
 

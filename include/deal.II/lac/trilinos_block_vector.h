@@ -198,10 +198,10 @@ namespace TrilinosWrappers
      * on the same Epetra_map is intended. In that case, the same communicator
      * is used for data exchange.
      *
-     * If <tt>fast==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<Epetra_Map> &partitioning,
-                 const bool                     fast = false);
+                 const bool                     omit_zeroing_entries = false);
 
     /**
      * Reinitialize the BlockVector to contain as many blocks as there are
@@ -211,21 +211,21 @@ namespace TrilinosWrappers
      * with a distributed vector based on the same initialization is intended.
      * In that case, the same communicator is used for data exchange.
      *
-     * If <tt>fast==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<IndexSet> &partitioning,
                  const MPI_Comm              &communicator = MPI_COMM_WORLD,
-                 const bool                   fast = false);
+                 const bool                   omit_zeroing_entries = false);
 
     /**
      * Reinitialize the BlockVector to contain as many blocks as there are
      * elements in the first argument, and with the respective sizes. Since no
      * distribution map is given, all vectors are local vectors.
      *
-     * If <tt>fast==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<size_type> &N,
-                 const bool                    fast=false);
+                 const bool                    omit_zeroing_entries=false);
 
     /**
      * Reinitialize the vector in the same way as the given to a distributed
@@ -238,7 +238,7 @@ namespace TrilinosWrappers
      * as for the other reinit() function.
      *
      * The elements of <tt>V</tt> are not copied, i.e.  this function is the
-     * same as calling <tt>reinit (V.size(), fast)</tt>.
+     * same as calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
      *
      * Note that you must call this (or the other reinit() functions)
      * function, rather than calling the reinit() functions of an individual
@@ -248,7 +248,7 @@ namespace TrilinosWrappers
      * the wrong block.
      */
     void reinit (const BlockVector &V,
-                 const bool fast = false);
+                 const bool omit_zeroing_entries = false);
 
     /**
      * Change the number of blocks to <tt>num_blocks</tt>. The individual
@@ -472,18 +472,18 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 TrilinosWrappers::BlockVector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.range_partitioner(), fast);
+        v.reinit(matrix.range_partitioner(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 TrilinosWrappers::BlockVector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
+        v.reinit(matrix.domain_partitioner(), omit_zeroing_entries);
       }
     };
 

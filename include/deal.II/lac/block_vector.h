@@ -245,11 +245,11 @@ public:
    * collect_sizes() to update the block system's knowledge of its individual
    * block's sizes.
    *
-   * If <tt>fast==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
   void reinit (const unsigned int n_blocks,
                const size_type block_size = 0,
-               const bool fast = false);
+               const bool omit_zeroing_entries = false);
 
   /**
    * Reinitialize the BlockVector such that it contains
@@ -259,7 +259,7 @@ public:
    * If the number of blocks is the same as before this function was called,
    * all vectors remain the same and reinit() is called for each vector.
    *
-   * If <tt>fast==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    *
    * Note that you must call this (or the other reinit() functions) function,
    * rather than calling the reinit() functions of an individual block, to
@@ -268,7 +268,7 @@ public:
    * yield unpredictable results since they may be routed to the wrong block.
    */
   void reinit (const std::vector<size_type> &block_sizes,
-               const bool                    fast=false);
+               const bool                    omit_zeroing_entries=false);
 
   /**
    * Reinitialize the BlockVector to reflect the structure found in
@@ -277,17 +277,17 @@ public:
    * If the number of blocks is the same as before this function was called,
    * all vectors remain the same and reinit() is called for each vector.
    *
-   * If <tt>fast==false</tt>, the vector is filled with zeros.
+   * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
   void reinit (const BlockIndices &block_indices,
-               const bool fast=false);
+               const bool omit_zeroing_entries=false);
 
   /**
    * Change the dimension to that of the vector <tt>V</tt>. The same applies
    * as for the other reinit() function.
    *
    * The elements of <tt>V</tt> are not copied, i.e.  this function is the
-   * same as calling <tt>reinit (V.size(), fast)</tt>.
+   * same as calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
    *
    * Note that you must call this (or the other reinit() functions) function,
    * rather than calling the reinit() functions of an individual block, to
@@ -297,7 +297,7 @@ public:
    */
   template <typename Number2>
   void reinit (const BlockVector<Number2> &V,
-               const bool                 fast=false);
+               const bool                 omit_zeroing_entries=false);
 
   /**
    * Multiply each element of this vector by the corresponding element of
@@ -514,18 +514,18 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 BlockVector<number> &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.get_row_indices(), fast);
+        v.reinit(matrix.get_row_indices(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 BlockVector<number> &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.get_column_indices(), fast);
+        v.reinit(matrix.get_column_indices(), omit_zeroing_entries);
       }
     };
 

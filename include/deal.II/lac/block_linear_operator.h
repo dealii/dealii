@@ -282,7 +282,7 @@ namespace internal
     populate_linear_operator_functions(
       dealii::BlockLinearOperator<Range, Domain> &op)
     {
-      op.reinit_range_vector = [=](Range &v, bool fast)
+      op.reinit_range_vector = [=](Range &v, bool omit_zeroing_entries)
       {
         const unsigned int m = op.n_block_rows();
 
@@ -291,12 +291,12 @@ namespace internal
 
         // And reinitialize every individual block with reinit_range_vectors:
         for (unsigned int i = 0; i < m; ++i)
-          op.block(i, 0).reinit_range_vector(v.block(i), fast);
+          op.block(i, 0).reinit_range_vector(v.block(i), omit_zeroing_entries);
 
         v.collect_sizes();
       };
 
-      op.reinit_domain_vector = [=](Domain &v, bool fast)
+      op.reinit_domain_vector = [=](Domain &v, bool omit_zeroing_entries)
       {
         const unsigned int n = op.n_block_cols();
 
@@ -305,7 +305,7 @@ namespace internal
 
         // And reinitialize every individual block with reinit_domain_vectors:
         for (unsigned int i = 0; i < n; ++i)
-          op.block(0, i).reinit_domain_vector(v.block(i), fast);
+          op.block(0, i).reinit_domain_vector(v.block(i), omit_zeroing_entries);
 
         v.collect_sizes();
       };
@@ -714,7 +714,7 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
 
     for (unsigned int i = 1; i < m; ++i)
       {
-        diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool fast=*/ true);
+        diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool omit_zeroing_entries=*/ true);
         *tmp = u.block(i);
         *tmp *= -1.;
         for (unsigned int j = 0; j < i; ++j)
@@ -821,7 +821,7 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &block_operator
 
     for (int i = m - 2; i >= 0; --i)
       {
-        diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool fast=*/ true);
+        diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool omit_zeroing_entries=*/ true);
         *tmp = u.block(i);
         *tmp *= -1.;
         for (int j = i + 1; j < m; ++j)

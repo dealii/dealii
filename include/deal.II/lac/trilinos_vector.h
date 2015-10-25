@@ -305,7 +305,7 @@ namespace TrilinosWrappers
       /**
        * Reinit functionality. This function sets the calling vector to the
        * dimension and the parallel distribution of the input vector, but does
-       * not copy the elements in <tt>v</tt>. If <tt>fast</tt> is not
+       * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt> is not
        * <tt>true</tt>, the elements in the vector are initialized with zero,
        * otherwise the content will be left unchanged and the user has to set
        * all elements.
@@ -316,13 +316,13 @@ namespace TrilinosWrappers
        * application of this function is to generate a replication of a whole
        * vector on each machine, when the calling vector is built according to
        * the localized vector class TrilinosWrappers::Vector, and <tt>v</tt>
-       * is a distributed vector. In this case, the variable <tt>fast</tt>
+       * is a distributed vector. In this case, the variable <tt>omit_zeroing_entries</tt>
        * needs to be set to <tt>false</tt>, since it does not make sense to
        * exchange data between differently parallelized vectors without
        * touching the elements.
        */
       void reinit (const VectorBase &v,
-                   const bool        fast = false,
+                   const bool        omit_zeroing_entries = false,
                    const bool        allow_different_maps = false);
 
       /**
@@ -472,7 +472,7 @@ namespace TrilinosWrappers
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const Epetra_Map &parallel_partitioning,
-                   const bool        fast = false) DEAL_II_DEPRECATED;
+                   const bool        omit_zeroing_entries = false) DEAL_II_DEPRECATED;
 
       /**
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
@@ -566,7 +566,7 @@ namespace TrilinosWrappers
       /**
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning.  The flag
-       * <tt>fast</tt> determines whether the vector should be filled with
+       * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with
        * zero (false) or left untouched (true).
        *
        *
@@ -580,7 +580,7 @@ namespace TrilinosWrappers
        */
       void reinit (const IndexSet &parallel_partitioning,
                    const MPI_Comm &communicator = MPI_COMM_WORLD,
-                   const bool      fast = false);
+                   const bool      omit_zeroing_entries = false);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -799,7 +799,7 @@ namespace TrilinosWrappers
      * <tt>n</tt>.
      */
     void reinit (const size_type n,
-                 const bool      fast = false);
+                 const bool      omit_zeroing_entries = false);
 
     /**
      * Initialization with an Epetra_Map. Similar to the call in the other
@@ -807,7 +807,7 @@ namespace TrilinosWrappers
      * is generated. This initialization function is appropriate when the data
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
-     * <tt>fast</tt> determines whether the vector should be filled with zero
+     * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with zero
      * or left untouched.
      *
      * Which element of the @p input_map argument are set is in fact ignored,
@@ -815,7 +815,7 @@ namespace TrilinosWrappers
      * this argument.
      */
     void reinit (const Epetra_Map &input_map,
-                 const bool        fast = false);
+                 const bool        omit_zeroing_entries = false);
 
     /**
      * Initialization with an IndexSet. Similar to the call in the other class
@@ -823,7 +823,7 @@ namespace TrilinosWrappers
      * generated. This initialization function is appropriate in case the data
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
-     * <tt>fast</tt> determines whether the vector should be filled with zero
+     * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with zero
      * (false) or left untouched (true).
      *
      * Which element of the @p input_map argument are set is in fact ignored,
@@ -832,14 +832,14 @@ namespace TrilinosWrappers
      */
     void reinit (const IndexSet   &input_map,
                  const MPI_Comm   &communicator = MPI_COMM_WORLD,
-                 const bool        fast = false);
+                 const bool        omit_zeroing_entries = false);
 
     /**
      * Reinit function. Takes the information of a Vector and copies
      * everything to the calling vector, now also allowing different maps.
      */
     void reinit (const VectorBase &V,
-                 const bool        fast = false,
+                 const bool        omit_zeroing_entries = false,
                  const bool        allow_different_maps = false);
 
     /**
@@ -986,18 +986,18 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 TrilinosWrappers::MPI::Vector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator(), fast);
+        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 TrilinosWrappers::MPI::Vector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator(), fast);
+        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator(), omit_zeroing_entries);
       }
     };
 
@@ -1013,18 +1013,22 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 TrilinosWrappers::Vector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator(), fast);
+        v.reinit(matrix.locally_owned_range_indices(),
+                 matrix.get_mpi_communicator(),
+                 omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 TrilinosWrappers::Vector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator(), fast);
+        v.reinit(matrix.locally_owned_domain_indices(),
+                 matrix.get_mpi_communicator(),
+                 omit_zeroing_entries);
       }
     };
 

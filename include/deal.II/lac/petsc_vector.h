@@ -167,21 +167,21 @@ namespace PETScWrappers
      * reduces memory consumption, or if for efficiency the same amount of
      * memory is used for less data.
      *
-     * If @p fast is false, the vector is filled by zeros. Otherwise, the
+     * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
      * elements are left an unspecified state.
      */
     void reinit (const size_type N,
-                 const bool      fast = false);
+                 const bool      omit_zeroing_entries = false);
 
     /**
      * Change the dimension to that of the vector @p v. The same applies as
      * for the other reinit() function.
      *
      * The elements of @p v are not copied, i.e.  this function is the same as
-     * calling <tt>reinit (v.size(), fast)</tt>.
+     * calling <tt>reinit (v.size(), omit_zeroing_entries)</tt>.
      */
     void reinit (const Vector &v,
-                 const bool    fast = false);
+                 const bool    omit_zeroing_entries = false);
 
   protected:
     /**

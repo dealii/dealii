@@ -158,11 +158,11 @@ namespace PETScWrappers
      * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
      * size <tt>block_size</tt> each.
      *
-     * If <tt>fast==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
      */
     void reinit (const unsigned int num_blocks,
                  const size_type    block_size,
-                 const bool fast = false);
+                 const bool omit_zeroing_entries = false);
 
     /**
      * Reinitialize the BlockVector such that it contains
@@ -172,7 +172,7 @@ namespace PETScWrappers
      * If the number of blocks is the same as before this function was called,
      * all vectors remain the same and reinit() is called for each vector.
      *
-     * If <tt>fast==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
      *
      * Note that you must call this (or the other reinit() functions)
      * function, rather than calling the reinit() functions of an individual
@@ -182,14 +182,14 @@ namespace PETScWrappers
      * the wrong block.
      */
     void reinit (const std::vector<size_type> &N,
-                 const bool                   fast=false);
+                 const bool                   omit_zeroing_entries=false);
 
     /**
      * Change the dimension to that of the vector <tt>V</tt>. The same applies
      * as for the other reinit() function.
      *
      * The elements of <tt>V</tt> are not copied, i.e.  this function is the
-     * same as calling <tt>reinit (V.size(), fast)</tt>.
+     * same as calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
      *
      * Note that you must call this (or the other reinit() functions)
      * function, rather than calling the reinit() functions of an individual
@@ -199,7 +199,7 @@ namespace PETScWrappers
      * the wrong block.
      */
     void reinit (const BlockVector &V,
-                 const bool         fast=false);
+                 const bool         omit_zeroing_entries=false);
 
     /**
      * Change the number of blocks to <tt>num_blocks</tt>. The individual
@@ -359,10 +359,10 @@ namespace PETScWrappers
   void
   BlockVector::reinit (const unsigned int n_bl,
                        const size_type    bl_sz,
-                       const bool         fast)
+                       const bool         omit_zeroing_entries)
   {
     std::vector<size_type> n(n_bl, bl_sz);
-    reinit(n, fast);
+    reinit(n, omit_zeroing_entries);
   }
 
 
@@ -370,28 +370,28 @@ namespace PETScWrappers
   inline
   void
   BlockVector::reinit (const std::vector<size_type> &n,
-                       const bool                    fast)
+                       const bool                    omit_zeroing_entries)
   {
     block_indices.reinit (n);
     if (this->components.size() != this->n_blocks())
       this->components.resize(this->n_blocks());
 
     for (unsigned int i=0; i<this->n_blocks(); ++i)
-      this->components[i].reinit(n[i], fast);
+      this->components[i].reinit(n[i], omit_zeroing_entries);
   }
 
 
   inline
   void
   BlockVector::reinit (const BlockVector &v,
-                       const bool fast)
+                       const bool omit_zeroing_entries)
   {
     block_indices = v.get_block_indices();
     if (this->components.size() != this->n_blocks())
       this->components.resize(this->n_blocks());
 
     for (unsigned int i=0; i<this->n_blocks(); ++i)
-      block(i).reinit(v.block(i), fast);
+      block(i).reinit(v.block(i), omit_zeroing_entries);
   }
 
 
