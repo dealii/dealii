@@ -23,67 +23,32 @@ ADD_CUSTOM_TARGET(code-gallery)
 
 
 #
-# Define ways to get the code-gallery repository downloaded at
-# the time that we call cmake, so that we can subsequently
-# use the files that we find during download as inputs for
-# doxygen. This has to happen at the time we run cmake because
-# doing so at build time is too late for us to set up the
-# proper dependencies for the build targets.
+# Check whether someone has either specified a global variable that
+# points to a code gallery directory, or whether it has been put into
+# a top-level code-gallery/ directory alongside the tutorial/
+# directory
 #
-# To do so, we need to execute git on a command line; this
-# (and consequently everything else below) will not work
-# on Windows. It will also not work if we can't find a version
-# of git
-#
-FIND_PACKAGE(Git)
-IF( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
-    AND
-    (NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
-    AND GIT_FOUND )
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
 
-  # First update or download the code-gallery repository
-  IF (IS_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/code-gallery)
-    MESSAGE(STATUS "Updating code-gallery git repository")
-    EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} checkout master
-                    COMMAND git pull origin master
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/code-gallery
-                    TIMEOUT 30
-                    OUTPUT_QUIET
-                    ERROR_QUIET
-		    RESULT_VARIABLE _result)
-  ELSE()
-    MESSAGE(STATUS "Cloning code-gallery git repository")
-    EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} clone https://github.com/bangerth/code-gallery.git
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    TIMEOUT 30
-                    OUTPUT_QUIET
-                    ERROR_QUIET
-		    RESULT_VARIABLE _result)
-  ENDIF()
+  MESSAGE(STATUS "Setting up code gallery documentation from ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
 
-  # See if getting the git repository update succeeded
-  IF (NOT ${_result})
-    MESSAGE(STATUS "Updating code-gallery git repository - Done")
+  # Collect the names of all code gallery projects. To
+  # do so, find all 'author' files, then strip the last two
+  # levels of these paths.
+  #
+  # For unclear reasons, the glob returns these files as
+  # "/a/b/c/name//doc//author", so make sure we eat the
+  # double slashes in the second step
+  FILE(GLOB _code_gallery_names
+       "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
+  STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
-    # Now collect the names of all code gallery projects. To
-    # do so, find all 'author' files, then strip the last two
-    # levels of these paths.
-    #
-    # For unclear reasons, the glob returns these files as
-    # "/a/b/c/name//doc//author", so make sure we eat the
-    # double slashes in the second step
-    FILE(GLOB _code_gallery_names
-         "${CMAKE_CURRENT_BINARY_DIR}/code-gallery/*/doc/author")
-    STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
+  # Now set up targets for each of the code gallery programs
 
-    # Now set up targets for each of the code gallery programs
+  # ...TODO...
 
-    # ...TODO...
-
-  ELSE()
-    MESSAGE(WARNING "Could not clone or update the code-gallery repository ${_result}")
-  ENDIF()
 ELSE()
-  MESSAGE(WARNING "Generating the code-gallery documentation is only possible on unix-like systems with 'git' installed.")
+  MESSAGE(STATUS "Generating the code-gallery documentation is only possible if the code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
 ENDIF()
 

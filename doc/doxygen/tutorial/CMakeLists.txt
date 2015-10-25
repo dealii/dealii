@@ -27,8 +27,9 @@ FILE(GLOB _deal_ii_steps
 # For unclear reasons, the glob returns these files as
 # "/a/b/c/name//doc//author", so make sure we eat the
 # double slashes in the second step
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
 FILE(GLOB _code_gallery_names 
-     "${CMAKE_BINARY_DIR}/doc/doxygen/code-gallery/code-gallery/*/doc/author")
+     "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
 STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
 #
