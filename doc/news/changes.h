@@ -184,9 +184,9 @@ inconvenience this causes.
 <h3>General</h3>
 <ol>
   <li> New: constrained_linear_operator() and constrained_right_hand_side()
-  implemented that provide a generic mechanism of applying constraints to a
-  LinearOperator. A detailed explanation with example code is given in the
-  @ref constraints module.
+  provide a generic mechanism of applying constraints to a LinearOperator.
+  A detailed explanation with example code is given in the @ref constraints
+  module.
   <br>
   (Mauro Bardelloni, Matthias Maier, 2015/10/25 - 2015/12/27)
   </li>

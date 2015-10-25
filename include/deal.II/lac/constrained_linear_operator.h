@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__constraint_linear_operator_h
-#define dealii__constraint_linear_operator_h
+#ifndef dealii__constrained_linear_operator_h
+#define dealii__constrained_linear_operator_h
 
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
@@ -32,15 +32,16 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * This function takes a ConstraintMatrix @p cm and an operator exemplar @p
- * exemplar (this exemplar is usually a linear operator that describes the
- * system matrix) and returns a LinearOperator object associated with the
- * "homogeneous action" of the underlying ConstraintMatrix object:
+ * This function takes a ConstraintMatrix @p constraint_matrix and an
+ * operator exemplar @p exemplar (this exemplar is usually a linear
+ * operator that describes the system matrix) and returns a LinearOperator
+ * object associated with the "homogeneous action" of the underlying
+ * ConstraintMatrix object:
  *
  * Applying the LinearOperator object on a vector <code>u</code> results in
  * a vector <code>v</code> that stores the result of calling
  * ConstraintMatrix::distribute() on <code>u</code> - with one important
- * difference; inhomogeneities are note applied, but always treated as 0
+ * difference: inhomogeneities are note applied, but always treated as 0
  * instead.
  *
  * The LinearOperator object created by this function is primarily used

@@ -437,8 +437,8 @@
  * <h3>Applying constraints indirectly with a LinearOperator</h3>
  *
  * Sometimes it is either not desirable, or not possible to directly
- * condensate, or eliminate constraints from a system of linear equations.
- * In particular if there is no underlying matrix object that could be
+ * condense, or eliminate constraints from a system of linear equations. In
+ * particular if there is no underlying matrix object that could be
  * condensed (or taken care of constraints during assembly). This is
  * usually the case if the system is described by a LinearOperator.
  *
@@ -446,8 +446,11 @@
  * @f[
  *   (C^T A C + Id_c) \tilde x = C^T (b - A\,k)
  * @f]
- * instead [1]. Here, $A$ is a given (unconstrained) system matrix $A$ and
- * $b$ the corresponding right hand side of a system of linear equations
+ * instead [1] (M. S. Shephard: Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process, 1985).
+ *
+ * Here, $A$ is a given (unconstrained) system matrix and $b$
+ * the corresponding right hand side of a system of linear equations
  * $A\,x=b$. The matrix $C$ describes the homogeneous part of the linear
  * constraints stored in a ConstraintMatrix and the vector $k$ is the
  * vector of corresponding inhomogeneities. More precisely, the
@@ -459,13 +462,13 @@
  * And finally, $Id_c$ denotes the identity on the subspace of constrained
  * degrees of freedom.
  *
- * The corresponding solution of $A\,x=b$ that obeys boundary conditions is
+ * The corresponding solution of $A\,x=b$ that obeys these constraints is
  * then recovered by distributing constraints: $x=C\tilde x+k$.
  *
  * The whole system can be set up and solved with the following snippet of
  * code:
  * @code
- * #include <deal.II/lac/constraint_linear_operator.h>
+ * #include <deal.II/lac/constrained_linear_operator.h>
  *
  * // ...
  *
@@ -484,7 +487,4 @@
  * solver.solve(op_amod, solution, rhs_mod, preconditioner);
  * constraint_matrix.distribute(solution);
  * @endcode
- *
- * [1] M. S. Shephard: Linear multipoint constraints applied via
- * transformation as part of a direct stiffness assembly process, 1985.
  */

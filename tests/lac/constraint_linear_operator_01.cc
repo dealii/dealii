@@ -45,7 +45,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
-#include <deal.II/lac/constraint_linear_operator.h>
+#include <deal.II/lac/constrained_linear_operator.h>
 
 #include <fstream>
 #include <iostream>
@@ -192,8 +192,8 @@ void Step6<dim>::solve ()
 
   const auto A = linear_operator(system_matrix_lo);
   const auto M = constrained_linear_operator(constraints, A);
-  Vector<double> rhs =
-    constrained_right_hand_side(constraints, A, system_rhs_lo);
+  const auto rhs = constrained_right_hand_side(constraints, A,
+                                               system_rhs_lo);
 
   check_solver_within_range(
     solver.solve(M, solution_lo, rhs, preconditioner),
