@@ -216,7 +216,7 @@ template <int dim>
 inline unsigned int
 PolynomialsBDM<dim>::degree() const
 {
-  return polynomial_space.degree();
+  return polynomial_space.degree()-1;
 }
 
 

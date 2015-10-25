@@ -379,6 +379,11 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: PolynomialsBDM::degree() now returns the correct value.
+  <br>
+  (Alistair Bentley, 2015/10/24)
+  </li>
+
   <li> New: Triangulation::set_all_manifold_ids_on_boundary(boundary_id, manifold_id) 
   which sets the manifold_id for all parts of the boundary with a given boundary_id.
   <br>
