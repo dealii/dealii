@@ -1941,7 +1941,7 @@ public:
      * active cells as argument. The children of this parent cell will subsequently
      * be coarsened away.
      */
-    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> pre_coarsening_on_cell;
+    boost::signals2::signal<void (const typename Triangulation<dim, spacedim>::cell_iterator &cell)> pre_coarsening_on_cell;
 
     /**
      * This signal is triggered for each cell that just has been refined.
@@ -1949,7 +1949,7 @@ public:
      * @note The signal parameter @p cell corresponds to the immediate parent cell
      * of a set of newly created active cells.
      */
-    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
+    boost::signals2::signal<void (const typename Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
 
     /**
      * This signal is triggered whenever the triangulation owning the signal
