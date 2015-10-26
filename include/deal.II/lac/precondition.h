@@ -1029,14 +1029,14 @@ PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(src);
 }
 
-inline typename PreconditionIdentity::size_type
+inline PreconditionIdentity::size_type
 PreconditionIdentity::m () const
 {
   Assert(n_rows != 0, ExcNotInitialized());
   return n_rows;
 }
 
-inline typename PreconditionIdentity::size_type
+inline PreconditionIdentity::size_type
 PreconditionIdentity::n () const
 {
   Assert(n_columns != 0, ExcNotInitialized());
@@ -1120,14 +1120,14 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(relaxation,src);
 }
 
-inline typename PreconditionRichardson::size_type
+inline PreconditionRichardson::size_type
 PreconditionRichardson::m () const
 {
   Assert(n_rows != 0, ExcNotInitialized());
   return n_rows;
 }
 
-inline typename PreconditionRichardson::size_type
+inline PreconditionRichardson::size_type
 PreconditionRichardson::n () const
 {
   Assert(n_columns != 0, ExcNotInitialized());

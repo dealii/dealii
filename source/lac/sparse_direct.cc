@@ -473,14 +473,14 @@ SparseDirectUMFPACK::Tvmult (
   this->solve(dst, /*transpose=*/ true);
 }
 
-typename SparseDirectUMFPACK::size_type
+SparseDirectUMFPACK::size_type
 SparseDirectUMFPACK::m () const
 {
   Assert (_m!=0, ExcNotInitialized());
   return _m;
 }
 
-typename SparseDirectUMFPACK::size_type
+SparseDirectUMFPACK::size_type
 SparseDirectUMFPACK::n () const
 {
   Assert (_n!=0, ExcNotInitialized());
