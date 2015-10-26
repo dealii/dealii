@@ -159,6 +159,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: Preliminary support for parallel, adaptive, geometric multigrid is
+  now in place with changes to MGConstrainedDoFs (many new functions), MGTransfer,
+  MGTools::extract_inner_interface_dofs, MGTransferPrebuilt,
+  DoFTools::extract_locally_relevant_level_dofs.
+  <br>
+  (Timo Heister, Guido Kanschat, 2015/10/26)
+  </li>
+
   <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
   ghost cells. Similarly ::level_ghost_owners() for level ghosts.
   <br>
