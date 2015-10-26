@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * Applying the LinearOperator object on a vector <code>u</code> results in
  * a vector <code>v</code> that stores the result of calling
  * ConstraintMatrix::distribute() on <code>u</code> - with one important
- * difference: inhomogeneities are note applied, but always treated as 0
+ * difference: inhomogeneities are not applied, but always treated as 0
  * instead.
  *
  * The LinearOperator object created by this function is primarily used
@@ -154,7 +154,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
     v = 0.;
     for (auto i : v.locally_owned_elements())
       if (constraint_matrix.is_constrained(i))
-        v(i) += u(i);
+        v(i) = u(i);
   };
 
   return_op.Tvmult = [&constraint_matrix](Domain &v, const Range &u)
@@ -162,7 +162,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
     v = 0.;
     for (auto i : v.locally_owned_elements())
       if (constraint_matrix.is_constrained(i))
-        v(i) += u(i);
+        v(i) = u(i);
   };
 
   return return_op;
