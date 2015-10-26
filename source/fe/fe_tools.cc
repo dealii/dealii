@@ -785,12 +785,11 @@ namespace FETools
       tria.begin_active()->set_refine_flag (RefinementCase<dim>(ref_case));
       tria.execute_coarsening_and_refinement ();
 
-      MappingQ1<dim,spacedim> mapping;
       const unsigned int degree = fe.degree;
       QGauss<dim> q_fine (degree+1);
       const unsigned int nq = q_fine.size();
 
-      FEValues<dim,spacedim> fine (mapping, fe, q_fine,
+      FEValues<dim,spacedim> fine (fe, q_fine,
                                    update_quadrature_points |
                                    update_JxW_values |
                                    update_values);
@@ -839,7 +838,7 @@ namespace FETools
               q_points_coarse[i](j) = q_points_fine[i](j);
           const Quadrature<dim> q_coarse (q_points_coarse,
                                           fine.get_JxW_values ());
-          FEValues<dim,spacedim> coarse (mapping, fe, q_coarse, update_values);
+          FEValues<dim,spacedim> coarse (fe, q_coarse, update_values);
 
           coarse.reinit (tria.begin (0));
 
@@ -1124,7 +1123,6 @@ namespace FETools
 
     // prepare FEValues, quadrature etc on
     // coarse cell
-    MappingQ1<dim,spacedim> mapping;
     QGauss<dim> q_fine(degree+1);
     const unsigned int nq = q_fine.size();
 
@@ -1135,7 +1133,7 @@ namespace FETools
       Triangulation<dim,spacedim> tr;
       GridGenerator::hyper_cube (tr, 0, 1);
 
-      FEValues<dim,spacedim> coarse (mapping, fe, q_fine,
+      FEValues<dim,spacedim> coarse (fe, q_fine,
                                      update_JxW_values | update_values);
 
       typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
@@ -1193,7 +1191,7 @@ namespace FETools
         tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
-        FEValues<dim,spacedim> fine (mapping, fe, q_fine,
+        FEValues<dim,spacedim> fine (StaticMappingQ1<dim,spacedim>::mapping, fe, q_fine,
                                      update_quadrature_points | update_JxW_values |
                                      update_values);
 
@@ -1219,7 +1217,7 @@ namespace FETools
                 q_points_coarse[q](j) = q_points_fine[q](j);
             Quadrature<dim> q_coarse (q_points_coarse,
                                       fine.get_JxW_values());
-            FEValues<dim,spacedim> coarse (mapping, fe, q_coarse, update_values);
+            FEValues<dim,spacedim> coarse (StaticMappingQ1<dim,spacedim>::mapping, fe, q_coarse, update_values);
             coarse.reinit(coarse_cell);
 
             // Build RHS

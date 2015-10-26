@@ -106,6 +106,10 @@ public:
    */
   MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping);
 
+  // for documentation, see the Mapping base class
+  virtual
+  Mapping<dim,spacedim> *clone () const;
+
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.
@@ -113,7 +117,8 @@ public:
   unsigned int get_degree () const;
 
   /**
-   * Always returns @p true because MappingQ1 preserves vertex locations.
+   * Always returns @p true because the default implementation of
+   * functions in this class preserves vertex locations.
    */
   virtual
   bool preserves_vertex_locations () const;
@@ -630,7 +635,8 @@ protected:
 
   /**
    * Make MappingQ a friend since it needs to call the
-   * fill_fe_values() functions on its MappingQ1 sub-object.
+   * fill_fe_values() functions on its MappingQGeneric(1)
+   * sub-object.
    */
   template <int, int> friend class MappingQ;
 };

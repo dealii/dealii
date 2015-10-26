@@ -201,23 +201,23 @@ namespace TrilinosWrappers
        * Epetra_Maps given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *
-       * If <tt>fast==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
        *
        * This function is deprecated.
        */
       void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
-                   const bool                     fast = false) DEAL_II_DEPRECATED;
+                   const bool                     omit_zeroing_entries = false) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
        * index sets given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *
-       * If <tt>fast==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
        */
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const MPI_Comm              &communicator = MPI_COMM_WORLD,
-                   const bool                   fast = false);
+                   const bool                   omit_zeroing_entries = false);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -247,7 +247,7 @@ namespace TrilinosWrappers
        * applies as for the other reinit() function.
        *
        * The elements of <tt>V</tt> are not copied, i.e.  this function is the
-       * same as calling <tt>reinit (V.size(), fast)</tt>.
+       * same as calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual
@@ -257,7 +257,7 @@ namespace TrilinosWrappers
        * be routed to the wrong block.
        */
       void reinit (const BlockVector &V,
-                   const bool fast = false);
+                   const bool omit_zeroing_entries = false);
 
       /**
        * Change the number of blocks to <tt>num_blocks</tt>. The individual
@@ -497,18 +497,18 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 TrilinosWrappers::MPI::BlockVector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.range_partitioner(), fast);
+        v.reinit(matrix.range_partitioner(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 TrilinosWrappers::MPI::BlockVector &v,
-                                bool fast)
+                                bool omit_zeroing_entries)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
+        v.reinit(matrix.domain_partitioner(), omit_zeroing_entries);
       }
     };
 

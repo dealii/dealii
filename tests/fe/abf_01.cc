@@ -630,7 +630,7 @@ int main (int /*argc*/, char **/*argv*/)
   DoFTools::make_hanging_node_constraints (*dof_handler,
                                            hn_constraints);
   hn_constraints.close ();
-  MappingQ1<2> map_default;
+  MappingQGeneric<2> map_default(1);
   project (map_default, *dof_handler, hn_constraints,
            QGauss<2> (6), ConstantFunction<2>(1., 2),
            solution);

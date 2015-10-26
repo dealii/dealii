@@ -531,7 +531,7 @@ public:
    * provided constructors of <tt>ComponentSelectFunction<dim, Number> <\tt>
    * class can only have same value for all components.
    *
-   * @note: we copy the underlaying component value data from @para f from its beginning.
+   * @note: we copy the underlying component value data from @para f from its beginning.
    * So the number of components of @para f cannot be less than the calling object.
    */
   virtual void substitute_function_value_with (const ConstantFunction<dim, Number> &f);

@@ -433,7 +433,7 @@ void mapping_test()
   std::vector<std::string> mapping_strings;
 
   MappingCartesian<dim> cart;
-  MappingQ1<dim> q1_old;
+  MappingQGeneric<dim> q1_old(1);
   MappingQ<dim> q1tmp(1);
   MappingQ<dim> q2tmp(2);
   MappingQ<dim> q3tmp(3);

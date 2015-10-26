@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Eulerian mapping of general unit cells by d-linear shape functions. Each
+ * Eulerian mapping of general unit cells by $d$-linear shape functions. Each
  * cell is thus shifted in space by values given to the mapping through a
  * finite element field.
  *
@@ -83,7 +83,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Michael Stadler, 2001
  */
 template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
-class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
+class MappingQ1Eulerian : public MappingQGeneric<dim,spacedim>
 {
 public:
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,19 +27,30 @@ namespace std_cxx11
 {
   // TODO: could fill up with more types from
   // C++11 type traits
+  using std::is_fundamental;
   using std::is_pod;
+  using std::is_pointer;
   using std::is_standard_layout;
   using std::is_trivial;
+  using std::enable_if;
 }
 DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #include <boost/type_traits.hpp>
+#include <boost/core/enable_if.hpp>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
+  using boost::is_fundamental;
   using boost::is_pod;
+  using boost::is_pointer;
+
+  // boost::enable_if_c, *not* boost::enable_if, is equivalent to std::enable_if.
+  template <bool B, class T = void>
+  struct enable_if : public boost::enable_if_c<B, T>
+  {};
 
   // boost does not have is_standard_layout and
   // is_trivial, but those are both a subset of

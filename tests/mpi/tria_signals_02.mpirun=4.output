@@ -1,0 +1,31 @@
+
+DEAL:0:2d-2d::n_cell_gap after refine : 0
+DEAL:0:2d-2d::n_cell_gap after coarsen : 0
+DEAL:0:2d-3d::n_cell_gap after refine : 0
+DEAL:0:2d-3d::n_cell_gap after coarsen : 0
+DEAL:0:3d-3d::n_cell_gap after refine : 0
+DEAL:0:3d-3d::n_cell_gap after coarsen : 0
+
+DEAL:1:2d-2d::n_cell_gap after refine : 0
+DEAL:1:2d-2d::n_cell_gap after coarsen : 0
+DEAL:1:2d-3d::n_cell_gap after refine : 0
+DEAL:1:2d-3d::n_cell_gap after coarsen : 0
+DEAL:1:3d-3d::n_cell_gap after refine : 0
+DEAL:1:3d-3d::n_cell_gap after coarsen : 0
+
+
+DEAL:2:2d-2d::n_cell_gap after refine : 0
+DEAL:2:2d-2d::n_cell_gap after coarsen : 0
+DEAL:2:2d-3d::n_cell_gap after refine : 0
+DEAL:2:2d-3d::n_cell_gap after coarsen : 0
+DEAL:2:3d-3d::n_cell_gap after refine : 0
+DEAL:2:3d-3d::n_cell_gap after coarsen : 0
+
+
+DEAL:3:2d-2d::n_cell_gap after refine : 0
+DEAL:3:2d-2d::n_cell_gap after coarsen : 0
+DEAL:3:2d-3d::n_cell_gap after refine : 0
+DEAL:3:2d-3d::n_cell_gap after coarsen : 0
+DEAL:3:3d-3d::n_cell_gap after refine : 0
+DEAL:3:3d-3d::n_cell_gap after coarsen : 0
+

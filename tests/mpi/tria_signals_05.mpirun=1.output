@@ -1,0 +1,9 @@
+
+DEAL:0:2d-2d::n_loop: 1, n_cell_gap: 0
+DEAL:0:2d-2d::n_loop: 2, n_cell_gap: 0
+DEAL:0:2d-2d::n_loop: 3, n_cell_gap: 0
+DEAL:0:2d-2d::n_loop: 4, n_cell_gap: 0
+DEAL:0:3d-3d::n_loop: 1, n_cell_gap: 0
+DEAL:0:3d-3d::n_loop: 2, n_cell_gap: 0
+DEAL:0:3d-3d::n_loop: 3, n_cell_gap: 0
+DEAL:0:3d-3d::n_loop: 4, n_cell_gap: 0

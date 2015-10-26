@@ -66,11 +66,17 @@ namespace parallel
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class PreconditionIdentity : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * This function is only present to provide the interface of a
    * preconditioner to be handed to a smoother.  This does nothing.
@@ -82,6 +88,11 @@ public:
      */
     AdditionalData () {}
   };
+
+  /**
+   * Constructor, sets the domain and range sizes to their defaults.
+   */
+  PreconditionIdentity();
 
   /**
    * The matrix argument is ignored and here just for compatibility with more
@@ -122,6 +133,35 @@ public:
    * preconditioner to be handed to a smoother.  This does nothing.
    */
   void clear () {}
+
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type n () const;
+
+private:
+  /**
+   * The dimension of the range space.
+   */
+  size_type n_rows;
+
+  /**
+   * The dimension of the domain space.
+   */
+  size_type n_columns;
 };
 
 
@@ -136,11 +176,17 @@ public:
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
  *
- * @author Guido Kanschat, 2005
+ * @author Guido Kanschat, 2005; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class PreconditionRichardson : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Parameters for Richardson preconditioner.
    */
@@ -160,7 +206,8 @@ public:
   };
 
   /**
-   * Constructor, sets the relaxation parameter to its default.
+   * Constructor, sets the relaxation parameter, domain and range sizes
+   * to their default.
    */
   PreconditionRichardson();
 
@@ -175,7 +222,7 @@ public:
    * compatibility with more complex preconditioners.
    */
   template <class MATRIX>
-  void initialize (const MATRIX &,
+  void initialize (const MATRIX &matrix,
                    const AdditionalData &parameters);
 
   /**
@@ -209,11 +256,39 @@ public:
    */
   void clear () {}
 
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   *
+   * @note This function should only be called if the preconditioner has been
+   * initialized.
+   */
+  size_type n () const;
+
 private:
   /**
    * The relaxation parameter multiplied with the vectors.
    */
   double relaxation;
+
+  /**
+   * The dimension of the range space.
+   */
+  size_type n_rows;
+
+  /**
+   * The dimension of the domain space.
+   */
+  size_type n_columns;
 };
 
 
@@ -301,12 +376,18 @@ private:
  * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
  * refer to derived classes.
  *
- * @author Guido Kanschat, 2000
+ * @author Guido Kanschat, 2000; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template<class MATRIX = SparseMatrix<double> >
 class PreconditionRelaxation : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef typename MATRIX::size_type size_type;
+
   /**
    * Class for parameters.
    */
@@ -336,6 +417,18 @@ public:
    * Release the matrix and reset its pointer.
    */
   void clear();
+
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   */
+  size_type n () const;
 
 protected:
   /**
@@ -514,7 +607,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef typename MATRIX::size_type size_type;
 
   /**
    * A typedef to the base class.
@@ -594,7 +687,8 @@ private:
  * solver.solve (A, x, b, precondition);
  * @endcode
  *
- * @author Guido Kanschat, 2003
+ * @author Guido Kanschat, 2003; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <class MATRIX = SparseMatrix<double> >
 class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
@@ -603,7 +697,42 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef typename MATRIX::size_type size_type;
+
+  /**
+    * Parameters for PreconditionPSOR.
+    */
+  class AdditionalData
+  {
+  public:
+    /**
+     * Constructor. For the parameters' description, see below.
+     *
+     * The permutation vectors are stored as a reference. Therefore, it has to
+     * be assured that the lifetime of the vector exceeds the lifetime of the
+     * preconditioner.
+     *
+     * The relaxation parameter should be larger than zero and smaller than 2
+     * for numerical reasons. It defaults to 1.
+     */
+    AdditionalData (const std::vector<size_type> &permutation,
+                    const std::vector<size_type> &inverse_permutation,
+                    const typename PreconditionRelaxation<MATRIX>::AdditionalData
+                    &parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
+
+    /**
+     * Storage for the permutation vector.
+     */
+    const std::vector<size_type> &permutation;
+    /**
+     * Storage for the inverse permutation vector.
+     */
+    const std::vector<size_type> &inverse_permutation;
+    /**
+     * Relaxation parameters
+     */
+    typename PreconditionRelaxation<MATRIX>::AdditionalData parameters;
+  };
 
   /**
    * Initialize matrix and relaxation parameter. The matrix is just stored in
@@ -621,6 +750,19 @@ public:
                    const std::vector<size_type> &inverse_permutation,
                    const typename PreconditionRelaxation<MATRIX>::AdditionalData &
                    parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
+
+  /**
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object.
+   *
+   * For more detail about possible parameters, see the class documentation
+   * and the documentation of the PreconditionPSOR::AdditionalData class.
+   *
+   * After this function is called the preconditioner is ready to be used
+   * (using the <code>vmult</code> function of derived classes).
+   */
+  void initialize (const MATRIX &A,
+                   const AdditionalData &additional_data);
 
   /**
    * Apply preconditioner.
@@ -658,7 +800,8 @@ private:
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).
  *
- * @author Martin Kronbichler, 2009
+ * @author Martin Kronbichler, 2009; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
 class PreconditionChebyshev : public Subscriptor
@@ -667,7 +810,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef typename MATRIX::size_type size_type;
 
   /**
    * Standardized data struct to pipe additional parameters to the
@@ -778,6 +921,18 @@ public:
    */
   void clear ();
 
+  /**
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
+   */
+  size_type m () const;
+
+  /**
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
+   */
+  size_type n () const;
+
 private:
 
   /**
@@ -824,12 +979,22 @@ private:
 
 #ifndef DOXYGEN
 
+inline
+PreconditionIdentity::PreconditionIdentity ()
+  :
+  n_rows (0),
+  n_columns (0)
+{}
+
 template <class MATRIX>
 inline void
 PreconditionIdentity::initialize (
-  const MATRIX &,
+  const MATRIX &matrix,
   const PreconditionIdentity::AdditionalData &)
-{}
+{
+  n_rows = matrix.m();
+  n_columns = matrix.n();
+}
 
 
 template<class VECTOR>
@@ -864,6 +1029,20 @@ PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(src);
 }
 
+inline PreconditionIdentity::size_type
+PreconditionIdentity::m () const
+{
+  Assert(n_rows != 0, ExcNotInitialized());
+  return n_rows;
+}
+
+inline PreconditionIdentity::size_type
+PreconditionIdentity::n () const
+{
+  Assert(n_columns != 0, ExcNotInitialized());
+  return n_columns;
+}
+
 //---------------------------------------------------------------------------
 
 inline
@@ -877,7 +1056,9 @@ PreconditionRichardson::AdditionalData::AdditionalData (
 inline
 PreconditionRichardson::PreconditionRichardson ()
   :
-  relaxation(0)
+  relaxation(0),
+  n_rows (0),
+  n_columns (0)
 {
   AdditionalData add_data;
   relaxation=add_data.relaxation;
@@ -897,10 +1078,12 @@ PreconditionRichardson::initialize (
 template <class MATRIX>
 inline void
 PreconditionRichardson::initialize (
-  const MATRIX &,
+  const MATRIX &matrix,
   const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
+  n_rows = matrix.m();
+  n_columns = matrix.n();
 }
 
 
@@ -937,6 +1120,20 @@ PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   dst.add(relaxation,src);
 }
 
+inline PreconditionRichardson::size_type
+PreconditionRichardson::m () const
+{
+  Assert(n_rows != 0, ExcNotInitialized());
+  return n_rows;
+}
+
+inline PreconditionRichardson::size_type
+PreconditionRichardson::n () const
+{
+  Assert(n_columns != 0, ExcNotInitialized());
+  return n_columns;
+}
+
 //---------------------------------------------------------------------------
 
 template <class MATRIX>
@@ -956,6 +1153,21 @@ PreconditionRelaxation<MATRIX>::clear ()
   A = 0;
 }
 
+template <class MATRIX>
+inline typename PreconditionRelaxation<MATRIX>::size_type
+PreconditionRelaxation<MATRIX>::m () const
+{
+  Assert (A!=0, ExcNotInitialized());
+  return A->m();
+}
+
+template <class MATRIX>
+inline typename PreconditionRelaxation<MATRIX>::size_type
+PreconditionRelaxation<MATRIX>::n () const
+{
+  Assert (A!=0, ExcNotInitialized());
+  return A->n();
+}
 
 //---------------------------------------------------------------------------
 
@@ -1144,6 +1356,19 @@ PreconditionPSOR<MATRIX>::initialize (
 
 
 template <class MATRIX>
+inline void
+PreconditionPSOR<MATRIX>::initialize (
+  const MATRIX         &A,
+  const AdditionalData &additional_data)
+{
+  initialize(A,
+             additional_data.permutation,
+             additional_data.inverse_permutation,
+             additional_data.parameters);
+}
+
+
+template <class MATRIX>
 template<class VECTOR>
 inline void
 PreconditionPSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
@@ -1163,6 +1388,19 @@ PreconditionPSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
   this->A->TPSOR (dst, *permutation, *inverse_permutation, this->relaxation);
+}
+
+template <class MATRIX>
+PreconditionPSOR<MATRIX>::AdditionalData::AdditionalData (
+  const std::vector<size_type> &permutation,
+  const std::vector<size_type> &inverse_permutation,
+  const typename PreconditionRelaxation<MATRIX>::AdditionalData &parameters)
+  :
+  permutation(permutation),
+  inverse_permutation(inverse_permutation),
+  parameters(parameters)
+{
+
 }
 
 
@@ -1620,6 +1858,24 @@ void PreconditionChebyshev<MATRIX,VECTOR>::clear ()
 }
 
 
+template <class MATRIX, class VECTOR>
+inline
+typename PreconditionChebyshev<MATRIX,VECTOR>::size_type
+PreconditionChebyshev<MATRIX,VECTOR>::m () const
+{
+  Assert (matrix_ptr!=0, ExcNotInitialized());
+  return matrix_ptr->m();
+}
+
+
+template <class MATRIX, class VECTOR>
+inline
+typename PreconditionChebyshev<MATRIX,VECTOR>::size_type
+PreconditionChebyshev<MATRIX,VECTOR>::n () const
+{
+  Assert (matrix_ptr!=0, ExcNotInitialized());
+  return matrix_ptr->n();
+}
 
 #endif // DOXYGEN
 

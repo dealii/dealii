@@ -4385,6 +4385,8 @@ namespace internal
                           right_neighbor->set_neighbor (nbnb, second_child);
                         }
                     }
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(cell);
                 }
           }
 
@@ -4742,6 +4744,8 @@ namespace internal
                                               internal::int2type<dim>(),
                                               internal::int2type<spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back (cell);
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(cell);
                 }
           }
 
@@ -8354,6 +8358,9 @@ namespace internal
 
                   // note that the refinement flag was already cleared
                   // at the beginning of this loop
+
+                  // inform all listeners that cell refinement is done
+                  triangulation.signals.post_refinement_on_cell(hex);
                 }
           }
 
@@ -8751,7 +8758,7 @@ Triangulation (const MeshSmoothing smooth_grid,
         = new std::map<unsigned int, types::manifold_id>();
     }
 
-  // connect the any_change signal to the other signals
+  // connect the any_change signal to the other top level signals
   signals.create.connect (signals.any_change);
   signals.post_refinement.connect (signals.any_change);
   signals.clear.connect (signals.any_change);
@@ -8885,6 +8892,40 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::man
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
         cell->face(f)->set_all_manifold_ids(m_number);
+}
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
+    const types::manifold_id m_number)
+{
+  bool boundary_found = false;
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    {
+      // loop on faces
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary() && cell->face(f)->boundary_id()==b_id)
+          {
+            boundary_found = true;
+            cell->face(f)->set_manifold_id(m_number);
+          }
+
+      // loop on edges if dim >= 3
+      if (dim>=3)
+        for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+          if (cell->line(e)->at_boundary() && cell->line(e)->boundary_id()==b_id)
+            {
+              boundary_found = true;
+              cell->line(e)->set_manifold_id(m_number);
+            }
+    }
+
+  (void)boundary_found;
+  Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
 
@@ -11662,11 +11703,15 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   if (levels.size() >= 2)
     for (cell = last(); cell!=endc; --cell)
       if (cell->level()<=static_cast<int>(levels.size()-2) && cell->user_flag_set())
-        // use a separate function,
-        // since this is dimension
-        // specific
-        internal::Triangulation::Implementation
-        ::delete_children (*this, cell, line_cell_count, quad_cell_count);
+        {
+          // inform all listeners that cell coarsening is going to happen
+          signals.pre_coarsening_on_cell(cell);
+          // use a separate function,
+          // since this is dimension
+          // specific
+          internal::Triangulation::Implementation
+          ::delete_children (*this, cell, line_cell_count, quad_cell_count);
+        }
 
   // re-compute number of lines and
   // quads
@@ -12102,7 +12147,7 @@ namespace
                 // natural to use the union. however, intersection is
                 // the less aggressive tactic and favours a smaller
                 // number of refined cells over an intensive
-                // smoothing. this way we try not to loose too much of
+                // smoothing. this way we try not to lose too much of
                 // the effort we put in anisotropic refinement
                 // indicators due to overly aggressive smoothing...
                 directional_cell_refinement_case

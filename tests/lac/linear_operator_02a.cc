@@ -52,7 +52,7 @@ int main()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global(2);
 
-  MappingQ1<dim> mapping_q1;
+  MappingQGeneric<dim> mapping_q1(1);
   FE_Q<dim> q1(1);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(q1);

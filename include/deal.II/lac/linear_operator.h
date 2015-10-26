@@ -230,7 +230,7 @@ public:
    * initalization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
-  std::function<void(Range &v, bool fast)> reinit_range_vector;
+  std::function<void(Range &v, bool omit_zeroing_entries)> reinit_range_vector;
 
   /**
    * Initializes a vector of the Domain space to be directly usable as the
@@ -239,7 +239,7 @@ public:
    * initalization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
-  std::function<void(Domain &v, bool fast)> reinit_domain_vector;
+  std::function<void(Domain &v, bool omit_zeroing_entries)> reinit_domain_vector;
 
   /**
    * @name In-place vector space operations
@@ -540,7 +540,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
         static GrowingVectorMemory<Intermediate> vector_memory;
 
         Intermediate *i = vector_memory.alloc();
-        second_op.reinit_range_vector(*i, /*bool fast =*/ true);
+        second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
         second_op.vmult(*i, u);
         first_op.vmult(v, *i);
         vector_memory.free(i);
@@ -551,7 +551,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
         static GrowingVectorMemory<Intermediate> vector_memory;
 
         Intermediate *i = vector_memory.alloc();
-        second_op.reinit_range_vector(*i, /*bool fast =*/ true);
+        second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
         second_op.vmult(*i, u);
         first_op.vmult_add(v, *i);
         vector_memory.free(i);
@@ -562,7 +562,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
         static GrowingVectorMemory<Intermediate> vector_memory;
 
         Intermediate *i = vector_memory.alloc();
-        first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
+        first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
         first_op.Tvmult(*i, u);
         second_op.Tvmult(v, *i);
         vector_memory.free(i);
@@ -573,7 +573,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
         static GrowingVectorMemory<Intermediate> vector_memory;
 
         Intermediate *i = vector_memory.alloc();
-        first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
+        first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
         first_op.Tvmult(*i, u);
         second_op.Tvmult_add(v, *i);
         vector_memory.free(i);
@@ -641,6 +641,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
 
   return_op.vmult = [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
+    op.reinit_range_vector(v, /*bool omit_zeroing_entries =*/ false);
     solver.solve(op, v, u, preconditioner);
   };
 
@@ -650,7 +651,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
 
     Vector *v2 = vector_memory.alloc();
-    op.reinit_range_vector(*v2, /*bool fast =*/ true);
+    op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
     solver.solve(op, *v2, u, preconditioner);
     v += *v2;
     vector_memory.free(v2);
@@ -659,6 +660,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
   return_op.Tvmult = [op, &solver, &preconditioner]( Vector &v, const
                                                      Vector &u)
   {
+    op.reinit_range_vector(v, /*bool omit_zeroing_entries =*/ false);
     solver.solve(transpose_operator(op), v, u, preconditioner);
   };
 
@@ -668,7 +670,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
 
     Vector *v2 = vector_memory.alloc();
-    op.reinit_range_vector(*v2, /*bool fast =*/ true);
+    op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
     solver.solve(transpose_operator(op), *v2, u, preconditioner);
     v += *v2;
     vector_memory.free(v2);
@@ -799,9 +801,9 @@ namespace internal
        */
       template <typename Matrix>
       static
-      void reinit_range_vector (const Matrix &matrix, Vector &v, bool fast)
+      void reinit_range_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
       {
-        v.reinit(matrix.m(), fast);
+        v.reinit(matrix.m(), omit_zeroing_entries);
       }
 
       /**
@@ -817,9 +819,9 @@ namespace internal
        */
       template <typename Matrix>
       static
-      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool fast)
+      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
       {
-        v.reinit(matrix.n(), fast);
+        v.reinit(matrix.n(), omit_zeroing_entries);
       }
     };
   } /* namespace LinearOperator */
@@ -870,7 +872,7 @@ namespace
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
-    i->reinit(v, /*bool fast =*/true);
+    i->reinit(v, /*bool omit_zeroing_entries =*/true);
 
     function(*i, u);
 
@@ -1095,14 +1097,14 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
   // creation of a LinearOperator wrapper is respected - further a matrix
   // or an operator_exemplar cannot usually be copied...
 
-  return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool fast)
+  return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool omit_zeroing_entries)
   {
-    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, fast);
+    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
-  return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool fast)
+  return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool omit_zeroing_entries)
   {
-    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, fast);
+    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
   typename std::conditional<

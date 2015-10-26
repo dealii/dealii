@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2001 - 2014 by the deal.II authors
+## Copyright (C) 2001 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -55,8 +55,8 @@ s/-0\.(0+)(?!\d)/0.\1/g;
 s/^DEAL.*::_.*\n//g;
 
 # Normalize version string by replacing (for example) 'written by
-# deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
-s/written by deal\.II \d+\.\d+\.(pre|rc\d*|\d+)/written by deal.II x.y.z/;
+# deal.II 8.1.0-pre' by written by 'written by deal.II x.y.z'
+s/written by deal\.II \d+\.\d+\.\d+(-pre|-rc\d*|)/written by deal.II x.y.z/;
 
 
 # different p4est versions output different text in VTU output. For

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,8 +53,6 @@ namespace FE_Q_Bubbles_Helper
       const unsigned int degree = fe.degree;
 
       // Initialize quadrature formula on fine cells
-      MappingQ1<dim, spacedim> mapping;
-
       std_cxx11::unique_ptr<Quadrature<dim> > q_fine;
       Quadrature<1> q_dummy(std::vector<Point<1> >(1), std::vector<double> (1,1.));
       switch (dim)
@@ -109,7 +107,7 @@ namespace FE_Q_Bubbles_Helper
           DoFHandler<dim, spacedim> dh(tr);
           dh.distribute_dofs(fe);
 
-          FEValues<dim, spacedim> fine (mapping, fe, *q_fine,
+          FEValues<dim, spacedim> fine (StaticMappingQ1<dim,spacedim>::mapping, fe, *q_fine,
                                         update_quadrature_points
                                         | update_JxW_values | update_values);
 

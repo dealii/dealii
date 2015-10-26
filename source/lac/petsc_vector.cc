@@ -72,7 +72,7 @@ namespace PETScWrappers
 
   void
   Vector::reinit (const size_type n,
-                  const bool      fast)
+                  const bool      omit_zeroing_entries)
   {
     // only do something if the sizes
     // mismatch
@@ -101,7 +101,7 @@ namespace PETScWrappers
 
     // finally clear the new vector if so
     // desired
-    if (fast == false)
+    if (omit_zeroing_entries == false)
       *this = 0;
   }
 
@@ -109,9 +109,9 @@ namespace PETScWrappers
 
   void
   Vector::reinit (const Vector &v,
-                  const bool    fast)
+                  const bool    omit_zeroing_entries)
   {
-    reinit (v.size(), fast);
+    reinit (v.size(), omit_zeroing_entries);
   }
 
 

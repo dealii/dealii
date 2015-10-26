@@ -77,7 +77,7 @@ namespace parallel
     template <typename Number>
     void
     Vector<Number>::reinit (const size_type size,
-                            const bool      fast)
+                            const bool      omit_zeroing_entries)
     {
       clear_mpi_requests();
       // check whether we need to reallocate
@@ -95,7 +95,7 @@ namespace parallel
       partitioner.reset (new Utilities::MPI::Partitioner (size));
 
       // set entries to zero if so requested
-      if (fast == false)
+      if (omit_zeroing_entries == false)
         this->operator = (Number());
 
       vector_is_ghosted = false;
@@ -107,7 +107,7 @@ namespace parallel
     template <typename Number2>
     void
     Vector<Number>::reinit (const Vector<Number2> &v,
-                            const bool             fast)
+                            const bool             omit_zeroing_entries)
     {
       clear_mpi_requests();
       Assert (v.partitioner.get() != 0, ExcNotInitialized());
@@ -128,7 +128,7 @@ namespace parallel
         Assert (vector_view.size() == partitioner->local_size(),
                 ExcInternalError());
 
-      if (fast == false)
+      if (omit_zeroing_entries == false)
         this->operator= (Number());
 
       if (import_data != 0)

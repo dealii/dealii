@@ -136,7 +136,7 @@ void curved_grid (std::ofstream &out)
   // now provide everything that is
   // needed for solving a Laplace
   // equation.
-  MappingQ1<2> mapping_q1;
+  MappingQGeneric<2> mapping_q1(1);
   FE_Q<2> fe(2);
   DoFHandler<2> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);

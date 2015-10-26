@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II Authors
+## Copyright (C) 2012 - 2015 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,12 +14,49 @@
 ## ---------------------------------------------------------------------
 
 
+
+# Collect all of the directory names for the tutorial programs
+FILE(GLOB _deal_ii_steps
+  ${CMAKE_SOURCE_DIR}/examples/step-*
+  )
+
+# Also collect the names of all code gallery projects. To
+# do so, find all 'author' files, then strip the last two
+# levels of these paths.
 #
-# Prepare tutorial.h:
+# For unclear reasons, the glob returns these files as
+# "/a/b/c/name//doc//author", so make sure we eat the
+# double slashes in the second step
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+FILE(GLOB _code_gallery_names 
+     "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
+STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
+
+#
+# Define target for the tutorial. It depends on the
+# file tutorial.h built via the next target below, as well
+# as the various files we create from the tutorial 
+# directories below that. These dependencies are added
+# below the respective targets.
+#
+# This file uses the DEAL_II_STEPS variable set in
+# ../CMakeLists.txt.
 #
 
-file(GLOB DEAL_II_STEPS_BUILDSON
+ADD_CUSTOM_TARGET(tutorial)
+
+#
+# Describe how to build tutorial.h:
+#
+
+file(GLOB _deal_ii_steps_buildson
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  )
+file(GLOB _deal_ii_steps_kind
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
+  )
+file(GLOB _deal_ii_steps_tooltip
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
 
 ADD_CUSTOM_COMMAND(
@@ -28,27 +65,28 @@ ADD_CUSTOM_COMMAND(
   ARGS
     ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
-    ${DEAL_II_STEPS}
+    ${_deal_ii_steps}
+    ${_code_gallery_names}
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
-    ${DEAL_II_STEPS}
-    ${DEAL_II_STEPS_BUILDSON}
+    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
+    ${_deal_ii_steps}
+    ${_deal_ii_steps_kind}
+    ${_deal_ii_steps_tooltip}
+    ${_deal_ii_steps_buildson}
+    ${_code_gallery_names}
   )
+ADD_CUSTOM_TARGET(build_tutorial_h
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h)
+ADD_DEPENDENCIES(tutorial build_tutorial_h)
 
-#
-# A target for the preparation of all the stuff happening in here...
-#
-
-ADD_CUSTOM_TARGET(tutorial
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
-  )
 
 #
 # Prepare the steps for documentation generation
 #
 
-FOREACH(_step ${DEAL_II_STEPS})
+FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
   ADD_CUSTOM_COMMAND(

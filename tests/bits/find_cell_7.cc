@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,8 +71,8 @@ void check2 ()
   deallog << inside(tria, p2) << std::endl;
 
   hp::MappingCollection<3> mappings;
-  mappings.push_back (MappingQ1<3>());
-  mappings.push_back (MappingQ1<3>());
+  mappings.push_back (MappingQGeneric<3>(1));
+  mappings.push_back (MappingQGeneric<3>(1));
 
   hp::FECollection<3> fes;
   fes.push_back (FE_Q<3>(1));

@@ -52,11 +52,13 @@ public:
    * to populate a TableIndices object upon creation, either completely, or
    * partially.
    *
-   * Index entries that are not set by this 1 - 9 arguments (either
-   * because they are omitted, or because @tparam N is larger than 9) are
-   * set to numbers::invalid_unsigned_int.
+   * Index entries that are not set by these arguments (either because
+   * they are omitted, or because $N > 9$) are set to
+   * numbers::invalid_unsigned_int.
    *
-   * Note that only the first @tparam N arguments are actually used.
+   * Note that only the first <tt>N</tt> arguments are actually used.
+   *
+   * @tparam N The number of indices stored in each object.
    */
   TableIndices (const unsigned int index0,
                 const unsigned int index1 = numbers::invalid_unsigned_int,

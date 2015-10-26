@@ -395,13 +395,13 @@ public:
   {
   public:
     /**
-     * Construct a valid accessor given an Indexset and the index @p range_idx
+     * Construct a valid accessor given an IndexSet and the index @p range_idx
      * of the range to point to.
      */
     IntervalAccessor(const IndexSet *idxset, const size_type range_idx);
 
     /**
-     * Construct an invalid accessor for the Indexset.
+     * Construct an invalid accessor for the IndexSet.
      */
     explicit IntervalAccessor(const IndexSet *idxset);
 

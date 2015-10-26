@@ -141,7 +141,7 @@
  * cmake/modules/Find*.cmake
  */
 
-/* cmake/moduels/FindARPACK.cmake */
+/* cmake/modules/FindARPACK.cmake */
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
 
 /* cmake/configure/configure_1_threads.cmake */

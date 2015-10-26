@@ -167,6 +167,12 @@ inconvenience this causes.
   (Timo Heister, Guido Kanschat, 2015/10/26)
   </li>
 
+  <li> New: Two cell level signals are added to class Triangulation, namely
+  pre_coarsening_on_cell and post_refinement_on_cell.
+  <br>
+  (Lei Qiao, 2015/10/22)
+  </li>
+
   <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
   ghost cells. Similarly ::level_ghost_owners() for level ghosts.
   <br>
@@ -176,6 +182,19 @@ inconvenience this causes.
   <li> New: FunctionParser now supports pow(a,b).
   <br>
   (Timo Heister, 2015/09/30)
+  </li>
+
+  <li> Improved: The interface to all deal.II type solvers and
+  preconditioners have been updated such that they function as expected
+  with the LinearOperator class and its associated functions (i.e.
+  linear_operator(), transpose_operator() and inverse_operator()).
+  These preconditioners can now be wrapped as a LinearOperator,
+  facilitating the construction of approximate matrix inverses such as in
+  the development of a block matrix preconditioner. An example of this
+  functionality can be found in
+  <code>tests/lac/linear_operator_08.cc</code>.
+  <br>
+  (Jean-Paul Pelteret, 2015/09/24 - 2015/10/19)
   </li>
 
   <li> New: MGTransferPrebuilt can now be used with parallel::distributed::Vector
@@ -332,7 +351,6 @@ inconvenience this causes.
   (Daniel Shapero, 2015/08/12)
   </li>
 
-
   <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
   with vanishing mean values of jumps across faces.
   <br>
@@ -375,7 +393,50 @@ inconvenience this causes.
 
 <ol>
 
-  <li> Added: DoFTools::locally_relevant_dofs_per_subdomain can be used
+  <li> Fixed: PolynomialsBDM::degree() now returns the correct value.
+  <br>
+  (Alistair Bentley, 2015/10/24)
+  </li>
+
+  <li> New: Triangulation::set_all_manifold_ids_on_boundary(boundary_id, manifold_id) 
+  which sets the manifold_id for all parts of the boundary with a given boundary_id.
+  <br>
+  (Alberto Sartori, 2015/10/22)
+  </li>
+
+  <li> Fixed: The range vectors in the construction of an
+  inverse_operator() is now reinitialised before solve calls. This ensures
+  a consistent starting point for the solver.
+  <br>
+  (Jean-Paul Pelteret, 2015/10/19)
+  </li>
+
+  <li> New: Ghost cells for the multigrid levels in
+  parallel::distributed::Triangulation are now correctly created also for
+  periodic boundary conditions.
+  <br>
+  (Martin Kronbichler, 2015/10/18)
+  </li>
+
+  <li> Fixed: GridGenerator::subdivided_parallelepiped() produced
+  invalid, unconnected meshes and wrong boundary indicators.
+  <br>
+  (Timo Heister, 2015/10/13)
+  </li>
+
+  <li> Improved: DoFTools::compute_intergrid_transfer_representation
+  can now be used with a fine grid given by a parallel::Triangulation.
+  <br>
+  (Alexander Grayver, 2015/10/09)
+  </li>
+
+  <li> New: GridIn::read_unv() can now read more element codes that
+  are used in typical meshes.
+  <br>
+  (Aslan Kosakian, 2015/10/06)
+  </li>
+
+  <li> New: DoFTools::locally_relevant_dofs_per_subdomain() can be used
   to extract an IndexSet of locally relevant DoFs for a Triangulation
   partitioned using METIS or with a parallel::shared::Triangulation .
   <br>

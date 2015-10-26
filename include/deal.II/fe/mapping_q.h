@@ -18,7 +18,6 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -208,10 +207,15 @@ protected:
    * member variables are marked as 'mutable'.
    *
    * The current class uses essentially the same fields for storage
-   * as the MappingQ1 class. Consequently, it inherits from
-   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
+   * as the MappingQGeneric class. Consequently, it inherits from
+   * MappingQGeneric::InternalData, rather than from Mapping::InternalDataBase.
+   * The principal difference to MappingQGeneric::InternalData is that
+   * MappingQ switches between $Q_1$ and $Q_p$ mappings depending
+   * on the cell we are on, so the internal data object needs to
+   * also store a pointer to an InternalData object that pertains
+   * to a $Q_1$ mapping.
    */
-  class InternalData : public MappingQ1<dim,spacedim>::InternalData
+  class InternalData : public MappingQGeneric<dim,spacedim>::InternalData
   {
   public:
     /**
@@ -237,7 +241,7 @@ protected:
      * A pointer to a structure to store the information for the pure
      * $Q_1$ mapping that is, by default, used on all interior cells.
      */
-    std_cxx11::unique_ptr<typename MappingQ1<dim,spacedim>::InternalData> mapping_q1_data;
+    std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_q1_data;
   };
 
 protected:
@@ -313,7 +317,7 @@ protected:
    *   our own Q1 mapping here, rather than simply resorting to
    *   StaticMappingQ1::mapping.
    */
-  std_cxx11::unique_ptr<const MappingQ1<dim,spacedim> > q1_mapping;
+  std_cxx11::unique_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
 
   /**
    * Declare other MappingQ classes friends.

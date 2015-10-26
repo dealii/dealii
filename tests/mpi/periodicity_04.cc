@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2014 by the deal.II authors
+ * Copyright (C) 2008 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -201,7 +201,7 @@ void check
   unsigned int n_local_constraints =0 ;
 
   std::map<types::global_dof_index, Point<dim> > support_points;
-  DoFTools::map_dofs_to_support_points (MappingQ1<dim>(), dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points (MappingQGeneric<dim>(1), dof_handler, support_points);
   IndexSet constraints_lines = constraints.get_local_lines();
 
   for (unsigned int i=0; i<constraints_lines.n_elements(); ++i)

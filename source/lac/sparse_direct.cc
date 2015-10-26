@@ -53,6 +53,8 @@ initialize (const SparsityPattern &)
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
   :
+  _m (0),
+  _n (0),
   symbolic_decomposition (0),
   numeric_decomposition (0),
   control (UMFPACK_CONTROL)
@@ -205,6 +207,9 @@ factorize (const Matrix &matrix)
   Assert (matrix.m() == matrix.n(), ExcNotQuadratic())
 
   clear ();
+
+  _m = matrix.m();
+  _n = matrix.n();
 
   const size_type N = matrix.m();
 
@@ -466,6 +471,20 @@ SparseDirectUMFPACK::Tvmult (
 {
   dst = src;
   this->solve(dst, /*transpose=*/ true);
+}
+
+SparseDirectUMFPACK::size_type
+SparseDirectUMFPACK::m () const
+{
+  Assert (_m!=0, ExcNotInitialized());
+  return _m;
+}
+
+SparseDirectUMFPACK::size_type
+SparseDirectUMFPACK::n () const
+{
+  Assert (_n!=0, ExcNotInitialized());
+  return _n;
 }
 
 

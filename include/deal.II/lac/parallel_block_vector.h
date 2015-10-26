@@ -211,11 +211,11 @@ namespace parallel
        * and call collect_sizes() to update the block system's knowledge of
        * its individual block's sizes.
        *
-       * If <tt>fast==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
        */
       void reinit (const size_type num_blocks,
                    const size_type block_size = 0,
-                   const bool fast = false);
+                   const bool omit_zeroing_entries = false);
 
       /**
        * Reinitialize the BlockVector such that it contains
@@ -226,7 +226,7 @@ namespace parallel
        * called, all vectors remain the same and reinit() is called for each
        * vector.
        *
-       * If <tt>fast==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual
@@ -236,14 +236,14 @@ namespace parallel
        * be routed to the wrong block.
        */
       void reinit (const std::vector<size_type> &N,
-                   const bool                    fast=false);
+                   const bool                    omit_zeroing_entries=false);
 
       /**
        * Change the dimension to that of the vector <tt>V</tt>. The same
        * applies as for the other reinit() function.
        *
        * The elements of <tt>V</tt> are not copied, i.e.  this function is the
-       * same as calling <tt>reinit (V.size(), fast)</tt>.
+       * same as calling <tt>reinit (V.size(), omit_zeroing_entries)</tt>.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual
@@ -254,7 +254,7 @@ namespace parallel
        */
       template <typename Number2>
       void reinit (const BlockVector<Number2> &V,
-                   const bool                 fast=false);
+                   const bool                 omit_zeroing_entries=false);
 
       /**
        * This function copies the data that has accumulated in the data buffer
@@ -531,24 +531,24 @@ namespace parallel
     inline
     void BlockVector<Number>::reinit (const size_type n_bl,
                                       const size_type bl_sz,
-                                      const bool         fast)
+                                      const bool         omit_zeroing_entries)
     {
       std::vector<size_type> n(n_bl, bl_sz);
-      reinit(n, fast);
+      reinit(n, omit_zeroing_entries);
     }
 
 
     template <typename Number>
     inline
     void BlockVector<Number>::reinit (const std::vector<size_type> &n,
-                                      const bool                    fast)
+                                      const bool                    omit_zeroing_entries)
     {
       this->block_indices.reinit (n);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
       for (size_type i=0; i<this->n_blocks(); ++i)
-        this->components[i].reinit(n[i], fast);
+        this->components[i].reinit(n[i], omit_zeroing_entries);
     }
 
 
@@ -557,14 +557,14 @@ namespace parallel
     template <typename Number2>
     inline
     void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
-                                      const bool fast)
+                                      const bool omit_zeroing_entries)
     {
       this->block_indices = v.get_block_indices();
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-        this->block(i).reinit(v.block(i), fast);
+        this->block(i).reinit(v.block(i), omit_zeroing_entries);
     }
 
 

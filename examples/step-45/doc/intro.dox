@@ -1,72 +1,149 @@
 <br>
 
-<i>This program was contributed by Markus B&uuml;rg.</i>
-<br>
-
+<i>This program was contributed by Daniel Arndt and Matthias Maier.</i>
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-In this example we consider how to use periodic boundary conditions in
-deal.II. Periodic boundary conditions are a typical approach when one wants to
-solve some equation on a representative piece of a larger domain that repeats
-in one or more direction; an example is the simulation of the electronic
-structure of photonic
+In this example we present how to use periodic boundary conditions in
+deal.II. Periodic boundary conditions are algebraic constraints that
+typically occur in computations on representative regions of a larger
+domain that repeat in one or more directions.
+
+An example is the simulation of the electronic structure of photonic
 crystals, because they have a lattice-like structure and, thus, it often
-suffices to do the actual computation on only one cell of the lattice. To be
-able to proceed this way one has to assume that the computation can be periodically
-extended to the other cells. This requires the solution to be periodic with respect
-to the cells. Hence the solution has to obtain the same nodal values on opposite
-parts of the boundary. In the figure below we show this
-concept in two space-dimensions. There, all dashed faces with the same color should
-have the same boundary values:
+suffices to do the actual computation on only one box of the lattice. To
+be able to proceed this way one has to assume that the computation can be
+periodically extended to the other boxes; this requires the solution to
+have a periodic structure.
 
-<img src="http://www.dealii.org/images/steps/developer/step-45.periodic_cells.png" alt="">
+<a name="Procedure"></a>
+<h1>Procedure</h1>
 
-To keep things simple, in this tutorial we will consider an academic,
-simplified problem that allows us to focus on only that part that we are
-interested in here, namely how to set up periodic boundary
-conditions. Specifically, we solve the Poisson problem on a domain, where the
-left and right parts of the boundary are identified. Let $\Omega=(0,1)^2$ and
-consider the problem
-@f{align*}
-   -\Delta u &=
-   \cos(2\pi x)e^{-2x}\cos(2\pi y)e^{-2y}  \qquad &&\text{in }\Omega
-  \\ 
-   u(x,0) &= 0 \qquad &&\text{for }x\in(0,1)\qquad &&\text{(bottom boundary)}
-  \\
-   u(x,1) &= 0 \qquad &&\text{for }x\in(0,1)\qquad &&\text{(top boundary)}
-  \\
-   u(0,y) &= u(1,y) \qquad &&\text{for }y\in(0,1) 
-   \qquad && \text{(left and right boundaries)}
+deal.II provides a number of high level entry points to impose periodic
+boundary conditions.
+The general approach to apply periodic boundary conditions consists of
+three steps (see also the
+@ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"):
+-# Create a mesh
+-# Identify those pairs of faces on different parts of the boundary across which
+   the solution should be symmetric, using GridTools::collect_periodic_faces()
+-# Add the periodicity information to the mesh
+   using parallel::distributed::Triangulation::add_periodicity()
+-# Add periodicity constraints using DoFTools::make_periodicity_constraints()
+
+The second and third step are necessary for distributed meshes
+to ensure that cells on opposite sides of the domain but connected by periodic
+faces are part of the ghost layer if one of them is stored on the local processor.
+If the Triangulation is not a parallel::distributed::Triangulation,
+these steps have to be omitted.
+
+The first step consists of collecting matching periodic faces and storing them in
+a <code>std::vector</code> of GridTools::PeriodicFacePair. This is done with the
+function GridTools::collect_periodic_faces() that can be invoked for example
+like this:
+@code
+GridTools::collect_periodic_faces(dof_handler,
+                                  b_id1,
+                                  b_id2,
+                                  direction,
+                                  matched_pairs,
+                                  offset = <default value>,
+                                  matrix = <default value>,
+                                  first_vector_components = <default value>);
+@endcode
+
+This call loops over all faces of the container dof_handler on the opposing
+boundaries with boundary indicator @p b_id1 and @p b_id2,
+respecitvely. If $\text{vertices}_{1/2}$ are the vertices of $\text{face}_{1/2}$,
+it matches pairs of faces (and dofs) such that the difference between $\text{vertices}_2$
+and $matrix\cdot \text{vertices}_1+\text{offset}$ vanishes in every component apart from direction
+and stores the resulting pairs with associated data in @p matched_pairs. (See
+GridTools::orthogonal_equality() for detailed information about the
+matching process.)
+
+Consider, for example, the colored unit square $\Omega=[0,1]^2$ with boundary
+indicator 0 on the left, 1 on the right, 2 on the bottom and 3 on the top
+faces. Then,
+@code
+GridTools::collect_periodic_faces(dof_handler,
+                                  /*b_id1*/ 0,
+                                  /*b_id2*/ 1,
+                                  /*direction*/ 0,
+                                  matched_pairs);
+@endcode
+would yield periodicity constraints such that $u(0,y)=u(1,y)$ for all
+$y\in[0,1]$.
+
+If we instead consider the parallelogram given by the convex hull of
+$(0,0)$, $(1,1)$, $(1,2)$, $(0,1)$ we can achieve the constraints
+$u(0,y)=u(1,y+1)$ by specifying an @p offset:
+@code
+GridTools::collect_periodic_faces(dof_handler,
+                                  /*b_id1*/ 0,
+                                  /*b_id2*/ 1,
+                                  /*direction*/ 0,
+                                  matched_pairs,
+                                  Tensor<1, 2>(0.,1.));
+@endcode
+or
+@code
+GridTools::collect_periodic_faces(dof_handler,
+                                  /*b_id1*/ 0,
+                                  /*b_id2*/ 1,
+                                  /*arbitrary direction*/ 0,
+                                  matched_pairs,
+                                  Tensor<1, 2>(1.,1.));
+@endcode
+
+The resulting @p matched_pairs can be used in
+DoFTools::make_periodicity_constraints for populating a ConstraintMatrix
+with periodicity constraints:
+@code
+DoFTools::make_periodicity_constraints(matched_pairs, constraints);
+@endcode
+
+Apart from this high level interface there are also variants of
+DoFTools::make_periodicity_constraints available that combine those two
+steps (see the variants of DofTools::make_periodicity_constraints).
+
+There is also a low level interface to
+DoFTools::make_periodicity_constraints if more flexibility is needed. The
+low level variant allows to directly specify two faces that shall be
+constrained:
+@code
+using namespace DoFTools;
+make_periodicity_constraints(face_1,
+                             face_2,
+                             constraint_matrix,
+                             component_mask = <default value>;
+                             face_orientation = <default value>,
+                             face_flip = <default value>,
+                             face_rotation = <default value>,
+                             matrix = <default value>);
+@endcode
+Here, we need to specify the orientation of the two faces using
+@p face_orientation, @p face_flip and @p face_orientation. For a closer description
+have a look at the documentation of DoFTools::make_periodicity_constraints.
+The remaining parameters are the same as for the high level interface apart
+from the self-explaining @p component_mask and @p constraint_matrix.
+
+<a name="problem"></a>
+<h1>A practical example</h1>
+
+In the following, we show how to use the above functions in a more involved
+example. The task is to enforce rotated periodicity constraints for the
+velocity component of a Stokes flow.
+
+On a quarter-circle defined by $\Omega=\{{\bf x}\in(0,1)^2:\|{\bf x}\|\in (0.5,1)\}$ we are
+going to solve the Stokes problem
+@f{eqnarray*}
+  -\Delta \; \textbf{u} + \nabla p &=& (\exp(-100*\|{\bf x}-(.75,0.1)^T\|^2),0)^T, \\
+  -\textrm{div}\;  \textbf{u}&=&0,\\
+  \textbf{u}|_{\Gamma_1}&=&{\bf 0},
 @f}
-Note that the source term is not symmetric and so the solution would not be
-periodic unless this is explicitly enforced.
-
-The way one has to see these periodic boundary conditions $u(x,0) = u(x,1)$ is
-as follows: Assume for a moment (as we do in this program) that we have a
-uniformly refined mesh. Then, after discretization there are a number of nodes
-(degrees of freedom) with indices $i \in {\cal I}_l$ on the left boundary of
-the domain, and  a second set of nodes at the right boundary $j \in {\cal
-I}_r$. Since we have assumed that the mesh is uniformly refined, there is
-exactly one node $j \in {\cal I}_r$ for each $i \in {\cal I}_l$ so that
-${\mathrm x}_j = {\mathrm x}_i + (1,0)^T$, i.e. the two of them match with
-respect to the periodicity. We will then write that $j=\text{periodic}(i)$
-(and, if you want, $i=\text{periodic}(j)$).
-If now $U_k, k=0,\ldots,N-1,$ are the unknowns of our discretized problem, then
-the periodic boundary condition boils down to the following set of
-constraints:
+where the boundary $\Gamma_1$ is defined as $\Gamma_1:=\{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
+For the remaining parts of the boundary we are going to use periodic boundary conditions, i.e.
 @f{align*}
-  U_{\text{periodic}(i)} = U_i, \qquad \forall i \in {\cal I}_l. 
+  u_x(0,\nu)&=-u_y(\nu,0)&\nu&\in[0,1]\\
+  u_y(0,\nu)&=u_x(\nu,0)&\nu&\in[0,1].
 @f}
-Now, this is exactly the sort of constraint that the ConstraintMatrix class,
-first introduced in step-6,
-handles and can enforce in a linear system. Consequently, the main point of this
-program is how we fill the ConstraintMatrix object that stores these
-constraints, and how this is applied to the resulting linear system.
-
-The code for solving this problem is simple and based on step-3 since we want
-to focus on the implementation of the periodic boundary conditions. The code
-could be much more sophisticated, of course. For example, we could want to
-enforce periodic boundary conditions for adaptively refined meshes in which
-there is no longer a one-to-one relationship between degrees of freedom. We
-will discuss this at the end of the results section of this program.

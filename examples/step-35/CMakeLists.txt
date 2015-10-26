@@ -35,7 +35,7 @@ IF(NOT ${deal.II_FOUND})
 ENDIF()
 
 #
-# Are all dependencies fullfilled?
+# Are all dependencies fulfilled?
 #
 IF(NOT DEAL_II_WITH_UMFPACK)
   MESSAGE(FATAL_ERROR "

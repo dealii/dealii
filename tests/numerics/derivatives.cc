@@ -174,7 +174,7 @@ void loop ()
 
   std::vector<Mapping<dim>*> maps;
 //  maps.push_back (new MappingCartesian<dim>);
-  maps.push_back (new MappingQ1<dim>);
+  maps.push_back (new MappingQGeneric<dim>(1));
   maps.push_back (new MappingQ<dim>(2));
 
   std::vector<FiniteElement<dim>*> elements;

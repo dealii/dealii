@@ -44,7 +44,9 @@ DEAL_II_NAMESPACE_OPEN
  * edges are not). This is the standard mapping used for polyhedral domains. It
  * is also the mapping used throughout deal.II for many functions that come in
  * two variants, one that allows to pass a mapping argument explicitly and one
- * that simply falls back to the MappingQ1 class declared here.
+ * that simply falls back to the MappingQ1 class declared here. (Or, in fact,
+ * to an object of kind MappingQGeneric(1), which implements exactly the
+ * functionality of this class.)
  *
  * The shape functions for this mapping are the same as for the finite
  * element FE_Q of polynomial degree 1. Therefore, coupling these two
@@ -73,15 +75,28 @@ public:
 
 
 /**
- * In order to avoid creation of static MappingQ1 objects at several places in
- * the library, we define a static MappingQ1 object once and for all, for use
- * in places where a $Q_1$ mapping is required but do not want to create a new
- * object of this type everytime we get there.
+ * Many places in the library by default use (bi-,tri-)linear mappings
+ * unless users explicitly provide a different mapping to use. In these
+ * cases, the called function has to create a $Q_1$ mapping object, i.e.,
+ * an object of kind MappingQGeneric(1). This is costly. It would also be
+ * costly to create such objects as static objects in the affected
+ * functions, because static objects are never destroyed throughout the
+ * lifetime of a program, even though they only have to be created once
+ * the first time code runs through a particular function.
+ *
+ * In order to avoid creation of (static or dynamic) $Q_1$ mapping objects
+ * in these contexts throughout the library, this class defines a static
+ * $Q_1$ mapping object. This object can then be used in all of those
+ * places where such an object is needed.
  */
 template <int dim, int spacedim=dim>
 struct StaticMappingQ1
 {
-  static MappingQ1<dim, spacedim> mapping;
+  /**
+   * The static $Q_1$ mapping object discussed in the documentation
+   * of this class.
+   */
+  static MappingQGeneric<dim, spacedim> mapping;
 };
 
 

@@ -246,7 +246,7 @@ void LaplaceProblem<dim>::setup_system ()
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  MappingQ1<dim> mapping;
+  MappingQGeneric<dim> mapping(1);
   VectorTools::interpolate_boundary_values (mapping,
                                             mg_dof_handler,
                                             dirichlet_boundary,
@@ -351,7 +351,7 @@ void LaplaceProblem<dim>::assemble_multigrid (bool use_mw)
       mg_interface_in = 0.;
       mg_interface_out = 0.;
 
-      MappingQ1<dim> mapping;
+      MappingQGeneric<dim> mapping(1);
       MeshWorker::IntegrationInfoBox<dim> info_box;
       UpdateFlags update_flags = update_values | update_gradients | update_hessians;
       info_box.add_update_flags_all(update_flags);

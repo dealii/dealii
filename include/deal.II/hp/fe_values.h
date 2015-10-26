@@ -28,7 +28,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class MappingQ1;
 template <int dim, int spacedim> class FiniteElement;
 
 
@@ -70,9 +69,9 @@ namespace internal
                     const dealii::hp::QCollection<q_dim>     &q_collection,
                     const UpdateFlags             update_flags);
       /**
-       * Constructor. Set the fields of this class to the values indicated by
-       * the parameters to the constructor, and choose a @p MappingQ1 object
-       * for the mapping object.
+       * Constructor. This constructor is equivalent to the other one except
+       * that it makes the object use a $Q_1$ mapping (i.e., an object of
+       * type MappingQGeneric(1)) implicitly.
        */
       FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
                     const dealii::hp::QCollection<q_dim> &q_collection,
@@ -240,7 +239,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the DoFHandler::get_fe() function.
      */
     FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
               const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
@@ -249,14 +248,15 @@ namespace hp
 
 
     /**
-     * Constructor. Initialize this object with the given parameters, and
-     * choose a @p MappingQ1 object for the mapping object.
+     * Constructor. This constructor is equivalent to the other one except
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of
+     * type MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the DoFHandler::get_fe() function.
      */
     FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
               const hp::QCollection<dim>      &q_collection,
@@ -304,7 +304,7 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a MappingQ1 object
+     * single element (a frequent case if one wants to use a $Q_1$ mapping
      * for all finite elements in an hp discretization), then this single
      * mapping is used unless a different value for this argument is
      * specified.
@@ -385,8 +385,9 @@ namespace hp
 
 
     /**
-     * Constructor. Initialize this object with the given parameters, and
-     * choose a @p MappingQ1 object for the mapping object.
+     * Constructor. This constructor is equivalent to the other one except
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of
+     * type MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
@@ -439,7 +440,7 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a MappingQ1 object
+     * single element (a frequent case if one wants to use a $Q_1$ mapping
      * for all finite elements in an hp discretization), then this single
      * mapping is used unless a different value for this argument is
      * specified.
@@ -503,8 +504,9 @@ namespace hp
 
 
     /**
-     * Constructor. Initialize this object with the given parameters, and
-     * choose a @p MappingQ1 object for the mapping object.
+     * Constructor. This constructor is equivalent to the other one except
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of
+     * type MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
@@ -547,7 +549,7 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a MappingQ1 object
+     * single element (a frequent case if one wants to use a $Q_1$ mapping
      * for all finite elements in an hp discretization), then this single
      * mapping is used unless a different value for this argument is
      * specified.

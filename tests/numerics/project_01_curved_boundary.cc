@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,7 +91,7 @@ void test()
 
   // use an explicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project (MappingQ1<dim>(),
+    VectorTools::project (MappingQGeneric<dim>(1),
                           dh, cm, QGauss<dim>(3), F<dim>(),
                           v);
     deallog << v.l2_norm() << std::endl;

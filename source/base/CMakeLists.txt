@@ -34,7 +34,6 @@ SET(_src
   index_set.cc
   job_identifier.cc
   logstream.cc
-  memory_consumption.cc
   mpi.cc
   multithread_info.cc
   named_selection.cc

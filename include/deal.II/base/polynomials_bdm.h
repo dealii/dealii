@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  *   Note: the curl of a scalar function is given by $\text{curl}(f(x,y)) =
  *   \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
  *
- *   <dd> The shape functions for $k=1$ are
+ *   <dd> The basis used to construct the $BDM_{1}$ shape functions is
  *   @f{align*}
  *     \phi_0 = \begin{pmatrix} 1 \\ 0 \end{pmatrix},
  *     \phi_1 = \begin{pmatrix} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{pmatrix},
@@ -216,7 +216,7 @@ template <int dim>
 inline unsigned int
 PolynomialsBDM<dim>::degree() const
 {
-  return polynomial_space.degree();
+  return polynomial_space.degree()-1;
 }
 
 

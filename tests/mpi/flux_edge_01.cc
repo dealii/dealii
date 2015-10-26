@@ -75,7 +75,7 @@ namespace Step39
     void setup_system ();
 
     parallel::distributed::Triangulation<dim>        triangulation;
-    const MappingQ1<dim>      mapping;
+    const MappingQGeneric<dim>      mapping;
     const FiniteElement<dim> &fe;
     DoFHandler<dim>           dof_handler;
 
@@ -96,7 +96,7 @@ namespace Step39
     triangulation (MPI_COMM_WORLD,Triangulation<dim>::
                    limit_level_difference_at_vertices,
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    mapping(),
+    mapping(1),
     fe(fe),
     dof_handler(triangulation)
   {

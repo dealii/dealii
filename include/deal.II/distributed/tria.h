@@ -809,6 +809,10 @@ namespace parallel
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
        *
+       * For more information on periodic boundary conditions see
+       * GridTools::collect_periodic_faces, DoFTools::make_periodicity_constraints
+       * and step-45.
+       *
        * @note Before this function can be used the Triangulation has to be
        * initialized and must not be refined. Calling this function more than
        * once is possible, but not recommended: The function destroys and
@@ -911,11 +915,20 @@ namespace parallel
        * grid cells are badly ordered this may mean that individual parts of
        * the forest stored on a local machine may be split across coarse grid
        * cells that are not geometrically close. Consequently, we apply a
-       * Cuthill-McKee preordering to ensure that the part of the forest
-       * stored by p4est is located on geometrically close coarse grid cells.
+       * hierarchical preordering according to
+       * SparsityTools::reorder_hierarchical() to ensure that the part of the
+       * forest stored by p4est is located on geometrically close coarse grid
+       * cells.
        */
       std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
       std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
+
+      /**
+       * If add_periodicity() is called, this variable stores the given
+       * periodic face pairs on level 0 for later access during the
+       * identification of ghost cells for the multigrid hierarchy.
+       */
+      std::vector<GridTools::PeriodicFacePair<cell_iterator> > periodic_face_pairs_level_0;
 
       /**
        * Return a pointer to the p4est tree that belongs to the given
@@ -953,14 +966,37 @@ namespace parallel
       void attach_mesh_data();
 
       /**
-       * fills a map that, for each vertex, lists all the processors whose
-       * subdomains are adjacent to that vertex.  Used by
+       * Fills a map that, for each vertex, lists all the processors whose
+       * subdomains are adjacent to that vertex. Used by
        * DoFHandler::Policy::ParallelDistributed.
        */
       void
       fill_vertices_with_ghost_neighbors
       (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
        &vertices_with_ghost_neighbors);
+
+      /**
+       * Fills a map that, for each vertex, lists all the processors whose
+       * subdomains are adjacent to that vertex on the given level for the
+       * multigrid hierarchy. Used by DoFHandler::Policy::ParallelDistributed.
+       */
+      void
+      fill_level_vertices_with_ghost_neighbors
+      (const unsigned int level,
+       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors);
+
+      /**
+       * This method returns a bit vector of length tria.n_vertices()
+       * indicating the locally active vertices on a level, i.e., the vertices
+       * touched by the locally owned level cells for use in geometric
+       * multigrid (possibly including the vertices due to periodic boundary
+       * conditions) are marked by true.
+       *
+       * Used by DoFHandler::Policy::ParallelDistributed.
+       */
+      std::vector<bool>
+      mark_locally_active_vertices_on_level(const unsigned int level) const;
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
     };
@@ -1063,6 +1099,23 @@ namespace parallel
       fill_vertices_with_ghost_neighbors
       (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
        &vertices_with_ghost_neighbors);
+
+      /**
+       * Like above, this method, which is only implemented for dim = 2 or 3,
+       * needs a stub because it is used in dof_handler_policy.cc
+       */
+      void
+      fill_level_vertices_with_ghost_neighbors
+      (const unsigned int level,
+       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors);
+
+      /**
+       * Like above, this method, which is only implemented for dim = 2 or 3,
+       * needs a stub because it is used in dof_handler_policy.cc
+       */
+      std::vector<bool>
+      mark_locally_active_vertices_on_level(const unsigned int level) const;
 
     };
   }

@@ -44,8 +44,8 @@ void test()
   GridGenerator::hyper_cube(static_cast<Triangulation<2>&>(tr));
   tr.refine_global (3);
 
-  Vector<float> indicators (tr.dealii::Triangulation<2>::n_active_cells());
-  float min_indicator = tr.dealii::Triangulation<2>::n_active_cells(),
+  Vector<float> indicators (tr.n_active_cells());
+  float min_indicator = tr.n_active_cells(),
         max_indicator = 0;
   {
     unsigned int cell_index = 0;

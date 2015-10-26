@@ -59,7 +59,8 @@ MappingQ1<dim,spacedim>::clone () const
 
 
 template<int dim, int spacedim>
-MappingQ1<dim,spacedim> StaticMappingQ1<dim,spacedim>::mapping;
+MappingQGeneric<dim,spacedim>
+StaticMappingQ1<dim,spacedim>::mapping = MappingQGeneric<dim,spacedim>(1);
 
 
 

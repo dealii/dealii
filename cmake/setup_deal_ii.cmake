@@ -77,9 +77,8 @@ FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
 SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
 
 #
-# We expect a version number of the form "X.Y.Z", where X and Y are always
-# numbers and Z is either a third number (for a release version) or a short
-# string.
+# We expect a version number of the form "X.Y.Z" or "X.Y.Z-bla", where X, Y, Z
+# are always numbers and bla is a short string ("pre", "rc0", "rc1", etc.).
 #
 STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
   DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
@@ -87,18 +86,10 @@ STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
 STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
   DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
+STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+  DEAL_II_VERSION_SUBMINOR "${DEAL_II_PACKAGE_VERSION}"
+  )
 
-#
-# If Z is not a number, replace it with "0", otherwise extract version
-# number:
-#
-IF(DEAL_II_PACKAGE_VERSION MATCHES "^[0-9]+\\.[0-9]+.*\\.[0-9]+.*")
-  STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+.*\\.([0-9]+).*" "\\1"
-    DEAL_II_VERSION_SUBMINOR "${DEAL_II_PACKAGE_VERSION}"
-    )
-ELSE()
-  SET(DEAL_II_VERSION_SUBMINOR "0")
-ENDIF()
 SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_VERSION_SUBMINOR})
 
 

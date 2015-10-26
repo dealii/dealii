@@ -199,13 +199,13 @@ namespace TrilinosWrappers
 
     void
     Vector::reinit (const Epetra_Map &input_map,
-                    const bool        fast)
+                    const bool        omit_zeroing_entries)
     {
       nonlocal_vector.reset();
 
       if (vector->Map().SameAs(input_map)==false)
         vector.reset (new Epetra_FEVector(input_map));
-      else if (fast == false)
+      else if (omit_zeroing_entries == false)
         {
           const int ierr = vector->PutScalar(0.);
           (void)ierr;
@@ -221,20 +221,20 @@ namespace TrilinosWrappers
     void
     Vector::reinit (const IndexSet &parallel_partitioner,
                     const MPI_Comm &communicator,
-                    const bool      fast)
+                    const bool      omit_zeroing_entries)
     {
       nonlocal_vector.reset();
 
       Epetra_Map map = parallel_partitioner.make_trilinos_map (communicator,
                                                                true);
-      reinit (map, fast);
+      reinit (map, omit_zeroing_entries);
     }
 
 
 
     void
     Vector::reinit (const VectorBase &v,
-                    const bool        fast,
+                    const bool        omit_zeroing_entries,
                     const bool        allow_different_maps)
     {
       nonlocal_vector.reset();
@@ -250,7 +250,7 @@ namespace TrilinosWrappers
               has_ghosts = v.has_ghosts;
               last_action = Zero;
             }
-          else if (fast == false)
+          else if (omit_zeroing_entries == false)
             {
               // old and new vectors
               // have exactly the
@@ -275,9 +275,9 @@ namespace TrilinosWrappers
       // what she is doing.
       else
         {
-          Assert (fast == false,
+          Assert (omit_zeroing_entries == false,
                   ExcMessage ("It is not possible to exchange data with the "
-                              "option fast set, which would not write "
+                              "option 'omit_zeroing_entries' set, which would not write "
                               "elements."));
 
           AssertThrow (size() == v.size(),
@@ -562,7 +562,7 @@ namespace TrilinosWrappers
 
   void
   Vector::reinit (const size_type n,
-                  const bool      fast)
+                  const bool      omit_zeroing_entries)
   {
     if (size() != n)
       {
@@ -570,7 +570,7 @@ namespace TrilinosWrappers
                              Utilities::Trilinos::comm_self());
         vector.reset (new Epetra_FEVector (map));
       }
-    else if (fast == false)
+    else if (omit_zeroing_entries == false)
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
@@ -588,7 +588,7 @@ namespace TrilinosWrappers
 
   void
   Vector::reinit (const Epetra_Map &input_map,
-                  const bool        fast)
+                  const bool        omit_zeroing_entries)
   {
     if (n_global_elements(vector->Map()) != n_global_elements(input_map))
       {
@@ -597,7 +597,7 @@ namespace TrilinosWrappers
                              input_map.Comm());
         vector.reset (new Epetra_FEVector (map));
       }
-    else if (fast == false)
+    else if (omit_zeroing_entries == false)
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
@@ -616,7 +616,7 @@ namespace TrilinosWrappers
   void
   Vector::reinit (const IndexSet &partitioning,
                   const MPI_Comm &communicator,
-                  const bool      fast)
+                  const bool      omit_zeroing_entries)
   {
     if (n_global_elements(vector->Map()) !=
         static_cast<TrilinosWrappers::types::int_type>(partitioning.size()))
@@ -631,7 +631,7 @@ namespace TrilinosWrappers
 #endif
         vector.reset (new Epetra_FEVector(map));
       }
-    else if (fast == false)
+    else if (omit_zeroing_entries == false)
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
@@ -649,7 +649,7 @@ namespace TrilinosWrappers
 
   void
   Vector::reinit (const VectorBase &v,
-                  const bool        fast,
+                  const bool        omit_zeroing_entries,
                   const bool        allow_different_maps)
   {
     // In case we do not allow to
@@ -659,7 +659,7 @@ namespace TrilinosWrappers
     // the vector, initialize our
     // map with the map in v, and
     // generate the vector.
-    (void)fast;
+    (void)omit_zeroing_entries;
     if (allow_different_maps == false)
       {
         if (local_range() != v.local_range())
@@ -695,9 +695,9 @@ namespace TrilinosWrappers
     // the data.
     else
       {
-        Assert (fast == false,
+        Assert (omit_zeroing_entries == false,
                 ExcMessage ("It is not possible to exchange data with the "
-                            "option fast set, which would not write "
+                            "option 'omit_zeroing_entries' set, which would not write "
                             "elements."));
 
         AssertThrow (size() == v.size(),

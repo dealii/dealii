@@ -1233,7 +1233,9 @@
  * using parallel::distributed::Triangulation::add_periodicity()
  * -# Gather the periodic faces using GridTools::collect_periodic_faces() (DoFHandler)
  * -# Add periodicity constraints using DoFTools::make_periodicity_constraints()
- *
+ * 
+ * An example for this can be found in step-45. 
+ * 
  *
  * <dt class="glossary">@anchor GlossPrimitive <b>Primitive finite
  * elements</b></dt>

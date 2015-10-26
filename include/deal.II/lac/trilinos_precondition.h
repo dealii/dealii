@@ -1373,8 +1373,17 @@ namespace TrilinosWrappers
       /**
        * Specifies the constant modes (near null space) of the matrix. This
        * parameter tells AMG whether we work on a scalar equation (where the
-       * near null space only consists of ones) or on a vector-valued
-       * equation.
+       * near null space only consists of ones, and default value is OK) or on
+       * a vector-valued equation.
+       * For vector-valued equation problem with <tt>n_component</tt>, the
+       * provided @p constant_modes should fulfill the following requirements:
+       * <ul>
+       * <li>  n_component.size() == <tt>n_component</tt> </li>
+       * <li>  n_component[*].size() == n_dof_local or
+       *       n_component[*].size() == n_dof_global </li>
+       * <li>  n_component[<tt>ic</tt>][<tt>id</tt>] == "<tt>id</tt><em>th</em>
+       *       DoF is corresponding to component <tt>ic</tt> </li>
+       * </ul>
        */
       std::vector<std::vector<bool> > constant_modes;
 

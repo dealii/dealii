@@ -112,7 +112,7 @@ namespace PETScWrappers
     Vector::reinit (const MPI_Comm  &comm,
                     const size_type  n,
                     const size_type  local_sz,
-                    const bool       fast)
+                    const bool       omit_zeroing_entries)
     {
       communicator = comm;
 
@@ -148,7 +148,7 @@ namespace PETScWrappers
 
       // finally clear the new vector if so
       // desired
-      if (fast == false)
+      if (omit_zeroing_entries == false)
         *this = 0;
     }
 
@@ -156,19 +156,19 @@ namespace PETScWrappers
 
     void
     Vector::reinit (const Vector &v,
-                    const bool    fast)
+                    const bool    omit_zeroing_entries)
     {
       if (v.has_ghost_elements())
         {
           reinit (v.locally_owned_elements(), v.ghost_indices, v.communicator);
-          if (!fast)
+          if (!omit_zeroing_entries)
             {
               int ierr = VecSet(vector, 0.0);
               AssertThrow (ierr == 0, ExcPETScError(ierr));
             }
         }
       else
-        reinit (v.communicator, v.size(), v.local_size(), fast);
+        reinit (v.communicator, v.size(), v.local_size(), omit_zeroing_entries);
     }
 
 

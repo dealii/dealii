@@ -668,10 +668,8 @@ namespace GridTools
                      Triangulation<dim> &triangulation,
                      const Function<dim> *coefficient)
   {
-    // first provide everything that is
-    // needed for solving a Laplace
+    // first provide everything that is needed for solving a Laplace
     // equation.
-    MappingQ1<dim> mapping_q1;
     FE_Q<dim> q1(1);
 
     DoFHandler<dim> dof_handler(triangulation);
@@ -690,7 +688,7 @@ namespace GridTools
 
     QGauss<dim> quadrature(4);
 
-    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
+    MatrixCreator::create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
 
     // set up the boundary values for
     // the laplace problem
@@ -1337,7 +1335,7 @@ next_cell:
                     best_cell     = std::make_pair(*cell, p_cell);
                   }
               }
-            catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+            catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
               {
                 // ok, the transformation
                 // failed presumably
@@ -1463,7 +1461,7 @@ next_cell:
                         best_cell     = std::make_pair(*cell, p_cell);
                       }
                   }
-                catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+                catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
                   {
                     // ok, the transformation
                     // failed presumably
@@ -1634,6 +1632,286 @@ next_cell:
       }
 
     return vertex_to_cell_map;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::map<unsigned int,types::global_vertex_index>
+  compute_local_to_global_vertex_index_map(
+    const parallel::distributed::Triangulation<dim,spacedim> &triangulation)
+  {
+    std::map<unsigned int,types::global_vertex_index> local_to_global_vertex_index;
+
+#ifndef DEAL_II_WITH_MPI
+
+    // without MPI, this function doesn't make sense because on cannot
+    // use parallel::distributed::Triangulation in any meaninful
+    // way
+    (void)triangulation;
+    Assert (false, ExcMessage ("This function does not make any sense "
+                               "for parallel::distributed::Triangulation "
+                               "objects if you do not have MPI enabled."));
+
+#else
+
+    typedef typename Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    const std::vector<std::set<active_cell_iterator> > vertex_to_cell =
+      vertex_to_cell_map(triangulation);
+
+    // Create a local index for the locally "owned" vertices
+    types::global_vertex_index next_index = 0;
+    unsigned int max_cellid_size = 0;
+    std::set<std::pair<types::subdomain_id,types::global_vertex_index> > vertices_added;
+    std::map<types::subdomain_id,std::set<unsigned int> > vertices_to_recv;
+    std::map<types::subdomain_id,std::vector<std_cxx11::tuple<types::global_vertex_index,
+        types::global_vertex_index,std::string> > > vertices_to_send;
+    active_cell_iterator cell = triangulation.begin_active(),
+                         endc = triangulation.end();
+    std::set<active_cell_iterator> missing_vert_cells;
+    std::set<unsigned int> used_vertex_index;
+    for (; cell!=endc; ++cell)
+      {
+        if (cell->is_locally_owned())
+          {
+            for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+              {
+                types::subdomain_id lowest_subdomain_id = cell->subdomain_id();
+                typename std::set<active_cell_iterator>::iterator
+                adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin(),
+                end_adj_cell = vertex_to_cell[cell->vertex_index(i)].end();
+                for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
+                  lowest_subdomain_id = std::min(lowest_subdomain_id,
+                                                 (*adjacent_cell)->subdomain_id());
+
+                // See if I "own" this vertex
+                if (lowest_subdomain_id==cell->subdomain_id())
+                  {
+                    // Check that the vertex we are working on a vertex that has not be
+                    // dealt with yet
+                    if (used_vertex_index.find(cell->vertex_index(i))==used_vertex_index.end())
+                      {
+                        // Set the local index
+                        local_to_global_vertex_index[cell->vertex_index(i)] = next_index++;
+
+                        // Store the information that will be sent to the adjacent cells
+                        // on other subdomains
+                        adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin();
+                        std::vector<types::subdomain_id> subdomain_ids;
+                        for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
+                          if ((*adjacent_cell)->subdomain_id()!=cell->subdomain_id())
+                            {
+                              std::pair<types::subdomain_id,types::global_vertex_index>
+                              tmp((*adjacent_cell)->subdomain_id(), cell->vertex_index(i));
+                              if (vertices_added.find(tmp)==vertices_added.end())
+                                {
+                                  vertices_to_send[(*adjacent_cell)->subdomain_id()].push_back(
+                                    std_cxx11::tuple<types::global_vertex_index,types::global_vertex_index,
+                                    std::string> (i,cell->vertex_index(i),
+                                                  cell->id().to_string()));
+                                  if (cell->id().to_string().size() > max_cellid_size)
+                                    max_cellid_size = cell->id().to_string().size();
+                                  vertices_added.insert(tmp);
+                                }
+                            }
+                        used_vertex_index.insert(cell->vertex_index(i));
+                      }
+                  }
+                else
+                  {
+                    // We don't own the vertex so we will receive its global index
+                    vertices_to_recv[lowest_subdomain_id].insert(cell->vertex_index(i));
+                    missing_vert_cells.insert(cell);
+                  }
+              }
+          }
+
+        // Some hanging nodes are vertices of ghost cells. They need to be
+        // received.
+        if (cell->is_ghost())
+          {
+            for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+              {
+                if (cell->at_boundary(i)==false)
+                  {
+                    if (cell->neighbor(i)->active())
+                      {
+                        typename Triangulation<dim,spacedim>::active_cell_iterator adjacent_cell =
+                          cell->neighbor(i);
+                        if ((adjacent_cell->is_locally_owned()))
+                          {
+                            types::subdomain_id adj_subdomain_id = adjacent_cell->subdomain_id();
+                            if (cell->subdomain_id()<adj_subdomain_id)
+                              for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_face; ++j)
+                                {
+                                  vertices_to_recv[cell->subdomain_id()].insert(cell->face(i)->vertex_index(j));
+                                  missing_vert_cells.insert(cell);
+                                }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+
+    // Get the size of the largest CellID string
+    max_cellid_size = Utilities::MPI::max(max_cellid_size, triangulation.get_communicator());
+
+    // Make indices global by getting the number of vertices owned by each
+    // processors and shifting the indices accordingly
+    const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
+    std::vector<types::global_vertex_index> indices(n_cpu);
+    MPI_Allgather(&next_index, 1, MPI_UNSIGNED_LONG_LONG, &indices[0],
+                  indices.size(), MPI_UNSIGNED_LONG_LONG, triangulation.get_communicator());
+    const types::global_vertex_index shift = std::accumulate(&indices[0],
+                                                             &indices[0]+triangulation.locally_owned_subdomain(),0);
+
+    std::map<unsigned int,types::global_vertex_index>::iterator
+    global_index_it = local_to_global_vertex_index.begin(),
+    global_index_end = local_to_global_vertex_index.end();
+    for (; global_index_it!=global_index_end; ++global_index_it)
+      global_index_it->second += shift;
+
+    // In a first message, send the global ID of the vertices and the local
+    // positions in the cells. In a second messages, send the cell ID as a
+    // resize string. This is done in two messages so that types are not mixed
+
+    // Send the first message
+    std::vector<std::vector<types::global_vertex_index> > vertices_send_buffers(
+      vertices_to_send.size());
+    std::vector<MPI_Request> first_requests(vertices_to_send.size());
+    typename std::map<types::subdomain_id,
+             std::vector<std_cxx11::tuple<types::global_vertex_index,
+             types::global_vertex_index,std::string> > >::iterator
+             vert_to_send_it = vertices_to_send.begin(),
+             vert_to_send_end = vertices_to_send.end();
+    for (unsigned int i=0; vert_to_send_it!=vert_to_send_end;
+         ++vert_to_send_it, ++i)
+      {
+        int destination = vert_to_send_it->first;
+        const unsigned int n_vertices = vert_to_send_it->second.size();
+        const int buffer_size = 2*n_vertices;
+        vertices_send_buffers[i].resize(buffer_size);
+
+        // fill the buffer
+        for (unsigned int j=0; j<n_vertices; ++j)
+          {
+            vertices_send_buffers[i][2*j] = std_cxx11::get<0>(vert_to_send_it->second[j]);
+            vertices_send_buffers[i][2*j+1] =
+              local_to_global_vertex_index[std_cxx11::get<1>(vert_to_send_it->second[j])];
+          }
+
+        // Send the message
+        MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                  destination, 0, triangulation.get_communicator(), &first_requests[i]);
+      }
+
+    // Receive the first message
+    std::vector<std::vector<types::global_vertex_index> > vertices_recv_buffers(
+      vertices_to_recv.size());
+    typename std::map<types::subdomain_id,std::set<unsigned int> >::iterator
+    vert_to_recv_it = vertices_to_recv.begin(),
+    vert_to_recv_end = vertices_to_recv.end();
+    for (unsigned int i=0; vert_to_recv_it!=vert_to_recv_end; ++vert_to_recv_it, ++i)
+      {
+        int source = vert_to_recv_it->first;
+        const unsigned int n_vertices = vert_to_recv_it->second.size();
+        const int buffer_size = 2*n_vertices;
+        vertices_recv_buffers[i].resize(buffer_size);
+
+        // Receive the message
+        MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+      }
+
+
+    // Send second message
+    std::vector<std::vector<char> > cellids_send_buffers(vertices_to_send.size());
+    std::vector<MPI_Request> second_requests(vertices_to_send.size());
+    vert_to_send_it = vertices_to_send.begin();
+    for (unsigned int i=0; vert_to_send_it!=vert_to_send_end;
+         ++vert_to_send_it, ++i)
+      {
+        int destination = vert_to_send_it->first;
+        const unsigned int n_vertices = vert_to_send_it->second.size();
+        const int buffer_size = max_cellid_size*n_vertices;
+        cellids_send_buffers[i].resize(buffer_size);
+
+        // fill the buffer
+        unsigned int pos = 0;
+        for (unsigned int j=0; j<n_vertices; ++j)
+          {
+            std::string cell_id = std_cxx11::get<2>(vert_to_send_it->second[j]);
+            for (unsigned int k=0; k<max_cellid_size; ++k, ++pos)
+              {
+                if (k<cell_id.size())
+                  cellids_send_buffers[i][pos] = cell_id[k];
+                // if necessary fill up the reserved part of the buffer with an
+                // invalid value
+                else
+                  cellids_send_buffers[i][pos] = '-';
+              }
+          }
+
+        // Send the message
+        MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
+                  destination, 0, triangulation.get_communicator(), &second_requests[i]);
+      }
+
+    // Receive the second message
+    std::vector<std::vector<char> > cellids_recv_buffers(vertices_to_recv.size());
+    vert_to_recv_it = vertices_to_recv.begin();
+    for (unsigned int i=0; vert_to_recv_it!=vert_to_recv_end; ++vert_to_recv_it, ++i)
+      {
+        int source = vert_to_recv_it->first;
+        const unsigned int n_vertices = vert_to_recv_it->second.size();
+        const int buffer_size = max_cellid_size*n_vertices;
+        cellids_recv_buffers[i].resize(buffer_size);
+
+        // Receive the message
+        MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
+                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+      }
+
+
+    // Match the data received with the required vertices
+    vert_to_recv_it = vertices_to_recv.begin();
+    for (unsigned int i=0; vert_to_recv_it!=vert_to_recv_end; ++i, ++vert_to_recv_it)
+      {
+        for (unsigned int j=0; j<vert_to_recv_it->second.size(); ++j)
+          {
+            const unsigned int local_pos_recv = vertices_recv_buffers[i][2*j];
+            const types::global_vertex_index global_id_recv = vertices_recv_buffers[i][2*j+1];
+            const std::string cellid_recv(&cellids_recv_buffers[i][max_cellid_size*j],
+                                          &cellids_recv_buffers[i][max_cellid_size*(j+1)]);
+            bool found = false;
+            typename std::set<active_cell_iterator>::iterator
+            cell_set_it = missing_vert_cells.begin(),
+            end_cell_set = missing_vert_cells.end();
+            for (; (found==false) && (cell_set_it!=end_cell_set); ++cell_set_it)
+              {
+                typename std::set<active_cell_iterator>::iterator
+                candidate_cell = vertex_to_cell[(*cell_set_it)->vertex_index(i)].begin(),
+                end_cell = vertex_to_cell[(*cell_set_it)->vertex_index(i)].end();
+                for (; candidate_cell!=end_cell; ++candidate_cell)
+                  {
+                    std::string current_cellid = (*candidate_cell)->id().to_string();
+                    current_cellid.resize(max_cellid_size,'-');
+                    if (current_cellid.compare(cellid_recv)==0)
+                      {
+                        local_to_global_vertex_index[(*candidate_cell)->vertex_index(local_pos_recv)] =
+                          global_id_recv;
+                        found = true;
+
+                        break;
+                      }
+                  }
+              }
+          }
+      }
+#endif
+
+    return local_to_global_vertex_index;
   }
 
 
@@ -2648,7 +2926,7 @@ next_cell:
    * An orthogonal equality test for points:
    *
    * point1 and point2 are considered equal, if
-   *   matrix.(point1 + offset) - point2
+   *   matrix.point1 + offset - point2
    * is parallel to the unit vector in <direction>
    */
   template<int spacedim>

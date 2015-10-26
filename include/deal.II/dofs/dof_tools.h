@@ -740,8 +740,12 @@ namespace DoFTools
    * elements of the other vector components of the finite element fields on
    * the fine grid are not touched.
    *
-   * The output of this function is a compressed format that can be given to
-   * the @p reinit functions of the SparsityPattern and SparseMatrix classes.
+   * Triangulation of the fine grid can be distributed. When called in parallel,
+   * each process has to have a copy of the coarse grid. In this case, function
+   * returns transfer representation for a set of locally owned cells.
+   *
+   * The output of this function is a compressed format that can be used to
+   * construct corresponding sparse transfer matrix.
    */
   template <int dim, int spacedim>
   void
@@ -943,7 +947,7 @@ namespace DoFTools
    *
    * @see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
-   * for further information.
+   * and step-45 for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
@@ -1101,8 +1105,6 @@ namespace DoFTools
    * @ref GlossComponentMask),
    * then this is equivalent to selecting <em>all</em> vector components
    * corresponding to this non-primitive base element.
-   *
-   * @note If the @p blocks argument is true,
    */
   template <int dim, int spacedim>
   void

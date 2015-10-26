@@ -182,33 +182,32 @@ namespace TrilinosWrappers
 
     if (constant_modes_dimension > 0)
       {
-        const size_type n_rows = n_global_rows(matrix);
-        const bool constant_modes_are_global =
-          additional_data.constant_modes[0].size() == n_rows;
-        const size_type n_relevant_rows =
-          constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
-        const size_type my_size = domain_map.NumMyElements();
-        if (constant_modes_are_global == false)
-          Assert (n_relevant_rows == my_size,
-                  ExcDimensionMismatch(n_relevant_rows, my_size));
-        Assert (n_rows ==
+        const size_type global_size = n_global_rows(matrix);
+        Assert (global_size ==
                 static_cast<size_type>(global_length(distributed_constant_modes)),
-                ExcDimensionMismatch(n_rows,
+                ExcDimensionMismatch(global_size,
                                      global_length(distributed_constant_modes)));
-
-        (void)n_relevant_rows;
-        (void)global_length;
+        const bool constant_modes_are_global
+          = additional_data.constant_modes[0].size() == global_size;
+        const size_type my_size = domain_map.NumMyElements();
 
         // Reshape null space as a contiguous vector of doubles so that
         // Trilinos can read from it.
+        const size_type expected_mode_size =
+          constant_modes_are_global ? global_size : my_size;
         for (size_type d=0; d<constant_modes_dimension; ++d)
-          for (size_type row=0; row<my_size; ++row)
-            {
-              TrilinosWrappers::types::int_type global_row_id =
-                constant_modes_are_global ? gid(domain_map,row) : row;
-              distributed_constant_modes[d][row] =
-                additional_data.constant_modes[d][global_row_id];
-            }
+          {
+            Assert (additional_data.constant_modes[d].size() == expected_mode_size,
+                    ExcDimensionMismatch(additional_data.constant_modes[d].size(), expected_mode_size));
+            for (size_type row=0; row<my_size; ++row)
+              {
+                const TrilinosWrappers::types::int_type mode_index =
+                  constant_modes_are_global ? gid(domain_map,row) : row;
+                distributed_constant_modes[d][row] =
+                  additional_data.constant_modes[d][mode_index];
+              }
+          }
+        (void)expected_mode_size;
 
         parameter_list.set("null space: type", "pre-computed");
         parameter_list.set("null space: dimension",
