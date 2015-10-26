@@ -939,11 +939,12 @@ namespace internal
  *       std::cout << "Triangulation has been refined." << std::endl;
  *     }
  *
- *     void f() {
+ *     void run () {
  *       Triangulation<dim> triangulation;
  *       // fill it somehow
  *       triangulation.signals.post_refinement.connect (&f);
  *       triangulation.refine_global (2);
+ *     }
  *   @endcode
  * This code will produce output twice, once for each refinement cycle.
  *
@@ -1010,29 +1011,8 @@ namespace internal
  *
  * The Triangulation class has a variety of signals that indicate different
  * actions by which the triangulation can modify itself and potentially
- * require follow-up action elsewhere: - creation: This signal is triggered
- * whenever the Triangulation::create_triangulation or
- * Triangulation::copy_triangulation is called. This signal is also triggered
- * when loading a triangulation from an archive via Triangulation::load. -
- * pre-refinement: This signal is triggered at the beginning of execution of
- * the Triangulation::execute_coarsening_and_refinement function (which is
- * itself called by other functions such as Triangulation::refine_global). At
- * the time this signal is triggered, the triangulation is still unchanged. -
- * post-refinement: This signal is triggered at the end of execution of the
- * Triangulation::execute_coarsening_and_refinement function when the
- * triangulation has reached its final state - copy: This signal is triggered
- * whenever the triangulation owning the signal is copied by another
- * triangulation using Triangulation::copy_triangulation (i.e. it is triggered
- * on the <i>old</i> triangulation, but the new one is passed as a argument).
- * - clear: This signal is triggered whenever the Triangulation::clear
- * function is called. This signal is also triggered when loading a
- * triangulation from an archive via Triangulation::load as the previous
- * content of the triangulation is first destroyed. - any_change: This is a
- * catch-all signal that is triggered whenever the create, post_refinement, or
- * clear signals are triggered. In effect, it can be used to indicate to an
- * object connected to the signal that the triangulation has been changed,
- * whatever the exact cause of the change.
- *
+ * require follow-up action elsewhere. Please refer to Triangulation::Signals
+ * for details.
  *
  * <h3>Serializing (loading or storing) triangulations</h3>
  *
@@ -1721,9 +1701,9 @@ public:
   std::vector<types::manifold_id> get_manifold_ids() const;
 
   /**
-   * Copy a triangulation. This operation is not cheap, so you should be
-   * careful with using this. We do not implement this function as a copy
-   * constructor, since it makes it easier to maintain collections of
+   * Copy @p old_tria to this triangulation. This operation is not cheap, so you
+   * should be careful with using this. We do not implement this function as a
+   * copy constructor, since it makes it easier to maintain collections of
    * triangulations if you can assign them values later on.
    *
    * Keep in mind that this function also copies the pointer to the boundary
@@ -1921,20 +1901,82 @@ public:
 
   /**
    * A structure that has boost::signal objects for a number of actions that a
-   * triangulation can do to itself. See the general documentation of the
-   * Triangulation class for more information and for documentation of the
-   * semantics of the member functions.
+   * triangulation can do to itself. Please refer to the
+   * "Getting notice when a triangulation changes" section in the general
+   * documentation of the @ref Triangulation class for more information
+   * and examples.
    *
    * For documentation on signals, see
    * http://www.boost.org/doc/libs/release/libs/signals2 .
    */
   struct Signals
   {
+    /**
+     * This signal is triggered whenever the
+     * Triangulation::create_triangulation or Triangulation::copy_triangulation()
+     * is called. This signal is also triggered when loading a triangulation from an
+     * archive via Triangulation::load().
+     */
     boost::signals2::signal<void ()> create;
+
+    /**
+     * This signal is triggered at the beginning of execution of
+     * the Triangulation::execute_coarsening_and_refinement() function (which is
+     * itself called by other functions such as Triangulation::refine_global() ).
+     * At the time this signal is triggered, the triangulation is still unchanged.
+     */
     boost::signals2::signal<void ()> pre_refinement;
+
+    /**
+     * This signal is triggered at the end of execution of the
+     * Triangulation::execute_coarsening_and_refinement() function when the
+     * triangulation has reached its final state
+     */
     boost::signals2::signal<void ()> post_refinement;
-    boost::signals2::signal<void (const Triangulation<dim, spacedim> &original_tria)> copy;
+
+    /**
+     * This signal is triggered for each cell that is going to be coarsened.
+     *
+     * @note This signal is triggered with the immediate parent cell of a set of
+     * active cells as argument. The children of this parent cell will subsequently
+     * be coarsened away.
+     */
+    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> pre_coarsening_on_cell;
+
+    /**
+     * This signal is triggered for each cell that just has been refined.
+     *
+     * @note The signal parameter @p cell corresponds to the immediate parent cell
+     * of a set of newly created active cells.
+     */
+    boost::signals2::signal<void (const Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
+
+    /**
+     * This signal is triggered whenever the triangulation owning the signal
+     * is copied by another triangulation using Triangulation::copy_triangulation()
+     * (i.e. it is triggered on the <i>old</i> triangulation, but the new one is
+     * passed as an argument).
+     */
+    boost::signals2::signal<void (const Triangulation<dim, spacedim> &destination_tria)> copy;
+
+    /**
+     * This signal is triggered whenever the Triangulation::clear()
+     * function is called. This signal is also triggered when loading a
+     * triangulation from an archive via Triangulation::load() as the previous
+     * content of the triangulation is first destroyed.
+     */
     boost::signals2::signal<void ()> clear;
+
+    /**
+     * This is a catch-all signal that is triggered whenever the create,
+     * post_refinement, or clear signals are triggered.
+     * In effect, it can be used to indicate to an object connected to
+     * the signal that the triangulation has been changed, whatever the
+     * exact cause of the change.
+     *
+     * @note The cell-level signals @p pre_coarsening_on_cell and
+     * @p post_refinement_on_cell are not connected to this signal.
+     */
     boost::signals2::signal<void ()> any_change;
   };
 
