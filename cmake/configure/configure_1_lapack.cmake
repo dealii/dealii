@@ -35,7 +35,6 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Push -pthread as well:
     ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
-    INCLUDE(CheckCSourceCompiles)
     CHECK_C_SOURCE_COMPILES("
       char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
       dgemm_(); char dgemv_(); char dgeqrf_(); char dgesdd_(); char
