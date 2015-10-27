@@ -80,9 +80,6 @@ DEAL:Solvers:Linear operator:Richardson::Convergence step 1 value 0.000000000
 DEAL:Solvers::SolverSelector
 DEAL:Solvers:cg::Convergence step 0 value 0.000000000
 DEAL:Solvers::SparseDirectUMFPACK
-DEAL:Solvers::IterativeInverse
-DEAL:Solvers:cg::Starting value 16.88194302
-DEAL:Solvers:cg::Convergence step 1 value 0.000000000
 DEAL::SparseMatrix OK
 DEAL::PreconditionBlockIdentity
 DEAL:cg::Starting value 49.69909456

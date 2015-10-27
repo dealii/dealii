@@ -396,21 +396,21 @@ int main()
       const auto lo_A_inv = linear_operator(solver);
       const Vector<double> x = lo_A_inv*b;
     }
-    {
-      deallog << "IterativeInverse" << std::endl;
-
-      PreconditionJacobi< SparseMatrix<double> > preconditioner;
-      preconditioner.initialize(A);
-
-      ReductionControl solver_control (10, 1.e-30, 1.e-2);
-      IterativeInverse< Vector<double> > A_inv;
-      A_inv.initialize(A,preconditioner);
-      A_inv.solver.select("cg");
-      A_inv.solver.set_control(solver_control);
-
-      const auto lo_A_inv = linear_operator(A_inv);
-      const Vector<double> x = lo_A_inv*b;
-    }
+//    { // See #1673 and #1784
+//      deallog << "IterativeInverse" << std::endl;
+//
+//      PreconditionJacobi< SparseMatrix<double> > preconditioner;
+//      preconditioner.initialize(A);
+//
+//      ReductionControl solver_control (10, 1.e-30, 1.e-2);
+//      IterativeInverse< Vector<double> > A_inv;
+//      A_inv.initialize(A,preconditioner);
+//      A_inv.solver.select("cg");
+//      A_inv.solver.set_control(solver_control);
+//
+//      const auto lo_A_inv = linear_operator(A_inv);
+//      const Vector<double> x = lo_A_inv*b;
+//    }
     deallog.pop();
 
 

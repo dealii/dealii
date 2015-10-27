@@ -810,7 +810,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef typename MATRIX::size_type size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Standardized data struct to pipe additional parameters to the
@@ -1092,6 +1092,12 @@ template<class VECTOR>
 inline void
 PreconditionRichardson::vmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<size_type, typename VECTOR::size_type>::value,
+    "PreconditionRichardson and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   dst.equ(relaxation,src);
 }
 
@@ -1101,6 +1107,12 @@ template<class VECTOR>
 inline void
 PreconditionRichardson::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<size_type, typename VECTOR::size_type>::value,
+    "PreconditionRichardson and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   dst.equ(relaxation,src);
 }
 
@@ -1108,6 +1120,12 @@ template<class VECTOR>
 inline void
 PreconditionRichardson::vmult_add (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<size_type, typename VECTOR::size_type>::value,
+    "PreconditionRichardson and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   dst.add(relaxation,src);
 }
 
@@ -1117,6 +1135,12 @@ template<class VECTOR>
 inline void
 PreconditionRichardson::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<size_type, typename VECTOR::size_type>::value,
+    "PreconditionRichardson and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   dst.add(relaxation,src);
 }
 
@@ -1176,6 +1200,12 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionJacobi<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionJacobi and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_Jacobi (dst, src, this->relaxation);
 }
@@ -1187,6 +1217,12 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionJacobi<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionJacobi and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_Jacobi (dst, src, this->relaxation);
 }
@@ -1198,6 +1234,12 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionJacobi<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionJacobi and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->Jacobi_step (dst, src, this->relaxation);
 }
@@ -1209,6 +1251,12 @@ template<class VECTOR>
 inline void
 PreconditionJacobi<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionJacobi<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionJacobi and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   step (dst, src);
 }
 
@@ -1221,6 +1269,12 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SOR (dst, src, this->relaxation);
 }
@@ -1232,6 +1286,12 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_TSOR (dst, src, this->relaxation);
 }
@@ -1243,6 +1303,12 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->SOR_step (dst, src, this->relaxation);
 }
@@ -1254,6 +1320,12 @@ template<class VECTOR>
 inline void
 PreconditionSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->TSOR_step (dst, src, this->relaxation);
 }
@@ -1301,6 +1373,12 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation, pos_right_of_diagonal);
 }
@@ -1312,6 +1390,12 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation, pos_right_of_diagonal);
 }
@@ -1323,6 +1407,12 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::step (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   this->A->SSOR_step (dst, src, this->relaxation);
 }
@@ -1334,6 +1424,12 @@ template<class VECTOR>
 inline void
 PreconditionSSOR<MATRIX>::Tstep (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionSSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionSSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   step (dst, src);
 }
 
@@ -1373,6 +1469,12 @@ template<class VECTOR>
 inline void
 PreconditionPSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionPSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionPSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
   this->A->PSOR (dst, *permutation, *inverse_permutation, this->relaxation);
@@ -1385,6 +1487,12 @@ template<class VECTOR>
 inline void
 PreconditionPSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<typename PreconditionPSOR<MATRIX>::size_type, typename VECTOR::size_type>::value,
+    "PreconditionPSOR and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
   this->A->TPSOR (dst, *permutation, *inverse_permutation, this->relaxation);
@@ -1678,7 +1786,13 @@ inline
 PreconditionChebyshev<MATRIX,VECTOR>::PreconditionChebyshev ()
   :
   is_initialized (false)
-{}
+{
+#ifdef DEAL_II_WITH_CXX11
+  static_assert(
+    std::is_same<size_type, typename VECTOR::size_type>::value,
+    "PreconditionChebyshev and VECTOR must have the same size_type.");
+#endif // DEAL_II_WITH_CXX11
+}
 
 
 
