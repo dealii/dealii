@@ -360,7 +360,7 @@ route and shows that solving <i>any</i> linear system can be done in just
 But then, this is a tutorial: we teach how to do things. Consequently,
 in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
-large matrix and vectors, but we will want to decompose matrices into vectors
+large matrix and vectors, but we will want to decompose matrices 
 into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are much
 better ways, for example those explained in the results section of step-22 or
