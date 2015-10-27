@@ -20,14 +20,16 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 
+
 DEAL_II_NAMESPACE_OPEN
+
+class IndexSet;
 
 namespace LinearAlgebra
 {
   template <typename Number>
   class ReadWriteVector;
 
-  class IndexSet;
 
   /*! @addtogroup Vectors
    *@{
@@ -48,6 +50,7 @@ namespace LinearAlgebra
     typedef Number                                            value_type;
     typedef types::global_dof_index                           size_type;
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
 
     /**
      * Multiply the entire vector by a fixed factor.
@@ -91,7 +94,7 @@ namespace LinearAlgebra
     virtual void sadd(const Number s, const VectorSpaceVector<Number> &V) = 0;
 
     /**
-     * Scaling and simple additiion of a multiple of a vector, i.e. <tt>*this =
+     * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
      * s*(*this)+a*V</tt>.
      */
     virtual void sadd(const Number s, const Number a,
@@ -154,7 +157,7 @@ namespace LinearAlgebra
     virtual size_type size() const = 0;
 
     /**
-     * Return an index set that describes which elements of this vector are
+     * Returns an index set that describes which elements of this vector are
      * owned by the current processor. As a consequence, the index sets returned
      * on different procesors if this is a distributed vector will form disjoint
      * sets that add up to the complete index set. Obviously, if a vector is
@@ -163,7 +166,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    virtual IndexSet locally_owned_elements() const = 0;
+    virtual const dealii::IndexSet &locally_owned_elements() const = 0;
 
     /**
      * Prints the vector to the output stream @p out.
@@ -178,7 +181,6 @@ namespace LinearAlgebra
      */
     virtual std::size_t memory_consumption() const = 0;
   };
-
   /*@}*/
 }
 

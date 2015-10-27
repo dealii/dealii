@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,37 +16,14 @@
 
 
 for (SCALAR : REAL_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template class ReadWriteVector<SCALAR>;
-  \}
-}
+  {
+    template class Vector<SCALAR>;
+  }
 
-for (S1, S2 : REAL_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
-}
 
 
 for (SCALAR : COMPLEX_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template class ReadWriteVector<SCALAR>;
-  \}
-}
-
-for (S1, S2 : COMPLEX_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
-}
+  {
+    template class Vector<SCALAR>;
+  }
 

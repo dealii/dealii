@@ -27,6 +27,7 @@ SET(_src
   constraint_matrix.cc
   full_matrix.cc
   lapack_full_matrix.cc
+  la_vector.cc
   matrix_lib.cc
   matrix_out.cc
   parallel_vector.cc
@@ -60,6 +61,7 @@ SET(_inst
   constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
+  la_vector.inst.in
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
