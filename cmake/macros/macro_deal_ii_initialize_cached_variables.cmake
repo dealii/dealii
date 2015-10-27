@@ -74,6 +74,9 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
     "CXX Compiler.")
 
+  SET(CMAKE_C_COMPILER ${DEAL_II_C_COMPILER} CACHE STRING
+    "C Compiler.")
+
   SET(CMAKE_CXX_FLAGS "" CACHE STRING
     "Flags used by the compiler during all build types."
     )
