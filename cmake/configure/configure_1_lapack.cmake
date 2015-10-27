@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -35,54 +35,46 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Push -pthread as well:
     ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
-    IF(CMAKE_C_COMPILER_WORKS)
+    CHECK_C_SOURCE_COMPILES("
+      char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
+      dgemm_(); char dgemv_(); char dgeqrf_(); char dgesdd_(); char
+      dgesvd_(); char dgetrf_(); char dgetri_(); char dgetrs_(); char
+      dorgqr_(); char dormqr_(); char dstev_(); char dsyevx_(); char
+      dsygv_(); char dsygvx_(); char dtrtrs_(); char saxpy_(); char
+      sgeev_(); char sgeevx_(); char sgelsd_(); char sgemm_(); char
+      sgemv_(); char sgeqrf_(); char sgesdd_(); char sgesvd_(); char
+      sgetrf_(); char sgetri_(); char sgetrs_(); char sorgqr_(); char
+      sormqr_(); char sstev_(); char ssyevx_(); char ssygv_(); char
+      ssygvx_(); char strtrs_();
+      int main(){
+        daxpy_ (); dgeev_ (); dgeevx_ (); dgelsd_ (); dgemm_ (); dgemv_ ();
+        dgeqrf_ (); dgesdd_ (); dgesvd_ (); dgetrf_ (); dgetri_ (); dgetrs_
+        (); dorgqr_ (); dormqr_ (); dstev_ (); dsyevx_ (); dsygv_ ();
+        dsygvx_ (); dtrtrs_ (); saxpy_ (); sgeev_ (); sgeevx_ (); sgelsd_
+        (); sgemm_ (); sgemv_ (); sgeqrf_ (); sgesdd_ (); sgesvd_ ();
+        sgetrf_ (); sgetri_ (); sgetrs_ (); sorgqr_ (); sormqr_ (); sstev_
+        (); ssyevx_ (); ssygv_ (); ssygvx_ (); strtrs_ ();
 
-      INCLUDE(CheckCSourceCompiles)
-      CHECK_C_SOURCE_COMPILES("
-        char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
-        dgemm_(); char dgemv_(); char dgeqrf_(); char dgesdd_(); char
-        dgesvd_(); char dgetrf_(); char dgetri_(); char dgetrs_(); char
-        dorgqr_(); char dormqr_(); char dstev_(); char dsyevx_(); char
-        dsygv_(); char dsygvx_(); char dtrtrs_(); char saxpy_(); char
-        sgeev_(); char sgeevx_(); char sgelsd_(); char sgemm_(); char
-        sgemv_(); char sgeqrf_(); char sgesdd_(); char sgesvd_(); char
-        sgetrf_(); char sgetri_(); char sgetrs_(); char sorgqr_(); char
-        sormqr_(); char sstev_(); char ssyevx_(); char ssygv_(); char
-        ssygvx_(); char strtrs_();
-        int main(){
-          daxpy_ (); dgeev_ (); dgeevx_ (); dgelsd_ (); dgemm_ (); dgemv_ ();
-          dgeqrf_ (); dgesdd_ (); dgesvd_ (); dgetrf_ (); dgetri_ (); dgetrs_
-          (); dorgqr_ (); dormqr_ (); dstev_ (); dsyevx_ (); dsygv_ ();
-          dsygvx_ (); dtrtrs_ (); saxpy_ (); sgeev_ (); sgeevx_ (); sgelsd_
-          (); sgemm_ (); sgemv_ (); sgeqrf_ (); sgesdd_ (); sgesvd_ ();
-          sgetrf_ (); sgetri_ (); sgetrs_ (); sorgqr_ (); sormqr_ (); sstev_
-          (); ssyevx_ (); ssygv_ (); ssygvx_ (); strtrs_ ();
+        return 0;
+      }"
+      LAPACK_SYMBOL_CHECK)
 
-          return 0;
-        }"
-        LAPACK_SYMBOL_CHECK)
-
-      IF(NOT LAPACK_SYMBOL_CHECK)
-        MESSAGE(STATUS
-          "Could not find a sufficient BLAS/LAPACK installation: "
-	  "BLAS/LAPACK symbol check failed! Consult CMakeFiles/CMakeError.log "
-          "for further information."
-          )
-        SET(LAPACK_ADDITIONAL_ERROR_STRING
-          ${LAPACK_ADDITIONAL_ERROR_STRING}
-          "Could not find a sufficient BLAS/LAPACK installation: \n"
-          "BLAS/LAPACK symbol check failed! This usually means that your "
-          "BLAS/LAPACK installation is incomplete or the link line is "
-          "broken. Consult\n"
-	  "  CMakeFiles/CMakeError.log\n"
-          "for further information.\n"
-          )
-        SET(${var} FALSE)
-      ENDIF()
-    ELSE()
+    IF(NOT LAPACK_SYMBOL_CHECK)
       MESSAGE(STATUS
-        "No suitable C compiler was found! Skipping LAPACK symbol check."
+        "Could not find a sufficient BLAS/LAPACK installation: "
+        "BLAS/LAPACK symbol check failed! Consult CMakeFiles/CMakeError.log "
+        "for further information."
         )
+      SET(LAPACK_ADDITIONAL_ERROR_STRING
+        ${LAPACK_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient BLAS/LAPACK installation: \n"
+        "BLAS/LAPACK symbol check failed! This usually means that your "
+        "BLAS/LAPACK installation is incomplete or the link line is "
+        "broken. Consult\n"
+        "  CMakeFiles/CMakeError.log\n"
+        "for further information.\n"
+        )
+      SET(${var} FALSE)
     ENDIF()
   ENDIF()
 ENDMACRO()
