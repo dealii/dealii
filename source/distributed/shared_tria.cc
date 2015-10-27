@@ -24,7 +24,10 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/distributed/shared_tria.h>
+
+
 
 
 #include <algorithm>
@@ -43,11 +46,61 @@ namespace parallel
 
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::Triangulation (MPI_Comm mpi_communicator,
-                                                const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid):
-      dealii::parallel::Triangulation<dim,spacedim>(mpi_communicator,smooth_grid,false)
+                                                const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
+                                                const bool allow_artificial_cells):
+      dealii::parallel::Triangulation<dim,spacedim>(mpi_communicator,smooth_grid,false),
+      allow_artificial_cells(allow_artificial_cells)
     {
     }
 
+    template <int dim, int spacedim>
+    void Triangulation<dim,spacedim>::partition()
+    {
+      dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+
+      if (allow_artificial_cells)
+        {
+          true_subdomain_ids_of_cells.resize(this->n_active_cells());
+
+          // get halo layer of (ghost) cells
+          // parallel::shared::Triangulation<dim>::
+          std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
+            = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
+
+          const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>
+          active_halo_layer_vector = GridTools::compute_active_cell_halo_layer (*this, predicate);
+          std::set<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>
+          active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
+
+          // loop over all cells and mark artificial:
+          typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+          cell = this->begin_active(),
+          endc = this->end();
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            {
+              // store original/true subdomain ids:
+              true_subdomain_ids_of_cells[index] = cell->subdomain_id();
+
+              if (cell->is_locally_owned() == false &&
+                  active_halo_layer.find(cell) == active_halo_layer.end())
+                cell->set_subdomain_id(numbers::artificial_subdomain_id);
+            }
+        }
+    }
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim,spacedim>::with_artificial_cells() const
+    {
+      return allow_artificial_cells;
+    }
+
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    Triangulation<dim,spacedim>::get_true_subdomain_ids_of_cells() const
+    {
+      return true_subdomain_ids_of_cells;
+    }
 
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::~Triangulation ()
@@ -60,7 +113,7 @@ namespace parallel
     Triangulation<dim,spacedim>::execute_coarsening_and_refinement ()
     {
       dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
-      dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+      partition();
       this->update_number_cache ();
     }
 
@@ -81,7 +134,7 @@ namespace parallel
           // cells
           AssertThrow (false, ExcInternalError());
         }
-      dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+      partition();
       this->update_number_cache ();
     }
 

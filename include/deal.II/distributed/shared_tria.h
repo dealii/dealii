@@ -77,10 +77,17 @@ namespace parallel
 
       /**
        * Constructor.
+       *
+       * If @p allow_aritifical_cells is true, this class will behave
+       * similar to parallel::distributed::Triangulation in that there will be
+       * locally owned, ghost and artificial cells.
+       *
+       * Otherwise all non-locally owned cells are considered ghost.
        */
       Triangulation (MPI_Comm mpi_communicator,
                      const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing =
-                       (dealii::Triangulation<dim,spacedim>::none) );
+                       (dealii::Triangulation<dim,spacedim>::none),
+                     const bool allow_artificial_cells = false);
 
       /**
        * Destructor.
@@ -106,6 +113,43 @@ namespace parallel
                                          const std::vector< CellData< dim > > &cells,
                                          const SubCellData &subcelldata);
 
+      /**
+       * Return a vector of length Triangulation::n_active_cells() where each
+       * element stores the subdomain id of the owner of this cell. The elements
+       * of the vector are obviously the same as the subdomain ids for locally
+       * owned and ghost cells, but are also correct for artificial cells that
+       * do not store who the owner of the cell is in their subdomain_id field.
+       */
+      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+
+      /**
+       * Return allow_artificial_cells , namely true if artificial cells are allowed.
+       */
+      bool with_artificial_cells() const;
+
+    private:
+      /**
+       * A flag to decide whether or not artificial cells are allowed.
+       */
+      const bool allow_artificial_cells;
+
+      /**
+       * This function calls GridTools::partition_triangulation () and if
+       * requested in the constructor of the class marks artificial cells.
+       */
+      void partition();
+
+      /**
+       * A vector containing subdomain IDs of cells obtained by partitioning
+       * using METIS. In case allow_artificial_cells is false, this vector
+       * is consistent with IDs stored in cell->subdomain_id() of the triangulation
+       * class. When allow_artificial_cells is true, cells which are artificial
+       * will have cell->subdomain_id() == numbers::artificial;
+       *
+       * The original parition information is stored to allow using sequential
+       * DoF distribution and partitioning functions with semi-artificial cells.
+       */
+      std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
     };
   }
 #else
