@@ -381,6 +381,7 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
      (&mg_dof.get_tria()));
   AssertThrow(send_data_temp.size()==0 || tria!=NULL, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
 
+#ifdef DEAL_II_WITH_MPI
   if (tria)
     {
       // TODO: Searching the owner for every single DoF becomes quite
@@ -459,6 +460,7 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
           requests.clear();
         }
     }
+#endif
 
   // Sort the indices. This will produce more reliable debug output for regression texts
   // and likely won't hurt performance even in release mode.
