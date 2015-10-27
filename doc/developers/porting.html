@@ -128,11 +128,12 @@ include/deal.II/base/config.h.in
 
     <p>
       You have to set up a native deal.II build directory first and run
-      <code>make expand_instantiations</code> in it. The executable is
+      <code>make expand_instantiations_exe</code> in it. The executable is
       needed for the build system (and obviously the cross compiled version
       cannot be used). Locate the <code>expand_instantiations</code>
-      executable and export its location in the <code>PATH</code>
-      environment variable.
+      executable (it usually resides under
+      <code>${CMAKE_BINARY_DIR}/bin</code> and export its location with the
+      <code>PATH</code> environment variable.
     </p>
 
     <p>
