@@ -436,7 +436,7 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
               }
 
             int count = len / sizeof(DoFPair);
-            Assert(count * sizeof(DoFPair) == len, ExcInternalError());
+            Assert(static_cast<int>(count * sizeof(DoFPair)) == len, ExcInternalError());
             receive_buffer.resize(count);
 
             void *ptr = &receive_buffer[0];
