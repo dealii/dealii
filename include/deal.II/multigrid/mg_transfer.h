@@ -249,6 +249,12 @@ public:
 private:
 
   /**
+   * Internal function to @p fill copy_indices*. Called by build_matrices().
+   */
+  template <int dim, int spacedim>
+  void fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
+
+  /**
    * Sizes of the multi-level vectors.
    */
   std::vector<types::global_dof_index> sizes;
@@ -283,7 +289,7 @@ private:
    * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  copy_indices_to_me;
+  copy_indices_global_mine;
 
   /**
    * Additional degrees of freedom for the copy_from_mg() function. These are
@@ -293,7 +299,7 @@ private:
    * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  copy_indices_from_me;
+  copy_indices_level_mine;
 
 
   /**

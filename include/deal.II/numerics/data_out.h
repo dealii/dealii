@@ -274,14 +274,14 @@ private:
    * pair that is locally owned. If this object operates on a non-distributed
    * triangulation, the result equals what first_cell() returns.
    */
-  cell_iterator first_locally_owned_cell ();
+  virtual cell_iterator first_locally_owned_cell ();
 
   /**
    * Return the next cell produced by the next_cell() function that is locally
    * owned. If this object operates on a non-distributed triangulation, the
    * result equals what first_cell() returns.
    */
-  cell_iterator next_locally_owned_cell (const cell_iterator &cell);
+  virtual cell_iterator next_locally_owned_cell (const cell_iterator &cell);
 
   /**
    * Build one patch. This function is called in a WorkStream context.

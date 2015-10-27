@@ -1511,8 +1511,10 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        // Do not look at artificial level cells (in a serial computation we
+        // need to ignore the level_subdomain_id() because it is never set).
         if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+            && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
           continue;
 
         bool has_coarser_neighbor = false;
@@ -1528,8 +1530,13 @@ namespace MGTools
                 const typename DoFHandler<dim>::cell_iterator
                 neighbor = cell->neighbor(face_nr);
 
-                // Do refinement face
-                // from the coarse side
+                // only process cell pairs if one or both of them are owned by me (ignore if running in serial)
+                if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+                    &&
+                    neighbor->level_subdomain_id()==numbers::artificial_subdomain_id)
+                  continue;
+
+                // Do refinement face from the coarse side
                 if (neighbor->level() < cell->level())
                   {
                     for (unsigned int j=0; j<dofs_per_face; ++j)

@@ -946,11 +946,14 @@ namespace DoFTools
     // collect all the locally owned dofs
     dof_set = dof_handler.locally_owned_dofs();
 
-    // add the DoF on the adjacent ghost cells to the IndexSet, cache them
-    // in a set. need to check each dof manually because we can't be sure
-    // that the dof range of locally_owned_dofs is really contiguous.
+    // now add the DoF on the adjacent ghost cells to the IndexSet
+
+    // Note: It is not worth it to cache intermediate data in a set because
+    // add_indices is more efficient. I also benchmarked skipping the
+    // locally_owned_dofs by doing locally_owned_dofs().is_element() but
+    // that is also slower unless 70%+ of the DoFs are locally owned and they
+    // are contiguous. - Timo Heister
     std::vector<types::global_dof_index> dof_indices;
-    std::set<types::global_dof_index> global_dof_indices;
 
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
@@ -959,20 +962,49 @@ namespace DoFTools
         {
           dof_indices.resize(cell->get_fe().dofs_per_cell);
           cell->get_dof_indices(dof_indices);
-
-          for (std::vector<types::global_dof_index>::iterator it=dof_indices.begin();
-               it!=dof_indices.end();
-               ++it)
-            if (!dof_set.is_element(*it))
-              global_dof_indices.insert(*it);
+          dof_set.add_indices(dof_indices.begin(), dof_indices.end());
         }
-
-    dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 
     dof_set.compress();
   }
 
 
+  template <class DH>
+  void
+  extract_locally_relevant_level_dofs (const DH &dof_handler,
+                                       const unsigned int level,
+                                       IndexSet &dof_set)
+  {
+    // collect all the locally owned dofs
+    dof_set = dof_handler.locally_owned_mg_dofs(level);
+
+    // add the DoF on the adjacent ghost cells to the IndexSet
+
+    // Note: It is not worth it to cache intermediate data in a set because
+    // add_indices is more efficient. I also benchmarked skipping the
+    // locally_owned_dofs by doing locally_owned_dofs().is_element() but
+    // that is also slower unless 70%+ of the DoFs are locally owned and they
+    // are contiguous. - Timo Heister
+    std::vector<types::global_dof_index> dof_indices;
+
+    typename DH::cell_iterator cell = dof_handler.begin(level),
+                               endc = dof_handler.end(level);
+    for (; cell!=endc; ++cell)
+      {
+        const types::subdomain_id id = cell->level_subdomain_id();
+
+        // skip artificial and own cells (only look at ghost cells)
+        if (id == dof_handler.get_tria().locally_owned_subdomain()
+            || id == numbers::artificial_subdomain_id)
+          continue;
+
+        dof_indices.resize(cell->get_fe().dofs_per_cell);
+        cell->get_mg_dof_indices(dof_indices);
+        dof_set.add_indices(dof_indices.begin(), dof_indices.end());
+      }
+
+    dof_set.compress();
+  }
 
   template <class DH>
   void

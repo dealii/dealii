@@ -1454,6 +1454,18 @@ namespace DoFTools
   std::vector<IndexSet>
   locally_relevant_dofs_per_subdomain (const DH   &dof_handler);
 
+
+  /**
+   * Same as extract_locally_relevant_dofs() but for multigrid DoFs
+   * for the given @p level.
+   */
+  template <class DH>
+  void
+  extract_locally_relevant_level_dofs (const DH &dof_handler,
+                                       const unsigned int level,
+                                       IndexSet &dof_set);
+
+
   /**
    * For each DoF, return in the output array to which subdomain (as given by
    * the <tt>cell->subdomain_id()</tt> function) it belongs. The output array

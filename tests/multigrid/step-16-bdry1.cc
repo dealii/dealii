@@ -129,8 +129,8 @@ public:
 private:
   void setup_system ();
   void assemble_system ();
-  void assemble_multigrid (const bool &use_mw);
-  void solve ();
+  void assemble_multigrid (bool use_mw);
+  void solve (bool use_mw);
   void refine_grid (const std::string &reftype);
   void output_results (const unsigned int cycle) const;
 
@@ -341,11 +341,15 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
+void LaplaceProblem<dim>::assemble_multigrid (bool use_mw)
 {
+  deallog << "assemble_multigrid " << (use_mw ? "(mesh_worker)":"") << std::endl;
+
   if (use_mw == true)
     {
       mg_matrices = 0.;
+      mg_interface_in = 0.;
+      mg_interface_out = 0.;
 
       MappingQGeneric<dim> mapping(1);
       MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -392,20 +396,15 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
 
       std::vector<std::vector<bool> > interface_dofs
         = mg_constrained_dofs.get_refinement_edge_indices ();
-      std::vector<std::vector<bool> > boundary_interface_dofs
-        = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
       std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
-      std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
+      ConstraintMatrix empty_constraints;
+
       for (unsigned int level=0; level<triangulation.n_levels(); ++level)
         {
           boundary_constraints[level].add_lines (interface_dofs[level]);
           boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
           boundary_constraints[level].close ();
-
-          boundary_interface_constraints[level]
-          .add_lines (boundary_interface_dofs[level]);
-          boundary_interface_constraints[level].close ();
         }
 
       typename DoFHandler<dim>::level_cell_iterator cell = mg_dof_handler.begin_mg(),
@@ -434,13 +433,37 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
                                        local_dof_indices,
                                        mg_matrices[cell->level()]);
 
+          const unsigned int lvl = cell->level();
+
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
-                     interface_dofs[cell->level()][local_dof_indices[j]]==false))
-                cell_matrix(i,j) = 0;
+              if (interface_dofs[lvl][local_dof_indices[i]]   // at_refinement_edge(i)
+                  &&
+                  !interface_dofs[lvl][local_dof_indices[j]]   // !at_refinement_edge(j)
+                  &&
+                  (
+                    (!mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                     &&
+                     !mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[j])
+                    ) // ( !boundary(i) && !boundary(j) )
+                    ||
+                    (
+                      mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
+                      &&
+                      local_dof_indices[i]==local_dof_indices[j]
+                    ) // ( boundary(i) && boundary(j) && i==j )
+                  )
+                 )
+                {
+                  // do nothing, so add entries to interface matrix
+                }
+              else
+                {
+                  cell_matrix(i,j) = 0;
+                }
 
-          boundary_interface_constraints[cell->level()]
+
+          empty_constraints
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
                                        mg_interface_in[cell->level()]);
@@ -450,7 +473,7 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void LaplaceProblem<dim>::solve (bool use_mw)
 {
   MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
@@ -470,6 +493,8 @@ void LaplaceProblem<dim>::solve ()
   mg::Matrix<> mg_matrix(mg_matrices);
   mg::Matrix<> mg_interface_up(mg_interface_in);
   mg::Matrix<> mg_interface_down(mg_interface_in);
+  //if (use_mw)
+  //mg_interface_down.initialize(mg_interface_out);
 
   Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,
@@ -588,9 +613,13 @@ void LaplaceProblem<dim>::run ()
       deallog << std::endl;
 
       assemble_system ();
-      assemble_multigrid (true);
+      assemble_multigrid (false);
 
-      solve ();
+      solve (false);
+
+      assemble_multigrid (true);
+      solve (true);
+
       // output_results (cycle);
     }
 }

@@ -235,6 +235,13 @@ DoFTools::extract_locally_relevant_dofs<hp::DoFHandler<deal_II_dimension> >
 
 template
 void
+DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> & dof_handler,
+ const unsigned int level,
+ IndexSet & dof_set);
+
+template
+void
 DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
  const ComponentMask &selected_components,

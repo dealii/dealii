@@ -159,6 +159,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: Preliminary support for parallel, adaptive, geometric multigrid is
+  now in place with changes to MGConstrainedDoFs (many new functions), MGTransfer,
+  MGTools::extract_inner_interface_dofs, MGTransferPrebuilt,
+  DoFTools::extract_locally_relevant_level_dofs.
+  <br>
+  (Timo Heister, Guido Kanschat, 2015/10/26)
+  </li>
+
   <li> New: Two cell level signals are added to class Triangulation, namely
   pre_coarsening_on_cell and post_refinement_on_cell.
   <br>
