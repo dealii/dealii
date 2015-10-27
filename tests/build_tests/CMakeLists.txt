@@ -132,7 +132,7 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/build_output
         COMMAND test ! -f ${_step_dir}/configure_output
           || (rm -f ${_step_dir}/failing_build_output
-              &&${CMAKE_COMMAND} --build ${_step_dir} --target all
+              && ${CMAKE_COMMAND} --build ${_step_dir} --target all
               > ${_step_dir}/build_output 2>&1)
           || (mv ${_step_dir}/build_output
                  ${_step_dir}/failing_build_output
