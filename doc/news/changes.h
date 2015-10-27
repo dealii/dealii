@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+
+  <li> New: 2nd derivatives are implemented for polynomials_BDM in 3D.
+  <br>
+  (Alistair Bentley, 2015/10/27)
+  </li>
+
   <li> New: Preliminary support for parallel, adaptive, geometric multigrid is
   now in place with changes to MGConstrainedDoFs (many new functions), MGTransfer,
   MGTools::extract_inner_interface_dofs, MGTransferPrebuilt,
@@ -398,7 +404,7 @@ inconvenience this causes.
   (Alistair Bentley, 2015/10/24)
   </li>
 
-  <li> New: Triangulation::set_all_manifold_ids_on_boundary(boundary_id, manifold_id) 
+  <li> New: Triangulation::set_all_manifold_ids_on_boundary(boundary_id, manifold_id)
   which sets the manifold_id for all parts of the boundary with a given boundary_id.
   <br>
   (Alberto Sartori, 2015/10/22)

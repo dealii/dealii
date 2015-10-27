@@ -92,7 +92,6 @@ DEAL_II_NAMESPACE_OPEN
  *</dl>
  *
  *
- * @todo Second derivatives in 3D are missing.
  *
  * @ingroup Polynomials
  * @author Guido Kanschat
