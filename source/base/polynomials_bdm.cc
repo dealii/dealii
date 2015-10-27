@@ -244,7 +244,90 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
             }
           if (grad_grads.size() != 0)
             {
-              Assert(false,ExcNotImplemented());
+              grad_grads[start][0][0][0] = 0.;
+              grad_grads[start][0][0][1] = monovali[1][2]*monovalk[2][0];
+              grad_grads[start][0][0][2] = monovali[1][1]*monovalk[2][1];
+              grad_grads[start][0][1][0] = monovali[1][2]*monovalk[2][0];
+              grad_grads[start][0][1][1] = unit_point(0)*monovali[1][3]*monovalk[2][0];
+              grad_grads[start][0][1][2] = unit_point(0)*monovali[1][2]*monovalk[2][1];
+              grad_grads[start][0][2][0] = monovali[1][1]*monovalk[2][1];
+              grad_grads[start][0][2][1] = unit_point(0)*monovali[1][2]*monovalk[2][1];
+              grad_grads[start][0][2][2] = unit_point(0)*monovali[1][1]*monovalk[2][2];
+              grad_grads[start][1][0][0] = 0.;
+              grad_grads[start][1][0][1] = 0.;
+              grad_grads[start][1][0][2] = 0.;
+              grad_grads[start][1][1][0] = 0.;
+              grad_grads[start][1][1][1] = -monovali[1][2]*monovalk[2][0];
+              grad_grads[start][1][1][2] = -monovali[1][1]*monovalk[2][1];
+              grad_grads[start][1][2][0] = 0.;
+              grad_grads[start][1][2][1] = -monovali[1][1]*monovalk[2][1];
+              grad_grads[start][1][2][2] = -monovali[1][0]*monovalk[2][2];
+              grad_grads[start][2][0][0] = 0.;
+              grad_grads[start][2][0][1] = 0.;
+              grad_grads[start][2][0][2] = 0.;
+              grad_grads[start][2][1][0] = 0.;
+              grad_grads[start][2][1][1] = 0.;
+              grad_grads[start][2][1][2] = 0.;
+              grad_grads[start][2][2][0] = 0.;
+              grad_grads[start][2][2][1] = 0.;
+              grad_grads[start][2][2][2] = 0.;
+
+              grad_grads[start+1][0][0][0] = 0.;
+              grad_grads[start+1][0][0][1] = 0.;
+              grad_grads[start+1][0][0][2] = 0.;
+              grad_grads[start+1][0][1][0] = 0.;
+              grad_grads[start+1][0][1][1] = 0.;
+              grad_grads[start+1][0][1][2] = 0.;
+              grad_grads[start+1][0][2][0] = 0.;
+              grad_grads[start+1][0][2][1] = 0.;
+              grad_grads[start+1][0][2][2] = 0.;
+              grad_grads[start+1][1][0][0] = unit_point(1)*monovali[2][1]*monovalk[0][2];
+              grad_grads[start+1][1][0][1] = monovali[2][1]*monovalk[0][1];
+              grad_grads[start+1][1][0][2] = unit_point(1)*monovali[2][2]*monovalk[0][1];
+              grad_grads[start+1][1][1][0] = monovalk[0][1]*monovali[2][1];
+              grad_grads[start+1][1][1][1] = 0.;
+              grad_grads[start+1][1][1][2] = monovalk[0][0]*monovali[2][2];
+              grad_grads[start+1][1][2][0] = unit_point(1)*monovalk[0][1]*monovali[2][2];
+              grad_grads[start+1][1][2][1] = monovalk[0][0]*monovali[2][2];
+              grad_grads[start+1][1][2][2] = unit_point(1)*monovalk[0][0]*monovali[2][3];
+              grad_grads[start+1][2][0][0] = -monovalk[0][2]*monovali[2][0];
+              grad_grads[start+1][2][0][1] = 0.;
+              grad_grads[start+1][2][0][2] = -monovalk[0][1]*monovali[2][1];
+              grad_grads[start+1][2][1][0] = 0.;
+              grad_grads[start+1][2][1][1] = 0.;
+              grad_grads[start+1][2][1][2] = 0.;
+              grad_grads[start+1][2][2][0] = -monovalk[0][1]*monovali[2][1];
+              grad_grads[start+1][2][2][1] = 0.;
+              grad_grads[start+1][2][2][2] = -monovalk[0][0]*monovali[2][2];
+
+              grad_grads[start+2][0][0][0] = -monovali[0][2]*monovalk[1][0];
+              grad_grads[start+2][0][0][1] = -monovali[0][1]*monovalk[1][1];
+              grad_grads[start+2][0][0][2] = 0.;
+              grad_grads[start+2][0][1][0] = -monovali[0][1]*monovalk[1][1];
+              grad_grads[start+2][0][1][1] = -monovali[0][0]*monovalk[1][2];
+              grad_grads[start+2][0][1][2] = 0.;
+              grad_grads[start+2][0][2][0] = 0.;
+              grad_grads[start+2][0][2][1] = 0.;
+              grad_grads[start+2][0][2][2] = 0.;
+              grad_grads[start+2][1][0][0] = 0.;
+              grad_grads[start+2][1][0][1] = 0.;
+              grad_grads[start+2][1][0][2] = 0.;
+              grad_grads[start+2][1][1][0] = 0.;
+              grad_grads[start+2][1][1][1] = 0.;
+              grad_grads[start+2][1][1][2] = 0.;
+              grad_grads[start+2][1][2][0] = 0.;
+              grad_grads[start+2][1][2][1] = 0.;
+              grad_grads[start+2][1][2][2] = 0.;
+              grad_grads[start+2][2][0][0] = unit_point(2)*monovali[0][3]*monovalk[1][0];
+              grad_grads[start+2][2][0][1] = unit_point(2)*monovali[0][2]*monovalk[1][1];
+              grad_grads[start+2][2][0][2] = monovali[0][2]*monovalk[1][0];
+              grad_grads[start+2][2][1][0] = unit_point(2)*monovali[0][2]*monovalk[1][1];
+              grad_grads[start+2][2][1][1] = unit_point(2)*monovali[0][1]*monovalk[1][2];
+              grad_grads[start+2][2][1][2] = monovali[0][1]*monovalk[1][1];
+              grad_grads[start+2][2][2][0] = monovali[0][2]*monovalk[1][0];
+              grad_grads[start+2][2][2][1] = monovali[0][1]*monovalk[1][1];
+              grad_grads[start+2][2][2][2] = 0.;
+
             }
         }
       Assert(start == n_pols, ExcInternalError());
