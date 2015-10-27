@@ -159,28 +159,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
-      // find the locally relevant level dofs for setting the writable rows of
-      // the sparsity pattern
-      IndexSet level_p1_relevant_dofs = mg_dof.locally_owned_mg_dofs(level+1);
-      std::vector<types::global_dof_index> relevant_dofs;
-      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
-           cell != mg_dof.end(level); ++cell)
-        if (cell->has_children() &&
-            ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-              || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
-            ))
-          for (unsigned int child=0; child<cell->n_children(); ++child)
-            {
-              cell->child(child)->get_mg_dof_indices (dof_indices_child);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                if (!level_p1_relevant_dofs.is_element(dof_indices_child[i]))
-                  relevant_dofs.push_back(dof_indices_child[i]);
-            }
-      std::sort(relevant_dofs.begin(), relevant_dofs.end());
-      level_p1_relevant_dofs.add_indices(relevant_dofs.begin(),
-                                         std::unique(relevant_dofs.begin(),
-                                                     relevant_dofs.end()));
-
       // reset the dimension of the structure.  note that for the number of
       // entries per row, the number of parent dofs coupling to a child dof is
       // necessary. this, of course, is the number of degrees of freedom per
@@ -188,6 +166,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       //
       // increment dofs_per_cell since a useless diagonal element will be
       // stored
+      IndexSet level_p1_relevant_dofs;
+      DoFTools::extract_locally_relevant_level_dofs(mg_dof, level+1,
+                                                    level_p1_relevant_dofs);
       DynamicSparsityPattern dsp (sizes[level+1],
                                   sizes[level],
                                   level_p1_relevant_dofs);
