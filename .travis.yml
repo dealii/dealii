@@ -1,23 +1,77 @@
-sudo : false
+sudo: false
 
 notifications:
   email: false
 
 language: C++
 
-compiler: 
-    - gcc
+matrix:
+  include:
+    - compiler: gcc
+      env: 
+        - COMPILE_WITH_MPI=OFF
+        - COMPILER=/usr/bin/g++
+        - CXX11=ON
+    - compiler: gcc
+      env: 
+        - COMPILE_WITH_MPI=ON
+        - COMPILER=/usr/bin/mpicxx
+        - CXX11=ON
+    - compiler: gcc
+      env: 
+        - COMPILE_WITH_MPI=ON
+        - COMPILER=/usr/bin/mpicxx
+        - CXX11=OFF
+    - compiler: clang
+      env: 
+        - COMPILE_WITH_MPI=OFF
+        - COMPILER=/usr/bin/clang++-3.6
+        - CXX11=ON
+    - compiler: clang
+      env: 
+        - COMPILE_WITH_MPI=ON
+        - COMPILER=/usr/bin/mpicxx
+        - CXX11=ON
 
 cache: 
+  apt: true
   directories:
     - programs
 
-install:
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.6
+    - george-edison55-precise-backports
+    packages:
+    - ninja-build
+    - openmpi-bin
+    - libopenmpi-dev
+    - clang-3.6
+    - cmake
+    - cmake-data
+    - build-essential
+    - libblas-dev
+    - liblapack-dev
+    - libboost-dev
+    - doxygen
+    - graphviz
+
+before_install:
     - export PATH=$PWD/programs/astyle/build/gcc/bin:$PATH
     - ./contrib/utilities/setup_astyle.sh 
+    - ./contrib/utilities/check_indentation.sh 
+
+install:
+    - export CXX=$COMPILER
+    - mkdir build 
+    - cd build 
+    - cmake -GNinja -DDEAL_II_WITH_MPI=$COMPILE_WITH_MPI -DDEAL_II_WITH_CXX11=$CXX11 ..
+    - ninja -j4
 
 script: 
-    - ./contrib/utilities/check_indentation.sh 
+    - ninja test
 
 branches:
   only:
