@@ -176,41 +176,6 @@ protected:
 private:
 
   /**
-   * Special quadrature rule used to define the support points in the
-   * reference configuration.
-   */
-
-  class SupportQuadrature : public Quadrature<dim>
-  {
-  public:
-    /**
-     * Constructor, with an argument defining the desired polynomial degree.
-     */
-
-    SupportQuadrature (const unsigned int map_degree);
-
-  };
-
-  /**
-   * A member variable holding the quadrature points in the right order.
-   */
-  const SupportQuadrature support_quadrature;
-
-  /**
-   * FEValues object used to query the the given finite element field at the
-   * support points in the reference configuration.
-   *
-   * The variable is marked as mutable since we have to call FEValues::reinit
-   * from compute_mapping_support_points, a function that is 'const'.
-   */
-  mutable FEValues<dim,spacedim> fe_values;
-
-  /**
-   * A variable to guard access to the fe_values variable.
-   */
-  mutable Threads::Mutex fe_values_mutex;
-
-  /**
    * A class derived from MappingQGeneric that provides the generic
    * mapping with support points on boundary objects so that the
    * corresponding Q3 mapping ends up being C1.
@@ -249,6 +214,42 @@ private:
      * Reference to the surrounding object off of which we live.
      */
     const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian;
+
+
+    /**
+     * Special quadrature rule used to define the support points in the
+     * reference configuration.
+     */
+
+    class SupportQuadrature : public Quadrature<dim>
+    {
+    public:
+      /**
+       * Constructor, with an argument defining the desired polynomial degree.
+       */
+
+      SupportQuadrature (const unsigned int map_degree);
+
+    };
+
+    /**
+     * A member variable holding the quadrature points in the right order.
+     */
+    const SupportQuadrature support_quadrature;
+
+    /**
+     * FEValues object used to query the the given finite element field at the
+     * support points in the reference configuration.
+     *
+     * The variable is marked as mutable since we have to call FEValues::reinit
+     * from compute_mapping_support_points, a function that is 'const'.
+     */
+    mutable FEValues<dim,spacedim> fe_values;
+
+    /**
+     * A variable to guard access to the fe_values variable.
+     */
+    mutable Threads::Mutex fe_values_mutex;
   };
 
 };

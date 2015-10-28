@@ -40,7 +40,11 @@ MappingQEulerianGeneric (const unsigned int degree,
                          const MappingQEulerian<dim, EulerVectorType, spacedim> &mapping_q_eulerian)
   :
   MappingQGeneric<dim,spacedim>(degree),
-  mapping_q_eulerian (mapping_q_eulerian)
+  mapping_q_eulerian (mapping_q_eulerian),
+  support_quadrature(degree),
+  fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
+            support_quadrature,
+            update_values | update_q_points)
 {}
 
 template <int dim, class EulerVectorType, int spacedim>
@@ -51,11 +55,7 @@ MappingQEulerian (const unsigned int degree,
   :
   MappingQ<dim,spacedim>(degree, true),
   euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler),
-  support_quadrature(degree),
-  fe_values(euler_dof_handler.get_fe(),
-            support_quadrature,
-            update_values | update_q_points)
+  euler_dof_handler(&euler_dof_handler)
 {
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
@@ -77,11 +77,7 @@ MappingQEulerian (const unsigned int degree,
   :
   MappingQ<dim,spacedim>(degree, true),
   euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler),
-  support_quadrature(degree),
-  fe_values(euler_dof_handler.get_fe(),
-            support_quadrature,
-            update_values | update_q_points)
+  euler_dof_handler(&euler_dof_handler)
 {
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
@@ -109,7 +105,7 @@ MappingQEulerian<dim, EulerVectorType, spacedim>::clone () const
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
 template <int dim, class EulerVectorType, int spacedim>
-MappingQEulerian<dim,EulerVectorType,spacedim>::
+MappingQEulerian<dim,EulerVectorType,spacedim>::MappingQEulerianGeneric::
 SupportQuadrature::
 SupportQuadrature (const unsigned int map_degree)
   :
@@ -206,7 +202,7 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
   // that.  this implies that the user should order components appropriately,
   // or create a separate dof handler for the displacements.
 
-  const unsigned int n_support_pts = mapping_q_eulerian.support_quadrature.size();
+  const unsigned int n_support_pts = support_quadrature.size();
   const unsigned int n_components  = mapping_q_eulerian.euler_dof_handler->get_fe().n_components();
 
   Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );
@@ -218,16 +214,16 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
   // threads
-  Threads::Mutex::ScopedLock lock(mapping_q_eulerian.fe_values_mutex);
-  mapping_q_eulerian.fe_values.reinit(dof_cell);
-  mapping_q_eulerian.fe_values.get_function_values(*mapping_q_eulerian.euler_vector, shift_vector);
+  Threads::Mutex::ScopedLock lock(fe_values_mutex);
+  fe_values.reinit(dof_cell);
+  fe_values.get_function_values(*mapping_q_eulerian.euler_vector, shift_vector);
 
   // and finally compute the positions of the support points in the deformed
   // configuration.
   std::vector<Point<spacedim> > a(n_support_pts);
   for (unsigned int q=0; q<n_support_pts; ++q)
     {
-      a[q] = mapping_q_eulerian.fe_values.quadrature_point(q);
+      a[q] = fe_values.quadrature_point(q);
       for (unsigned int d=0; d<spacedim; ++d)
         a[q](d) += shift_vector[q](d);
     }
