@@ -113,25 +113,25 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) = 0;
 
     /**
-     * Returns the l<sub>1</sub> norm of the vector (i.e., the sum of the
+     * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries among all processors).
      */
     virtual real_type l1_norm() = 0;
 
     /**
-     * Returns the l<sub>2</sub> norm of the vector (i.e., the square root of
+     * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
      * the sum of the square of all entries among all processors).
      */
     virtual real_type l2_norm() = 0;
 
     /**
-     * Returns the maximum norm of the vector (i.e., the maximum absolute value
+     * Return the maximum norm of the vector (i.e., the maximum absolute value
      * among all entries and among all processors).
      */
     virtual real_type linfty_norm() = 0;
 
     /**
-     * Performs a combined operation of a vector addition and a subsequent
+     * Perform a combined operation of a vector addition and a subsequent
      * inner product, returning the value of the inner product. In other
      * words, the result of this function is the same as if the user called
      * @code
@@ -151,13 +151,13 @@ namespace LinearAlgebra
                                const VectorSpaceVector<Number> &W) = 0;
 
     /**
-     * Returns the global size of the vector, equal to the sum of the number of
+     * Return the global size of the vector, equal to the sum of the number of
      * locally owned indices among all processors.
      */
     virtual size_type size() const = 0;
 
     /**
-     * Returns an index set that describes which elements of this vector are
+     * Return an index set that describes which elements of this vector are
      * owned by the current processor. As a consequence, the index sets returned
      * on different procesors if this is a distributed vector will form disjoint
      * sets that add up to the complete index set. Obviously, if a vector is
@@ -169,7 +169,7 @@ namespace LinearAlgebra
     virtual const dealii::IndexSet &locally_owned_elements() const = 0;
 
     /**
-     * Prints the vector to the output stream @p out.
+     * Print the vector to the output stream @p out.
      */
     virtual void print(std::ostream &out,
                        const unsigned int precision=3,
@@ -177,7 +177,7 @@ namespace LinearAlgebra
                        const bool across=true) const = 0;
 
     /**
-     * Returns the memory consumption of this class in bytes.
+     * Return the memory consumption of this class in bytes.
      */
     virtual std::size_t memory_consumption() const = 0;
   };

@@ -49,6 +49,9 @@ namespace LinearAlgebra
   template <typename Number>
   VectorSpaceVector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     Assert(down_V.size()==this->size(),
@@ -67,6 +70,9 @@ namespace LinearAlgebra
   template <typename Number>
   VectorSpaceVector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     Assert(down_V.size()==this->size(),
@@ -85,6 +91,10 @@ namespace LinearAlgebra
   template <typename Number>
   Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     Assert(down_V.size()==this->size(),
@@ -105,6 +115,10 @@ namespace LinearAlgebra
   template <typename Number>
   void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     AssertIsFinite(a);
@@ -123,6 +137,13 @@ namespace LinearAlgebra
   void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V,
                            const Number b, const VectorSpaceVector<Number> &W)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+           ExcVectorTypeNotCompatible());
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&W)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     // Downcast W. If fails, throws an exception.
@@ -156,6 +177,10 @@ namespace LinearAlgebra
   void Vector<Number>::sadd(const Number s, const Number a,
                             const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     *this *= s;
     // Downcast V. It fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
@@ -169,6 +194,10 @@ namespace LinearAlgebra
   template <typename Number>
   void Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&scaling_factors)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     // Downcast scaling_factors. If fails, throws an exception.
     const Vector<Number> &down_scaling_factors =
       dynamic_cast<const Vector<Number>&>(scaling_factors);
@@ -186,6 +215,10 @@ namespace LinearAlgebra
   template <typename Number>
   void Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
   {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+           ExcVectorTypeNotCompatible());
+
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     *this = down_V;
@@ -220,7 +253,7 @@ namespace LinearAlgebra
     // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
     typedef typename ReadWriteVector<Number>::real_type real_type;
     real_type norm_square = 0.;
-    norm_square = l2_norm_recursive(0,this->size()-1);
+    norm_square = l2_norm_squared_recursive(0,this->size()-1);
     if (numbers::is_finite(norm_square) &&
         norm_square>=std::numeric_limits<real_type>::min())
       return std::sqrt(norm_square);
@@ -255,8 +288,7 @@ namespace LinearAlgebra
   {
     typename ReadWriteVector<Number>::real_type norm = 0.;
     for (unsigned int i=0; i<this->size(); ++i)
-      if (std::abs(this->val[i])>norm)
-        norm = std::abs(this->val[i]);
+      norm = std::max(std::abs(this->val[i]),norm);
 
     return norm;
   }
@@ -276,8 +308,9 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm_recursive(unsigned int i,
-      unsigned int j)
+  typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm_recursive(
+    unsigned int i,
+    unsigned int j)
   {
     Assert(j>=i, ExcInternalError());
     typename ReadWriteVector<Number>::real_type norm = 0.;
@@ -296,16 +329,17 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm_recursive(unsigned int i,
-      unsigned int j)
+  typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm_squared_recursive(
+    unsigned int i,
+    unsigned int j)
   {
     Assert(j>=i, ExcInternalError());
 
     typename ReadWriteVector<Number>::real_type norm = 0.;
     if ((j-i)!=0)
       {
-        norm += l2_norm_recursive(i,(i+j)/2);
-        norm += l2_norm_recursive((i+j)/2+1,j);
+        norm += l2_norm_squared_recursive(i,(i+j)/2);
+        norm += l2_norm_squared_recursive((i+j)/2+1,j);
       }
     else
       norm += std::pow(std::abs(this->val[i]),2);
