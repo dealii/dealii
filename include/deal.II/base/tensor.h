@@ -1630,7 +1630,7 @@ double_contract (const Tensor<rank_1, dim, Number> &src1,
  * tensors of equal rank: Return a scalar number that is the result of a
  * full contraction of a tensor @p left and @p right:
  * @f[
- *   \sum_{i_1,..,i_{r}
+ *   \sum_{i_1,..,i_r}
  *   \text{left}_{i_1,..,i_r}
  *   \text{right}_{i_1,..,i_r}
  * @f]
