@@ -76,7 +76,7 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001, Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim=dim>
-class MappingQ : public MappingQGeneric<dim,spacedim>
+class MappingQ : public Mapping<dim,spacedim>
 {
 public:
   /**
@@ -103,6 +103,19 @@ public:
    * Copy constructor.
    */
   MappingQ (const MappingQ<dim,spacedim> &mapping);
+
+  /**
+   * Return the degree of the mapping, i.e. the value which was passed to the
+   * constructor.
+   */
+  unsigned int get_degree () const;
+
+  /**
+   * Always returns @p true because the default implementation of
+   * functions in this class preserves vertex locations.
+   */
+  virtual
+  bool preserves_vertex_locations () const;
 
   /**
    * Transforms the point @p p on the unit cell to the point @p p_real on the
@@ -215,13 +228,13 @@ protected:
    * also store a pointer to an InternalData object that pertains
    * to a $Q_1$ mapping.
    */
-  class InternalData : public MappingQGeneric<dim,spacedim>::InternalData
+  class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
   public:
     /**
      * Constructor.
      */
-    InternalData (const unsigned int polynomial_degree);
+    InternalData ();
 
 
     /**
@@ -242,9 +255,20 @@ protected:
      * $Q_1$ mapping that is, by default, used on all interior cells.
      */
     std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_q1_data;
+
+    /**
+     * A pointer to a structure to store the information for the full
+     * $Q_p$ mapping that is, by default, used on all boundary cells.
+     */
+    std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_qp_data;
   };
 
 protected:
+
+  // documentation can be found in Mapping::requires_update_flags()
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
 
   // documentation can be found in Mapping::get_data()
   virtual
@@ -297,6 +321,12 @@ protected:
 protected:
 
   /**
+   * The polynomial degree of the cells to be used on all cells at the
+   * boundary of the domain, or everywhere if so specified.
+   */
+  const unsigned int polynomial_degree;
+
+  /**
    * If this flag is set @p true then @p MappingQ is used on all cells, not
    * only on boundary cells.
    */
@@ -316,13 +346,29 @@ protected:
    *   displacements. This also means that we really need to store
    *   our own Q1 mapping here, rather than simply resorting to
    *   StaticMappingQ1::mapping.
+   *
+   * @note If the polynomial degree used for the current object is one,
+   *   then the qp_mapping and q1_mapping variables point to the same
+   *   underlying object.
    */
-  std_cxx11::unique_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
+  std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
 
   /**
-   * Declare other MappingQ classes friends.
+   * Pointer to a Q_p mapping. This mapping is used on boundary cells unless
+   * use_mapping_q_on_all_cells was set in the call to the
+   * constructor (in which case it is used for all cells).
+   *
+   * @note MappingQEulerian and MappingC1 reset this pointer to an object of
+   *   their own implementation to ensure that the Q_p mapping also knows
+   *   about the proper shifts and transformations of the Eulerian
+   *   displacements (Eulerian case) and proper choice of support
+   *   points (C1 case).
+   *
+   * @note If the polynomial degree used for the current object is one,
+   *   then the qp_mapping and q1_mapping variables point to the same
+   *   underlying object.
    */
-  template <int,int> friend class MappingQ;
+  std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> > qp_mapping;
 };
 
 /*@}*/

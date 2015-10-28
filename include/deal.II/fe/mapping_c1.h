@@ -33,13 +33,10 @@ DEAL_II_NAMESPACE_OPEN
  * class chooses them such that the discretized boundary is globally
  * continuously differentiable.
  *
- * To use this class, make sure that the Boundary::@p get_normals_at_vertices
+ * To use this class, make sure that the Boundary::get_normals_at_vertices()
  * function is implemented for the user's boundary object.
  *
- * For more information about the <tt>spacedim</tt> template parameter check
- * the documentation of FiniteElement or the one of Triangulation.
- *
- * @author Wolfgang Bangerth, 2001
+ * @author Wolfgang Bangerth, 2001, 2015
  */
 template<int dim, int spacedim=dim>
 class MappingC1 : public MappingQ<dim,spacedim>
@@ -59,37 +56,53 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
 protected:
-  /**
-   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-   * located on bounding lines to the vector @p a. Points located on the line
-   * but on vertices are not included.
-   *
-   * Needed by the <tt>compute_support_points_simple(laplace)</tt> functions.
-   * For <tt>dim=1</tt> this function is empty.
-   *
-   * This function chooses the respective points not such that they are
-   * interpolating the boundary (as does the base class), but rather such that
-   * the resulting cubic mapping is a continuous one.
-   */
-  virtual void
-  add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
-                           std::vector<Point<dim> > &a) const;
 
   /**
-   * For <tt>dim=3</tt>. Append the support points of all shape functions
-   * located on bounding faces (quads in 3d) to the vector @p a. Points
-   * located on the line but on vertices are not included.
-   *
-   * Needed by the @p compute_support_points_laplace function. For
-   * <tt>dim=1</tt> and 2 this function is empty.
-   *
-   * This function chooses the respective points not such that they are
-   * interpolating the boundary (as does the base class), but rather such that
-   * the resulting cubic mapping is a continuous one.
+   * A class derived from MappingQGeneric that provides the generic
+   * mapping with support points on boundary objects so that the
+   * corresponding Q3 mapping ends up being C1.
    */
-  virtual void
-  add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-                          std::vector<Point<dim> > &a) const;
+  class MappingC1Generic : public MappingQGeneric<dim,spacedim>
+  {
+  public:
+
+    /**
+     * Constructor.
+     */
+    MappingC1Generic ();
+
+    /**
+     * For <tt>dim=2,3</tt>. Append the support points of all shape functions
+     * located on bounding lines to the vector @p a. Points located on the line
+     * but on vertices are not included.
+     *
+     * Needed by the <tt>compute_support_points_simple(laplace)</tt> functions.
+     * For <tt>dim=1</tt> this function is empty.
+     *
+     * This function chooses the respective points not such that they are
+     * interpolating the boundary (as does the base class), but rather such that
+     * the resulting cubic mapping is a continuous one.
+     */
+    virtual void
+    add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
+                             std::vector<Point<dim> > &a) const;
+
+    /**
+     * For <tt>dim=3</tt>. Append the support points of all shape functions
+     * located on bounding faces (quads in 3d) to the vector @p a. Points
+     * located on the line but on vertices are not included.
+     *
+     * Needed by the @p compute_support_points_laplace function. For
+     * <tt>dim=1</tt> and 2 this function is empty.
+     *
+     * This function chooses the respective points not such that they are
+     * interpolating the boundary (as does the base class), but rather such that
+     * the resulting cubic mapping is a continuous one.
+     */
+    virtual void
+    add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
+                            std::vector<Point<dim> > &a) const;
+  };
 };
 
 /*@}*/
@@ -98,17 +111,17 @@ protected:
 
 #ifndef DOXYGEN
 
-template <> void MappingC1<1>::add_line_support_points (
+template <> void MappingC1<1>::MappingC1Generic::add_line_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;
-template <> void MappingC1<2>::add_line_support_points (
+template <> void MappingC1<2>::MappingC1Generic::add_line_support_points (
   const Triangulation<2>::cell_iterator &cell,
   std::vector<Point<2> > &a) const;
 
-template <> void MappingC1<1>::add_quad_support_points (
+template <> void MappingC1<1>::MappingC1Generic::add_quad_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;
-template <> void MappingC1<2>::add_quad_support_points (
+template <> void MappingC1<2>::MappingC1Generic::add_quad_support_points (
   const Triangulation<2>::cell_iterator &,
   std::vector<Point<2> > &) const;
 
