@@ -154,6 +154,23 @@ namespace parallel
     {
       Assert (false, ExcNotImplemented());
     }
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim,spacedim>::with_artificial_cells() const
+    {
+      Assert (false, ExcNotImplemented());
+      return true;
+    }
+
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    Triangulation<dim,spacedim>::get_true_subdomain_ids_of_cells() const
+    {
+      Assert (false, ExcNotImplemented());
+      return true_subdomain_ids_of_cells;
+    }
+
   }
 }
 
