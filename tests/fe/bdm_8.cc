@@ -108,7 +108,8 @@ main()
   for (unsigned int i=1; i<4; ++i)
     {
       test<2>(i);
-      test<3>(i);
+      if (i<3)
+        test<3>(i);
     }
 
   return 0;
