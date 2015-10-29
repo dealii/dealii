@@ -107,8 +107,10 @@ int main()
   auto op_b10 = linear_operator(a.block(1, 0));
   auto op_b11 = linear_operator(a.block(1, 1));
 
-  std::array<std::array<decltype(op_b00), 2>, 2> temp{
-      {op_b00, op_b01, op_b10, op_b11}};
+  std::array<std::array<decltype(op_b00), 2>, 2> temp
+  {
+    {op_b00, op_b01, op_b10, op_b11}
+  };
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   {
@@ -184,8 +186,10 @@ int main()
 
   // And finally complicated block structures:
 
-  std::array<std::array<decltype(op_b00), 3>, 3> temp2{
-      {op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10}};
+  std::array<std::array<decltype(op_b00), 3>, 3> temp2
+  {
+    {op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10}
+  };
   auto op_upp_x_upu = block_operator<3, 3, BlockVector<double>>(temp2);
 
   op_upp_x_upu.reinit_domain_vector(u, false);
@@ -203,12 +207,16 @@ int main()
   op_upp_x_upu.vmult_add(v, u);
   PRINTME("v", v);
 
-  std::array<std::array<decltype(op_b01), 1>, 3> temp3{
-      {op_b01, op_b11, op_b11}};
+  std::array<std::array<decltype(op_b01), 1>, 3> temp3
+  {
+    {op_b01, op_b11, op_b11}
+  };
   auto op_upp_x_p = block_operator<3, 1, BlockVector<double>>(temp3);
 
-  std::array<std::array<decltype(op_b01), 3>, 1> temp4{
-      {op_b00, op_b01, op_b00}};
+  std::array<std::array<decltype(op_b01), 3>, 1> temp4
+  {
+    {op_b00, op_b01, op_b00}
+  };
   auto op_u_x_upu = block_operator<1, 3, BlockVector<double>>(temp4);
 
   auto op_long = op_u_x_upu * transpose_operator(op_upp_x_upu) * op_upp_x_p;
