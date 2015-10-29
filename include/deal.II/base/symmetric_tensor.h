@@ -1994,6 +1994,72 @@ SymmetricTensor<rank,dim,Number>::serialize(Archive &ar, const unsigned int)
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
+
+/**
+ * Addition of a SymmetricTensor and a general Tensor of equal rank. The
+ * result is a general Tensor.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator+(const SymmetricTensor<rank, dim, Number> &left,
+          const Tensor<rank, dim, OtherNumber> &right)
+{
+  return Tensor<rank, dim, Number>(left) + right;
+}
+
+
+/**
+ * Addition of a general Tensor with a SymmetricTensor of equal rank. The
+ * result is a general Tensor.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator+(const Tensor<rank, dim, Number> &left,
+          const SymmetricTensor<rank, dim, OtherNumber> &right)
+{
+  return left + Tensor<rank, dim, OtherNumber>(right);
+}
+
+
+/**
+ * Subtraction of a SymmetricTensor and a general Tensor of equal rank. The
+ * result is a general Tensor.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator-(const SymmetricTensor<rank, dim, Number> &left,
+          const Tensor<rank, dim, OtherNumber> &right)
+{
+  return Tensor<rank, dim, Number>(left) - right;
+}
+
+
+/**
+ * Subtraction of a general Tensor with a SymmetricTensor of equal rank.
+ * The result is a general Tensor.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator-(const Tensor<rank, dim, Number> &left,
+          const SymmetricTensor<rank, dim, OtherNumber> &right)
+{
+  return left - Tensor<rank, dim, OtherNumber>(right);
+}
+
+
+
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is also
  * commonly referred to as the third invariant of rank-2 tensors.
