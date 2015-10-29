@@ -84,8 +84,7 @@ int main()
   auto op_b1 = linear_operator(a.block(1, 1));
   auto op_b2 = linear_operator(a.block(2, 2));
 
-
-  std::array<decltype(op_b0), 3> temp {op_b0, op_b1, op_b2};
+  std::array<decltype(op_b0), 3> temp {{op_b0, op_b1, op_b2}};
   auto op_b = block_diagonal_operator<3, BlockVector<double>>(temp);
 
 
@@ -157,7 +156,7 @@ int main()
 
   // And finally the other block_diagonal_operator variant:
 
-  std::array<decltype(op_b0), 5> temp2 {op_b0, op_b0, op_b0, op_b0, op_b0};
+  std::array<decltype(op_b0), 5> temp2 {{op_b0, op_b0, op_b0, op_b0, op_b0}};
   auto op_c = block_diagonal_operator<5, BlockVector<double>>(temp2);
 
   auto op_d = block_diagonal_operator<5, BlockVector<double>>(op_b0);
