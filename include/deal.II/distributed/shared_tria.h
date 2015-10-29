@@ -170,11 +170,27 @@ namespace parallel
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
+    public:
+
+      /**
+       * A dummy function to return empty vector.
+       */
+      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+
+      /**
+       * A dummy function which always returns true.
+       */
+      bool with_artificial_cells() const;
     private:
       /**
        * Constructor.
        */
       Triangulation ();
+
+      /**
+       * A dummy vector.
+       */
+      std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
     };
   }
 
