@@ -43,8 +43,8 @@ public:
   /**
   * Apply preconditioner.
   */
-  template<class VECTOR>
-  void vmult (VECTOR &, const VECTOR &) const;
+  template<typename VectorType>
+  void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -53,13 +53,13 @@ public:
    * the same as
    * vmult().
    */
-  template<class VECTOR>
-  void Tvmult (VECTOR &, const VECTOR &) const;
+  template<typename VectorType>
+  void Tvmult (VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
-  template<class VECTOR>
-  void vmult_add (VECTOR &, const VECTOR &) const;
+  template<typename VectorType>
+  void vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -68,8 +68,8 @@ public:
    * the same as
    * vmult_add().
    */
-  template<class VECTOR>
-  void Tvmult_add (VECTOR &, const VECTOR &) const;
+  template<typename VectorType>
+  void Tvmult_add (VectorType &, const VectorType &) const;
 
 private:
   number factor;
@@ -86,25 +86,25 @@ ScalingMatrix<number>::ScalingMatrix(number factor)
 
 
 template<typename number>
-template<class VECTOR>
+template<typename VectorType>
 inline void
-ScalingMatrix<number>::vmult (VECTOR &dst, const VECTOR &src) const
+ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
 
 template<typename number>
-template<class VECTOR>
+template<typename VectorType>
 inline void
-ScalingMatrix<number>::Tvmult (VECTOR &dst, const VECTOR &src) const
+ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
 
 template<typename number>
-template<class VECTOR>
+template<typename VectorType>
 inline void
-ScalingMatrix<number>::vmult_add (VECTOR &dst, const VECTOR &src) const
+ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);
 }
@@ -112,9 +112,9 @@ ScalingMatrix<number>::vmult_add (VECTOR &dst, const VECTOR &src) const
 
 
 template<typename number>
-template<class VECTOR>
+template<typename VectorType>
 inline void
-ScalingMatrix<number>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
+ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);
 }

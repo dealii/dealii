@@ -41,21 +41,21 @@ std::ofstream logfile("output");
 
 
 
-template <int dim, int fe_degree, typename Number, typename VECTOR=Vector<Number> >
+template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number> >
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const DoFHandler<dim> &dof_handler,
-                 const ConstraintMatrix &constraints)
+  MatrixFreeTest (const DoFHandler<dim>  &dof_handler,
+                  const ConstraintMatrix &constraints)
     :
     dof_handler (dof_handler),
     constraints (constraints)
   {}
 
-  void vmult (VECTOR       &dst,
-              const VECTOR &src) const
+  void vmult (VectorType       &dst,
+              const VectorType &src) const
   {
-    VECTOR src_cpy = src;
+    VectorType src_cpy = src;
     constraints.distribute(src_cpy);
     FEEvaluation<dim,fe_degree,fe_degree+1,dim,Number> fe_eval
     (dof_handler.get_fe(), QGauss<1>(fe_degree+1),

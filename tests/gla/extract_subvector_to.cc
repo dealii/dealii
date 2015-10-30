@@ -15,7 +15,7 @@
 
 
 
-// test the various VECTOR::extract_subvector_to functions
+// test the various VectorType::extract_subvector_to functions
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
