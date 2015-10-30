@@ -14,8 +14,22 @@
 ## ---------------------------------------------------------------------
 
 ADD_EXECUTABLE(expand_instantiations_exe expand_instantiations.cc)
+
+#
+# We run into a bug when compiling expand_instantiations with
+# -fuse-ld=gold -pthreads, see https://github.com/dealii/dealii/issues/1798
+# Work around this by stripping -fuse-ld=gold out of the build flags
+# for the script. This does little harm because linking this one file
+# is so exceedingly cheap that there is no speed difference between
+# using gold or the old BFD ld linker.
+#
+# If we are on a system where -fuse-ld=gold simply isn't part of the
+# linker flag, filtering this one command out of the list of flags
+# does not harm either.
+#
+STRING(REPLACE "-fuse-ld=gold" "" _expand_instantiations_link_flags ${DEAL_II_LINKER_FLAGS} )
 SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
-  LINK_FLAGS "${DEAL_II_LINKER_FLAGS}"
+  LINK_FLAGS "${_expand_instantiations_link_flags}"
   LINKER_LANGUAGE "CXX"
   COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS}"
   COMPILE_FLAGS "${DEAL_II_CXX_FLAGS}"
