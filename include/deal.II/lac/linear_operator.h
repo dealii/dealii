@@ -1027,12 +1027,12 @@ namespace
  *   // with appropriate size and internal layout
  *
  *   // Application of matrix to vector src, writes the result into dst.
- *   vmult(VECTOR &dst, const VECTOR &src);
+ *   vmult(Range &dst, const Domain &src);
  *
  *   // Application of the transpose of matrix to vector src, writes the
  *   // result into dst. (Depending on the usage of the linear operator
  *   // class this can be a dummy implementation throwing an error.)
- *   Tvmult(VECTOR &dst, const VECTOR &src);
+ *   Tvmult(Range &dst, const Domain &src);
  * };
  * @endcode
  *
@@ -1043,11 +1043,11 @@ namespace
  * {
  * public:
  *   // Application of matrix to vector src, adds the result to dst.
- *   vmult_add(VECTOR &dst, const VECTOR &src);
+ *   vmult_add(Range &dst, const Domain &src);
  *
  *   // Application of the transpose of matrix to vector src, adds the
  *   // result to dst.
- *   Tvmult_add(VECTOR &dst, const VECTOR &src);
+ *   Tvmult_add(Range &dst, const Domain &src);
  * };
  * @endcode
  *
