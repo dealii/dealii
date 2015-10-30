@@ -1252,7 +1252,7 @@ namespace DoFTools
                       "This could happen when the function is called before NumberCache is written."));
 
     // In case this function is executed with parallel::shared::Triangulation
-    // with artifical cells, we need to take "true" subdomain IDs (i.e. without
+    // with possibly artifical cells, we need to take "true" subdomain IDs (i.e. without
     // artificial cells). Otherwise we are good to use subdomain_id as stored
     // in cell->subdomain_id().
     std::vector<types::subdomain_id> cell_owners (dof_handler.get_tria().n_active_cells());
@@ -1260,6 +1260,8 @@ namespace DoFTools
           (dynamic_cast<const parallel::shared::Triangulation<DH::dimension, DH::space_dimension>*> (&dof_handler.get_tria ())))
       {
         cell_owners = tr->get_true_subdomain_ids_of_cells();
+        Assert (tr->get_true_subdomain_ids_of_cells().size() == tr->n_active_cells(),
+                ExcInternalError());
       }
     else
       {
