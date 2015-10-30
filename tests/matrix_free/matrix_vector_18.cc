@@ -258,4 +258,3 @@ int main ()
     deallog.pop();
   }
 }
-

@@ -99,4 +99,3 @@ int main(int argc, char **argv)
   GrowingVectorMemory<PETScWrappers::Vector>::release_unused_memory ();
 
 }
-

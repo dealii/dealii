@@ -71,7 +71,3 @@ public:
 private:
   const MatrixFree<dim,Number> &data;
 };
-
-
-
-
