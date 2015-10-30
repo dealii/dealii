@@ -1,50 +1,20 @@
 
 DEAL:0:2d::n_dofs: 818
-DEAL:0:2d::n_locally_owned_dofs: 289
-DEAL:0:2d::n_locally_owned_dofs_per_processor: 289 297 232  sum: 818
 DEAL:0:2d::n_dofs: 1754
-DEAL:0:2d::n_locally_owned_dofs: 578
-DEAL:0:2d::n_locally_owned_dofs_per_processor: 578 588 588  sum: 1754
 DEAL:0:2d::n_dofs: 3056
-DEAL:0:2d::n_locally_owned_dofs: 1023
-DEAL:0:2d::n_locally_owned_dofs_per_processor: 1023 1013 1020  sum: 3056
 DEAL:0:3d::n_dofs: 13282
-DEAL:0:3d::n_locally_owned_dofs: 4446
-DEAL:0:3d::n_locally_owned_dofs_per_processor: 4446 4386 4450  sum: 13282
 DEAL:0:3d::n_dofs: 41826
-DEAL:0:3d::n_locally_owned_dofs: 13862
-DEAL:0:3d::n_locally_owned_dofs_per_processor: 13862 14131 13833  sum: 41826
 
 DEAL:1:2d::n_dofs: 818
-DEAL:1:2d::n_locally_owned_dofs: 297
-DEAL:1:2d::n_locally_owned_dofs_per_processor: 289 297 232  sum: 818
 DEAL:1:2d::n_dofs: 1754
-DEAL:1:2d::n_locally_owned_dofs: 588
-DEAL:1:2d::n_locally_owned_dofs_per_processor: 578 588 588  sum: 1754
 DEAL:1:2d::n_dofs: 3056
-DEAL:1:2d::n_locally_owned_dofs: 1013
-DEAL:1:2d::n_locally_owned_dofs_per_processor: 1023 1013 1020  sum: 3056
 DEAL:1:3d::n_dofs: 13282
-DEAL:1:3d::n_locally_owned_dofs: 4386
-DEAL:1:3d::n_locally_owned_dofs_per_processor: 4446 4386 4450  sum: 13282
 DEAL:1:3d::n_dofs: 41826
-DEAL:1:3d::n_locally_owned_dofs: 14131
-DEAL:1:3d::n_locally_owned_dofs_per_processor: 13862 14131 13833  sum: 41826
 
 
 DEAL:2:2d::n_dofs: 818
-DEAL:2:2d::n_locally_owned_dofs: 232
-DEAL:2:2d::n_locally_owned_dofs_per_processor: 289 297 232  sum: 818
 DEAL:2:2d::n_dofs: 1754
-DEAL:2:2d::n_locally_owned_dofs: 588
-DEAL:2:2d::n_locally_owned_dofs_per_processor: 578 588 588  sum: 1754
 DEAL:2:2d::n_dofs: 3056
-DEAL:2:2d::n_locally_owned_dofs: 1020
-DEAL:2:2d::n_locally_owned_dofs_per_processor: 1023 1013 1020  sum: 3056
 DEAL:2:3d::n_dofs: 13282
-DEAL:2:3d::n_locally_owned_dofs: 4450
-DEAL:2:3d::n_locally_owned_dofs_per_processor: 4446 4386 4450  sum: 13282
 DEAL:2:3d::n_dofs: 41826
-DEAL:2:3d::n_locally_owned_dofs: 13833
-DEAL:2:3d::n_locally_owned_dofs_per_processor: 13862 14131 13833  sum: 41826
 
