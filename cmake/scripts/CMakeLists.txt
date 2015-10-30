@@ -27,7 +27,8 @@ ADD_EXECUTABLE(expand_instantiations_exe expand_instantiations.cc)
 # linker flag, filtering this one command out of the list of flags
 # does not harm either.
 #
-STRING(REPLACE "-fuse-ld=gold" "" _expand_instantiations_link_flags ${DEAL_II_LINKER_FLAGS} )
+STRING(REPLACE "-fuse-ld=gold" "" _expand_instantiations_link_flags "${DEAL_II_LINKER_FLAGS}" )
+
 SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
   LINK_FLAGS "${_expand_instantiations_link_flags}"
   LINKER_LANGUAGE "CXX"
