@@ -101,7 +101,8 @@ public:
                         const BlockVector<number2> &src) const;
 
   /**
-   * A wrapper to least_squares(), implementing the standard MATRIX interface.
+   * A wrapper to least_squares(), implementing the standard MatrixType
+   * interface.
    */
   template<class VectorType>
   void vmult (VectorType &dst, const VectorType &src) const;

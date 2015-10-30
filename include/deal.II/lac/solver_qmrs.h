@@ -125,9 +125,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -198,9 +198,9 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   IterationResult
-  iterate (const MATRIX &A,
+  iterate (const MatrixType     &A,
            const PRECONDITIONER &precondition);
 
   /**
@@ -264,9 +264,9 @@ SolverQMRS<VectorType>::print_vectors(const unsigned int,
 
 
 template<class VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 void
-SolverQMRS<VectorType>::solve (const MATRIX         &A,
+SolverQMRS<VectorType>::solve (const MatrixType     &A,
                                VectorType           &x,
                                const VectorType     &b,
                                const PRECONDITIONER &precondition)
@@ -322,9 +322,9 @@ SolverQMRS<VectorType>::solve (const MATRIX         &A,
 
 
 template<class VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 typename SolverQMRS<VectorType>::IterationResult
-SolverQMRS<VectorType>::iterate(const MATRIX         &A,
+SolverQMRS<VectorType>::iterate(const MatrixType     &A,
                                 const PRECONDITIONER &precondition)
 {
   /* Remark: the matrix A in the article is the preconditioned matrix.

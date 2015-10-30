@@ -172,14 +172,14 @@ public:
    * Leave it at its default zero, which will be reset to the size of
    * <code>eigenvalues</code> internally.
    */
-  template <typename VectorType, typename MATRIX1,
-            typename MATRIX2, typename INVERSE>
-  void solve (const MATRIX1                      &A,
-              const MATRIX2                      &B,
+  template <typename VectorType, typename MatrixType1,
+            typename MatrixType2, typename INVERSE>
+  void solve (const MatrixType1                  &A,
+              const MatrixType2                  &B,
               const INVERSE                      &inverse,
               std::vector<std::complex<double> > &eigenvalues,
               std::vector<VectorType>            &eigenvectors,
-              const unsigned int                 n_eigenvalues = 0);
+              const unsigned int                  n_eigenvalues = 0);
 
 protected:
 
@@ -257,15 +257,15 @@ ArpackSolver::ArpackSolver (SolverControl &control,
 {}
 
 
-template <typename VectorType, typename MATRIX1,
-          typename MATRIX2, typename INVERSE>
+template <typename VectorType, typename MatrixType1,
+          typename MatrixType2, typename INVERSE>
 inline
-void ArpackSolver::solve (const MATRIX1                      &system_matrix,
-                          const MATRIX2                      &mass_matrix,
+void ArpackSolver::solve (const MatrixType1                  &system_matrix,
+                          const MatrixType2                  &mass_matrix,
                           const INVERSE                      &inverse,
                           std::vector<std::complex<double> > &eigenvalues,
                           std::vector<VectorType>            &eigenvectors,
-                          const unsigned int                 n_eigenvalues)
+                          const unsigned int                  n_eigenvalues)
 {
   //inside the routines of ARPACK the
   //values change magically, so store

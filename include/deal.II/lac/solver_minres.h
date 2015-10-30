@@ -98,9 +98,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -196,9 +196,9 @@ SolverMinRes<VectorType>::print_vectors(const unsigned int,
 
 
 template<class VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 void
-SolverMinRes<VectorType>::solve (const MATRIX         &A,
+SolverMinRes<VectorType>::solve (const MatrixType     &A,
                                  VectorType           &x,
                                  const VectorType     &b,
                                  const PRECONDITIONER &precondition)

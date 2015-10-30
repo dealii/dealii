@@ -97,11 +97,11 @@ public:
    * approximated eigenvalue and @p x is the corresponding eigenvector,
    * normalized with respect to the l2-norm.
    */
-  template <class MATRIX>
+  template <typename MatrixType>
   void
-  solve (double       &value,
-         const MATRIX &A,
-         VectorType   &x);
+  solve (double           &value,
+         const MatrixType &A,
+         VectorType       &x);
 
 protected:
   /**
@@ -194,11 +194,11 @@ public:
    * eigenvalue and @p x is the corresponding eigenvector, normalized with
    * respect to the l2-norm.
    */
-  template <class MATRIX>
+  template <typename MatrixType>
   void
-  solve (double       &value,
-         const MATRIX &A,
-         VectorType   &x);
+  solve (double           &value,
+         const MatrixType &A,
+         VectorType       &x);
 
 protected:
   /**
@@ -229,11 +229,11 @@ EigenPower<VectorType>::~EigenPower ()
 
 
 template <class VectorType>
-template <class MATRIX>
+template <typename MatrixType>
 void
-EigenPower<VectorType>::solve (double       &value,
-                               const MATRIX &A,
-                               VectorType   &x)
+EigenPower<VectorType>::solve (double           &value,
+                               const MatrixType &A,
+                               VectorType       &x)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -323,18 +323,18 @@ EigenInverse<VectorType>::~EigenInverse ()
 
 
 template <class VectorType>
-template <class MATRIX>
+template <typename MatrixType>
 void
-EigenInverse<VectorType>::solve (double       &value,
-                                 const MATRIX &A,
-                                 VectorType   &x)
+EigenInverse<VectorType>::solve (double           &value,
+                                 const MatrixType &A,
+                                 VectorType       &x)
 {
   deallog.push("Wielandt");
 
   SolverControl::State conv=SolverControl::iterate;
 
   // Prepare matrix for solver
-  ShiftedMatrix <MATRIX> A_s(A, -value);
+  ShiftedMatrix <MatrixType> A_s(A, -value);
 
   // Define solver
   ReductionControl inner_control (5000, 1.e-16, 1.e-5, false, false);

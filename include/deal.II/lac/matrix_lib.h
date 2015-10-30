@@ -71,9 +71,9 @@ public:
    * Constructor.  Additionally to the two constituting matrices, a memory
    * pool for the auxiliary vector must be provided.
    */
-  template <class MATRIX1, class MATRIX2>
-  ProductMatrix (const MATRIX1            &m1,
-                 const MATRIX2            &m2,
+  template <typename MatrixType1, typename MatrixType2>
+  ProductMatrix (const MatrixType1        &m1,
+                 const MatrixType2        &m2,
                  VectorMemory<VectorType> &mem);
 
   /**
@@ -84,15 +84,16 @@ public:
   /**
    * Change the matrices.
    */
-  template <class MATRIX1, class MATRIX2>
-  void reinit(const MATRIX1 &m1, const MATRIX2 &m2);
+  template <typename MatrixType1, typename MatrixType2>
+  void reinit (const MatrixType1 &m1, const MatrixType2 &m2);
 
   /**
    * Change the matrices and memory pool.
    */
-  template <class MATRIX1, class MATRIX2>
-  void initialize(const MATRIX1 &m1, const MATRIX2 &m2,
-                  VectorMemory<VectorType> &mem);
+  template <typename MatrixType1, typename MatrixType2>
+  void initialize (const MatrixType1 &m1,
+                   const MatrixType2 &m2,
+                   VectorMemory<VectorType> &mem);
 
   // Doc in PointerMatrixBase
   void clear();
@@ -165,8 +166,8 @@ public:
   /**
    * Constructor with initialization.
    */
-  template <class MATRIX>
-  ScaledMatrix (const MATRIX &M, const double factor);
+  template <typename MatrixType>
+  ScaledMatrix (const MatrixType &M, const double factor);
 
   /**
    * Destructor
@@ -175,8 +176,8 @@ public:
   /**
    * Initialize for use with a new matrix and factor.
    */
-  template <class MATRIX>
-  void initialize (const MATRIX &M, const double factor);
+  template <typename MatrixType>
+  void initialize (const MatrixType &M, const double factor);
 
   /**
    * Reset the object to its original state.
@@ -448,8 +449,8 @@ public:
    * Initialization function. Provide a solver object, a matrix, and another
    * preconditioner for this.
    */
-  template <class MATRIX, class PRECONDITION>
-  void initialize (const MATRIX &,
+  template <typename MatrixType, class PRECONDITION>
+  void initialize (const MatrixType &,
                    const PRECONDITION &);
 
   /**
@@ -515,9 +516,9 @@ ScaledMatrix<VectorType>::ScaledMatrix()
 
 
 template<typename VectorType>
-template<class MATRIX>
+template<typename MatrixType>
 inline
-ScaledMatrix<VectorType>::ScaledMatrix(const MATRIX &mat, const double factor)
+ScaledMatrix<VectorType>::ScaledMatrix(const MatrixType &mat, const double factor)
   :
   m(new_pointer_matrix_base(mat, VectorType())),
   factor(factor)
@@ -526,10 +527,10 @@ ScaledMatrix<VectorType>::ScaledMatrix(const MATRIX &mat, const double factor)
 
 
 template<typename VectorType>
-template<class MATRIX>
+template<typename MatrixType>
 inline
 void
-ScaledMatrix<VectorType>::initialize(const MATRIX &mat, const double f)
+ScaledMatrix<VectorType>::initialize(const MatrixType &mat, const double f)
 {
   if (m) delete m;
   m = new_pointer_matrix_base(mat, VectorType());
@@ -592,41 +593,41 @@ ProductMatrix<VectorType>::ProductMatrix (VectorMemory<VectorType> &m)
 
 
 template<typename VectorType>
-template<class MATRIX1, class MATRIX2>
-ProductMatrix<VectorType>::ProductMatrix (const MATRIX1            &mat1,
-                                          const MATRIX2            &mat2,
+template<typename MatrixType1, typename MatrixType2>
+ProductMatrix<VectorType>::ProductMatrix (const MatrixType1        &mat1,
+                                          const MatrixType2        &mat2,
                                           VectorMemory<VectorType> &m)
   : mem(&m)
 {
-  m1 = new PointerMatrix<MATRIX1, VectorType>(&mat1, typeid(*this).name());
-  m2 = new PointerMatrix<MATRIX2, VectorType>(&mat2, typeid(*this).name());
+  m1 = new PointerMatrix<MatrixType1, VectorType>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MatrixType2, VectorType>(&mat2, typeid(*this).name());
 }
 
 
 template<typename VectorType>
-template<class MATRIX1, class MATRIX2>
+template<typename MatrixType1, typename MatrixType2>
 void
-ProductMatrix<VectorType>::reinit (const MATRIX1 &mat1, const MATRIX2 &mat2)
+ProductMatrix<VectorType>::reinit (const MatrixType1 &mat1, const MatrixType2 &mat2)
 {
   if (m1) delete m1;
   if (m2) delete m2;
-  m1 = new PointerMatrix<MATRIX1, VectorType>(&mat1, typeid(*this).name());
-  m2 = new PointerMatrix<MATRIX2, VectorType>(&mat2, typeid(*this).name());
+  m1 = new PointerMatrix<MatrixType1, VectorType>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MatrixType2, VectorType>(&mat2, typeid(*this).name());
 }
 
 
 template<typename VectorType>
-template<class MATRIX1, class MATRIX2>
+template<typename MatrixType1, typename MatrixType2>
 void
-ProductMatrix<VectorType>::initialize (const MATRIX1            &mat1,
-                                       const MATRIX2            &mat2,
+ProductMatrix<VectorType>::initialize (const MatrixType1        &mat1,
+                                       const MatrixType2        &mat2,
                                        VectorMemory<VectorType> &memory)
 {
   mem = &memory;
   if (m1) delete m1;
   if (m2) delete m2;
-  m1 = new PointerMatrix<MATRIX1, VectorType>(&mat1, typeid(*this).name());
-  m2 = new PointerMatrix<MATRIX2, VectorType>(&mat2, typeid(*this).name());
+  m1 = new PointerMatrix<MatrixType1, VectorType>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MatrixType2, VectorType>(&mat2, typeid(*this).name());
 }
 
 
@@ -734,13 +735,13 @@ MeanValueFilter::Tvmult_add(VectorType &, const VectorType &) const
 //-----------------------------------------------------------------------//
 
 template <typename VectorType>
-template <class MATRIX, class PRECONDITION>
+template <typename MatrixType, class PRECONDITION>
 inline void
-InverseMatrixRichardson<VectorType>::initialize (const MATRIX &m, const PRECONDITION &p)
+InverseMatrixRichardson<VectorType>::initialize (const MatrixType &m, const PRECONDITION &p)
 {
   if (matrix != 0)
     delete matrix;
-  matrix = new PointerMatrix<MATRIX, VectorType>(&m);
+  matrix = new PointerMatrix<MatrixType, VectorType>(&m);
   if (precondition != 0)
     delete precondition;
   precondition = new PointerMatrix<PRECONDITION, VectorType>(&p);

@@ -128,9 +128,9 @@ public:
   /**
    * Solve primal problem only.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -139,8 +139,8 @@ protected:
   /**
    * Computation of the stopping criterion.
    */
-  template <class MATRIX>
-  double criterion (const MATRIX &A, const VectorType &x, const VectorType &b);
+  template <typename MatrixType>
+  double criterion (const MatrixType &A, const VectorType &x, const VectorType &b);
 
   /**
    * Interface for derived class.  This function gets the current iteration
@@ -229,8 +229,8 @@ private:
   /**
    * Everything before the iteration loop.
    */
-  template <class MATRIX>
-  SolverControl::State start(const MATRIX &A);
+  template <typename MatrixType>
+  SolverControl::State start(const MatrixType &A);
 
   /**
    * A structure returned by the iterate() function representing what it found
@@ -253,9 +253,9 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   IterationResult
-  iterate(const MATRIX &A,
+  iterate(const MatrixType     &A,
           const PRECONDITIONER &precondition);
 };
 
@@ -307,9 +307,11 @@ SolverBicgstab<VectorType>::~SolverBicgstab ()
 
 
 template <typename VectorType>
-template <class MATRIX>
+template <typename MatrixType>
 double
-SolverBicgstab<VectorType>::criterion (const MATRIX &A, const VectorType &x, const VectorType &b)
+SolverBicgstab<VectorType>::criterion (const MatrixType &A,
+                                       const VectorType &x,
+                                       const VectorType &b)
 {
   A.vmult(*Vt, x);
   Vt->add(-1.,b);
@@ -321,9 +323,9 @@ SolverBicgstab<VectorType>::criterion (const MATRIX &A, const VectorType &x, con
 
 
 template <typename VectorType >
-template <class MATRIX>
+template <typename MatrixType>
 SolverControl::State
-SolverBicgstab<VectorType>::start(const MATRIX &A)
+SolverBicgstab<VectorType>::start (const MatrixType &A)
 {
   A.vmult(*Vr, *Vx);
   Vr->sadd(-1.,1.,*Vb);
@@ -345,9 +347,9 @@ SolverBicgstab<VectorType>::print_vectors(const unsigned int,
 
 
 template<typename VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 typename SolverBicgstab<VectorType>::IterationResult
-SolverBicgstab<VectorType>::iterate(const MATRIX         &A,
+SolverBicgstab<VectorType>::iterate(const MatrixType     &A,
                                     const PRECONDITIONER &precondition)
 {
 //TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
@@ -432,9 +434,9 @@ SolverBicgstab<VectorType>::iterate(const MATRIX         &A,
 
 
 template<typename VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 void
-SolverBicgstab<VectorType>::solve(const MATRIX         &A,
+SolverBicgstab<VectorType>::solve(const MatrixType     &A,
                                   VectorType           &x,
                                   const VectorType     &b,
                                   const PRECONDITIONER &precondition)

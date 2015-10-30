@@ -539,9 +539,9 @@ public:
    *
    * The function returns a reference to @p this.
    */
-  template <class MATRIX>
+  template <typename MatrixType>
   SparseMatrixEZ<number> &
-  copy_from (const MATRIX &source, const bool elide_zero_values = true);
+  copy_from (const MatrixType &source, const bool elide_zero_values = true);
 
   /**
    * Add @p matrix scaled by @p factor to this matrix.
@@ -550,9 +550,9 @@ public:
    * type is convertible to the data type of this matrix and it has the
    * standard @p const_iterator.
    */
-  template <class MATRIX>
-  void add (const number factor,
-            const MATRIX &matrix);
+  template <typename MatrixType>
+  void add (const number      factor,
+            const MatrixType &matrix);
 //@}
   /**
    * @name Entry Access
@@ -673,10 +673,10 @@ public:
    * matrix entries and that @p A has a function <tt>el(i,j)</tt> for access
    * to a specific entry.
    */
-  template <class MATRIXA, class MATRIXB>
-  void conjugate_add (const MATRIXA &A,
-                      const MATRIXB &B,
-                      const bool transpose = false);
+  template <typename MatrixTypeA, typename MatrixTypeB>
+  void conjugate_add (const MatrixTypeA &A,
+                      const MatrixTypeB &B,
+                      const bool         transpose = false);
 //@}
   /**
    * @name Iterators
@@ -1392,10 +1392,10 @@ SparseMatrixEZ<number>::end (const size_type r) const
 }
 
 template<typename number>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 SparseMatrixEZ<number> &
-SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values)
+SparseMatrixEZ<number>::copy_from (const MatrixType &M, const bool elide_zero_values)
 {
   reinit(M.m(),
          M.n(),
@@ -1407,8 +1407,8 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values
   // copy them into the current object
   for (size_type row = 0; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         set(row, entry->column(), entry->value(), elide_zero_values);
     }
@@ -1417,11 +1417,11 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M, const bool elide_zero_values
 }
 
 template<typename number>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 void
-SparseMatrixEZ<number>::add (const number factor,
-                             const MATRIX &M)
+SparseMatrixEZ<number>::add (const number      factor,
+                             const MatrixType &M)
 {
   Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
   Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
@@ -1434,8 +1434,8 @@ SparseMatrixEZ<number>::add (const number factor,
   // add them into the current object
   for (size_type row = 0; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         if (entry->value() != 0)
           add(row, entry->column(), factor * entry->value());
@@ -1445,11 +1445,11 @@ SparseMatrixEZ<number>::add (const number factor,
 
 
 template<typename number>
-template <class MATRIXA, class MATRIXB>
+template <typename MatrixTypeA, typename MatrixTypeB>
 inline void
-SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
-                                       const MATRIXB &B,
-                                       const bool transpose)
+SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
+                                       const MatrixTypeB &B,
+                                       const bool         transpose)
 {
 // Compute the result
 // r_ij = \sum_kl b_ik b_jl a_kl
@@ -1467,20 +1467,20 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
   // corresponding rows of B only.
   // For the non-transpose case, we
   // must find a trick.
-  typename MATRIXB::const_iterator b1 = B.begin();
-  const typename MATRIXB::const_iterator b_final = B.end();
+  typename MatrixTypeB::const_iterator b1 = B.begin();
+  const typename MatrixTypeB::const_iterator b_final = B.end();
   if (transpose)
     while (b1 != b_final)
       {
         const size_type i = b1->column();
         const size_type k = b1->row();
-        typename MATRIXB::const_iterator b2 = B.begin();
+        typename MatrixTypeB::const_iterator b2 = B.begin();
         while (b2 != b_final)
           {
             const size_type j = b2->column();
             const size_type l = b2->row();
 
-            const typename MATRIXA::value_type a = A.el(k,l);
+            const typename MatrixTypeA::value_type a = A.el(k,l);
 
             if (a != 0.)
               add (i, j, a * b1->value() * b2->value());
@@ -1506,12 +1506,12 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
           ++b1;
         }
 
-      typename MATRIXA::const_iterator ai = A.begin();
-      const typename MATRIXA::const_iterator ae = A.end();
+      typename MatrixTypeA::const_iterator ai = A.begin();
+      const typename MatrixTypeA::const_iterator ae = A.end();
 
       while (ai != ae)
         {
-          const typename MATRIXA::value_type a = ai->value();
+          const typename MatrixTypeA::value_type a = ai->value();
           // Don't do anything if
           // this entry is zero.
           if (a == 0.) continue;
@@ -1521,9 +1521,9 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
           // nonzero entry in column
           // ai->row()
           b1 = B.begin(minrow[ai->row()]);
-          const typename MATRIXB::const_iterator
+          const typename MatrixTypeB::const_iterator
           be1 = B.end(maxrow[ai->row()]);
-          const typename MATRIXB::const_iterator
+          const typename MatrixTypeB::const_iterator
           be2 = B.end(maxrow[ai->column()]);
 
           while (b1 != be1)
@@ -1537,7 +1537,7 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
                 {
                   const size_type i = b1->row();
 
-                  typename MATRIXB::const_iterator
+                  typename MatrixTypeB::const_iterator
                   b2 = B.begin(minrow[ai->column()]);
                   while (b2 != be2)
                     {

@@ -159,7 +159,7 @@ public:
   /**
    * Auxiliary class to represent <code>A-sigma*B</code> operator.
    */
-  template <typename MATRIX>
+  template <typename MatrixType>
   class Shift : public dealii::Subscriptor
   {
   public:
@@ -167,9 +167,9 @@ public:
     /**
      * Constructor.
      */
-    Shift (const MATRIX &A,
-           const MATRIX &B,
-           const double sigma)
+    Shift (const MatrixType &A,
+           const MatrixType &B,
+           const double      sigma)
       :
       A(A),
       B(B),
@@ -197,8 +197,8 @@ public:
     }
 
   private:
-    const MATRIX &A;
-    const MATRIX &B;
+    const MatrixType &A;
+    const MatrixType &B;
     const double sigma;
   };
 
@@ -244,15 +244,15 @@ public:
    * calling the <code>pd(n/s)eupd</code> and <code>pd(n/s)aupd</code>
    * functions of PARPACK.
    */
-  template <typename MATRIX1,
-            typename MATRIX2, typename INVERSE>
+  template <typename MatrixType1,
+            typename MatrixType2, typename INVERSE>
   void solve
-  (const MATRIX1                      &A,
-   const MATRIX2                      &B,
+  (const MatrixType1                  &A,
+   const MatrixType2                  &B,
    const INVERSE                      &inverse,
    std::vector<std::complex<double> > &eigenvalues,
    std::vector<VectorType>            &eigenvectors,
-   const unsigned int                 n_eigenvalues);
+   const unsigned int                  n_eigenvalues);
 
   std::size_t memory_consumption() const;
 
@@ -517,14 +517,14 @@ void PArpackSolver<VectorType>::reinit(const dealii::IndexSet &locally_owned_dof
 }
 
 template <typename VectorType>
-template <typename MATRIX1,typename MATRIX2, typename INVERSE>
+template <typename MatrixType1,typename MatrixType2, typename INVERSE>
 void PArpackSolver<VectorType>::solve
-(const MATRIX1                      &/*system_matrix*/,
- const MATRIX2                      &mass_matrix,
+(const MatrixType1                  &/*system_matrix*/,
+ const MatrixType2                  &mass_matrix,
  const INVERSE                      &inverse,
  std::vector<std::complex<double> > &eigenvalues,
  std::vector<VectorType>            &eigenvectors,
- const unsigned int                 n_eigenvalues)
+ const unsigned int                  n_eigenvalues)
 {
 
   Assert (n_eigenvalues <= eigenvectors.size(),

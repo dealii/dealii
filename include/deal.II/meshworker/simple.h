@@ -150,7 +150,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class MATRIX>
+    template <typename MatrixType>
     class MatrixSimple
     {
     public:
@@ -163,12 +163,12 @@ namespace MeshWorker
       /**
        * Store the result matrix for later assembling.
        */
-      void initialize(MATRIX &m);
+      void initialize(MatrixType &m);
 
       /**
        * Store several result matrices for later assembling.
        */
-      void initialize(std::vector<MATRIX> &m);
+      void initialize(std::vector<MatrixType> &m);
 
       /**
        * Initialize the constraints. After this function has been called with
@@ -216,11 +216,11 @@ namespace MeshWorker
       /**
        * The vector of global matrices being assembled.
        */
-      std::vector<SmartPointer<MATRIX,MatrixSimple<MATRIX> > > matrix;
+      std::vector<SmartPointer<MatrixType,MatrixSimple<MatrixType> > > matrix;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,MatrixSimple<MATRIX> > constraints;
+      SmartPointer<const ConstraintMatrix,MatrixSimple<MatrixType> > constraints;
 
       /**
        * The smallest positive number that will be entered into the global
@@ -242,7 +242,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class MATRIX>
+    template <typename MatrixType>
     class MGMatrixSimple
     {
     public:
@@ -255,7 +255,7 @@ namespace MeshWorker
       /**
        * Store the result matrix for later assembling.
        */
-      void initialize(MGLevelObject<MATRIX> &m);
+      void initialize(MGLevelObject<MatrixType> &m);
 
       /**
        * Initialize the multilevel constraints.
@@ -266,16 +266,16 @@ namespace MeshWorker
        * Initialize the matrices #flux_up and #flux_down used for local
        * refinement with discontinuous Galerkin methods.
        */
-      void initialize_fluxes(MGLevelObject<MATRIX> &flux_up,
-                             MGLevelObject<MATRIX> &flux_down);
+      void initialize_fluxes(MGLevelObject<MatrixType> &flux_up,
+                             MGLevelObject<MatrixType> &flux_down);
 
       /**
        * Initialize the matrices #interface_in and #interface_out used for
        * local refinement with continuous Galerkin methods.
        */
 
-      void initialize_interfaces(MGLevelObject<MATRIX> &interface_in,
-                                 MGLevelObject<MATRIX> &interface_out);
+      void initialize_interfaces(MGLevelObject<MatrixType> &interface_in,
+                                 MGLevelObject<MatrixType> &interface_out);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -303,7 +303,7 @@ namespace MeshWorker
       /**
        * Assemble a single matrix into a global matrix.
        */
-      void assemble(MATRIX &G,
+      void assemble(MatrixType &G,
                     const FullMatrix<double> &M,
                     const std::vector<types::global_dof_index> &i1,
                     const std::vector<types::global_dof_index> &i2);
@@ -311,7 +311,7 @@ namespace MeshWorker
       /**
        * Assemble a single matrix into a global matrix.
        */
-      void assemble(MATRIX &G,
+      void assemble(MatrixType &G,
                     const FullMatrix<double> &M,
                     const std::vector<types::global_dof_index> &i1,
                     const std::vector<types::global_dof_index> &i2,
@@ -321,7 +321,7 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
 
-      void assemble_up(MATRIX &G,
+      void assemble_up(MatrixType &G,
                        const FullMatrix<double> &M,
                        const std::vector<types::global_dof_index> &i1,
                        const std::vector<types::global_dof_index> &i2,
@@ -330,7 +330,7 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
 
-      void assemble_down(MATRIX &G,
+      void assemble_down(MatrixType &G,
                          const FullMatrix<double> &M,
                          const std::vector<types::global_dof_index> &i1,
                          const std::vector<types::global_dof_index> &i2,
@@ -340,7 +340,7 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
 
-      void assemble_in(MATRIX &G,
+      void assemble_in(MatrixType &G,
                        const FullMatrix<double> &M,
                        const std::vector<types::global_dof_index> &i1,
                        const std::vector<types::global_dof_index> &i2,
@@ -350,7 +350,7 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
 
-      void assemble_out(MATRIX &G,
+      void assemble_out(MatrixType &G,
                         const FullMatrix<double> &M,
                         const std::vector<types::global_dof_index> &i1,
                         const std::vector<types::global_dof_index> &i2,
@@ -359,35 +359,35 @@ namespace MeshWorker
       /**
        * The global matrix being assembled.
        */
-      SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > matrix;
+      SmartPointer<MGLevelObject<MatrixType>,MGMatrixSimple<MatrixType> > matrix;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_up;
+      SmartPointer<MGLevelObject<MatrixType>,MGMatrixSimple<MatrixType> > flux_up;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_down;
+      SmartPointer<MGLevelObject<MatrixType>,MGMatrixSimple<MatrixType> > flux_down;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_in;
+      SmartPointer<MGLevelObject<MatrixType>,MGMatrixSimple<MatrixType> > interface_in;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_out;
+      SmartPointer<MGLevelObject<MatrixType>,MGMatrixSimple<MatrixType> > interface_out;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MATRIX> > mg_constrained_dofs;
+      SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MatrixType> > mg_constrained_dofs;
 
       /**
        * The smallest positive number that will be entered into the global
@@ -409,9 +409,9 @@ namespace MeshWorker
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
      */
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     class SystemSimple :
-      private MatrixSimple<MATRIX>,
+      private MatrixSimple<MatrixType>,
       private ResidualSimple<VectorType>
     {
     public:
@@ -423,7 +423,7 @@ namespace MeshWorker
       /**
        * Store the two objects data is assembled into.
        */
-      void initialize(MATRIX &m, VectorType &rhs);
+      void initialize(MatrixType &m, VectorType &rhs);
 
       /**
        * Initialize the constraints. After this function has been called with
@@ -477,9 +477,9 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    ResidualSimple<MATRIX>::initialize_local_blocks(const BlockIndices &)
+    ResidualSimple<MatrixType>::initialize_local_blocks(const BlockIndices &)
     {}
 
 
@@ -562,26 +562,26 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline
-    MatrixSimple<MATRIX>::MatrixSimple(double threshold)
+    MatrixSimple<MatrixType>::MatrixSimple(double threshold)
       :
       threshold(threshold)
     {}
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MatrixSimple<MATRIX>::initialize(MATRIX &m)
+    MatrixSimple<MatrixType>::initialize(MatrixType &m)
     {
       matrix.resize(1);
       matrix[0] = &m;
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MatrixSimple<MATRIX>::initialize(std::vector<MATRIX> &m)
+    MatrixSimple<MatrixType>::initialize(std::vector<MatrixType> &m)
     {
       matrix.resize(m.size());
       for (unsigned int i=0; i<m.size(); ++i)
@@ -589,18 +589,18 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MatrixSimple<MATRIX>::initialize(const ConstraintMatrix &c)
+    MatrixSimple<MatrixType>::initialize(const ConstraintMatrix &c)
     {
       constraints = &c;
     }
 
 
-    template <class MATRIX >
+    template <typename MatrixType >
     template <class DOFINFO>
     inline void
-    MatrixSimple<MATRIX>::initialize_info(DOFINFO &info, bool face) const
+    MatrixSimple<MatrixType>::initialize_info(DOFINFO &info, bool face) const
     {
       Assert(matrix.size() != 0, ExcNotInitialized());
 
@@ -629,9 +629,9 @@ namespace MeshWorker
 
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MatrixSimple<MATRIX>::assemble(const FullMatrix<double> &M,
+    MatrixSimple<MatrixType>::assemble(const FullMatrix<double> &M,
                                    const unsigned int index,
                                    const std::vector<types::global_dof_index> &i1,
                                    const std::vector<types::global_dof_index> &i2)
@@ -651,10 +651,10 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     template <class DOFINFO>
     inline void
-    MatrixSimple<MATRIX>::assemble(const DOFINFO &info)
+    MatrixSimple<MatrixType>::assemble(const DOFINFO &info)
     {
       Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
       const unsigned int n = info.indices_by_block.size();
@@ -675,10 +675,10 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     template <class DOFINFO>
     inline void
-    MatrixSimple<MATRIX>::assemble(const DOFINFO &info1, const DOFINFO &info2)
+    MatrixSimple<MatrixType>::assemble(const DOFINFO &info1, const DOFINFO &info2)
     {
       Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
       Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
@@ -719,53 +719,53 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline
-    MGMatrixSimple<MATRIX>::MGMatrixSimple(double threshold)
+    MGMatrixSimple<MatrixType>::MGMatrixSimple(double threshold)
       :
       threshold(threshold)
     {}
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::initialize(MGLevelObject<MATRIX> &m)
+    MGMatrixSimple<MatrixType>::initialize(MGLevelObject<MatrixType> &m)
     {
       matrix = &m;
     }
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::initialize(const MGConstrainedDoFs &c)
+    MGMatrixSimple<MatrixType>::initialize(const MGConstrainedDoFs &c)
     {
       mg_constrained_dofs = &c;
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::initialize_fluxes(
-      MGLevelObject<MATRIX> &up, MGLevelObject<MATRIX> &down)
+    MGMatrixSimple<MatrixType>::initialize_fluxes(MGLevelObject<MatrixType> &up,
+                                                  MGLevelObject<MatrixType> &down)
     {
       flux_up = &up;
       flux_down = &down;
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::initialize_interfaces(
-      MGLevelObject<MATRIX> &in, MGLevelObject<MATRIX> &out)
+    MGMatrixSimple<MatrixType>::initialize_interfaces
+    (MGLevelObject<MatrixType> &in, MGLevelObject<MatrixType> &out)
     {
       interface_in = &in;
       interface_out = &out;
     }
 
 
-    template <class MATRIX >
+    template <typename MatrixType >
     template <class DOFINFO>
     inline void
-    MGMatrixSimple<MATRIX>::initialize_info(DOFINFO &info, bool face) const
+    MGMatrixSimple<MatrixType>::initialize_info(DOFINFO &info, bool face) const
     {
       const unsigned int n = info.indices_by_block.size();
 
@@ -790,13 +790,13 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2)
+    MGMatrixSimple<MatrixType>::assemble
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -810,14 +810,14 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2,
-      const unsigned int level)
+    MGMatrixSimple<MatrixType>::assemble
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2,
+     const unsigned int                          level)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -863,14 +863,14 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_up(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2,
-      const unsigned int level)
+    MGMatrixSimple<MatrixType>::assemble_up
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2,
+     const unsigned int                          level)
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
@@ -892,14 +892,14 @@ namespace MeshWorker
         }
     }
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_down(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2,
-      const unsigned int level)
+    MGMatrixSimple<MatrixType>::assemble_down
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2,
+     const unsigned int                          level)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -921,14 +921,14 @@ namespace MeshWorker
         }
     }
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_in(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2,
-      const unsigned int level)
+    MGMatrixSimple<MatrixType>::assemble_in
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2,
+     const unsigned int                          level)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -962,14 +962,14 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_out(
-      MATRIX &G,
-      const FullMatrix<double> &M,
-      const std::vector<types::global_dof_index> &i1,
-      const std::vector<types::global_dof_index> &i2,
-      const unsigned int level)
+    MGMatrixSimple<MatrixType>::assemble_out
+    (MatrixType                                 &G,
+     const FullMatrix<double>                   &M,
+     const std::vector<types::global_dof_index> &i1,
+     const std::vector<types::global_dof_index> &i2,
+     const unsigned int                          level)
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
@@ -992,10 +992,10 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     template <class DOFINFO>
     inline void
-    MGMatrixSimple<MATRIX>::assemble(const DOFINFO &info)
+    MGMatrixSimple<MatrixType>::assemble(const DOFINFO &info)
     {
       Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
@@ -1032,10 +1032,10 @@ namespace MeshWorker
     }
 
 
-    template <class MATRIX>
+    template <typename MatrixType>
     template <class DOFINFO>
     inline void
-    MGMatrixSimple<MATRIX>::assemble(const DOFINFO &info1,
+    MGMatrixSimple<MatrixType>::assemble(const DOFINFO &info1,
                                      const DOFINFO &info2)
     {
       Assert(info1.level_cell, ExcMessage("Cell must access level dofs"));
@@ -1097,62 +1097,62 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-    template <class MATRIX, typename VectorType>
-    SystemSimple<MATRIX,VectorType>::SystemSimple(double t)
+    template <typename MatrixType, typename VectorType>
+    SystemSimple<MatrixType,VectorType>::SystemSimple(double t)
       :
-      MatrixSimple<MATRIX>(t)
+      MatrixSimple<MatrixType>(t)
     {}
 
 
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     inline void
-    SystemSimple<MATRIX,VectorType>::initialize(MATRIX &m, VectorType &rhs)
+    SystemSimple<MatrixType,VectorType>::initialize(MatrixType &m, VectorType &rhs)
     {
       AnyData data;
       VectorType *p = &rhs;
       data.add(p, "right hand side");
 
-      MatrixSimple<MATRIX>::initialize(m);
+      MatrixSimple<MatrixType>::initialize(m);
       ResidualSimple<VectorType>::initialize(data);
     }
 
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     inline void
-    SystemSimple<MATRIX,VectorType>::initialize(const ConstraintMatrix &c)
+    SystemSimple<MatrixType,VectorType>::initialize(const ConstraintMatrix &c)
     {
-      MatrixSimple<MATRIX>::initialize(c);
+      MatrixSimple<MatrixType>::initialize(c);
       ResidualSimple<VectorType>::initialize(c);
     }
 
 
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VectorType>::initialize_info(DOFINFO &info,
+    SystemSimple<MatrixType,VectorType>::initialize_info(DOFINFO &info,
                                                      bool    face) const
     {
-      MatrixSimple<MATRIX>::initialize_info(info, face);
+      MatrixSimple<MatrixType>::initialize_info(info, face);
       ResidualSimple<VectorType>::initialize_info(info, face);
     }
 
 
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VectorType>::assemble(const DOFINFO &info)
+    SystemSimple<MatrixType,VectorType>::assemble(const DOFINFO &info)
     {
-      MatrixSimple<MATRIX>::assemble(info);
+      MatrixSimple<MatrixType>::assemble(info);
       ResidualSimple<VectorType>::assemble(info);
     }
 
 
-    template <class MATRIX, typename VectorType>
+    template <typename MatrixType, typename VectorType>
     template <class DOFINFO>
     inline void
-    SystemSimple<MATRIX,VectorType>::assemble(const DOFINFO &info1,
+    SystemSimple<MatrixType,VectorType>::assemble(const DOFINFO &info1,
                                               const DOFINFO &info2)
     {
-      MatrixSimple<MATRIX>::assemble(info1, info2);
+      MatrixSimple<MatrixType>::assemble(info1, info2);
       ResidualSimple<VectorType>::assemble(info1, info2);
     }
   }

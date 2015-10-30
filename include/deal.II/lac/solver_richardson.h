@@ -107,9 +107,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -117,9 +117,9 @@ public:
   /**
    * Solve $A^Tx=b$ for $x$.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  Tsolve (const MATRIX         &A,
+  Tsolve (const MatrixType     &A,
           VectorType           &x,
           const VectorType     &b,
           const PRECONDITIONER &precondition);
@@ -214,9 +214,9 @@ SolverRichardson<VectorType>::~SolverRichardson()
 
 
 template <class VectorType>
-template <class MATRIX, class PRECONDITIONER>
+template <typename MatrixType, class PRECONDITIONER>
 void
-SolverRichardson<VectorType>::solve (const MATRIX         &A,
+SolverRichardson<VectorType>::solve (const MatrixType     &A,
                                      VectorType           &x,
                                      const VectorType     &b,
                                      const PRECONDITIONER &precondition)
@@ -285,9 +285,9 @@ SolverRichardson<VectorType>::solve (const MATRIX         &A,
 
 
 template <class VectorType>
-template <class MATRIX, class PRECONDITIONER>
+template <typename MatrixType, class PRECONDITIONER>
 void
-SolverRichardson<VectorType>::Tsolve (const MATRIX         &A,
+SolverRichardson<VectorType>::Tsolve (const MatrixType     &A,
                                       VectorType           &x,
                                       const VectorType     &b,
                                       const PRECONDITIONER &precondition)

@@ -175,9 +175,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template <class MATRIX, class PRECONDITIONER>
+  template <typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -453,9 +453,9 @@ SolverCG<VectorType>::compute_eigs_and_cond
 
 
 template <typename VectorType>
-template <class MATRIX, class PRECONDITIONER>
+template <typename MatrixType, class PRECONDITIONER>
 void
-SolverCG<VectorType>::solve (const MATRIX         &A,
+SolverCG<VectorType>::solve (const MatrixType     &A,
                              VectorType           &x,
                              const VectorType     &b,
                              const PRECONDITIONER &precondition)

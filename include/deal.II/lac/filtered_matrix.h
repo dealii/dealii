@@ -341,9 +341,9 @@ public:
    * @arg @p expect_constrained_source: See documentation of
    * #expect_constrained_source.
    */
-  template <class MATRIX>
-  FilteredMatrix (const MATRIX &matrix,
-                  bool expect_constrained_source = false);
+  template <typename MatrixType>
+  FilteredMatrix (const MatrixType &matrix,
+                  bool              expect_constrained_source = false);
 
   /**
    * Copy operator. Take over matrix and constraints from the other object.
@@ -359,9 +359,9 @@ public:
    * @arg @p expect_constrained_source: See documentation of
    * #expect_constrained_source.
    */
-  template <class MATRIX>
-  void initialize (const MATRIX &m,
-                   bool expect_constrained_source = false);
+  template <typename MatrixType>
+  void initialize (const MatrixType &m,
+                   bool              expect_constrained_source = false);
 
   /**
    * Delete all constraints and the matrix pointer.
@@ -700,10 +700,10 @@ operator () (const IndexValuePair &i1,
 
 
 template <typename VectorType>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 void
-FilteredMatrix<VectorType>::initialize (const MATRIX &m, bool ecs)
+FilteredMatrix<VectorType>::initialize (const MatrixType &m, bool ecs)
 {
   matrix.reset (new_pointer_matrix_base(m, VectorType()));
 
@@ -732,10 +732,10 @@ FilteredMatrix<VectorType>::FilteredMatrix (const FilteredMatrix &fm)
 
 
 template <typename VectorType>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 FilteredMatrix<VectorType>::
-FilteredMatrix (const MATRIX &m, bool ecs)
+FilteredMatrix (const MatrixType &m, bool ecs)
 {
   initialize (m, ecs);
 }

@@ -60,9 +60,9 @@ DEAL_II_NAMESPACE_OPEN
  * this class. If you need a preconditioner for a BlockMatrixArray object, use
  * BlockTrianglePrecondition.
  *
- * <h3>Requirements on MATRIX</h3>
+ * <h3>Requirements on MatrixType</h3>
  *
- * The template argument <tt>MATRIX</tt> is a class providing the matrix-
+ * The template argument <tt>MatrixType</tt> is a class providing the matrix-
  * vector multiplication functions vmult(), Tvmult(), vmult_add() and
  * Tvmult_add() used in this class, but with arguments of type
  * Vector&lt;number&gt; instead of BlockVector&lt;number&gt;. Every matrix
@@ -154,8 +154,8 @@ public:
    * entering a block of wrong dimension here will only lead to a
    * ExcDimensionMismatch in one of the multiplication functions.
    */
-  template <class MATRIX>
-  void enter (const MATRIX       &matrix,
+  template <typename MatrixType>
+  void enter (const MatrixType   &matrix,
               const unsigned int  row,
               const unsigned int  col,
               const number        prefix = 1.,
@@ -272,10 +272,12 @@ protected:
      * Constructor initializing all data fields. A PointerMatrix object is
      * generated for <tt>matrix</tt>.
      */
-    template<class MATRIX>
-    Entry (const MATRIX &matrix,
-           size_type row, size_type col,
-           number prefix, bool transpose);
+    template<typename MatrixType>
+    Entry (const MatrixType &matrix,
+           size_type row,
+           size_type col,
+           number prefix,
+           bool transpose);
 
     /**
      * Copy constructor invalidating the old object. Since it is only used for
@@ -423,12 +425,12 @@ public:
    * Enter a block. This calls BlockMatrixArray::enter(). Remember that the
    * diagonal blocks should actually be inverse matrices or preconditioners.
    */
-  template <class MATRIX>
-  void enter (const MATRIX   &matrix,
-              const size_type row,
-              const size_type col,
-              const number    prefix = 1.,
-              const bool      transpose = false);
+  template <typename MatrixType>
+  void enter (const MatrixType &matrix,
+              const size_type   row,
+              const size_type   col,
+              const number      prefix    = 1.,
+              const bool        transpose = false);
 
   /**
    * Preconditioning.
@@ -513,14 +515,14 @@ private:
 //---------------------------------------------------------------------------
 
 template <typename number, typename BLOCK_VECTOR>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 BlockMatrixArray<number, BLOCK_VECTOR>::Entry::Entry (
-  const MATRIX &m,
-  size_type row,
-  size_type col,
-  number prefix,
-  bool transpose)
+  const MatrixType &m,
+  size_type         row,
+  size_type         col,
+  number            prefix,
+  bool              transpose)
   :
   row (row),
   col (col),
@@ -532,15 +534,14 @@ BlockMatrixArray<number, BLOCK_VECTOR>::Entry::Entry (
 
 
 template <typename number, typename BLOCK_VECTOR>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 void
-BlockMatrixArray<number, BLOCK_VECTOR>::enter (
-  const MATRIX &matrix,
-  unsigned int row,
-  unsigned int col,
-  number prefix,
-  bool transpose)
+BlockMatrixArray<number, BLOCK_VECTOR>::enter (const MatrixType &matrix,
+                                               unsigned int      row,
+                                               unsigned int      col,
+                                               number            prefix,
+                                               bool              transpose)
 {
   Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
@@ -612,12 +613,14 @@ BlockMatrixArray<number, BLOCK_VECTOR>::print_latex (STREAM &out) const
 }
 
 template <typename number, typename BLOCK_VECTOR>
-template <class MATRIX>
+template <typename MatrixType>
 inline
 void
-BlockTrianglePrecondition<number, BLOCK_VECTOR>::enter (const MATRIX &matrix,
-                                                        size_type row, size_type col,
-                                                        number prefix, bool transpose)
+BlockTrianglePrecondition<number, BLOCK_VECTOR>::enter (const MatrixType &matrix,
+                                                        size_type         row,
+                                                        size_type         col,
+                                                        number            prefix,
+                                                        bool              transpose)
 {
   BlockMatrixArray<number, BLOCK_VECTOR>::enter(matrix, row, col, prefix, transpose);
 }

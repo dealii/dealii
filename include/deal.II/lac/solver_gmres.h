@@ -259,9 +259,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -452,9 +452,9 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<class MATRIX, class PRECONDITIONER>
+  template<typename MatrixType, class PRECONDITIONER>
   void
-  solve (const MATRIX         &A,
+  solve (const MatrixType     &A,
          VectorType           &x,
          const VectorType     &b,
          const PRECONDITIONER &precondition);
@@ -746,9 +746,9 @@ SolverGMRES<VectorType>::compute_eigs_and_cond
 
 
 template<class VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 void
-SolverGMRES<VectorType>::solve (const MATRIX         &A,
+SolverGMRES<VectorType>::solve (const MatrixType     &A,
                                 VectorType           &x,
                                 const VectorType     &b,
                                 const PRECONDITIONER &precondition)
@@ -1114,9 +1114,9 @@ SolverFGMRES<VectorType>::SolverFGMRES (SolverControl        &cn,
 
 
 template<class VectorType>
-template<class MATRIX, class PRECONDITIONER>
+template<typename MatrixType, class PRECONDITIONER>
 void
-SolverFGMRES<VectorType>::solve (const MATRIX         &A,
+SolverFGMRES<VectorType>::solve (const MatrixType     &A,
                                  VectorType           &x,
                                  const VectorType     &b,
                                  const PRECONDITIONER &precondition)

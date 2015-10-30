@@ -312,19 +312,19 @@ public:
 
   /**
    * Assignment from different matrix classes. This assignment operator uses
-   * iterators of the class MATRIX. Therefore, sparse matrices are possible
+   * iterators of the typename MatrixType. Therefore, sparse matrices are possible
    * sources.
    */
-  template <class MATRIX>
-  void copy_from (const MATRIX &);
+  template <typename MatrixType>
+  void copy_from (const MatrixType &);
 
   /**
    * Transposing assignment from different matrix classes. This assignment
-   * operator uses iterators of the class MATRIX. Therefore, sparse matrices
+   * operator uses iterators of the typename MatrixType. Therefore, sparse matrices
    * are possible sources.
    */
-  template <class MATRIX>
-  void copy_transposed (const MATRIX &);
+  template <typename MatrixType>
+  void copy_transposed (const MatrixType &);
 
   /**
    * Fill matrix with elements extracted from a tensor, taking rows included
@@ -373,7 +373,7 @@ public:
    * this operation.
    */
   template <typename MatrixType, typename index_type>
-  void extract_submatrix_from (const MatrixType &matrix,
+  void extract_submatrix_from (const MatrixType              &matrix,
                                const std::vector<index_type> &row_index_set,
                                const std::vector<index_type> &column_index_set);
 
@@ -393,7 +393,7 @@ public:
   void
   scatter_matrix_to (const std::vector<index_type> &row_index_set,
                      const std::vector<index_type> &column_index_set,
-                     MatrixType &matrix) const;
+                     MatrixType                    &matrix) const;
 
   /**
    * Fill rectangular block.
@@ -1206,9 +1206,9 @@ void FullMatrix<number>::fill (const number2 *src)
 
 
 template <typename number>
-template <class MATRIX>
+template <typename MatrixType>
 void
-FullMatrix<number>::copy_from (const MATRIX &M)
+FullMatrix<number>::copy_from (const MatrixType &M)
 {
   this->reinit (M.m(), M.n());
 
@@ -1217,8 +1217,8 @@ FullMatrix<number>::copy_from (const MATRIX &M)
   // copy them into the current object
   for (size_type row = 0; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
@@ -1227,9 +1227,9 @@ FullMatrix<number>::copy_from (const MATRIX &M)
 
 
 template <typename number>
-template <class MATRIX>
+template <typename MatrixType>
 void
-FullMatrix<number>::copy_transposed (const MATRIX &M)
+FullMatrix<number>::copy_transposed (const MatrixType &M)
 {
   this->reinit (M.n(), M.m());
 
@@ -1238,8 +1238,8 @@ FullMatrix<number>::copy_transposed (const MATRIX &M)
   // copy them into the current object
   for (size_type row = 0; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         this->el(entry->column(), row) = entry->value();
     }
@@ -1251,7 +1251,7 @@ template <typename number>
 template <typename MatrixType, typename index_type>
 inline
 void
-FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
+FullMatrix<number>::extract_submatrix_from (const MatrixType              &matrix,
                                             const std::vector<index_type> &row_index_set,
                                             const std::vector<index_type> &column_index_set)
 {
@@ -1274,7 +1274,7 @@ inline
 void
 FullMatrix<number>::scatter_matrix_to (const std::vector<index_type> &row_index_set,
                                        const std::vector<index_type> &column_index_set,
-                                       MatrixType &matrix) const
+                                       MatrixType                    &matrix) const
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
