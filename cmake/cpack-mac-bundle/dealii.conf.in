@@ -32,7 +32,6 @@ fi
 
 # Start with default compilers libraries
 export PATH=$DEAL_II_RESOURCES/bin:$PATH
-export DYLD_LIBRARY_PATH=$DEAL_II_RESOURCES/lib:$DYLD_LIBRARY_PATH
 export DEAL_II_DIR=$DEAL_II_RESOURCES
 
 # Do whatever the external library tells us to
@@ -58,7 +57,11 @@ if [ -z "$DEAL_II_CONF_SILENT" ]; then
         | |/ /  __/ (_| | |__| |_ _| |_
         |___/ \___|\__,_|_(_)___/ \___/
 
-This is a shell with PATH's and DYLD_LIBRARY_PATH setup to work with Deal.II.
+This is a shell with PATHs and \${EXTERNAL_LIB}_DIR setup to work with Deal.II.
+All external libraries are located in 
+
+    $DEAL_II_RESOURCES/opt/
+
 If you are new to Deal.II you probably want to have a look at
 
     $DEAL_II_RESOURCES/examples/
