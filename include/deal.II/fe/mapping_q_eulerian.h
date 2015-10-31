@@ -176,48 +176,82 @@ protected:
 private:
 
   /**
-   * Special quadrature rule used to define the support points in the
-   * reference configuration.
+   * A class derived from MappingQGeneric that provides the generic
+   * mapping with support points on boundary objects so that the
+   * corresponding Q3 mapping ends up being C1.
    */
-
-  class SupportQuadrature : public Quadrature<dim>
+  class MappingQEulerianGeneric : public MappingQGeneric<dim,spacedim>
   {
   public:
+
     /**
-     * Constructor, with an argument defining the desired polynomial degree.
+     * Constructor.
+     */
+    MappingQEulerianGeneric (const unsigned int degree,
+                             const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian);
+
+    /**
+     * Return the mapped vertices of the cell. For the current class, this function does
+     * not use the support points from the geometry of the current cell but
+     * instead evaluates an externally given displacement field in addition to
+     * the geometry of the cell.
+     */
+    virtual
+    std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+    get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+    /**
+     * Compute the positions of the support points in the current configuration.
+     * See the documentation of MappingQGeneric::compute_mapping_support_points()
+     * for more information.
+     */
+    virtual
+    std::vector<Point<spacedim> >
+    compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+  private:
+    /**
+     * Reference to the surrounding object off of which we live.
+     */
+    const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian;
+
+
+    /**
+     * Special quadrature rule used to define the support points in the
+     * reference configuration.
      */
 
-    SupportQuadrature (const unsigned int map_degree);
+    class SupportQuadrature : public Quadrature<dim>
+    {
+    public:
+      /**
+       * Constructor, with an argument defining the desired polynomial degree.
+       */
 
+      SupportQuadrature (const unsigned int map_degree);
+
+    };
+
+    /**
+     * A member variable holding the quadrature points in the right order.
+     */
+    const SupportQuadrature support_quadrature;
+
+    /**
+     * FEValues object used to query the the given finite element field at the
+     * support points in the reference configuration.
+     *
+     * The variable is marked as mutable since we have to call FEValues::reinit
+     * from compute_mapping_support_points, a function that is 'const'.
+     */
+    mutable FEValues<dim,spacedim> fe_values;
+
+    /**
+     * A variable to guard access to the fe_values variable.
+     */
+    mutable Threads::Mutex fe_values_mutex;
   };
 
-  /**
-   * A member variable holding the quadrature points in the right order.
-   */
-  const SupportQuadrature support_quadrature;
-
-  /**
-   * FEValues object used to query the the given finite element field at the
-   * support points in the reference configuration.
-   *
-   * The variable is marked as mutable since we have to call FEValues::reinit
-   * from compute_mapping_support_points, a function that is 'const'.
-   */
-  mutable FEValues<dim,spacedim> fe_values;
-
-  /**
-   * A variable to guard access to the fe_values variable.
-   */
-  mutable Threads::Mutex fe_values_mutex;
-
-  /**
-   * Compute the positions of the support points in the current configuration.
-   * See the documentation of MappingQGeneric::compute_mapping_support_points()
-   * for more information.
-   */
-  virtual
-  std::vector<Point<spacedim> >
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 };
 
 /*@}*/

@@ -1160,7 +1160,10 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
   support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
   support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree))
-{}
+{
+  Assert (p >= 1, ExcMessage ("It only makes sense to create polynomial mappings "
+                              "with a polynomial degree greater or equal to one."));
+}
 
 
 
