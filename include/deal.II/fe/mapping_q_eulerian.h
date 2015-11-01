@@ -188,7 +188,7 @@ private:
      * Constructor.
      */
     MappingQEulerianGeneric (const unsigned int degree,
-                             const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian);
+                             const MappingQEulerian<dim,VectorType,spacedim> &mapping_q_eulerian);
 
     /**
      * Return the mapped vertices of the cell. For the current class, this function does
@@ -213,7 +213,7 @@ private:
     /**
      * Reference to the surrounding object off of which we live.
      */
-    const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian;
+    const MappingQEulerian<dim,VectorType,spacedim> &mapping_q_eulerian;
 
 
     /**
