@@ -177,7 +177,7 @@ namespace mg
     matrices.resize(p.min_level(), p.max_level());
     for (unsigned int level=p.min_level(); level <= p.max_level(); ++level)
       matrices[level] = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> >
-        (new_pointer_matrix_base(p[level], VectorType()));
+                        (new_pointer_matrix_base(p[level], VectorType()));
   }
 
 

@@ -456,7 +456,7 @@ template <class VectorType>
 inline
 SolverControl::State
 Solver<VectorType>::StateCombiner::operator ()(const SolverControl::State state1,
-                                           const SolverControl::State state2) const
+                                               const SolverControl::State state2) const
 {
   if ((state1 == SolverControl::failure)
       ||
@@ -476,7 +476,7 @@ template <typename Iterator>
 inline
 SolverControl::State
 Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
-                                           const Iterator end) const
+                                               const Iterator end) const
 {
   Assert (begin != end, ExcMessage ("You can't combine iterator states if no state is given."));
 
@@ -494,7 +494,7 @@ Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
 template<class VectorType>
 inline
 Solver<VectorType>::Solver (SolverControl        &solver_control,
-                        VectorMemory<VectorType> &vector_memory)
+                            VectorMemory<VectorType> &vector_memory)
   :
   memory(vector_memory)
 {

@@ -779,7 +779,7 @@ namespace MeshWorker
   (const FiniteElement<dim,sdim> &el,
    const Mapping<dim,sdim>       &mapping,
    const AnyData                 &data,
-   const VectorType              &,
+   const VectorType &,
    const BlockInfo               *block_info)
   {
     initialize(el, mapping, block_info);

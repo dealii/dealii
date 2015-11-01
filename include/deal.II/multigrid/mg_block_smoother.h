@@ -52,11 +52,11 @@ public:
    * Constructor. Sets memory and smoothing parameters.
    */
   MGSmootherBlock (VectorMemory<BlockVector<number> > &mem,
-                  const unsigned int                   steps     = 1,
-                  const bool                           variable  = false,
-                  const bool                           symmetric = false,
-                  const bool                           transpose = false,
-                  const bool                           reverse   = false);
+                   const unsigned int                   steps     = 1,
+                   const bool                           variable  = false,
+                   const bool                           symmetric = false,
+                   const bool                           transpose = false,
+                   const bool                           reverse   = false);
 
   /**
    * Initialize for matrices. The parameter <tt>matrices</tt> can be any
@@ -263,7 +263,7 @@ template <typename MatrixType, class RELAX, typename number>
 inline void
 MGSmootherBlock<MatrixType, RELAX, number>::smooth(const unsigned int   level,
                                                    BlockVector<number> &u,
-  const BlockVector<number> &rhs) const
+                                                   const BlockVector<number> &rhs) const
 {
   deallog.push("Smooth");
 

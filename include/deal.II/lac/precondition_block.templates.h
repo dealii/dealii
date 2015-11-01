@@ -979,7 +979,7 @@ PreconditionBlockSSOR<MatrixType,inverse_type>::PreconditionBlockSSOR ()
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>       &dst,
-                                                        const Vector<number2> &src) const
+                                                            const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
@@ -1010,7 +1010,7 @@ void PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>     
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSSOR<MatrixType,inverse_type>::Tvmult (Vector<number2>       &dst,
-                                                             const Vector<number2> &src) const
+    const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);

@@ -156,7 +156,7 @@ protected:
 template<class VectorType>
 SolverMinRes<VectorType>::SolverMinRes (SolverControl            &cn,
                                         VectorMemory<VectorType> &mem,
-                                        const AdditionalData     &)
+                                        const AdditionalData &)
   :
   Solver<VectorType>(cn,mem)
 {}

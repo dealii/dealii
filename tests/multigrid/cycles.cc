@@ -73,7 +73,7 @@ void test_cycles(unsigned int minlevel, unsigned int maxlevel)
   mg::Matrix<VectorType> mgmatrix(level_matrices);
 
   Multigrid<VectorType> mg1(minlevel, maxlevel, mgmatrix, all, all, all, all,
-                        Multigrid<VectorType>::v_cycle);
+                            Multigrid<VectorType>::v_cycle);
   mg1.set_debug(3);
   for (unsigned int i=minlevel; i<=maxlevel; ++i)
     mg1.defect[i].reinit(N);

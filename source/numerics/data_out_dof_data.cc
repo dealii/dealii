@@ -484,7 +484,7 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     DataEntry<DH,VectorType>::
     DataEntry (const DH                               *dofs,
                const VectorType                       *data,
@@ -497,7 +497,7 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     DataEntry<DH,VectorType>::
     DataEntry (const DH                                     *dofs,
                const VectorType                             *data,
@@ -510,10 +510,10 @@ namespace internal
 
     namespace
     {
-      template <class VectorType>
+      template <typename VectorType>
       double
-      get_vector_element (const VectorType &vector,
-                          const unsigned int cell_number)
+      get_vector_element (const VectorType   &vector,
+                          const unsigned int  cell_number)
       {
         return vector[cell_number];
       }
@@ -529,7 +529,7 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     double
     DataEntry<DH,VectorType>::
     get_cell_data_value (const unsigned int cell_number) const
@@ -539,11 +539,11 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                         std::vector<dealii::Vector<double> >    &patch_values_system) const
+    DataEntry<DH,VectorType>::get_function_values
+    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+     std::vector<dealii::Vector<double> >                  &patch_values_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -584,9 +584,9 @@ namespace internal
 
     template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                         std::vector<double>             &patch_values) const
+    DataEntry<DH,VectorType>::get_function_values
+    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+     std::vector<double>                                   &patch_values) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -623,11 +623,11 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                            std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
+    DataEntry<DH,VectorType>::get_function_gradients
+    (const FEValuesBase<DH::dimension,DH::space_dimension>     &fe_patch_values,
+     std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -669,9 +669,9 @@ namespace internal
 
     template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                            std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
+    DataEntry<DH,VectorType>::get_function_gradients
+    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+     std::vector<Tensor<1,DH::space_dimension> >           &patch_gradients) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -709,11 +709,11 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
+    DataEntry<DH,VectorType>::get_function_hessians
+    (const FEValuesBase<DH::dimension,DH::space_dimension>     &fe_patch_values,
+     std::vector<std::vector<Tensor<2,DH::space_dimension> > > &patch_hessians_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -755,9 +755,9 @@ namespace internal
 
     template <class DH, typename VectorType>
     void
-    DataEntry<DH,VectorType>::
-    get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
+    DataEntry<DH,VectorType>::get_function_hessians
+    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+     std::vector<Tensor<2,DH::space_dimension> >           &patch_hessians) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -804,7 +804,7 @@ namespace internal
 
 
 
-    template <class DH, class VectorType>
+    template <class DH, typename VectorType>
     void
     DataEntry<DH,VectorType>::clear ()
     {
@@ -868,10 +868,10 @@ attach_triangulation (const Triangulation<DH::dimension,DH::space_dimension> &tr
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR                             &vec,
+add_data_vector (const VectorType                         &vec,
                  const std::string                        &name,
                  const DataVectorType                      type,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
@@ -907,10 +907,10 @@ add_data_vector (const VECTOR                             &vec,
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR                             &vec,
+add_data_vector (const VectorType                         &vec,
                  const std::vector<std::string>           &names,
                  const DataVectorType                      type,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
@@ -971,8 +971,8 @@ add_data_vector (const VECTOR                             &vec,
     }
 
   internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VECTOR>(dofs, &vec, names,
-                                                  data_component_interpretation);
+    = new internal::DataOut::DataEntry<DH,VectorType>(dofs, &vec, names,
+                                                      data_component_interpretation);
   if (actual_type == type_dof_data)
     dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
   else
@@ -983,10 +983,10 @@ add_data_vector (const VECTOR                             &vec,
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR                           &vec,
+add_data_vector (const VectorType                       &vec,
                  const DataPostprocessor<DH::space_dimension> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
@@ -1003,7 +1003,7 @@ add_data_vector (const VECTOR                           &vec,
                                                      dofs->get_tria().n_active_cells()));
 
   internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VECTOR>(dofs, &vec, &data_postprocessor);
+    = new internal::DataOut::DataEntry<DH,VectorType>(dofs, &vec, &data_postprocessor);
   dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
 }
 
@@ -1011,11 +1011,11 @@ add_data_vector (const VECTOR                           &vec,
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const DH                               &dof_handler,
-                 const VECTOR                           &vec,
+                 const VectorType                       &vec,
                  const DataPostprocessor<DH::space_dimension> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
@@ -1026,7 +1026,7 @@ add_data_vector (const DH                               &dof_handler,
   AssertDimension (vec.size(), dof_handler.n_dofs());
 
   internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VECTOR>(&dof_handler, &vec, &data_postprocessor);
+    = new internal::DataOut::DataEntry<DH,VectorType>(&dof_handler, &vec, &data_postprocessor);
   dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
 }
 
@@ -1034,11 +1034,11 @@ add_data_vector (const DH                               &dof_handler,
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const DH                       &dof_handler,
-                 const VECTOR                   &data,
+                 const VectorType               &data,
                  const std::string              &name,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
@@ -1067,11 +1067,11 @@ add_data_vector (const DH                       &dof_handler,
 
 template <class DH,
           int patch_dim, int patch_space_dim>
-template <class VECTOR>
+template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const DH                       &dof_handler,
-                 const VECTOR                   &data,
+                 const VectorType               &data,
                  const std::vector<std::string> &names,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
 {
@@ -1098,8 +1098,8 @@ add_data_vector (const DH                       &dof_handler,
        (names.size(), DataComponentInterpretation::component_is_scalar));
 
   internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VECTOR>(&dof_handler, &data, names,
-                                                  data_component_interpretation);
+    = new internal::DataOut::DataEntry<DH,VectorType>(&dof_handler, &data, names,
+                                                      data_component_interpretation);
   dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
 }
 

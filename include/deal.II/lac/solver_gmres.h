@@ -524,7 +524,7 @@ namespace internal
     template <class VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator() (const unsigned int i,
-                                    const VectorType       &temp)
+                                        const VectorType       &temp)
     {
       Assert (i+offset<data.size(),
               ExcIndexRange(i,-offset, data.size()-offset));

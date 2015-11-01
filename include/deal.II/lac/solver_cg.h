@@ -339,8 +339,8 @@ AdditionalData ()
 
 template <typename VectorType>
 SolverCG<VectorType>::SolverCG (SolverControl        &cn,
-                            VectorMemory<VectorType> &mem,
-                            const AdditionalData     &data)
+                                VectorMemory<VectorType> &mem,
+                                const AdditionalData     &data)
   :
   Solver<VectorType>(cn,mem),
   additional_data(data)

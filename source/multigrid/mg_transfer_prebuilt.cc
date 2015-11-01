@@ -42,35 +42,35 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
+template<typename VectorType>
+MGTransferPrebuilt<VectorType>::MGTransferPrebuilt ()
 {}
 
 
-template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+template<typename VectorType>
+MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
   :
   constraints(&c),
   mg_constrained_dofs(&mg_c)
 {}
 
 
-template <class VECTOR>
-MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
+template <typename VectorType>
+MGTransferPrebuilt<VectorType>::~MGTransferPrebuilt ()
 {}
 
 
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::initialize_constraints (
-  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+template <typename VectorType>
+void MGTransferPrebuilt<VectorType>::initialize_constraints
+(const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
 {
   constraints = &c;
   mg_constrained_dofs = &mg_c;
 }
 
 
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::clear ()
+template <typename VectorType>
+void MGTransferPrebuilt<VectorType>::clear ()
 {
   sizes.resize(0);
   prolongation_matrices.resize(0);
@@ -85,11 +85,10 @@ void MGTransferPrebuilt<VECTOR>::clear ()
 }
 
 
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::prolongate (
-  const unsigned int to_level,
-  VECTOR            &dst,
-  const VECTOR      &src) const
+template <typename VectorType>
+void MGTransferPrebuilt<VectorType>::prolongate (const unsigned int to_level,
+                                                 VectorType        &dst,
+                                                 const VectorType  &src) const
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -98,11 +97,10 @@ void MGTransferPrebuilt<VECTOR>::prolongate (
 }
 
 
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::restrict_and_add (
-  const unsigned int   from_level,
-  VECTOR       &dst,
-  const VECTOR &src) const
+template <typename VectorType>
+void MGTransferPrebuilt<VectorType>::restrict_and_add (const unsigned int from_level,
+                                                       VectorType        &dst,
+                                                       const VectorType  &src) const
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
           ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
@@ -112,10 +110,10 @@ void MGTransferPrebuilt<VECTOR>::restrict_and_add (
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 template <int dim, int spacedim>
-void MGTransferPrebuilt<VECTOR>::build_matrices (
-  const DoFHandler<dim,spacedim>  &mg_dof)
+void MGTransferPrebuilt<VectorType>::build_matrices
+(const DoFHandler<dim,spacedim>  &mg_dof)
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_global_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -140,9 +138,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities.push_back
-      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> (new typename internal::MatrixSelector<VECTOR>::Sparsity));
+      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> (new typename internal::MatrixSelector<VectorType>::Sparsity));
       prolongation_matrices.push_back
-      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> (new typename internal::MatrixSelector<VECTOR>::Matrix));
+      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> (new typename internal::MatrixSelector<VectorType>::Matrix));
     }
 
   // two fields which will store the
@@ -209,11 +207,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               }
           }
 
-      internal::MatrixSelector<VECTOR>::reinit(*prolongation_matrices[level],
-                                               *prolongation_sparsities[level],
-                                               level,
-                                               dsp,
-                                               mg_dof);
+      internal::MatrixSelector<VectorType>::reinit(*prolongation_matrices[level],
+                                                   *prolongation_sparsities[level],
+                                                   level,
+                                                   dsp,
+                                                   mg_dof);
       dsp.reinit(0,0);
 
       FullMatrix<double> prolongation;
@@ -284,11 +282,11 @@ namespace
   };
 }
 
-template <class VECTOR>
+template <typename VectorType>
 template <int dim, int spacedim>
 void
-MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
-  const DoFHandler<dim,spacedim> &mg_dof)
+MGTransferPrebuilt<VectorType>::fill_and_communicate_copy_indices
+(const DoFHandler<dim,spacedim> &mg_dof)
 {
   // Now we are filling the variables copy_indices*, which are essentially
   // maps from global to mgdof for each level stored as a std::vector of
@@ -473,9 +471,9 @@ MGTransferPrebuilt<VECTOR>::fill_and_communicate_copy_indices(
     std::sort(copy_indices_global_mine[level].begin(), copy_indices_global_mine[level].end(), compare);
 }
 
-template <class VECTOR>
+template <typename VectorType>
 void
-MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream &os) const
+MGTransferPrebuilt<VectorType>::print_matrices (std::ostream &os) const
 {
   for (unsigned int level = 0; level<prolongation_matrices.size(); ++level)
     {
@@ -485,9 +483,9 @@ MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream &os) const
     }
 }
 
-template <class VECTOR>
+template <typename VectorType>
 void
-MGTransferPrebuilt<VECTOR>::print_indices (std::ostream &os) const
+MGTransferPrebuilt<VectorType>::print_indices (std::ostream &os) const
 {
   for (unsigned int level = 0; level<copy_indices.size(); ++level)
     {

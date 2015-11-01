@@ -170,8 +170,8 @@ template <int dim, class InVector, int spacedim>
 void
 MGTransferPrebuilt<VectorType>::copy_to_mg
 (const DoFHandler<dim,spacedim> &mg_dof_handler,
-  MGLevelObject<VectorType>     &dst,
-  const InVector                &src) const
+ MGLevelObject<VectorType>     &dst,
+ const InVector                &src) const
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;

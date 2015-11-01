@@ -595,8 +595,8 @@ namespace VectorTools
                 VectorType                      &vec,
                 const bool                      enforce_zero_boundary = false,
                 const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
-                                                               QGauss<dim-1>(2) :
-                                                               Quadrature<dim-1>(0)),
+                                                              QGauss<dim-1>(2) :
+                                                              Quadrature<dim-1>(0)),
                 const bool                      project_to_boundary_first = false);
 
   /**
@@ -611,8 +611,8 @@ namespace VectorTools
                 VectorType                      &vec,
                 const bool                      enforce_zero_boundary = false,
                 const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
-                                                        QGauss<dim-1>(2) :
-                                                        Quadrature<dim-1>(0)),
+                                                              QGauss<dim-1>(2) :
+                                                              Quadrature<dim-1>(0)),
                 const bool                      project_to_boundary_first = false);
 
   /**
@@ -644,8 +644,8 @@ namespace VectorTools
                 VectorType                         &vec,
                 const bool                         enforce_zero_boundary = false,
                 const hp::QCollection<dim-1>       &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
-                                                                 QGauss<dim-1>(2) :
-                                                                 Quadrature<dim-1>(0)),
+                    QGauss<dim-1>(2) :
+                    Quadrature<dim-1>(0)),
                 const bool                         project_to_boundary_first = false);
 
   /**

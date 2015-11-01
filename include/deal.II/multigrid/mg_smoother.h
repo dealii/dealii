@@ -797,8 +797,8 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
 template <typename MatrixType, class RELAX, typename VectorType>
 inline void
 MGSmootherRelaxation<MatrixType, RELAX, VectorType>::smooth (const unsigned int  level,
-                                                             VectorType         &u,
-                                                             const VectorType   &rhs) const
+    VectorType         &u,
+    const VectorType   &rhs) const
 {
   unsigned int maxlevel = smoothers.max_level();
   unsigned int steps2 = this->steps;

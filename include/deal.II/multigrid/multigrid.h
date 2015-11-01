@@ -424,12 +424,12 @@ private:
 template <typename VectorType>
 template <int dim>
 Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler,
-                              const MGMatrixBase<VectorType>     &matrix,
-                              const MGCoarseGridBase<VectorType> &coarse,
-                              const MGTransferBase<VectorType>   &transfer,
-                              const MGSmootherBase<VectorType>   &pre_smooth,
-                              const MGSmootherBase<VectorType>   &post_smooth,
-                              Cycle                              cycle)
+                                  const MGMatrixBase<VectorType>     &matrix,
+                                  const MGCoarseGridBase<VectorType> &coarse,
+                                  const MGTransferBase<VectorType>   &transfer,
+                                  const MGSmootherBase<VectorType>   &pre_smooth,
+                                  const MGSmootherBase<VectorType>   &post_smooth,
+                                  Cycle                              cycle)
   :
   cycle_type(cycle),
   minlevel(0),
@@ -529,7 +529,7 @@ template<int dim, typename VectorType, class TRANSFER>
 template<class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
-(OtherVectorType       &,
+(OtherVectorType &,
  const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
@@ -540,7 +540,7 @@ template<int dim, typename VectorType, class TRANSFER>
 template<class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add
-(OtherVectorType       &,
+(OtherVectorType &,
  const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());

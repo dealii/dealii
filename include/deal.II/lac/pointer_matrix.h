@@ -742,7 +742,7 @@ PointerMatrixAux<MatrixType, VectorType>::empty () const
 template<typename MatrixType, typename VectorType>
 inline void
 PointerMatrixAux<MatrixType, VectorType>::vmult (VectorType       &dst,
-                                             const VectorType &src) const
+                                                 const VectorType &src) const
 {
   if (mem == 0)
     mem = &my_memory;
@@ -755,7 +755,7 @@ PointerMatrixAux<MatrixType, VectorType>::vmult (VectorType       &dst,
 template<typename MatrixType, typename VectorType>
 inline void
 PointerMatrixAux<MatrixType, VectorType>::Tvmult (VectorType       &dst,
-                                              const VectorType &src) const
+                                                  const VectorType &src) const
 {
   if (mem == 0)
     mem = &my_memory;
@@ -768,7 +768,7 @@ PointerMatrixAux<MatrixType, VectorType>::Tvmult (VectorType       &dst,
 template<typename MatrixType, typename VectorType>
 inline void
 PointerMatrixAux<MatrixType, VectorType>::vmult_add (VectorType       &dst,
-                                                 const VectorType &src) const
+                                                     const VectorType &src) const
 {
   if (mem == 0)
     mem = &my_memory;
@@ -785,7 +785,7 @@ PointerMatrixAux<MatrixType, VectorType>::vmult_add (VectorType       &dst,
 template<typename MatrixType, typename VectorType>
 inline void
 PointerMatrixAux<MatrixType, VectorType>::Tvmult_add (VectorType       &dst,
-                                                  const VectorType &src) const
+                                                      const VectorType &src) const
 {
   if (mem == 0)
     mem = &my_memory;

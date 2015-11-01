@@ -1335,7 +1335,7 @@ PreconditionSOR<MatrixType>::Tstep (VectorType &dst, const VectorType &src) cons
 template <typename MatrixType>
 inline void
 PreconditionSSOR<MatrixType>::initialize (const MatrixType                     &rA,
-                                      const typename BaseClass::AdditionalData &parameters)
+                                          const typename BaseClass::AdditionalData &parameters)
 {
   this->PreconditionRelaxation<MatrixType>::initialize (rA, parameters);
 
@@ -1514,7 +1514,7 @@ PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData
 
 template<typename MatrixType, class VectorType>
 PreconditionUseMatrix<MatrixType,VectorType>::PreconditionUseMatrix(const MatrixType   &M,
-                                                                    const function_ptr method)
+    const function_ptr method)
   :
   matrix(M), precondition(method)
 {}

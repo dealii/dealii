@@ -632,9 +632,9 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MatrixSimple<MatrixType>::assemble(const FullMatrix<double> &M,
-                                   const unsigned int index,
-                                   const std::vector<types::global_dof_index> &i1,
-                                   const std::vector<types::global_dof_index> &i2)
+                                       const unsigned int index,
+                                       const std::vector<types::global_dof_index> &i1,
+                                       const std::vector<types::global_dof_index> &i2)
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
@@ -1036,7 +1036,7 @@ namespace MeshWorker
     template <class DOFINFO>
     inline void
     MGMatrixSimple<MatrixType>::assemble(const DOFINFO &info1,
-                                     const DOFINFO &info2)
+                                         const DOFINFO &info2)
     {
       Assert(info1.level_cell, ExcMessage("Cell must access level dofs"));
       Assert(info2.level_cell, ExcMessage("Cell must access level dofs"));
@@ -1129,7 +1129,7 @@ namespace MeshWorker
     template <class DOFINFO>
     inline void
     SystemSimple<MatrixType,VectorType>::initialize_info(DOFINFO &info,
-                                                     bool    face) const
+                                                         bool    face) const
     {
       MatrixSimple<MatrixType>::initialize_info(info, face);
       ResidualSimple<VectorType>::initialize_info(info, face);
@@ -1150,7 +1150,7 @@ namespace MeshWorker
     template <class DOFINFO>
     inline void
     SystemSimple<MatrixType,VectorType>::assemble(const DOFINFO &info1,
-                                              const DOFINFO &info2)
+                                                  const DOFINFO &info2)
     {
       MatrixSimple<MatrixType>::assemble(info1, info2);
       ResidualSimple<VectorType>::assemble(info1, info2);

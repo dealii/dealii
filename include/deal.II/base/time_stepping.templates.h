@@ -202,8 +202,8 @@ namespace TimeStepping
 
   template <typename VectorType>
   ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(runge_kutta_method method,
-                                                 unsigned int max_it,
-                                                 double tolerance)
+                                                     unsigned int max_it,
+                                                     double tolerance)
     :
     RungeKutta<VectorType> (),
     skip_linear_combi(false),
