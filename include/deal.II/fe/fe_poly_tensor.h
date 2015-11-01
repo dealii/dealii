@@ -188,16 +188,8 @@ protected:
     // generate a new data object and
     // initialize some fields
     InternalData *data = new InternalData;
+    data->update_each = update_each(update_flags) | update_once(update_flags);  // FIX: only update_each required
 
-    // check what needs to be
-    // initialized only once and what
-    // on every cell/face/subface we
-    // visit
-    data->update_once = update_once(update_flags);
-    data->update_each = update_each(update_flags);
-    data->update_flags = data->update_once | data->update_each;
-
-    const UpdateFlags flags(data->update_flags);
     const unsigned int n_q_points = quadrature.size();
 
     // some scratch arrays
@@ -207,13 +199,13 @@ protected:
     std::vector<Tensor<4,dim> > third_derivatives(0);
     std::vector<Tensor<5,dim> > fourth_derivatives(0);
 
-    if (flags & (update_values | update_gradients | update_hessians) )
+    if (update_flags & (update_values | update_gradients | update_hessians) )
       data->sign_change.resize (this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if (flags & update_values)
+    if (update_flags & update_values)
       {
         values.resize (this->dofs_per_cell);
         data->shape_values.resize (this->dofs_per_cell);
@@ -223,7 +215,7 @@ protected:
           data->transformed_shape_values.resize (n_q_points);
       }
 
-    if (flags & update_gradients)
+    if (update_flags & update_gradients)
       {
         grads.resize (this->dofs_per_cell);
         data->shape_grads.resize (this->dofs_per_cell);
@@ -241,7 +233,7 @@ protected:
           data->untransformed_shape_grads.resize(n_q_points);
       }
 
-    if (flags & update_hessians)
+    if (update_flags & update_hessians)
       {
         grad_grads.resize (this->dofs_per_cell);
         data->shape_grad_grads.resize (this->dofs_per_cell);
@@ -259,7 +251,7 @@ protected:
     // node values N_i holds
     // N_i(v_j)=\delta_ij for all basis
     // functions v_j
-    if (flags & (update_values | update_gradients))
+    if (update_flags & (update_values | update_gradients))
       for (unsigned int k=0; k<n_q_points; ++k)
         {
           poly_space.compute(quadrature.point(k),
@@ -267,7 +259,7 @@ protected:
                              third_derivatives,
                              fourth_derivatives);
 
-          if (flags & update_values)
+          if (update_flags & update_values)
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -282,7 +274,7 @@ protected:
                   }
             }
 
-          if (flags & update_gradients)
+          if (update_flags & update_gradients)
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -297,7 +289,7 @@ protected:
                   }
             }
 
-          if (flags & update_hessians)
+          if (update_flags & update_hessians)
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i=0; i<this->dofs_per_cell; ++i)

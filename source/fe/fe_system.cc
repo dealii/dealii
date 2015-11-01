@@ -104,20 +104,6 @@ InternalData::get_fe_output_object (const unsigned int base_no) const
 
 
 
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::InternalData::clear_first_cell ()
-{
-  // call respective function of base
-  // class
-  FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ();
-  // then the functions of all the
-  // sub-objects
-  for (unsigned int i=0; i<base_fe_datas.size(); ++i)
-    base_fe_datas[i]->clear_first_cell ();
-}
-
-
 /* ---------------------------------- FESystem ------------------- */
 
 
@@ -893,10 +879,7 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 {
   UpdateFlags flags = flags_;
   InternalData *data = new InternalData(this->n_base_elements());
-
-  data->update_once = update_once (flags);
-  data->update_each = update_each (flags);
-  flags = data->update_once | data->update_each;
+  data->update_each = update_each(flags) | update_once(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their
@@ -922,13 +905,11 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_flags);
+                                        flags | base_fe_data->update_each);
 
       // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
-  data->update_flags = data->update_once |
-                       data->update_each;
   return data;
 }
 
@@ -944,10 +925,7 @@ FESystem<dim,spacedim>::get_face_data (
 {
   UpdateFlags flags = flags_;
   InternalData *data = new InternalData(this->n_base_elements());
-
-  data->update_once = update_once (flags);
-  data->update_each = update_each (flags);
-  flags = data->update_once | data->update_each;
+  data->update_each = update_each(flags) | update_once(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their
@@ -973,13 +951,11 @@ FESystem<dim,spacedim>::get_face_data (
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_flags);
+                                        flags | base_fe_data->update_each);
 
       // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
-  data->update_flags = data->update_once |
-                       data->update_each;
   return data;
 }
 
@@ -997,10 +973,7 @@ FESystem<dim,spacedim>::get_subface_data (
 {
   UpdateFlags flags = flags_;
   InternalData *data = new InternalData(this->n_base_elements());
-
-  data->update_once = update_once (flags);
-  data->update_each = update_each (flags);
-  flags = data->update_once | data->update_each;
+  data->update_each = update_each(flags) | update_once(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their
@@ -1026,13 +999,11 @@ FESystem<dim,spacedim>::get_subface_data (
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_flags);
+                                        flags | base_fe_data->update_each);
 
       // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
-  data->update_flags = data->update_once |
-                       data->update_each;
   return data;
 }
 
@@ -1183,9 +1154,7 @@ compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping
   // all shape functions of the composed element, and here only treat
   // those shape functions that belong to a given base element
   //TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
-  const UpdateFlags base_flags(dim_1==dim ?
-                               base_fe_data.current_update_flags() :
-                               base_fe_data.update_flags);
+  const UpdateFlags base_flags = base_fe_data.update_each;
 
   // if the current cell is just a translation of the previous one,
   // the underlying data has not changed, and we don't even need to
@@ -1270,9 +1239,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
   // (fill_fe_values) or dim_1==dim-1
   // (fill_fe_(sub)face_values)
   Assert(dim_1==dim || dim_1==dim-1, ExcInternalError());
-  const UpdateFlags flags(dim_1==dim ?
-                          fe_data.current_update_flags() :
-                          fe_data.update_flags);
+  const UpdateFlags flags = fe_data.update_each;
 
 
   if (flags & (update_values | update_gradients

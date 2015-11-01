@@ -1145,15 +1145,6 @@ private:
     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
     get_fe_output_object (const unsigned int base_no) const;
 
-    /**
-     * Set the @p first_cell flag to @p false. Used by the @p FEValues class
-     * to indicate that we have already done the work on the first cell.
-     *
-     * In addition to calling the respective function of the base class, this
-     * function also calls the functions of the sub-data objects.
-     */
-    virtual void clear_first_cell ();
-
   private:
 
     /**

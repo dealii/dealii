@@ -118,9 +118,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
-  if (flags & update_values)
+  if (fe_data.update_each & update_values)
     for (unsigned int i=0; i<quadrature.size(); ++i)
       {
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
@@ -136,7 +134,10 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
                 for (unsigned int k=0; k<this->dofs_per_quad; ++k)
                   output_data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
               }
+
+            // fall through...
           }
+
           case 2:
           {
             // Fill data for line shape functions
@@ -150,7 +151,10 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
                         = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
                   }
               }
+
+            // fall through...
           }
+
           case 1:
           {
             // Fill data for vertex shape functions
@@ -185,12 +189,10 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
   const unsigned int foffset = fe_data.shape_values.size() * face;
   const unsigned int offset = subface*quadrature.size();
 
-  if (flags & update_values)
+  if (fe_data.update_each & update_values)
     for (unsigned int i=0; i<quadrature.size(); ++i)
       {
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
@@ -199,8 +201,8 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
           output_data.shape_values(foffset+k,i) = fe_data.shape_values[k][i+offset];
       }
 
-  Assert (!(flags & update_gradients), ExcNotImplemented());
-  Assert (!(flags & update_hessians), ExcNotImplemented());
+  Assert (!(fe_data.update_each & update_gradients), ExcNotImplemented());
+  Assert (!(fe_data.update_each & update_hessians), ExcNotImplemented());
 }
 
 DEAL_II_NAMESPACE_CLOSE

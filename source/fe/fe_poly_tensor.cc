@@ -307,11 +307,10 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const unsigned int n_q_points = quadrature.size();
-  const UpdateFlags flags(fe_data.current_update_flags());
 
-  Assert(!(flags & update_values) || fe_data.shape_values.size() == this->dofs_per_cell,
+  Assert(!(fe_data.update_each & update_values) || fe_data.shape_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(fe_data.shape_values.size(), this->dofs_per_cell));
-  Assert(!(flags & update_values) || fe_data.shape_values[0].size() == n_q_points,
+  Assert(!(fe_data.update_each & update_values) || fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
   // Create table with sign changes, due to the special structure of the RT elements.
@@ -338,7 +337,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
       // the previous one; or, even if it is a translation, if we use mappings
       // other than the standard mappings that require us to recompute values
       // and derivatives because of possible sign changes
-      if (flags & update_values &&
+      if (fe_data.update_each & update_values &&
           ((cell_similarity != CellSimilarity::translation)
            ||
            ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
@@ -404,7 +403,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
         }
 
       // update gradients. apply the same logic as above
-      if (flags & update_gradients
+      if (fe_data.update_each & update_gradients
           &&
           ((cell_similarity != CellSimilarity::translation)
            ||
@@ -532,7 +531,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
         }
 
       // update hessians. apply the same logic as above
-      if (flags & update_hessians
+      if (fe_data.update_each & update_hessians
           &&
           ((cell_similarity != CellSimilarity::translation)
            ||
@@ -742,7 +741,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
         }
 
       // third derivatives are not implemented
-      if (flags & update_3rd_derivatives
+      if (fe_data.update_each & update_3rd_derivatives
           &&
           ((cell_similarity != CellSimilarity::translation)
            ||
@@ -788,8 +787,6 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                                                 cell->face_rotation(face),
                                                 n_q_points);
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
 //TODO: Size assertions
 
 // Create table with sign changes, due to the special structure of the RT elements.
@@ -810,7 +807,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
       const unsigned int first = output_data.shape_function_to_row_table[i * this->n_components() +
                                  this->get_nonzero_components(i).first_selected_component()];
 
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         {
           switch (mapping_type)
             {
@@ -880,7 +877,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             }
         }
 
-      if (flags & update_gradients)
+      if (fe_data.update_each & update_gradients)
         {
           VectorSlice< std::vector<Tensor<2,spacedim> > >
           transformed_shape_grads (fe_data.transformed_shape_grads, offset, n_q_points);
@@ -1004,7 +1001,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
             }
         }
 
-      if (flags & update_hessians)
+      if (fe_data.update_each & update_hessians)
 
         {
 
@@ -1208,7 +1205,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
         }
 
       // third derivatives are not implemented
-      if (flags & update_3rd_derivatives)
+      if (fe_data.update_each & update_3rd_derivatives)
         {
           Assert(false, ExcNotImplemented())
         }
@@ -1251,8 +1248,6 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                                                    n_q_points,
                                                    cell->subface_case(face));
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
 //   Assert(mapping_type == independent
 //       || ( mapping_type == independent_on_cartesian
 //            && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
@@ -1276,7 +1271,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
       const unsigned int first = output_data.shape_function_to_row_table[i * this->n_components() +
                                  this->get_nonzero_components(i).first_selected_component()];
 
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         {
           switch (mapping_type)
             {
@@ -1343,7 +1338,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             }
         }
 
-      if (flags & update_gradients)
+      if (fe_data.update_each & update_gradients)
         {
           VectorSlice< std::vector<Tensor<2, spacedim > > >
           transformed_shape_grads (fe_data.transformed_shape_grads, offset, n_q_points);
@@ -1469,7 +1464,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
             }
         }
 
-      if (flags & update_hessians)
+      if (fe_data.update_each & update_hessians)
 
         {
 
@@ -1672,7 +1667,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
         }
 
       // third derivatives are not implemented
-      if (flags & update_3rd_derivatives)
+      if (fe_data.update_each & update_3rd_derivatives)
         {
           Assert(false, ExcNotImplemented())
         }

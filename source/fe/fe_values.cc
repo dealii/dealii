@@ -3768,8 +3768,6 @@ void FEValues<dim,spacedim>::do_reinit ()
                                 this->mapping_output,
                                 this->finite_element_output,
                                 this->cell_similarity);
-
-  this->fe_data->clear_first_cell ();
 }
 
 
@@ -3974,8 +3972,6 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                      *this->fe_data,
                                      this->mapping_output,
                                      this->finite_element_output);
-
-  this->fe_data->clear_first_cell ();
 }
 
 
@@ -4217,8 +4213,6 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                         *this->fe_data,
                                         this->mapping_output,
                                         this->finite_element_output);
-
-  this->fe_data->clear_first_cell ();
 }
 
 

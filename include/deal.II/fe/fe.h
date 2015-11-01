@@ -520,16 +520,6 @@ public:
     virtual ~InternalDataBase ();
 
     /**
-     * Values updated by the constructor or by reinit.
-     */
-    UpdateFlags          update_flags;
-
-    /**
-     * Values computed by constructor.
-     */
-    UpdateFlags          update_once;
-
-    /**
      * A set of update flags specifying the kind of information that
      * an implementation of the FiniteElement interface needs to compute on
      * each cell or face, i.e., in FiniteElement::fill_fe_values() and
@@ -548,29 +538,9 @@ public:
     UpdateFlags          update_each;
 
     /**
-     * If <tt>first_cell==true</tt> this function returns @p update_flags,
-     * i.e. <tt>update_once|update_each</tt>. If <tt>first_cell==false</tt> it
-     * returns @p update_each.
-     */
-    UpdateFlags  current_update_flags() const;
-
-    /**
-     * Set the @p first_cell flag to @p false. Used by the @p FEValues class
-     * to indicate that we have already done the work on the first cell.
-     */
-    virtual void clear_first_cell ();
-
-    /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
-
-  private:
-    /**
-     * Initially set to true, but reset to false when clear_first_cell()
-     * is called.
-     */
-    bool first_cell;
   };
 
 public:

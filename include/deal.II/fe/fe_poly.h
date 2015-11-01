@@ -222,16 +222,8 @@ protected:
     // generate a new data object and
     // initialize some fields
     InternalData *data = new InternalData;
+    data->update_each = update_each(update_flags) | update_once(update_flags);  // FIX: only update_each required
 
-    // check what needs to be
-    // initialized only once and what
-    // on every cell/face/subface we
-    // visit
-    data->update_once = update_once(update_flags);
-    data->update_each = update_each(update_flags);
-    data->update_flags = data->update_once | data->update_each;
-
-    const UpdateFlags flags(data->update_flags);
     const unsigned int n_q_points = quadrature.size();
 
     // some scratch arrays
@@ -244,28 +236,28 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if (flags & update_values)
+    if (update_flags & update_values)
       {
         values.resize (this->dofs_per_cell);
         data->shape_values.resize (this->dofs_per_cell,
                                    std::vector<double> (n_q_points));
       }
 
-    if (flags & update_gradients)
+    if (update_flags & update_gradients)
       {
         grads.resize (this->dofs_per_cell);
         data->shape_gradients.resize (this->dofs_per_cell,
                                       std::vector<Tensor<1,dim> > (n_q_points));
       }
 
-    if (flags & update_hessians)
+    if (update_flags & update_hessians)
       {
         grad_grads.resize (this->dofs_per_cell);
         data->shape_hessians.resize (this->dofs_per_cell,
                                      std::vector<Tensor<2,dim> > (n_q_points));
       }
 
-    if (flags & update_3rd_derivatives)
+    if (update_flags & update_3rd_derivatives)
       {
         third_derivatives.resize (this->dofs_per_cell);
         data->shape_3rd_derivatives.resize (this->dofs_per_cell,
@@ -279,8 +271,8 @@ protected:
     // unit cell, and need to be
     // transformed when visiting an
     // actual cell
-    if (flags & (update_values | update_gradients
-                 | update_hessians | update_3rd_derivatives) )
+    if (update_flags & (update_values | update_gradients
+                        | update_hessians | update_3rd_derivatives) )
       for (unsigned int i=0; i<n_q_points; ++i)
         {
           poly_space.compute(quadrature.point(i),
@@ -288,19 +280,19 @@ protected:
                              third_derivatives,
                              fourth_derivatives);
 
-          if (flags & update_values)
+          if (update_flags & update_values)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_values[k][i] = values[k];
 
-          if (flags & update_gradients)
+          if (update_flags & update_gradients)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_gradients[k][i] = grads[k];
 
-          if (flags & update_hessians)
+          if (update_flags & update_hessians)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_hessians[k][i] = grad_grads[k];
 
-          if (flags & update_3rd_derivatives)
+          if (update_flags & update_3rd_derivatives)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_3rd_derivatives[k][i] = third_derivatives[k];
         }

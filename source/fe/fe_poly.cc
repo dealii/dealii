@@ -47,21 +47,19 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
-
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
                            mapping_internal,
                            output_data.shape_gradients[k]);
 
-      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
@@ -75,7 +73,7 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
                 * output_data.shape_gradients[k][i][j];
         }
 
-      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_3rd_derivatives[k],
                              mapping_covariant_hessian,
@@ -107,21 +105,19 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
-
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
                            mapping_internal,
                            output_data.shape_gradients[k]);
 
-      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
@@ -135,7 +131,7 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
                 * output_data.shape_gradients[k][i][j];
         }
 
-      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_3rd_derivatives[k],
                              mapping_covariant_hessian,
@@ -168,21 +164,19 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
-
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
                            mapping_internal,
                            output_data.shape_gradients[k]);
 
-      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
@@ -196,7 +190,7 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
                 * output_data.shape_gradients[k][i][j];
         }
 
-      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_3rd_derivatives[k],
                              mapping_covariant_hessian,
@@ -224,22 +218,20 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
-
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (flags & update_values)
+      if (fe_data.update_each & update_values)
         for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(k,i) = fe_data.shape_values[k][i];
 
 
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
                            mapping_internal,
                            output_data.shape_gradients[k]);
 
-      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_hessians[k],
                              mapping_covariant_gradient,
@@ -253,7 +245,7 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
                 * output_data.shape_gradients[k][i][j];
         }
 
-      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+      if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
         {
           mapping.transform (fe_data.shape_3rd_derivatives[k],
                              mapping_covariant_hessian,
