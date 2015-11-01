@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,7 +14,10 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(${BOOST_BUNDLED_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(
+  ${BOOST_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
+  )
 
 SET(src_boost_iostreams
     file_descriptor.cpp

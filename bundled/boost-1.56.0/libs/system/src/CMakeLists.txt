@@ -14,7 +14,10 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(${BOOST_BUNDLED_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(
+  ${BOOST_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
+  )
 
 SET(src_boost_system
   error_code.cpp
