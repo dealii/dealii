@@ -41,9 +41,9 @@ public:
 
 
 
-template <class MATRIX, class VECTOR>
+template <class MATRIX, typename VectorType>
 void
-check(const MATRIX &A, const VECTOR &f)
+check(const MATRIX &A, const VectorType &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -52,11 +52,11 @@ check(const MATRIX &A, const VECTOR &f)
   names.push_back("fgmres");
 
   MySolverControl mycont;
-  SolverSelector<VECTOR> solver;
+  SolverSelector<VectorType> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
 
-  VECTOR u;
+  VectorType u;
   u.reinit(f);
 
   std::vector<std::string>::const_iterator name;

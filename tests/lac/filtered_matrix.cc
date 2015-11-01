@@ -25,21 +25,21 @@
 #include <fstream>
 
 
-template<class VECTOR>
-void test (const FilteredMatrix<VECTOR> &M)
+template<typename VectorType>
+void test (const FilteredMatrix<VectorType> &M)
 {
   deallog << "Iterator";
 
   unsigned int max = 0;
-  for (typename FilteredMatrix<VECTOR>::const_iterator i= M.begin();
+  for (typename FilteredMatrix<VectorType>::const_iterator i= M.begin();
        i != M.end(); ++i)
     {
       Assert(i->row() == i->column(), ExcInternalError());
       deallog << ' ' << i->row() << ':' << i->value();
       max = i->row();
     }
-  VECTOR v(max+1);
-  VECTOR w(max+1);
+  VectorType v(max+1);
+  VectorType w(max+1);
 
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = 31+i;

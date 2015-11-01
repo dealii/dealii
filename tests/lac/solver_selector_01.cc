@@ -26,9 +26,9 @@
 
 #include <fstream>
 
-template <class MATRIX, class VECTOR>
+template <class MATRIX, typename VectorType>
 void
-check(const MATRIX &A, const VECTOR &f)
+check (const MATRIX &A, const VectorType &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -38,11 +38,11 @@ check(const MATRIX &A, const VECTOR &f)
 
   ReductionControl cont1(100, 0., 1.e-4);
   SolverControl cont2(100, 1.e-7);
-  SolverSelector<VECTOR> solver;
+  SolverSelector<VectorType> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
 
-  VECTOR u;
+  VectorType u;
   u.reinit(f);
 
   std::vector<std::string>::const_iterator name;

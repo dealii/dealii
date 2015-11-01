@@ -15,7 +15,7 @@
 
 
 
-// test the various VECTOR::extract_subvector_to functions for
+// test the various extract_subvector_to functions for
 // parallel vectors and block vectors
 
 #include "../tests.h"
