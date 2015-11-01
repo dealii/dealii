@@ -247,11 +247,11 @@ private:
 
 
 
-template <typename MATRIX>
+template <typename MatrixType>
 class MGTransferPrebuiltMF : public MGTransferPrebuilt<parallel::distributed::Vector<double> >
 {
 public:
-  MGTransferPrebuiltMF(const MGLevelObject<MATRIX> &laplace)
+  MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace)
     :
     laplace_operator (laplace)
   {};
@@ -273,18 +273,18 @@ public:
   }
 
 private:
-  const MGLevelObject<MATRIX> &laplace_operator;
+  const MGLevelObject<MatrixType> &laplace_operator;
 };
 
 
 
-template<typename MATRIX, typename Number>
+template<typename MatrixType, typename Number>
 class MGCoarseIterative : public MGCoarseGridBase<parallel::distributed::Vector<Number> >
 {
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MATRIX &matrix)
+  void initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
@@ -298,7 +298,7 @@ public:
     solver_coarse.solve (*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
-  const MATRIX *coarse_matrix;
+  const MatrixType *coarse_matrix;
 };
 
 

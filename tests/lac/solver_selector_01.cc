@@ -26,9 +26,9 @@
 
 #include <fstream>
 
-template <class MATRIX, typename VectorType>
+template <typename MatrixType, typename VectorType>
 void
-check (const MATRIX &A, const VectorType &f)
+check (const MatrixType &A, const VectorType &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");

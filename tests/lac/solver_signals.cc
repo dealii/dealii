@@ -56,10 +56,10 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
   deallog << std::endl;
 }
 
-template<class SOLVER, class MATRIX, typename VectorType, class PRECONDITION>
+template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SOLVER             &solver,
-            const MATRIX       &A,
+            const MatrixType   &A,
             VectorType         &u,
             VectorType         &f,
             const PRECONDITION &P)

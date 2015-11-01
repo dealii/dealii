@@ -121,12 +121,12 @@ ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 
 //----------------------------------------------------------------------//
 
-template<class MATRIX, class RELAX>
-void check_smoother(const MGLevelObject<MATRIX> &m,
+template<typename MatrixType, class RELAX>
+void check_smoother(const MGLevelObject<MatrixType> &m,
                     const MGLevelObject<RELAX> &r)
 {
   GrowingVectorMemory<BlockVector<double> > mem;
-  MGSmootherBlock<MATRIX, RELAX, double> smoother(mem);
+  MGSmootherBlock<MatrixType, RELAX, double> smoother(mem);
 
   smoother.initialize(m, r);
 

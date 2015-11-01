@@ -35,8 +35,8 @@
 
 using namespace dealii;
 
-template <class DOFINFO, class MATRIX>
-void test(DOFINFO &info, MeshWorker::Assembler::MatrixSimple<MATRIX> &ass)
+template <class DOFINFO, typename MatrixType>
+void test(DOFINFO &info, MeshWorker::Assembler::MatrixSimple<MatrixType> &ass)
 {
   ass.initialize_info(info, false);
   deallog << "No faces" << std::endl;

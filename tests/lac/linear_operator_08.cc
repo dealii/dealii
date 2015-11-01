@@ -49,10 +49,10 @@
 using namespace dealii;
 
 
-template<class PRECONDITIONER, class MATRIX, typename VectorType,
+template<class PRECONDITIONER, typename MatrixType, typename VectorType,
          class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner (const MATRIX &A,
+test_preconditioner (const MatrixType &A,
                      const VectorType &b,
                      const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {

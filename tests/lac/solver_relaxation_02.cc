@@ -32,10 +32,10 @@
 #include <deal.II/lac/precondition_block.h>
 #include <deal.II/lac/relaxation_block.h>
 
-template<class SOLVER, class MATRIX, typename VectorType, class PRECONDITION>
+template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
 double
 check_solve (SOLVER             &solver,
-             const MATRIX       &A,
+             const MatrixType   &A,
              VectorType         &u,
              VectorType         &f,
              const PRECONDITION &P)
