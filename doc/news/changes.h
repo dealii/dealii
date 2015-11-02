@@ -159,6 +159,20 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Changed: The functionality to distribute cells across processes
+  according to a vector of cell weights that was passed in a call to
+  <code>parallel::distributed::Triangulation<dim>::repartition()</code>
+  was replaced by a cell-wise signal. This signal is called during
+  <code>execute_coarsening_and_refinement</code> and <code>repartition</code>
+  if any function is connected to it. It allows to connect a function that
+  takes the current cell iterator and a status argument that indicates whether
+  this cell will be refined, coarsened or remains unchanged and returns a
+  cell weight, which will be used to distribute cells across processes in a
+  way that keeps the sum of weights across each individual process
+  approximately equal.
+  <br>
+  (Rene Gassmoeller, 2015/11/02)
+  </li>
 
   <li> New: 2nd derivatives are implemented for polynomials_BDM in 3D.
   <br>

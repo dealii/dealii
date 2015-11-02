@@ -368,6 +368,8 @@ namespace parallel
        */
       typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
 
+      typedef typename dealii::Triangulation<dim,spacedim>::CellStatus CellStatus;
+
       /**
        * Configuration flags for distributed Triangulations to be set in the
        * constructor. Settings can be combined using bitwise OR.
@@ -482,22 +484,21 @@ namespace parallel
        * affected by flags set on locally owned cells.
        *
        * @note This function by default partitions the mesh in such a way
-       *   that the number of cells on all processors is roughly equal,
-       *   i.e., it is not possible to "weigh" cells that are more expensive
-       *   to compute on than others. This is because these weights would apply
-       *   to the current set of cells, which will then be refined and
-       *   coarsened into a separate set of cells, which will only then be
-       *   partitioned between processors. In other words, the weights for
-       *   cells you could attach before calling this function will no
-       *   longer be the set of cells that will ultimately be partitioned.
-       *   If you want to set weights for partitioning, you need to create
-       *   your triangulation object by passing the
+       *   that the number of cells on all processors is roughly equal.
+       *   If you want to set weights for partitioning, e.g. because some cells
+       *   are more expensive to compute than others, you can use the signal
+       *   cell_weight as documented in the dealii::Triangulation class. This
+       *   function will check whether a function is connected to the signal
+       *   and if so use it. If you prefer to repartition the mesh yourself at
+       *   user-defined intervals only, you can create your triangulation
+       *   object by passing the
        *   parallel::distributed::Triangulation::no_automatic_repartitioning
        *   flag to the constructor, which ensures that calling the current
        *   function only refines and coarsens the triangulation, but doesn't
-       *   partition it. You would then call the current function, in a second
-       *   step compute and use cell weights when partitioning the mesh upon
-       *   calling repartition() with a non-default argument.
+       *   partition it. You can then call the repartition() function manually.
+       *   The usage of the cell_weights signal is identical in both cases,
+       *   if a function is connected to the signal it will be used to balance
+       *   the calculated weights, otherwise the number of cells is balanced.
        */
       virtual void execute_coarsening_and_refinement ();
 
@@ -519,30 +520,15 @@ namespace parallel
        * the same way as execute_coarsening_and_refinement() with respect to
        * dealing with data movement (SolutionTransfer, etc.).
        *
-       * @param weights_per_cell A vector of weights that indicates how
-       *   "expensive" computations are on each of the active cells. If
-       *   left at its default value, this function will partition the
-       *   mesh in such a way that it has roughly equal numbers of cells
-       *   on all processors. If the argument is specified, then the mesh
-       *   is partitioned so that the sum of weights of the cells owned
-       *   by each processor is roughly equal. The size of the vector
-       *   needs to equal the number of active cells of the current
-       *   triangulation (i.e., must be equal to
-       *   <code>triangulation.n_active_cells()</code>) and be in the order
-       *   in which one encounters these cells in a loop over all cells (in
-       *   the same way as vectors of refinement indicators are interpreted
-       *   in namespace GridRefinement). In other words, the element of this
-       *   vector that corresponds to a given cell has index
-       *   <code>cell-@>active_cell_index()</code>. Of the elements of this
-       *   vector, only those that correspond to <i>locally owned</i>
-       *   active cells are actually considered. You can set the rest
-       *   to arbitrary values.
-       *
-       * @note The only requirement on the weights is that every cell's
-       *   weight is positive and that the sum over all weights on all
-       *   processors can be formed using a 64-bit integer. Beyond that,
-       *   it is your choice how you want to interpret the weights. A
-       *   common approach is to consider the weights proportional to
+       * @note If no function is connected to the cell_weight signal described
+       *   in the dealii::Triangulation class, this function will balance the
+       *   number of cells on each processor. If one or more functions are
+       *   connected, it will calculate the sum of the weights and balance the
+       *   weights across processors. The only requirement on the weights is
+       *   that every cell's weight is positive and that the sum over all
+       *   weights on all processors can be formed using a 64-bit integer.
+       *   Beyond that, it is your choice how you want to interpret the weights.
+       *   A common approach is to consider the weights proportional to
        *   the cost of doing computations on a cell, e.g., by summing
        *   the time for assembly and solving. In practice, determining
        *   this cost is of course not trivial since we don't solve on
@@ -555,15 +541,9 @@ namespace parallel
        *   (such as forming boundary integrals during the assembly
        *   only on cells that are actually at the boundary, or computing
        *   expensive nonlinear terms only on some cells but not others,
-       *   e.g., in the elasto-plastic problem in step-42). In any
-       *   case, the scaling does not matter: you can choose the weights
-       *   equal to the number of unknowns on each cell, or equal to ten
-       *   times the number of unknowns -- because only their relative
-       *   size matters in partitioning, both choices will lead to the
-       *   same mesh.
+       *   e.g., in the elasto-plastic problem in step-42).
        */
-      void repartition (const std::vector<unsigned int> &weights_per_cell
-                        = std::vector<unsigned int>());
+      void repartition ();
 
       /**
        * When vertices have been moved locally, for example using code like
@@ -697,34 +677,6 @@ namespace parallel
                 const bool autopartition = true);
 
       /**
-       * Used to inform in the callbacks of register_data_attach() and
-       * notify_ready_to_unpack() how the cell with the given cell_iterator is
-       * going to change.  Note that this may me different than the
-       * refine_flag() and coarsen_flag() in the cell_iterator because of
-       * refinement constraints that this machine does not see.
-       */
-      enum CellStatus
-      {
-        /**
-         * The cell will not be refined or coarsened and might or might not
-         * move to a different processor.
-         */
-        CELL_PERSIST,
-        /**
-         * The cell will be or was refined.
-         */
-        CELL_REFINE,
-        /**
-         * The children of this cell will be or were coarsened into this cell.
-         */
-        CELL_COARSEN,
-        /**
-         * Invalid status. Will not occur for the user.
-         */
-        CELL_INVALID
-      };
-
-      /**
        * Register a function with the current Triangulation object that will
        * be used to attach data to active cells before
        * execute_coarsening_and_refinement(). In
@@ -821,7 +773,6 @@ namespace parallel
       void
       add_periodicity
       (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &);
-
 
 
     private:
@@ -964,6 +915,21 @@ namespace parallel
        * execute_coarsening_and_refinement().
        */
       void attach_mesh_data();
+
+      /**
+       * Internal function notifying all registered slots to provide their
+       * weights before repartitioning occurs. Called from
+       * execute_coarsening_and_refinement() and repartition().
+       *
+       * @param return A vector of unsigned integers representing the weight or
+       * computational load of every cell after the refinement/coarsening/
+       * repartition cycle. Note that the number of entries does not need to
+       * be equal to either n_active_cells or n_locally_owned_active_cells,
+       * because the triangulation is not updated yet. The weights are sorted
+       * in the order that p4est will encounter them while iterating over them.
+       */
+      std::vector<unsigned int>
+      get_cell_weights();
 
       /**
        * Fills a map that, for each vertex, lists all the processors whose
