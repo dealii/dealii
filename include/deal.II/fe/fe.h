@@ -2232,7 +2232,7 @@ protected:
 
   /**
    * Prepare internal data structures and fill in values independent of the
-   * cell. Returns a pointer to an object of which the caller of this function
+   * cell. Return a pointer to an object of which the caller of this function
    * then has to assume ownership (which includes destruction when it is no
    * more needed).
    *
@@ -2247,9 +2247,18 @@ protected:
 
   /**
    * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell. Returns a pointer to an object of which
+   * values independent of the cell. Return a pointer to an object of which
    * the caller of this function then has to assume ownership (which includes
    * destruction when it is no more needed).
+   *
+   * The default implementation of this function converts the face quadrature
+   * into a cell quadrature with appropriate quadrature point locations,
+   * and with that calls the get_data() function above that has to be
+   * implemented in derived classes.
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
    */
   virtual InternalDataBase *
   get_face_data (const UpdateFlags        flags,
@@ -2258,9 +2267,18 @@ protected:
 
   /**
    * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell. Returns a pointer to an
+   * and fill in values independent of the cell. Return a pointer to an
    * object of which the caller of this function then has to assume ownership
    * (which includes destruction when it is no more needed).
+   *
+   * The default implementation of this function converts the face quadrature
+   * into a cell quadrature with appropriate quadrature point locations,
+   * and with that calls the get_data() function above that has to be
+   * implemented in derived classes.
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
    */
   virtual InternalDataBase *
   get_subface_data (const UpdateFlags        flags,
