@@ -398,6 +398,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: A compilation issue with DEAL_II_INCLUDE_DIRS not used for
+  compiling bundled boost.
+  <br>
+  (Lukas Korous, 2015/11/01)
+  </li>
 
   <li> Fixed: PolynomialsBDM::degree() now returns the correct value.
   <br>
