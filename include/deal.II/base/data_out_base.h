@@ -332,6 +332,11 @@ namespace DataOutBase
     std::size_t memory_consumption () const;
 
     /**
+     * Swap the current object's contents with those of the given argument.
+     */
+    void swap (Patch<dim,spacedim> &other_patch);
+
+    /**
      * Value to be used if this patch has no neighbor on one side.
      */
     static const unsigned int no_neighbor = numbers::invalid_unsigned_int;

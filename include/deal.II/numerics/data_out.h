@@ -286,13 +286,17 @@ private:
   /**
    * Build one patch. This function is called in a WorkStream context.
    *
-   * The result is written into the patch variable.
+   * The first argument here is the iterator, the second the scratch data object.
+   * All following are tied to particular values when calling WorkStream::run().
+   * The function does not take a CopyData object but rather allocates one
+   * on its own stack for memory access efficiency reasons.
    */
-  void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
-                        internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
-                        ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
-                        const CurvedCellRegion curved_cell_region,
-                        std::vector<dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches);
+  void build_one_patch (const std::pair<cell_iterator, unsigned int>                         *cell_and_index,
+                        internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>  &scratch_data,
+                        const unsigned int                                                    n_subdivisions,
+                        const unsigned int                                                    n_datasets,
+                        const CurvedCellRegion                                                curved_cell_region,
+                        std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches);
 };
 
 

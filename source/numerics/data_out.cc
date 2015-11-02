@@ -62,31 +62,39 @@ namespace internal
 template <int dim, class DH>
 void
 DataOut<dim,DH>::
-build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
-                 internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
-                 DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
-                 const CurvedCellRegion curved_cell_region,
+build_one_patch (const std::pair<cell_iterator, unsigned int>                         *cell_and_index,
+                 internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>  &scratch_data,
+                 const unsigned int                                                    n_subdivisions,
+                 const unsigned int                                                    n_datasets,
+                 const CurvedCellRegion                                                curved_cell_region,
                  std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches)
 {
+  // first create the output object that we will write into
+  ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> patch;
+  patch.n_subdivisions = n_subdivisions;
+  patch.data.reinit (n_datasets,
+                     Utilities::fixed_power<DH::dimension>(n_subdivisions+1));
+
+
   // use ucd_to_deal map as patch vertices are in the old, unnatural
   // ordering. if the mapping does not preserve locations
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
   for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension>::vertices_per_cell; ++vertex)
-    if (data.mapping_collection[0].preserves_vertex_locations())
+    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
       patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
     else
-      patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
+      patch.vertices[vertex] = scratch_data.mapping_collection[0].transform_unit_to_real_cell
                                (cell_and_index->first,
                                 GeometryInfo<DH::dimension>::unit_cell_vertex (vertex));
 
-  if (data.n_datasets > 0)
+  if (scratch_data.n_datasets > 0)
     {
       // create DH::active_cell_iterator and initialize FEValues
-      data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
+      scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
 
       const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values
-        = data.get_present_fe_values (0);
+        = scratch_data.get_present_fe_values (0);
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
@@ -109,7 +117,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
           const std::vector<Point<DH::space_dimension> > &q_points=fe_patch_values.get_quadrature_points();
           // resize the patch.data member in order to have enough memory for
           // the quadrature points as well
-          patch.data.reinit (data.n_datasets+DH::space_dimension, n_q_points);
+          patch.data.reinit (scratch_data.n_datasets+DH::space_dimension, n_q_points);
           // set the flag indicating that for this cell the points are
           // explicitly given
           patch.points_are_available=true;
@@ -120,7 +128,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
         }
       else
         {
-          patch.data.reinit(data.n_datasets, n_q_points);
+          patch.data.reinit(scratch_data.n_datasets, n_q_points);
           patch.points_are_available = false;
         }
 
@@ -132,7 +140,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
         {
           const FEValuesBase<DH::dimension,DH::space_dimension> &this_fe_patch_values
-            = data.get_present_fe_values (dataset);
+            = scratch_data.get_present_fe_values (dataset);
           const unsigned int n_components =
             this_fe_patch_values.get_fe().n_components();
 
@@ -149,55 +157,55 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                   // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  data.patch_values);
+                                                                  scratch_data.patch_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     data.patch_gradients);
+                                                                     scratch_data.patch_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    data.patch_hessians);
+                                                                    scratch_data.patch_hessians);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
+                    scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
 
                   std::vector<Point<DH::space_dimension> > dummy_normals;
                   postprocessor->
-                  compute_derived_quantities_scalar(data.patch_values,
-                                                    data.patch_gradients,
-                                                    data.patch_hessians,
+                  compute_derived_quantities_scalar(scratch_data.patch_values,
+                                                    scratch_data.patch_gradients,
+                                                    scratch_data.patch_hessians,
                                                     dummy_normals,
-                                                    data.patch_evaluation_points,
-                                                    data.postprocessed_values[dataset]);
+                                                    scratch_data.patch_evaluation_points,
+                                                    scratch_data.postprocessed_values[dataset]);
                 }
               else
                 {
-                  data.resize_system_vectors (n_components);
+                  scratch_data.resize_system_vectors (n_components);
 
                   // at each point there is a vector valued function and its
                   // derivative...
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  data.patch_values_system);
+                                                                  scratch_data.patch_values_system);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     data.patch_gradients_system);
+                                                                     scratch_data.patch_gradients_system);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    data.patch_hessians_system);
+                                                                    scratch_data.patch_hessians_system);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
+                    scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   std::vector<Point<DH::space_dimension> > dummy_normals;
 
                   postprocessor->
-                  compute_derived_quantities_vector(data.patch_values_system,
-                                                    data.patch_gradients_system,
-                                                    data.patch_hessians_system,
+                  compute_derived_quantities_vector(scratch_data.patch_values_system,
+                                                    scratch_data.patch_gradients_system,
+                                                    scratch_data.patch_hessians_system,
                                                     dummy_normals,
-                                                    data.patch_evaluation_points,
-                                                    data.postprocessed_values[dataset]);
+                                                    scratch_data.patch_evaluation_points,
+                                                    scratch_data.postprocessed_values[dataset]);
                 }
 
               for (unsigned int q=0; q<n_q_points; ++q)
@@ -205,7 +213,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                      component<this->dof_data[dataset]->n_output_variables;
                      ++component)
                   patch.data(offset+component,q)
-                    = data.postprocessed_values[dataset][q](component);
+                    = scratch_data.postprocessed_values[dataset][q](component);
             }
           else
             // now we use the given data vector without modifications. again,
@@ -214,20 +222,20 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
             if (n_components == 1)
               {
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              data.patch_values);
+                                                              scratch_data.patch_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
-                  patch.data(offset,q) = data.patch_values[q];
+                  patch.data(offset,q) = scratch_data.patch_values[q];
               }
             else
               {
-                data.resize_system_vectors(n_components);
+                scratch_data.resize_system_vectors(n_components);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              data.patch_values_system);
+                                                              scratch_data.patch_values_system);
                 for (unsigned int component=0; component<n_components;
                      ++component)
                   for (unsigned int q=0; q<n_q_points; ++q)
                     patch.data(offset+component,q) =
-                      data.patch_values_system[q](component);
+                      scratch_data.patch_values_system[q](component);
               }
           // increment the counter for the actual data record
           offset+=this->dof_data[dataset]->n_output_variables;
@@ -273,12 +281,12 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 
       const cell_iterator neighbor = cell_and_index->first->neighbor(f);
       Assert (static_cast<unsigned int>(neighbor->level()) <
-              data.cell_to_patch_index_map->size(),
+              scratch_data.cell_to_patch_index_map->size(),
               ExcInternalError());
       if ((static_cast<unsigned int>(neighbor->index()) >=
-           (*data.cell_to_patch_index_map)[neighbor->level()].size())
+           (*scratch_data.cell_to_patch_index_map)[neighbor->level()].size())
           ||
-          ((*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
+          ((*scratch_data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
            ==
            dealii::DataOutBase::Patch<DH::dimension>::no_neighbor))
         {
@@ -289,17 +297,19 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       // now, there is a neighbor, so get its patch number and set it for the
       // neighbor index
       patch.neighbors[f]
-        = (*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
+        = (*scratch_data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
     }
 
   const unsigned int patch_idx =
-    (*data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
+    (*scratch_data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
   // did we mess up the indices?
   Assert(patch_idx < patches.size(), ExcInternalError());
+  patch.patch_index = patch_idx;
 
-  // Put the patch in the patches vector
-  patches[patch_idx] = patch;
-  patches[patch_idx].patch_index = patch_idx;
+  // Put the patch into the patches vector. instead of copying the data,
+  // simply swap the contents to avoid the penalty of writing into another
+  // processor's memory
+  patches[patch_idx].swap (patch);
 }
 
 
@@ -436,23 +446,25 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                update_flags,
                cell_to_patch_index_map);
 
-  ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> sample_patch;
-  sample_patch.n_subdivisions = n_subdivisions;
-  sample_patch.data.reinit (n_datasets,
-                            Utilities::fixed_power<DH::dimension>(n_subdivisions+1));
-
-
   // now build the patches in parallel
   if (all_cells.size() > 0)
     WorkStream::run (&all_cells[0],
                      &all_cells[0]+all_cells.size(),
                      std_cxx11::bind(&DataOut<dim,DH>::build_one_patch,
-                                     this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3,
-                                     curved_cell_region,std_cxx11::ref(this->patches)),
+                                     this,
+                                     std_cxx11::_1,
+                                     std_cxx11::_2,
+                                     /* no std_cxx11::_3, since this function doesn't actually need a
+                                        copy data object -- it just writes everything right into the
+                                        output array */
+                                     n_subdivisions,
+                                     n_datasets,
+                                     curved_cell_region,
+                                     std_cxx11::ref(this->patches)),
                      // no copy-local-to-global function needed here
-                     std_cxx11::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
+                     std_cxx11::function<void (const int &)>(),
                      thread_data,
-                     sample_patch,
+                     /* dummy CopyData object = */ 0,
                      // experimenting shows that we can make things run a bit
                      // faster if we increase the number of cells we work on
                      // per item (i.e., WorkStream's chunk_size argument,
