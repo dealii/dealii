@@ -92,19 +92,20 @@ void test()
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
 
+      // avoid outputing any partitioning info until Parmetis gives reproducable results
       deallog
-          << "n_dofs: " << dof_handler.n_dofs() << std::endl
-          << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
+          << "n_dofs: " << dof_handler.n_dofs() << std::endl;
+//          << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
-      deallog << "n_locally_owned_dofs_per_processor: ";
-      std::vector<types::global_dof_index> v = dof_handler.n_locally_owned_dofs_per_processor();
-      unsigned int sum = 0;
-      for (unsigned int i=0; i<v.size(); ++i)
-        {
-          deallog << v[i] << " ";
-          sum += v[i];
-        }
-      deallog << " sum: " << sum << std::endl;
+//      deallog << "n_locally_owned_dofs_per_processor: ";
+//      std::vector<types::global_dof_index> v = dof_handler.n_locally_owned_dofs_per_processor();
+//      unsigned int sum = 0;
+//      for (unsigned int i=0; i<v.size(); ++i)
+//        {
+//          deallog << v[i] << " ";
+//          sum += v[i];
+//        }
+//      deallog << " sum: " << sum << std::endl;
 
       Assert(dof_handler.n_locally_owned_dofs() == dof_handler.n_locally_owned_dofs_per_processor()[triangulation.locally_owned_subdomain()], ExcInternalError());
       Assert( dof_handler.n_locally_owned_dofs() == dof_handler.locally_owned_dofs().n_elements(), ExcInternalError());

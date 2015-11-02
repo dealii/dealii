@@ -63,6 +63,14 @@ void test()
                                           Triangulation<dim>::none,
                                           /*artificial*/true);
 
+  AssertThrow( tr.with_artificial_cells() == true,
+               ExcInternalError());
+
+  const std::vector<unsigned int> &
+  true_subdomain_ids_of_cells = tr.get_true_subdomain_ids_of_cells();
+
+  AssertThrow (true_subdomain_ids_of_cells.size() == tr.n_active_cells(),
+               ExcInternalError());
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global();
@@ -86,18 +94,23 @@ void test()
     deallog << v[i] << " ";
     deallog << std::endl;*/
 
-  deallog << "subdomains: ";
+  // untill parmetis is stable, do not output partitioning
+  //deallog << "subdomains: ";
   typename  parallel::shared::Triangulation<dim>::active_cell_iterator it=tr.begin_active();
-  for (; it!=tr.end(); ++it)
+  for (unsigned int index=0; it!=tr.end(); ++it,++index)
     {
-      deallog << (int) it->subdomain_id() << " ";
+      // check that true subdomain_ids are the same as those, stored in cell->subdomain_id()
+      AssertThrow( (it->is_artificial() == true) ||
+                   (true_subdomain_ids_of_cells[index] == it->subdomain_id()),
+                   ExcInternalError());
+      //deallog << (int) it->subdomain_id() << " ";
     }
   deallog << std::endl;
 
-  const std::string filename = ("mesh_" +
-                                Utilities::int_to_string(dim)+
-                                "D_");
-  write_mesh(tr, filename.c_str());
+//  const std::string filename = ("mesh_" +
+//                                Utilities::int_to_string(dim)+
+//                                "D_");
+//  write_mesh(tr, filename.c_str());
 }
 
 
