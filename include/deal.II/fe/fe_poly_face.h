@@ -99,16 +99,8 @@ protected:
     // generate a new data object and
     // initialize some fields
     InternalData *data = new InternalData;
+    data->update_each = update_once(update_flags) | update_each(update_flags);  // FIX: only update_each required
 
-    // check what needs to be
-    // initialized only once and what
-    // on every cell/face/subface we
-    // visit
-    data->update_once = update_once(update_flags);
-    data->update_each = update_each(update_flags);
-    data->update_flags = data->update_once | data->update_each;
-
-    const UpdateFlags flags(data->update_flags);
     const unsigned int n_q_points = quadrature.size();
 
     // some scratch arrays
@@ -121,7 +113,7 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if (flags & update_values)
+    if (data->update_each & update_values)
       {
         values.resize (poly_space.n());
         data->shape_values.resize (poly_space.n(),
@@ -139,7 +131,7 @@ protected:
       }
     // No derivatives of this element
     // are implemented.
-    if (flags & update_gradients || flags & update_hessians)
+    if (data->update_each & update_gradients || data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }

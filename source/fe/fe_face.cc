@@ -494,10 +494,8 @@ fill_fe_face_values (const Mapping<1,spacedim> &,
                      const internal::FEValues::MappingRelatedData<1,spacedim> &,
                      internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const
 {
-  const UpdateFlags flags(fedata.update_once | fedata.update_each);
-
   const unsigned int foffset = face;
-  if (flags & update_values)
+  if (fedata.update_each & update_values)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         output_data.shape_values(k,0) = 0.;

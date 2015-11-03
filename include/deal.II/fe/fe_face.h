@@ -250,20 +250,14 @@ protected:
     // generate a new data object and initialize some fields
     typename FiniteElement<1,spacedim>::InternalDataBase *data =
       new typename FiniteElement<1,spacedim>::InternalDataBase;
+    data->update_each = update_once(update_flags) | update_each(update_flags);  // FIX: only update_each required
 
-    // check what needs to be initialized only once and what on every
-    // cell/face/subface we visit
-    data->update_once = update_once(update_flags);
-    data->update_each = update_each(update_flags);
-    data->update_flags = data->update_once | data->update_each;
-
-    const UpdateFlags flags(data->update_flags);
     const unsigned int n_q_points = quadrature.size();
     AssertDimension(n_q_points, 1);
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (flags & update_gradients || flags & update_hessians)
+    if (data->update_each & update_gradients || data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }

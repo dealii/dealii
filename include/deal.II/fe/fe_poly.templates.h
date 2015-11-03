@@ -240,7 +240,7 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
   Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
+  const UpdateFlags flags(fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -312,7 +312,7 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
                                                 cell->face_rotation(face),
                                                 quadrature.size());
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  const UpdateFlags flags(fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -388,7 +388,7 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
                                                    quadrature.size(),
                                                    cell->subface_case(face));
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  const UpdateFlags flags(fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
