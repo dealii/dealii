@@ -79,7 +79,7 @@ namespace TrilinosWrappers
  * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2001
  */
-template <class SparsityPatternBase>
+template <class SP>
 class BlockSparsityPatternBase : public Subscriptor
 {
 public:
@@ -160,7 +160,7 @@ public:
   /**
    * Access the block with the given coordinates.
    */
-  SparsityPatternBase &
+  SP &
   block (const size_type row,
          const size_type column);
 
@@ -169,7 +169,7 @@ public:
    * Access the block with the given coordinates. Version for constant
    * objects.
    */
-  const SparsityPatternBase &
+  const SP &
   block (const size_type row,
          const size_type column) const;
 
@@ -338,7 +338,7 @@ protected:
   /**
    * Array of sparsity patterns.
    */
-  Table<2,SmartPointer<SparsityPatternBase, BlockSparsityPatternBase<SparsityPatternBase> > > sub_objects;
+  Table<2,SmartPointer<SP, BlockSparsityPatternBase<SP> > > sub_objects;
 
   /**
    * Object storing and managing the transformation of row indices to indices
@@ -749,11 +749,11 @@ namespace TrilinosWrappers
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
-SparsityPatternBase &
-BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
-                                                      const size_type column)
+SP &
+BlockSparsityPatternBase<SP>::block (const size_type row,
+                                     const size_type column)
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
@@ -762,11 +762,11 @@ BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
-const SparsityPatternBase &
-BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
-                                                      const size_type column) const
+const SP &
+BlockSparsityPatternBase<SP>::block (const size_type row,
+                                     const size_type column) const
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
@@ -775,31 +775,31 @@ BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
 const BlockIndices &
-BlockSparsityPatternBase<SparsityPatternBase>::get_row_indices () const
+BlockSparsityPatternBase<SP>::get_row_indices () const
 {
   return row_indices;
 }
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
 const BlockIndices &
-BlockSparsityPatternBase<SparsityPatternBase>::get_column_indices () const
+BlockSparsityPatternBase<SP>::get_column_indices () const
 {
   return column_indices;
 }
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
 void
-BlockSparsityPatternBase<SparsityPatternBase>::add (const size_type i,
-                                                    const size_type j)
+BlockSparsityPatternBase<SP>::add (const size_type i,
+                                   const size_type j)
 {
   // if you get an error here, are
   // you sure you called
@@ -813,13 +813,13 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const size_type i,
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 template <typename ForwardIterator>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const size_type row,
-                                                            ForwardIterator begin,
-                                                            ForwardIterator end,
-                                                            const bool      indices_are_sorted)
+BlockSparsityPatternBase<SP>::add_entries (const size_type row,
+                                           ForwardIterator begin,
+                                           ForwardIterator end,
+                                           const bool      indices_are_sorted)
 {
   // Resize scratch arrays
   if (block_column_indices.size() < this->n_block_cols())
@@ -900,11 +900,11 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const size_type row,
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
 bool
-BlockSparsityPatternBase<SparsityPatternBase>::exists (const size_type i,
-                                                       const size_type j) const
+BlockSparsityPatternBase<SP>::exists (const size_type i,
+                                      const size_type j) const
 {
   // if you get an error here, are
   // you sure you called
@@ -918,10 +918,10 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const size_type i,
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
 unsigned int
-BlockSparsityPatternBase<SparsityPatternBase>::
+BlockSparsityPatternBase<SP>::
 row_length (const size_type row) const
 {
   const std::pair<size_type , size_type>
@@ -937,20 +937,20 @@ row_length (const size_type row) const
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
+typename BlockSparsityPatternBase<SP>::size_type
+BlockSparsityPatternBase<SP>::n_block_cols () const
 {
   return columns;
 }
 
 
 
-template <class SparsityPatternBase>
+template <class SP>
 inline
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
+typename BlockSparsityPatternBase<SP>::size_type
+BlockSparsityPatternBase<SP>::n_block_rows () const
 {
   return rows;
 }

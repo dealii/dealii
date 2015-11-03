@@ -25,12 +25,12 @@ namespace internal
   {
 // -------------------------- FEValuesBase -------------------------
 
-    template <int dim, int q_dim, class FEValues>
-    FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
-                  const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
-                  const dealii::hp::QCollection<q_dim>     &q_collection,
-                  const UpdateFlags                   update_flags)
+    template <int dim, int q_dim, class FEValuesType>
+    FEValuesBase<dim,q_dim,FEValuesType>::FEValuesBase
+    (const dealii::hp::MappingCollection<dim,FEValuesType::space_dimension> &mapping_collection,
+     const dealii::hp::FECollection<dim,FEValuesType::space_dimension>      &fe_collection,
+     const dealii::hp::QCollection<q_dim>                                   &q_collection,
+     const UpdateFlags                                                       update_flags)
       :
       fe_collection (&fe_collection),
       mapping_collection (&mapping_collection),
@@ -45,14 +45,14 @@ namespace internal
     {}
 
 
-    template <int dim, int q_dim, class FEValues>
-    FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
-                  const dealii::hp::QCollection<q_dim> &q_collection,
-                  const UpdateFlags         update_flags)
+    template <int dim, int q_dim, class FEValuesType>
+    FEValuesBase<dim,q_dim,FEValuesType>::FEValuesBase
+    (const dealii::hp::FECollection<dim,FEValuesType::space_dimension> &fe_collection,
+     const dealii::hp::QCollection<q_dim>                              &q_collection,
+     const UpdateFlags                                                  update_flags)
       :
       fe_collection (&fe_collection),
-      mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValues::space_dimension>::
+      mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValuesType::space_dimension>::
                           mapping_collection),
       q_collection (q_collection),
       fe_values_table (fe_collection.size(),
@@ -66,12 +66,12 @@ namespace internal
 
 
 
-    template <int dim, int q_dim, class FEValues>
-    FEValues &
-    FEValuesBase<dim,q_dim,FEValues>::
-    select_fe_values (const unsigned int fe_index,
-                      const unsigned int mapping_index,
-                      const unsigned int q_index)
+    template <int dim, int q_dim, class FEValuesType>
+    FEValuesType &
+    FEValuesBase<dim,q_dim,FEValuesType>::select_fe_values
+    (const unsigned int fe_index,
+     const unsigned int mapping_index,
+     const unsigned int q_index)
     {
       Assert (fe_index < fe_collection->size(),
               ExcIndexRange (fe_index, 0, fe_collection->size()));
@@ -94,11 +94,11 @@ namespace internal
       if (fe_values_table(present_fe_values_index).get() == 0)
         fe_values_table(present_fe_values_index)
           =
-            std_cxx11::shared_ptr<FEValues>
-            (new FEValues ((*mapping_collection)[mapping_index],
-                           (*fe_collection)[fe_index],
-                           q_collection[q_index],
-                           update_flags));
+            std_cxx11::shared_ptr<FEValuesType>
+            (new FEValuesType ((*mapping_collection)[mapping_index],
+                               (*fe_collection)[fe_index],
+                               q_collection[q_index],
+                               update_flags));
 
       // now there definitely is one!
       return *fe_values_table(present_fe_values_index);

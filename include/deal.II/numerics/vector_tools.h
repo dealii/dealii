@@ -1963,12 +1963,12 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  void point_difference (const DoFHandler<dim,spacedim> &dof,
-                         const InVector                 &fe_function,
-                         const Function<spacedim,double>       &exact_solution,
-                         Vector<double>                 &difference,
-                         const Point<spacedim>          &point);
+  template <int dim, class VectorType, int spacedim>
+  void point_difference (const DoFHandler<dim,spacedim>  &dof,
+                         const VectorType                &fe_function,
+                         const Function<spacedim,double> &exact_solution,
+                         Vector<double>                  &difference,
+                         const Point<spacedim>           &point);
 
   /**
    * Point error evaluation. Find the first cell containing the given point
@@ -1982,13 +1982,13 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  void point_difference (const Mapping<dim, spacedim>   &mapping,
-                         const DoFHandler<dim,spacedim> &dof,
-                         const InVector                 &fe_function,
-                         const Function<spacedim,double>       &exact_solution,
-                         Vector<double>                 &difference,
-                         const Point<spacedim>          &point);
+  template <int dim, class VectorType, int spacedim>
+  void point_difference (const Mapping<dim, spacedim>    &mapping,
+                         const DoFHandler<dim,spacedim>  &dof,
+                         const VectorType                &fe_function,
+                         const Function<spacedim,double> &exact_solution,
+                         Vector<double>                  &difference,
+                         const Point<spacedim>           &point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -2001,10 +2001,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector                 &fe_function,
+               const VectorType               &fe_function,
                const Point<spacedim>          &point,
                Vector<double>                 &value);
 
@@ -2014,10 +2014,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector                     &fe_function,
+               const VectorType                   &fe_function,
                const Point<spacedim>              &point,
                Vector<double>                     &value);
 
@@ -2036,10 +2036,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const DoFHandler<dim,spacedim> &dof,
-               const InVector                 &fe_function,
+               const VectorType               &fe_function,
                const Point<spacedim>          &point);
 
   /**
@@ -2048,10 +2048,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
-               const InVector                     &fe_function,
+               const VectorType                   &fe_function,
                const Point<spacedim>              &point);
 
   /**
@@ -2065,11 +2065,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
-               const InVector                 &fe_function,
+               const VectorType               &fe_function,
                const Point<spacedim>          &point,
                Vector<double>                 &value);
 
@@ -2079,11 +2079,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_value (const hp::MappingCollection<dim, spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>         &dof,
-               const InVector                             &fe_function,
+               const VectorType                           &fe_function,
                const Point<spacedim>                      &point,
                Vector<double>                             &value);
 
@@ -2098,11 +2098,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const Mapping<dim,spacedim>    &mapping,
                const DoFHandler<dim,spacedim> &dof,
-               const InVector                 &fe_function,
+               const VectorType               &fe_function,
                const Point<spacedim>          &point);
 
   /**
@@ -2111,11 +2111,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double
   point_value (const hp::MappingCollection<dim,spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>        &dof,
-               const InVector                            &fe_function,
+               const VectorType                          &fe_function,
                const Point<spacedim>                     &point);
 
   /**
@@ -2129,12 +2129,12 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_gradient (const DoFHandler<dim,spacedim>    &dof,
-                  const InVector                    &fe_function,
+                  const VectorType                  &fe_function,
                   const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &value);
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &value);
 
   /**
    * Same as above for hp.
@@ -2142,12 +2142,12 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector                     &fe_function,
+                  const VectorType                   &fe_function,
                   const Point<spacedim>              &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> >  &value);
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2160,10 +2160,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
-                  const InVector                 &fe_function,
+                  const VectorType               &fe_function,
                   const Point<spacedim>          &point);
 
   /**
@@ -2172,10 +2172,10 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
-                  const InVector                     &fe_function,
+                  const VectorType                   &fe_function,
                   const Point<spacedim>              &point);
 
   /**
@@ -2189,13 +2189,13 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_gradient (const Mapping<dim, spacedim>      &mapping,
                   const DoFHandler<dim,spacedim>    &dof,
-                  const InVector                    &fe_function,
+                  const VectorType                  &fe_function,
                   const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &value);
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &value);
 
   /**
    * Same as above for hp.
@@ -2203,13 +2203,13 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   void
   point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>         &dof,
-                  const InVector                             &fe_function,
+                  const VectorType                           &fe_function,
                   const Point<spacedim>                      &point,
-                  std::vector<Tensor<1, spacedim, typename InVector::value_type> >          &value);
+                  std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2222,11 +2222,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const Mapping<dim,spacedim>    &mapping,
                   const DoFHandler<dim,spacedim> &dof,
-                  const InVector                 &fe_function,
+                  const VectorType               &fe_function,
                   const Point<spacedim>          &point);
 
   /**
@@ -2235,11 +2235,11 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim, typename InVector::value_type>
+  template <int dim, class VectorType, int spacedim>
+  Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::MappingCollection<dim,spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>        &dof,
-                  const InVector                            &fe_function,
+                  const VectorType                          &fe_function,
                   const Point<spacedim>                     &point);
 
   //@}
@@ -2321,22 +2321,22 @@ namespace VectorTools
    * Lagrangian elements. For all other elements, you will need to compute the
    * mean value and subtract it right inside the evaluation routine.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double compute_mean_value (const Mapping<dim, spacedim>   &mapping,
                              const DoFHandler<dim,spacedim> &dof,
                              const Quadrature<dim>          &quadrature,
-                             const InVector                 &v,
-                             const unsigned int              component);
+                             const VectorType               &v,
+                             const unsigned int             component);
 
   /**
    * Calls the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, class InVector, int spacedim>
+  template <int dim, class VectorType, int spacedim>
   double compute_mean_value (const DoFHandler<dim,spacedim> &dof,
                              const Quadrature<dim>          &quadrature,
-                             const InVector                 &v,
-                             const unsigned int              component);
+                             const VectorType               &v,
+                             const unsigned int             component);
   //@}
   /**
    * Geometrical interpolation

@@ -53,7 +53,7 @@ namespace BlockMatrixIterators
    * Base class for block matrix accessors, implementing the stepping through
    * a matrix.
    */
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   class AccessorBase
   {
   public:
@@ -65,7 +65,7 @@ namespace BlockMatrixIterators
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrix::value_type value_type;
+    typedef typename BlockMatrixType::value_type value_type;
 
     /**
      * Initialize data fields to default values.
@@ -105,17 +105,17 @@ namespace BlockMatrixIterators
   /**
    * Accessor classes in block matrices.
    */
-  template <class BlockMatrix, bool ConstNess>
+  template <class BlockMatrixType, bool Constness>
   class Accessor;
 
 
   /**
    * Block matrix accessor for non const matrices.
    */
-  template <class BlockMatrix>
-  class Accessor<BlockMatrix, false>
+  template <class BlockMatrixType>
+  class Accessor<BlockMatrixType, false>
     :
-    public AccessorBase<BlockMatrix>
+    public AccessorBase<BlockMatrixType>
   {
   public:
     /**
@@ -126,12 +126,12 @@ namespace BlockMatrixIterators
     /**
      * Type of the matrix used in this accessor.
      */
-    typedef BlockMatrix MatrixType;
+    typedef BlockMatrixType MatrixType;
 
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrix::value_type value_type;
+    typedef typename BlockMatrixType::value_type value_type;
 
     /**
      * Constructor. Since we use accessors only for read access, a const
@@ -141,7 +141,7 @@ namespace BlockMatrixIterators
      * create the end pointer if @p row equals the total number of rows in the
      * matrix.
      */
-    Accessor (BlockMatrix *m,
+    Accessor (BlockMatrixType *m,
               const size_type row,
               const size_type col);
 
@@ -169,12 +169,12 @@ namespace BlockMatrixIterators
     /**
      * The matrix accessed.
      */
-    BlockMatrix *matrix;
+    BlockMatrixType *matrix;
 
     /**
      * Iterator of the underlying matrix class.
      */
-    typename BlockMatrix::BlockType::iterator base_iterator;
+    typename BlockMatrixType::BlockType::iterator base_iterator;
 
     /**
      * Move ahead one element.
@@ -187,17 +187,17 @@ namespace BlockMatrixIterators
     bool operator == (const Accessor &a) const;
 
     template <typename> friend class MatrixIterator;
-    friend class Accessor<BlockMatrix, true>;
+    friend class Accessor<BlockMatrixType, true>;
   };
 
   /**
    * Block matrix accessor for constant matrices, implementing the stepping
    * through a matrix.
    */
-  template <class BlockMatrix>
-  class Accessor<BlockMatrix, true>
+  template <class BlockMatrixType>
+  class Accessor<BlockMatrixType, true>
     :
-    public AccessorBase<BlockMatrix>
+    public AccessorBase<BlockMatrixType>
   {
   public:
     /**
@@ -208,12 +208,12 @@ namespace BlockMatrixIterators
     /**
      * Type of the matrix used in this accessor.
      */
-    typedef const BlockMatrix MatrixType;
+    typedef const BlockMatrixType MatrixType;
 
     /**
      * Typedef the value type of the matrix we point into.
      */
-    typedef typename BlockMatrix::value_type value_type;
+    typedef typename BlockMatrixType::value_type value_type;
 
     /**
      * Constructor. Since we use accessors only for read access, a const
@@ -223,14 +223,14 @@ namespace BlockMatrixIterators
      * create the end pointer if @p row equals the total number of rows in the
      * matrix.
      */
-    Accessor (const BlockMatrix *m,
+    Accessor (const BlockMatrixType *m,
               const size_type row,
               const size_type col);
 
     /**
      * Initialize const accessor from non const accessor.
      */
-    Accessor(const Accessor<BlockMatrix, false> &);
+    Accessor(const Accessor<BlockMatrixType, false> &);
 
     /**
      * Row number of the element represented by this object.
@@ -250,12 +250,12 @@ namespace BlockMatrixIterators
     /**
      * The matrix accessed.
      */
-    const BlockMatrix *matrix;
+    const BlockMatrixType *matrix;
 
     /**
      * Iterator of the underlying matrix class.
      */
-    typename BlockMatrix::BlockType::const_iterator base_iterator;
+    typename BlockMatrixType::BlockType::const_iterator base_iterator;
 
     /**
      * Move ahead one element.
@@ -1040,19 +1040,19 @@ private:
 
 namespace BlockMatrixIterators
 {
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  AccessorBase<BlockMatrix>::AccessorBase()
+  AccessorBase<BlockMatrixType>::AccessorBase()
     :
     row_block(0),
     col_block(0)
   {}
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   unsigned int
-  AccessorBase<BlockMatrix>::block_row() const
+  AccessorBase<BlockMatrixType>::block_row() const
   {
     Assert (row_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1061,10 +1061,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   unsigned int
-  AccessorBase<BlockMatrix>::block_column() const
+  AccessorBase<BlockMatrixType>::block_column() const
   {
     Assert (col_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1073,12 +1073,12 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  Accessor<BlockMatrix, true>::Accessor (
-    const BlockMatrix  *matrix,
-    const size_type     row,
-    const size_type     col)
+  Accessor<BlockMatrixType, true>::Accessor (
+    const BlockMatrixType  *matrix,
+    const size_type        row,
+    const size_type        col)
     :
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
@@ -1126,9 +1126,9 @@ namespace BlockMatrixIterators
   }
 
 
-//   template <class BlockMatrix>
+//   template <class BlockMatrixType>
 //   inline
-//   Accessor<BlockMatrix, true>::Accessor (const Accessor<BlockMatrix, true>& other)
+//   Accessor<BlockMatrixType, true>::Accessor (const Accessor<BlockMatrixType, true>& other)
 //                :
 //                matrix(other.matrix),
 //                base_iterator(other.base_iterator)
@@ -1138,9 +1138,9 @@ namespace BlockMatrixIterators
 //   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  Accessor<BlockMatrix, true>::Accessor (const Accessor<BlockMatrix, false> &other)
+  Accessor<BlockMatrixType, true>::Accessor (const Accessor<BlockMatrixType, false> &other)
     :
     matrix(other.matrix),
     base_iterator(other.base_iterator)
@@ -1150,10 +1150,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, true>::size_type
-  Accessor<BlockMatrix, true>::row() const
+  typename Accessor<BlockMatrixType, true>::size_type
+  Accessor<BlockMatrixType, true>::row() const
   {
     Assert (this->row_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1163,10 +1163,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, true>::size_type
-  Accessor<BlockMatrix, true>::column() const
+  typename Accessor<BlockMatrixType, true>::size_type
+  Accessor<BlockMatrixType, true>::column() const
   {
     Assert (this->col_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1176,10 +1176,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, true>::value_type
-  Accessor<BlockMatrix, true>::value () const
+  typename Accessor<BlockMatrixType, true>::value_type
+  Accessor<BlockMatrixType, true>::value () const
   {
     Assert (this->row_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1191,10 +1191,10 @@ namespace BlockMatrixIterators
 
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   void
-  Accessor<BlockMatrix, true>::advance ()
+  Accessor<BlockMatrixType, true>::advance ()
   {
     Assert (this->row_block != numbers::invalid_unsigned_int,
             ExcIteratorPastEnd());
@@ -1257,10 +1257,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   bool
-  Accessor<BlockMatrix, true>::operator == (const Accessor &a) const
+  Accessor<BlockMatrixType, true>::operator == (const Accessor &a) const
   {
     if (matrix != a.matrix)
       return false;
@@ -1283,12 +1283,12 @@ namespace BlockMatrixIterators
 //----------------------------------------------------------------------//
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  Accessor<BlockMatrix, false>::Accessor (
-    BlockMatrix  *matrix,
-    const size_type row,
-    const size_type col)
+  Accessor<BlockMatrixType, false>::Accessor (
+    BlockMatrixType  *matrix,
+    const size_type  row,
+    const size_type  col)
     :
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
@@ -1335,10 +1335,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, false>::size_type
-  Accessor<BlockMatrix, false>::row() const
+  typename Accessor<BlockMatrixType, false>::size_type
+  Accessor<BlockMatrixType, false>::row() const
   {
     Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1348,10 +1348,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, false>::size_type
-  Accessor<BlockMatrix, false>::column() const
+  typename Accessor<BlockMatrixType, false>::size_type
+  Accessor<BlockMatrixType, false>::column() const
   {
     Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1361,10 +1361,10 @@ namespace BlockMatrixIterators
   }
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
-  typename Accessor<BlockMatrix, false>::value_type
-  Accessor<BlockMatrix, false>::value () const
+  typename Accessor<BlockMatrixType, false>::value_type
+  Accessor<BlockMatrixType, false>::value () const
   {
     Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1376,10 +1376,10 @@ namespace BlockMatrixIterators
 
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   void
-  Accessor<BlockMatrix, false>::set_value (typename Accessor<BlockMatrix, false>::value_type newval) const
+  Accessor<BlockMatrixType, false>::set_value (typename Accessor<BlockMatrixType, false>::value_type newval) const
   {
     Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1391,10 +1391,10 @@ namespace BlockMatrixIterators
 
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   void
-  Accessor<BlockMatrix, false>::advance ()
+  Accessor<BlockMatrixType, false>::advance ()
   {
     Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1458,10 +1458,10 @@ namespace BlockMatrixIterators
 
 
 
-  template <class BlockMatrix>
+  template <class BlockMatrixType>
   inline
   bool
-  Accessor<BlockMatrix, false>::operator == (const Accessor &a) const
+  Accessor<BlockMatrixType, false>::operator == (const Accessor &a) const
   {
     if (matrix != a.matrix)
       return false;
