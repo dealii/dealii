@@ -72,18 +72,9 @@ FE_Nothing<dim,spacedim>::get_name () const
 
 template <int dim, int spacedim>
 UpdateFlags
-FE_Nothing<dim,spacedim>::update_once (const UpdateFlags /*flags*/) const
+FE_Nothing<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
-  return update_default;
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_Nothing<dim,spacedim>::update_each (const UpdateFlags /*flags*/) const
-{
-  return update_default;
+  return flags;
 }
 
 

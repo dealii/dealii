@@ -216,6 +216,16 @@ FE_DGPNonparametric<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 }
 
 
+
+template <int dim, int spacedim>
+UpdateFlags
+FE_DGPNonparametric<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
+{
+  return update_once(flags) | update_each(flags);
+}
+
+
+
 template <int dim, int spacedim>
 UpdateFlags
 FE_DGPNonparametric<dim,spacedim>::update_once (const UpdateFlags) const

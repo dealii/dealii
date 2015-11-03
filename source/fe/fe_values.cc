@@ -3436,16 +3436,14 @@ template <int dim, int spacedim>
 UpdateFlags
 FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags) const
 {
-
-  // first find out which objects
-  // need to be recomputed on each
-  // cell we visit. this we have to
-  // ask the finite element and mapping.
-  // elements are first since they
-  // might require update in mapping
+  // first find out which objects need to be recomputed on each
+  // cell we visit. this we have to ask the finite element and mapping.
+  // elements are first since they might require update in mapping
+  //
+  // there is no need to iterate since mappings will never require
+  // the finite element to compute something for them
   UpdateFlags flags = update_flags
-                      | fe->update_once (update_flags)
-                      | fe->update_each (update_flags);
+                      | fe->requires_update_flags (update_flags);
   flags |= mapping->requires_update_flags (flags);
 
   return flags;

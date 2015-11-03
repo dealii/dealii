@@ -74,6 +74,11 @@ public:
    */
   unsigned int get_degree () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
 protected:
   /*
    * NOTE: The following functions have their definitions inlined into the class declaration
@@ -196,7 +201,7 @@ protected:
    * All other flags of the result are cleared, since everything else must be
    * computed for each cell.
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
    * Determine the values that need to be computed on every cell to be able to
@@ -226,7 +231,7 @@ protected:
    *
    * </ul>
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags update_each (const UpdateFlags flags) const;
 
 
   /**

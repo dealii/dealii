@@ -176,6 +176,13 @@ FE_Poly<POLY,dim,spacedim>::shape_4th_derivative_component (const unsigned int i
 //---------------------------------------------------------------------------
 
 
+template <class POLY, int dim, int spacedim>
+UpdateFlags
+FE_Poly<POLY,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
+{
+  return update_once(flags) | update_each(flags);
+}
+
 
 
 template <class POLY, int dim, int spacedim>

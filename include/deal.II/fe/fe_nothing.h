@@ -113,36 +113,10 @@ public:
   std::string
   get_name() const;
 
-  /**
-   * Determine the values a finite element should compute on initialization of
-   * data for FEValues.
-   *
-   * Given a set of flags indicating what quantities are requested from a
-   * FEValues object, update_once() and update_each() compute which values
-   * must really be computed. Then, the <tt>fill_*_values</tt> functions are
-   * called with the result of these.
-   *
-   * In this case, since the element has zero degrees of freedom and no
-   * information can be computed on it, this function simply returns the
-   * default (empty) set of update flags.
-   */
-
+  // for documentation, see the FiniteElement base class
   virtual
   UpdateFlags
-  update_once (const UpdateFlags flags) const;
-
-  /**
-   * Complementary function for update_once().
-   *
-   * While update_once() returns the values to be computed on the unit cell
-   * for yielding the required data, this function determines the values that
-   * must be recomputed on each cell.
-   *
-   * Refer to update_once() for more details.
-   */
-  virtual
-  UpdateFlags
-  update_each (const UpdateFlags flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
    * Return the value of the @p ith shape function at the point @p p. @p p is
@@ -276,11 +250,11 @@ public:
   bool is_dominating() const;
 
 private:
+
   /**
    * If true, this element will dominate any other apart from itself in compare_for_face_domination();
    */
   const bool dominate;
-
 };
 
 
