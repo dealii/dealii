@@ -15,6 +15,8 @@
 
 // Generic routines to check consistency of function classes
 
+#ifndef __TESTS_FUNCTIONS_H
+#define __TESTS_FUNCTIONS_H
 
 // Check, whether the various implementations of function values are
 // consistent. Arguments include the function, the amount of
@@ -230,3 +232,4 @@ check_gradient(
   deallog << std::endl;
 }
 
+#endif
