@@ -17,6 +17,7 @@
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
+#include <cmath>
 
 
 #ifdef DEAL_II_WITH_MUPARSER
@@ -170,6 +171,11 @@ namespace internal
   {
     return std::pow(a, b);
   }
+
+  double mu_erfc(double value)
+  {
+    return erfc(value);
+  }
 }
 
 
@@ -208,6 +214,7 @@ void FunctionParser<dim>:: init_muparser() const
       fp.get()[component].DefineFun("sec", internal::mu_sec, true);
       fp.get()[component].DefineFun("log", internal::mu_log, true);
       fp.get()[component].DefineFun("pow", internal::mu_pow, true);
+      fp.get()[component].DefineFun("erfc", internal::mu_erfc, true);
 
       try
         {
@@ -257,7 +264,8 @@ void FunctionParser<dim>:: init_muparser() const
             "csc",
             "floor",
             "sec",
-            "pow"
+            "pow",
+            "erfc"
           };
           for (unsigned int f=0; f<sizeof(function_names)/sizeof(function_names[0]); ++f)
             {
