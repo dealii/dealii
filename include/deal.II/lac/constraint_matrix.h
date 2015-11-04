@@ -1000,7 +1000,7 @@ public:
    * the constraint $x_3=\frac 12 x_1 + \frac 12 x_2$, then this function will
    * read the values of $x_1$ and $x_1$ from the given vector and set the
    * element $x_3$ according to this constraints. Similarly, if the current
-   * object stores the constraint $x_42=208$, then this function will set the
+   * object stores the constraint $x_{42}=208$, then this function will set the
    * 42nd element of the given vector to 208.
    *
    * @note If this function is called with a parallel vector @p vec, then the
