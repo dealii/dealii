@@ -1707,9 +1707,10 @@ namespace MatrixCreator
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
-    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
+    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping,
+                          dof, q, matrix, coefficient, constraints);
   }
 
 
@@ -1766,10 +1767,10 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
-                          matrix, rhs, rhs_vector, coefficient);
+                          matrix, rhs, rhs_vector, coefficient, constraints);
   }
 
 
@@ -1819,9 +1820,10 @@ namespace MatrixCreator
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
-    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
+    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
+                          matrix, coefficient, constraints);
   }
 
 
@@ -1875,10 +1877,10 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-                          matrix, rhs, rhs_vector, coefficient);
+                          matrix, rhs, rhs_vector, coefficient, constraints);
   }
 
 }  // namespace MatrixCreator
