@@ -548,20 +548,36 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<dealii::Vector<typename VectorType::value_type> > tmp(patch_values_system.size());
-      for (unsigned int i = 0; i < patch_values_system.size(); i++)
-        tmp[i].reinit(patch_values_system[i]);
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_values (*vector,
+                                               // reinterpret output argument type; because of
+                                               // the 'if' statement above, this is the
+                                               // identity cast whenever the code is
+                                               // executed, but the cast is necessary
+                                               // to allow compilation even if we don't get here
+                                               reinterpret_cast<std::vector<dealii::Vector<typename VectorType::value_type> >&>
+                                               (patch_values_system));
+        }
+      else
+        {
+          std::vector<dealii::Vector<typename VectorType::value_type> > tmp(patch_values_system.size());
+          for (unsigned int i = 0; i < patch_values_system.size(); i++)
+            tmp[i].reinit(patch_values_system[i]);
 
-      fe_patch_values.get_function_values (*vector, tmp);
+          fe_patch_values.get_function_values (*vector, tmp);
 
-      for (unsigned int i = 0; i < patch_values_system.size(); i++)
-        patch_values_system[i] = tmp[i];
+          for (unsigned int i = 0; i < patch_values_system.size(); i++)
+            patch_values_system[i] = tmp[i];
+        }
     }
 
 
@@ -575,18 +591,34 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<typename VectorType::value_type> tmp (patch_values.size());
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_values (*vector,
+                                               // reinterpret output argument type; because of
+                                               // the 'if' statement above, this is the
+                                               // identity cast whenever the code is
+                                               // executed, but the cast is necessary
+                                               // to allow compilation even if we don't get here
+                                               reinterpret_cast<std::vector<typename VectorType::value_type>&>
+                                               (patch_values));
+        }
+      else
+        {
+          std::vector<typename VectorType::value_type> tmp (patch_values.size());
 
-      fe_patch_values.get_function_values (*vector, tmp);
+          fe_patch_values.get_function_values (*vector, tmp);
 
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        patch_values[i] = tmp[i];
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            patch_values[i] = tmp[i];
+        }
     }
 
 
@@ -600,21 +632,37 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        tmp[i].resize(patch_gradients_system[i].size());
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_gradients (*vector,
+                                                  // reinterpret output argument type; because of
+                                                  // the 'if' statement above, this is the
+                                                  // identity cast whenever the code is
+                                                  // executed, but the cast is necessary
+                                                  // to allow compilation even if we don't get here
+                                                  reinterpret_cast<std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > >&>
+                                                  (patch_gradients_system));
+        }
+      else
+        {
+          std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            tmp[i].resize(patch_gradients_system[i].size());
 
-      fe_patch_values.get_function_gradients (*vector, tmp);
+          fe_patch_values.get_function_gradients (*vector, tmp);
 
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        for (unsigned int j = 0; j < tmp[i].size(); j++)
-          patch_gradients_system[i][j] = tmp[i][j];
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            for (unsigned int j = 0; j < tmp[i].size(); j++)
+              patch_gradients_system[i][j] = tmp[i][j];
+        }
     }
 
 
@@ -628,19 +676,35 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >  tmp;
-      tmp.resize(patch_gradients.size());
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_gradients (*vector,
+                                                  // reinterpret output argument type; because of
+                                                  // the 'if' statement above, this is the
+                                                  // identity cast whenever the code is
+                                                  // executed, but the cast is necessary
+                                                  // to allow compilation even if we don't get here
+                                                  reinterpret_cast<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >&>
+                                                  (patch_gradients));
+        }
+      else
+        {
+          std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >  tmp;
+          tmp.resize(patch_gradients.size());
 
-      fe_patch_values.get_function_gradients (*vector, tmp);
+          fe_patch_values.get_function_gradients (*vector, tmp);
 
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        patch_gradients[i] = tmp[i];
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            patch_gradients[i] = tmp[i];
+        }
     }
 
 
@@ -654,21 +718,37 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_hessians_system.size());
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        tmp[i].resize(patch_hessians_system[i].size());
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_hessians (*vector,
+                                                 // reinterpret output argument type; because of
+                                                 // the 'if' statement above, this is the
+                                                 // identity cast whenever the code is
+                                                 // executed, but the cast is necessary
+                                                 // to allow compilation even if we don't get here
+                                                 reinterpret_cast<std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > >&>
+                                                 (patch_hessians_system));
+        }
+      else
+        {
+          std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_hessians_system.size());
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            tmp[i].resize(patch_hessians_system[i].size());
 
-      fe_patch_values.get_function_hessians (*vector, tmp);
+          fe_patch_values.get_function_hessians (*vector, tmp);
 
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        for (unsigned int j = 0; j < tmp[i].size(); j++)
-          patch_hessians_system[i][j] = tmp[i][j];
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            for (unsigned int j = 0; j < tmp[i].size(); j++)
+              patch_hessians_system[i][j] = tmp[i][j];
+        }
     }
 
 
@@ -682,18 +762,34 @@ namespace internal
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
       // up as 'double' vectors. this requires the use of a temporary
-      // variable here
+      // variable here if the data we get is not a 'double' vector.
+      // (of course, in reality, this also means that we may lose
+      // information to begin with.)
       //
       // the correct thing would be to also use the correct data type
       // upstream somewhere, but this is complicated because we hide
       // the actual data type from upstream. rather, we should at
       // least make sure we can deal with complex numbers
-      std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > tmp(patch_hessians.size());
+      if (typeid(typename VectorType::value_type) == typeid(double))
+        {
+          fe_patch_values.get_function_hessians (*vector,
+                                                 // reinterpret output argument type; because of
+                                                 // the 'if' statement above, this is the
+                                                 // identity cast whenever the code is
+                                                 // executed, but the cast is necessary
+                                                 // to allow compilation even if we don't get here
+                                                 reinterpret_cast<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> >&>
+                                                 (patch_hessians));
+        }
+      else
+        {
+          std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > tmp(patch_hessians.size());
 
-      fe_patch_values.get_function_hessians (*vector, tmp);
+          fe_patch_values.get_function_hessians (*vector, tmp);
 
-      for (unsigned int i = 0; i < tmp.size(); i++)
-        patch_hessians[i] = tmp[i];
+          for (unsigned int i = 0; i < tmp.size(); i++)
+            patch_hessians[i] = tmp[i];
+        }
     }
 
 
