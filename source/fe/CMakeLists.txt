@@ -33,6 +33,7 @@ SET(_src
   fe_nothing.cc
   fe_poly.cc
   fe_poly_tensor.cc
+  fe_p1nc.cc
   fe_q_base.cc
   fe_q.cc
   fe_q_bubbles.cc
