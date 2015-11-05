@@ -1297,8 +1297,7 @@ namespace Step9
     // using this quantity and the right powers of the mesh width:
     const Tensor<2,dim> Y_inverse = invert(Y);
 
-    Tensor<1,dim> gradient;
-    contract (gradient, Y_inverse, projected_gradient);
+    Tensor<1,dim> gradient = Y_inverse * projected_gradient;
 
     // The last part of this function is the one where we
     // write into the element of the output vector what
