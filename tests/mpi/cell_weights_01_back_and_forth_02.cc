@@ -61,9 +61,9 @@ void test()
 
   // repartition the mesh as described above, first in some arbitrary
   // way, and then with no weights
-  tr.signals.cell_weight.connect(std::bind(&cell_weight_1<dim>,
-                                           std_cxx11::_1,
-                                           std_cxx11::_2));
+  tr.signals.cell_weight.connect(std_cxx11::bind(&cell_weight_1<dim>,
+                                                 std_cxx11::_1,
+                                                 std_cxx11::_2));
   tr.repartition();
 
   tr.signals.cell_weight.disconnect_all_slots();
