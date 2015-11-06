@@ -294,7 +294,6 @@ private:
   void build_one_patch (const std::pair<cell_iterator, unsigned int>                         *cell_and_index,
                         internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>  &scratch_data,
                         const unsigned int                                                    n_subdivisions,
-                        const unsigned int                                                    n_datasets,
                         const CurvedCellRegion                                                curved_cell_region,
                         std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches);
 };

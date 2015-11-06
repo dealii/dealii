@@ -65,16 +65,12 @@ DataOut<dim,DH>::
 build_one_patch (const std::pair<cell_iterator, unsigned int>                         *cell_and_index,
                  internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>  &scratch_data,
                  const unsigned int                                                    n_subdivisions,
-                 const unsigned int                                                    n_datasets,
                  const CurvedCellRegion                                                curved_cell_region,
                  std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches)
 {
   // first create the output object that we will write into
   ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> patch;
   patch.n_subdivisions = n_subdivisions;
-  patch.data.reinit (n_datasets,
-                     Utilities::fixed_power<DH::dimension>(n_subdivisions+1));
-
 
   // use ucd_to_deal map as patch vertices are in the old, unnatural
   // ordering. if the mapping does not preserve locations
@@ -458,7 +454,6 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                                         copy data object -- it just writes everything right into the
                                         output array */
                                      n_subdivisions,
-                                     n_datasets,
                                      curved_cell_region,
                                      std_cxx11::ref(this->patches)),
                      // no copy-local-to-global function needed here
