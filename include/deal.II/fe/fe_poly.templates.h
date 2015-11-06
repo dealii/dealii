@@ -249,41 +249,44 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
 
   const UpdateFlags flags(fe_data.update_each);
 
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+  if (flags & update_values)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      for (unsigned int i=0; i<quadrature.size(); ++i)
+        output_data.shape_values(k,i) = fe_data.shape_values[k][i];
+
+  if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      mapping.transform (fe_data.shape_gradients[k],
+                         mapping_covariant,
+                         mapping_internal,
+                         output_data.shape_gradients[k]);
+
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform (fe_data.shape_gradients[k],
-                           mapping_covariant,
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (fe_data.shape_hessians[k],
+                           mapping_covariant_gradient,
                            mapping_internal,
-                           output_data.shape_gradients[k]);
+                           output_data.shape_hessians[k]);
 
-      if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-        {
-          mapping.transform (fe_data.shape_hessians[k],
-                             mapping_covariant_gradient,
-                             mapping_internal,
-                             output_data.shape_hessians[k]);
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            output_data.shape_hessians[k][i] -=
+              mapping_data.jacobian_pushed_forward_grads[i][j]
+              * output_data.shape_gradients[k][i][j];
+    }
 
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              output_data.shape_hessians[k][i] -=
-                mapping_data.jacobian_pushed_forward_grads[i][j]
-                * output_data.shape_gradients[k][i][j];
-        }
+  if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (fe_data.shape_3rd_derivatives[k],
+                           mapping_covariant_hessian,
+                           mapping_internal,
+                           output_data.shape_3rd_derivatives[k]);
 
-      if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
-        {
-          mapping.transform (fe_data.shape_3rd_derivatives[k],
-                             mapping_covariant_hessian,
-                             mapping_internal,
-                             output_data.shape_3rd_derivatives[k]);
-
-          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
-        }
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
     }
 }
 
@@ -321,45 +324,48 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 
   const UpdateFlags flags(fe_data.update_each);
 
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+  if (flags & update_values)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      for (unsigned int i=0; i<quadrature.size(); ++i)
+        output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+
+  if (flags & update_gradients)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                         mapping_covariant,
+                         mapping_internal,
+                         output_data.shape_gradients[k]);
+
+  if (flags & update_hessians)
     {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
-
-      if (flags & update_gradients)
-        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                           mapping_covariant,
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (make_slice(fe_data.shape_hessians[k],
+                                      offset,
+                                      quadrature.size()),
+                           mapping_covariant_gradient,
                            mapping_internal,
-                           output_data.shape_gradients[k]);
+                           output_data.shape_hessians[k]);
 
-      if (flags & update_hessians)
-        {
-          mapping.transform (make_slice(fe_data.shape_hessians[k],
-                                        offset,
-                                        quadrature.size()),
-                             mapping_covariant_gradient,
-                             mapping_internal,
-                             output_data.shape_hessians[k]);
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            output_data.shape_hessians[k][i] -=
+              mapping_data.jacobian_pushed_forward_grads[i][j]
+              * output_data.shape_gradients[k][i][j];
+    }
 
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              output_data.shape_hessians[k][i] -=
-                mapping_data.jacobian_pushed_forward_grads[i][j]
-                * output_data.shape_gradients[k][i][j];
-        }
+  if (flags & update_3rd_derivatives)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                      offset,
+                                      quadrature.size()),
+                           mapping_covariant_hessian,
+                           mapping_internal,
+                           output_data.shape_3rd_derivatives[k]);
 
-      if (flags & update_3rd_derivatives)
-        {
-          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
-                                        offset,
-                                        quadrature.size()),
-                             mapping_covariant_hessian,
-                             mapping_internal,
-                             output_data.shape_3rd_derivatives[k]);
-
-          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
-        }
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
     }
 }
 
@@ -397,47 +403,52 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 
   const UpdateFlags flags(fe_data.update_each);
 
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+  if (flags & update_values)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      for (unsigned int i=0; i<quadrature.size(); ++i)
+        output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
+
+  if (flags & update_gradients)
+    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+      mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+                         mapping_covariant,
+                         mapping_internal,
+                         output_data.shape_gradients[k]);
+
+  if (flags & update_hessians)
     {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
-
-      if (flags & update_gradients)
-        mapping.transform (make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
-                           mapping_covariant,
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (make_slice(fe_data.shape_hessians[k],
+                                      offset,
+                                      quadrature.size()),
+                           mapping_covariant_gradient,
                            mapping_internal,
-                           output_data.shape_gradients[k]);
+                           output_data.shape_hessians[k]);
 
-      if (flags & update_hessians)
-        {
-          mapping.transform (make_slice(fe_data.shape_hessians[k],
-                                        offset,
-                                        quadrature.size()),
-                             mapping_covariant_gradient,
-                             mapping_internal,
-                             output_data.shape_hessians[k]);
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            output_data.shape_hessians[k][i] -=
+              mapping_data.jacobian_pushed_forward_grads[i][j]
+              * output_data.shape_gradients[k][i][j];
+    }
 
-          for (unsigned int i=0; i<quadrature.size(); ++i)
-            for (unsigned int j=0; j<spacedim; ++j)
-              output_data.shape_hessians[k][i] -=
-                mapping_data.jacobian_pushed_forward_grads[i][j]
-                * output_data.shape_gradients[k][i][j];
-        }
+  if (flags & update_3rd_derivatives)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
+                                      offset,
+                                      quadrature.size()),
+                           mapping_covariant_hessian,
+                           mapping_internal,
+                           output_data.shape_3rd_derivatives[k]);
 
-      if (flags & update_3rd_derivatives)
-        {
-          mapping.transform (make_slice(fe_data.shape_3rd_derivatives[k],
-                                        offset,
-                                        quadrature.size()),
-                             mapping_covariant_hessian,
-                             mapping_internal,
-                             output_data.shape_3rd_derivatives[k]);
-
-          correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
-        }
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
     }
 }
+
+
 
 template <class POLY, int dim, int spacedim>
 inline void
