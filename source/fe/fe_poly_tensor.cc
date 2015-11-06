@@ -1675,6 +1675,15 @@ fill_fe_subface_values (const Mapping<dim,spacedim>                             
 }
 
 
+
+template <class POLY, int dim, int spacedim>
+UpdateFlags
+FE_PolyTensor<POLY,dim,spacedim>::requires_update_flags(const UpdateFlags flags) const
+{
+  return update_once(flags) | update_each(flags);
+}
+
+
 template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyTensor<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const

@@ -168,6 +168,11 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element.  The size of the matrix is then
@@ -322,7 +327,7 @@ protected:
    * All other flags of the result are cleared, since everything else must be
    * computed for each cell.
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
    * Determine the values that need to be computed on every cell to be able to
@@ -352,7 +357,7 @@ protected:
    *
    * </ul>
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags update_each (const UpdateFlags flags) const;
 
 private:
   /**

@@ -283,6 +283,11 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the value of the @p ith shape function at the point @p p. See the
    * FiniteElement base class for more information about the semantics of this
@@ -582,7 +587,7 @@ private:
    *
    * For the present kind of finite element, this is exactly the case.
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
    * This is the opposite to the above function: given a set of flags
@@ -593,7 +598,7 @@ private:
    * (for example, we often need the covariant transformation when gradients
    * need to be computed), include this in the result as well.
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * Degree of the polynomials.

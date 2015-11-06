@@ -844,28 +844,13 @@ face_to_cell_index (const unsigned int face_dof_index,
 
 template <int dim, int spacedim>
 UpdateFlags
-FESystem<dim,spacedim>::update_once (const UpdateFlags flags) const
+FESystem<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
   // generate maximal set of flags
   // that are necessary
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    out |= base_element(base_no).update_once(flags);
-  return out;
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-  // generate maximal set of flags
-  // that are necessary
-  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    out |= base_element(base_no).update_each(flags);
-
+    out |= base_element(base_no).requires_update_flags (flags);
   return out;
 }
 
@@ -873,13 +858,19 @@ FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
+FESystem<dim,spacedim>::get_data (const UpdateFlags      flags,
                                   const Mapping<dim,spacedim>    &mapping,
                                   const Quadrature<dim> &quadrature) const
 {
-  UpdateFlags flags = flags_;
+  // create an internal data object and set the update flags we will need
+  // to deal with. the current object does not make use of these flags,
+  // but we need to nevertheless set them correctly since we look
+  // into the update_each flag of base elements in fill_fe_values,
+  // and so the current object's update_each flag needs to be
+  // correct in case the current FESystem is a base element for another,
+  // higher-level FESystem itself.
   InternalData *data = new InternalData(this->n_base_elements());
-  data->update_each = update_each(flags) | update_once(flags);
+  data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their
@@ -918,14 +909,19 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_face_data (
-  const UpdateFlags      flags_,
-  const Mapping<dim,spacedim>    &mapping,
-  const Quadrature<dim-1> &quadrature) const
+FESystem<dim,spacedim>::get_face_data (const UpdateFlags      flags,
+                                       const Mapping<dim,spacedim>    &mapping,
+                                       const Quadrature<dim-1> &quadrature) const
 {
-  UpdateFlags flags = flags_;
+  // create an internal data object and set the update flags we will need
+  // to deal with. the current object does not make use of these flags,
+  // but we need to nevertheless set them correctly since we look
+  // into the update_each flag of base elements in fill_fe_values,
+  // and so the current object's update_each flag needs to be
+  // correct in case the current FESystem is a base element for another,
+  // higher-level FESystem itself.
   InternalData *data = new InternalData(this->n_base_elements());
-  data->update_each = update_each(flags) | update_once(flags);
+  data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their
@@ -966,14 +962,19 @@ FESystem<dim,spacedim>::get_face_data (
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_subface_data (
-  const UpdateFlags      flags_,
-  const Mapping<dim,spacedim>    &mapping,
-  const Quadrature<dim-1> &quadrature) const
+FESystem<dim,spacedim>::get_subface_data (const UpdateFlags      flags,
+                                          const Mapping<dim,spacedim>    &mapping,
+                                          const Quadrature<dim-1> &quadrature) const
 {
-  UpdateFlags flags = flags_;
+  // create an internal data object and set the update flags we will need
+  // to deal with. the current object does not make use of these flags,
+  // but we need to nevertheless set them correctly since we look
+  // into the update_each flag of base elements in fill_fe_values,
+  // and so the current object's update_each flag needs to be
+  // correct in case the current FESystem is a base element for another,
+  // higher-level FESystem itself.
   InternalData *data = new InternalData(this->n_base_elements());
-  data->update_each = update_each(flags) | update_once(flags);
+  data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. do the creation of these objects in parallel as their

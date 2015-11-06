@@ -126,6 +126,11 @@ public:
                  const std::vector<bool> &restriction_is_additive_flags,
                  const std::vector<ComponentMask> &nonzero_components);
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Since these elements are vector valued, an exception is thrown.
    */
@@ -156,29 +161,30 @@ public:
                                                    const Point<dim> &p,
                                                    const unsigned int component) const;
 
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed only
-   * for the reference cell. Make sure, that #mapping_type is set by the
-   * derived class, such that this function can operate correctly.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed in
-   * each cell cell. Make sure, that #mapping_type is set by the derived
-   * class, such that this function can operate correctly.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
-
 protected:
   /**
    * The mapping type to be used to map shape functions from the reference
    * cell to the mesh cell.
    */
   MappingType mapping_type;
+
+
   /**
-  NOTE: The following function has its definition inlined into the class declaration
-    * because we otherwise run into a compiler error with MS Visual Studio.
-    */
+   * Given <tt>flags</tt>, determines the values which must be computed only
+   * for the reference cell. Make sure, that #mapping_type is set by the
+   * derived class, such that this function can operate correctly.
+   */
+  UpdateFlags update_once (const UpdateFlags flags) const;
+
+  /**
+   * Given <tt>flags</tt>, determines the values which must be computed in
+   * each cell cell. Make sure, that #mapping_type is set by the derived
+   * class, such that this function can operate correctly.
+   */
+  UpdateFlags update_each (const UpdateFlags flags) const;
+
+  /* NOTE: The following function has its definition inlined into the class declaration
+     because we otherwise run into a compiler error with MS Visual Studio. */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data(const UpdateFlags update_flags,

@@ -83,6 +83,11 @@ public:
    */
   unsigned int get_degree () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the numbering of the underlying polynomial space compared to
    * lexicographic ordering of the basis functions. Returns
@@ -347,7 +352,7 @@ protected:
    * All other flags of the result are cleared, since everything else must be
    * computed for each cell.
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
    * Determine the values that need to be computed on every cell to be able to
@@ -377,7 +382,7 @@ protected:
    *
    * </ul>
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * Fields of cell-independent data.

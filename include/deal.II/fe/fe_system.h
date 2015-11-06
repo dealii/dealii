@@ -430,6 +430,11 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the value of the @p ith shape function at the point @p p.  @p p is
    * a point on the reference element. Since this finite element is always
@@ -842,12 +847,12 @@ protected:
   /**
    * Compute flags for initial update only.
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
    * Compute flags for update on each cell.
    */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * @p clone function instead of a copy constructor.

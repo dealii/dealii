@@ -2169,36 +2169,28 @@ protected:
   compute_n_nonzero_components (const std::vector<ComponentMask> &nonzero_components);
 
   /**
-   * Determine the values a finite element should compute on initialization of
-   * data for FEValues.
+   * Given a set of update flags, compute which other quantities <i>also</i>
+   * need to be computed in order to satisfy the request by the given flags.
+   * Then return the combination of the original set of flags and those
+   * just computed.
    *
-   * Given a set of flags indicating what quantities are requested from a
-   * FEValues object, update_once() and update_each() compute which values
-   * must really be computed. Then, the <tt>fill_*_values</tt> functions are
-   * called with the result of these.
+   * As an example, if @p update_flags contains update_gradients
+   * a finite element class will typically
+   * require the computation of the inverse of the Jacobian matrix in order to
+   * rotate the gradient of shape functions on the reference cell to the
+   * real cell. It would then return not just
+   * update_gradients, but also update_covariant_transformation, the flag that
+   * makes the mapping class produce the inverse of the Jacobian matrix.
    *
-   * Furthermore, values must be computed either on the unit cell or on the
-   * physical cell. For instance, the function values of FE_Q do only depend
-   * on the quadrature points on the unit cell. Therefore, this flags will be
-   * returned by update_once(). The gradients require computation of the
-   * covariant transformation matrix. Therefore, @p
-   * update_covariant_transformation and @p update_gradients will be returned
-   * by update_each().
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module.
    *
-   * For an example see the same function in the derived class FE_Q.
+   * @see UpdateFlags
    */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-
-  /**
-   * Complementary function for update_once().
-   *
-   * While update_once() returns the values to be computed on the unit cell
-   * for yielding the required data, this function determines the values that
-   * must be recomputed on each cell.
-   *
-   * Refer to update_once() for more details.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const = 0;
 
   /**
    * Prepare internal data structures and fill in values independent of the
