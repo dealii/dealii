@@ -873,34 +873,30 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags,
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
-  // them. do the creation of these objects in parallel as their
-  // creation may be expensive (because we precompute a bunch of
-  // things)
-  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
-  get_data_tasks (this->n_base_elements());
-  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
-                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_data,
-                                                     std_cxx11::cref(base_element(base_no)),
-                                                     std_cxx11::cref(flags),
-                                                     std_cxx11::cref(mapping),
-                                                     std_cxx11::cref(quadrature))));
-
-  // then wait for each of these calls to finish in turn and initialize
-  // these objects
+  // them. one might think that doing this in parallel (over the
+  // base elements) would be a good idea, but this turns out to
+  // be wrong because we would then run these jobs on different
+  // threads/processors and this allocates memory in different
+  // NUMA domains; this has large detrimental effects when later
+  // writing into these objects in fill_fe_*_values. all of this
+  // is particularly true when using FEValues objects in
+  // WorkStream contexts where we explicitly make sure that
+  // every function only uses objects previously allocated
+  // in the same NUMA context and on the same thread as the
+  // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        get_data_tasks[base_no].return_value();
+        base_element(base_no).get_data (flags, mapping, quadrature);
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_fe_data->update_each);
 
-      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
+
   return data;
 }
 
@@ -924,34 +920,30 @@ FESystem<dim,spacedim>::get_face_data (const UpdateFlags      flags,
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
-  // them. do the creation of these objects in parallel as their
-  // creation may be expensive (because we precompute a bunch of
-  // things)
-  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
-  get_data_tasks (this->n_base_elements());
-  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
-                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_face_data,
-                                                     std_cxx11::cref(base_element(base_no)),
-                                                     std_cxx11::cref(flags),
-                                                     std_cxx11::cref(mapping),
-                                                     std_cxx11::cref(quadrature))));
-
-  // then wait for each of these calls to finish in turn and initialize
-  // these objects
+  // them. one might think that doing this in parallel (over the
+  // base elements) would be a good idea, but this turns out to
+  // be wrong because we would then run these jobs on different
+  // threads/processors and this allocates memory in different
+  // NUMA domains; this has large detrimental effects when later
+  // writing into these objects in fill_fe_*_values. all of this
+  // is particularly true when using FEValues objects in
+  // WorkStream contexts where we explicitly make sure that
+  // every function only uses objects previously allocated
+  // in the same NUMA context and on the same thread as the
+  // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        get_data_tasks[base_no].return_value();
+        base_element(base_no).get_face_data (flags, mapping, quadrature);
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_fe_data->update_each);
 
-      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
+
   return data;
 }
 
@@ -977,34 +969,30 @@ FESystem<dim,spacedim>::get_subface_data (const UpdateFlags      flags,
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
-  // them. do the creation of these objects in parallel as their
-  // creation may be expensive (because we precompute a bunch of
-  // things)
-  std::vector<Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *> >
-  get_data_tasks (this->n_base_elements());
-  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-    get_data_tasks[base_no] = Threads::new_task (std_cxx11::function<typename FiniteElement<dim,spacedim>::InternalDataBase * ()>
-                                                 (std_cxx11::bind(&FiniteElement<dim,spacedim>::get_subface_data,
-                                                     std_cxx11::cref(base_element(base_no)),
-                                                     std_cxx11::cref(flags),
-                                                     std_cxx11::cref(mapping),
-                                                     std_cxx11::cref(quadrature))));
-
-  // then wait for each of these calls to finish in turn and initialize
-  // these objects
+  // them. one might think that doing this in parallel (over the
+  // base elements) would be a good idea, but this turns out to
+  // be wrong because we would then run these jobs on different
+  // threads/processors and this allocates memory in different
+  // NUMA domains; this has large detrimental effects when later
+  // writing into these objects in fill_fe_*_values. all of this
+  // is particularly true when using FEValues objects in
+  // WorkStream contexts where we explicitly make sure that
+  // every function only uses objects previously allocated
+  // in the same NUMA context and on the same thread as the
+  // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        get_data_tasks[base_no].return_value();
+        base_element(base_no).get_subface_data (flags, mapping, quadrature);
 
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_fe_data->update_each);
 
-      // then store the pointer to the base internal object
       data->set_fe_data(base_no, base_fe_data);
     }
+
   return data;
 }
 
@@ -1245,24 +1233,17 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 
   if (flags & (update_values | update_gradients
                | update_hessians | update_3rd_derivatives ))
-    {
-      // let base elements update the necessary data
-      Threads::TaskGroup<> task_group;
-      for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-        task_group
-        += Threads::new_task (std_cxx11::function<void ()>(std_cxx11::bind (&FESystem<dim,spacedim>::template compute_fill_one_base<dim_1>,
-                                                           this,
-                                                           std_cxx11::cref(mapping),
-                                                           std::make_pair(cell, CellSimilarity::none),
-                                                           std::make_pair(face_no, sub_no),
-                                                           std_cxx11::cref(quadrature),
-                                                           std::make_pair(&mapping_internal,
-                                                               &fedata),
-                                                           base_no,
-                                                           std_cxx11::ref(mapping_data),
-                                                           std_cxx11::ref(output_data))));
-      task_group.join_all();
-    }
+    for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
+      {
+        compute_fill_one_base<dim_1> (mapping,
+                                      std::make_pair(cell, CellSimilarity::none),
+                                      std::make_pair(face_no, sub_no),
+                                      quadrature,
+                                      std::make_pair(&mapping_internal, &fedata),
+                                      base_no,
+                                      mapping_data,
+                                      output_data);
+      }
 }
 
 
