@@ -280,37 +280,37 @@ protected:
 
   virtual
   void
-  fill_fe_values (const Mapping<1,spacedim>                              &mapping,
-                  const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                  const Quadrature<1>                                     &quadrature,
-                  const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                  const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data,
-                  const CellSimilarity::Similarity                          cell_similarity) const;
+  fill_fe_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                   cell_similarity,
+                  const Quadrature<1>                                               &quadrature,
+                  const Mapping<1,spacedim>                                         &mapping,
+                  const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                  const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                  const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_face_values (const Mapping<1,spacedim>                               &mapping,
-                       const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<0>                                   &quadrature,
-                       const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                       const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
+  fill_fe_face_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                       const unsigned int                                                 face_no,
+                       const Quadrature<0>                                               &quadrature,
+                       const Mapping<1,spacedim>                                         &mapping,
+                       const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                       const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                       const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<1,spacedim>                               &mapping,
-                          const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         sub_no,
-                          const Quadrature<0>                                   &quadrature,
-                          const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                          const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
+  fill_fe_subface_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                          const unsigned int                                                 face_no,
+                          const unsigned int                                                 sub_no,
+                          const Quadrature<0>                                               &quadrature,
+                          const Mapping<1,spacedim>                                         &mapping,
+                          const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                          const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                          const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
 
   /**

@@ -1001,17 +1001,17 @@ FESystem<dim,spacedim>::get_subface_data (const UpdateFlags      flags,
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
-                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const Quadrature<dim>                            &quadrature,
-                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
-                const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                const CellSimilarity::Similarity                                     cell_similarity,
+                const Quadrature<dim>                                               &quadrature,
+                const Mapping<dim,spacedim>                                         &mapping,
+                const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
-               quadrature, cell_similarity, mapping_internal, fe_data,
+               quadrature, cell_similarity, mapping_internal, fe_internal,
                mapping_data, output_data);
 }
 
@@ -1020,17 +1020,17 @@ fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                    face_no,
-                     const Quadrature<dim-1>              &quadrature,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                     const unsigned int                                                   face_no,
+                     const Quadrature<dim-1>                                             &quadrature,
+                     const Mapping<dim,spacedim>                                         &mapping,
+                     const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
-                CellSimilarity::none, mapping_internal, fe_data,
+                CellSimilarity::none, mapping_internal, fe_internal,
                 mapping_data, output_data);
 }
 
@@ -1040,18 +1040,18 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim>                      &mapping,
-                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const unsigned int                                face_no,
-                        const unsigned int                                sub_no,
-                        const Quadrature<dim-1>                          &quadrature,
-                        const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
-                        const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                        const unsigned int                                                   face_no,
+                        const unsigned int                                                   sub_no,
+                        const Quadrature<dim-1>                                             &quadrature,
+                        const Mapping<dim,spacedim>                                         &mapping,
+                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, sub_no, quadrature,
-                CellSimilarity::none, mapping_internal, fe_data,
+                CellSimilarity::none, mapping_internal, fe_internal,
                 mapping_data, output_data);
 }
 
@@ -1068,7 +1068,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const Quadrature<dim_1>                          &quadrature,
               const CellSimilarity::Similarity                  cell_similarity,
               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-              const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
+              const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
               const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
               internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
@@ -1076,8 +1076,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // Either dim_1==dim
   // (fill_fe_values) or dim_1==dim-1
@@ -1145,14 +1145,20 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         // copied from base_data to data on each face, therefore use
         // base_fe_data.update_flags.
         if (face_no==invalid_face_number)
-          base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_internal,
-                                 base_fe_data, mapping_data, base_data, cell_similarity);
+          base_fe.fill_fe_values(cell, cell_similarity,
+                                 *cell_quadrature,
+                                 mapping, mapping_internal, mapping_data,
+                                 base_fe_data, base_data);
         else if (sub_no==invalid_face_number)
-          base_fe.fill_fe_face_values(mapping, cell, face_no,
-                                      *face_quadrature, mapping_internal, base_fe_data, mapping_data, base_data);
+          base_fe.fill_fe_face_values(cell, face_no,
+                                      *face_quadrature,
+                                      mapping, mapping_internal, mapping_data,
+                                      base_fe_data, base_data);
         else
-          base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
-                                         *face_quadrature, mapping_internal, base_fe_data, mapping_data, base_data);
+          base_fe.fill_fe_subface_values(cell, face_no, sub_no,
+                                         *face_quadrature,
+                                         mapping, mapping_internal, mapping_data,
+                                         base_fe_data, base_data);
 
         // now data has been generated, so copy it. we used to work by
         // looping over all base elements (i.e. this outer loop), then over
