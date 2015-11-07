@@ -1090,24 +1090,6 @@ private:
   hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Compute the equivalent of compute_fill(), but only for the base element
-   * specified by the second-to-last argument. Some elements are grouped
-   * together to stay within the limit of 8 function arguments of boost.
-   */
-  template <int dim_1>
-  void
-  compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
-                         const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-                         CellSimilarity::Similarity>       cell_and_similarity,
-                         const std::pair<unsigned int,unsigned int>        face_sub_no,
-                         const Quadrature<dim_1>                          &quadrature,
-                         const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
-                         const typename FiniteElement<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
-                         const unsigned int                                base_element,
-                         const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
-
-  /**
    * Usually: Fields of cell-independent data.
    *
    * However, here, this class does not itself store the data but only
