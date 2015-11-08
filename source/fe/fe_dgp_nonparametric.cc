@@ -308,15 +308,18 @@ fill_fe_values (const Mapping<dim,spacedim> &,
                                  values, grads, grad_grads,
                                  empty_vector_of_3rd_order_tensors,
                                  empty_vector_of_4th_order_tensors);
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (fe_data.update_each & update_values)
-              output_data.shape_values[k][i] = values[k];
-            if (fe_data.update_each & update_gradients)
-              output_data.shape_gradients[k][i] = grads[k];
-            if (fe_data.update_each & update_hessians)
-              output_data.shape_hessians[k][i] = grad_grads[k];
-          }
+
+        if (fe_data.update_each & update_values)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_values[k][i] = values[k];
+
+        if (fe_data.update_each & update_gradients)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_gradients[k][i] = grads[k];
+
+        if (fe_data.update_each & update_hessians)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_hessians[k][i] = grad_grads[k];
       }
 }
 
@@ -351,15 +354,18 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
                                  values, grads, grad_grads,
                                  empty_vector_of_3rd_order_tensors,
                                  empty_vector_of_4th_order_tensors);
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (fe_data.update_each & update_values)
-              output_data.shape_values[k][i] = values[k];
-            if (fe_data.update_each & update_gradients)
-              output_data.shape_gradients[k][i] = grads[k];
-            if (fe_data.update_each & update_hessians)
-              output_data.shape_hessians[k][i] = grad_grads[k];
-          }
+
+        if (fe_data.update_each & update_values)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_values[k][i] = values[k];
+
+        if (fe_data.update_each & update_gradients)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_gradients[k][i] = grads[k];
+
+        if (fe_data.update_each & update_hessians)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_hessians[k][i] = grad_grads[k];
       }
 }
 
@@ -395,15 +401,18 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
                                  values, grads, grad_grads,
                                  empty_vector_of_3rd_order_tensors,
                                  empty_vector_of_4th_order_tensors);
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (fe_data.update_each & update_values)
-              output_data.shape_values[k][i] = values[k];
-            if (fe_data.update_each & update_gradients)
-              output_data.shape_gradients[k][i] = grads[k];
-            if (fe_data.update_each & update_hessians)
-              output_data.shape_hessians[k][i] = grad_grads[k];
-          }
+
+        if (fe_data.update_each & update_values)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_values[k][i] = values[k];
+
+        if (fe_data.update_each & update_gradients)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_gradients[k][i] = grads[k];
+
+        if (fe_data.update_each & update_hessians)
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            output_data.shape_hessians[k][i] = grad_grads[k];
       }
 }
 

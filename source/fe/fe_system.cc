@@ -1197,29 +1197,31 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
                 Assert (this->n_nonzero_components(system_index) ==
                         base_fe.n_nonzero_components(base_index),
                         ExcInternalError());
-                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                  {
-                    if (base_flags & update_values)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        output_data.shape_values[out_index+s][q] =
-                          base_data.shape_values(in_index+s,q);
 
-                    if (base_flags & update_gradients)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        output_data.shape_gradients[out_index+s][q] =
-                          base_data.shape_gradients[in_index+s][q];
+                if (base_flags & update_values)
+                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                    for (unsigned int q=0; q<n_q_points; ++q)
+                      output_data.shape_values[out_index+s][q] =
+                        base_data.shape_values(in_index+s,q);
 
-                    if (base_flags & update_hessians)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        output_data.shape_hessians[out_index+s][q] =
-                          base_data.shape_hessians[in_index+s][q];
+                if (base_flags & update_gradients)
+                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                    for (unsigned int q=0; q<n_q_points; ++q)
+                      output_data.shape_gradients[out_index+s][q] =
+                        base_data.shape_gradients[in_index+s][q];
 
-                    if (base_flags & update_3rd_derivatives)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        output_data.shape_3rd_derivatives[out_index+s][q] =
-                          base_data.shape_3rd_derivatives[in_index+s][q];
+                if (base_flags & update_hessians)
+                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                    for (unsigned int q=0; q<n_q_points; ++q)
+                      output_data.shape_hessians[out_index+s][q] =
+                        base_data.shape_hessians[in_index+s][q];
 
-                  }
+                if (base_flags & update_3rd_derivatives)
+                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                    for (unsigned int q=0; q<n_q_points; ++q)
+                      output_data.shape_3rd_derivatives[out_index+s][q] =
+                        base_data.shape_3rd_derivatives[in_index+s][q];
+
               }
       }
 }

@@ -197,13 +197,14 @@ fill_fe_subface_values (const Mapping<dim,spacedim> &,
   const unsigned int offset = subface*quadrature.size();
 
   if (fe_data.update_each & update_values)
-    for (unsigned int i=0; i<quadrature.size(); ++i)
-      {
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(k,i) = 0.;
-        for (unsigned int k=0; k<fe_data.shape_values.size(); ++k)
+      for (unsigned int k=0; k<fe_data.shape_values.size(); ++k)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
           output_data.shape_values(foffset+k,i) = fe_data.shape_values[k][i+offset];
-      }
+    }
 
   Assert (!(fe_data.update_each & update_gradients), ExcNotImplemented());
   Assert (!(fe_data.update_each & update_hessians), ExcNotImplemented());
