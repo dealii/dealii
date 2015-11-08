@@ -721,6 +721,7 @@ namespace FETools
     FullMatrix<double> matrix(n2,n1);
     get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);
 
+    u2 = 0;
     while (cell2 != end)
       {
         cell1->get_dof_values(u1, u1_local);
