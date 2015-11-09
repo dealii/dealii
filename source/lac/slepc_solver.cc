@@ -420,6 +420,11 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- Lanczos ------------------------ */
+  SolverLanczos::AdditionalData::
+  AdditionalData(const EPSLanczosReorthogType r)
+    : reorthog(r)
+  {}
+
   SolverLanczos::SolverLanczos (SolverControl        &cn,
                                 const MPI_Comm       &mpi_communicator,
                                 const AdditionalData &data)
@@ -439,6 +444,9 @@ namespace SLEPcWrappers
     // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    ierr = EPSLanczosSetReorthog(eps,additional_data.reorthog);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -466,6 +474,11 @@ namespace SLEPcWrappers
   }
 
   /* ---------------- Generalized Davidson ----------------- */
+  SolverGeneralizedDavidson::AdditionalData::
+  AdditionalData(bool double_expansion)
+    :  double_expansion(double_expansion)
+  {}
+
   SolverGeneralizedDavidson::SolverGeneralizedDavidson (SolverControl        &cn,
                                                         const MPI_Comm       &mpi_communicator,
                                                         const AdditionalData &data)
@@ -487,6 +500,12 @@ namespace SLEPcWrappers
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    if (additional_data.double_expansion)
+      {
+        ierr = EPSGDSetDoubleExpansion (eps, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+      }
 #else
     // Suppress compiler warnings about unused parameters.
     (void) eps;

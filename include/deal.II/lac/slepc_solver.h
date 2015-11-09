@@ -526,7 +526,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    *
-   * @author Toby D. Young 2009
+   * @author Toby D. Young 2009; Denis Davydov 2015;
    */
   class SolverLanczos : public SolverBase
   {
@@ -536,7 +536,17 @@ namespace SLEPcWrappers
      * it be needed.
      */
     struct AdditionalData
-    {};
+    {
+      /**
+       * The type of reorthogonalization used during the Lanczos iteration.
+       */
+      EPSLanczosReorthogType reorthog;
+
+      /**
+       * Constructor. By default sets the type of reorthogonalization used during the Lanczos iteration to full.
+       */
+      AdditionalData(const EPSLanczosReorthogType r  = EPS_LANCZOS_REORTHOG_FULL);
+    };
 
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
@@ -608,7 +618,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    *
-   * @author Toby D. Young 2010
+   * @author Toby D. Young 2010; Denis Davydov 2015
    */
   class SolverGeneralizedDavidson : public SolverBase
   {
@@ -618,7 +628,17 @@ namespace SLEPcWrappers
      * it be needed.
      */
     struct AdditionalData
-    {};
+    {
+      /**
+        * Use double expansion in search subspace.
+        */
+      bool double_expansion;
+
+      /**
+       * Constructor. By default set double_expansion to false.
+       */
+      AdditionalData(bool double_expansion = false);
+    };
 
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
