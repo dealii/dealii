@@ -53,7 +53,6 @@ namespace SLEPcWrappers
     set_problem (EPS_GNHEP),
     opA (NULL),
     opB (NULL),
-    initial_vector (NULL),
     transformation (NULL)
   {}
 
@@ -80,7 +79,8 @@ namespace SLEPcWrappers
   void
   SolverBase::set_initial_vector (const PETScWrappers::VectorBase &this_initial_vector)
   {
-    initial_vector = (&this_initial_vector);
+    initial_vectors.resize(1);
+    initial_vectors[0] = this_initial_vector;
   }
 
   void
@@ -140,14 +140,13 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // set the initial vector(s) if any
-    if (initial_vector && initial_vector->size() != 0)
+    if (initial_vectors.size() != 0)
       {
 
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)
-        ierr = EPSSetInitialVector (solver_data->eps, *initial_vector);
+        ierr = EPSSetInitialVector (solver_data->eps, &initial_vectors[0]);
 #else
-        Vec this_vector = *initial_vector;
-        ierr = EPSSetInitialSpace (solver_data->eps, 1, &this_vector);
+        ierr = EPSSetInitialSpace (solver_data->eps, initial_vectors.size(), &initial_vectors[0]);
 #endif
 
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
