@@ -3758,14 +3758,14 @@ void FEValues<dim,spacedim>::do_reinit ()
   // already filled by the mapping, let it compute the
   // data for the mapped shape function values, gradients,
   // etc.
-  this->get_fe().fill_fe_values(this->get_mapping(),
-                                *this->present_cell,
-                                quadrature,
+  this->get_fe().fill_fe_values(*this->present_cell,
+                                this->cell_similarity,
+                                this->quadrature,
+                                this->get_mapping(),
                                 *this->mapping_data,
-                                *this->fe_data,
                                 this->mapping_output,
-                                this->finite_element_output,
-                                this->cell_similarity);
+                                *this->fe_data,
+                                this->finite_element_output);
 }
 
 
@@ -3963,12 +3963,13 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                           *this->mapping_data,
                                           this->mapping_output);
 
-  this->get_fe().fill_fe_face_values(this->get_mapping(),
-                                     *this->present_cell, face_no,
+  this->get_fe().fill_fe_face_values(*this->present_cell,
+                                     face_no,
                                      this->quadrature,
+                                     this->get_mapping(),
                                      *this->mapping_data,
-                                     *this->fe_data,
                                      this->mapping_output,
+                                     *this->fe_data,
                                      this->finite_element_output);
 }
 
@@ -4203,13 +4204,14 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                              *this->mapping_data,
                                              this->mapping_output);
 
-  this->get_fe().fill_fe_subface_values(this->get_mapping(),
-                                        *this->present_cell,
-                                        face_no, subface_no,
+  this->get_fe().fill_fe_subface_values(*this->present_cell,
+                                        face_no,
+                                        subface_no,
                                         this->quadrature,
+                                        this->get_mapping(),
                                         *this->mapping_data,
-                                        *this->fe_data,
                                         this->mapping_output,
+                                        *this->fe_data,
                                         this->finite_element_output);
 }
 

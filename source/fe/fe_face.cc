@@ -477,14 +477,14 @@ FE_FaceQ<1,spacedim>::update_each (const UpdateFlags flags) const
 template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
-fill_fe_values(const Mapping<1,spacedim> &,
-               const typename Triangulation<1,spacedim>::cell_iterator &,
+fill_fe_values(const typename Triangulation<1,spacedim>::cell_iterator &,
+               const CellSimilarity::Similarity                                   ,
                const Quadrature<1> &,
+               const Mapping<1,spacedim> &,
                const typename Mapping<1,spacedim>::InternalDataBase &,
+               const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
                const typename FiniteElement<1,spacedim>::InternalDataBase &,
-               const internal::FEValues::MappingRelatedData<1,spacedim> &,
-               internal::FEValues::FiniteElementRelatedData<1,spacedim> &,
-               const CellSimilarity::Similarity ) const
+               dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &) const
 {
   // Do nothing, since we do not have values in the interior
 }
@@ -494,17 +494,17 @@ fill_fe_values(const Mapping<1,spacedim> &,
 template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
-fill_fe_face_values (const Mapping<1,spacedim> &,
-                     const typename Triangulation<1,spacedim>::cell_iterator &,
-                     const unsigned int face,
+fill_fe_face_values (const typename Triangulation<1,spacedim>::cell_iterator &,
+                     const unsigned int                                                 face,
                      const Quadrature<0> &,
+                     const Mapping<1,spacedim> &,
                      const typename Mapping<1,spacedim>::InternalDataBase &,
-                     const typename FiniteElement<1,spacedim>::InternalDataBase &fedata,
-                     const internal::FEValues::MappingRelatedData<1,spacedim> &,
-                     internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const
+                     const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
+                     const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                     dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const
 {
   const unsigned int foffset = face;
-  if (fedata.update_each & update_values)
+  if (fe_internal.update_each & update_values)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         output_data.shape_values(k,0) = 0.;
@@ -516,15 +516,15 @@ fill_fe_face_values (const Mapping<1,spacedim> &,
 template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
-fill_fe_subface_values (const Mapping<1,spacedim> &,
-                        const typename Triangulation<1,spacedim>::cell_iterator &,
-                        const unsigned int ,
-                        const unsigned int ,
+fill_fe_subface_values (const typename Triangulation<1,spacedim>::cell_iterator &,
+                        const unsigned int                                                 ,
+                        const unsigned int                                                 ,
                         const Quadrature<0> &,
+                        const Mapping<1,spacedim> &,
                         const typename Mapping<1,spacedim>::InternalDataBase &,
+                        const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
                         const typename FiniteElement<1,spacedim>::InternalDataBase &,
-                        const internal::FEValues::MappingRelatedData<1,spacedim> &,
-                        internal::FEValues::FiniteElementRelatedData<1,spacedim> &) const
+                        dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &) const
 {
   Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
 }

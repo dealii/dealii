@@ -31,21 +31,21 @@ DEAL_II_NAMESPACE_OPEN
 template <>
 void
 FE_Poly<TensorProductPolynomials<1>,1,2>::
-fill_fe_values (const Mapping<1,2>                                &mapping,
-                const Triangulation<1,2>::cell_iterator &,
-                const Quadrature<1>                               &quadrature,
-                const Mapping<1,2>::InternalDataBase              &mapping_internal,
-                const FiniteElement<1,2>::InternalDataBase        &fedata,
-                const internal::FEValues::MappingRelatedData<1,2> &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<1,2> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+fill_fe_values (const Triangulation<1,2>::cell_iterator &,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<1>                                       &quadrature,
+                const Mapping<1,2>                                        &mapping,
+                const Mapping<1,2>::InternalDataBase                      &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                const FiniteElement<1,2>::InternalDataBase                &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<1,2> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -90,20 +90,20 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
 template <>
 void
 FE_Poly<TensorProductPolynomials<2>,2,3>::
-fill_fe_values (const Mapping<2,3>                                &mapping,
-                const Triangulation<2,3>::cell_iterator &,
-                const Quadrature<2>                               &quadrature,
-                const Mapping<2,3>::InternalDataBase              &mapping_internal,
-                const FiniteElement<2,3>::InternalDataBase        &fedata,
-                const internal::FEValues::MappingRelatedData<2,3> &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<2,3> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+fill_fe_values (const Triangulation<2,3>::cell_iterator &,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<2>                                       &quadrature,
+                const Mapping<2,3>                                        &mapping,
+                const Mapping<2,3>::InternalDataBase                      &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                const FiniteElement<2,3>::InternalDataBase                &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<2,3> &output_data) const
 {
 
   // assert that the following dynamics
   // cast is really well-defined.
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -147,22 +147,22 @@ fill_fe_values (const Mapping<2,3>                                &mapping,
 template <>
 void
 FE_Poly<PolynomialSpace<1>,1,2>::
-fill_fe_values (const Mapping<1,2>                                &mapping,
-                const Triangulation<1,2>::cell_iterator &,
-                const Quadrature<1>                               &quadrature,
-                const Mapping<1,2>::InternalDataBase              &mapping_internal,
-                const FiniteElement<1,2>::InternalDataBase        &fedata,
-                const internal::FEValues::MappingRelatedData<1,2> &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<1,2> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+fill_fe_values (const Triangulation<1,2>::cell_iterator &,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<1>                                       &quadrature,
+                const Mapping<1,2>                                        &mapping,
+                const Mapping<1,2>::InternalDataBase                      &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                const FiniteElement<1,2>::InternalDataBase                &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<1,2> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
 
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -206,17 +206,17 @@ fill_fe_values (const Mapping<1,2>                                &mapping,
 template <>
 void
 FE_Poly<PolynomialSpace<2>,2,3>::
-fill_fe_values (const Mapping<2,3>                                &mapping,
-                const Triangulation<2,3>::cell_iterator &,
-                const Quadrature<2>                               &quadrature,
-                const Mapping<2,3>::InternalDataBase              &mapping_internal,
-                const FiniteElement<2,3>::InternalDataBase        &fedata,
-                const internal::FEValues::MappingRelatedData<2,3> &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<2,3> &output_data,
-                const CellSimilarity::Similarity                  cell_similarity) const
+fill_fe_values (const Triangulation<2,3>::cell_iterator &,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<2>                                       &quadrature,
+                const Mapping<2,3>                                        &mapping,
+                const Mapping<2,3>::InternalDataBase                      &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                const FiniteElement<2,3>::InternalDataBase                &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<2,3> &output_data) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {

@@ -2248,44 +2248,219 @@ protected:
                     const Quadrature<dim-1> &quadrature) const;
 
   /**
-   * To be written.
+   * Compute information about the shape functions on the cell denoted
+   * by the first argument. Derived classes will have to implement this
+   * function based on the kind of element they represent. It is called
+   * by FEValues::reinit().
+   *
+   * Conceptually, this function evaluates shape functions and their
+   * derivatives at the quadrature points represented by the mapped
+   * locations of those described by the quadrature argument to this
+   * function. In many cases, computing derivatives of shape functions
+   * (and in some cases also computing values of shape functions)
+   * requires making use of the mapping from the reference to the real
+   * cell; this information can either be taken from the @p mapping_data
+   * object that has been filled for the current cell before this
+   * function is called, or by calling the member functions of a
+   * Mapping object with the @p mapping_internal object that also
+   * corresponds to the current cell.
+   *
+   * The information computed by this function is used to fill the various
+   * member variables of the output argument of this function. Which of
+   * the member variables of that structure should be filled is determined
+   * by the update flags stored in the
+   * FiniteElement::InternalDataBase::update_each field of the object
+   * passed to this function. These flags are typically set by
+   * FiniteElement::get_data(), FiniteElement::get_face_date() and
+   * FiniteElement::get_subface_data() (or, more specifically, implementations
+   * of these functions in derived classes).
    *
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] cell_similarity Whether or not the cell given as first
+   *   argument is simply a translation, rotation, etc of the cell for
+   *   which this function was called the most recent time. This
+   *   information is computed simply by matching the vertices (as stored
+   *   by the Triangulation) between the previous and the current cell.
+   *   The value passed here may be modified by implementations of
+   *   this function and should then be returned (see the discussion of the
+   *   return value of this function).
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   *
+   * @note FEValues ensures that this function is always called with
+   *   the same pair of @p fe_internal and @output_data objects. In
+   *   other words, if an implementation of this function knows that it
+   *   has written a piece of data into the output argument in a previous
+   *   call, then there is no need to copy it there again in a later
+   *   call if the implementation knows that this is the same value.
    */
   virtual
   void
-  fill_fe_values (const Mapping<dim,spacedim>                                         &mapping,
-                  const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                     cell_similarity,
                   const Quadrature<dim>                                               &quadrature,
+                  const Mapping<dim,spacedim>                                         &mapping,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const InternalDataBase                                              &fe_internal,
                   const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data,
-                  const CellSimilarity::Similarity                                     cell_similarity) const = 0;
+                  const InternalDataBase                                              &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
+  /**
+   * This function is the equivalent to FiniteElement::fill_fe_values(),
+   * but for faces of cells. See there for an extensive discussion
+   * of its purpose. It is called by FEFaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face we are currently considering,
+   *   indexed among the faces of the cell specified by the previous argument.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   */
   virtual
   void
-  fill_fe_face_values (const Mapping<dim,spacedim>                                         &mapping,
-                       const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                        const unsigned int                                                   face_no,
                        const Quadrature<dim-1>                                             &quadrature,
+                       const Mapping<dim,spacedim>                                         &mapping,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const InternalDataBase                                              &fe_internal,
                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const InternalDataBase                                              &fe_internal,
                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
+  /**
+   * This function is the equivalent to FiniteElement::fill_fe_values(),
+   * but for the children of faces of cells. See there for an extensive
+   * discussion of its purpose. It is called by FESubfaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face we are currently considering,
+   *   indexed among the faces of the cell specified by the previous argument.
+   * @param[in] sub_no The number of the subface, i.e., the number of the child
+   *   of a face, that we are currently considering,
+   *   indexed among the children of the face specified by the previous
+   *   argument.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   */
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim,spacedim>                                         &mapping,
-                          const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                           const unsigned int                                                   face_no,
                           const unsigned int                                                   sub_no,
                           const Quadrature<dim-1>                                             &quadrature,
+                          const Mapping<dim,spacedim>                                         &mapping,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const InternalDataBase                                              &fe_internal,
                           const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const InternalDataBase                                              &fe_internal,
                           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   friend class InternalDataBase;

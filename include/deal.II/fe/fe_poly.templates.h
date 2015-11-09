@@ -231,21 +231,21 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim>                                  &mapping,
-                const typename Triangulation<dim,spacedim>::cell_iterator &,
-                const Quadrature<dim>                                        &quadrature,
-                const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
-                internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data,
-                const CellSimilarity::Similarity                              cell_similarity) const
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const CellSimilarity::Similarity                                     cell_similarity,
+                const Quadrature<dim>                                               &quadrature,
+                const Mapping<dim,spacedim>                                         &mapping,
+                const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   const UpdateFlags flags(fe_data.update_each);
 
@@ -295,31 +295,31 @@ fill_fe_values (const Mapping<dim,spacedim>                                  &ma
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim>                                  &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
-                     const unsigned int                                            face,
-                     const Quadrature<dim-1>                                      &quadrature,
-                     const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                     const unsigned int                                                   face_no,
+                     const Quadrature<dim-1>                                             &quadrature,
+                     const Mapping<dim,spacedim>                                         &mapping,
+                     const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // offset determines which data set
   // to take (all data sets for all
   // faces are stored contiguously)
 
   const typename QProjector<dim>::DataSetDescriptor offset
-    = QProjector<dim>::DataSetDescriptor::face (face,
-                                                cell->face_orientation(face),
-                                                cell->face_flip(face),
-                                                cell->face_rotation(face),
+    = QProjector<dim>::DataSetDescriptor::face (face_no,
+                                                cell->face_orientation(face_no),
+                                                cell->face_flip(face_no),
+                                                cell->face_rotation(face_no),
                                                 quadrature.size());
 
   const UpdateFlags flags(fe_data.update_each);
@@ -372,34 +372,34 @@ fill_fe_face_values (const Mapping<dim,spacedim>                                
 template <class POLY, int dim, int spacedim>
 void
 FE_Poly<POLY,dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim>                                  &mapping,
-                        const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
-                        const unsigned int                                            face,
-                        const unsigned int                                            subface,
-                        const Quadrature<dim-1>                                      &quadrature,
-                        const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                        const internal::FEValues::MappingRelatedData<dim,spacedim>   &mapping_data,
-                        internal::FEValues::FiniteElementRelatedData<dim,spacedim>   &output_data) const
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                        const unsigned int                                                   face_no,
+                        const unsigned int                                                   sub_no,
+                        const Quadrature<dim-1>                                             &quadrature,
+                        const Mapping<dim,spacedim>                                         &mapping,
+                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // offset determines which data set
   // to take (all data sets for all
   // sub-faces are stored contiguously)
 
   const typename QProjector<dim>::DataSetDescriptor offset
-    = QProjector<dim>::DataSetDescriptor::subface (face, subface,
-                                                   cell->face_orientation(face),
-                                                   cell->face_flip(face),
-                                                   cell->face_rotation(face),
+    = QProjector<dim>::DataSetDescriptor::subface (face_no, sub_no,
+                                                   cell->face_orientation(face_no),
+                                                   cell->face_flip(face_no),
+                                                   cell->face_rotation(face_no),
                                                    quadrature.size(),
-                                                   cell->subface_case(face));
+                                                   cell->subface_case(face_no));
 
   const UpdateFlags flags(fe_data.update_each);
 

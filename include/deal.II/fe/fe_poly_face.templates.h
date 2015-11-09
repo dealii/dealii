@@ -88,14 +88,14 @@ FE_PolyFace<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim> &,
-                const typename Triangulation<dim,spacedim>::cell_iterator &,
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const CellSimilarity::Similarity                                     ,
                 const Quadrature<dim> &,
+                const Mapping<dim,spacedim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,
+                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase &,
-                const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &,
-                const CellSimilarity::Similarity ) const
+                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &) const
 {
   // Do nothing, since we do not have
   // values in the interior
@@ -106,21 +106,21 @@ fill_fe_values (const Mapping<dim,spacedim> &,
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim> &,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &,
-                     const unsigned int face,
-                     const Quadrature<dim-1>& quadrature,
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                     const unsigned int                                                   face_no,
+                     const Quadrature<dim-1>                                             &quadrature,
+                     const Mapping<dim,spacedim> &,
                      const typename Mapping<dim,spacedim>::InternalDataBase &,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   if (fe_data.update_each & update_values)
     for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -134,7 +134,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
             // Fill data for quad shape functions
             if (this->dofs_per_quad !=0)
               {
-                const unsigned int foffset = this->first_quad_index + this->dofs_per_quad * face;
+                const unsigned int foffset = this->first_quad_index + this->dofs_per_quad * face_no;
                 for (unsigned int k=0; k<this->dofs_per_quad; ++k)
                   output_data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
               }
@@ -151,7 +151,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
                 for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_face; ++line)
                   {
                     for (unsigned int k=0; k<this->dofs_per_line; ++k)
-                      output_data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face, line)*this->dofs_per_line+k,i)
+                      output_data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face_no, line)*this->dofs_per_line+k,i)
                         = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
                   }
               }
@@ -164,7 +164,7 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
             // Fill data for vertex shape functions
             if (this->dofs_per_vertex != 0)
               for (unsigned int lvertex=0; lvertex<GeometryInfo<dim>::vertices_per_face; ++lvertex)
-                output_data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face, lvertex),i)
+                output_data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face_no, lvertex),i)
                   = fe_data.shape_values[lvertex][i];
             break;
           }
@@ -176,25 +176,25 @@ fill_fe_face_values (const Mapping<dim,spacedim> &,
 template <class POLY, int dim, int spacedim>
 void
 FE_PolyFace<POLY,dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim> &,
-                        const typename Triangulation<dim,spacedim>::cell_iterator &,
-                        const unsigned int face,
-                        const unsigned int subface,
-                        const Quadrature<dim-1>& quadrature,
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                        const unsigned int                                                   face_no,
+                        const unsigned int                                                   sub_no,
+                        const Quadrature<dim-1>                                             &quadrature,
+                        const Mapping<dim,spacedim> &,
                         const typename Mapping<dim,spacedim>::InternalDataBase &,
-                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fedata,
-                        const internal::FEValues::MappingRelatedData<dim,spacedim> &,
-                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
-  const unsigned int foffset = fe_data.shape_values.size() * face;
-  const unsigned int offset = subface*quadrature.size();
+  const unsigned int foffset = fe_data.shape_values.size() * face_no;
+  const unsigned int offset = sub_no*quadrature.size();
 
   if (fe_data.update_each & update_values)
     {

@@ -110,14 +110,14 @@ FE_Nothing<dim,spacedim>::get_data (const UpdateFlags  /*flags*/,
 template <int dim, int spacedim>
 void
 FE_Nothing<dim,spacedim>::
-fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
-                const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
-                const Quadrature<dim> & /*quadrature*/,
-                const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
-                const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
-                internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/,
-                const CellSimilarity::Similarity  /*cell_similarity*/) const
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                const CellSimilarity::Similarity                                     ,
+                const Quadrature<dim> &,
+                const Mapping<dim,spacedim> &,
+                const typename Mapping<dim,spacedim>::InternalDataBase &,
+                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &,
+                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &) const
 {
   // leave data fields empty
 }
@@ -127,33 +127,37 @@ fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
 template <int dim, int spacedim>
 void
 FE_Nothing<dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim> & /*mapping*/,
-                     const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
-                     const unsigned int /*face*/,
-                     const Quadrature<dim-1> & /*quadrature*/,
-                     const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/) const
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                     const unsigned int                                                   ,
+                     const Quadrature<dim-1>                                             &,
+                     const Mapping<dim,spacedim> &,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &,
+                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                     const typename FiniteElement<dim,spacedim>::InternalDataBase &,
+                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &) const
 {
   // leave data fields empty
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_Nothing<dim,spacedim>::
-fill_fe_subface_values (const Mapping<dim,spacedim> & /*mapping*/,
-                        const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
-                        const unsigned int /*face*/,
-                        const unsigned int /*subface*/,
-                        const Quadrature<dim-1> & /*quadrature*/,
-                        const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                        const typename FiniteElement<dim,spacedim>::InternalDataBase & /*fedata*/,
-                        const internal::FEValues::MappingRelatedData<dim,spacedim> &/*mapping_data*/,
-                        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &/*output_data*/) const
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                        const unsigned int                                                   ,
+                        const unsigned int                                                   ,
+                        const Quadrature<dim-1>                                             &,
+                        const Mapping<dim,spacedim> &,
+                        const typename Mapping<dim,spacedim>::InternalDataBase &,
+                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                        const typename FiniteElement<dim,spacedim>::InternalDataBase &,
+                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &) const
 {
   // leave data fields empty
 }
+
+
 
 template <int dim, int spacedim>
 bool
