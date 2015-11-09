@@ -412,6 +412,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: extra parameters to GD and Lanczos SLEPc solvers. Also added unit tests.
+  <br>
+  (Denis Davydov, 2015/11/09)
+  </li>
+
   <li> Fixed: FETools::project_dg was adding the vector projection to 
   the output vector. Now is the output vector initialized to zero. 
   <br>
