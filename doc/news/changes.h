@@ -412,6 +412,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: FETools::project_dg was adding the vector projection to 
+  the output vector. Now is the output vector initialized to zero. 
+  <br>
+  (Adam Kosik, 2015/11/09)
+  </li>
+
   <li> Fixed: A compilation issue with DEAL_II_INCLUDE_DIRS not used for
   compiling bundled boost.
   <br>
