@@ -72,6 +72,8 @@ install:
 
 script: 
     - ninja test
+    - ninja setup_tests_all-headers
+    - ctest -j4 -V -R all-headers
 
 branches:
   only:
