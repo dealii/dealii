@@ -401,6 +401,15 @@ inconvenience this causes.
   (Timo Heister, 2015/07/12)
   </li>
 
+  <li> New: Added class DoFVector as a union of a dof handler and a
+  vector describing functions on such a handler. The new class is also
+  used in the new implementation of FEFieldFunction. The function
+  DoFVector::sync() serves to replace reinitializing vector sizes by
+  hand. It is currently implemented for Vector, BlockVector and
+  MGLevelObject thereof.
+  <br>
+  (Guido Kanschat, 2015/07/07)
+  </li>
 </ol>
 
 

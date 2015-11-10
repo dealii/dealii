@@ -1,0 +1,113 @@
+
+DEAL::FE_Q<2>(1)
+DEAL:: dim 2 v1: 9
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 2 vb: [1->9|9]
+DEAL::MGFE_Q<2>(1)
+DEAL::dim 2 v1: (0->1)
+DEAL:: l0: 4
+DEAL:: l1: 9
+DEAL::dim 2 vb: (0->1)
+DEAL:: l0: [1->4|4]
+DEAL:: l1: [1->9|9]
+DEAL::FE_Q<2>(1)
+DEAL:: dim 2 v1: 9
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 2 vb: [1->9|9]
+DEAL::MGFE_Q<2>(1)
+DEAL::dim 2 v1: (0->1)
+DEAL:: l0: 4
+DEAL:: l1: 9
+DEAL::dim 2 vb: (0->1)
+DEAL:: l0: [1->4|4]
+DEAL:: l1: [1->9|9]
+DEAL::FESystem<2>[FE_Q<2>(1)^3]
+DEAL:: dim 2 v1: 27
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 2 vb: [3->9,9,9|27]
+DEAL::MGFESystem<2>[FE_Q<2>(1)^3]
+DEAL::dim 2 v1: (0->1)
+DEAL:: l0: 12
+DEAL:: l1: 27
+DEAL::dim 2 vb: (0->1)
+DEAL:: l0: [3->4,4,4|12]
+DEAL:: l1: [3->9,9,9|27]
+DEAL::FESystem<2>[FE_Q<2>(1)^3]
+DEAL:: dim 2 v1: 27
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 2 vb: [3->9,9,9|27]
+DEAL::MGFESystem<2>[FE_Q<2>(1)^3]
+DEAL::dim 2 v1: (0->1)
+DEAL:: l0: 12
+DEAL:: l1: 27
+DEAL::dim 2 vb: (0->1)
+DEAL:: l0: [3->4,4,4|12]
+DEAL:: l1: [3->9,9,9|27]
+DEAL::FE_Q<3>(1)
+DEAL:: dim 3 v1: 27
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 3 vb: [1->27|27]
+DEAL::MGFE_Q<3>(1)
+DEAL::dim 3 v1: (0->1)
+DEAL:: l0: 8
+DEAL:: l1: 27
+DEAL::dim 3 vb: (0->1)
+DEAL:: l0: [1->8|8]
+DEAL:: l1: [1->27|27]
+DEAL::FE_Q<3>(1)
+DEAL:: dim 3 v1: 27
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 3 vb: [1->27|27]
+DEAL::MGFE_Q<3>(1)
+DEAL::dim 3 v1: (0->1)
+DEAL:: l0: 8
+DEAL:: l1: 27
+DEAL::dim 3 vb: (0->1)
+DEAL:: l0: [1->8|8]
+DEAL:: l1: [1->27|27]
+DEAL::FESystem<3>[FE_Q<3>(1)^3]
+DEAL:: dim 3 v1: 81
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 3 vb: [3->27,27,27|81]
+DEAL::MGFESystem<3>[FE_Q<3>(1)^3]
+DEAL::dim 3 v1: (0->1)
+DEAL:: l0: 24
+DEAL:: l1: 81
+DEAL::dim 3 vb: (0->1)
+DEAL:: l0: [3->8,8,8|24]
+DEAL:: l1: [3->27,27,27|81]
+DEAL::FESystem<3>[FE_Q<3>(1)^3]
+DEAL:: dim 3 v1: 81
+DEAL::dv1 mo
+DEAL::dv2 cx
+DEAL::dv3 mx
+DEAL::dv4 cx
+DEAL::dim 3 vb: [3->27,27,27|81]
+DEAL::MGFESystem<3>[FE_Q<3>(1)^3]
+DEAL::dim 3 v1: (0->1)
+DEAL:: l0: 24
+DEAL:: l1: 81
+DEAL::dim 3 vb: (0->1)
+DEAL:: l0: [3->8,8,8|24]
+DEAL:: l1: [3->27,27,27|81]
