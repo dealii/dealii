@@ -174,9 +174,10 @@ public:
    */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags     update_flags,
-            const Mapping<dim,spacedim>     &mapping,
-            const Quadrature<dim> &quadrature) const;
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Return whether this element dominates the one given as argument when they

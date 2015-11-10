@@ -88,18 +88,20 @@ protected:
 
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags /*update_flags*/,
-            const Mapping<dim,spacedim> &/*mapping*/,
-            const Quadrature<dim> &/*quadrature*/) const
+  get_data (const UpdateFlags                                                    /*update_flags*/,
+            const Mapping<dim,spacedim>                                         &/*mapping*/,
+            const Quadrature<dim>                                               &/*quadrature*/,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
   {
     InternalData *data = new InternalData;
     return data;
   }
 
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_face_data(const UpdateFlags update_flags,
-                const Mapping<dim,spacedim> &/*mapping*/,
-                const Quadrature<dim-1>& quadrature) const
+  get_face_data(const UpdateFlags                                                    update_flags,
+                const Mapping<dim,spacedim>                                         &/*mapping*/,
+                const Quadrature<dim-1>                                             &quadrature,
+                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
   {
     // generate a new data object and
     // initialize some fields
@@ -145,12 +147,14 @@ protected:
   }
 
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_subface_data(const UpdateFlags update_flags,
-                   const Mapping<dim,spacedim> &mapping,
-                   const Quadrature<dim-1>& quadrature) const
+  get_subface_data(const UpdateFlags                                                    update_flags,
+                   const Mapping<dim,spacedim>                                         &mapping,
+                   const Quadrature<dim-1>                                             &quadrature,
+                   dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
   {
     return get_face_data(update_flags, mapping,
-                         QProjector<dim - 1>::project_to_all_children(quadrature));
+                         QProjector<dim - 1>::project_to_all_children(quadrature),
+                         output_data);
   }
 
   virtual

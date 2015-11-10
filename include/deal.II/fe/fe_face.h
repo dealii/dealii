@@ -240,9 +240,10 @@ protected:
 
   virtual
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Mapping<1,spacedim> &/*mapping*/,
-            const Quadrature<1> &/*quadrature*/) const
+  get_data (const UpdateFlags                                                  /*update_flags*/,
+            const Mapping<1,spacedim>                                         &/*mapping*/,
+            const Quadrature<1>                                               &/*quadrature*/,
+            dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     return new typename FiniteElement<1, spacedim>::InternalDataBase;
   }
@@ -250,7 +251,8 @@ protected:
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_face_data(const UpdateFlags update_flags,
                 const Mapping<1,spacedim> &/*mapping*/,
-                const Quadrature<0> &quadrature) const
+                const Quadrature<0> &quadrature,
+                dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     // generate a new data object and initialize some fields
     typename FiniteElement<1,spacedim>::InternalDataBase *data =
@@ -271,11 +273,12 @@ protected:
   }
 
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_subface_data(const UpdateFlags update_flags,
-                   const Mapping<1,spacedim> &mapping,
-                   const Quadrature<0> &quadrature) const
+  get_subface_data(const UpdateFlags                                                  update_flags,
+                   const Mapping<1,spacedim>                                         &mapping,
+                   const Quadrature<0>                                               &quadrature,
+                   dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const
   {
-    return get_face_data(update_flags, mapping, quadrature);
+    return get_face_data(update_flags, mapping, quadrature, output_data);
   }
 
   virtual

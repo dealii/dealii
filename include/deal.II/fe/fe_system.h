@@ -861,20 +861,26 @@ protected:
    */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags      update_flags,
-            const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const;
 
   virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags      update_flags,
-                 const Mapping<dim,spacedim>    &mapping,
-                 const Quadrature<dim-1> &quadrature) const;
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags      update_flags,
-                    const Mapping<dim,spacedim>    &mapping,
-                    const Quadrature<dim-1> &quadrature) const;
+  virtual
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags                                                    update_flags,
+                 const Mapping<dim,spacedim>                                         &mapping,
+                 const Quadrature<dim-1>                                             &quadrature,
+                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  virtual
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags                                                    update_flags,
+                    const Mapping<dim,spacedim>                                         &mapping,
+                    const Quadrature<dim-1>                                             &quadrature,
+                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void

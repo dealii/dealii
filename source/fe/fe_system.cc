@@ -858,9 +858,11 @@ FESystem<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_data (const UpdateFlags      flags,
-                                  const Mapping<dim,spacedim>    &mapping,
-                                  const Quadrature<dim> &quadrature) const
+FESystem<dim,spacedim>::
+get_data (const UpdateFlags                                                    flags,
+          const Mapping<dim,spacedim>                                         &mapping,
+          const Quadrature<dim>                                               &quadrature,
+          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -886,13 +888,20 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags,
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_data (flags, mapping, quadrature);
-
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_each);
+                                        flags | base_element(base_no).requires_update_flags(flags));
+
+      // let base objects produce their scratch objects. they may
+      // also at this time write into the output objects we provide
+      // for them; it would be nice if we could already copy something
+      // out of the base output object into the system output object,
+      // but we can't because we can't know what the elements already
+      // copied and/or will want to update on every cell
+      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+        base_element(base_no).get_data (flags, mapping, quadrature,
+                                        base_fe_output_object);
 
       data->set_fe_data(base_no, base_fe_data);
     }
@@ -905,9 +914,11 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags,
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_face_data (const UpdateFlags      flags,
-                                       const Mapping<dim,spacedim>    &mapping,
-                                       const Quadrature<dim-1> &quadrature) const
+FESystem<dim,spacedim>::
+get_face_data (const UpdateFlags                                                    flags,
+               const Mapping<dim,spacedim>                                         &mapping,
+               const Quadrature<dim-1>                                             &quadrature,
+               dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -933,13 +944,20 @@ FESystem<dim,spacedim>::get_face_data (const UpdateFlags      flags,
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_face_data (flags, mapping, quadrature);
-
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_each);
+                                        flags | base_element(base_no).requires_update_flags(flags));
+
+      // let base objects produce their scratch objects. they may
+      // also at this time write into the output objects we provide
+      // for them; it would be nice if we could already copy something
+      // out of the base output object into the system output object,
+      // but we can't because we can't know what the elements already
+      // copied and/or will want to update on every cell
+      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+        base_element(base_no).get_face_data (flags, mapping, quadrature,
+                                             base_fe_output_object);
 
       data->set_fe_data(base_no, base_fe_data);
     }
@@ -954,9 +972,11 @@ FESystem<dim,spacedim>::get_face_data (const UpdateFlags      flags,
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FESystem<dim,spacedim>::get_subface_data (const UpdateFlags      flags,
-                                          const Mapping<dim,spacedim>    &mapping,
-                                          const Quadrature<dim-1> &quadrature) const
+FESystem<dim,spacedim>::
+get_subface_data (const UpdateFlags                                                    flags,
+                  const Mapping<dim,spacedim>                                         &mapping,
+                  const Quadrature<dim-1>                                             &quadrature,
+                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -982,13 +1002,20 @@ FESystem<dim,spacedim>::get_subface_data (const UpdateFlags      flags,
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
-        base_element(base_no).get_subface_data (flags, mapping, quadrature);
-
       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
-                                        flags | base_fe_data->update_each);
+                                        flags | base_element(base_no).requires_update_flags(flags));
+
+      // let base objects produce their scratch objects. they may
+      // also at this time write into the output objects we provide
+      // for them; it would be nice if we could already copy something
+      // out of the base output object into the system output object,
+      // but we can't because we can't know what the elements already
+      // copied and/or will want to update on every cell
+      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+        base_element(base_no).get_subface_data (flags, mapping, quadrature,
+                                                base_fe_output_object);
 
       data->set_fe_data(base_no, base_fe_data);
     }

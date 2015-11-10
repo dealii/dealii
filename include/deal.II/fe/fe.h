@@ -2202,10 +2202,12 @@ protected:
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
    */
-  virtual InternalDataBase *
-  get_data (const UpdateFlags      flags,
-            const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const = 0;
+  virtual
+  InternalDataBase *
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * Prepare internal data structure for transformation of faces and fill in
@@ -2222,10 +2224,12 @@ protected:
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
    */
-  virtual InternalDataBase *
-  get_face_data (const UpdateFlags        flags,
-                 const Mapping<dim,spacedim>      &mapping,
-                 const Quadrature<dim-1> &quadrature) const;
+  virtual
+  InternalDataBase *
+  get_face_data (const UpdateFlags                                                    update_flags,
+                 const Mapping<dim,spacedim>                                         &mapping,
+                 const Quadrature<dim-1>                                             &quadrature,
+                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Prepare internal data structure for transformation of children of faces
@@ -2242,10 +2246,12 @@ protected:
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
    */
-  virtual InternalDataBase *
-  get_subface_data (const UpdateFlags        flags,
-                    const Mapping<dim,spacedim>      &mapping,
-                    const Quadrature<dim-1> &quadrature) const;
+  virtual
+  InternalDataBase *
+  get_subface_data (const UpdateFlags                                                    update_flags,
+                    const Mapping<dim,spacedim>                                         &mapping,
+                    const Quadrature<dim-1>                                             &quadrature,
+                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Compute information about the shape functions on the cell denoted
