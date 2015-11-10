@@ -194,7 +194,7 @@ namespace SLEPcWrappers
     template <typename Vector>
     void
     set_initial_space
-    (const std::vector<Vector> &initial_vectors);
+    (const std::vector<Vector> &initial_space);
 
     /**
      * Set the spectral transformation to be used.
@@ -371,7 +371,7 @@ namespace SLEPcWrappers
     /**
      * An initial vector space used in SLEPc solvers.
      */
-    std::vector<Vec> initial_vectors;
+    std::vector<Vec> initial_space;
 
     /**
      * Pointer to an an object that describes transformations that can be
@@ -874,12 +874,12 @@ namespace SLEPcWrappers
 
   template <typename Vector>
   void
-  SolverBase::set_initial_space(const std::vector<Vector> &vectors)
+  SolverBase::set_initial_space(const std::vector<Vector> &this_initial_space)
   {
-    initial_vectors.resize(vectors.size());
-    for (unsigned int i = 0; i < initial_vectors.size(); i++)
+    initial_space.resize(this_initial_space.size());
+    for (unsigned int i = 0; i < initial_space.size(); i++)
       {
-        initial_vectors[i] = vectors[i];
+        initial_space[i] = this_initial_space[i];
       }
   }
 
