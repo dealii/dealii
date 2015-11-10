@@ -17,6 +17,7 @@
 #define dealii__sacado_product_type_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/template_constraints.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
