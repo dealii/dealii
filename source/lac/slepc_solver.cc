@@ -53,7 +53,6 @@ namespace SLEPcWrappers
     set_problem (EPS_GNHEP),
     opA (NULL),
     opB (NULL),
-    initial_vector (NULL),
     transformation (NULL)
   {}
 
@@ -80,7 +79,8 @@ namespace SLEPcWrappers
   void
   SolverBase::set_initial_vector (const PETScWrappers::VectorBase &this_initial_vector)
   {
-    initial_vector = (&this_initial_vector);
+    initial_space.resize(1);
+    initial_space[0] = this_initial_vector;
   }
 
   void
@@ -140,14 +140,13 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // set the initial vector(s) if any
-    if (initial_vector && initial_vector->size() != 0)
+    if (initial_space.size() != 0)
       {
 
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)
-        ierr = EPSSetInitialVector (solver_data->eps, *initial_vector);
+        ierr = EPSSetInitialVector (solver_data->eps, &initial_space[0]);
 #else
-        Vec this_vector = *initial_vector;
-        ierr = EPSSetInitialSpace (solver_data->eps, 1, &this_vector);
+        ierr = EPSSetInitialSpace (solver_data->eps, initial_space.size(), &initial_space[0]);
 #endif
 
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -421,6 +420,11 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- Lanczos ------------------------ */
+  SolverLanczos::AdditionalData::
+  AdditionalData(const EPSLanczosReorthogType r)
+    : reorthog(r)
+  {}
+
   SolverLanczos::SolverLanczos (SolverControl        &cn,
                                 const MPI_Comm       &mpi_communicator,
                                 const AdditionalData &data)
@@ -440,6 +444,9 @@ namespace SLEPcWrappers
     // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    ierr = EPSLanczosSetReorthog(eps,additional_data.reorthog);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -467,6 +474,11 @@ namespace SLEPcWrappers
   }
 
   /* ---------------- Generalized Davidson ----------------- */
+  SolverGeneralizedDavidson::AdditionalData::
+  AdditionalData(bool double_expansion)
+    :  double_expansion(double_expansion)
+  {}
+
   SolverGeneralizedDavidson::SolverGeneralizedDavidson (SolverControl        &cn,
                                                         const MPI_Comm       &mpi_communicator,
                                                         const AdditionalData &data)
@@ -488,6 +500,12 @@ namespace SLEPcWrappers
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    if (additional_data.double_expansion)
+      {
+        ierr = EPSGDSetDoubleExpansion (eps, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+      }
 #else
     // Suppress compiler warnings about unused parameters.
     (void) eps;

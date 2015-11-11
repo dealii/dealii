@@ -1,0 +1,33 @@
+
+DEAL::Size 31 Unknowns 30
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers17SolverKrylovSchurE
+DEAL::Convergence step 5 value 0
+DEAL::Solver stopped after 5 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers13SolverArnoldiE
+DEAL::Convergence step 21 value 0
+DEAL::Solver stopped after 21 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers13SolverLanczosE
+DEAL::Convergence step 23 value 0
+DEAL::Solver stopped after 23 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
+DEAL::Convergence step 120 value 0
+DEAL::Solver stopped after 120 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers20SolverJacobiDavidsonE
+DEAL::Convergence step 399 value 0
+DEAL::Solver stopped after 399 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
+DEAL::Convergence step 145 value 0
+DEAL::Solver stopped after 145 iterations
+DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
+DEAL::

@@ -186,7 +186,15 @@ namespace SLEPcWrappers
      */
     void
     set_initial_vector
-    (const PETScWrappers::VectorBase &this_initial_vector);
+    (const PETScWrappers::VectorBase &this_initial_vector) DEAL_II_DEPRECATED;
+
+    /**
+     * Set the initial vector space for the solver.
+     */
+    template <typename Vector>
+    void
+    set_initial_space
+    (const std::vector<Vector> &initial_space);
 
     /**
      * Set the spectral transformation to be used.
@@ -361,9 +369,9 @@ namespace SLEPcWrappers
     const PETScWrappers::MatrixBase *opB;
 
     /**
-     * An initial vector used to "feed" some SLEPc solvers.
+     * An initial vector space used in SLEPc solvers.
      */
-    const PETScWrappers::VectorBase *initial_vector;
+    std::vector<Vec> initial_space;
 
     /**
      * Pointer to an an object that describes transformations that can be
@@ -518,7 +526,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    *
-   * @author Toby D. Young 2009
+   * @author Toby D. Young 2009; Denis Davydov 2015;
    */
   class SolverLanczos : public SolverBase
   {
@@ -528,7 +536,17 @@ namespace SLEPcWrappers
      * it be needed.
      */
     struct AdditionalData
-    {};
+    {
+      /**
+       * The type of reorthogonalization used during the Lanczos iteration.
+       */
+      EPSLanczosReorthogType reorthog;
+
+      /**
+       * Constructor. By default sets the type of reorthogonalization used during the Lanczos iteration to full.
+       */
+      AdditionalData(const EPSLanczosReorthogType r  = EPS_LANCZOS_REORTHOG_FULL);
+    };
 
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
@@ -600,7 +618,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    *
-   * @author Toby D. Young 2010
+   * @author Toby D. Young 2010; Denis Davydov 2015
    */
   class SolverGeneralizedDavidson : public SolverBase
   {
@@ -610,7 +628,17 @@ namespace SLEPcWrappers
      * it be needed.
      */
     struct AdditionalData
-    {};
+    {
+      /**
+        * Use double expansion in search subspace.
+        */
+      bool double_expansion;
+
+      /**
+       * Constructor. By default set double_expansion to false.
+       */
+      AdditionalData(bool double_expansion = false);
+    };
 
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
@@ -842,6 +870,17 @@ namespace SLEPcWrappers
       get_eigenpair (index,
                      real_eigenvalues[index], imag_eigenvalues[index],
                      real_eigenvectors[index], imag_eigenvectors[index]);
+  }
+
+  template <typename Vector>
+  void
+  SolverBase::set_initial_space(const std::vector<Vector> &this_initial_space)
+  {
+    initial_space.resize(this_initial_space.size());
+    for (unsigned int i = 0; i < initial_space.size(); i++)
+      {
+        initial_space[i] = this_initial_space[i];
+      }
   }
 
 }
