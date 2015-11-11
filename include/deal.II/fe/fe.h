@@ -2193,14 +2193,81 @@ protected:
   requires_update_flags (const UpdateFlags update_flags) const = 0;
 
   /**
-   * Prepare internal data structures and fill in values independent of the
-   * cell. Return a pointer to an object of which the caller of this function
-   * then has to assume ownership (which includes destruction when it is no
-   * more needed).
+   * Create an internal data object and return a pointer to it of which the
+   * caller of this function then assumes ownership. This object will
+   * then be passed to the FiniteElement::fill_fe_values() every time
+   * the finite element shape functions and their derivatives are evaluated
+   * on a concrete cell. The object created here is therefore used by
+   * derived classes as a place for scratch objects that are used in
+   * evaluating shape functions, as well as to store information that
+   * can be pre-computed once and re-used on every cell (e.g., for
+   * evaluating the values and gradients of shape functions on the
+   * reference cell, for later re-use when transforming these values to
+   * a concrete cell).
+   *
+   * This function is the first one called in the process of initializing
+   * a FEValues object for a given mapping and finite element object. The
+   * returned object will later be passed to FiniteElement::fill_fe_values()
+   * for a concrete cell, which will itself place its output into an object
+   * of type internal::FEValues::FiniteElementRelatedData. Since there may
+   * be data that can already be computed in its <i>final</i> form on the
+   * reference cell, this function also receives a reference to the
+   * internal::FEValues::FiniteElementRelatedData object as its last argument.
+   * This output argument is guaranteed to always be the same one when used
+   * with the InternalDataBase object returned by this function. In other
+   * words, the subdivision of scratch data and final data in the returned
+   * object and the @p output_data object is as follows: If data can be
+   * pre-computed on the reference cell in the exact form in which it
+   * will later be needed on a concrete cell, then this function should
+   * already emplace it in the @p output_data object. An example are the
+   * values of shape functions at quadrature points for the usual
+   * Lagrange elements which on a concrete cell are identical to the
+   * ones on the reference cell. On the other hand, if some data can
+   * be pre-computed to make computations on a concrete cell <i>cheaper</i>,
+   * then it should be put into the returned object for later re-use
+   * in a derive class's implementation of FiniteElement::fill_fe_values().
+   * An example are the gradients of shape functions on the reference
+   * cell for Lagrange elements: to compute the gradients of the shape
+   * functions on a concrete cell, one has to multiply the gradients on
+   * the reference cell by the inverse of the Jacobian of the mapping;
+   * consequently, we cannot already compute the gradients on a concrete
+   * cell at the time the current function is called, but we can at least
+   * pre-compute the gradients on the reference cell, and store it
+   * in the object returned.
    *
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
-   * module.
+   * module. See also the documentation of the InternalDataBase class.
+   *
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_values() is called
+   *   what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
    */
   virtual
   InternalDataBase *
@@ -2210,19 +2277,46 @@ protected:
             dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
-   * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell. Return a pointer to an object of which
-   * the caller of this function then has to assume ownership (which includes
-   * destruction when it is no more needed).
+   * Like get_data(), but return an object that will later be used for
+   * evaluating shape function information at quadrature points on faces
+   * of cells. The object will then be used in calls to implementations of
+   * FiniteElement::fill_fe_face_values(). See the documentation of get_data()
+   * for more information.
    *
    * The default implementation of this function converts the face quadrature
    * into a cell quadrature with appropriate quadrature point locations,
    * and with that calls the get_data() function above that has to be
    * implemented in derived classes.
    *
-   * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
-   * module.
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_face_values() is called
+   *   what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_face_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
    */
   virtual
   InternalDataBase *
@@ -2232,19 +2326,46 @@ protected:
                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
-   * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell. Return a pointer to an
-   * object of which the caller of this function then has to assume ownership
-   * (which includes destruction when it is no more needed).
+   * Like get_data(), but return an object that will later be used for
+   * evaluating shape function information at quadrature points on children
+   * of faces of cells. The object will then be used in calls to
+   * implementations of FiniteElement::fill_fe_subface_values(). See the
+   * documentation of get_data() for more information.
    *
    * The default implementation of this function converts the face quadrature
    * into a cell quadrature with appropriate quadrature point locations,
    * and with that calls the get_data() function above that has to be
    * implemented in derived classes.
    *
-   * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
-   * module.
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_subface_values()
+   *   is called what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_subface_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
    */
   virtual
   InternalDataBase *
