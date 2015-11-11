@@ -93,9 +93,10 @@ FE_Nothing<dim,spacedim>::shape_value (const unsigned int /*i*/,
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FE_Nothing<dim,spacedim>::get_data (const UpdateFlags  /*flags*/,
-                                    const Mapping<dim,spacedim> & /*mapping*/,
-                                    const Quadrature<dim> & /*quadrature*/) const
+FE_Nothing<dim,spacedim>::get_data (const UpdateFlags                                                    /*update_flags*/,
+                                    const Mapping<dim,spacedim>                                         &/*mapping*/,
+                                    const Quadrature<dim>                                               &/*quadrature*/,
+                                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // Create a default data object.  Normally we would then
   // need to resize things to hold the appropriate numbers

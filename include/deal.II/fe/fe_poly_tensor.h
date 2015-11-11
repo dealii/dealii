@@ -187,9 +187,10 @@ protected:
      because we otherwise run into a compiler error with MS Visual Studio. */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data(const UpdateFlags update_flags,
-           const Mapping<dim,spacedim> &,
-           const Quadrature<dim> &quadrature) const
+  get_data(const UpdateFlags                                                    update_flags,
+           const Mapping<dim,spacedim>                                         &/*mapping*/,
+           const Quadrature<dim>                                               &quadrature,
+           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
   {
     // generate a new data object and
     // initialize some fields

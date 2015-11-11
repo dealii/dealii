@@ -3631,6 +3631,10 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
+  // initialize the base classes
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
+
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. we can do this in parallel
   Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *>
@@ -3638,16 +3642,13 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->fe,
                                    flags,
                                    *this->mapping,
-                                   quadrature);
+                                   quadrature,
+                                   this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
   mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
                                         *this->mapping,
                                         flags,
                                         quadrature);
-
-  // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
-  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 
@@ -3869,6 +3870,10 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
+  // initialize the base classes
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
+
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. this can be done in parallel
   Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *>
@@ -3876,16 +3881,13 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->fe,
                                    flags,
                                    *this->mapping,
-                                   this->quadrature);
+                                   this->quadrature,
+                                   this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
   mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_face_data,
                                         *this->mapping,
                                         flags,
                                         this->quadrature);
-
-  // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
-  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 
@@ -4024,6 +4026,10 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
+  // initialize the base classes
+  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
+
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. this can be done
   // in parallel
@@ -4032,16 +4038,13 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->fe,
                                    flags,
                                    *this->mapping,
-                                   this->quadrature);
+                                   this->quadrature,
+                                   this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
   mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_subface_data,
                                         *this->mapping,
                                         flags,
                                         this->quadrature);
-
-  // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
-  this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   this->update_flags = flags;
 

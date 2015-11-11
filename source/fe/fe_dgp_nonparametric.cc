@@ -258,10 +258,11 @@ FE_DGPNonparametric<dim,spacedim>::update_each (const UpdateFlags flags) const
 
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FE_DGPNonparametric<dim,spacedim>::get_data (
-  const UpdateFlags      update_flags,
-  const Mapping<dim,spacedim> &,
-  const Quadrature<dim> &) const
+FE_DGPNonparametric<dim,spacedim>::
+get_data (const UpdateFlags                                                    update_flags,
+          const Mapping<dim,spacedim> &,
+          const Quadrature<dim> &,
+          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // generate a new data object
   typename FiniteElement<dim,spacedim>::InternalDataBase *data = new typename FiniteElement<dim,spacedim>::InternalDataBase;
