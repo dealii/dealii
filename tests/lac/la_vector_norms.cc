@@ -40,7 +40,7 @@ void check_norms ()
         skip += 17;
       LinearAlgebra::Vector<number> vec(size);
       for (unsigned int i=0; i<size; ++i)
-        vec(i) = i+1;
+        vec[i] = i+1;
 
       const number l1_norm = vec.l1_norm();
       AssertThrow (std::abs(l1_norm-0.5*size*(size+1)) < acc*0.5*size*(size+1),
@@ -64,7 +64,7 @@ void check_norms ()
 template <typename number>
 void check_complex_norms ()
 {
-  const number acc = 1e1*std::numeric_limits<number>::epsilon();
+  const number acc = 1e2*std::numeric_limits<number>::epsilon();
   unsigned int skip = 73;
   for (unsigned int size=1; size<100000; size+=skip)
     {

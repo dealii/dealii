@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <boost/serialization/vector.hpp>
 #include <vector>
 #include <algorithm>
 

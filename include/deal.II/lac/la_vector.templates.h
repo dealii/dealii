@@ -17,6 +17,8 @@
 #define dealii__la_vector_templates_h
 
 #include <deal.II/lac/la_vector.h>
+#include <iostream>
+#include <iomanip>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -345,6 +347,67 @@ namespace LinearAlgebra
       norm += std::pow(std::abs(this->val[i]),2);
 
     return norm;
+  }
+
+
+
+  template <typename Number>
+  void Vector<Number>::block_write(std::ostream &out) const
+  {
+    AssertThrow(out, ExcIO());
+
+    // Other version of the following
+    //  out << size() << std::endl << '[';
+    // Reason: operator<< seems to use some resources  that lead to problems in
+    // a multithreaded environment.
+    const size_type sz = this->size();
+    char buf[16];
+#ifdef DEAL_II_WITH_64BIT_INDICES
+    std::sprintf(buf, "%llu", sz);
+#else
+    std::sprintf(buf, "%u", sz);
+#endif
+    std::strcat(buf, "\n[");
+
+    out.write(buf, std::strlen(buf));
+    out.write(reinterpret_cast<const char *>(this->begin()),
+              reinterpret_cast<const char *>(this->end())
+              - reinterpret_cast<const char *>(this->begin()));
+
+    // out << ']';
+    const char outro = ']';
+    out.write(&outro, 1);
+
+    AssertThrow(out, ExcIO());
+  }
+
+
+
+  template <typename Number>
+  void Vector<Number>::block_read(std::istream &in)
+  {
+    AssertThrow(in, ExcIO());
+
+    size_type sz;
+
+    char buf[16];
+
+    in.getline(buf,16,'\n');
+    sz = std::atoi(buf);
+    this->reinit(sz,true);
+
+    char c;
+    // in >> c;
+    in.read(&c,1);
+    AssertThrow(c=='[', ExcIO());
+
+    in.read(reinterpret_cast<char *>(this->begin()),
+            reinterpret_cast<const char *>(this->end())
+            - reinterpret_cast<const char *>(this->begin()));
+
+    // in >> c;
+    in.read(&c,1);
+    AssertThrow(c=']', ExcIO());
   }
 }
 

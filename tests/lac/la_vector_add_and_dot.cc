@@ -33,11 +33,13 @@ void check ()
     {
       const unsigned int size = 17 + test*1101;
       LinearAlgebra::Vector<number> v1 (size), v2(size), v3(size), check(size);
+      // Check that the assignment works
+      v1 = 0.;
       for (unsigned int i=0; i<size; ++i)
         {
-          v1(i) = 0.1 + 0.005 * i;
-          v2(i) = -5.2 + 0.18 * i;
-          v3(i) = 3.14159 + 2.7183/(1.+i);
+          v1[i] = 0.1 + 0.005 * i;
+          v2[i] = -5.2 + 0.18 * i;
+          v3[i] = 3.14159 + 2.7183/(1.+i);
         }
       check = v1;
       const number factor = 0.01432;
@@ -54,6 +56,13 @@ void check ()
           deallog << "Vector check reference: ";
           for (unsigned int i=0; i<size; ++i)
             deallog << check[i] << " ";
+          deallog << std::endl;
+
+          const number constant = 1.;
+          v1.add(constant);
+          deallog << "Vector add constant:    ";
+          for (unsigned int i=0; i<size; ++i)
+            deallog << v1[i] << " ";
           deallog << std::endl;
         }
 

@@ -23,6 +23,8 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_space_vector.h>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <cstdio>
 #include <iostream>
@@ -89,6 +91,23 @@ namespace LinearAlgebra
     virtual ~Vector();
 
     /**
+     * Copies the data of the input vector @p in_vector.
+     */
+    Vector<Number> &operator= (const Vector<Number> &in_vector);
+
+    /**
+     * Copies the data of the input vector @p in_vector.
+     */
+    template <typename Number2>
+    Vector<Number> &operator= (const Vector<Number2> &in_vector);
+
+    /**
+     * Sets all elements of the vector to the scalar @p s. This operation is
+     * only allowed if @p s is equal to zero.
+     */
+    Vector<Number> &operator= (const Number s);
+
+    /**
      * Multiply the entire vector by a fixed factor.
      */
     virtual VectorSpaceVector<Number> &operator*= (const Number factor);
@@ -112,6 +131,11 @@ namespace LinearAlgebra
      * Return the scalar product of two vectors.
      */
     virtual Number operator* (const VectorSpaceVector<Number> &V);
+
+    /**
+     * Add @p a to all components. Note that @p a is a scalar not a vector.
+     */
+    virtual void add(const Number a);
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
@@ -204,6 +228,25 @@ namespace LinearAlgebra
                        const unsigned int precision=3,
                        const bool scientific=true,
                        const bool across=true) const;
+    /**
+     * Write the vector en bloc to a file. This is done in a binary mode, so the
+     * output is neither readable by humans nor (probably) by other computers
+     * using a different operating system or number format.
+     */
+    void block_write (std::ostream &out) const;
+
+    /**
+     * Read a vector en block from a file. This is done using the inverse
+     * operations to the above function, so it is reasonably fast because the
+     * bitstream is not interpreted.
+     *
+     * The vector is resized if necessary.
+     *
+     * A primitive form of error checking is performed which will recognize the
+     * bluntest attempts to interpret some data as a vector stored bitwise to a
+     * file, but not more.
+     */
+    void block_read (std::istream &in);
 
     /**
      * Returns the memory consumption of this class in bytes.
@@ -233,6 +276,15 @@ namespace LinearAlgebra
     typename VectorSpaceVector<Number>::real_type l2_norm_squared_recursive(
       unsigned int i,
       unsigned int j);
+
+    /**
+     * Serialize the data of this object using boost. This function is necessary
+     * to use boost::archive::text_iarchive and boost::archive::text_oarchive.
+     */
+    template <typename Archive>
+    void serialize(Archive &ar, const unsigned int version);
+
+    friend class boost::serialization::access;
   };
 
   /*@}*/
@@ -281,6 +333,56 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline
+  Vector<Number> &Vector<Number>::operator= (const Vector<Number> &in_vector)
+  {
+    this->reinit(in_vector.size(),true);
+    std::copy(in_vector.begin(), in_vector.end(), this->begin());
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  template <typename Number2>
+  inline
+  Vector<Number> &Vector<Number>::operator= (const Vector<Number2> &in_vector)
+  {
+    this->reinit(in_vector.size(in_vector.size()),true);
+    std::copy(in_vector.begin(), in_vector.end(), this->begin());
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  inline
+  Vector<Number> &Vector<Number>::operator= (const Number s)
+  {
+    Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
+    (void) s;
+
+    std::fill(this->begin(),this->end(),Number());
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  inline
+  void Vector<Number>::add(const Number a)
+  {
+    AssertIsFinite(a);
+    for (unsigned int i=0; i<this->size(); ++i)
+      this->val[i] += a;
+  }
+
+
+
+  template <typename Number>
+  inline
   typename Vector<Number>::size_type Vector<Number>::size() const
   {
     return ReadWriteVector<Number>::size();
@@ -305,6 +407,22 @@ namespace LinearAlgebra
                              const bool) const
   {
     ReadWriteVector<Number>::print(out, precision, scientific);
+  }
+
+
+
+  template <typename Number>
+  template <typename Archive>
+  inline
+  void Vector<Number>::serialize(Archive &ar, const unsigned int)
+  {
+    unsigned int current_size = this->size();
+    ar &static_cast<Subscriptor &>(*this);
+    ar &this->stored_elements;
+    // If necessary, resize the vector during a read operation
+    if (this->size()!=current_size)
+      this->reinit(this->size());
+    ar &boost::serialization::make_array(this->val,this->size());
   }
 
 

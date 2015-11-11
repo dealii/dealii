@@ -78,6 +78,11 @@ namespace LinearAlgebra
     virtual Number operator* (const VectorSpaceVector<Number> &V) = 0;
 
     /**
+     * Add @p a to all components. Note that @p a is a scalar not a vector.
+     */
+    virtual void add(const Number a) = 0;
+
+    /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     virtual void add(const Number a, const VectorSpaceVector<Number> &V) = 0;
