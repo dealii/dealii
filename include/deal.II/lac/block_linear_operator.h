@@ -588,7 +588,7 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
           new_ops[i][j].reinit_domain_vector = ops[j].reinit_domain_vector;
         }
 
-  return block_operator(new_ops);
+  return block_operator<m,m,Range,Domain>(new_ops);
 }
 
 
