@@ -931,9 +931,13 @@ namespace GridTools
   fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
                                 Triangulation<dim,spacedim> &triangulation);
 
+
+
+
   /*@}*/
   /**
-   * @name Extracting and creating patches of cells surrounding a single cell
+   * @name Extracting and creating patches of cells surrounding a single cell,
+   *  and creating triangulation out of them
    */
   /*@{*/
 
@@ -981,6 +985,73 @@ namespace GridTools
   template <class Container>
   std::vector<typename Container::active_cell_iterator>
   get_patch_around_cell(const typename Container::active_cell_iterator &cell);
+
+
+  /**
+   * This function takes a vector of active cells (here named as patch_cells) 
+   * as input argument, and returns vector of their parent cells with the 
+   * coarsest common level of refinement.
+   * The way that the function works, is as follows:
+   * first it computes the minimum refinement level of the given vector of
+   * active cells. Then loops over cells of the input vector of active cells.
+   * For each cell, if its refinement level is equal to the computted minimum 
+   * refinement level, that cell is pushed back to the vector of output cells.
+   * Otherwise, the function looks for the parent cell of the current cell, 
+   * with the level equal to the computed minimum refinement level, and 
+   * then pushes back this parent cell to the vector of output cells.
+   *
+   * @tparam Container
+   * In C++, the compiler can not determine the type of <code>Container</code>
+   * from the function call. You need to specify it as an explicit template
+   * argument following the function name.
+   * @param[in] patch_cells This vector of cells, typically results from 
+   * calling the function GridTools::get_patch_around_cell().
+   * @return A list of cells with the coarsest common level of refinement
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::cell_iterator> get_cells_at_coarsest_common_level(
+    const std::vector<typename Container::active_cell_iterator> &patch_cells);
+
+  /**
+   * The first element of input argument is a vector of active cells which we
+   * want to build local triangulation associated with this vector. 
+   * Besides building triangulation for the given vector of cells, this 
+   * function returns a map which actually pairs each cell of the local 
+   * triangulation with their corresponding cell of type global DofHandler 
+   * in the problem domain. The function loops over all cells of local 
+   * triangulation to fill out the map. It actually asks from the map,
+   * if mutual pair of the given cell in the map 
+   * has children in global DofHandler, then set_refine_flag() for that cell. 
+   * After doing refinement the refined cell should not be in the map anymore.
+   * Instead, the children may be added into the map.  
+   * Therefore, the next loop is over the children, so that they are inserted  
+   * to the map and the parent cell will be erased from the map. This way the 
+   * final map always contains the set of active cells of type triangulation, 
+   * such that the key comes fromlocal triangulation and the value comes from 
+   * cells of type global DofHandler.
+   *
+   * @tparam Container
+   * In C++, the compiler can not determine the type of <code>Container</code>
+   * from the function call. You need to specify it as an explicit template
+   * argument following the function name.
+   * @param[in] A vector of active cells
+   * @param[out] local triangulation corresponding to the given vector of active cells
+   * @param[out] patch_to_global_tria_map A map between the local triangulation which 
+   * is built as explained above, and the cells of type global DofHandler.
+   *
+   *  @author Arezou Ghesmati, 2015
+   */
+  template <class Container>
+  void
+  build_triangulation_from_patch (
+    const std::vector<typename Container::active_cell_iterator>  &patch,
+    Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
+    std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
+    typename Container::active_cell_iterator> &patch_to_global_tria_map);
+
+
 
 
   /*@}*/
