@@ -35,12 +35,12 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template<class SOLVER, class MATRIX, class VECTOR>
+template<class SOLVER, class MATRIX, typename VectorType>
 void
 check_solve( SOLVER &solver,
              const SolverControl &solver_control,
              const MATRIX &A,
-             std::vector<VECTOR> &u, std::vector<PetscScalar > &v)
+             std::vector<VectorType> &u, std::vector<PetscScalar > &v)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
