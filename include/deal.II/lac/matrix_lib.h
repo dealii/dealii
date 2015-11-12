@@ -449,9 +449,9 @@ public:
    * Initialization function. Provide a solver object, a matrix, and another
    * preconditioner for this.
    */
-  template <typename MatrixType, class PRECONDITION>
+  template <typename MatrixType, typename PreconditionerType>
   void initialize (const MatrixType &,
-                   const PRECONDITION &);
+                   const PreconditionerType &);
 
   /**
    * Access to the SolverControl object used by the solver.
@@ -735,16 +735,17 @@ MeanValueFilter::Tvmult_add(VectorType &, const VectorType &) const
 //-----------------------------------------------------------------------//
 
 template <typename VectorType>
-template <typename MatrixType, class PRECONDITION>
+template <typename MatrixType, typename PreconditionerType>
 inline void
-InverseMatrixRichardson<VectorType>::initialize (const MatrixType &m, const PRECONDITION &p)
+InverseMatrixRichardson<VectorType>::initialize (const MatrixType &m,
+                                                 const PreconditionerType &p)
 {
   if (matrix != 0)
     delete matrix;
   matrix = new PointerMatrix<MatrixType, VectorType>(&m);
   if (precondition != 0)
     delete precondition;
-  precondition = new PointerMatrix<PRECONDITION, VectorType>(&p);
+  precondition = new PointerMatrix<PreconditionerType, VectorType>(&p);
 }
 
 

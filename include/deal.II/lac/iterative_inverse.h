@@ -83,8 +83,8 @@ public:
    * Initialization function. Provide a matrix and preconditioner for the
    * solve in vmult().
    */
-  template <typename MatrixType, class PRECONDITION>
-  void initialize (const MatrixType &, const PRECONDITION &);
+  template <typename MatrixType, typename PreconditionerType>
+  void initialize (const MatrixType &, const PreconditionerType &);
 
   /**
    * Delete the pointers to matrix and preconditioner.
@@ -124,10 +124,10 @@ private:
 
 
 template <typename VectorType>
-template <typename MatrixType, class PRECONDITION>
+template <typename MatrixType, typename PreconditionerType>
 inline
 void
-IterativeInverse<VectorType>::initialize(const MatrixType &m, const PRECONDITION &p)
+IterativeInverse<VectorType>::initialize(const MatrixType &m, const PreconditionerType &p)
 {
   // dummy variable
   VectorType *v = 0;

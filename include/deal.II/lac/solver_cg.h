@@ -175,12 +175,12 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template <typename MatrixType, class PRECONDITIONER>
+  template <typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
   /**
    * Connect a slot to retrieve the CG coefficients. The slot will be called
@@ -453,12 +453,12 @@ SolverCG<VectorType>::compute_eigs_and_cond
 
 
 template <typename VectorType>
-template <typename MatrixType, class PRECONDITIONER>
+template <typename MatrixType, typename PreconditionerType>
 void
-SolverCG<VectorType>::solve (const MatrixType     &A,
-                             VectorType           &x,
-                             const VectorType     &b,
-                             const PRECONDITIONER &precondition)
+SolverCG<VectorType>::solve (const MatrixType         &A,
+                             VectorType               &x,
+                             const VectorType         &b,
+                             const PreconditionerType &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -521,7 +521,7 @@ SolverCG<VectorType>::solve (const MatrixType     &A,
           return;
         }
 
-      if (types_are_equal<PRECONDITIONER,PreconditionIdentity>::value == false)
+      if (types_are_equal<PreconditionerType,PreconditionIdentity>::value == false)
         {
           precondition.vmult(h,g);
 
@@ -553,7 +553,7 @@ SolverCG<VectorType>::solve (const MatrixType     &A,
           if (conv != SolverControl::iterate)
             break;
 
-          if (types_are_equal<PRECONDITIONER,PreconditionIdentity>::value
+          if (types_are_equal<PreconditionerType,PreconditionIdentity>::value
               == false)
             {
               precondition.vmult(h,g);

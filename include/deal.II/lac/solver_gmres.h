@@ -259,12 +259,12 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
   /**
    * Connect a slot to retrieve the estimated condition number.
@@ -452,12 +452,12 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
 private:
 
@@ -746,12 +746,12 @@ SolverGMRES<VectorType>::compute_eigs_and_cond
 
 
 template<class VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 void
-SolverGMRES<VectorType>::solve (const MatrixType     &A,
-                                VectorType           &x,
-                                const VectorType     &b,
-                                const PRECONDITIONER &precondition)
+SolverGMRES<VectorType>::solve (const MatrixType         &A,
+                                VectorType               &x,
+                                const VectorType         &b,
+                                const PreconditionerType &precondition)
 {
   // this code was written a very long time ago by people not associated with
   // deal.II. we don't make any guarantees to its optimality or that it even
@@ -1114,12 +1114,12 @@ SolverFGMRES<VectorType>::SolverFGMRES (SolverControl        &cn,
 
 
 template<class VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 void
-SolverFGMRES<VectorType>::solve (const MatrixType     &A,
-                                 VectorType           &x,
-                                 const VectorType     &b,
-                                 const PRECONDITIONER &precondition)
+SolverFGMRES<VectorType>::solve (const MatrixType         &A,
+                                 VectorType               &x,
+                                 const VectorType         &b,
+                                 const PreconditionerType &precondition)
 {
   deallog.push("FGMRES");
 

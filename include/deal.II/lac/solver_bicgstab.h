@@ -128,12 +128,12 @@ public:
   /**
    * Solve primal problem only.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
 protected:
   /**
@@ -253,10 +253,10 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   IterationResult
-  iterate(const MatrixType     &A,
-          const PRECONDITIONER &precondition);
+  iterate(const MatrixType         &A,
+          const PreconditionerType &precondition);
 };
 
 /*@}*/
@@ -347,10 +347,10 @@ SolverBicgstab<VectorType>::print_vectors(const unsigned int,
 
 
 template<typename VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 typename SolverBicgstab<VectorType>::IterationResult
-SolverBicgstab<VectorType>::iterate(const MatrixType     &A,
-                                    const PRECONDITIONER &precondition)
+SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
+                                    const PreconditionerType &precondition)
 {
 //TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
   SolverControl::State state = SolverControl::iterate;
@@ -434,12 +434,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType     &A,
 
 
 template<typename VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 void
-SolverBicgstab<VectorType>::solve(const MatrixType     &A,
-                                  VectorType           &x,
-                                  const VectorType     &b,
-                                  const PRECONDITIONER &precondition)
+SolverBicgstab<VectorType>::solve(const MatrixType         &A,
+                                  VectorType               &x,
+                                  const VectorType         &b,
+                                  const PreconditionerType &precondition)
 {
   deallog.push("Bicgstab");
   Vr    = this->memory.alloc();

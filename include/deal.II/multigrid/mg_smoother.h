@@ -399,7 +399,7 @@ private:
  *
  * @author Guido Kanschat, 2009
  */
-template<typename MatrixType, class PRECONDITIONER, typename VectorType>
+template<typename MatrixType, typename PreconditionerType, typename VectorType>
 class MGSmootherPrecondition : public MGSmoother<VectorType>
 {
 public:
@@ -416,19 +416,19 @@ public:
    * matrices and initializes the smoothing operator with the same smoother
    * for each level.
    *
-   * @p additional_data is an object of type @p PRECONDITIONER::AdditionalData
+   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const typename PRECONDITIONER::AdditionalData &additional_data = typename PRECONDITIONER::AdditionalData());
+                   const typename PreconditionerType::AdditionalData &additional_data = typename PreconditionerType::AdditionalData());
 
   /**
    * Initialize for matrices. This function stores pointers to the level
    * matrices and initializes the smoothing operator with the according
    * smoother for each level.
    *
-   * @p additional_data is an object of type @p PRECONDITIONER::AdditionalData
+   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -441,7 +441,7 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the same smoother for each level.
    *
-   * @p additional_data is an object of type @p PRECONDITIONER::AdditionalData
+   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -456,7 +456,7 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the according smoother for each level.
    *
-   * @p additional_data is an object of type @p PRECONDITIONER::AdditionalData
+   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -480,7 +480,7 @@ public:
   /**
    * Object containing relaxation methods.
    */
-  MGLevelObject<PRECONDITIONER> smoothers;
+  MGLevelObject<PreconditionerType> smoothers;
 
   /**
    * Memory used by this object.
@@ -840,9 +840,9 @@ memory_consumption () const
 
 //----------------------------------------------------------------------//
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::MGSmootherPrecondition
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::MGSmootherPrecondition
 (const unsigned int steps,
  const bool         variable,
  const bool         symmetric,
@@ -853,9 +853,9 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::MGSmootherPrecon
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::clear ()
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::clear ()
 {
   smoothers.clear();
 
@@ -867,12 +867,12 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::clear ()
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 template <typename MatrixType2>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 (const MGLevelObject<MatrixType2>              &m,
- const typename PRECONDITIONER::AdditionalData &data)
+ const typename PreconditionerType::AdditionalData &data)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -889,10 +889,10 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const MGLevelObject<DATA>        &data)
 {
@@ -916,10 +916,10 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const DATA                       &data,
  const unsigned int                row,
@@ -940,10 +940,10 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const MGLevelObject<DATA>        &data,
  const unsigned int                row,
@@ -969,9 +969,9 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::initialize
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline void
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::smooth
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::smooth
 (const unsigned int level,
  VectorType         &u,
  const VectorType   &rhs) const
@@ -1040,10 +1040,10 @@ MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::smooth
 
 
 
-template <typename MatrixType, class PRECONDITIONER, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline
 std::size_t
-MGSmootherPrecondition<MatrixType, PRECONDITIONER, VectorType>::
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
 memory_consumption () const
 {
   return sizeof(*this)

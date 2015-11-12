@@ -125,12 +125,12 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
   /**
    * Interface for derived class. This function gets the current iteration
@@ -198,10 +198,10 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   IterationResult
-  iterate (const MatrixType     &A,
-           const PRECONDITIONER &precondition);
+  iterate (const MatrixType         &A,
+           const PreconditionerType &precondition);
 
   /**
    * Number of the current iteration (accumulated over restarts)
@@ -264,12 +264,12 @@ SolverQMRS<VectorType>::print_vectors(const unsigned int,
 
 
 template<class VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 void
-SolverQMRS<VectorType>::solve (const MatrixType     &A,
-                               VectorType           &x,
-                               const VectorType     &b,
-                               const PRECONDITIONER &precondition)
+SolverQMRS<VectorType>::solve (const MatrixType         &A,
+                               VectorType               &x,
+                               const VectorType         &b,
+                               const PreconditionerType &precondition)
 {
   deallog.push("QMRS");
 
@@ -322,10 +322,10 @@ SolverQMRS<VectorType>::solve (const MatrixType     &A,
 
 
 template<class VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
-SolverQMRS<VectorType>::iterate(const MatrixType     &A,
-                                const PRECONDITIONER &precondition)
+SolverQMRS<VectorType>::iterate(const MatrixType         &A,
+                                const PreconditionerType &precondition)
 {
   /* Remark: the matrix A in the article is the preconditioned matrix.
    * Therefore, we have to precondition x before we compute the first residual.

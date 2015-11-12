@@ -107,22 +107,22 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
   /**
    * Solve $A^Tx=b$ for $x$.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  Tsolve (const MatrixType     &A,
-          VectorType           &x,
-          const VectorType     &b,
-          const PRECONDITIONER &precondition);
+  Tsolve (const MatrixType         &A,
+          VectorType               &x,
+          const VectorType         &b,
+          const PreconditionerType &precondition);
 
   /**
    * Set the damping-coefficient. Default is 1., i.e. no damping.
@@ -214,12 +214,12 @@ SolverRichardson<VectorType>::~SolverRichardson()
 
 
 template <class VectorType>
-template <typename MatrixType, class PRECONDITIONER>
+template <typename MatrixType, typename PreconditionerType>
 void
-SolverRichardson<VectorType>::solve (const MatrixType     &A,
-                                     VectorType           &x,
-                                     const VectorType     &b,
-                                     const PRECONDITIONER &precondition)
+SolverRichardson<VectorType>::solve (const MatrixType         &A,
+                                     VectorType               &x,
+                                     const VectorType         &b,
+                                     const PreconditionerType &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -285,12 +285,12 @@ SolverRichardson<VectorType>::solve (const MatrixType     &A,
 
 
 template <class VectorType>
-template <typename MatrixType, class PRECONDITIONER>
+template <typename MatrixType, typename PreconditionerType>
 void
-SolverRichardson<VectorType>::Tsolve (const MatrixType     &A,
-                                      VectorType           &x,
-                                      const VectorType     &b,
-                                      const PRECONDITIONER &precondition)
+SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
+                                      VectorType               &x,
+                                      const VectorType         &b,
+                                      const PreconditionerType &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
   double last_criterion = -std::numeric_limits<double>::max();

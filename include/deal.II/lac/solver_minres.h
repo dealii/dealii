@@ -98,12 +98,12 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, class PRECONDITIONER>
+  template<typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const PRECONDITIONER &precondition);
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &precondition);
 
   /**
    * @addtogroup Exceptions
@@ -196,12 +196,12 @@ SolverMinRes<VectorType>::print_vectors(const unsigned int,
 
 
 template<class VectorType>
-template<typename MatrixType, class PRECONDITIONER>
+template<typename MatrixType, typename PreconditionerType>
 void
-SolverMinRes<VectorType>::solve (const MatrixType     &A,
-                                 VectorType           &x,
-                                 const VectorType     &b,
-                                 const PRECONDITIONER &precondition)
+SolverMinRes<VectorType>::solve (const MatrixType         &A,
+                                 VectorType               &x,
+                                 const VectorType         &b,
+                                 const PreconditionerType &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
