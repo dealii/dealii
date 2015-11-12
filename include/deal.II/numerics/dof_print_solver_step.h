@@ -101,10 +101,11 @@ DoFPrintSolverStep<dim, SolverType, VectorType>::DoFPrintSolverStep
 
 template<int dim, typename SolverType, class VectorType>
 void
-DoFPrintSolverStep<dim, SolverType, VectorType>::print_vectors (const unsigned int  step,
-                                                                const VectorType   &x,
-                                                                const VectorType   &r,
-                                                                const VectorType   &d) const
+DoFPrintSolverStep<dim, SolverType, VectorType>::print_vectors
+(const unsigned int  step,
+ const VectorType   &x,
+ const VectorType   &r,
+ const VectorType   &d) const
 {
   out.clear_data_vectors();
   out.add_data_vector(x, "solution");
