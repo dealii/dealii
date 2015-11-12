@@ -29,8 +29,8 @@ public:
   /**
    * Fill the matrix with values.
    */
-  template <typename MATRIX>
-  void diag(MATRIX &) const;
+  template <typename MatrixType>
+  void diag(MatrixType &) const;
 
   template <typename number>
   void gnuplot_print(std::ostream &, const Vector<number> &) const;
@@ -75,10 +75,10 @@ FDDiagMatrix::diag_structure(SP &structure) const
 }
 
 
-template<typename MATRIX>
+template<typename MatrixType>
 inline
 void
-FDDiagMatrix::diag(MATRIX &A) const
+FDDiagMatrix::diag(MatrixType &A) const
 {
   for (unsigned int i=0; i<=ny-2; i++)
     {
@@ -131,8 +131,8 @@ public:
   /**
    * Fill the matrix with values.
    */
-  template <typename MATRIX>
-  void three_point(MATRIX &) const;
+  template <typename MatrixType>
+  void three_point(MatrixType &) const;
 
 private:
   /**
@@ -168,10 +168,10 @@ FD1DLaplaceMatrix::three_point_structure(SP &structure) const
 }
 
 
-template<typename MATRIX>
+template<typename MatrixType>
 inline
 void
-FD1DLaplaceMatrix::three_point(MATRIX &A) const
+FD1DLaplaceMatrix::three_point(MatrixType &A) const
 {
   for (unsigned int i=0; i<=n-2; i++)
     {
