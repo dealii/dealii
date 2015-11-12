@@ -43,7 +43,7 @@ template <int dim, int spacedim> class MappingQ;
  * are suitable for DG and hybrid formulations involving these function
  * spaces.
  *
- * The template argument <tt>POLY</tt> refers to a vector valued polynomial
+ * The template argument <tt>PolynomialType</tt> refers to a vector valued polynomial
  * space like PolynomialsRaviartThomas or PolynomialsNedelec. Note that the
  * dimension of the polynomial space and the argument <tt>dim</tt> must
  * coincide.
@@ -52,10 +52,10 @@ template <int dim, int spacedim> class MappingQ;
  * @author Guido Kanschat
  * @date 2010
  */
-template <class POLY, int dim, int spacedim=dim>
+template <class PolynomialType, int dim, int spacedim=dim>
 class FE_DGVector
   :
-  public FE_PolyTensor<POLY, dim, spacedim>
+  public FE_PolyTensor<PolynomialType, dim, spacedim>
 {
 public:
   /**

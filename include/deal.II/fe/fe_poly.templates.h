@@ -25,43 +25,45 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <class POLY, int dim, int spacedim>
-FE_Poly<POLY,dim,spacedim>::FE_Poly (const POLY &poly_space,
-                                     const FiniteElementData<dim> &fe_data,
-                                     const std::vector<bool> &restriction_is_additive_flags,
-                                     const std::vector<ComponentMask> &nonzero_components):
+template <class PolynomialType, int dim, int spacedim>
+FE_Poly<PolynomialType,dim,spacedim>::FE_Poly
+(const PolynomialType             &poly_space,
+ const FiniteElementData<dim>     &fe_data,
+ const std::vector<bool>          &restriction_is_additive_flags,
+ const std::vector<ComponentMask> &nonzero_components):
   FiniteElement<dim,spacedim> (fe_data,
                                restriction_is_additive_flags,
                                nonzero_components),
   poly_space(poly_space)
 {
-  AssertDimension(dim, POLY::dimension);
+  AssertDimension(dim, PolynomialType::dimension);
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 unsigned int
-FE_Poly<POLY,dim,spacedim>::get_degree () const
+FE_Poly<PolynomialType,dim,spacedim>::get_degree () const
 {
   return this->degree;
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 double
-FE_Poly<POLY,dim,spacedim>::shape_value (const unsigned int i,
-                                         const Point<dim> &p) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_value (const unsigned int i,
+                                                   const Point<dim>  &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return poly_space.compute_value(i, p);
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 double
-FE_Poly<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
-                                                   const Point<dim> &p,
-                                                   const unsigned int component) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_value_component
+(const unsigned int  i,
+ const Point<dim>   &p,
+ const unsigned int  component) const
 {
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -71,10 +73,10 @@ FE_Poly<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<1,dim>
-FE_Poly<POLY,dim,spacedim>::shape_grad (const unsigned int i,
-                                        const Point<dim> &p) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_grad (const unsigned int i,
+                                                  const Point<dim>  &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return poly_space.template compute_derivative<1>(i, p);
@@ -82,11 +84,11 @@ FE_Poly<POLY,dim,spacedim>::shape_grad (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<1,dim>
-FE_Poly<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
-                                                  const Point<dim> &p,
-                                                  const unsigned int component) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_grad_component (const unsigned int  i,
+                                                            const Point<dim>   &p,
+                                                            const unsigned int  component) const
 {
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -96,10 +98,10 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<2,dim>
-FE_Poly<POLY,dim,spacedim>::shape_grad_grad (const unsigned int i,
-                                             const Point<dim> &p) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_grad_grad (const unsigned int i,
+                                                       const Point<dim>  &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return poly_space.template compute_derivative<2>(i, p);
@@ -107,11 +109,12 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_grad (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<2,dim>
-FE_Poly<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int i,
-                                                       const Point<dim> &p,
-                                                       const unsigned int component) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_grad_grad_component
+(const unsigned int  i,
+ const Point<dim>   &p,
+ const unsigned int  component) const
 {
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -121,10 +124,10 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<3,dim>
-FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative (const unsigned int i,
-                                                  const Point<dim> &p) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_3rd_derivative (const unsigned int i,
+                                                            const Point<dim>  &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return poly_space.template compute_derivative<3>(i, p);
@@ -132,11 +135,12 @@ FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<3,dim>
-FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative_component (const unsigned int i,
-                                                            const Point<dim> &p,
-                                                            const unsigned int component) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_3rd_derivative_component
+(const unsigned int  i,
+ const Point<dim>   &p,
+ const unsigned int  component) const
 {
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -146,10 +150,10 @@ FE_Poly<POLY,dim,spacedim>::shape_3rd_derivative_component (const unsigned int i
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<4,dim>
-FE_Poly<POLY,dim,spacedim>::shape_4th_derivative (const unsigned int i,
-                                                  const Point<dim> &p) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_4th_derivative (const unsigned int i,
+                                                            const Point<dim>  &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return poly_space.template compute_derivative<4>(i, p);
@@ -157,11 +161,12 @@ FE_Poly<POLY,dim,spacedim>::shape_4th_derivative (const unsigned int i,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 Tensor<4,dim>
-FE_Poly<POLY,dim,spacedim>::shape_4th_derivative_component (const unsigned int i,
-                                                            const Point<dim> &p,
-                                                            const unsigned int component) const
+FE_Poly<PolynomialType,dim,spacedim>::shape_4th_derivative_component
+(const unsigned int  i,
+ const Point<dim>   &p,
+ const unsigned int  component) const
 {
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -176,18 +181,18 @@ FE_Poly<POLY,dim,spacedim>::shape_4th_derivative_component (const unsigned int i
 //---------------------------------------------------------------------------
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_Poly<POLY,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
+FE_Poly<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
   return update_once(flags) | update_each(flags);
 }
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_Poly<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
+FE_Poly<PolynomialType,dim,spacedim>::update_once (const UpdateFlags flags) const
 {
   // for this kind of elements, only
   // the values can be precomputed
@@ -199,9 +204,9 @@ FE_Poly<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
+FE_Poly<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -228,9 +233,9 @@ FE_Poly<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 //---------------------------------------------------------------------------
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::
+FE_Poly<PolynomialType,dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const CellSimilarity::Similarity                                     cell_similarity,
                 const Quadrature<dim>                                               &quadrature,
@@ -292,9 +297,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::
+FE_Poly<PolynomialType,dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                      const unsigned int                                                   face_no,
                      const Quadrature<dim-1>                                             &quadrature,
@@ -369,9 +374,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
     }
 }
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_Poly<POLY,dim,spacedim>::
+FE_Poly<PolynomialType,dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                         const unsigned int                                                   face_no,
                         const unsigned int                                                   sub_no,
@@ -450,9 +455,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 inline void
-FE_Poly<POLY,dim,spacedim>::
+FE_Poly<PolynomialType,dim,spacedim>::
 correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
                            const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
                            const unsigned int                                                n_q_points,
@@ -479,36 +484,36 @@ correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spac
 
 namespace internal
 {
-  template <class POLY>
+  template <class PolynomialType>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering (const POLY &)
+  get_poly_space_numbering (const PolynomialType &)
   {
     Assert (false, ExcNotImplemented());
     return std::vector<unsigned int>();
   }
 
-  template <class POLY>
+  template <class PolynomialType>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering_inverse (const POLY &)
+  get_poly_space_numbering_inverse (const PolynomialType &)
   {
     Assert (false, ExcNotImplemented());
     return std::vector<unsigned int>();
   }
 
-  template <int dim, typename POLY>
+  template <int dim, typename PolynomialType>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering (const TensorProductPolynomials<dim,POLY> &poly)
+  get_poly_space_numbering (const TensorProductPolynomials<dim,PolynomialType> &poly)
   {
     return poly.get_numbering();
   }
 
-  template <int dim, typename POLY>
+  template <int dim, typename PolynomialType>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering_inverse (const TensorProductPolynomials<dim,POLY> &poly)
+  get_poly_space_numbering_inverse (const TensorProductPolynomials<dim,PolynomialType> &poly)
   {
     return poly.get_numbering_inverse();
   }
@@ -532,9 +537,9 @@ namespace internal
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
-FE_Poly<POLY,dim,spacedim>::get_poly_space_numbering () const
+FE_Poly<PolynomialType,dim,spacedim>::get_poly_space_numbering () const
 {
   return internal::get_poly_space_numbering (poly_space);
 }
@@ -542,9 +547,9 @@ FE_Poly<POLY,dim,spacedim>::get_poly_space_numbering () const
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
-FE_Poly<POLY,dim,spacedim>::get_poly_space_numbering_inverse () const
+FE_Poly<PolynomialType,dim,spacedim>::get_poly_space_numbering_inverse () const
 {
   return internal::get_poly_space_numbering_inverse (poly_space);
 }

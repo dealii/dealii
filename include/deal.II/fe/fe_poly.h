@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
  * TensorProductPolynomials or PolynomialSpace classes.
  *
  * Every class conforming to the following interface can be used as template
- * parameter POLY.
+ * parameter PolynomialType.
  *
  * @code
  * static const unsigned int dimension;
@@ -65,14 +65,14 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann 2004, Guido Kanschat, 2009
  */
 
-template <class POLY, int dim=POLY::dimension, int spacedim=dim>
+template <class PolynomialType, int dim=PolynomialType::dimension, int spacedim=dim>
 class FE_Poly : public FiniteElement<dim,spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Poly (const POLY &poly_space,
+  FE_Poly (const PolynomialType &poly_space,
            const FiniteElementData<dim> &fe_data,
            const std::vector<bool> &restriction_is_additive_flags,
            const std::vector<ComponentMask> &nonzero_components);
@@ -91,13 +91,13 @@ public:
   /**
    * Return the numbering of the underlying polynomial space compared to
    * lexicographic ordering of the basis functions. Returns
-   * POLY::get_numbering().
+   * PolynomialType::get_numbering().
    */
   std::vector<unsigned int> get_poly_space_numbering() const;
 
   /**
    * Return the inverse numbering of the underlying polynomial space. Returns
-   * POLY::get_numbering_inverse().
+   * PolynomialType::get_numbering_inverse().
    */
   std::vector<unsigned int> get_poly_space_numbering_inverse() const;
 
@@ -463,9 +463,9 @@ protected:
                              const unsigned int                                                dof) const;
 
   /**
-   * The polynomial space. Its type is given by the template parameter POLY.
+   * The polynomial space. Its type is given by the template parameter PolynomialType.
    */
-  POLY poly_space;
+  PolynomialType poly_space;
 };
 
 /*@}*/
