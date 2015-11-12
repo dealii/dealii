@@ -38,9 +38,9 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve (SOLVER              &solver,
+check_solve (SolverType          &solver,
              const SolverControl &solver_control,
              const MatrixType    &A,
              VectorType          &u,

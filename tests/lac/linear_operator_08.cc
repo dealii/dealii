@@ -129,7 +129,7 @@ test_preconditioner (const SparseMatrix<double> &A,
   }
 }
 
-template<class SOLVER>
+template<typename SolverType>
 void
 test_solver (const SparseMatrix<double> &A,
              const Vector<double> &b)
@@ -138,7 +138,7 @@ test_solver (const SparseMatrix<double> &A,
   {
     deallog.push("Standard solver");
     SolverControl solver_control (100, 1.0e-10);
-    SOLVER solver (solver_control);
+    SolverType solver (solver_control);
 
     PreconditionJacobi< SparseMatrix<double> > preconditioner;
     preconditioner.initialize(A);
@@ -156,7 +156,7 @@ test_solver (const SparseMatrix<double> &A,
     const auto lo_A = linear_operator(A);
 
     SolverControl solver_control (100, 1.0e-10);
-    SOLVER solver (solver_control);
+    SolverType solver (solver_control);
 
     PreconditionJacobi< SparseMatrix<double> > preconditioner;
     preconditioner.initialize(A);
@@ -322,7 +322,7 @@ int main()
     }
     deallog.pop();
 
-    // === SOLVERS ===
+    // === SolverTypes ===
     deallog << std::endl;
     deallog << "Solvers" << std::endl;
     deallog.push("Solvers");

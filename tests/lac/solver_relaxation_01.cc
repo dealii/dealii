@@ -31,9 +31,9 @@
 #include <deal.II/lac/solver_relaxation.h>
 #include <deal.II/lac/precondition.h>
 
-template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 double
-check_solve (SOLVER             &solver,
+check_solve (SolverType         &solver,
              const MatrixType   &A,
              VectorType         &u,
              VectorType         &f,

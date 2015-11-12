@@ -32,7 +32,7 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/base/point.h>
 
-template<class SOLVER>
+template<typename SolverType>
 void test()
 {
   const unsigned int size = 3;
@@ -50,7 +50,7 @@ void test()
   rhs(size-1)=1.0;
 
   SolverControl solvctrl(1000, 1e-12, true);
-  SOLVER solver(solvctrl);
+  SolverType solver(solvctrl);
 
   PreconditionIdentity precond;
   solver.solve(mat, solvec, rhs, precond);

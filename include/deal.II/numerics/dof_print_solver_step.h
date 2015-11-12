@@ -49,8 +49,8 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup output
  * @author Guido Kanschat, 2000
  */
-template<int dim, class SOLVER, class VectorType = Vector<double> >
-class DoFPrintSolverStep : public SOLVER
+template<int dim, typename SolverType, class VectorType = Vector<double> >
+class DoFPrintSolverStep : public SolverType
 {
 public:
   /**
@@ -87,24 +87,24 @@ private:
 
 /* ----------------------- template functions --------------- */
 
-template<int dim, class SOLVER, class VectorType>
-DoFPrintSolverStep<dim, SOLVER, VectorType>::DoFPrintSolverStep
+template<int dim, typename SolverType, class VectorType>
+DoFPrintSolverStep<dim, SolverType, VectorType>::DoFPrintSolverStep
 (SolverControl            &control,
  VectorMemory<VectorType> &mem,
  DataOut<dim>             &data_out,
  const std::string        &basename)
-  : SOLVER (control, mem),
+  : SolverType (control, mem),
     out (data_out),
     basename (basename)
 {}
 
 
-template<int dim, class SOLVER, class VectorType>
+template<int dim, typename SolverType, class VectorType>
 void
-DoFPrintSolverStep<dim, SOLVER, VectorType>::print_vectors (const unsigned int step,
-                                                            const VectorType &x,
-                                                            const VectorType &r,
-                                                            const VectorType &d) const
+DoFPrintSolverStep<dim, SolverType, VectorType>::print_vectors (const unsigned int  step,
+                                                                const VectorType   &x,
+                                                                const VectorType   &r,
+                                                                const VectorType   &d) const
 {
   out.clear_data_vectors();
   out.add_data_vector(x, "solution");

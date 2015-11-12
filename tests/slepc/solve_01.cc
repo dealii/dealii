@@ -35,9 +35,9 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template<class SOLVER, typename MatrixType, typename VectorType>
+template<typename SolverType, typename MatrixType, typename VectorType>
 void
-check_solve( SOLVER &solver,
+check_solve( SolverType &solver,
              const SolverControl &solver_control,
              const MatrixType &A, const MatrixType &B,
              std::vector<VectorType> &u, std::vector<PetscScalar > &v)

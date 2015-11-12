@@ -31,9 +31,9 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
-template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve (SOLVER             &solver,
+check_solve (SolverType         &solver,
              const MatrixType   &A,
              VectorType         &u,
              VectorType         &f,
@@ -51,9 +51,9 @@ check_solve (SOLVER             &solver,
     }
 }
 
-template<class SOLVER, typename MatrixType, typename VectorType, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_Tsolve (SOLVER             &solver,
+check_Tsolve (SolverType         &solver,
               const MatrixType   &A,
               VectorType         &u,
               VectorType         &f,

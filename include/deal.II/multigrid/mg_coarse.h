@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
-template<class SOLVER, class VectorType = Vector<double> >
+template<typename SolverType, class VectorType = Vector<double> >
 class MGCoarseGridLACIteration :  public MGCoarseGridBase<VectorType>
 {
 public:
@@ -51,7 +51,7 @@ public:
    * use.
    */
   template<typename MatrixType, class PRECOND>
-  MGCoarseGridLACIteration (SOLVER &,
+  MGCoarseGridLACIteration (SolverType &,
                             const MatrixType &,
                             const PRECOND &);
 
@@ -64,7 +64,7 @@ public:
    * Initialize new data.
    */
   template<typename MatrixType, class PRECOND>
-  void initialize (SOLVER &,
+  void initialize (SolverType &,
                    const MatrixType &,
                    const PRECOND &);
 
@@ -92,7 +92,7 @@ private:
   /**
    * Reference to the solver.
    */
-  SmartPointer<SOLVER,MGCoarseGridLACIteration<SOLVER,VectorType> > solver;
+  SmartPointer<SolverType,MGCoarseGridLACIteration<SolverType,VectorType> > solver;
 
   /**
    * Reference to the matrix.
@@ -187,8 +187,8 @@ private:
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
 
-template<class SOLVER, class VectorType>
-MGCoarseGridLACIteration<SOLVER, VectorType>
+template<typename SolverType, class VectorType>
+MGCoarseGridLACIteration<SolverType, VectorType>
 ::MGCoarseGridLACIteration()
   :
   solver(0, typeid(*this).name()),
@@ -197,10 +197,10 @@ MGCoarseGridLACIteration<SOLVER, VectorType>
 {}
 
 
-template<class SOLVER, class VectorType>
+template<typename SolverType, class VectorType>
 template<typename MatrixType, class PRECOND>
-MGCoarseGridLACIteration<SOLVER, VectorType>
-::MGCoarseGridLACIteration (SOLVER           &s,
+MGCoarseGridLACIteration<SolverType, VectorType>
+::MGCoarseGridLACIteration (SolverType       &s,
                             const MatrixType &m,
                             const PRECOND    &p)
   :
@@ -211,19 +211,19 @@ MGCoarseGridLACIteration<SOLVER, VectorType>
 }
 
 
-template<class SOLVER, class VectorType>
-MGCoarseGridLACIteration<SOLVER, VectorType>
+template<typename SolverType, class VectorType>
+MGCoarseGridLACIteration<SolverType, VectorType>
 ::~MGCoarseGridLACIteration()
 {
   clear();
 }
 
 
-template<class SOLVER, class VectorType>
+template<typename SolverType, class VectorType>
 template<typename MatrixType, class PRECOND>
 void
-MGCoarseGridLACIteration<SOLVER, VectorType>
-::initialize (SOLVER           &s,
+MGCoarseGridLACIteration<SolverType, VectorType>
+::initialize (SolverType       &s,
               const MatrixType &m,
               const PRECOND    &p)
 {
@@ -237,9 +237,9 @@ MGCoarseGridLACIteration<SOLVER, VectorType>
 }
 
 
-template<class SOLVER, class VectorType>
+template<typename SolverType, class VectorType>
 void
-MGCoarseGridLACIteration<SOLVER, VectorType>
+MGCoarseGridLACIteration<SolverType, VectorType>
 ::clear()
 {
   solver = 0;
@@ -252,9 +252,9 @@ MGCoarseGridLACIteration<SOLVER, VectorType>
 }
 
 
-template<class SOLVER, class VectorType>
+template<typename SolverType, class VectorType>
 void
-MGCoarseGridLACIteration<SOLVER, VectorType>
+MGCoarseGridLACIteration<SolverType, VectorType>
 ::operator() (const unsigned int /* level */,
               VectorType         &dst,
               const VectorType   &src) const
@@ -266,10 +266,10 @@ MGCoarseGridLACIteration<SOLVER, VectorType>
 }
 
 
-template<class SOLVER, class VectorType>
+template<typename SolverType, class VectorType>
 template<typename MatrixType>
 void
-MGCoarseGridLACIteration<SOLVER, VectorType>
+MGCoarseGridLACIteration<SolverType, VectorType>
 ::set_matrix(const MatrixType &m)
 {
   if (matrix)
