@@ -349,8 +349,8 @@ namespace MeshWorker
      */
     void reinit(const BlockIndices &local_sizes);
 
-    template <class STREAM>
-    void print_debug(STREAM &os) const;
+    template <class StreamType>
+    void print_debug(StreamType &os) const;
 
     /**
      * The memory used by this object.
@@ -640,9 +640,9 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class STREAM>
+  template <class StreamType>
   void
-  LocalResults<number>::print_debug(STREAM &os) const
+  LocalResults<number>::print_debug(StreamType &os) const
   {
     os << "J: " << J.size() << std::endl;
     os << "R: " << R.size() << std::endl;

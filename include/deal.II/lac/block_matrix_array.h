@@ -252,8 +252,8 @@ public:
    * Nevertheless, the output at least gives some kind of idea of the block
    * structure of this matrix.
    */
-  template <class STREAM>
-  void print_latex (STREAM &out) const;
+  template <class StreamType>
+  void print_latex (StreamType &out) const;
 
 protected:
   /**
@@ -550,10 +550,10 @@ BlockMatrixArray<number, BlockVectorType>::enter (const MatrixType &matrix,
 
 
 template <typename number, typename BlockVectorType>
-template <class STREAM>
+template <class StreamType>
 inline
 void
-BlockMatrixArray<number, BlockVectorType>::print_latex (STREAM &out) const
+BlockMatrixArray<number, BlockVectorType>::print_latex (StreamType &out) const
 {
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')

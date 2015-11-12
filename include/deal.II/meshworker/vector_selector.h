@@ -134,14 +134,14 @@ namespace MeshWorker
     /**
      * Print the contents of the selection to the stream.
      */
-    template <class STREAM, typename DATA>
-    void print (STREAM &s, const AnyData &v) const;
+    template <class StreamType, typename DATA>
+    void print (StreamType &s, const AnyData &v) const;
 
     /**
      * Print the number of selections to the stream.
      */
-    template <class STREAM>
-    void print (STREAM &s) const;
+    template <class StreamType>
+    void print (StreamType &s) const;
 
     /**
      * The memory used by this object.
@@ -496,9 +496,9 @@ namespace MeshWorker
   }
 
 
-  template <class STREAM>
+  template <class StreamType>
   inline void
-  VectorSelector::print(STREAM &s) const
+  VectorSelector::print(StreamType &s) const
   {
     s << "values: " << n_values()
       << " gradients: " << n_gradients()
@@ -507,9 +507,9 @@ namespace MeshWorker
   }
 
 
-  template <class STREAM, typename DATA>
+  template <class StreamType, typename DATA>
   inline void
-  VectorSelector::print(STREAM &s, const AnyData &v) const
+  VectorSelector::print(StreamType &s, const AnyData &v) const
   {
     s << "values:   ";
     for (unsigned int i=0; i<n_values(); ++i)

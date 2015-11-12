@@ -406,8 +406,8 @@ public:
    * existing row lengths and allocated row lengths. Otherwise, just the
    * relation of allocated and used entries is shown.
    */
-  template <class STREAM>
-  void print_statistics (STREAM &s, bool full = false);
+  template <class StreamType>
+  void print_statistics (StreamType &s, bool full = false);
 
   /**
    * Compute numbers of entries.
@@ -1558,10 +1558,10 @@ SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
 
 
 template <typename number>
-template <class STREAM>
+template <class StreamType>
 inline
 void
-SparseMatrixEZ<number>::print_statistics(STREAM &out, bool full)
+SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 {
   size_type used;
   size_type allocated;

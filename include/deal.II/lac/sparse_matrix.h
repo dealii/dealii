@@ -1428,10 +1428,10 @@ public:
    * internal storage scheme. If it is false, the elements in a row are
    * written in ascending column order.
    */
-  template <class STREAM>
-  void print (STREAM &out,
-              const bool across = false,
-              const bool diagonal_first = true) const;
+  template <class StreamType>
+  void print (StreamType &out,
+              const bool  across = false,
+              const bool  diagonal_first = true) const;
 
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
@@ -2340,11 +2340,11 @@ SparseMatrix<number>::end (const size_type r)
 
 
 template <typename number>
-template <class STREAM>
+template <class StreamType>
 inline
-void SparseMatrix<number>::print (STREAM &out,
-                                  const bool across,
-                                  const bool diagonal_first) const
+void SparseMatrix<number>::print (StreamType &out,
+                                  const bool  across,
+                                  const bool  diagonal_first) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());

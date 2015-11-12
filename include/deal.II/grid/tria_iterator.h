@@ -473,8 +473,8 @@ public:
    * Print the iterator to a stream <code>out</code>. The format is
    * <tt>level.index</tt>.
    */
-  template <class STREAM>
-  void print (STREAM &out) const;
+  template <class StreamType>
+  void print (StreamType &out) const;
 
 
   /**
@@ -1059,10 +1059,10 @@ TriaRawIterator<Accessor>::operator -- ()
 
 
 template <typename Accessor>
-template <class STREAM>
+template <class StreamType>
 inline
 void
-TriaRawIterator<Accessor>::print (STREAM &out) const
+TriaRawIterator<Accessor>::print (StreamType &out) const
 {
   if (Accessor::structure_dimension==Accessor::dimension)
     out << accessor.level() << "." << accessor.index();

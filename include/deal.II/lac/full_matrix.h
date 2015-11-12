@@ -566,8 +566,8 @@ public:
    * stream before setting these given values for output, and restores the
    * previous values after output.
    */
-  template <class STREAM>
-  void print (STREAM             &s,
+  template <class StreamType>
+  void print (StreamType         &s,
               const unsigned int  width=5,
               const unsigned int  precision=2) const;
 
@@ -1529,10 +1529,10 @@ FullMatrix<number>::add (const size_type    row,
 
 
 template <typename number>
-template <class STREAM>
+template <class StreamType>
 inline
 void
-FullMatrix<number>::print (STREAM             &s,
+FullMatrix<number>::print (StreamType         &s,
                            const unsigned int  w,
                            const unsigned int  p) const
 {

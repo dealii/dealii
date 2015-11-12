@@ -167,8 +167,8 @@ public:
   bool is_type(const unsigned int i) const;
 
   /// List the contents to a stream
-  template <class STREAM>
-  void list (STREAM &os) const;
+  template <class StreamType>
+  void list (StreamType &os) const;
 
   /// An entry with this name does not exist in the AnyData object.
   DeclException1(ExcNameNotFound, std::string,
@@ -448,9 +448,9 @@ AnyData::merge(const AnyData &other)
 }
 
 
-template <class STREAM>
+template <class StreamType>
 inline
-void AnyData::list(STREAM &os) const
+void AnyData::list(StreamType &os) const
 {
   for (unsigned int i=0; i<names.size(); ++i)
     {

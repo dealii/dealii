@@ -243,9 +243,9 @@ enum UpdateFlags
  *
  * @ref UpdateFlags
  */
-template <class STREAM>
+template <class StreamType>
 inline
-STREAM &operator << (STREAM &s, UpdateFlags u)
+StreamType &operator << (StreamType &s, UpdateFlags u)
 {
   s << " UpdateFlags|";
   if (u & update_values)                                  s << "values|";

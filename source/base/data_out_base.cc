@@ -2127,10 +2127,10 @@ namespace DataOutBase
 
 //----------------------------------------------------------------------//
 
-  template <int dim, int spacedim, typename STREAM>
+  template <int dim, int spacedim, typename StreamType>
   void
   write_nodes (const std::vector<Patch<dim,spacedim> > &patches,
-               STREAM &out)
+               StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
@@ -2168,10 +2168,10 @@ namespace DataOutBase
     out.flush_points ();
   }
 
-  template <int dim, int spacedim, typename STREAM>
+  template <int dim, int spacedim, typename StreamType>
   void
   write_cells (const std::vector<Patch<dim,spacedim> > &patches,
-               STREAM &out)
+               StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
@@ -2210,13 +2210,13 @@ namespace DataOutBase
   }
 
 
-  template <int dim, int spacedim, class STREAM>
+  template <int dim, int spacedim, class StreamType>
   void
-  write_data (
-    const std::vector<Patch<dim,spacedim> > &patches,
-    unsigned int n_data_sets,
-    const bool double_precision,
-    STREAM &out)
+  write_data
+  (const std::vector<Patch<dim,spacedim> > &patches,
+   unsigned int                             n_data_sets,
+   const bool                               double_precision,
+   StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
