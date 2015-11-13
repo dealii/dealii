@@ -205,7 +205,6 @@ void PreconditionSelector<MatrixType,VectorType>::use_matrix(const MatrixType &M
   A=&M;
 }
 
-<<<<<<< fc87b7c22812a5fc7751b36c66b20e6fa54df72c
 
 template <typename MatrixType, typename VectorType>
 inline typename PreconditionSelector<MatrixType,VectorType>::size_type
