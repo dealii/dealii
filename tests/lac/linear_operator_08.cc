@@ -49,38 +49,38 @@
 using namespace dealii;
 
 
-template<class PRECONDITIONER, class MATRIX, class VECTOR,
+template<class PRECONDITIONER, typename MatrixType, typename VectorType,
          class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner (const MATRIX &A,
-                     const VECTOR &b,
+test_preconditioner (const MatrixType &A,
+                     const VectorType &b,
                      const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
-  const auto lo_A = linear_operator<VECTOR>(A);
+  const auto lo_A = linear_operator<VectorType>(A);
 
   PRECONDITIONER preconditioner;
   preconditioner.initialize(A, data);
 
   SolverControl solver_control (100, 1.0e-10);
-  SolverCG<VECTOR> solver (solver_control);
+  SolverCG<VectorType> solver (solver_control);
 
   // Exact inverse
   const auto lo_A_inv = inverse_operator(lo_A,
                                          solver,
                                          preconditioner);
 
-  const VECTOR x = lo_A_inv*b;
+  const VectorType x = lo_A_inv*b;
 
   // Approximate inverse
   {
     // Using exemplar matrix
-    const auto lo_A_inv_approx = linear_operator<VECTOR>(A, preconditioner);
-    const VECTOR x_approx = lo_A_inv_approx*b;
+    const auto lo_A_inv_approx = linear_operator<VectorType>(A, preconditioner);
+    const VectorType x_approx = lo_A_inv_approx*b;
   }
   {
     // Stand-alone
-    const auto lo_A_inv_approx = linear_operator<VECTOR>(preconditioner);
-    const VECTOR x_approx = lo_A_inv_approx*b;
+    const auto lo_A_inv_approx = linear_operator<VectorType>(preconditioner);
+    const VectorType x_approx = lo_A_inv_approx*b;
   }
 }
 
@@ -129,7 +129,7 @@ test_preconditioner (const SparseMatrix<double> &A,
   }
 }
 
-template<class SOLVER>
+template<typename SolverType>
 void
 test_solver (const SparseMatrix<double> &A,
              const Vector<double> &b)
@@ -138,7 +138,7 @@ test_solver (const SparseMatrix<double> &A,
   {
     deallog.push("Standard solver");
     SolverControl solver_control (100, 1.0e-10);
-    SOLVER solver (solver_control);
+    SolverType solver (solver_control);
 
     PreconditionJacobi< SparseMatrix<double> > preconditioner;
     preconditioner.initialize(A);
@@ -156,7 +156,7 @@ test_solver (const SparseMatrix<double> &A,
     const auto lo_A = linear_operator(A);
 
     SolverControl solver_control (100, 1.0e-10);
-    SOLVER solver (solver_control);
+    SolverType solver (solver_control);
 
     PreconditionJacobi< SparseMatrix<double> > preconditioner;
     preconditioner.initialize(A);
@@ -193,16 +193,16 @@ public:
                               matrix.n_block_cols());
   }
 
-  template<typename VECTOR>
+  template<typename VectorType>
   void
-  vmult(VECTOR &dst, const VECTOR &src) const
+  vmult(VectorType &dst, const VectorType &src) const
   {
     dst = src;
   }
 
-  template<class VECTOR>
+  template<typename VectorType>
   void
-  Tvmult(VECTOR &dst, const VECTOR &src) const
+  Tvmult(VectorType &dst, const VectorType &src) const
   {
     dst = src;
   }
@@ -322,7 +322,7 @@ int main()
     }
     deallog.pop();
 
-    // === SOLVERS ===
+    // === SolverTypes ===
     deallog << std::endl;
     deallog << "Solvers" << std::endl;
     deallog.push("Solvers");

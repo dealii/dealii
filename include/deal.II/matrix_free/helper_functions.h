@@ -101,8 +101,8 @@ namespace internal
        * Prints minimum, average, and maximal memory consumption over the MPI
        * processes.
        */
-      template <typename STREAM>
-      void print_memory_statistics (STREAM     &out,
+      template <typename StreamType>
+      void print_memory_statistics (StreamType &out,
                                     std::size_t data_length) const;
 
       /**

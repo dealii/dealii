@@ -82,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Michael Stadler, 2001
  */
-template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
+template <int dim, typename VectorType = Vector<double>, int spacedim=dim >
 class MappingQ1Eulerian : public MappingQGeneric<dim,spacedim>
 {
 public:
@@ -97,7 +97,7 @@ public:
    * problem. Alternatively, the @p Vector can be initialized by
    * <tt>DoFAccessor::set_dof_values()</tt>.
    */
-  MappingQ1Eulerian (const VECTOR  &euler_transform_vectors,
+  MappingQ1Eulerian (const VectorType  &euler_transform_vectors,
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**
@@ -115,7 +115,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  MappingQ1Eulerian<dim,VECTOR,spacedim> *clone () const;
+  MappingQ1Eulerian<dim,VectorType,spacedim> *clone () const;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general
@@ -161,12 +161,12 @@ protected:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VECTOR, MappingQ1Eulerian<dim,VECTOR,spacedim> > euler_transform_vectors;
+  SmartPointer<const VectorType, MappingQ1Eulerian<dim,VectorType,spacedim> > euler_transform_vectors;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
+  SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VectorType,spacedim> > shiftmap_dof_handler;
 };
 
 /*@}*/
@@ -175,10 +175,10 @@ protected:
 
 #ifndef DOXYGEN
 
-template <int dim, class VECTOR, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 inline
 bool
-MappingQ1Eulerian<dim,VECTOR,spacedim>::preserves_vertex_locations () const
+MappingQ1Eulerian<dim,VectorType,spacedim>::preserves_vertex_locations () const
 {
   return false;
 }

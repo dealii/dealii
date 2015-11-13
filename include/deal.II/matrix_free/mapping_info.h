@@ -116,8 +116,8 @@ namespace internal
        * Prints a detailed summary of memory consumption in the different
        * structures of this class to the given output stream.
        */
-      template <typename STREAM>
-      void print_memory_consumption(STREAM         &out,
+      template <typename StreamType>
+      void print_memory_consumption(StreamType     &out,
                                     const SizeInfo &size_info) const;
 
       /**
@@ -274,8 +274,8 @@ namespace internal
          * Prints a detailed summary of memory consumption in the different
          * structures of this class to the given output stream.
          */
-        template <typename STREAM>
-        void print_memory_consumption(STREAM         &out,
+        template <typename StreamType>
+        void print_memory_consumption(StreamType     &out,
                                       const SizeInfo &size_info) const;
 
         /**

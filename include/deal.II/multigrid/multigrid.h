@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1999 - 2005
  */
-template <class VECTOR>
+template <typename VectorType>
 class Multigrid : public Subscriptor
 {
 public:
@@ -77,8 +77,8 @@ public:
     f_cycle
   };
 
-  typedef VECTOR vector_type;
-  typedef const VECTOR const_vector_type;
+  typedef VectorType vector_type;
+  typedef const VectorType const_vector_type;
 
   /**
    * Constructor. The DoFHandler is used to determine the highest possible
@@ -90,27 +90,27 @@ public:
    * this type as late as possible.
    */
   template <int dim>
-  Multigrid(const DoFHandler<dim> &mg_dof_handler,
-            const MGMatrixBase<VECTOR> &matrix,
-            const MGCoarseGridBase<VECTOR> &coarse,
-            const MGTransferBase<VECTOR> &transfer,
-            const MGSmootherBase<VECTOR> &pre_smooth,
-            const MGSmootherBase<VECTOR> &post_smooth,
-            Cycle cycle = v_cycle);
+  Multigrid(const DoFHandler<dim>              &mg_dof_handler,
+            const MGMatrixBase<VectorType>     &matrix,
+            const MGCoarseGridBase<VectorType> &coarse,
+            const MGTransferBase<VectorType>   &transfer,
+            const MGSmootherBase<VectorType>   &pre_smooth,
+            const MGSmootherBase<VectorType>   &post_smooth,
+            Cycle                              cycle = v_cycle);
 
   /**
    * Experimental constructor for cases in which no DoFHandler is available.
    *
    * @warning Not intended for general use.
    */
-  Multigrid(const unsigned int minlevel,
-            const unsigned int maxlevel,
-            const MGMatrixBase<VECTOR> &matrix,
-            const MGCoarseGridBase<VECTOR> &coarse,
-            const MGTransferBase<VECTOR> &transfer,
-            const MGSmootherBase<VECTOR> &pre_smooth,
-            const MGSmootherBase<VECTOR> &post_smooth,
-            Cycle cycle = v_cycle);
+  Multigrid(const unsigned int                 minlevel,
+            const unsigned int                 maxlevel,
+            const MGMatrixBase<VectorType>     &matrix,
+            const MGCoarseGridBase<VectorType> &coarse,
+            const MGTransferBase<VectorType>   &transfer,
+            const MGSmootherBase<VectorType>   &pre_smooth,
+            const MGSmootherBase<VectorType>   &post_smooth,
+            Cycle                              cycle = v_cycle);
 
   /**
    * Reinit this class according to #minlevel and #maxlevel.
@@ -148,8 +148,8 @@ public:
    * <tt>edge_in</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_matrices (const MGMatrixBase<VECTOR> &edge_out,
-                          const MGMatrixBase<VECTOR> &edge_in);
+  void set_edge_matrices (const MGMatrixBase<VectorType> &edge_out,
+                          const MGMatrixBase<VectorType> &edge_in);
 
   /**
    * Set additional matrices to correct residual computation at refinement
@@ -163,8 +163,8 @@ public:
    * <tt>edge_up</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_flux_matrices (const MGMatrixBase<VECTOR> &edge_down,
-                               const MGMatrixBase<VECTOR> &edge_up);
+  void set_edge_flux_matrices (const MGMatrixBase<VectorType> &edge_down,
+                               const MGMatrixBase<VectorType> &edge_up);
 
   /**
    * Return the finest level for multigrid.
@@ -252,56 +252,56 @@ public:
    * Input vector for the cycle. Contains the defect of the outer method
    * projected to the multilevel vectors.
    */
-  MGLevelObject<VECTOR> defect;
+  MGLevelObject<VectorType> defect;
 
   /**
    * The solution update after the multigrid step.
    */
-  MGLevelObject<VECTOR> solution;
+  MGLevelObject<VectorType> solution;
 
 private:
   /**
    * Auxiliary vector.
    */
-  MGLevelObject<VECTOR> t;
+  MGLevelObject<VectorType> t;
 
   /**
    * Auxiliary vector for W- and F-cycles. Left uninitialized in V-cycle.
    */
-  MGLevelObject<VECTOR> defect2;
+  MGLevelObject<VectorType> defect2;
 
 
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > matrix;
+  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > matrix;
 
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGCoarseGridBase<VECTOR>,Multigrid<VECTOR> > coarse;
+  SmartPointer<const MGCoarseGridBase<VectorType>,Multigrid<VectorType> > coarse;
 
   /**
    * Object for grid tranfer.
    */
-  SmartPointer<const MGTransferBase<VECTOR>,Multigrid<VECTOR> > transfer;
+  SmartPointer<const MGTransferBase<VectorType>,Multigrid<VectorType> > transfer;
 
   /**
    * The pre-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VECTOR>,Multigrid<VECTOR> > pre_smooth;
+  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > pre_smooth;
 
   /**
    * The post-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VECTOR>,Multigrid<VECTOR> > post_smooth;
+  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > post_smooth;
 
   /**
    * Edge matrix from the interior of the refined part to the refinement edge.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VECTOR> > edge_out;
+  SmartPointer<const MGMatrixBase<VectorType> > edge_out;
 
   /**
    * Transpose edge matrix from the refinement edge to the interior of the
@@ -309,28 +309,28 @@ private:
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VECTOR> > edge_in;
+  SmartPointer<const MGMatrixBase<VectorType> > edge_in;
 
   /**
    * Edge matrix from fine to coarse.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_down;
+  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > edge_down;
 
   /**
    * Transpose edge matrix from coarse to fine.
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VECTOR>,Multigrid<VECTOR> > edge_up;
+  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > edge_up;
 
   /**
    * Level for debug output. Defaults to zero and can be set by set_debug().
    */
   unsigned int debug;
 
-  template<int dim, class VECTOR2, class TRANSFER> friend class PreconditionMG;
+  template<int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
 };
 
 
@@ -339,13 +339,13 @@ private:
  * multi-level preconditioning and provide the standard interface for LAC
  * iterative methods.
  *
- * Furthermore, it needs functions <tt>void copy_to_mg(const VECTOR&)</tt> to
+ * Furthermore, it needs functions <tt>void copy_to_mg(const VectorType&)</tt> to
  * store @p src in the right hand side of the multi-level method and <tt>void
- * copy_from_mg(VECTOR&)</tt> to store the result of the v-cycle in @p dst.
+ * copy_from_mg(VectorType&)</tt> to store the result of the v-cycle in @p dst.
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
-template<int dim, class VECTOR, class TRANSFER>
+template<int dim, typename VectorType, class TRANSFER>
 class PreconditionMG : public Subscriptor
 {
 public:
@@ -353,9 +353,9 @@ public:
    * Constructor. Arguments are the multigrid object, pre-smoother, post-
    * smoother and coarse grid solver.
    */
-  PreconditionMG(const DoFHandler<dim>     &dof_handler,
-                 Multigrid<VECTOR>           &mg,
-                 const TRANSFER &transfer);
+  PreconditionMG(const DoFHandler<dim> &dof_handler,
+                 Multigrid<VectorType> &mg,
+                 const TRANSFER        &transfer);
 
   /**
    * Dummy function needed by other classes.
@@ -368,51 +368,51 @@ public:
    *
    * This is the operator used by LAC iterative solvers.
    */
-  template<class VECTOR2>
-  void vmult (VECTOR2       &dst,
-              const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void vmult (OtherVectorType       &dst,
+              const OtherVectorType &src) const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
-  template<class VECTOR2>
-  void vmult_add (VECTOR2       &dst,
-                  const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void vmult_add (OtherVectorType       &dst,
+                  const OtherVectorType &src) const;
 
   /**
    * Tranposed preconditioning operator.
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class VECTOR2>
-  void Tvmult (VECTOR2       &dst,
-               const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void Tvmult (OtherVectorType       &dst,
+               const OtherVectorType &src) const;
 
   /**
    * Tranposed preconditioning operator.
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class VECTOR2>
-  void Tvmult_add (VECTOR2       &dst,
-                   const VECTOR2 &src) const;
+  template<class OtherVectorType>
+  void Tvmult_add (OtherVectorType       &dst,
+                   const OtherVectorType &src) const;
 
 private:
   /**
    * Associated @p DoFHandler.
    */
-  SmartPointer<const DoFHandler<dim>,PreconditionMG<dim,VECTOR,TRANSFER> > dof_handler;
+  SmartPointer<const DoFHandler<dim>,PreconditionMG<dim,VectorType,TRANSFER> > dof_handler;
 
   /**
    * The multigrid object.
    */
-  SmartPointer<Multigrid<VECTOR>,PreconditionMG<dim,VECTOR,TRANSFER> > multigrid;
+  SmartPointer<Multigrid<VectorType>,PreconditionMG<dim,VectorType,TRANSFER> > multigrid;
 
   /**
    * Object for grid tranfer.
    */
-  SmartPointer<const TRANSFER,PreconditionMG<dim,VECTOR,TRANSFER> > transfer;
+  SmartPointer<const TRANSFER,PreconditionMG<dim,VectorType,TRANSFER> > transfer;
 };
 
 /*@}*/
@@ -421,15 +421,15 @@ private:
 /* --------------------------- inline functions --------------------- */
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <int dim>
-Multigrid<VECTOR>::Multigrid (const DoFHandler<dim> &mg_dof_handler,
-                              const MGMatrixBase<VECTOR> &matrix,
-                              const MGCoarseGridBase<VECTOR> &coarse,
-                              const MGTransferBase<VECTOR> &transfer,
-                              const MGSmootherBase<VECTOR> &pre_smooth,
-                              const MGSmootherBase<VECTOR> &post_smooth,
-                              Cycle                         cycle)
+Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler,
+                                  const MGMatrixBase<VectorType>     &matrix,
+                                  const MGCoarseGridBase<VectorType> &coarse,
+                                  const MGTransferBase<VectorType>   &transfer,
+                                  const MGSmootherBase<VectorType>   &pre_smooth,
+                                  const MGSmootherBase<VectorType>   &post_smooth,
+                                  Cycle                              cycle)
   :
   cycle_type(cycle),
   minlevel(0),
@@ -450,20 +450,20 @@ Multigrid<VECTOR>::Multigrid (const DoFHandler<dim> &mg_dof_handler,
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 unsigned int
-Multigrid<VECTOR>::get_maxlevel () const
+Multigrid<VectorType>::get_maxlevel () const
 {
   return maxlevel;
 }
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 unsigned int
-Multigrid<VECTOR>::get_minlevel () const
+Multigrid<VectorType>::get_minlevel () const
 {
   return minlevel;
 }
@@ -472,30 +472,30 @@ Multigrid<VECTOR>::get_minlevel () const
 /* --------------------------- inline functions --------------------- */
 
 
-template<int dim, class VECTOR, class TRANSFER>
-PreconditionMG<dim, VECTOR, TRANSFER>
-::PreconditionMG(const DoFHandler<dim>      &dof_handler,
-                 Multigrid<VECTOR> &mg,
-                 const TRANSFER              &transfer)
+template<int dim, typename VectorType, class TRANSFER>
+PreconditionMG<dim, VectorType, TRANSFER>
+::PreconditionMG(const DoFHandler<dim>  &dof_handler,
+                 Multigrid<VectorType>  &mg,
+                 const TRANSFER         &transfer)
   :
   dof_handler(&dof_handler),
   multigrid(&mg),
   transfer(&transfer)
 {}
 
-template<int dim, class VECTOR, class TRANSFER>
+template<int dim, typename VectorType, class TRANSFER>
 inline bool
-PreconditionMG<dim, VECTOR, TRANSFER>::empty () const
+PreconditionMG<dim, VectorType, TRANSFER>::empty () const
 {
   return false;
 }
 
-template<int dim, class VECTOR, class TRANSFER>
-template<class VECTOR2>
+template<int dim, typename VectorType, class TRANSFER>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
-  VECTOR2 &dst,
-  const VECTOR2 &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult
+(OtherVectorType       &dst,
+ const OtherVectorType &src) const
 {
   transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
@@ -508,12 +508,12 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
 }
 
 
-template<int dim, class VECTOR, class TRANSFER>
-template<class VECTOR2>
+template<int dim, typename VectorType, class TRANSFER>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
-  VECTOR2 &dst,
-  const VECTOR2 &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
+(OtherVectorType       &dst,
+ const OtherVectorType &src) const
 {
   transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
@@ -525,23 +525,23 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
 }
 
 
-template<int dim, class VECTOR, class TRANSFER>
-template<class VECTOR2>
+template<int dim, typename VectorType, class TRANSFER>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult (
-  VECTOR2 &,
-  const VECTOR2 &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
+(OtherVectorType &,
+ const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template<int dim, class VECTOR, class TRANSFER>
-template<class VECTOR2>
+template<int dim, typename VectorType, class TRANSFER>
+template<class OtherVectorType>
 void
-PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult_add (
-  VECTOR2 &,
-  const VECTOR2 &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add
+(OtherVectorType &,
+ const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }

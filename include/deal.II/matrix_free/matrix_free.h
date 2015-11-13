@@ -730,8 +730,8 @@ public:
    * Prints a detailed summary of memory consumption in the different
    * structures of this class to the given output stream.
    */
-  template <typename STREAM>
-  void print_memory_consumption(STREAM &out) const;
+  template <typename StreamType>
+  void print_memory_consumption(StreamType &out) const;
 
   /**
    * Prints a summary of this class to the given output stream. It is focused

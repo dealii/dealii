@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth
  * 2003
  */
-template <int dim, typename POLY=Polynomials::Polynomial<double> >
+template <int dim, typename PolynomialType=Polynomials::Polynomial<double> >
 class TensorProductPolynomials
 {
 public:
@@ -73,8 +73,8 @@ public:
   /**
    * Constructor. <tt>pols</tt> is a vector of objects that should be derived
    * or otherwise convertible to one-dimensional polynomial objects of type @p
-   * POLY (template argument of class). It will be copied element by element
-   * into a private variable.
+   * PolynomialType (template argument of class). It will be copied element by
+   * element into a private variable.
    */
   template <class Pol>
   TensorProductPolynomials (const std::vector<Pol> &pols);
@@ -193,7 +193,7 @@ protected:
   /**
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
-  std::vector<POLY> polynomials;
+  std::vector<PolynomialType> polynomials;
 
   /**
    * Number of tensor product polynomials. See n().
@@ -380,10 +380,10 @@ private:
 /* ---------------- template and inline functions ---------- */
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 template <class Pol>
 inline
-TensorProductPolynomials<dim,POLY>::
+TensorProductPolynomials<dim,PolynomialType>::
 TensorProductPolynomials(const std::vector<Pol> &pols)
   :
   polynomials (pols.begin(), pols.end()),
@@ -402,10 +402,10 @@ TensorProductPolynomials(const std::vector<Pol> &pols)
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 inline
 unsigned int
-TensorProductPolynomials<dim,POLY>::n() const
+TensorProductPolynomials<dim,PolynomialType>::n() const
 {
   if (dim == 0)
     return numbers::invalid_unsigned_int;
@@ -415,28 +415,29 @@ TensorProductPolynomials<dim,POLY>::n() const
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 inline
 const std::vector<unsigned int> &
-TensorProductPolynomials<dim,POLY>::get_numbering() const
+TensorProductPolynomials<dim,PolynomialType>::get_numbering() const
 {
   return index_map;
 }
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 inline
 const std::vector<unsigned int> &
-TensorProductPolynomials<dim,POLY>::get_numbering_inverse() const
+TensorProductPolynomials<dim,PolynomialType>::get_numbering_inverse() const
 {
   return index_map_inverse;
 }
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 template <int order>
 Tensor<order,dim>
-TensorProductPolynomials<dim,POLY>::compute_derivative (const unsigned int i,
-                                                        const Point<dim> &p) const
+TensorProductPolynomials<dim,PolynomialType>::compute_derivative
+(const unsigned int  i,
+ const Point<dim>   &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);

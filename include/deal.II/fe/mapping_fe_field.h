@@ -69,13 +69,13 @@ DEAL_II_NAMESPACE_OPEN
  * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
 template <int dim, int spacedim=dim,
-          class VECTOR=Vector<double>,
+          typename VectorType=Vector<double>,
           class DH=DoFHandler<dim,spacedim> >
 class MappingFEField : public Mapping<dim,spacedim>
 {
 public:
   /**
-   * Constructor. The first argument is a VECTOR that specifies the
+   * Constructor. The first argument is a VectorType that specifies the
    * transformation of the domain from the reference to the current
    * configuration.
    *
@@ -106,14 +106,14 @@ public:
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
-  MappingFEField (const DH      &euler_dof_handler,
-                  const VECTOR  &euler_vector,
+  MappingFEField (const DH            &euler_dof_handler,
+                  const VectorType    &euler_vector,
                   const ComponentMask mask=ComponentMask());
 
   /**
    * Copy constructor.
    */
-  MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
+  MappingFEField (const MappingFEField<dim,spacedim,VectorType,DH> &mapping);
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -489,7 +489,7 @@ private:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,VECTOR,DH> > euler_vector;
+  SmartPointer<const VectorType, MappingFEField<dim,spacedim,VectorType,DH> > euler_vector;
 
   /**
    * A FiniteElement object which is only needed in 3D, since it knows how to
@@ -498,13 +498,13 @@ private:
    * prevent construction in 1D and 2D, but since memory and time requirements
    * are not particularly high this seems unnecessary at the moment.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VECTOR,DH> > fe;
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VectorType,DH> > fe;
 
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,VECTOR,DH> > euler_dof_handler;
+  SmartPointer<const DH,MappingFEField<dim,spacedim,VectorType,DH> > euler_dof_handler;
 
 private:
   /**

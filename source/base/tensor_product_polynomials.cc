@@ -73,10 +73,10 @@ namespace internal
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 inline
 void
-TensorProductPolynomials<dim,POLY>::
+TensorProductPolynomials<dim,PolynomialType>::
 compute_index (const unsigned int i,
                unsigned int       (&indices)[(dim > 0 ? dim : 1)]) const
 {
@@ -87,9 +87,9 @@ compute_index (const unsigned int i,
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 void
-TensorProductPolynomials<dim,POLY>::output_indices(std::ostream &out) const
+TensorProductPolynomials<dim,PolynomialType>::output_indices(std::ostream &out) const
 {
   unsigned int ix[dim];
   for (unsigned int i=0; i<n_tensor_pols; ++i)
@@ -104,10 +104,10 @@ TensorProductPolynomials<dim,POLY>::output_indices(std::ostream &out) const
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 void
-TensorProductPolynomials<dim,POLY>::set_numbering(
-  const std::vector<unsigned int> &renumber)
+TensorProductPolynomials<dim,PolynomialType>::set_numbering
+(const std::vector<unsigned int> &renumber)
 {
   Assert(renumber.size()==index_map.size(),
          ExcDimensionMismatch(renumber.size(), index_map.size()));
@@ -131,10 +131,11 @@ TensorProductPolynomials<0,Polynomials::Polynomial<double> >
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 double
-TensorProductPolynomials<dim,POLY>::compute_value (const unsigned int i,
-                                                   const Point<dim> &p) const
+TensorProductPolynomials<dim,PolynomialType>::compute_value
+(const unsigned int  i,
+ const Point<dim>   &p) const
 {
   Assert(dim>0, ExcNotImplemented());
 
@@ -150,10 +151,10 @@ TensorProductPolynomials<dim,POLY>::compute_value (const unsigned int i,
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 Tensor<1,dim>
-TensorProductPolynomials<dim,POLY>::compute_grad (const unsigned int i,
-                                                  const Point<dim> &p) const
+TensorProductPolynomials<dim,PolynomialType>::compute_grad (const unsigned int  i,
+                                                            const Point<dim>   &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -186,10 +187,11 @@ TensorProductPolynomials<dim,POLY>::compute_grad (const unsigned int i,
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 Tensor<2,dim>
-TensorProductPolynomials<dim,POLY>::compute_grad_grad (const unsigned int i,
-                                                       const Point<dim> &p) const
+TensorProductPolynomials<dim,PolynomialType>::compute_grad_grad
+(const unsigned int  i,
+ const Point<dim>   &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -231,9 +233,9 @@ TensorProductPolynomials<dim,POLY>::compute_grad_grad (const unsigned int i,
 
 
 
-template <int dim, typename POLY>
+template <int dim, typename PolynomialType>
 void
-TensorProductPolynomials<dim,POLY>::
+TensorProductPolynomials<dim,PolynomialType>::
 compute (const Point<dim>            &p,
          std::vector<double>         &values,
          std::vector<Tensor<1,dim> > &grads,

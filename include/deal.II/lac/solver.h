@@ -60,13 +60,13 @@ template <typename number> class Vector;
  *   public:
  *                        // Application of matrix to vector src.
  *                        // Write result into dst
- *     void vmult (VECTOR &dst,
- *                 const VECTOR &src) const;
+ *     void vmult (VectorType       &dst,
+ *                 const VectorType &src) const;
  *
  *                        // Application of transpose to a vector.
  *                        // Only used by some iterative methods.
- *     void Tvmult (VECTOR &dst,
- *                  const VECTOR &src) const;
+ *     void Tvmult (VectorType       &dst,
+ *                  const VectorType &src) const;
  * };
  *
  *
@@ -120,11 +120,11 @@ template <typename number> class Vector;
  * @endcode
  *
  * In addition, for some solvers there has to be a global function
- * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two
- * vectors.
+ * <tt>swap(VectorType &a, VectorType &b)</tt> that exchanges the values of
+ * the two vectors.
  *
  * Finally, the solvers also expect an instantiation of
- * GrowingVectorMemory@<VECTOR@>. These instantiations are provided by the
+ * GrowingVectorMemory@<VectorType@>. These instantiations are provided by the
  * deal.II library for the built-in vector types, but must be explicitly added
  * for user-provided vector classes. Otherwise, the linker will complain that
  * it cannot find the constructors and destructors of GrowingVectorMemory that
@@ -321,14 +321,14 @@ template <typename number> class Vector;
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
  * 2014
  */
-template <class VECTOR = Vector<double> >
+template <class VectorType = Vector<double> >
 class Solver : public Subscriptor
 {
 public:
   /**
    * A typedef for the underlying vector type
    */
-  typedef VECTOR vector_type;
+  typedef VectorType vector_type;
 
   /**
    * Constructor. Takes a control object which evaluates the conditions for
@@ -339,8 +339,8 @@ public:
    * responsibility to guarantee that the lifetime of the two arguments is at
    * least as long as that of the solver object.
    */
-  Solver (SolverControl        &solver_control,
-          VectorMemory<VECTOR> &vector_memory);
+  Solver (SolverControl            &solver_control,
+          VectorMemory<VectorType> &vector_memory);
 
   /**
    * Constructor. Takes a control object which evaluates the conditions for
@@ -384,8 +384,8 @@ public:
    */
   boost::signals2::connection
   connect (const std_cxx11::function<SolverControl::State (const unsigned int iteration,
-                                                           const double        check_value,
-                                                           const VECTOR       &current_iterate)> &slot);
+                                                           const double       check_value,
+                                                           const VectorType   &current_iterate)> &slot);
 
 
 
@@ -394,12 +394,12 @@ protected:
    * A static vector memory object to be used whenever no such object has been
    * given to the constructor.
    */
-  mutable GrowingVectorMemory<VECTOR> static_vector_memory;
+  mutable GrowingVectorMemory<VectorType> static_vector_memory;
 
   /**
    * A reference to an object that provides memory for auxiliary vectors.
    */
-  VectorMemory<VECTOR> &memory;
+  VectorMemory<VectorType> &memory;
 
 private:
   /**
@@ -443,8 +443,8 @@ protected:
    * signal's return value indicates that the iteration should be terminated.
    */
   boost::signals2::signal<SolverControl::State (const unsigned int iteration,
-                                                const double        check_value,
-                                                const VECTOR       &current_iterate),
+                                                const double       check_value,
+                                                const VectorType   &current_iterate),
                                                       StateCombiner> iteration_status;
 };
 
@@ -452,11 +452,11 @@ protected:
 /*-------------------------------- Inline functions ------------------------*/
 
 
-template <class VECTOR>
+template <class VectorType>
 inline
 SolverControl::State
-Solver<VECTOR>::StateCombiner::operator ()(const SolverControl::State state1,
-                                           const SolverControl::State state2) const
+Solver<VectorType>::StateCombiner::operator ()(const SolverControl::State state1,
+                                               const SolverControl::State state2) const
 {
   if ((state1 == SolverControl::failure)
       ||
@@ -471,12 +471,12 @@ Solver<VECTOR>::StateCombiner::operator ()(const SolverControl::State state1,
 }
 
 
-template <class VECTOR>
+template <class VectorType>
 template <typename Iterator>
 inline
 SolverControl::State
-Solver<VECTOR>::StateCombiner::operator ()(const Iterator begin,
-                                           const Iterator end) const
+Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
+                                               const Iterator end) const
 {
   Assert (begin != end, ExcMessage ("You can't combine iterator states if no state is given."));
 
@@ -491,10 +491,10 @@ Solver<VECTOR>::StateCombiner::operator ()(const Iterator begin,
 }
 
 
-template<class VECTOR>
+template<class VectorType>
 inline
-Solver<VECTOR>::Solver (SolverControl        &solver_control,
-                        VectorMemory<VECTOR> &vector_memory)
+Solver<VectorType>::Solver (SolverControl        &solver_control,
+                            VectorMemory<VectorType> &vector_memory)
   :
   memory(vector_memory)
 {
@@ -510,9 +510,9 @@ Solver<VECTOR>::Solver (SolverControl        &solver_control,
 
 
 
-template<class VECTOR>
+template<class VectorType>
 inline
-Solver<VECTOR>::Solver (SolverControl        &solver_control)
+Solver<VectorType>::Solver (SolverControl &solver_control)
   :
   // use the static memory object this class owns
   memory(static_vector_memory)
@@ -529,13 +529,13 @@ Solver<VECTOR>::Solver (SolverControl        &solver_control)
 
 
 
-template<class VECTOR>
+template<class VectorType>
 inline
 boost::signals2::connection
-Solver<VECTOR>::
+Solver<VectorType>::
 connect (const std_cxx11::function<SolverControl::State (const unsigned int iteration,
-                                                         const double        check_value,
-                                                         const VECTOR       &current_iterate)> &slot)
+                                                         const double       check_value,
+                                                         const VectorType   &current_iterate)> &slot)
 {
   return iteration_status.connect (slot);
 }

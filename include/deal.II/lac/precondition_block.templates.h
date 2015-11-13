@@ -29,12 +29,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<class MATRIX, typename inverse_type>
-PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
+template<typename MatrixType, typename inverse_type>
+PreconditionBlock<MatrixType, inverse_type>::AdditionalData::
 AdditionalData (const size_type block_size,
-                const double relaxation,
-                const bool invert_diagonal,
-                const bool same_diagonal)
+                const double    relaxation,
+                const bool      invert_diagonal,
+                const bool      same_diagonal)
   :
   relaxation (relaxation),
   block_size(block_size),
@@ -50,21 +50,21 @@ PreconditionBlockBase<number>::~PreconditionBlockBase ()
 {}
 
 
-template <class MATRIX, typename inverse_type>
-PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock (bool store)
+template <typename MatrixType, typename inverse_type>
+PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
   : PreconditionBlockBase<inverse_type>(store),
     blocksize(0),
     A(0, typeid(*this).name())
 {}
 
 
-template <class MATRIX, typename inverse_type>
-PreconditionBlock<MATRIX,inverse_type>::~PreconditionBlock ()
+template <typename MatrixType, typename inverse_type>
+PreconditionBlock<MatrixType,inverse_type>::~PreconditionBlock ()
 {}
 
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::clear ()
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::clear ()
 {
   PreconditionBlockBase<inverse_type>::clear();
   blocksize     = 0;
@@ -72,10 +72,10 @@ void PreconditionBlock<MATRIX,inverse_type>::clear ()
 }
 
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::initialize (
-  const MATRIX &M,
-  const AdditionalData parameters)
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::initialize
+(const MatrixType     &M,
+ const AdditionalData  parameters)
 {
   const size_type bsize = parameters.block_size;
 
@@ -100,26 +100,26 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
 }
 
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::initialize (
-  const MATRIX &M,
-  const std::vector<size_type> &permutation,
-  const std::vector<size_type> &inverse_permutation,
-  const AdditionalData parameters)
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::initialize
+(const MatrixType             &M,
+ const std::vector<size_type> &permutation,
+ const std::vector<size_type> &inverse_permutation,
+ const AdditionalData          parameters)
 {
   set_permutation(permutation, inverse_permutation);
   initialize(M, parameters);
 }
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
-  const std::vector<size_type> &permutation,
-  const std::vector<size_type> &inverse_permutation)
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks
+(const std::vector<size_type> &permutation,
+ const std::vector<size_type> &inverse_permutation)
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
 
-  const MATRIX &M=*A;
+  const MatrixType &M=*A;
   Assert (this->inverses_ready()==0, ExcInverseMatricesAlreadyExist());
   AssertDimension (permutation.size(), M.m());
   AssertDimension (inverse_permutation.size(), M.m());
@@ -132,8 +132,8 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 
       for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
-          typename MATRIX::const_iterator entry = M.begin(row_cell);
-          const typename MATRIX::const_iterator row_end = M.end(row_cell);
+          typename MatrixType::const_iterator entry = M.begin(row_cell);
+          const typename MatrixType::const_iterator row_end = M.end(row_cell);
           while (entry != row_end)
             {
               if (entry->column() < blocksize)
@@ -180,8 +180,8 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 
               const size_type row = permutation[urow];
 
-              typename MATRIX::const_iterator entry = M.begin(row);
-              const typename MATRIX::const_iterator row_end = M.end(row);
+              typename MatrixType::const_iterator entry = M.begin(row);
+              const typename MatrixType::const_iterator row_end = M.end(row);
 
               for (; entry != row_end; ++entry)
                 {
@@ -221,17 +221,17 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlock<MATRIX,inverse_type>::forward_step (
-  Vector<number2>       &dst,
-  const Vector<number2> &prev,
-  const Vector<number2> &src,
-  const bool transpose_diagonal) const
+void PreconditionBlock<MatrixType,inverse_type>::forward_step
+(Vector<number2>       &dst,
+ const Vector<number2> &prev,
+ const Vector<number2> &src,
+ const bool             transpose_diagonal) const
 {
   Assert (this->A!=0, ExcNotInitialized());
 
-  const MATRIX &M=*this->A;
+  const MatrixType &M=*this->A;
 
   if (permutation.size() != 0)
     Assert (permutation.size() == M.m() || permutation.size() == this->size(),
@@ -272,8 +272,8 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
            ++row_cell, ++row)
         {
 //        deallog << ' ' << row;
-          const typename MATRIX::const_iterator row_end = M.end(row);
-          typename MATRIX::const_iterator entry = M.begin(row);
+          const typename MatrixType::const_iterator row_end = M.end(row);
+          typename MatrixType::const_iterator entry = M.begin(row);
 
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
@@ -319,17 +319,17 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlock<MATRIX,inverse_type>::backward_step (
-  Vector<number2>       &dst,
-  const Vector<number2> &prev,
-  const Vector<number2> &src,
-  const bool transpose_diagonal) const
+void PreconditionBlock<MatrixType,inverse_type>::backward_step
+(Vector<number2>       &dst,
+ const Vector<number2> &prev,
+ const Vector<number2> &src,
+ const bool             transpose_diagonal) const
 {
   Assert (this->A!=0, ExcNotInitialized());
 
-  const MATRIX &M=*this->A;
+  const MatrixType &M=*this->A;
 
   if (permutation.size() != 0)
     Assert (permutation.size() == M.m() || permutation.size() == this->size(),
@@ -364,8 +364,8 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
            row_cell<this->blocksize;
            ++row_cell, ++row)
         {
-          const typename MATRIX::const_iterator row_end = M.end(row);
-          typename MATRIX::const_iterator entry = M.begin(row);
+          const typename MatrixType::const_iterator row_end = M.end(row);
+          typename MatrixType::const_iterator entry = M.begin(row);
 
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
@@ -417,21 +417,21 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
 }
 
 
-template <class MATRIX, typename inverse_type>
-typename PreconditionBlock<MATRIX,inverse_type>::size_type
-PreconditionBlock<MATRIX,inverse_type>::block_size() const
+template <typename MatrixType, typename inverse_type>
+typename PreconditionBlock<MatrixType,inverse_type>::size_type
+PreconditionBlock<MatrixType,inverse_type>::block_size() const
 {
   return blocksize;
 }
 
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
 
-  const MATRIX &M=*A;
+  const MatrixType &M=*A;
   Assert (this->inverses_ready()==0, ExcInverseMatricesAlreadyExist());
 
   FullMatrix<inverse_type> M_cell(blocksize);
@@ -441,8 +441,8 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
       for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
-          typename MATRIX::const_iterator entry = M.begin(row_cell);
-          const typename MATRIX::const_iterator row_end = M.end(row_cell);
+          typename MatrixType::const_iterator entry = M.begin(row_cell);
+          const typename MatrixType::const_iterator row_end = M.end(row_cell);
           while (entry != row_end)
             {
               if (entry->column() < blocksize)
@@ -478,8 +478,8 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
           for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
             {
               const size_type row = row_cell + cell_start;
-              typename MATRIX::const_iterator entry = M.begin(row);
-              const typename MATRIX::const_iterator row_end = M.end(row);
+              typename MatrixType::const_iterator entry = M.begin(row);
+              const typename MatrixType::const_iterator row_end = M.end(row);
 
               for (; entry != row_end; ++entry)
                 {
@@ -517,10 +517,10 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 
 
 
-template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::set_permutation (
-  const std::vector<size_type> &p,
-  const std::vector<size_type> &i)
+template <typename MatrixType, typename inverse_type>
+void PreconditionBlock<MatrixType,inverse_type>::set_permutation
+(const std::vector<size_type> &p,
+ const std::vector<size_type> &i)
 {
   Assert (p.size() == i.size(), ExcDimensionMismatch(p.size(), i.size()));
 
@@ -539,9 +539,9 @@ void PreconditionBlock<MATRIX,inverse_type>::set_permutation (
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 std::size_t
-PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
+PreconditionBlock<MatrixType,inverse_type>::memory_consumption () const
 {
   return (sizeof(*this)
           - sizeof(PreconditionBlockBase<inverse_type>)
@@ -554,16 +554,16 @@ PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
 /*--------------------- PreconditionBlockJacobi -----------------------*/
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::do_vmult (Vector<number2>       &dst,
             const Vector<number2> &src,
-            bool adding) const
+            bool                   adding) const
 {
   Assert(this->A!=0, ExcNotInitialized());
 
-  const MATRIX &M=*this->A;
+  const MatrixType &M=*this->A;
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -629,9 +629,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::vmult (Vector<number2>       &dst,
          const Vector<number2> &src) const
 {
@@ -639,9 +639,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::Tvmult (Vector<number2>       &dst,
           const Vector<number2> &src) const
 {
@@ -649,9 +649,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::vmult_add (Vector<number2>       &dst,
              const Vector<number2> &src) const
 {
@@ -659,9 +659,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::Tvmult_add (Vector<number2>       &dst,
               const Vector<number2> &src) const
 {
@@ -669,9 +669,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::step (Vector<number2>       &dst,
         const Vector<number2> &src) const
 {
@@ -684,9 +684,9 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockJacobi<MATRIX,inverse_type>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
 ::Tstep (Vector<number2>       &dst,
          const Vector<number2> &src) const
 {
@@ -704,29 +704,29 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
 
-template <class MATRIX, typename inverse_type>
-PreconditionBlockSOR<MATRIX,inverse_type>::PreconditionBlockSOR ()
-  : PreconditionBlock<MATRIX,inverse_type> (false)
+template <typename MatrixType, typename inverse_type>
+PreconditionBlockSOR<MatrixType,inverse_type>::PreconditionBlockSOR ()
+  : PreconditionBlock<MatrixType,inverse_type> (false)
 
 {}
 
-template <class MATRIX, typename inverse_type>
-PreconditionBlockSOR<MATRIX,inverse_type>::PreconditionBlockSOR (bool store)
-  : PreconditionBlock<MATRIX,inverse_type> (store)
+template <typename MatrixType, typename inverse_type>
+PreconditionBlockSOR<MatrixType,inverse_type>::PreconditionBlockSOR (bool store)
+  : PreconditionBlock<MatrixType,inverse_type> (store)
 
 {}
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
-  Vector<number2>       &dst,
-  const Vector<number2> &src,
-  const bool transpose_diagonal,
-  const bool) const
+void PreconditionBlockSOR<MatrixType,inverse_type>::forward
+(Vector<number2>       &dst,
+ const Vector<number2> &src,
+ const bool             transpose_diagonal,
+ const bool) const
 {
   Assert (this->A!=0, ExcNotInitialized());
 
-  const MATRIX &M=*this->A;
+  const MatrixType &M=*this->A;
   const bool permuted = (this->permutation.size() != 0);
   if (permuted)
     {
@@ -758,8 +758,8 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
            row_cell < this->blocksize;
            ++row_cell, ++row)
         {
-          const typename MATRIX::const_iterator row_end = M.end(row);
-          typename MATRIX::const_iterator entry = M.begin(row);
+          const typename MatrixType::const_iterator row_end = M.end(row);
+          typename MatrixType::const_iterator entry = M.begin(row);
 
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
@@ -806,17 +806,17 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
-  Vector<number2>       &dst,
-  const Vector<number2> &src,
-  const bool transpose_diagonal,
-  const bool) const
+void PreconditionBlockSOR<MatrixType,inverse_type>::backward
+(Vector<number2>       &dst,
+ const Vector<number2> &src,
+ const bool              transpose_diagonal,
+ const bool) const
 {
   Assert (this->A!=0, ExcNotInitialized());
 
-  const MATRIX &M=*this->A;
+  const MatrixType &M=*this->A;
   const bool permuted = (this->permutation.size() != 0);
   if (permuted)
     {
@@ -849,8 +849,8 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
            row_cell<this->blocksize;
            ++row_cell, ++row)
         {
-          const typename MATRIX::const_iterator row_end = M.end(row);
-          typename MATRIX::const_iterator entry = M.begin(row);
+          const typename MatrixType::const_iterator row_end = M.end(row);
+          typename MatrixType::const_iterator entry = M.begin(row);
 
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
@@ -903,9 +903,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::vmult (Vector<number2>       &dst,
          const Vector<number2> &src) const
 {
@@ -913,9 +913,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::vmult_add (Vector<number2>       &dst,
              const Vector<number2> &src) const
 {
@@ -923,9 +923,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::Tvmult (Vector<number2>       &dst,
           const Vector<number2> &src) const
 {
@@ -933,9 +933,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::Tvmult_add (Vector<number2>       &dst,
               const Vector<number2> &src) const
 {
@@ -944,9 +944,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::step (Vector<number2>       &dst,
         const Vector<number2> &src) const
 {
@@ -954,9 +954,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>
+void PreconditionBlockSOR<MatrixType,inverse_type>
 ::Tstep (Vector<number2>       &dst,
          const Vector<number2> &src) const
 {
@@ -969,17 +969,17 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 //---------------------------------------------------------------------------
 
 
-template <class MATRIX, typename inverse_type>
-PreconditionBlockSSOR<MATRIX,inverse_type>::PreconditionBlockSSOR ()
-  : PreconditionBlockSOR<MATRIX,inverse_type> (true)
+template <typename MatrixType, typename inverse_type>
+PreconditionBlockSSOR<MatrixType,inverse_type>::PreconditionBlockSSOR ()
+  : PreconditionBlockSOR<MatrixType,inverse_type> (true)
 
 {}
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &dst,
-                                                        const Vector<number2> &src) const
+void PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>       &dst,
+                                                            const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
@@ -1007,10 +1007,10 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &d
   this->backward(dst, help, false, false);
 }
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &dst,
-                                                         const Vector<number2> &src) const
+void PreconditionBlockSSOR<MatrixType,inverse_type>::Tvmult (Vector<number2>       &dst,
+    const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
@@ -1039,9 +1039,9 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MATRIX,inverse_type>
+void PreconditionBlockSSOR<MatrixType,inverse_type>
 ::step (Vector<number2>       &dst,
         const Vector<number2> &src) const
 {
@@ -1050,9 +1050,9 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>
 }
 
 
-template <class MATRIX, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MATRIX,inverse_type>
+void PreconditionBlockSSOR<MatrixType,inverse_type>
 ::Tstep (Vector<number2>       &dst,
          const Vector<number2> &src) const
 {

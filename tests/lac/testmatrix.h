@@ -36,20 +36,20 @@ public:
   /**
    * Fill the matrix with values.
    */
-  template <typename MATRIX>
-  void five_point(MATRIX &, bool nonsymmetric = false) const;
+  template <typename MatrixType>
+  void five_point(MatrixType &, bool nonsymmetric = false) const;
 
   /**
    * Fill the matrix with values.
    */
-  template <typename MATRIX>
-  void nine_point(MATRIX &, bool nonsymmetric = false) const;
+  template <typename MatrixType>
+  void nine_point(MatrixType &, bool nonsymmetric = false) const;
 
   /**
    * Fill the matrix with values.
    */
-  template <typename MATRIX>
-  void upwind(MATRIX &, bool back = false) const;
+  template <typename MatrixType>
+  void upwind(MatrixType &, bool back = false) const;
 
   template <typename number>
   void gnuplot_print(std::ostream &, const Vector<number> &) const;
@@ -173,9 +173,9 @@ FDMatrix::nine_point_structure(SP &structure) const
 
 
 
-template<typename MATRIX>
+template<typename MatrixType>
 void
-FDMatrix::nine_point(MATRIX &A, bool) const
+FDMatrix::nine_point(MatrixType &A, bool) const
 {
   for (unsigned int i=0; i<=ny-2; i++)
     {
@@ -229,10 +229,10 @@ FDMatrix::nine_point(MATRIX &A, bool) const
     }
 }
 
-template<typename MATRIX>
+template<typename MatrixType>
 inline
 void
-FDMatrix::five_point(MATRIX &A, bool nonsymmetric) const
+FDMatrix::five_point(MatrixType &A, bool nonsymmetric) const
 {
   for (unsigned int i=0; i<=ny-2; i++)
     {
@@ -273,10 +273,10 @@ FDMatrix::five_point(MATRIX &A, bool nonsymmetric) const
 
 
 
-template<typename MATRIX>
+template<typename MatrixType>
 inline
 void
-FDMatrix::upwind(MATRIX &A, bool back) const
+FDMatrix::upwind(MatrixType &A, bool back) const
 {
   for (unsigned int i=0; i<=ny-2; i++)
     {

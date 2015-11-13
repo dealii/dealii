@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * classes.
  *
  * Every class that implements the following functions can be used as template
- * parameter POLY.
+ * parameter PolynomialType.
  *
  * @code
  * double compute_value (const unsigned int i,
@@ -57,14 +57,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2009
  */
-template <class POLY, int dim=POLY::dimension+1, int spacedim=dim>
+template <class PolynomialType, int dim=PolynomialType::dimension+1, int spacedim=dim>
 class FE_PolyFace : public FiniteElement<dim,spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_PolyFace (const POLY &poly_space,
+  FE_PolyFace (const PolynomialType &poly_space,
                const FiniteElementData<dim> &fe_data,
                const std::vector<bool> &restriction_is_additive_flags);
 
@@ -264,9 +264,9 @@ protected:
   };
 
   /**
-   * The polynomial space. Its type is given by the template parameter POLY.
+   * The polynomial space. Its type is given by the template parameter PolynomialType.
    */
-  POLY poly_space;
+  PolynomialType poly_space;
 };
 
 /*@}*/

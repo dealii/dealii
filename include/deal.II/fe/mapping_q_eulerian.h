@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Joshua White, 2008
  */
-template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
+template <int dim, typename VectorType = Vector<double>, int spacedim=dim >
 class MappingQEulerian : public MappingQ<dim, spacedim>
 {
 public:
@@ -104,16 +104,16 @@ public:
    * interpreted as the displacement we use in defining the mapping,
    * relative to the location of cells of the underlying triangulation.
    */
-  MappingQEulerian (const unsigned int              degree,
+  MappingQEulerian (const unsigned int             degree,
                     const DoFHandler<dim,spacedim> &euler_dof_handler,
-                    const VECTOR                   &euler_vector);
+                    const VectorType               &euler_vector);
 
   /**
    * @deprecated Use the constructor with the reverse order of second and
    * third argument.
    */
-  MappingQEulerian (const unsigned int              degree,
-                    const VECTOR                   &euler_vector,
+  MappingQEulerian (const unsigned int             degree,
+                    const VectorType               &euler_vector,
                     const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
 
   /**
@@ -165,12 +165,12 @@ protected:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VECTOR, MappingQEulerian<dim,VECTOR,spacedim> > euler_vector;
+  SmartPointer<const VectorType, MappingQEulerian<dim,VectorType,spacedim> > euler_vector;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
+  SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VectorType,spacedim> > euler_dof_handler;
 
 
 private:
@@ -188,7 +188,7 @@ private:
      * Constructor.
      */
     MappingQEulerianGeneric (const unsigned int degree,
-                             const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian);
+                             const MappingQEulerian<dim,VectorType,spacedim> &mapping_q_eulerian);
 
     /**
      * Return the mapped vertices of the cell. For the current class, this function does
@@ -213,7 +213,7 @@ private:
     /**
      * Reference to the surrounding object off of which we live.
      */
-    const MappingQEulerian<dim,VECTOR,spacedim> &mapping_q_eulerian;
+    const MappingQEulerian<dim,VectorType,spacedim> &mapping_q_eulerian;
 
 
     /**
@@ -261,10 +261,10 @@ private:
 
 #ifndef DOXYGEN
 
-template <int dim, class VECTOR, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 inline
 bool
-MappingQEulerian<dim,VECTOR,spacedim>::preserves_vertex_locations () const
+MappingQEulerian<dim,VectorType,spacedim>::preserves_vertex_locations () const
 {
   return false;
 }
@@ -276,4 +276,3 @@ DEAL_II_NAMESPACE_CLOSE
 
 
 #endif // dealii__mapping_q_eulerian_h
-

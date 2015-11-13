@@ -42,7 +42,7 @@
 
 
 
-template <int dim, int fe_degree, typename Number, typename VECTOR=Vector<Number> >
+template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number> >
 class MatrixFreeTest
 {
 public:
@@ -50,20 +50,20 @@ public:
     data (data_in)
   {};
 
-  void vmult (VECTOR       &dst,
-              const VECTOR &src) const
+  void vmult (VectorType       &dst,
+              const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VECTOR>::local_operation,
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_operation,
                     this, dst, src);
   };
 
 private:
   const MatrixFree<dim,Number> &data;
 
-  void local_operation (const MatrixFree<dim,Number> &data,
-                        VECTOR &out,
-                        const VECTOR &in,
+  void local_operation (const MatrixFree<dim,Number>               &data,
+                        VectorType                                 &out,
+                        const VectorType                           &in,
                         const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
@@ -258,4 +258,3 @@ int main ()
     deallog.pop();
   }
 }
-

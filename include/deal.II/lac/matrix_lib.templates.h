@@ -124,10 +124,10 @@ MeanValueFilter::vmult_add(BlockVector<number> &dst,
 //----------------------------------------------------------------------//
 
 
-template <class VECTOR>
-InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
+template <typename VectorType>
+InverseMatrixRichardson<VectorType>::InverseMatrixRichardson(
   SolverControl &c,
-  VectorMemory<VECTOR> &m)
+  VectorMemory<VectorType> &m)
   :
   mem(m),
   solver(c,m),
@@ -136,17 +136,17 @@ InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
 {}
 
 
-template <class VECTOR>
-InverseMatrixRichardson<VECTOR>::~InverseMatrixRichardson()
+template <typename VectorType>
+InverseMatrixRichardson<VectorType>::~InverseMatrixRichardson()
 {
   if (matrix != 0) delete matrix;
   if (precondition != 0) delete precondition;
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-InverseMatrixRichardson<VECTOR>::vmult(VECTOR &dst, const VECTOR &src) const
+InverseMatrixRichardson<VectorType>::vmult(VectorType &dst, const VectorType &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
@@ -156,13 +156,13 @@ InverseMatrixRichardson<VECTOR>::vmult(VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR &dst, const VECTOR &src) const
+InverseMatrixRichardson<VectorType>::vmult_add(VectorType &dst, const VectorType &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR *aux = mem.alloc();
+  VectorType *aux = mem.alloc();
   aux->reinit(dst);
 
   solver.solve(*matrix, *aux, src, *precondition);
@@ -173,9 +173,9 @@ InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR &dst, const VECTOR &src) const
+InverseMatrixRichardson<VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
@@ -185,13 +185,13 @@ InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR &dst, const VECTOR &src) const
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR &dst, const VECTOR &src) const
+InverseMatrixRichardson<VectorType>::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR *aux = mem.alloc();
+  VectorType *aux = mem.alloc();
   aux->reinit(dst);
 
   solver.Tsolve(*matrix, *aux, src, *precondition);

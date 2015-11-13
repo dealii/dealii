@@ -39,14 +39,16 @@
 #include <deal.II/lac/solver_qmrs.h>
 #include <deal.II/lac/precondition.h>
 
-template<class SOLVER, class MATRIX, class VECTOR>
+template<typename SolverType, typename MatrixType, typename VectorType>
 void
-check_solve( const MATRIX &A, VECTOR &u, VECTOR &f,
-             const typename SOLVER::AdditionalData &additional_data = typename SOLVER::AdditionalData() )
+check_solve (const MatrixType &A,
+             VectorType       &u,
+             VectorType       &f,
+             const typename SolverType::AdditionalData &additional_data = typename SolverType::AdditionalData())
 {
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
-  SOLVER solver(control, mem, additional_data);
+  SolverType solver(control, mem, additional_data);
   PreconditionIdentity prec_no;
   u = 0.;
   f = 0.;
@@ -102,4 +104,3 @@ int main()
     }
 
 }
-

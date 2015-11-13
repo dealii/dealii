@@ -400,20 +400,20 @@ namespace VectorTools
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  template <class VECTOR, int dim, int spacedim, template <int,int> class DH>
-  void interpolate (const Mapping<dim,spacedim>    &mapping,
-                    const DH<dim,spacedim>         &dof,
-                    const Function<spacedim,double>       &function,
-                    VECTOR                         &vec);
+  template <typename VectorType, int dim, int spacedim, template <int,int> class DH>
+  void interpolate (const Mapping<dim,spacedim>     &mapping,
+                    const DH<dim,spacedim>          &dof,
+                    const Function<spacedim,double> &function,
+                    VectorType                      &vec);
 
   /**
    * Calls the @p interpolate() function above with
    * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
    */
-  template <class VECTOR, class DH>
-  void interpolate (const DH              &dof,
-                    const Function<DH::space_dimension,double>   &function,
-                    VECTOR                &vec);
+  template <typename VectorType, class DH>
+  void interpolate (const DH                                   &dof,
+                    const Function<DH::space_dimension,double> &function,
+                    VectorType                                 &vec);
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
@@ -484,13 +484,14 @@ namespace VectorTools
    *
    * @author Valentin Zingan, 2013
    */
-  template<typename VECTOR, typename DH>
+  template<typename VectorType, typename DH>
   void
-  interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>                          &mapping,
-                                   const DH                                                                   &dof_handler,
-                                   const std::map< types::material_id, const Function<DH::space_dimension,double>* > &function_map,
-                                   VECTOR                                                                     &dst,
-                                   const ComponentMask                                                        &component_mask = ComponentMask());
+  interpolate_based_on_material_id
+  (const Mapping<DH::dimension, DH::space_dimension> &mapping,
+   const DH                                          &dof_handler,
+   const std::map< types::material_id, const Function<DH::space_dimension,double>* > &function_map,
+   VectorType                                        &dst,
+   const ComponentMask                               &component_mask = ComponentMask());
 
   /**
    * Gives the interpolation of a @p dof1-function @p u1 to a @p dof2-function
@@ -518,12 +519,12 @@ namespace VectorTools
    */
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class VECTOR>
+            typename VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
-                                 const VECTOR            &u1,
+                                 const VectorType        &u1,
                                  const DH<dim, spacedim> &dof2,
-                                 VECTOR                  &u2);
+                                 VectorType              &u2);
 
   /**
    * Gives the interpolation of a @p dof1-function @p u1 to a @p dof2-function
@@ -540,13 +541,13 @@ namespace VectorTools
    */
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class VECTOR>
+            typename VectorType>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
-                                 const VECTOR            &u1,
+                                 const VectorType        &u1,
                                  const DH<dim, spacedim> &dof2,
                                  const ConstraintMatrix  &constraints,
-                                 VECTOR                  &u2);
+                                 VectorType              &u2);
 
 
   /**
@@ -558,12 +559,12 @@ namespace VectorTools
    */
   template <int dim, int spacedim,
             template <int,int> class DH,
-            class VECTOR>
+            typename VectorType>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
-                                 const VECTOR                           &u1,
+                                 const VectorType                       &u1,
                                  const ConstraintMatrix                 &constraints,
-                                 VECTOR                                 &u2);
+                                 VectorType                             &u2);
 
   /**
    * Compute the projection of @p function to the finite element space.
@@ -585,67 +586,67 @@ namespace VectorTools
    * In 1d, the default value of the boundary quadrature formula is an invalid
    * object since integration on the boundary doesn't happen in 1d.
    */
-  template <int dim, class VECTOR, int spacedim>
-  void project (const Mapping<dim, spacedim>       &mapping,
-                const DoFHandler<dim,spacedim>    &dof,
-                const ConstraintMatrix   &constraints,
-                const Quadrature<dim>    &quadrature,
-                const Function<spacedim,double>      &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary = false,
-                const Quadrature<dim-1>  &q_boundary = (dim > 1 ?
-                                                        QGauss<dim-1>(2) :
-                                                        Quadrature<dim-1>(0)),
-                const bool                project_to_boundary_first = false);
+  template <int dim, typename VectorType, int spacedim>
+  void project (const Mapping<dim, spacedim>    &mapping,
+                const DoFHandler<dim,spacedim>  &dof,
+                const ConstraintMatrix          &constraints,
+                const Quadrature<dim>           &quadrature,
+                const Function<spacedim,double> &function,
+                VectorType                      &vec,
+                const bool                      enforce_zero_boundary = false,
+                const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
+                                                              QGauss<dim-1>(2) :
+                                                              Quadrature<dim-1>(0)),
+                const bool                      project_to_boundary_first = false);
 
   /**
    * Calls the project() function above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, class VECTOR, int spacedim>
-  void project (const DoFHandler<dim,spacedim>    &dof,
-                const ConstraintMatrix   &constraints,
-                const Quadrature<dim>    &quadrature,
-                const Function<spacedim,double>      &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary = false,
-                const Quadrature<dim-1>  &q_boundary = (dim > 1 ?
-                                                        QGauss<dim-1>(2) :
-                                                        Quadrature<dim-1>(0)),
-                const bool                project_to_boundary_first = false);
+  template <int dim, typename VectorType, int spacedim>
+  void project (const DoFHandler<dim,spacedim>  &dof,
+                const ConstraintMatrix          &constraints,
+                const Quadrature<dim>           &quadrature,
+                const Function<spacedim,double> &function,
+                VectorType                      &vec,
+                const bool                      enforce_zero_boundary = false,
+                const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
+                                                              QGauss<dim-1>(2) :
+                                                              Quadrature<dim-1>(0)),
+                const bool                      project_to_boundary_first = false);
 
   /**
    * Same as above, but for arguments of type hp::DoFHandler,
    * hp::QuadratureCollection, hp::MappingCollection
    */
-  template <int dim, class VECTOR, int spacedim>
-  void project (const hp::MappingCollection<dim, spacedim>       &mapping,
-                const hp::DoFHandler<dim,spacedim>    &dof,
-                const ConstraintMatrix   &constraints,
-                const hp::QCollection<dim>    &quadrature,
-                const Function<spacedim,double>      &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary = false,
-                const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
-                                                            QGauss<dim-1>(2) :
-                                                            Quadrature<dim-1>(0)),
-                const bool                project_to_boundary_first = false);
+  template <int dim, typename VectorType, int spacedim>
+  void project (const hp::MappingCollection<dim, spacedim> &mapping,
+                const hp::DoFHandler<dim,spacedim>         &dof,
+                const ConstraintMatrix                     &constraints,
+                const hp::QCollection<dim>                 &quadrature,
+                const Function<spacedim,double>            &function,
+                VectorType                                 &vec,
+                const bool                                 enforce_zero_boundary = false,
+                const hp::QCollection<dim-1> &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
+                                                           QGauss<dim-1>(2) :
+                                                           Quadrature<dim-1>(0)),
+                const bool                                 project_to_boundary_first = false);
 
   /**
    * Calls the project() function above, with a collection of
    * $Q_1$ mapping objects, i.e., with hp::StaticMappingQ1::mapping_collection.
    */
-  template <int dim, class VECTOR, int spacedim>
-  void project (const hp::DoFHandler<dim,spacedim>    &dof,
-                const ConstraintMatrix   &constraints,
-                const hp::QCollection<dim>    &quadrature,
-                const Function<spacedim,double>      &function,
-                VECTOR                   &vec,
-                const bool                enforce_zero_boundary = false,
-                const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
-                                                            QGauss<dim-1>(2) :
-                                                            Quadrature<dim-1>(0)),
-                const bool                project_to_boundary_first = false);
+  template <int dim, typename VectorType, int spacedim>
+  void project (const hp::DoFHandler<dim,spacedim> &dof,
+                const ConstraintMatrix             &constraints,
+                const hp::QCollection<dim>         &quadrature,
+                const Function<spacedim,double>    &function,
+                VectorType                         &vec,
+                const bool                         enforce_zero_boundary = false,
+                const hp::QCollection<dim-1>       &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
+                    QGauss<dim-1>(2) :
+                    Quadrature<dim-1>(0)),
+                const bool                         project_to_boundary_first = false);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
@@ -1963,7 +1964,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void point_difference (const DoFHandler<dim,spacedim>  &dof,
                          const VectorType                &fe_function,
                          const Function<spacedim,double> &exact_solution,
@@ -1982,7 +1983,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void point_difference (const Mapping<dim, spacedim>    &mapping,
                          const DoFHandler<dim,spacedim>  &dof,
                          const VectorType                &fe_function,
@@ -2001,7 +2002,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -2014,7 +2015,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
@@ -2036,7 +2037,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -2048,7 +2049,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
@@ -2065,7 +2066,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
@@ -2079,7 +2080,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_value (const hp::MappingCollection<dim, spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>         &dof,
@@ -2098,7 +2099,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const Mapping<dim,spacedim>    &mapping,
                const DoFHandler<dim,spacedim> &dof,
@@ -2111,7 +2112,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double
   point_value (const hp::MappingCollection<dim,spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>        &dof,
@@ -2129,7 +2130,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const DoFHandler<dim,spacedim>    &dof,
                   const VectorType                  &fe_function,
@@ -2142,7 +2143,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const VectorType                   &fe_function,
@@ -2160,7 +2161,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
                   const VectorType               &fe_function,
@@ -2172,7 +2173,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const VectorType                   &fe_function,
@@ -2189,7 +2190,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const Mapping<dim, spacedim>      &mapping,
                   const DoFHandler<dim,spacedim>    &dof,
@@ -2203,7 +2204,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   void
   point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>         &dof,
@@ -2222,7 +2223,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const Mapping<dim,spacedim>    &mapping,
                   const DoFHandler<dim,spacedim> &dof,
@@ -2235,7 +2236,7 @@ namespace VectorTools
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient (const hp::MappingCollection<dim,spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>        &dof,
@@ -2294,8 +2295,8 @@ namespace VectorTools
    * not equal to $(1,1,\ldots,1)^T$. For such elements, a different procedure
    * has to be used when subtracting the mean value.
    */
-  template <class VECTOR>
-  void subtract_mean_value(VECTOR                  &v,
+  template <typename VectorType>
+  void subtract_mean_value(VectorType              &v,
                            const std::vector<bool> &p_select = std::vector<bool>());
 
 
@@ -2321,7 +2322,7 @@ namespace VectorTools
    * Lagrangian elements. For all other elements, you will need to compute the
    * mean value and subtract it right inside the evaluation routine.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double compute_mean_value (const Mapping<dim, spacedim>   &mapping,
                              const DoFHandler<dim,spacedim> &dof,
                              const Quadrature<dim>          &quadrature,
@@ -2332,7 +2333,7 @@ namespace VectorTools
    * Calls the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename VectorType, int spacedim>
   double compute_mean_value (const DoFHandler<dim,spacedim> &dof,
                              const Quadrature<dim>          &quadrature,
                              const VectorType               &v,
@@ -2348,14 +2349,14 @@ namespace VectorTools
    * points of a FE_Q() finite element of the same degree as the
    * degree of the required components.
    *
-   * Curved manifold are respected, and the resulting VECTOR will be
+   * Curved manifold are respected, and the resulting VectorType will be
    * geometrically consistent. The resulting map is guaranteed to be
    * interpolatory at the support points of a FE_Q() finite element of
    * the same degree as the degree of the required components.
    *
    * If the underlying finite element is an FE_Q(1)^spacedim, then the
-   * resulting VECTOR is a finite element field representation of the vertices
-   * of the Triangulation.
+   * resulting @p VectorType is a finite element field representation of the
+   * vertices of the Triangulation.
    *
    * The optional ComponentMask argument can be used to specify what
    * components of the FiniteElement to use to describe the geometry. If no
@@ -2368,9 +2369,9 @@ namespace VectorTools
    *
    * @author Luca Heltai, 2015
    */
-  template<class DH, class VECTOR>
+  template<class DH, typename VectorType>
   void get_position_vector(const DH &dh,
-                           VECTOR &vector,
+                           VectorType &vector,
                            const ComponentMask &mask=ComponentMask());
 
   //@}

@@ -18,14 +18,14 @@
 #include <deal.II/lac/parallel_vector.h>
 
 
-template <int dim, int fe_degree, typename VECTOR>
+template <int dim, int fe_degree, typename VectorType>
 void
-helmholtz_operator (const MatrixFree<dim,typename VECTOR::value_type>  &data,
-                    VECTOR       &dst,
-                    const VECTOR &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range)
+helmholtz_operator (const MatrixFree<dim,typename VectorType::value_type> &data,
+                    VectorType                                            &dst,
+                    const VectorType                                      &src,
+                    const std::pair<unsigned int,unsigned int>            &cell_range)
 {
-  typedef typename VECTOR::value_type Number;
+  typedef typename VectorType::value_type Number;
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -46,7 +46,7 @@ helmholtz_operator (const MatrixFree<dim,typename VECTOR::value_type>  &data,
 
 
 
-template <int dim, int fe_degree, typename Number, typename VECTOR=Vector<Number> >
+template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number> >
 class MatrixFreeTest
 {
 public:
@@ -56,22 +56,18 @@ public:
     data (data_in)
   {};
 
-  void vmult (VECTOR       &dst,
-              const VECTOR &src) const
+  void vmult (VectorType       &dst,
+              const VectorType &src) const
   {
     dst = 0;
-    const std_cxx11::function<void(const MatrixFree<dim,typename VECTOR::value_type> &,
-                                   VECTOR &,
-                                   const VECTOR &,
+    const std_cxx11::function<void(const MatrixFree<dim,typename VectorType::value_type> &,
+                                   VectorType &,
+                                   const VectorType &,
                                    const std::pair<unsigned int,unsigned int> &)>
-    wrap = helmholtz_operator<dim,fe_degree,VECTOR>;
+    wrap = helmholtz_operator<dim,fe_degree,VectorType>;
     data.cell_loop (wrap, dst, src);
   };
 
 private:
   const MatrixFree<dim,Number> &data;
 };
-
-
-
-

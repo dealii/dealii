@@ -33,9 +33,9 @@
 using namespace Polynomials;
 
 
-template<int dim, class POLY>
-void check_poly(const Point<dim> &x,
-                const POLY &p)
+template<int dim, class PolynomialType>
+void check_poly(const Point<dim>     &x,
+                const PolynomialType &p)
 {
   const unsigned int n = p.n();
   const double eps = 5.0e-15;

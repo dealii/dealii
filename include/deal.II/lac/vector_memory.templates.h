@@ -22,24 +22,24 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <typename VECTOR>
-typename GrowingVectorMemory<VECTOR>::Pool GrowingVectorMemory<VECTOR>::pool;
+template <typename VectorType>
+typename GrowingVectorMemory<VectorType>::Pool GrowingVectorMemory<VectorType>::pool;
 
-template <typename VECTOR>
-Threads::Mutex GrowingVectorMemory<VECTOR>::mutex;
+template <typename VectorType>
+Threads::Mutex GrowingVectorMemory<VectorType>::mutex;
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-GrowingVectorMemory<VECTOR>::Pool::Pool()
+GrowingVectorMemory<VectorType>::Pool::Pool()
   :
   data(0)
 {}
 
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-GrowingVectorMemory<VECTOR>::Pool::~Pool()
+GrowingVectorMemory<VectorType>::Pool::~Pool()
 {
   // Nothing to do if memory was unused.
   if (data == 0) return;
@@ -58,10 +58,10 @@ GrowingVectorMemory<VECTOR>::Pool::~Pool()
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
 void
-GrowingVectorMemory<VECTOR>::Pool::initialize(const size_type size)
+GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
 {
   if (data == 0)
     {
@@ -72,16 +72,16 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const size_type size)
            ++i)
         {
           i->first = false;
-          i->second = new VECTOR;
+          i->second = new VectorType;
         }
     }
 }
 
 
-template <typename VECTOR>
+template <typename VectorType>
 inline
-GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const size_type initial_size,
-                                                  const bool log_statistics)
+GrowingVectorMemory<VectorType>::GrowingVectorMemory (const size_type initial_size,
+                                                      const bool log_statistics)
 
   :
   total_alloc(0),
@@ -93,9 +93,9 @@ GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const size_type initial_size,
 }
 
 
-template<typename VECTOR>
+template<typename VectorType>
 inline
-GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
+GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 {
   AssertNothrow(current_alloc == 0,
                 StandardExceptions::ExcMemoryLeak(current_alloc));
@@ -110,10 +110,10 @@ GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 
 
 
-template<typename VECTOR>
+template<typename VectorType>
 inline
-VECTOR *
-GrowingVectorMemory<VECTOR>::alloc ()
+VectorType *
+GrowingVectorMemory<VectorType>::alloc ()
 {
   Threads::Mutex::ScopedLock lock(mutex);
   ++total_alloc;
@@ -132,7 +132,7 @@ GrowingVectorMemory<VECTOR>::alloc ()
 
   // no free vector found, so let's
   // just allocate a new one
-  const entry_type t (true, new VECTOR);
+  const entry_type t (true, new VectorType);
   pool.data->push_back(t);
 
   return t.second;
@@ -140,10 +140,10 @@ GrowingVectorMemory<VECTOR>::alloc ()
 
 
 
-template<typename VECTOR>
+template<typename VectorType>
 inline
 void
-GrowingVectorMemory<VECTOR>::free(const VECTOR *const v)
+GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
   Threads::Mutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.data->begin();
@@ -156,15 +156,15 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR *const v)
           return;
         }
     }
-  Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
+  Assert(false, typename VectorMemory<VectorType>::ExcNotAllocatedHere());
 }
 
 
 
-template<typename VECTOR>
+template<typename VectorType>
 inline
 void
-GrowingVectorMemory<VECTOR>::release_unused_memory ()
+GrowingVectorMemory<VectorType>::release_unused_memory ()
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
@@ -187,10 +187,10 @@ GrowingVectorMemory<VECTOR>::release_unused_memory ()
 
 
 
-template<typename VECTOR>
+template<typename VectorType>
 inline
 std::size_t
-GrowingVectorMemory<VECTOR>::memory_consumption () const
+GrowingVectorMemory<VectorType>::memory_consumption () const
 {
   Threads::Mutex::ScopedLock lock(mutex);
 

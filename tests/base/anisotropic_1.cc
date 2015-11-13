@@ -32,10 +32,10 @@
 using namespace Polynomials;
 
 
-template<int dim, class POLY1, class POLY2>
-void check_poly(const Point<dim> &x,
-                const POLY1      &p,
-                const POLY2      &q)
+template<int dim, class PolynomialType1, class PolynomialType2>
+void check_poly(const Point<dim>      &x,
+                const PolynomialType1 &p,
+                const PolynomialType2 &q)
 {
   const unsigned int n = p.n();
 

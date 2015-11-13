@@ -109,8 +109,8 @@ public:
   /**
    * Prints the data to the given stream.
    */
-  template <class STREAM>
-  void print_data(STREAM &stream) const;
+  template <class StreamType>
+  void print_data(StreamType &stream) const;
 
 
 #endif
@@ -685,10 +685,10 @@ Timer::get_data() const
 
 
 
-template <class STREAM>
+template <class StreamType>
 inline
 void
-Timer::print_data(STREAM &stream) const
+Timer::print_data(StreamType &stream) const
 {
   unsigned int my_id = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
   if (my_id==0)

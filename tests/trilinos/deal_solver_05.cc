@@ -37,12 +37,14 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve( SOLVER &solver,
+check_solve (SolverType          &solver,
              const SolverControl &solver_control,
-             const MATRIX &A,
-             VECTOR &u, VECTOR &f, const PRECONDITION &P)
+             const MatrixType    &A,
+             VectorType          &u,
+             VectorType          &f,
+             const PRECONDITION  &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -103,4 +105,3 @@ int main(int argc, char **argv)
     check_solve (solver, control, A,u,f, preconditioner);
   }
 }
-

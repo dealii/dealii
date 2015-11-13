@@ -21,36 +21,36 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-  template <class VECTOR>
-  Operator<VECTOR>::Operator()
+  template <typename VectorType>
+  Operator<VectorType>::Operator()
   {}
 
-  template <class VECTOR>
-  OutputOperator<VECTOR>::~OutputOperator()
+  template <typename VectorType>
+  OutputOperator<VectorType>::~OutputOperator()
   {}
 
-  template <class VECTOR>
-  OutputOperator<VECTOR>::OutputOperator()
+  template <typename VectorType>
+  OutputOperator<VectorType>::OutputOperator()
     :
     os(0)
   {}
 
-  template <class VECTOR>
-  void OutputOperator<VECTOR>::initialize_stream(std::ostream &stream)
+  template <typename VectorType>
+  void OutputOperator<VectorType>::initialize_stream(std::ostream &stream)
   {
     os =&stream;
   }
 
-  template <class VECTOR>
-  OutputOperator<VECTOR> &
-  OutputOperator<VECTOR>::operator<< (const AnyData &vectors)
+  template <typename VectorType>
+  OutputOperator<VectorType> &
+  OutputOperator<VectorType>::operator<< (const AnyData &vectors)
   {
     if (os == 0)
       {
         deallog << "Step " << step << std::endl;
         for (unsigned int i=0; i<vectors.size(); ++i)
           {
-            const VECTOR *v = vectors.try_read_ptr<VECTOR>(i);
+            const VectorType *v = vectors.try_read_ptr<VectorType>(i);
             if (v == 0) continue;
             deallog << vectors.name(i);
             for (unsigned int j=0; j<v->size(); ++j)
@@ -64,7 +64,7 @@ namespace Algorithms
         (*os) << ' ' << step;
         for (unsigned int i=0; i<vectors.size(); ++i)
           {
-            const VECTOR *v = vectors.try_read_ptr<VECTOR>(i);
+            const VectorType *v = vectors.try_read_ptr<VectorType>(i);
             if (v == 0) continue;
             for (unsigned int j=0; j<v->size(); ++j)
               (*os) << ' ' << (*v)(j);

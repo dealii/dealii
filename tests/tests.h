@@ -162,16 +162,16 @@ std::string unify_pretty_function (const std::string &text)
 /*
  * Test that a solver converged within a certain range of iteration steps.
  *
- * SOLVER_COMMAND is the command to issue, CONTROL_COMMAND a function call
+ * SolverType_COMMAND is the command to issue, CONTROL_COMMAND a function call
  * that returns the number of iterations (castable to unsigned int), and
  * MIN_ALLOWED, MAX_ALLOWED is the inclusive range of allowed iteration
  * steps.
  */
 
-#define check_solver_within_range(SOLVER_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
+#define check_solver_within_range(SolverType_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
   {                                                                              \
     const unsigned int previous_depth = deallog.depth_file(0);                   \
-    SOLVER_COMMAND;                                                              \
+    SolverType_COMMAND;                                                              \
     deallog.depth_file(previous_depth);                                          \
     const unsigned int steps = CONTROL_COMMAND;                                  \
     if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \

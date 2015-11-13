@@ -107,27 +107,27 @@ public:
    * Matrix-vector multiplication. For the present case, this of course
    * amounts to simply copying the input vector to the output vector.
    */
-  template <class VECTOR1, class VECTOR2>
-  void vmult (VECTOR1       &out,
-              const VECTOR2 &in) const;
+  template <typename OutVectorType, typename InVectorType>
+  void vmult (OutVectorType      &out,
+              const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with addition to the output vector. For the
    * present case, this of course amounts to simply adding the input vector to
    * the output vector.
    */
-  template <class VECTOR1, class VECTOR2>
-  void vmult_add (VECTOR1       &out,
-                  const VECTOR2 &in) const;
+  template <typename OutVectorType, typename InVectorType>
+  void vmult_add (OutVectorType      &out,
+                  const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with the transpose matrix. For the present
    * case, this of course amounts to simply copying the input vector to the
    * output vector.
    */
-  template <class VECTOR1, class VECTOR2>
-  void Tvmult (VECTOR1       &out,
-               const VECTOR2 &in) const;
+  template <typename OutVectorType, typename InVectorType>
+  void Tvmult (OutVectorType      &out,
+               const InVectorType &in) const;
 
 
   /**
@@ -135,9 +135,9 @@ public:
    * the output vector. For the present case, this of course amounts to simply
    * adding the input vector to the output vector.
    */
-  template <class VECTOR1, class VECTOR2>
-  void Tvmult_add (VECTOR1       &out,
-                   const VECTOR2 &in) const;
+  template <typename OutVectorType, typename InVectorType>
+  void Tvmult_add (OutVectorType      &out,
+                   const InVectorType &in) const;
 private:
 
   /**
@@ -196,11 +196,11 @@ IdentityMatrix::n () const
 
 
 
-template <class VECTOR1, class VECTOR2>
+template <typename OutVectorType, typename InVectorType>
 inline
 void
-IdentityMatrix::vmult (VECTOR1       &out,
-                       const VECTOR2 &in) const
+IdentityMatrix::vmult (OutVectorType      &out,
+                       const InVectorType &in) const
 {
   Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
   Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
@@ -210,11 +210,11 @@ IdentityMatrix::vmult (VECTOR1       &out,
 
 
 
-template <class VECTOR1, class VECTOR2>
+template <typename OutVectorType, typename InVectorType>
 inline
 void
-IdentityMatrix::vmult_add (VECTOR1       &out,
-                           const VECTOR2 &in) const
+IdentityMatrix::vmult_add (OutVectorType      &out,
+                           const InVectorType &in) const
 {
   Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
   Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
@@ -224,11 +224,11 @@ IdentityMatrix::vmult_add (VECTOR1       &out,
 
 
 
-template <class VECTOR1, class VECTOR2>
+template <typename OutVectorType, typename InVectorType>
 inline
 void
-IdentityMatrix::Tvmult (VECTOR1       &out,
-                        const VECTOR2 &in) const
+IdentityMatrix::Tvmult (OutVectorType      &out,
+                        const InVectorType &in) const
 {
   Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
   Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
@@ -238,11 +238,11 @@ IdentityMatrix::Tvmult (VECTOR1       &out,
 
 
 
-template <class VECTOR1, class VECTOR2>
+template <typename OutVectorType, typename InVectorType>
 inline
 void
-IdentityMatrix::Tvmult_add (VECTOR1       &out,
-                            const VECTOR2 &in) const
+IdentityMatrix::Tvmult_add (OutVectorType      &out,
+                            const InVectorType &in) const
 {
   Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
   Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
@@ -258,4 +258,3 @@ IdentityMatrix::Tvmult_add (VECTOR1       &out,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

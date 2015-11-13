@@ -56,10 +56,13 @@ SolverControl::State monitor_mean (const unsigned int    iteration,
 
 
 
-template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve( SOLVER &solver, const MATRIX &A,
-             VECTOR &u, VECTOR &f, const PRECONDITION &P)
+check_solve (SolverType         &solver,
+             const MatrixType   &A,
+             VectorType         &u,
+             VectorType         &f,
+             const PRECONDITION &P)
 {
   u = 0.;
   f = 1.;
@@ -140,4 +143,3 @@ int main()
         }
     }
 }
-

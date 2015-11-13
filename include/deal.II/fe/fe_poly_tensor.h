@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * PolynomialsBDM and PolynomialsRaviartThomas.
  *
  * Every class that implements following function can be used as template
- * parameter POLY.
+ * parameter PolynomialType.
  *
  * @code
  * void compute (const Point<dim>            &unit_point,
@@ -94,7 +94,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note The matrix #inverse_node_matrix should have dimensions zero before
  * this piece of code is executed. Only then, shape_value_component() will
- * return the raw polynomial <i>j</i> as defined in the polynomial space POLY.
+ * return the raw polynomial <i>j</i> as defined in the polynomial space PolynomialType.
  *
  * <h4>Setting the transformation</h4>
  *
@@ -111,7 +111,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2005
  */
-template <class POLY, int dim, int spacedim=dim>
+template <class PolynomialType, int dim, int spacedim=dim>
 class FE_PolyTensor : public FiniteElement<dim,spacedim>
 {
 public:
@@ -397,9 +397,9 @@ protected:
 
 
   /**
-   * The polynomial space. Its type is given by the template parameter POLY.
+   * The polynomial space. Its type is given by the template parameter PolynomialType.
    */
-  POLY poly_space;
+  PolynomialType poly_space;
 
   /**
    * The inverse of the matrix <i>a<sub>ij</sub></i> of node values

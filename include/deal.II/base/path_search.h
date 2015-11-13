@@ -149,8 +149,8 @@ public:
   /**
    * Show the paths and suffixes used for this object.
    */
-  template <class STREAM>
-  void show(STREAM &stream) const;
+  template <class StreamType>
+  void show(StreamType &stream) const;
 
   /**
    * Add a new class.
@@ -252,10 +252,10 @@ private:
 /* ----------------------------- inline functions ------------------------- */
 
 
-template <class STREAM>
+template <class StreamType>
 inline
 void
-PathSearch::show(STREAM &out) const
+PathSearch::show(StreamType &out) const
 {
   out << "DEAL_II_" << cls << "PATH=\"";
   bool first = true;

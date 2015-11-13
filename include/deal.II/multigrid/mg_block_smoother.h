@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2005
  */
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 class MGSmootherBlock
   : public MGSmootherBase<BlockVector<number> >
 {
@@ -51,18 +51,18 @@ public:
   /**
    * Constructor. Sets memory and smoothing parameters.
    */
-  MGSmootherBlock(VectorMemory<BlockVector<number> > &mem,
-                  const unsigned int steps = 1,
-                  const bool variable = false,
-                  const bool symmetric = false,
-                  const bool transpose = false,
-                  const bool reverse = false);
+  MGSmootherBlock (VectorMemory<BlockVector<number> > &mem,
+                   const unsigned int                   steps     = 1,
+                   const bool                           variable  = false,
+                   const bool                           symmetric = false,
+                   const bool                           transpose = false,
+                   const bool                           reverse   = false);
 
   /**
    * Initialize for matrices. The parameter <tt>matrices</tt> can be any
    * object having functions <tt>get_minlevel()</tt> and
    * <tt>get_maxlevel()</tt> as well as an <tt>operator[]</tt> returning a
-   * reference to @p MATRIX.
+   * reference to @p MatrixType.
    *
    * The same convention is used for the parameter <tt>smoothers</tt>, such
    * that <tt>operator[]</tt> returns the object doing the block-smoothing on
@@ -71,9 +71,9 @@ public:
    * This function stores pointers to the level matrices and smoothing
    * operator for each level.
    */
-  template <class MGMATRIX, class MGRELAX>
-  void initialize (const MGMATRIX &matrices,
-                   const MGRELAX &smoothers);
+  template <class MGMatrixType, class MGRELAX>
+  void initialize (const MGMatrixType &matrices,
+                   const MGRELAX      &smoothers);
 
   /**
    * Empty all vectors.
@@ -117,7 +117,7 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<MATRIX, BlockVector<number> > > matrices;
+  MGLevelObject<PointerMatrix<MatrixType, BlockVector<number> > > matrices;
 
   /**
    * Pointer to the matrices.
@@ -162,15 +162,15 @@ private:
 
 #ifndef DOXYGEN
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline
-MGSmootherBlock<MATRIX, RELAX, number>::MGSmootherBlock(
-  VectorMemory<BlockVector<number> > &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose,
-  const bool reverse)
+MGSmootherBlock<MatrixType, RELAX, number>::MGSmootherBlock
+(VectorMemory<BlockVector<number> > &mem,
+ const unsigned int                  steps,
+ const bool                          variable,
+ const bool                          symmetric,
+ const bool                          transpose,
+ const bool                          reverse)
   :
   steps(steps),
   variable(variable),
@@ -181,9 +181,9 @@ MGSmootherBlock<MATRIX, RELAX, number>::MGSmootherBlock(
 {}
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::clear ()
+MGSmootherBlock<MatrixType, RELAX, number>::clear ()
 {
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
@@ -195,12 +195,11 @@ MGSmootherBlock<MATRIX, RELAX, number>::clear ()
 }
 
 
-template <class MATRIX, class RELAX, typename number>
-template <class MGMATRIX, class MGRELAX>
+template <typename MatrixType, class RELAX, typename number>
+template <class MGMatrixType, class MGRELAX>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::initialize (
-  const MGMATRIX &m,
-  const MGRELAX &s)
+MGSmootherBlock<MatrixType, RELAX, number>::initialize (const MGMatrixType &m,
+                                                        const MGRELAX      &s)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -215,57 +214,56 @@ MGSmootherBlock<MATRIX, RELAX, number>::initialize (
     }
 }
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::
+MGSmootherBlock<MatrixType, RELAX, number>::
 set_steps (const unsigned int s)
 {
   steps = s;
 }
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::
+MGSmootherBlock<MatrixType, RELAX, number>::
 set_variable (const bool flag)
 {
   variable = flag;
 }
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::
+MGSmootherBlock<MatrixType, RELAX, number>::
 set_symmetric (const bool flag)
 {
   symmetric = flag;
 }
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::
+MGSmootherBlock<MatrixType, RELAX, number>::
 set_transpose (const bool flag)
 {
   transpose = flag;
 }
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::
+MGSmootherBlock<MatrixType, RELAX, number>::
 set_reverse (const bool flag)
 {
   reverse = flag;
 }
 
 
-template <class MATRIX, class RELAX, typename number>
+template <typename MatrixType, class RELAX, typename number>
 inline void
-MGSmootherBlock<MATRIX, RELAX, number>::smooth(
-  const unsigned int level,
-  BlockVector<number> &u,
-  const BlockVector<number> &rhs) const
+MGSmootherBlock<MatrixType, RELAX, number>::smooth(const unsigned int   level,
+                                                   BlockVector<number> &u,
+                                                   const BlockVector<number> &rhs) const
 {
   deallog.push("Smooth");
 

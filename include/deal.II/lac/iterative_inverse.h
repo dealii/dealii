@@ -75,7 +75,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2010
  */
-template <class VECTOR>
+template <typename VectorType>
 class IterativeInverse : public Subscriptor
 {
 public:
@@ -83,8 +83,8 @@ public:
    * Initialization function. Provide a matrix and preconditioner for the
    * solve in vmult().
    */
-  template <class MATRIX, class PRECONDITION>
-  void initialize (const MATRIX &, const PRECONDITION &);
+  template <typename MatrixType, typename PreconditionerType>
+  void initialize (const MatrixType &, const PreconditionerType &);
 
   /**
    * Delete the pointers to matrix and preconditioner.
@@ -94,61 +94,61 @@ public:
   /**
    * Solve for right hand side <tt>src</tt>.
    */
-  void vmult (VECTOR &dst, const VECTOR &src) const;
+  void vmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Solve for right hand side <tt>src</tt>, but allow for the fact that the
    * vectors given to this function have different type from the vectors used
    * by the inner solver.
    */
-  template <class VECTOR2>
-  void vmult (VECTOR2 &dst, const VECTOR2 &src) const;
+  template <class OtherVectorType>
+  void vmult (OtherVectorType &dst, const OtherVectorType &src) const;
 
   /**
    * The solver, which allows selection of the actual solver as well as
    * adjustment of parameters.
    */
-  SolverSelector<VECTOR> solver;
+  SolverSelector<VectorType> solver;
 
 private:
   /**
    * The matrix in use.
    */
-  std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
+  std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > matrix;
 
   /**
    * The preconditioner to use.
    */
-  std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
+  std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > preconditioner;
 };
 
 
-template <class VECTOR>
-template <class MATRIX, class PRECONDITION>
+template <typename VectorType>
+template <typename MatrixType, typename PreconditionerType>
 inline
 void
-IterativeInverse<VECTOR>::initialize(const MATRIX &m, const PRECONDITION &p)
+IterativeInverse<VectorType>::initialize(const MatrixType &m, const PreconditionerType &p)
 {
   // dummy variable
-  VECTOR *v = 0;
-  matrix = std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(m, *v));
-  preconditioner = std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p, *v));
+  VectorType *v = 0;
+  matrix = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(m, *v));
+  preconditioner = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(p, *v));
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline
 void
-IterativeInverse<VECTOR>::clear()
+IterativeInverse<VectorType>::clear()
 {
   matrix = 0;
   preconditioner = 0;
 }
 
 
-template <class VECTOR>
+template <typename VectorType>
 inline void
-IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
+IterativeInverse<VectorType>::vmult (VectorType &dst, const VectorType &src) const
 {
   Assert(matrix.get() != 0, ExcNotInitialized());
   Assert(preconditioner.get() != 0, ExcNotInitialized());
@@ -157,16 +157,16 @@ IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-template <class VECTOR>
-template <class VECTOR2>
+template <typename VectorType>
+template <class OtherVectorType>
 inline void
-IterativeInverse<VECTOR>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
+IterativeInverse<VectorType>::vmult (OtherVectorType &dst, const OtherVectorType &src) const
 {
   Assert(matrix.get() != 0, ExcNotInitialized());
   Assert(preconditioner.get() != 0, ExcNotInitialized());
-  GrowingVectorMemory<VECTOR> mem;
-  typename VectorMemory<VECTOR>::Pointer sol(mem);
-  typename VectorMemory<VECTOR>::Pointer rhs(mem);
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer sol(mem);
+  typename VectorMemory<VectorType>::Pointer rhs(mem);
   sol->reinit(dst);
   *rhs = src;
   solver.solve(*matrix, *sol, *rhs, *preconditioner);
@@ -178,5 +178,3 @@ IterativeInverse<VECTOR>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-

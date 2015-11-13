@@ -20,8 +20,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-  template <class VECTOR, int dim, int spacedim>
-  DoFOutputOperator<VECTOR, dim, spacedim>::DoFOutputOperator (
+  template <typename VectorType, int dim, int spacedim>
+  DoFOutputOperator<VectorType, dim, spacedim>::DoFOutputOperator (
     const std::string filename_base,
     const unsigned int digits)
     :
@@ -32,23 +32,23 @@ namespace Algorithms
   }
 
 
-  template <class VECTOR, int dim, int spacedim>
+  template <typename VectorType, int dim, int spacedim>
   void
-  DoFOutputOperator<VECTOR, dim, spacedim>::parse_parameters(ParameterHandler &param)
+  DoFOutputOperator<VectorType, dim, spacedim>::parse_parameters(ParameterHandler &param)
   {
     out.parse_parameters(param);
   }
 
-  template <class VECTOR, int dim, int spacedim>
-  OutputOperator<VECTOR> &
-  DoFOutputOperator<VECTOR, dim, spacedim>::operator<<(
+  template <typename VectorType, int dim, int spacedim>
+  OutputOperator<VectorType> &
+  DoFOutputOperator<VectorType, dim, spacedim>::operator<<(
     const AnyData &data)
   {
     Assert ((dof!=0), ExcNotInitialized());
     out.attach_dof_handler (*dof);
     for (unsigned int i=0; i<data.size(); ++i)
       {
-        const VECTOR *p = data.try_read_ptr<VECTOR>(i);
+        const VectorType *p = data.try_read_ptr<VectorType>(i);
         if (p!=0)
           {
             out.add_data_vector (*p, data.name(i));

@@ -22,9 +22,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <class POLY, int dim, int spacedim>
-FE_PolyFace<POLY,dim,spacedim>::FE_PolyFace (
-  const POLY &poly_space,
+template <class PolynomialType, int dim, int spacedim>
+FE_PolyFace<PolynomialType,dim,spacedim>::FE_PolyFace (
+  const PolynomialType &poly_space,
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &restriction_is_additive_flags):
   FiniteElement<dim,spacedim> (fe_data,
@@ -32,13 +32,13 @@ FE_PolyFace<POLY,dim,spacedim>::FE_PolyFace (
                                std::vector<ComponentMask> (1, ComponentMask(1,true))),
   poly_space(poly_space)
 {
-  AssertDimension(dim, POLY::dimension+1);
+  AssertDimension(dim, PolynomialType::dimension+1);
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 unsigned int
-FE_PolyFace<POLY,dim,spacedim>::get_degree () const
+FE_PolyFace<PolynomialType,dim,spacedim>::get_degree () const
 {
   return this->degree;
 }
@@ -49,26 +49,26 @@ FE_PolyFace<POLY,dim,spacedim>::get_degree () const
 //---------------------------------------------------------------------------
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_PolyFace<POLY,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
+FE_PolyFace<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
   return update_once(flags) | update_each(flags);
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_PolyFace<POLY,dim,spacedim>::update_once (const UpdateFlags) const
+FE_PolyFace<PolynomialType,dim,spacedim>::update_once (const UpdateFlags) const
 {
   return update_default;
 }
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
-FE_PolyFace<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
+FE_PolyFace<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = flags & update_values;
   if (flags & update_gradients)
@@ -85,9 +85,9 @@ FE_PolyFace<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 //---------------------------------------------------------------------------
 // Fill data of FEValues
 //---------------------------------------------------------------------------
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::
+FE_PolyFace<PolynomialType,dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const CellSimilarity::Similarity                                     ,
                 const Quadrature<dim> &,
@@ -103,9 +103,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
 
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::
+FE_PolyFace<PolynomialType,dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                      const unsigned int                                                   face_no,
                      const Quadrature<dim-1>                                             &quadrature,
@@ -173,9 +173,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_PolyFace<POLY,dim,spacedim>::
+FE_PolyFace<PolynomialType,dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                         const unsigned int                                                   face_no,
                         const unsigned int                                                   sub_no,

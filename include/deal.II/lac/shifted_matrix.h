@@ -39,14 +39,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2000, 2001
  */
-template<class MATRIX>
+template<typename MatrixType>
 class ShiftedMatrix
 {
 public:
   /**
    * Constructor.  Provide the base matrix and a shift parameter.
    */
-  ShiftedMatrix (const MATRIX &A, const double sigma);
+  ShiftedMatrix (const MatrixType &A, const double sigma);
 
   /**
    * Set the shift parameter.
@@ -61,25 +61,25 @@ public:
   /**
    * Matrix-vector-product.
    */
-  template <class VECTOR>
-  void vmult (VECTOR &dst, const VECTOR &src) const;
+  template <typename VectorType>
+  void vmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Residual.
    */
-  template <class VECTOR>
-  double residual (VECTOR &dst, const VECTOR &src, const VECTOR &rhs) const;
+  template <typename VectorType>
+  double residual (VectorType &dst, const VectorType &src, const VectorType &rhs) const;
 
 private:
   /**
    * Storage for base matrix.
    */
-  SmartPointer<const MATRIX,ShiftedMatrix<MATRIX> > A;
+  SmartPointer<const MatrixType,ShiftedMatrix<MatrixType> > A;
 
   /**
    * Auxiliary vector.
    */
-  //    VECTOR aux;
+  //    VectorType aux;
   /**
    * Shift parameter.
    */
@@ -103,16 +103,16 @@ private:
  *
  * @author Guido Kanschat, 2001
  */
-template<class MATRIX, class MASSMATRIX, class VECTOR>
+template<typename MatrixType, class MASSMatrixType, class VectorType>
 class ShiftedMatrixGeneralized
 {
 public:
   /**
    * Constructor. Provide the base matrix and a shift parameter.
    */
-  ShiftedMatrixGeneralized (const MATRIX &A,
-                            const MASSMATRIX &M,
-                            const double sigma);
+  ShiftedMatrixGeneralized (const MatrixType     &A,
+                            const MASSMatrixType &M,
+                            const double          sigma);
 
   /**
    * Set the shift parameter.
@@ -127,27 +127,27 @@ public:
   /**
    * Matrix-vector-product.
    */
-  void vmult (VECTOR &dst, const VECTOR &src) const;
+  void vmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Residual.
    */
-  double residual (VECTOR &dst, const VECTOR &src, const VECTOR &rhs) const;
+  double residual (VectorType &dst, const VectorType &src, const VectorType &rhs) const;
 
 private:
   /**
    * Storage for base matrix.
    */
-  SmartPointer<const MATRIX,ShiftedMatrixGeneralized<MATRIX,MASSMATRIX,VECTOR> > A;
+  SmartPointer<const MatrixType,ShiftedMatrixGeneralized<MatrixType,MASSMatrixType,VectorType> > A;
   /**
    * Storage for mass matrix.
    */
-  SmartPointer<const MASSMATRIX,ShiftedMatrixGeneralized<MATRIX,MASSMATRIX,VECTOR> > M;
+  SmartPointer<const MASSMatrixType,ShiftedMatrixGeneralized<MatrixType,MASSMatrixType,VectorType> > M;
 
   /**
    * Auxiliary vector.
    */
-  VECTOR aux;
+  VectorType aux;
 
   /**
    * Shift parameter.
@@ -159,36 +159,37 @@ private:
 /*@}*/
 //---------------------------------------------------------------------------
 
-template <class MATRIX>
+template <typename MatrixType>
 inline
-ShiftedMatrix<MATRIX>::ShiftedMatrix (const MATRIX &A, const double sigma)
+ShiftedMatrix<MatrixType>::ShiftedMatrix (const MatrixType &A,
+                                          const double      sigma)
   :
   A(&A), sigma(sigma)
 {}
 
 
 
-template <class MATRIX>
+template <typename MatrixType>
 inline void
-ShiftedMatrix<MATRIX>::shift (const double s)
+ShiftedMatrix<MatrixType>::shift (const double s)
 {
   sigma = s;
 }
 
 
-template <class MATRIX>
+template <typename MatrixType>
 inline double
-ShiftedMatrix<MATRIX>::shift () const
+ShiftedMatrix<MatrixType>::shift () const
 {
   return sigma;
 }
 
 
 
-template <class MATRIX>
-template <class VECTOR>
+template <typename MatrixType>
+template <class VectorType>
 inline void
-ShiftedMatrix<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
+ShiftedMatrix<MatrixType>::vmult (VectorType &dst, const VectorType &src) const
 {
   A->vmult(dst, src);
   if (sigma != 0.)
@@ -196,12 +197,12 @@ ShiftedMatrix<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 }
 
 
-template <class MATRIX>
-template <class VECTOR>
+template <typename MatrixType>
+template <class VectorType>
 inline double
-ShiftedMatrix<MATRIX>::residual (VECTOR &dst,
-                                 const VECTOR &src,
-                                 const VECTOR &rhs) const
+ShiftedMatrix<MatrixType>::residual (VectorType       &dst,
+                                     const VectorType &src,
+                                     const VectorType &rhs) const
 {
   A->vmult(dst, src);
   if (sigma != 0.)
@@ -212,36 +213,37 @@ ShiftedMatrix<MATRIX>::residual (VECTOR &dst,
 
 
 //---------------------------------------------------------------------------
-template <class MATRIX, class MASSMATRIX, class VECTOR>
+template <typename MatrixType, class MASSMatrixType, class VectorType>
 inline
-ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>
-::ShiftedMatrixGeneralized (const MATRIX &A,
-                            const MASSMATRIX &M,
-                            const double sigma)
+ShiftedMatrixGeneralized<MatrixType, MASSMatrixType, VectorType>
+::ShiftedMatrixGeneralized (const MatrixType     &A,
+                            const MASSMatrixType &M,
+                            const double          sigma)
   :
   A(&A), M(&M), sigma(sigma)
 {}
 
 
-template <class MATRIX, class MASSMATRIX, class VECTOR>
+template <typename MatrixType, class MASSMatrixType, class VectorType>
 inline void
-ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::shift (const double s)
+ShiftedMatrixGeneralized<MatrixType, MASSMatrixType, VectorType>::shift (const double s)
 {
   sigma = s;
 }
 
-template <class MATRIX, class MASSMATRIX, class VECTOR>
+template <typename MatrixType, class MASSMatrixType, class VectorType>
 inline double
-ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::shift () const
+ShiftedMatrixGeneralized<MatrixType, MASSMatrixType, VectorType>::shift () const
 {
   return sigma;
 }
 
 
-template <class MATRIX, class MASSMATRIX, class VECTOR>
+template <typename MatrixType, class MASSMatrixType, class VectorType>
 inline void
-ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::vmult (VECTOR &dst,
-    const VECTOR &src) const
+ShiftedMatrixGeneralized<MatrixType, MASSMatrixType, VectorType>::vmult
+(VectorType       &dst,
+ const VectorType &src) const
 {
   A->vmult(dst, src);
   if (sigma != 0.)
@@ -253,11 +255,12 @@ ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::vmult (VECTOR &dst,
 }
 
 
-template <class MATRIX, class MASSMATRIX, class VECTOR>
+template <typename MatrixType, class MASSMatrixType, class VectorType>
 inline double
-ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::residual (VECTOR &dst,
-    const VECTOR &src,
-    const VECTOR &rhs) const
+ShiftedMatrixGeneralized<MatrixType, MASSMatrixType, VectorType>::residual
+(VectorType       &dst,
+ const VectorType &src,
+ const VectorType &rhs) const
 {
   A->vmult(dst, src);
   if (sigma != 0.)

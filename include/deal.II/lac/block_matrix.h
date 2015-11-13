@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000
  */
-template <class MATRIX>
+template <typename MatrixType>
 class BlockDiagonalMatrix : public Subscriptor
 {
 public:
@@ -55,7 +55,7 @@ public:
    * Constructor for an @p n_blocks by @p n_blocks matrix with diagonal blocks
    * @p M.
    */
-  BlockDiagonalMatrix (const MATRIX       &M,
+  BlockDiagonalMatrix (const MatrixType   &M,
                        const unsigned int  n_blocks);
 
   /**
@@ -80,26 +80,26 @@ private:
   /**
    * Diagonal entry.
    */
-  SmartPointer<const MATRIX,BlockDiagonalMatrix<MATRIX> > matrix;
+  SmartPointer<const MatrixType,BlockDiagonalMatrix<MatrixType> > matrix;
 };
 
 /*@}*/
 //---------------------------------------------------------------------------
 
-template <class MATRIX>
-BlockDiagonalMatrix<MATRIX>::BlockDiagonalMatrix (const MATRIX &M,
-                                                  const unsigned int num_blocks)
+template <typename MatrixType>
+BlockDiagonalMatrix<MatrixType>::BlockDiagonalMatrix (const MatrixType &M,
+                                                      const unsigned int num_blocks)
   :
   num_blocks (num_blocks),
   matrix(&M)
 {}
 
 
-template <class MATRIX>
+template <typename MatrixType>
 template <typename number1, typename number2>
 void
-BlockDiagonalMatrix<MATRIX>::vmult (BlockVector<number1> &dst,
-                                    const BlockVector<number2> &src) const
+BlockDiagonalMatrix<MatrixType>::vmult (BlockVector<number1>       &dst,
+                                        const BlockVector<number2> &src) const
 {
   Assert (dst.n_blocks()==num_blocks,
           ExcDimensionMismatch(dst.n_blocks(),num_blocks));
@@ -111,11 +111,11 @@ BlockDiagonalMatrix<MATRIX>::vmult (BlockVector<number1> &dst,
 }
 
 
-template <class MATRIX>
+template <typename MatrixType>
 template <typename number1, typename number2>
 void
-BlockDiagonalMatrix<MATRIX>::Tvmult (BlockVector<number1> &dst,
-                                     const BlockVector<number2> &src) const
+BlockDiagonalMatrix<MatrixType>::Tvmult (BlockVector<number1>       &dst,
+                                         const BlockVector<number2> &src) const
 {
   Assert (dst.n_blocks()==num_blocks,
           ExcDimensionMismatch(dst.n_blocks(),num_blocks));

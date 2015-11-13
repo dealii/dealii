@@ -165,13 +165,13 @@ namespace
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <int dim, class InVector, int spacedim>
 void
-MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const DoFHandler<dim,spacedim> &mg_dof_handler,
-  MGLevelObject<VECTOR> &dst,
-  const InVector &src) const
+MGTransferPrebuilt<VectorType>::copy_to_mg
+(const DoFHandler<dim,spacedim> &mg_dof_handler,
+ MGLevelObject<VectorType>     &dst,
+ const InVector                &src) const
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
@@ -182,7 +182,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
     {
       --level;
-      VECTOR &dst_level = dst[level];
+      VectorType &dst_level = dst[level];
 
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
@@ -222,13 +222,13 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
-MGTransferPrebuilt<VECTOR>::copy_from_mg(
-  const DoFHandler<dim,spacedim>       &mg_dof_handler,
-  OutVector                     &dst,
-  const MGLevelObject<VECTOR> &src) const
+MGTransferPrebuilt<VectorType>::copy_from_mg
+(const DoFHandler<dim,spacedim>  &mg_dof_handler,
+ OutVector                       &dst,
+ const MGLevelObject<VectorType> &src) const
 {
   // For non-DG: degrees of
   // freedom in the refinement
@@ -276,13 +276,13 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
-MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
-  const DoFHandler<dim,spacedim> &mg_dof_handler,
-  OutVector                            &dst,
-  const MGLevelObject<VECTOR> &src) const
+MGTransferPrebuilt<VectorType>::copy_from_mg_add
+(const DoFHandler<dim,spacedim>  &mg_dof_handler,
+ OutVector                       &dst,
+ const MGLevelObject<VectorType> &src) const
 {
   // For non-DG: degrees of
   // freedom in the refinement
@@ -311,17 +311,17 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 
 
 
-template <class VECTOR>
+template <typename VectorType>
 void
-MGTransferPrebuilt<VECTOR>::
+MGTransferPrebuilt<VectorType>::
 set_component_to_block_map (const std::vector<unsigned int> &map)
 {
   component_to_block_map = map;
 }
 
-template <class VECTOR>
+template <typename VectorType>
 std::size_t
-MGTransferPrebuilt<VECTOR>::memory_consumption () const
+MGTransferPrebuilt<VectorType>::memory_consumption () const
 {
   std::size_t result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();

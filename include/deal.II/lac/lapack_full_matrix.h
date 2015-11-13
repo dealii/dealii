@@ -124,11 +124,11 @@ public:
   /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
-   * uses iterators of the class MATRIX. Therefore, sparse matrices are
+   * uses iterators of the typename MatrixType. Therefore, sparse matrices are
    * possible sources.
    */
-  template <class MATRIX>
-  void copy_from (const MATRIX &);
+  template <typename MatrixType>
+  void copy_from (const MatrixType &);
 
   /**
    * Regenerate the current matrix by one that has the same properties as if
@@ -172,8 +172,8 @@ public:
    * The final two arguments allow to enter a multiple of the source or its
    * transpose.
    */
-  template<class MATRIX>
-  void fill (const MATRIX &src,
+  template<typename MatrixType>
+  void fill (const MatrixType &src,
              const size_type dst_offset_i = 0,
              const size_type dst_offset_j = 0,
              const size_type src_offset_i = 0,
@@ -702,9 +702,9 @@ LAPACKFullMatrix<number>::n () const
 }
 
 template <typename number>
-template <class MATRIX>
+template <typename MatrixType>
 inline void
-LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
+LAPACKFullMatrix<number>::copy_from (const MatrixType &M)
 {
   this->reinit (M.m(), M.n());
 
@@ -713,8 +713,8 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
   // copy them into the current object
   for (size_type row = 0; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
@@ -725,23 +725,22 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
 
 
 template <typename number>
-template <class MATRIX>
+template <typename MatrixType>
 inline void
-LAPACKFullMatrix<number>::fill (
-  const MATRIX &M,
-  const size_type dst_offset_i,
-  const size_type dst_offset_j,
-  const size_type src_offset_i,
-  const size_type src_offset_j,
-  const number factor,
-  const bool transpose)
+LAPACKFullMatrix<number>::fill (const MatrixType &M,
+                                const size_type   dst_offset_i,
+                                const size_type   dst_offset_j,
+                                const size_type   src_offset_i,
+                                const size_type   src_offset_j,
+                                const number      factor,
+                                const bool        transpose)
 {
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class
   for (size_type row = src_offset_i; row < M.m(); ++row)
     {
-      const typename MATRIX::const_iterator end_row = M.end(row);
-      for (typename MATRIX::const_iterator entry = M.begin(row);
+      const typename MatrixType::const_iterator end_row = M.end(row);
+      for (typename MatrixType::const_iterator entry = M.begin(row);
            entry != end_row; ++entry)
         {
           const size_type i = transpose ? entry->column() : row;
