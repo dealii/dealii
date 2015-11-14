@@ -44,8 +44,11 @@ int main(int argc, char *argv[])
   auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
   auto op_b3 = linear_operator<TrilinosWrappers::BlockVector>(b);
 
-  auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector >({{ op_a, op_a}});
-  auto op_c2 = block_diagonal_operator<2, TrilinosWrappers::BlockVector >({{ op_a2, op_a2}});
+  typedef LinearOperator<TrilinosWrappers::MPI::Vector,TrilinosWrappers::MPI::Vector> Op_MPI;
+  typedef LinearOperator<TrilinosWrappers::Vector,TrilinosWrappers::Vector> Op;
+
+  auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector >(std::array<Op_MPI,2> ({{ op_a, op_a}}));
+  auto op_c2 = block_diagonal_operator<2, TrilinosWrappers::BlockVector >(std::array<Op,2> ({{ op_a2, op_a2}}));
 
   deallog << "OK" << std::endl;
 
