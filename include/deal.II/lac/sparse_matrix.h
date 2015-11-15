@@ -431,18 +431,16 @@ namespace SparseMatrixIterators
 //TODO: Add multithreading to the other vmult functions.
 
 /**
- * Sparse matrix. This class implements the function to store values in the
- * locations of a sparse matrix denoted by a SparsityPattern. The separation
- * of sparsity pattern and values is done since one can store data elements of
- * different type in these locations without the SparsityPattern having to
- * know this, and more importantly one can associate more than one matrix with
- * the same sparsity pattern.
+ * Sparse matrix. This class implements the functionality to store
+ * matrix entry values in the locations denoted by a
+ * SparsityPattern. See @ref Sparsity for a discussion about the
+ * separation between sparsity patterns and matrices.
  *
  * The elements of a SparseMatrix are stored in the same order in which the
  * SparsityPattern class stores its entries. Within each row, elements are
  * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (n_rows() ==
- * n_columns()), then the diagonal entry is stored as the first element in
+ * exception to this rule is that if the matrix is square (m() ==
+ * n()), then the diagonal entry is stored as the first element in
  * each row to make operations like applying a Jacobi or SSOR preconditioner
  * faster. As a consequence, if you traverse the elements of a row of a
  * SparseMatrix with the help of iterators into this object (using

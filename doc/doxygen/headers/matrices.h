@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,6 +127,22 @@ class MATRIX
 
 /**
  * @defgroup Sparsity Sparsity patterns
+ *
+ * Almost all finite element formulations lead to matrices that are
+ * "sparse", i.e., for which the number of nonzero elements per row is
+ * (i) relatively small compared to the overall size of the matrix,
+ * and (ii) bounded by a fixed number that does not grow if the mesh
+ * is refined. For such cases, it is more efficient to not store
+ * <i>all</i> elements of the matrix, but only those that are actually
+ * (or may be) nonzero. This requires storing, for each row, the
+ * column indices of the nonzero entries (we call this the "sparsity
+ * pattern") as well as the actual values of these nonzero
+ * entries. (In practice, it sometimes happens that some of the
+ * nonzero values are, in fact, zero. Sparsity patterns and sparse
+ * matrices only intend to provision space for entries that <i>may</i>
+ * be nonzero, and do so at a time when we don't know yet what values
+ * these entries will ultimately have; they may have a zero value if a
+ * coefficient or cell happens to have particular values.)
  *
  * In deal.II, sparsity patterns are typically separated from the actual
  * sparse matrices (with the exception of the SparseMatrixEZ class and some
