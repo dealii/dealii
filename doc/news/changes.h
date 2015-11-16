@@ -159,6 +159,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Fixed: Trilinos ML preconditioner is now deterministic when using
+  version 12.4 or newer.
+  <br>
+  (Timo Heister, 2015/11/16)
+  </li>
+
   <li> Changed: The functionality to distribute cells across processes
   according to a vector of cell weights that was passed in a call to
   <code>parallel::distributed::Triangulation<dim>::repartition()</code>
