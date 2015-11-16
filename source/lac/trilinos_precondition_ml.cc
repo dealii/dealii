@@ -183,6 +183,7 @@ namespace TrilinosWrappers
     if (constant_modes_dimension > 0)
       {
         const size_type global_size = n_global_rows(matrix);
+        (void)global_length; // work around compiler warning about unused function in release mode
         Assert (global_size ==
                 static_cast<size_type>(global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(global_size,
