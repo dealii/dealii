@@ -654,9 +654,17 @@ public:
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_value_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value (const unsigned int  i,
                               const Point<dim>   &p) const;
@@ -682,9 +690,17 @@ public:
    * should throw an exception of type ExcShapeFunctionNotPrimitive. In that
    * case, use the shape_grad_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
@@ -710,9 +726,17 @@ public:
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_grad_grad_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim>   &p) const;
@@ -736,11 +760,19 @@ public:
    * than one non-zero component (which we refer to with the term non-
    * primitive), then derived classes implementing this function should throw
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * shape_3rd_derivative_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
                                               const Point<dim>   &p) const;
@@ -764,11 +796,19 @@ public:
    * than one non-zero component (which we refer to with the term non-
    * primitive), then derived classes implementing this function should throw
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * shape_4th_derivative_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
                                               const Point<dim>   &p) const;
