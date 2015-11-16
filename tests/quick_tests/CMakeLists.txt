@@ -115,6 +115,7 @@ ENDIF()
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Running quicktests..."
   )
 
 MESSAGE(STATUS "Setting up quick_tests in ${_mybuild} mode - Done")
