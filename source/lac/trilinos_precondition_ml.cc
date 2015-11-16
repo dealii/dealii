@@ -150,6 +150,12 @@ namespace TrilinosWrappers
     parameter_list.set("smoother: type", additional_data.smoother_type);
     parameter_list.set("coarse: type", additional_data.coarse_type);
 
+    // Force re-initialization of the random seed to make ML deterministic
+    // (only supported in trilinos >12.2):
+#if DEAL_II_TRILINOS_VERSION_GTE(12,4,0)
+    parameter_list.set("initialize random seed", true);
+#endif
+
     parameter_list.set("smoother: sweeps",
                        static_cast<int>(additional_data.smoother_sweeps));
     parameter_list.set("cycle applications",
