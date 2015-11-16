@@ -793,7 +793,7 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &block_operator
         auto &dst = v.block(i);
         dst = u.block(i);
         dst *= -1.;
-        for (int j = i + 1; j < m; ++j)
+        for (unsigned int j = i + 1; j < m; ++j)
           block_operator.block(i, j).vmult_add(dst, v.block(j));
         dst *= -1.;
         diagonal_inverse.block(i, i).vmult(dst, dst); // uses intermediate storage
@@ -824,7 +824,7 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &block_operator
         diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool omit_zeroing_entries=*/ true);
         *tmp = u.block(i);
         *tmp *= -1.;
-        for (int j = i + 1; j < m; ++j)
+        for (unsigned int j = i + 1; j < m; ++j)
           block_operator.block(i, j).vmult_add(*tmp,v.block(j));
         *tmp *= -1.;
         diagonal_inverse.block(i, i).vmult_add(v.block(i),*tmp);
