@@ -2240,10 +2240,11 @@ inline
 void
 TriaAccessor<0, dim, spacedim>::operator -- ()
 {
-  if (global_vertex_index!=numbers::invalid_unsigned_int)
+  if (global_vertex_index != numbers::invalid_unsigned_int)
     {
-      --global_vertex_index;
-      if (global_vertex_index==static_cast<unsigned int>(-1))
+      if (global_vertex_index != 0)
+        --global_vertex_index;
+      else
         global_vertex_index = numbers::invalid_unsigned_int;
     }
 }
