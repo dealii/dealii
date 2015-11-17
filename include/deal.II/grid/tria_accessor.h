@@ -1546,11 +1546,9 @@ public:
   TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
 
   /**
-   * Return the state of the iterator. Since an iterator to points can not be
-   * incremented or decremented, its state remains constant, and in particular
-   * equal to IteratorState::valid.
+   * Return the state of the iterator.
    */
-  static IteratorState::IteratorStates state ();
+  IteratorState::IteratorStates state () const;
 
   /**
    * Level of this object. Vertices have no level, so this function always
@@ -1571,16 +1569,14 @@ public:
    * @{
    */
   /**
-   * This operator advances the iterator to the next element. For points, this
-   * operation is not defined, so you can't iterate over point iterators.
+   * This operator advances the iterator to the next element.
    */
-  void operator ++ () const;
+  void operator ++ ();
 
   /**
-   * This operator moves the iterator to the previous element. For points,
-   * this operation is not defined, so you can't iterate over point iterators.
+   * This operator moves the iterator to the previous element.
    */
-  void operator -- () const;
+  void operator -- ();
   /**
    * Compare for equality.
    */
@@ -1819,6 +1815,12 @@ protected:
    * The global vertex index of the vertex this object corresponds to.
    */
   unsigned int  global_vertex_index;
+
+private:
+
+  template <typename Accessor> friend class TriaRawIterator;
+  template <typename Accessor> friend class TriaIterator;
+  template <typename Accessor> friend class TriaActiveIterator;
 };
 
 

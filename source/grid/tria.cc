@@ -10605,6 +10605,62 @@ Triangulation<dim,spacedim>::end_face () const
 }
 
 
+/*------------------------ Vertex iterator functions ------------------------*/
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::vertex_iterator
+Triangulation<dim,spacedim>::begin_vertex() const
+{
+  if (dim==1)
+    {
+      // This does not work if dim==1 because TriaAccessor<0,1,spacedim> does not
+      // implement operator++
+      Assert(false, ExcNotImplemented());
+      return raw_vertex_iterator();
+    }
+  else
+    {
+      vertex_iterator i = raw_vertex_iterator(const_cast<Triangulation<dim, spacedim>*>(this),
+                                              0,
+                                              0);
+      if (i.state() != IteratorState::valid)
+        return i;
+      // This loop will end because every triangulation has used vertices.
+      while (i->used() == false)
+        if ((++i).state() != IteratorState::valid)
+          return i;
+      return i;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::active_vertex_iterator
+Triangulation<dim,spacedim>::begin_active_vertex() const
+{
+  return begin_vertex();
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::vertex_iterator
+Triangulation<dim,spacedim>::end_vertex() const
+{
+  if (dim==1)
+    {
+      Assert(false, ExcNotImplemented());
+      return raw_vertex_iterator();
+    }
+  else
+    return raw_vertex_iterator(const_cast<Triangulation<dim, spacedim>*>(this),
+                               -1,
+                               numbers::invalid_unsigned_int);
+}
+
+
 
 
 /*------------------------ Line iterator functions ------------------------*/
