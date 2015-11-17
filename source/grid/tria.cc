@@ -10614,6 +10614,8 @@ Triangulation<dim,spacedim>::begin_vertex() const
 {
   if (dim==1)
     {
+      // This does not work if dim==1 because TriaAccessor<0,1,spacedim> does not
+      // implement operator++
       Assert(false, ExcNotImplemented());
       return raw_vertex_iterator();
     }
@@ -10624,6 +10626,7 @@ Triangulation<dim,spacedim>::begin_vertex() const
                                               0);
       if (i.state() != IteratorState::valid)
         return i;
+      // This loop will end because every triangulation has used vertices.
       while (i->used() == false)
         if ((++i).state() != IteratorState::valid)
           return i;

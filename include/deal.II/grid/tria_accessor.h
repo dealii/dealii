@@ -1815,6 +1815,12 @@ protected:
    * The global vertex index of the vertex this object corresponds to.
    */
   unsigned int  global_vertex_index;
+
+private:
+
+  template <typename Accessor> friend class TriaRawIterator;
+  template <typename Accessor> friend class TriaIterator;
+  template <typename Accessor> friend class TriaActiveIterator;
 };
 
 

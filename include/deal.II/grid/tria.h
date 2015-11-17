@@ -2559,19 +2559,22 @@ public:
    */
 
   /**
-   * Iterator to the first used vertex.
+   * Iterator to the first used vertex. This function can only be used if dim is
+   * not one.
    */
   vertex_iterator        begin_vertex() const;
 
   /**
    * Iterator to the first active vertex. Because all vertices are active,
-   * begin_vertex() and begin_active_vertex() return the same vertex.
+   * begin_vertex() and begin_active_vertex() return the same vertex. This
+   * function can only be used if dim is not one.
    */
   active_vertex_iterator begin_active_vertex() const;
 
   /**
    * Iterator past the end; this iterator serves for comparisons of iterators
-   * with past-the-end or before-the-beginning states.
+   * with past-the-end or before-the-beginning states. This function can only be
+   * used if dim is not one.
    */
   vertex_iterator        end_vertex() const;
 
