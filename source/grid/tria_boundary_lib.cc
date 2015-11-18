@@ -51,7 +51,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 CylinderBoundary<dim,spacedim>::get_axis_vector (const unsigned int axis)
 {
-  Assert (axis < dim, ExcIndexRange (axis, 0, dim));
+  Assert (axis < spacedim, ExcIndexRange (axis, 0, spacedim));
 
   Point<spacedim> axis_vector;
   axis_vector[axis] = 1;
