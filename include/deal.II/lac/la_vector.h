@@ -155,7 +155,7 @@ namespace LinearAlgebra
 
     /**
      * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
-     * s*(*this)+a*V<tt>.
+     * s*(*this)+a*V</tt>.
      */
     virtual void sadd(const Number s, const Number a,
                       const VectorSpaceVector<Number> &V);
