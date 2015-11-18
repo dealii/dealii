@@ -821,7 +821,7 @@ namespace parallel
        * Addition of @p s to all components. Note that @p s is a scalar and
        * not a vector.
        */
-      void add (const Number s) DEAL_II_DEPRECATED;
+      void add (const Number s);
 
       /**
        * Simple vector addition, equal to the <tt>operator +=</tt>.
