@@ -660,7 +660,7 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Number s) DEAL_II_DEPRECATED;
+  void add (const Number s);
 
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.

@@ -640,10 +640,8 @@ inconvenience this causes.
   (Maien Hamed, 2015/08/01-2015/08/09)
   </li>
 
-  <li> Changed: The function Vector::add() that adds a scalar number to all
-  elements of a vector has been deprecated. The same is true for the
-  Vector::ratio() function, and for the corresponding functions in other
-  vector classes.
+  <li> Changed: The function Vector::ratio() and the corresponding
+  functions in other vector classes have been deprecated.
   <br>
   (Wolfgang Bangerth, Bruno Turcksin, 2015/08/13)
   </li>

@@ -609,7 +609,7 @@ namespace PETScWrappers
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void add (const PetscScalar s) DEAL_II_DEPRECATED;
+    void add (const PetscScalar s);
 
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
