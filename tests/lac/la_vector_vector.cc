@@ -116,7 +116,7 @@ void check_vectors (LinearAlgebra::Vector<number1> &d1, LinearAlgebra::Vector<nu
 
   deallog << "sadd & scale" << std::endl;
 
-  d2.sadd (2., d1);
+  d2.sadd (2., 1., d1);
   print (d2);
 
   d2.sadd (2., .5, d1);

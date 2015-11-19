@@ -167,15 +167,6 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::sadd(const Number s, const VectorSpaceVector<Number> &V)
-  {
-    *this *= s;
-    *this += V;
-  }
-
-
-
-  template <typename Number>
   void Vector<Number>::sadd(const Number s, const Number a,
                             const VectorSpaceVector<Number> &V)
   {

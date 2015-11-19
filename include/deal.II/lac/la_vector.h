@@ -149,11 +149,6 @@ namespace LinearAlgebra
                      const Number b, const VectorSpaceVector<Number> &W);
 
     /**
-     * Scaling and simple vector addition, i.e. <tt>*this = s*(*this)+V</tt>.
-     */
-    virtual void sadd(const Number s, const VectorSpaceVector<Number> &V);
-
-    /**
      * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
      * s*(*this)+a*V</tt>.
      */
