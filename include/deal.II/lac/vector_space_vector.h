@@ -164,7 +164,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    virtual const dealii::IndexSet &locally_owned_elements() const = 0;
+    virtual const dealii::IndexSet locally_owned_elements() const = 0;
 
     /**
      * Print the vector to the output stream @p out.

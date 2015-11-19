@@ -29,6 +29,9 @@
 #include <cstring>
 #include <iomanip>
 
+#ifdef DEAL_II_WITH_TRILINOS
+#include "Epetra_MultiVector.h"
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,6 +49,14 @@ namespace PETScWrappers
 namespace TrilinosWrappers
 {
   namespace MPI
+  {
+    class Vector;
+  }
+}
+
+namespace LinearAlgebra
+{
+  namespace EpetraWrappers
   {
     class Vector;
   }
@@ -221,6 +232,13 @@ namespace LinearAlgebra
      */
     ReadWriteVector<Number> &
     operator= (const TrilinosWrappers::MPI::Vector &trilinos_vec);
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the input
+     * vector @p epetra_vec.
+     */
+    ReadWriteVector<Number> &
+    operator= (const EpetraWrappers::Vector &epetra_vec);
 #endif
 
     /**
@@ -405,6 +423,14 @@ namespace LinearAlgebra
     //@}
 
   protected:
+#ifdef DEAL_II_WITH_TRILINOS
+    /**
+     * Imports all the elements present in the vector's IndexSet from the input
+     * vector @p multivector.
+     */
+    ReadWriteVector<Number> &import(const Epetra_MultiVector &multivector,
+                                    const IndexSet           &locally_owned_elements);
+#endif
 
     /**
      * Return the local position of @p global_index.

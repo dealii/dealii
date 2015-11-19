@@ -216,7 +216,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    const dealii::IndexSet &locally_owned_elements() const;
+    const dealii::IndexSet locally_owned_elements() const;
 
     /**
      * Prints the vector to the output stream @p out.
@@ -391,7 +391,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline
-  const dealii::IndexSet &Vector<Number>::locally_owned_elements() const
+  const dealii::IndexSet Vector<Number>::locally_owned_elements() const
   {
     return ReadWriteVector<Number>::get_stored_elements();
   }

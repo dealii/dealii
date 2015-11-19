@@ -21,6 +21,7 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Import.h>
@@ -164,11 +165,12 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
   ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+  ReadWriteVector<Number>::import(const Epetra_MultiVector &multivector,
+                                  const IndexSet           &locally_owned_elements)
   {
     // Copy the local elements
     std::vector<size_type> trilinos_indices, readwrite_indices;
-    trilinos_vec.locally_owned_elements().fill_index_vector(trilinos_indices);
+    locally_owned_elements.fill_index_vector(trilinos_indices);
     stored_elements.fill_index_vector(readwrite_indices);
     std::vector<size_type> intersection(trilinos_indices.size());
     std::vector<size_type>::iterator end;
@@ -185,7 +187,7 @@ namespace LinearAlgebra
           ++j;
         trilinos_position[i] = j;
       }
-    double *values = trilinos_vec.trilinos_vector().Values();
+    double *values = multivector.Values();
     for (size_t i=0; i<trilinos_position.size(); ++i)
       val[global_to_local(intersection[i])] = values[trilinos_position[i]];
 
@@ -194,7 +196,7 @@ namespace LinearAlgebra
     // Copy the off-processor elements if necessary
     if (intersection_size != n_elements())
       {
-        Epetra_BlockMap source_map = trilinos_vec.trilinos_vector().Map();
+        Epetra_BlockMap source_map = multivector.Map();
         std::vector<size_type> off_proc_indices(readwrite_indices.size());
         // Subtract the elements of readwrite that are in intersection.
         end = std::set_difference(readwrite_indices.begin(), readwrite_indices.end(),
@@ -211,7 +213,7 @@ namespace LinearAlgebra
         delete [] off_proc_array;
         Epetra_Import import(target_map, source_map);
         Epetra_FEVector target_vector(target_map);
-        target_vector.Import(trilinos_vec.trilinos_vector(), import, Insert);
+        target_vector.Import(multivector, import, Insert);
         values = target_vector.Values();
         for (unsigned int i=0; i<off_proc_indices.size(); ++i)
           val[global_to_local(off_proc_indices[i])] = values[i];
@@ -224,6 +226,21 @@ namespace LinearAlgebra
   }
 #endif
 
+
+  template <typename Number>
+  ReadWriteVector<Number> &
+  ReadWriteVector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+  {
+    return import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements());
+  }
+
+
+  template <typename Number>
+  ReadWriteVector<Number> &
+  ReadWriteVector<Number>::operator = (const LinearAlgebra::EpetraWrappers::Vector &trilinos_vec)
+  {
+    return import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements());
+  }
 
 
   template <typename Number>
