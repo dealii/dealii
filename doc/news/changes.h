@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Previously deprecated global instance multithread_info of
+  MultithreadInfo has been removed (all members of this class are static
+  so there is no reason to use/create an instance). The deprecated
+  MultithreadInfo::n_cpus member also got removed in favor of
+  MultithreadInfo::n_cores().
+  <br>
+  (Timo Heister, 2015/11/19)
+
   <li> Removed: The <code>UpdateFlags</code> flags
   <code>update_support_points</code>, <code>update_support_jacobians</code>,
   and <code>update_support_inverse_jacobians</code> have been removed.
