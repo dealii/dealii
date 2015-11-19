@@ -13,40 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/la_vector.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
 
-for (SCALAR : REAL_SCALARS)
+namespace LinearAlgebra
 {
-  namespace LinearAlgebra
-  \{
-    template class ReadWriteVector<SCALAR>;
-  \}
+#include "la_vector.inst"
 }
 
-for (S1, S2 : REAL_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
-}
-
-
-for (SCALAR : COMPLEX_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template class ReadWriteVector<SCALAR>;
-  \}
-}
-
-for (S1, S2 : COMPLEX_SCALARS)
-{
-  namespace LinearAlgebra
-  \{
-    template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
-}
-
+DEAL_II_NAMESPACE_CLOSE

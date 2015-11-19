@@ -61,6 +61,7 @@ namespace LinearAlgebra
     resize_val(size);
 
     stored_elements = complete_index_set(size);
+    stored_elements.compress();
 
     // set entries to zero if so requested
     if (omit_zeroing_entries == false)
