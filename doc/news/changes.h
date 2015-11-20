@@ -167,6 +167,17 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Changed: The function FE_DGPNonparametric::shape_value() and similar
+  functions in the same class returned values and derivatives of shape
+  functions on the reference cell. However, this element is not defined
+  through mapping of shape functions from the reference cell, and consequently
+  it makes no sense to ask for this information. These functions have therefore
+  been changed to throw an exception instead, as documented in
+  FiniteElement::shape_value().
+  <br>
+  (Wolfgang Bangerth, 2015/11/20)
+  </li>
+
   <li> Fixed: Trilinos ML preconditioner is now deterministic when using
   version 12.4 or newer.
   <br>
@@ -431,8 +442,8 @@ inconvenience this causes.
   (Denis Davydov, 2015/11/09)
   </li>
 
-  <li> Fixed: FETools::project_dg was adding the vector projection to 
-  the output vector. Now is the output vector initialized to zero. 
+  <li> Fixed: FETools::project_dg was adding the vector projection to
+  the output vector. Now is the output vector initialized to zero.
   <br>
   (Adam Kosik, 2015/11/09)
   </li>
