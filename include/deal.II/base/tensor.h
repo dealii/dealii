@@ -1412,7 +1412,7 @@ operator * (const Tensor<rank,dim,Number> &t,
   // recurse over the base objects
   Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
+    tt[unchecked_index(d)] = t[unchecked_index(d)] * factor;
   return tt;
 }
 
@@ -1458,7 +1458,7 @@ operator / (const Tensor<rank,dim,Number> &t,
   // recurse over the base objects
   Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] / factor;
+    tt[unchecked_index(d)] = t[unchecked_index(d)] / factor;
   return tt;
 }
 
@@ -1800,8 +1800,8 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
 
   Tensor<1, dim, Number> result;
 
-  result[0] = src[1];
-  result[1] = -src[0];
+  result[unchecked_index(0u)] = src[unchecked_index(1u)];
+  result[unchecked_index(1u)] = -src[unchecked_index(0u)];
 
   return result;
 }
@@ -1827,9 +1827,9 @@ cross_product_3d (const Tensor<1,dim,Number> &src1,
 
   Tensor<1, dim, Number> result;
 
-  result[0] = src1[1]*src2[2] - src1[2]*src2[1];
-  result[1] = src1[2]*src2[0] - src1[0]*src2[2];
-  result[2] = src1[0]*src2[1] - src1[1]*src2[0];
+  result[unchecked_index(0u)] = src1[unchecked_index(1u)]*src2[unchecked_index(2u)] - src1[unchecked_index(2u)]*src2[unchecked_index(1u)];
+  result[unchecked_index(1u)] = src1[unchecked_index(2u)]*src2[unchecked_index(0u)] - src1[unchecked_index(0u)]*src2[unchecked_index(2u)];
+  result[unchecked_index(2u)] = src1[unchecked_index(0u)]*src2[unchecked_index(1u)] - src1[unchecked_index(1u)]*src2[unchecked_index(0u)];
 
   return result;
 }
