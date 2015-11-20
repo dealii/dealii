@@ -1911,7 +1911,12 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcUnitShapeValuesDoNotExist);
+  DeclExceptionMsg (ExcUnitShapeValuesDoNotExist,
+                    "You are trying to access the values or derivatives of shape functions "
+                    "on the reference cell of an element that does not define its shape "
+                    "functions through mapping from the reference cell. Consequently, "
+                    "you cannot ask for shape function values or derivatives on the "
+                    "reference cell.");
 
   /**
    * Attempt to access support points of a finite element that is not
