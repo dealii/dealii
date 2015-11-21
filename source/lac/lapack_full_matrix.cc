@@ -22,6 +22,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
+#include <boost/math/special_functions/round.hpp>
+
 #include <iostream>
 #include <iomanip>
 
@@ -503,7 +505,7 @@ LAPACKFullMatrix<number>::compute_svd()
         &work[0], &lwork, &ipiv[0], &info);
   AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
   // Now resize work array and
-  lwork = static_cast<int>(work[0] + .5);
+  lwork = boost::math::iround(work[0]);
 
   work.resize(lwork);
   // Do the actual SVD.
@@ -655,7 +657,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion.
-  lwork = (int) (work[0]+.1);
+  lwork = boost::math::iround(work[0]);
 
   // resize workspace array
   work.resize((size_type ) lwork);
@@ -727,7 +729,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion.
-  lwork = (int) (work[0]+.1);
+  lwork = boost::math::iround(work[0]);
   work.resize(static_cast<size_type> (lwork));
 
   // Finally compute the eigenvalues.
@@ -817,7 +819,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion.
-  lwork = (int) (work[0]+.1);
+  lwork = boost::math::iround(work[0]);
 
   // resize workspace arrays
   work.resize(static_cast<size_type> (lwork));
@@ -898,7 +900,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion.
-  lwork = (int) (work[0]+.1);
+  lwork = boost::math::iround(work[0]);
 
   // resize workspace array
   work.resize((size_type) lwork);
