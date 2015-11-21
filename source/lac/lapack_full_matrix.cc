@@ -635,11 +635,15 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   const char *const jobvr = (right) ? (&V) : (&N);
   const char *const jobvl = (left)  ? (&V) : (&N);
 
-  // The LAPACK routine DGEEV requires a sufficient large workspace variable,
-  // minimum requirement is
-  //    work.size>=4*nn.
-  // However, to improve performance, a somewhat larger workspace may be
-  // needed.
+  /*
+   * The LAPACK routine xGEEV requires a sufficiently large work array; the
+   * minimum requirement is
+   *
+   * work.size >= 4*nn.
+   *
+   * However, for better performance, a larger work array may be needed. The
+   * first call determines the optimal work size and the second does the work.
+   */
   lwork = -1;
   work.resize(1);
 
@@ -701,11 +705,15 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
   std::vector<int> ifail(static_cast<size_type> (nn));
 
 
-  // The LAPACK routine ?SYEVX requires a sufficient large workspace variable,
-  // minimum requirement is
-  //    work.size>=3*nn-1.
-  // However, to improve performance, a somewhat larger workspace may be
-  // needed.
+  /*
+   * The LAPACK routine xSYEVX requires a sufficiently large work array; the
+   * minimum requirement is
+   *
+   * work.size >= 8*nn.
+   *
+   * However, for better performance, a larger work array may be needed. The
+   * first call determines the optimal work size and the second does the work.
+   */
   work.resize(1);
 
   syevx (jobz, range,
@@ -789,11 +797,15 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   std::vector<int> ifail(static_cast<size_type> (nn));
 
 
-  // The LAPACK routine ?SYGVX requires a sufficient large workspace variable,
-  // minimum requirement is
-  //    work.size>=3*nn-1.
-  // However, to improve performance, a somewhat larger workspace may be
-  // needed.
+  /*
+   * The LAPACK routine xSYGVX requires a sufficiently large work array; the
+   * minimum requirement is
+   *
+   * work.size >= 8*nn.
+   *
+   * However, for better performance, a larger work array may be needed. The
+   * first call determines the optimal work size and the second does the work.
+   */
   work.resize(1);
 
   sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
@@ -868,11 +880,15 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   const char *const jobz = (eigenvectors.size() > 0) ? (&V) : (&N);
   const char *const uplo = (&U);
 
-  // The LAPACK routine DSYGV requires a sufficient large workspace variable,
-  // minimum requirement is
-  //    work.size>=3*nn-1.
-  // However, to improve performance, a somewhat larger workspace may be
-  // needed.
+  /*
+   * The LAPACK routine xSYGV requires a sufficiently large work array; the
+   * minimum requirement is
+   *
+   * work.size >= 3*nn - 1.
+   *
+   * However, for better performance, a larger work array may be needed. The
+   * first call determines the optimal work size and the second does the work.
+   */
   work.resize(1);
 
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
