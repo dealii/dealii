@@ -869,7 +869,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
          ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
 
   wr.resize(nn);
-  wi.resize(nn); //This is set purley for consistency reasons with the
+  wi.resize(nn); //This is set purely for consistency reasons with the
   //eigenvalues() function.
 
   number *values_A = const_cast<number *> (&this->values[0]);
