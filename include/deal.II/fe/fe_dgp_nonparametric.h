@@ -289,63 +289,81 @@ public:
   requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
-   * Return the value of the @p ith shape function at the point @p p. See the
-   * FiniteElement base class for more information about the semantics of this
-   * function.
+   * This function is intended to return the value of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_value(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
 
   /**
-   * Return the value of the @p componentth vector component of the @p ith
-   * shape function at the point @p p. See the FiniteElement base class for
-   * more information about the semantics of this function.
+   * This function is intended to return the value of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_value_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim> &p,
                                         const unsigned int component) const;
 
   /**
-   * Return the gradient of the @p ith shape function at the point @p p. See
-   * the FiniteElement base class for more information about the semantics of
-   * this function.
+   * This function is intended to return the gradient of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
 
   /**
-   * Return the gradient of the @p componentth vector component of the @p ith
-   * shape function at the point @p p. See the FiniteElement base class for
-   * more information about the semantics of this function.
+   * This function is intended to return the gradient of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim> &p,
                                               const unsigned int component) const;
 
   /**
-   * Return the tensor of second derivatives of the @p ith shape function at
-   * point @p p on the unit cell.  See the FiniteElement base class for more
-   * information about the semantics of this function.
+   * This function is intended to return the Hessian of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_grad(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim> &p) const;
 
   /**
-   * Return the second derivative of the @p componentth vector component of
-   * the @p ith shape function at the point @p p. See the FiniteElement base
-   * class for more information about the semantics of this function.
+   * This function is intended to return the Hessian of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_grad_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,

@@ -128,8 +128,11 @@ double
 FE_DGPNonparametric<dim,spacedim>::shape_value (const unsigned int i,
                                                 const Point<dim> &p) const
 {
+  (void)i;
+  (void)p;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  return polynomial_space.compute_value(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return 0;
 }
 
 
@@ -140,10 +143,13 @@ FE_DGPNonparametric<dim,spacedim>::shape_value_component (const unsigned int i,
                                                           const Point<dim> &p,
                                                           const unsigned int component) const
 {
+  (void)i;
+  (void)p;
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_value(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return 0;
 }
 
 
@@ -153,8 +159,11 @@ Tensor<1,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad (const unsigned int i,
                                                const Point<dim> &p) const
 {
+  (void)i;
+  (void)p;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  return polynomial_space.compute_grad(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return Tensor<1,dim>();
 }
 
 
@@ -164,10 +173,13 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_component (const unsigned int i,
                                                          const Point<dim> &p,
                                                          const unsigned int component) const
 {
+  (void)i;
+  (void)p;
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return Tensor<1,dim>();
 }
 
 
@@ -177,8 +189,11 @@ Tensor<2,dim>
 FE_DGPNonparametric<dim,spacedim>::shape_grad_grad (const unsigned int i,
                                                     const Point<dim> &p) const
 {
+  (void)i;
+  (void)p;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  return polynomial_space.compute_grad_grad(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return Tensor<2,dim>();
 }
 
 
@@ -189,10 +204,13 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_grad_component (const unsigned int
     const Point<dim> &p,
     const unsigned int component) const
 {
+  (void)i;
+  (void)p;
   (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad_grad(i, p);
+  AssertThrow (false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  return Tensor<2,dim>();
 }
 
 
