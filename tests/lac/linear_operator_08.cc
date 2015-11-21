@@ -260,8 +260,8 @@ int main()
     {
       deallog << "PreconditionPSOR" << std::endl;
       typedef PreconditionPSOR< SparseMatrix<double> > PREC;
-      std::vector<unsigned int> permutation(b.size());
-      std::vector<unsigned int> inverse_permutation(b.size());
+      std::vector<PREC::size_type> permutation(b.size());
+      std::vector<PREC::size_type> inverse_permutation(b.size());
       test_preconditioner<PREC>(A, b,
                                 typename PREC::AdditionalData(permutation,
                                                               inverse_permutation));
