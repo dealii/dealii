@@ -37,17 +37,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class DH, bool lda>
+template <typename DoFHandlerType, bool lda>
 template <class OutputVector, typename number>
 void
-DoFCellAccessor<DH,lda>::
+DoFCellAccessor<DoFHandlerType,lda>::
 set_dof_values_by_interpolation (const Vector<number> &local_values,
                                  OutputVector         &values,
                                  const unsigned int fe_index) const
 {
   if (!this->has_children() && !this->is_artificial ())
     {
-      if ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
            (this->dof_handler)
            != 0)
           ||
@@ -56,7 +56,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
           // or that you specify the correct one
           (fe_index == this->active_fe_index())
           ||
-          (fe_index == DH::default_fe_index))
+          (fe_index == DoFHandlerType::default_fe_index))
         // simply set the values on this cell
         this->set_dof_values (local_values, values);
       else
@@ -83,11 +83,11 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
   else
     // otherwise distribute them to the children
     {
-      Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+      Assert ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
                (this->dof_handler)
                != 0)
               ||
-              (fe_index != DH::default_fe_index),
+              (fe_index != DoFHandlerType::default_fe_index),
               ExcMessage ("You cannot call this function on non-active cells "
                           "of hp::DoFHandler objects unless you provide an explicit "
                           "finite element index because they do not have naturally "

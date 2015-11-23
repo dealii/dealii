@@ -99,7 +99,7 @@ namespace internal
  *
  * @pre This class only makes sense if the first template argument,
  * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim == DH::dimension</code>. This
+ * second template argument, i.e., if <code>dim == DoFHandlerType::dimension</code>. This
  * redundancy is a historical relic from the time where the library had only a
  * single DoFHandler class and this class consequently only a single template
  * argument.
@@ -110,28 +110,28 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
-template <int dim, class DH=DoFHandler<dim> >
-class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
-  DH::dimension>
+template <int dim, typename DoFHandlerType=DoFHandler<dim> >
+class DataOutFaces : public DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension-1,
+  DoFHandlerType::dimension>
 {
 public:
   /**
    * An abbreviation for the dimension of the DoFHandler object we work with.
    * Faces are then <code>dimension-1</code> dimensional objects.
    */
-  static const unsigned int dimension = DH::dimension;
+  static const unsigned int dimension = DoFHandlerType::dimension;
 
   /**
    * An abbreviation for the spatial dimension within which the triangulation
    * and DoFHandler are embedded in.
    */
-  static const unsigned int space_dimension = DH::space_dimension;
+  static const unsigned int space_dimension = DoFHandlerType::space_dimension;
 
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DH,dimension-1,
+  typedef typename DataOut_DoFData<DoFHandlerType,dimension-1,
           dimension>::cell_iterator cell_iterator;
 
   /**

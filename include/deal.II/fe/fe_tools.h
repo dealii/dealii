@@ -562,14 +562,14 @@ namespace FETools
    * @p distribute function of your hanging node constraints object.
    */
   template <int dim, int spacedim,
-            template <int,int> class DH1,
-            template <int,int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate (const DH1<dim,spacedim> &dof1,
-               const InVector          &u1,
-               const DH2<dim,spacedim> &dof2,
-               OutVector               &u2);
+  interpolate (const DoFHandlerType1<dim,spacedim> &dof1,
+               const InVector                      &u1,
+               const DoFHandlerType2<dim,spacedim> &dof2,
+               OutVector                           &u2);
 
   /**
    * Gives the interpolation of a the @p dof1-function @p u1 to a @p
@@ -588,14 +588,14 @@ namespace FETools
    * at the discontinuities.
    */
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
-  void interpolate (const DH1<dim,spacedim>  &dof1,
-                    const InVector           &u1,
-                    const DH2<dim,spacedim>  &dof2,
-                    const ConstraintMatrix   &constraints,
-                    OutVector                &u2);
+  void interpolate (const DoFHandlerType1<dim,spacedim> &dof1,
+                    const InVector                      &u1,
+                    const DoFHandlerType2<dim,spacedim> &dof2,
+                    const ConstraintMatrix              &constraints,
+                    OutVector                           &u2);
 
   /**
    * Gives the interpolation of the @p fe1-function @p u1 to a @p
@@ -621,12 +621,12 @@ namespace FETools
    * type @p hp::DoFHandler.
    */
   template <int dim,
-            template <int> class DH,
+            template <int> class DoFHandlerType,
             class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DH<dim>            &dof1,
-                         const InVector           &u1,
+  void back_interpolate (const DoFHandlerType<dim>         &dof1,
+                         const InVector                    &u1,
                          const FiniteElement<dim,spacedim> &fe2,
-                         OutVector                &u1_interpolated);
+                         OutVector                         &u1_interpolated);
 
   /**
    * Gives the interpolation of the @p dof1-function @p u1 to a @p

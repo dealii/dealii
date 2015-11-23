@@ -105,7 +105,7 @@ template <int dim, int spacedim> class DoFHandler;
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim, int spacedim=dim, class DH = DoFHandler<dim,spacedim> >
+template <int dim, int spacedim=dim, typename DoFHandlerType = DoFHandler<dim,spacedim> >
 class DataOutStack : public DataOutInterface<dim+1>
 {
 public:
@@ -136,7 +136,7 @@ public:
    * This has to happen before adding data vectors for the present parameter
    * value.
    */
-  void attach_dof_handler (const DH &dof_handler);
+  void attach_dof_handler (const DoFHandlerType &dof_handler);
 
   /**
    * Declare a data vector. The @p vector_type argument determines whether the
@@ -289,7 +289,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DH,DataOutStack<dim,spacedim,DH> > dof_handler;
+  SmartPointer<const DoFHandlerType,DataOutStack<dim,spacedim,DoFHandlerType> > dof_handler;
 
   /**
    * List of patches of all past and present parameter value data sets.

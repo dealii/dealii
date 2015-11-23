@@ -59,37 +59,38 @@ namespace internal
 
 
 
-template <int dim, class DH>
+template <int dim, typename DoFHandlerType>
 void
-DataOut<dim,DH>::
-build_one_patch (const std::pair<cell_iterator, unsigned int>                         *cell_and_index,
-                 internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>  &scratch_data,
-                 const unsigned int                                                    n_subdivisions,
-                 const CurvedCellRegion                                                curved_cell_region,
-                 std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches)
+DataOut<dim,DoFHandlerType>::
+build_one_patch
+(const std::pair<cell_iterator, unsigned int>                                                *cell_and_index,
+ internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &scratch_data,
+ const unsigned int                                                                           n_subdivisions,
+ const CurvedCellRegion                                                                       curved_cell_region,
+ std::vector<DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> > &patches)
 {
   // first create the output object that we will write into
-  ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> patch;
+  ::dealii::DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> patch;
   patch.n_subdivisions = n_subdivisions;
 
   // use ucd_to_deal map as patch vertices are in the old, unnatural
   // ordering. if the mapping does not preserve locations
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
-  for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension>::vertices_per_cell; ++vertex)
+  for (unsigned int vertex=0; vertex<GeometryInfo<DoFHandlerType::dimension>::vertices_per_cell; ++vertex)
     if (scratch_data.mapping_collection[0].preserves_vertex_locations())
       patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
     else
       patch.vertices[vertex] = scratch_data.mapping_collection[0].transform_unit_to_real_cell
                                (cell_and_index->first,
-                                GeometryInfo<DH::dimension>::unit_cell_vertex (vertex));
+                                GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex (vertex));
 
   if (scratch_data.n_datasets > 0)
     {
-      // create DH::active_cell_iterator and initialize FEValues
+      // create DoFHandlerType::active_cell_iterator and initialize FEValues
       scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
 
-      const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values
+      const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values
         = scratch_data.get_present_fe_values (0);
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
@@ -107,20 +108,20 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
            &&
            (cell_and_index->first->at_boundary()
             ||
-            (DH::dimension != DH::space_dimension))))
+            (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
         {
-          Assert(patch.space_dim==DH::space_dimension, ExcInternalError());
-          const std::vector<Point<DH::space_dimension> > &q_points=fe_patch_values.get_quadrature_points();
+          Assert(patch.space_dim==DoFHandlerType::space_dimension, ExcInternalError());
+          const std::vector<Point<DoFHandlerType::space_dimension> > &q_points=fe_patch_values.get_quadrature_points();
           // resize the patch.data member in order to have enough memory for
           // the quadrature points as well
-          patch.data.reinit (scratch_data.n_datasets+DH::space_dimension, n_q_points);
+          patch.data.reinit (scratch_data.n_datasets+DoFHandlerType::space_dimension, n_q_points);
           // set the flag indicating that for this cell the points are
           // explicitly given
           patch.points_are_available=true;
           // copy points to patch.data
-          for (unsigned int i=0; i<DH::space_dimension; ++i)
+          for (unsigned int i=0; i<DoFHandlerType::space_dimension; ++i)
             for (unsigned int q=0; q<n_q_points; ++q)
-              patch.data(patch.data.size(0)-DH::space_dimension+i,q)=q_points[q][i];
+              patch.data(patch.data.size(0)-DoFHandlerType::space_dimension+i,q)=q_points[q][i];
         }
       else
         {
@@ -135,12 +136,12 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
       // first fill dof_data
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
         {
-          const FEValuesBase<DH::dimension,DH::space_dimension> &this_fe_patch_values
+          const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &this_fe_patch_values
             = scratch_data.get_present_fe_values (dataset);
           const unsigned int n_components =
             this_fe_patch_values.get_fe().n_components();
 
-          const DataPostprocessor<DH::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
+          const DataPostprocessor<DoFHandlerType::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
 
           if (postprocessor != 0)
             {
@@ -165,7 +166,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
                     scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
 
-                  std::vector<Point<DH::space_dimension> > dummy_normals;
+                  std::vector<Point<DoFHandlerType::space_dimension> > dummy_normals;
                   postprocessor->
                   compute_derived_quantities_scalar(scratch_data.patch_values,
                                                     scratch_data.patch_gradients,
@@ -193,7 +194,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
-                  std::vector<Point<DH::space_dimension> > dummy_normals;
+                  std::vector<Point<DoFHandlerType::space_dimension> > dummy_normals;
 
                   postprocessor->
                   compute_derived_quantities_vector(scratch_data.patch_values_system,
@@ -255,7 +256,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
     }
 
 
-  for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+  for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
     {
       // let's look up whether the neighbor behind that face is noted in the
       // table of cells which we treat. this can only happen if the neighbor
@@ -284,7 +285,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
           ||
           ((*scratch_data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
            ==
-           dealii::DataOutBase::Patch<DH::dimension>::no_neighbor))
+           dealii::DataOutBase::Patch<DoFHandlerType::dimension>::no_neighbor))
         {
           patch.neighbors[f] = numbers::invalid_unsigned_int;
           continue;
@@ -310,22 +311,23 @@ build_one_patch (const std::pair<cell_iterator, unsigned int>                   
 
 
 
-template <int dim, class DH>
-void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions)
+template <int dim, typename DoFHandlerType>
+void DataOut<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions)
 {
-  build_patches (StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
+  build_patches (StaticMappingQ1<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::mapping,
                  n_subdivisions, no_curved_cells);
 }
 
 
 
-template <int dim, class DH>
-void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
-                                     const unsigned int n_subdivisions_,
-                                     const CurvedCellRegion curved_region)
+template <int dim, typename DoFHandlerType>
+void DataOut<dim,DoFHandlerType>::build_patches
+(const Mapping<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &mapping,
+ const unsigned int                                                        n_subdivisions_,
+ const CurvedCellRegion                                                    curved_region)
 {
   // Check consistency of redundant template parameter
-  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  Assert (dim==DoFHandlerType::dimension, ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
   Assert (this->triangulation != 0,
           Exceptions::DataOut::ExcNoTriangulationSelected());
@@ -362,7 +364,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                                 static_cast<unsigned int>(cell->index()));
 
       cell_to_patch_index_map[l].resize (max_index+1,
-                                         dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension>::no_neighbor);
+                                         dealii::DataOutBase::Patch<DoFHandlerType::dimension,
+                                         DoFHandlerType::space_dimension>::no_neighbor);
     }
 
   // will be all_cells[patch_index] = pair(cell, active_index)
@@ -434,7 +437,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
           ExcMessage("The update of normal vectors may not be requested for evaluation of "
                      "data on cells via DataPostprocessor."));
 
-  internal::DataOut::ParallelData<DH::dimension, DH::space_dimension>
+  internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
   thread_data (n_datasets, n_subdivisions,
                n_postprocessor_outputs,
                mapping,
@@ -446,7 +449,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   if (all_cells.size() > 0)
     WorkStream::run (&all_cells[0],
                      &all_cells[0]+all_cells.size(),
-                     std_cxx11::bind(&DataOut<dim,DH>::build_one_patch,
+                     std_cxx11::bind(&DataOut<dim,DoFHandlerType>::build_one_patch,
                                      this,
                                      std_cxx11::_1,
                                      std_cxx11::_2,
@@ -472,22 +475,23 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
 
 
-template <int dim, class DH>
-typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::first_cell ()
+template <int dim, typename DoFHandlerType>
+typename DataOut<dim,DoFHandlerType>::cell_iterator
+DataOut<dim,DoFHandlerType>::first_cell ()
 {
   return this->triangulation->begin_active ();
 }
 
 
 
-template <int dim, class DH>
-typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
+template <int dim, typename DoFHandlerType>
+typename DataOut<dim,DoFHandlerType>::cell_iterator
+DataOut<dim,DoFHandlerType>::next_cell
+(const typename DataOut<dim,DoFHandlerType>::cell_iterator &cell)
 {
   // convert the iterator to an active_iterator and advance this to the next
   // active cell
-  typename Triangulation<DH::dimension,DH::space_dimension>::
+  typename Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::
   active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
@@ -495,11 +499,11 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
 
 
 
-template <int dim, class DH>
-typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::first_locally_owned_cell ()
+template <int dim, typename DoFHandlerType>
+typename DataOut<dim,DoFHandlerType>::cell_iterator
+DataOut<dim,DoFHandlerType>::first_locally_owned_cell ()
 {
-  typename DataOut<dim,DH>::cell_iterator
+  typename DataOut<dim,DoFHandlerType>::cell_iterator
   cell = first_cell();
 
   // skip cells if the current one has no children (is active) and is a ghost
@@ -514,11 +518,12 @@ DataOut<dim,DH>::first_locally_owned_cell ()
 
 
 
-template <int dim, class DH>
-typename DataOut<dim,DH>::cell_iterator
-DataOut<dim,DH>::next_locally_owned_cell (const typename DataOut<dim,DH>::cell_iterator &old_cell)
+template <int dim, typename DoFHandlerType>
+typename DataOut<dim,DoFHandlerType>::cell_iterator
+DataOut<dim,DoFHandlerType>::next_locally_owned_cell
+(const typename DataOut<dim,DoFHandlerType>::cell_iterator &old_cell)
 {
-  typename DataOut<dim,DH>::cell_iterator
+  typename DataOut<dim,DoFHandlerType>::cell_iterator
   cell = next_cell(old_cell);
   while ((cell != this->triangulation->end()) &&
          (cell->has_children() == false) &&

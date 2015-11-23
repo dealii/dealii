@@ -70,7 +70,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <int dim, int spacedim=dim,
           typename VectorType=Vector<double>,
-          class DH=DoFHandler<dim,spacedim> >
+          typename DoFHandlerType=DoFHandler<dim,spacedim> >
 class MappingFEField : public Mapping<dim,spacedim>
 {
 public:
@@ -106,14 +106,14 @@ public:
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
-  MappingFEField (const DH            &euler_dof_handler,
-                  const VectorType    &euler_vector,
-                  const ComponentMask mask=ComponentMask());
+  MappingFEField (const DoFHandlerType &euler_dof_handler,
+                  const VectorType     &euler_vector,
+                  const ComponentMask   mask = ComponentMask());
 
   /**
    * Copy constructor.
    */
-  MappingFEField (const MappingFEField<dim,spacedim,VectorType,DH> &mapping);
+  MappingFEField (const MappingFEField<dim,spacedim,VectorType,DoFHandlerType> &mapping);
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -489,7 +489,7 @@ private:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType, MappingFEField<dim,spacedim,VectorType,DH> > euler_vector;
+  SmartPointer<const VectorType, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_vector;
 
   /**
    * A FiniteElement object which is only needed in 3D, since it knows how to
@@ -498,13 +498,13 @@ private:
    * prevent construction in 1D and 2D, but since memory and time requirements
    * are not particularly high this seems unnecessary at the moment.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VectorType,DH> > fe;
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > fe;
 
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,VectorType,DH> > euler_dof_handler;
+  SmartPointer<const DoFHandlerType,MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_dof_handler;
 
 private:
   /**

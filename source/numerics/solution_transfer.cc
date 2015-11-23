@@ -34,8 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template<int dim, typename VectorType, class DH>
-SolutionTransfer<dim, VectorType, DH>::SolutionTransfer(const DH &dof)
+template<int dim, typename VectorType, typename DoFHandlerType>
+SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(const DoFHandlerType &dof)
   :
   dof_handler(&dof, typeid(*this).name()),
   n_dofs_old(0),
@@ -44,16 +44,16 @@ SolutionTransfer<dim, VectorType, DH>::SolutionTransfer(const DH &dof)
 
 
 
-template<int dim, typename VectorType, class DH>
-SolutionTransfer<dim, VectorType, DH>::~SolutionTransfer()
+template<int dim, typename VectorType, typename DoFHandlerType>
+SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer()
 {
   clear ();
 }
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::clear ()
+template<int dim, typename VectorType, typename DoFHandlerType>
+void SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -64,8 +64,8 @@ void SolutionTransfer<dim, VectorType, DH>::clear ()
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
+template<int dim, typename VectorType, typename DoFHandlerType>
+void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for!=coarsening_and_refinement,
@@ -80,8 +80,8 @@ void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
   std::vector<std::vector<types::global_dof_index> > (n_active_cells)
   .swap(indices_on_cell);
 
-  typename DH::active_cell_iterator cell = dof_handler->begin_active(),
-                                    endc = dof_handler->end();
+  typename DoFHandlerType::active_cell_iterator cell = dof_handler->begin_active(),
+                                                endc = dof_handler->end();
 
   for (unsigned int i=0; cell!=endc; ++cell, ++i)
     {
@@ -101,10 +101,11 @@ void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VectorType, typename DoFHandlerType>
 void
-SolutionTransfer<dim, VectorType, DH>::refine_interpolate (const VectorType &in,
-                                                           VectorType       &out) const
+SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate
+(const VectorType &in,
+ VectorType       &out) const
 {
   Assert(prepared_for==pure_refinement, ExcNotPrepared());
   Assert(in.size()==n_dofs_old, ExcDimensionMismatch(in.size(),n_dofs_old));
@@ -116,8 +117,8 @@ SolutionTransfer<dim, VectorType, DH>::refine_interpolate (const VectorType &in,
 
   Vector<typename VectorType::value_type> local_values(0);
 
-  typename DH::cell_iterator cell = dof_handler->begin(),
-                             endc = dof_handler->end();
+  typename DoFHandlerType::cell_iterator cell = dof_handler->begin(),
+                                         endc = dof_handler->end();
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
   pointerstruct,
@@ -169,8 +170,8 @@ namespace internal
    * which no such interpolation is
    * implemented.
    */
-  template <typename DH>
-  void extract_interpolation_matrices (const DH &,
+  template <typename DoFHandlerType>
+  void extract_interpolation_matrices (const DoFHandlerType &,
                                        dealii::Table<2,FullMatrix<double> > &)
   {}
 
@@ -226,9 +227,9 @@ namespace internal
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VectorType, typename DoFHandlerType>
 void
-SolutionTransfer<dim, VectorType, DH>::
+SolutionTransfer<dim, VectorType, DoFHandlerType>::
 prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 {
   Assert (prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
@@ -257,7 +258,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
   // and that'll stay or be refined
   unsigned int n_cells_to_coarsen=0;
   unsigned int n_cells_to_stay_or_refine=0;
-  for (typename DH::active_cell_iterator act_cell = dof_handler->begin_active();
+  for (typename DoFHandlerType::active_cell_iterator act_cell = dof_handler->begin_active();
        act_cell!=dof_handler->end(); ++act_cell)
     {
       if (act_cell->coarsen_flag_set())
@@ -269,7 +270,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
          ExcInternalError());
 
   unsigned int n_coarsen_fathers=0;
-  for (typename DH::cell_iterator cell=dof_handler->begin();
+  for (typename DoFHandlerType::cell_iterator cell=dof_handler->begin();
        cell!=dof_handler->end(); ++cell)
     if (!cell->active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
@@ -296,7 +297,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
   // the 'to_stay_or_refine' cells 'n_sr' and
   // the 'coarsen_fathers' cells 'n_cf',
   unsigned int n_sr=0, n_cf=0;
-  for (typename DH::cell_iterator cell=dof_handler->begin();
+  for (typename DoFHandlerType::cell_iterator cell=dof_handler->begin();
        cell!=dof_handler->end(); ++cell)
     {
       // CASE 1: active cell that remains as it is
@@ -379,9 +380,10 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VectorType, typename DoFHandlerType>
 void
-SolutionTransfer<dim, VectorType, DH>::prepare_for_coarsening_and_refinement (const VectorType &in)
+SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_coarsening_and_refinement
+(const VectorType &in)
 {
   std::vector<VectorType> all_in=std::vector<VectorType>(1, in);
   prepare_for_coarsening_and_refinement(all_in);
@@ -389,8 +391,8 @@ SolutionTransfer<dim, VectorType, DH>::prepare_for_coarsening_and_refinement (co
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::
+template<int dim, typename VectorType, typename DoFHandlerType>
+void SolutionTransfer<dim, VectorType, DoFHandlerType>::
 interpolate (const std::vector<VectorType> &all_in,
              std::vector<VectorType>       &all_out) const
 {
@@ -420,8 +422,8 @@ interpolate (const std::vector<VectorType> &all_in,
   internal::extract_interpolation_matrices (*dof_handler, interpolation_hp);
   Vector<typename VectorType::value_type> tmp, tmp2;
 
-  typename DH::cell_iterator cell = dof_handler->begin(),
-                             endc = dof_handler->end();
+  typename DoFHandlerType::cell_iterator cell = dof_handler->begin(),
+                                         endc = dof_handler->end();
   for (; cell!=endc; ++cell)
     {
       pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
@@ -518,9 +520,10 @@ interpolate (const std::vector<VectorType> &all_in,
 
 
 
-template<int dim, typename VectorType, class DH>
-void SolutionTransfer<dim, VectorType, DH>::interpolate (const VectorType &in,
-                                                         VectorType       &out) const
+template<int dim, typename VectorType, typename DoFHandlerType>
+void SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate
+(const VectorType &in,
+ VectorType       &out) const
 {
   Assert (in.size()==n_dofs_old,
           ExcDimensionMismatch(in.size(), n_dofs_old));
@@ -538,9 +541,9 @@ void SolutionTransfer<dim, VectorType, DH>::interpolate (const VectorType &in,
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VectorType, typename DoFHandlerType>
 std::size_t
-SolutionTransfer<dim, VectorType, DH>::memory_consumption () const
+SolutionTransfer<dim, VectorType, DoFHandlerType>::memory_consumption () const
 {
   // at the moment we do not include the memory
   // consumption of the cell_map as we have no
@@ -555,9 +558,9 @@ SolutionTransfer<dim, VectorType, DH>::memory_consumption () const
 
 
 
-template<int dim, typename VectorType, class DH>
+template<int dim, typename VectorType, typename DoFHandlerType>
 std::size_t
-SolutionTransfer<dim, VectorType, DH>::Pointerstruct::memory_consumption () const
+SolutionTransfer<dim, VectorType, DoFHandlerType>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);
 }

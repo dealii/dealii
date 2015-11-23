@@ -139,9 +139,9 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <class DH, bool lda>
+  template <typename DoFHandlerType, bool lda>
   void
-  FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
+  FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
                                   const unsigned int q_index,
                                   const unsigned int mapping_index,
                                   const unsigned int fe_index)
@@ -256,9 +256,9 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <class DH, bool lda>
+  template <typename DoFHandlerType, bool lda>
   void
-  FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
+  FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
                                       const unsigned int face_no,
                                       const unsigned int q_index,
                                       const unsigned int mapping_index,
@@ -375,9 +375,9 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <class DH, bool lda>
+  template <typename DoFHandlerType, bool lda>
   void
-  FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
+  FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
                                          const unsigned int face_no,
                                          const unsigned int subface_no,
                                          const unsigned int q_index,

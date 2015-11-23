@@ -38,9 +38,9 @@ using namespace dealii;
 
 const double eps = 1e-10;
 
-template <class DH>
+template <typename DoFHandlerType>
 std::vector<IndexSet>
-locally_owned_dofs_per_subdomain (const DH  &dof_handler)
+locally_owned_dofs_per_subdomain (const DoFHandlerType  &dof_handler)
 {
   std::vector< types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
   DoFTools::get_subdomain_association (dof_handler, subdomain_association);

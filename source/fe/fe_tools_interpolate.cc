@@ -51,14 +51,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace FETools
 {
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate(const DH1<dim, spacedim> &dof1,
-              const InVector           &u1,
-              const DH2<dim, spacedim> &dof2,
-              OutVector                &u2)
+  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
+              const InVector                       &u1,
+              const DoFHandlerType2<dim, spacedim> &dof2,
+              OutVector                            &u2)
   {
     ConstraintMatrix dummy;
     dummy.close();
@@ -68,15 +68,15 @@ namespace FETools
 
 
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate (const DH1<dim, spacedim> &dof1,
-               const InVector           &u1,
-               const DH2<dim, spacedim> &dof2,
-               const ConstraintMatrix   &constraints,
-               OutVector                &u2)
+  interpolate (const DoFHandlerType1<dim, spacedim> &dof1,
+               const InVector                       &u1,
+               const DoFHandlerType2<dim, spacedim> &dof2,
+               const ConstraintMatrix               &constraints,
+               OutVector                            &u2)
   {
     Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
 
@@ -119,10 +119,10 @@ namespace FETools
         std_cxx11::shared_ptr<FullMatrix<double> > > >
         interpolation_matrices;
 
-    typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
-                                                     endc1 = dof1.end();
-    typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
-                                                     endc2 = dof2.end();
+    typename DoFHandlerType1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
+                                                                 endc1 = dof1.end();
+    typename DoFHandlerType2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
+                                                                 endc2 = dof2.end();
     (void)endc2;
 
     std::vector<types::global_dof_index> dofs;
@@ -315,13 +315,13 @@ namespace FETools
 
 
   template <int dim,
-            template <int> class DH,
+            template <int> class DoFHandlerType,
             class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DH<dim>            &dof1,
-                   const InVector           &u1,
+  back_interpolate(const DoFHandlerType<dim>         &dof1,
+                   const InVector                    &u1,
                    const FiniteElement<dim,spacedim> &fe2,
-                   OutVector                &u1_interpolated)
+                   OutVector                         &u1_interpolated)
   {
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -353,8 +353,8 @@ namespace FETools
     const types::subdomain_id subdomain_id =
       dof1.get_tria().locally_owned_subdomain();
 
-    typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
-                                           endc = dof1.end();
+    typename DoFHandlerType<dim>::active_cell_iterator cell = dof1.begin_active(),
+                                                       endc = dof1.end();
 
     // map from possible fe objects in
     // dof1 to the back_interpolation

@@ -3712,9 +3712,10 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 
 
 template <int dim, int spacedim>
-template <template <int,int> class DH, bool lda>
+template <template <int, int> class DoFHandlerType, bool lda>
 void
-FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > &cell)
+FEValues<dim,spacedim>::reinit
+(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>, lda> > &cell)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -3728,7 +3729,9 @@ FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH<dim,spaced
   this->maybe_invalidate_previous_present_cell (cell);
   this->check_cell_similarity(cell);
 
-  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > > >
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template
+  CellIterator<TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,
+                                            lda> > > >
   (this->present_cell, cell);
 
   // this was the part of the work
@@ -3899,10 +3902,11 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 
 template <int dim, int spacedim>
-template <template <int,int> class DH, bool lda>
+template <template <int, int> class DoFHandlerType, bool lda>
 void
-FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > &cell,
-                                    const unsigned int face_no)
+FEFaceValues<dim,spacedim>::reinit
+(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>, lda> > &cell,
+ const unsigned int face_no)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -3918,7 +3922,9 @@ FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH<dim,sp
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
   this->maybe_invalidate_previous_present_cell (cell);
-  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > > >
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template
+  CellIterator<TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,
+                                            lda> > > >
   (this->present_cell, cell);
 
   // this was the part of the work
@@ -4055,10 +4061,11 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 
 template <int dim, int spacedim>
-template <template <int,int> class DH, bool lda>
-void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > &cell,
-                                            const unsigned int         face_no,
-                                            const unsigned int         subface_no)
+template <template <int, int> class DoFHandlerType, bool lda>
+void FESubfaceValues<dim,spacedim>::reinit
+(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>, lda> > &cell,
+ const unsigned int face_no,
+ const unsigned int subface_no)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -4091,7 +4098,9 @@ void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<D
                       "instead in these cases."));
 
   this->maybe_invalidate_previous_present_cell (cell);
-  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH<dim,spacedim>, lda> > > >
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template
+  CellIterator<TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,
+                                            lda> > > >
   (this->present_cell, cell);
 
   // this was the part of the work

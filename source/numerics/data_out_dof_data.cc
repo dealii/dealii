@@ -206,12 +206,12 @@ namespace internal
 
 
     template <int dim, int spacedim>
-    template <typename DH>
+    template <typename DoFHandlerType>
     void
     ParallelDataBase<dim,spacedim>::
-    reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DH> > > &dof_data,
-                         const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                         const unsigned int face)
+    reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
+                         const typename dealii::Triangulation<dim,spacedim>::cell_iterator   &cell,
+                         const unsigned int                                                   face)
     {
       for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
         {
@@ -221,10 +221,10 @@ namespace internal
               duplicate = true;
           if (duplicate == false)
             {
-              typename DH::active_cell_iterator dh_cell(&cell->get_triangulation(),
-                                                        cell->level(),
-                                                        cell->index(),
-                                                        dof_data[dataset]->dof_handler);
+              typename DoFHandlerType::active_cell_iterator dh_cell(&cell->get_triangulation(),
+                                                                    cell->level(),
+                                                                    cell->index(),
+                                                                    dof_data[dataset]->dof_handler);
               if (x_fe_values.empty())
                 {
                   AssertIndexRange(face,
@@ -306,12 +306,13 @@ namespace internal
 {
   namespace DataOut
   {
-    template <class DH>
-    DataEntryBase<DH>::DataEntryBase (const DH                       *dofs,
-                                      const std::vector<std::string> &names_in,
-                                      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+    template <typename DoFHandlerType>
+    DataEntryBase<DoFHandlerType>::DataEntryBase
+    (const DoFHandlerType           *dofs,
+     const std::vector<std::string> &names_in,
+     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
       :
-      dof_handler (dofs, typeid(dealii::DataOut_DoFData<DH,DH::dimension,DH::space_dimension>).name()),
+      dof_handler (dofs, typeid(dealii::DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension,DoFHandlerType::space_dimension>).name()),
       names(names_in),
       data_component_interpretation (data_component_interpretation),
       postprocessor(0, typeid(*this).name()),
@@ -334,11 +335,12 @@ namespace internal
 
 
 
-    template <class DH>
-    DataEntryBase<DH>::DataEntryBase (const DH *dofs,
-                                      const DataPostprocessor<DH::space_dimension> *data_postprocessor)
+    template <typename DoFHandlerType>
+    DataEntryBase<DoFHandlerType>::DataEntryBase
+    (const DoFHandlerType *dofs,
+     const DataPostprocessor<DoFHandlerType::space_dimension> *data_postprocessor)
       :
-      dof_handler (dofs, typeid(dealii::DataOut_DoFData<DH,DH::dimension,DH::space_dimension>).name()),
+      dof_handler (dofs, typeid(dealii::DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension,DoFHandlerType::space_dimension>).name()),
       names(data_postprocessor->get_names()),
       data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
       postprocessor(data_postprocessor, typeid(*this).name()),
@@ -363,8 +365,8 @@ namespace internal
 
 
 
-    template <class DH>
-    DataEntryBase<DH>::~DataEntryBase ()
+    template <typename DoFHandlerType>
+    DataEntryBase<DoFHandlerType>::~DataEntryBase ()
     {}
 
 
@@ -375,8 +377,8 @@ namespace internal
      *
      * @author Wolfgang Bangerth, 2004
      */
-    template <class DH, typename VectorType>
-    class DataEntry : public DataEntryBase<DH>
+    template <typename DoFHandlerType, typename VectorType>
+    class DataEntry : public DataEntryBase<DoFHandlerType>
     {
     public:
       /**
@@ -384,19 +386,20 @@ namespace internal
        * the vector and their interpretation as scalar or vector data. This
        * constructor assumes that no postprocessor is going to be used.
        */
-      DataEntry (const DH                       *dofs,
-                 const VectorType               *data,
-                 const std::vector<std::string> &names,
-                 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
+      DataEntry
+      (const DoFHandlerType           *dofs,
+       const VectorType               *data,
+       const std::vector<std::string> &names,
+       const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
 
       /**
        * Constructor when a data postprocessor is going to be used. In that
        * case, the names and vector declarations are going to be acquired from
        * the postprocessor.
        */
-      DataEntry (const DH                                     *dofs,
-                 const VectorType                             *data,
-                 const DataPostprocessor<DH::space_dimension> *data_postprocessor);
+      DataEntry (const DoFHandlerType                                     *dofs,
+                 const VectorType                                         *data,
+                 const DataPostprocessor<DoFHandlerType::space_dimension> *data_postprocessor);
 
       /**
        * Assuming that the stored vector is a cell vector, extract the given
@@ -412,8 +415,9 @@ namespace internal
        */
       virtual
       void
-      get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<double>             &patch_values) const;
+      get_function_values
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<double> &patch_values) const;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -422,8 +426,9 @@ namespace internal
        */
       virtual
       void
-      get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<dealii::Vector<double> >    &patch_values_system) const;
+      get_function_values
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<dealii::Vector<double> > &patch_values_system) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -431,8 +436,9 @@ namespace internal
        */
       virtual
       void
-      get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
+      get_function_gradients
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<Tensor<1,DoFHandlerType::space_dimension> > &patch_gradients) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -441,8 +447,9 @@ namespace internal
        */
       virtual
       void
-      get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const;
+      get_function_gradients
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -450,8 +457,9 @@ namespace internal
        */
       virtual
       void
-      get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
+      get_function_hessians
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<Tensor<2,DoFHandlerType::space_dimension> > &patch_hessians) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -460,8 +468,9 @@ namespace internal
        */
       virtual
       void
-      get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const;
+      get_function_hessians
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const;
 
       /**
        * Clear all references to the vectors.
@@ -484,26 +493,26 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
-    DataEntry<DH,VectorType>::
-    DataEntry (const DH                               *dofs,
-               const VectorType                       *data,
-               const std::vector<std::string>         &names,
+    template <typename DoFHandlerType, typename VectorType>
+    DataEntry<DoFHandlerType,VectorType>::
+    DataEntry (const DoFHandlerType           *dofs,
+               const VectorType               *data,
+               const std::vector<std::string> &names,
                const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
       :
-      DataEntryBase<DH> (dofs, names, data_component_interpretation),
+      DataEntryBase<DoFHandlerType> (dofs, names, data_component_interpretation),
       vector (data)
     {}
 
 
 
-    template <class DH, typename VectorType>
-    DataEntry<DH,VectorType>::
-    DataEntry (const DH                                     *dofs,
-               const VectorType                             *data,
-               const DataPostprocessor<DH::space_dimension> *data_postprocessor)
+    template <typename DoFHandlerType, typename VectorType>
+    DataEntry<DoFHandlerType,VectorType>::
+    DataEntry (const DoFHandlerType                                     *dofs,
+               const VectorType                                         *data,
+               const DataPostprocessor<DoFHandlerType::space_dimension> *data_postprocessor)
       :
-      DataEntryBase<DH> (dofs, data_postprocessor),
+      DataEntryBase<DoFHandlerType> (dofs, data_postprocessor),
       vector (data)
     {}
 
@@ -529,9 +538,9 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     double
-    DataEntry<DH,VectorType>::
+    DataEntry<DoFHandlerType,VectorType>::
     get_cell_data_value (const unsigned int cell_number) const
     {
       return get_vector_element(*vector, cell_number);
@@ -539,10 +548,10 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_values
-    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+    DataEntry<DoFHandlerType,VectorType>::get_function_values
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
      std::vector<dealii::Vector<double> >                  &patch_values_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
@@ -582,10 +591,10 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_values
-    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+    DataEntry<DoFHandlerType,VectorType>::get_function_values
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
      std::vector<double>                                   &patch_values) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
@@ -623,11 +632,11 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_gradients
-    (const FEValuesBase<DH::dimension,DH::space_dimension>     &fe_patch_values,
-     std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const
+    DataEntry<DoFHandlerType,VectorType>::get_function_gradients
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>     &fe_patch_values,
+     std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -648,12 +657,14 @@ namespace internal
                                                   // identity cast whenever the code is
                                                   // executed, but the cast is necessary
                                                   // to allow compilation even if we don't get here
-                                                  reinterpret_cast<std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > >&>
+                                                  reinterpret_cast<std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension,typename VectorType::value_type> > >&>
                                                   (patch_gradients_system));
         }
       else
         {
-          std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
+          std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension,
+              typename VectorType::value_type> > >
+              tmp(patch_gradients_system.size());
           for (unsigned int i = 0; i < tmp.size(); i++)
             tmp[i].resize(patch_gradients_system[i].size());
 
@@ -667,11 +678,11 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_gradients
-    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-     std::vector<Tensor<1,DH::space_dimension> >           &patch_gradients) const
+    DataEntry<DoFHandlerType,VectorType>::get_function_gradients
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     std::vector<Tensor<1,DoFHandlerType::space_dimension> >           &patch_gradients) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -692,12 +703,12 @@ namespace internal
                                                   // identity cast whenever the code is
                                                   // executed, but the cast is necessary
                                                   // to allow compilation even if we don't get here
-                                                  reinterpret_cast<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >&>
+                                                  reinterpret_cast<std::vector<Tensor<1,DoFHandlerType::space_dimension,typename VectorType::value_type> >&>
                                                   (patch_gradients));
         }
       else
         {
-          std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >  tmp;
+          std::vector<Tensor<1,DoFHandlerType::space_dimension,typename VectorType::value_type> >  tmp;
           tmp.resize(patch_gradients.size());
 
           fe_patch_values.get_function_gradients (*vector, tmp);
@@ -709,11 +720,11 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_hessians
-    (const FEValuesBase<DH::dimension,DH::space_dimension>     &fe_patch_values,
-     std::vector<std::vector<Tensor<2,DH::space_dimension> > > &patch_hessians_system) const
+    DataEntry<DoFHandlerType,VectorType>::get_function_hessians
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -734,12 +745,14 @@ namespace internal
                                                  // identity cast whenever the code is
                                                  // executed, but the cast is necessary
                                                  // to allow compilation even if we don't get here
-                                                 reinterpret_cast<std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > >&>
+                                                 reinterpret_cast<std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension,typename VectorType::value_type> > >&>
                                                  (patch_hessians_system));
         }
       else
         {
-          std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_hessians_system.size());
+          std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension,
+              typename VectorType::value_type> > >
+              tmp(patch_hessians_system.size());
           for (unsigned int i = 0; i < tmp.size(); i++)
             tmp[i].resize(patch_hessians_system[i].size());
 
@@ -753,11 +766,11 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::get_function_hessians
-    (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-     std::vector<Tensor<2,DH::space_dimension> >           &patch_hessians) const
+    DataEntry<DoFHandlerType,VectorType>::get_function_hessians
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const
     {
       // FIXME: FEValuesBase gives us data in types that match that of
       // the solution vector. but this function needs to pass it back
@@ -778,12 +791,14 @@ namespace internal
                                                  // identity cast whenever the code is
                                                  // executed, but the cast is necessary
                                                  // to allow compilation even if we don't get here
-                                                 reinterpret_cast<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> >&>
+                                                 reinterpret_cast<std::vector<Tensor<2,DoFHandlerType
+                                                 ::space_dimension,typename VectorType::value_type> >&>
                                                  (patch_hessians));
         }
       else
         {
-          std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > tmp(patch_hessians.size());
+          std::vector<Tensor<2,DoFHandlerType::space_dimension,typename VectorType::value_type> >
+          tmp(patch_hessians.size());
 
           fe_patch_values.get_function_hessians (*vector, tmp);
 
@@ -794,9 +809,9 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     std::size_t
-    DataEntry<DH,VectorType>::memory_consumption () const
+    DataEntry<DoFHandlerType,VectorType>::memory_consumption () const
     {
       return (sizeof (vector) +
               MemoryConsumption::memory_consumption (this->names));
@@ -804,9 +819,9 @@ namespace internal
 
 
 
-    template <class DH, typename VectorType>
+    template <typename DoFHandlerType, typename VectorType>
     void
-    DataEntry<DH,VectorType>::clear ()
+    DataEntry<DoFHandlerType,VectorType>::clear ()
     {
       vector = 0;
       this->dof_handler = 0;
@@ -816,9 +831,9 @@ namespace internal
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::DataOut_DoFData ()
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::DataOut_DoFData ()
   :
   triangulation(0,typeid(*this).name()),
   dofs(0,typeid(*this).name())
@@ -826,51 +841,55 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::DataOut_DoFData ()
 
 
 
-template <class DH, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::~DataOut_DoFData ()
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
   clear ();
 }
 
 
 
-template <class DH, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-attach_dof_handler (const DH &d)
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+attach_dof_handler (const DoFHandlerType &d)
 {
   Assert (dof_data.size() == 0,
           Exceptions::DataOut::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
           Exceptions::DataOut::ExcOldDataStillPresent());
 
-  triangulation = SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> >(&d.get_tria(), typeid(*this).name());
-  dofs = SmartPointer<const DH>(&d, typeid(*this).name());
+  triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,
+  DoFHandlerType::space_dimension> >
+  (&d.get_tria(), typeid(*this).name());
+  dofs = SmartPointer<const DoFHandlerType>(&d, typeid(*this).name());
 }
 
 
 
-template <class DH, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-attach_triangulation (const Triangulation<DH::dimension,DH::space_dimension> &tria)
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+attach_triangulation (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &tria)
 {
   Assert (dof_data.size() == 0,
           Exceptions::DataOut::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
           Exceptions::DataOut::ExcOldDataStillPresent());
 
-  triangulation = SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> >(&tria, typeid(*this).name());
+  triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,
+  DoFHandlerType::space_dimension> >
+  (&tria, typeid(*this).name());
 }
 
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 add_data_vector (const VectorType                         &vec,
                  const std::string                        &name,
                  const DataVectorType                      type,
@@ -905,11 +924,11 @@ add_data_vector (const VectorType                         &vec,
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 add_data_vector (const VectorType                         &vec,
                  const std::vector<std::string>           &names,
                  const DataVectorType                      type,
@@ -970,24 +989,24 @@ add_data_vector (const VectorType                         &vec,
       Assert (false, ExcInternalError());
     }
 
-  internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VectorType>(dofs, &vec, names,
-                                                      data_component_interpretation);
+  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
+    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, names,
+        data_component_interpretation);
   if (actual_type == type_dof_data)
-    dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
+    dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
   else
-    cell_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
+    cell_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 add_data_vector (const VectorType                       &vec,
-                 const DataPostprocessor<DH::space_dimension> &data_postprocessor)
+                 const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
   // postprocessor. if we do, we know that we have type_dof_data, which makes
@@ -1002,21 +1021,21 @@ add_data_vector (const VectorType                       &vec,
                                                      dofs->n_dofs(),
                                                      dofs->get_tria().n_active_cells()));
 
-  internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VectorType>(dofs, &vec, &data_postprocessor);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
+  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
+    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, &data_postprocessor);
+  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const DH                               &dof_handler,
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector (const DoFHandlerType                   &dof_handler,
                  const VectorType                       &vec,
-                 const DataPostprocessor<DH::space_dimension> &data_postprocessor)
+                 const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
   // postprocessor. if we do, we know that we have type_dof_data, which makes
@@ -1025,22 +1044,23 @@ add_data_vector (const DH                               &dof_handler,
 
   AssertDimension (vec.size(), dof_handler.n_dofs());
 
-  internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VectorType>(&dof_handler, &vec, &data_postprocessor);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
+  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
+    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &vec, &data_postprocessor);
+  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const DH                       &dof_handler,
-                 const VectorType               &data,
-                 const std::string              &name,
-                 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const DoFHandlerType           &dof_handler,
+ const VectorType               &data,
+ const std::string              &name,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components ();
 
@@ -1065,21 +1085,22 @@ add_data_vector (const DH                       &dof_handler,
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const DH                       &dof_handler,
-                 const VectorType               &data,
-                 const std::vector<std::string> &names,
-                 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const DoFHandlerType           &dof_handler,
+ const VectorType               &data,
+ const std::vector<std::string> &names,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
 {
   // this is an extended version of the other functions where we pass a vector
   // together with its DoFHandler. if we do, we know that we have
   // type_dof_data, which makes things a bit simpler
   if (triangulation == 0)
-    triangulation = SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> >(&dof_handler.get_tria(), typeid(*this).name());
+    triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> >(&dof_handler.get_tria(), typeid(*this).name());
 
   Assert (&dof_handler.get_tria() == triangulation,
           ExcMessage("The triangulation attached to the DoFHandler does not "
@@ -1097,17 +1118,17 @@ add_data_vector (const DH                       &dof_handler,
        std::vector<DataComponentInterpretation::DataComponentInterpretation>
        (names.size(), DataComponentInterpretation::component_is_scalar));
 
-  internal::DataOut::DataEntryBase<DH> *new_entry
-    = new internal::DataOut::DataEntry<DH,VectorType>(&dof_handler, &data, names,
-                                                      data_component_interpretation);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
+  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
+    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &data, names,
+        data_component_interpretation);
+  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-void DataOut_DoFData<DH,patch_dim,patch_space_dim>::clear_data_vectors ()
+void DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear_data_vectors ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
@@ -1119,10 +1140,10 @@ void DataOut_DoFData<DH,patch_dim,patch_space_dim>::clear_data_vectors ()
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
@@ -1137,10 +1158,10 @@ clear_input_data_references ()
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::clear ()
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
@@ -1155,17 +1176,17 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::clear ()
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 std::vector<std::string>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 get_dataset_names () const
 {
   std::vector<std::string> names;
   // collect the names of dof
   // and cell data
   typedef
-  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> > >::const_iterator
+  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   for (data_iterator  d=dof_data.begin();
@@ -1183,10 +1204,10 @@ get_dataset_names () const
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 {
   std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
   ranges;
@@ -1194,7 +1215,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
   // collect the ranges of dof
   // and cell data
   typedef
-  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> > >::const_iterator
+  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   unsigned int output_component = 0;
@@ -1277,23 +1298,24 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 const std::vector< dealii::DataOutBase::Patch<patch_dim, patch_space_dim> > &
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_patches () const
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
 }
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DH::dimension,DH::space_dimension> > >
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_finite_elements() const
+std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
+    DoFHandlerType::space_dimension> > >
+    DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_finite_elements() const
 {
-  const unsigned int dhdim = DH::dimension;
-  const unsigned int dhspacedim = DH::space_dimension;
+  const unsigned int dhdim = DoFHandlerType::dimension;
+  const unsigned int dhspacedim = DoFHandlerType::space_dimension;
   std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dhdim,dhspacedim> > >
   finite_elements(this->dof_data.size());
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
@@ -1329,10 +1351,10 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_finite_elements() const
 
 
 
-template <class DH,
+template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 std::size_t
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::memory_consumption () const
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::memory_consumption () const
 {
   return (DataOutInterface<patch_dim,patch_space_dim>::memory_consumption () +
           MemoryConsumption::memory_consumption (dofs) +

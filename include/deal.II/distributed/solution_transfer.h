@@ -112,14 +112,14 @@ namespace parallel
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
-    template<int dim, typename VectorType, class DH=DoFHandler<dim> >
+    template<int dim, typename VectorType, typename DoFHandlerType=DoFHandler<dim> >
     class SolutionTransfer
     {
     public:
       /**
        * Constructor, takes the current DoFHandler as argument.
        */
-      SolutionTransfer(const DH &dof);
+      SolutionTransfer(const DoFHandlerType &dof);
       /**
        * Destructor.
        */
@@ -200,7 +200,7 @@ namespace parallel
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const DH,SolutionTransfer<dim,VectorType,DH> > dof_handler;
+      SmartPointer<const DoFHandlerType,SolutionTransfer<dim,VectorType,DoFHandlerType> > dof_handler;
 
       /**
        * A vector that stores pointers to all the vectors we are supposed to
