@@ -35,49 +35,6 @@
 using namespace std;
 
 
-template <int s_dim, int spacedim>
-bool test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
-                               map< typename Triangulation<s_dim,spacedim>::cell_iterator,
-                               typename Triangulation<s_dim+1,spacedim>::face_iterator >
-                               &surface_to_volume_mapping,
-                               const int verbosity = 1)
-{
-  typename Triangulation<s_dim,spacedim>::active_cell_iterator
-  cell = boundary_mesh.begin_active(),
-  endc = boundary_mesh.end();
-  typename Triangulation<s_dim+1,spacedim>::face_iterator face;
-
-  bool success = true;
-
-  if (verbosity>1)
-    deallog << "Vol faces" << "\t" << "Surf cell" <<
-            "\t" << "Distance" <<endl;
-
-  for (; cell!=endc; ++cell)
-    {
-
-      face = surface_to_volume_mapping [cell];
-
-      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
-        {
-          Point<spacedim> diff(face->vertex(k));
-          diff -= cell->vertex(k);
-          if (verbosity>1)
-            {
-              deallog << face->vertex(k) << "\t\t";
-              deallog << cell->vertex(k) << "\t\t\t" << diff.square() << endl;
-            }
-          if (diff.square()>0)
-            {
-              success = false;
-              break;
-            }
-        }
-      if (verbosity>1) deallog << endl;
-    }
-  return success;
-}
-
 template <int dim, int spacedim>
 void save_mesh(const Triangulation<dim,spacedim> &tria)
 {
@@ -114,12 +71,6 @@ int main ()
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
-    if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
-      deallog << "Passed.";
-    else
-      deallog << "Failed.";
-    deallog << endl;
-
     save_mesh(boundary_mesh);
 
   }
@@ -144,12 +95,6 @@ int main ()
 
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
-
-    if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
-      deallog << "Passed.";
-    else
-      deallog << "Failed.";
-    deallog << endl;
 
     save_mesh(boundary_mesh);
 
@@ -180,12 +125,6 @@ int main ()
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
                                               boundary_ids);
-
-    if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
-      deallog << "Passed.";
-    else
-      deallog << "Failed.";
-    deallog << endl;
 
     save_mesh(boundary_mesh);
 

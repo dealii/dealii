@@ -4213,9 +4213,6 @@ namespace GridGenerator
 
     std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
 
-    unsigned int v_index;
-    CellData< boundary_dim > c_data;
-
     for (typename Container<dim,spacedim>::cell_iterator
          cell = volume_mesh.begin(0);
          cell != volume_mesh.end(0);
@@ -4230,10 +4227,12 @@ namespace GridGenerator
                (boundary_ids.empty() ||
                 ( boundary_ids.find(face->boundary_id()) != boundary_ids.end())) )
             {
+              CellData< boundary_dim > c_data;
+
               for (unsigned int j=0;
                    j<GeometryInfo<boundary_dim>::vertices_per_cell; ++j)
                 {
-                  v_index = face->vertex_index(j);
+                  const unsigned int v_index = face->vertex_index(j);
 
                   if ( !touched[v_index] )
                     {
@@ -4245,6 +4244,19 @@ namespace GridGenerator
                   c_data.vertices[j] = map_vert_index[v_index];
                   c_data.material_id = static_cast<types::material_id>(face->boundary_id());
                 }
+
+              // if we start from a 3d mesh, then we have copied the
+              // vertex information in the same order in which they
+              // appear in the face; however, this means that we
+              // impart a coordinate system that is right-handed when
+              // looked at *from the outside* of the cell if the
+              // current face has index 0, 2, 4 within a 3d cell, but
+              // right-handed when looked at *from the inside* for the
+              // other faces. we fix this by flipping opposite
+              // vertices if we are on a face 1, 3, 5
+              if (dim == 3)
+                if (i % 2 == 1)
+                  std::swap (c_data.vertices[1], c_data.vertices[2]);
 
               cells.push_back(c_data);
               mapping.push_back(face);
