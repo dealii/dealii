@@ -426,7 +426,17 @@ inconvenience this causes.
 
 
 <ol>
-  <li> New: extra parameters to GD and Lanczos SLEPc solvers. Also added unit tests.
+  <li> Fixed: GridGenerator::extract_boundary_mesh() in 3d could generate
+  surface cells that did not uniformly had a right- or left-handed coordinate
+  system associated with them when viewed from one side of the surface. This
+  has been fixed: they now all have a right-handed coordinate system when seen
+  from one side of the surface, and a left-handed one when viewed from the
+  other side.
+  <br>
+  (Daniel Weygand, Wolfgang Bangerth, 2015/11/22)
+  </li>
+
+  <li> New: Extra parameters to GD and Lanczos SLEPc solvers. Also added unit tests.
   <br>
   (Denis Davydov, 2015/11/09)
   </li>
