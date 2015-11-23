@@ -1005,7 +1005,7 @@ namespace GridGenerator
    * extend the function to also copy boundary indicators from finer level
    * faces to their corresponding surface mesh cells, for example to
    * accommodate different geometry descriptions in the case of curved
-   * boundaries (but this is not currently implemented().
+   * boundaries (but this is not currently implemented).
    */
   template <template <int,int> class Container, int dim, int spacedim>
 #ifndef _MSC_VER
