@@ -72,10 +72,14 @@ namespace hp
  *
  * BlockVector<double> solution(dof_handler.block_info().global());
  *
- * MGLevelObject<BlockVector<double> > mg_vector(0,
- * triangulation.n_levels()-1); for (unsigned int
- * i=0;i<triangulation.n_levels();++i)
- * mg_vector[i].reinit(dof_handler.block_info().level(i)); </code> In this
+ * MGLevelObject<BlockVector<double> > mg_vector(0, triangulation.n_levels()-1);
+ * for (unsigned int i = 0; i < triangulation.n_levels(); ++i)
+ *   {
+ *     mg_vector[i].reinit(dof_handler.block_info().level(i));
+ *   }
+ * </code>
+ *
+ * In this
  * example, <tt>solution</tt> obtains the block structure needed to represent
  * a finite element function on the DoFHandler. Similarly, all levels of
  * <tt>mg_vector</tt> will have the block structure needed on that level.
