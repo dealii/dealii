@@ -49,10 +49,9 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (fe_data.update_each & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
+      // transform gradients and higher derivatives. there is nothing to do
+      // for values since we already emplaced them into output_data when
+      // we were in get_data()
       if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
@@ -107,10 +106,9 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (fe_data.update_each & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
+      // transform gradients and higher derivatives. there is nothing to do
+      // for values since we already emplaced them into output_data when
+      // we were in get_data()
       if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
@@ -166,10 +164,9 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (fe_data.update_each & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
+      // transform gradients and higher derivatives. there is nothing to do
+      // for values since we already emplaced them into output_data when
+      // we were in get_data()
       if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,
@@ -220,11 +217,9 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
-      if (fe_data.update_each & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-          output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
-
+      // transform gradients and higher derivatives. there is nothing to do
+      // for values since we already emplaced them into output_data when
+      // we were in get_data()
       if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
         mapping.transform (fe_data.shape_gradients[k],
                            mapping_covariant,

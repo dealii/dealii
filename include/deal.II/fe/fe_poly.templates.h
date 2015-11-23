@@ -254,11 +254,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
 
   const UpdateFlags flags(fe_data.update_each);
 
-  if (flags & update_values)
-    for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      for (unsigned int i=0; i<quadrature.size(); ++i)
-        output_data.shape_values(k,i) = fe_data.shape_values[k][i];
-
+  // transform gradients and higher derivatives. there is nothing to do
+  // for values since we already emplaced them into output_data when
+  // we were in get_data()
   if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
       mapping.transform (fe_data.shape_gradients[k],
@@ -329,6 +327,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
 
   const UpdateFlags flags(fe_data.update_each);
 
+  // transform gradients and higher derivatives. we also have to copy
+  // the values (unlike in the case of fill_fe_values()) since
+  // we need to take into account the offsets
   if (flags & update_values)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
       for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -408,6 +409,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   const UpdateFlags flags(fe_data.update_each);
 
+  // transform gradients and higher derivatives. we also have to copy
+  // the values (unlike in the case of fill_fe_values()) since
+  // we need to take into account the offsets
   if (flags & update_values)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
       for (unsigned int i=0; i<quadrature.size(); ++i)
