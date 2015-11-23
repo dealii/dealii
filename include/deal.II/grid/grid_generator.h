@@ -952,7 +952,7 @@ namespace GridGenerator
    * mesh. The surface mesh is then refined in the same way as the faces of
    * the volume mesh are. In order to ensure that the surface mesh has the
    * same vertices as the volume mesh, it is therefore important that you
-   * assign appropriate boundary objects through Triangulation::set_boundary
+   * assign appropriate boundary objects through Triangulation::set_boundary()
    * to the surface mesh object before calling this function. If you don't,
    * the refinement will happen under the assumption that all faces are
    * straight (i.e using the StraightBoundary class) rather than any curved
@@ -971,6 +971,32 @@ namespace GridGenerator
    * iterators into the Container arguments. However, the function will not
    * actually distribute degrees of freedom on this newly created surface
    * mesh.
+   * @tparam dim The dimension of the cells of the volume mesh. For example, if
+   *   dim==2, then the cells are quadrilaterals that either live in the
+   *   plane, or form a surface in a higher-dimensional space. The dimension
+   *   of the cells of the surface mesh is consequently dim-1.
+   * @param spacedim The dimension of the space in which both the volume and
+   *   the surface mesh live.
+   *
+   * @param[in] volume_mesh A container of cells that define the volume mesh.
+   * @param[out] surface_mesh A container whose associated triangulation
+   *   will be built to consist of the cells that correspond to the (selected
+   *   portion of) the boundary of the volume mesh.
+   * @param[in] boundary_ids A list of boundary indicators denoting that subset
+   *   of faces of volume cells for which this function should extract
+   *   the surface mesh. If left at its default, i.e., if the set is empty,
+   *   then the function operates on <i>all</i> boundary faces.
+   *
+   * @return A map that for each cell of the surface mesh (key) returns an
+   *   iterator to the corresponding face of a cell of the volume mesh (value).
+   *   The keys include both active and non-active cells of the surface mesh.
+   *   For dim=2 (i.e., where volume cells are quadrilaterals and surface
+   *   cells are lines), the order of vertices of surface cells and the
+   *   corresponding volume faces match. For dim=3 (i.e., where volume cells
+   *   are hexahedra and surface cells are quadrilaterals), the order of
+   *   vertices may not match in order to ensure that each surface cell
+   *   has a right-handed coordinate system when viewed from one of the
+   *   two sides of the surface connecting the cells of the surface mesh.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as
@@ -979,7 +1005,7 @@ namespace GridGenerator
    * extend the function to also copy boundary indicators from finer level
    * faces to their corresponding surface mesh cells, for example to
    * accommodate different geometry descriptions in the case of curved
-   * boundaries.
+   * boundaries (but this is not currently implemented().
    */
   template <template <int,int> class Container, int dim, int spacedim>
 #ifndef _MSC_VER
