@@ -64,8 +64,10 @@ namespace hp
  * The most common usage for this object is initializing vectors as in the
  * following code:
  *
- * <code> MGDofHandler<dim> dof_handler(triangulation);
- * dof_handler.distribute_dofs(fesystem);
+ * <code>
+ * DoFHandler<dim> dof_handler(triangulation);
+ * dof_handler.distribute_dofs(fe_system);
+ * dof_handler.distribute_mg_dofs(fe_system);
  * DoFRenumbering::block_wise(dof_handler);
  *
  * BlockVector<double> solution(dof_handler.block_info().global());
