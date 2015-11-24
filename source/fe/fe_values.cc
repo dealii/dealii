@@ -16,6 +16,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -2127,40 +2128,51 @@ namespace internal
                                                   const UpdateFlags         flags)
     {
       if (flags & update_quadrature_points)
-        this->quadrature_points.resize(n_quadrature_points);
+        this->quadrature_points.resize(n_quadrature_points,
+                                       Point<spacedim>(numbers::signaling_nan<Tensor<1,spacedim> >()));
 
       if (flags & update_JxW_values)
-        this->JxW_values.resize(n_quadrature_points);
+        this->JxW_values.resize(n_quadrature_points,
+                                numbers::signaling_nan<double>());
 
       if (flags & update_jacobians)
-        this->jacobians.resize(n_quadrature_points);
+        this->jacobians.resize(n_quadrature_points,
+                               numbers::signaling_nan<DerivativeForm<1,dim,spacedim> >());
 
       if (flags & update_jacobian_grads)
-        this->jacobian_grads.resize(n_quadrature_points);
+        this->jacobian_grads.resize(n_quadrature_points,
+                                    numbers::signaling_nan<DerivativeForm<2,dim,spacedim> >());
 
       if (flags & update_jacobian_pushed_forward_grads)
-        this->jacobian_pushed_forward_grads.resize(n_quadrature_points);
+        this->jacobian_pushed_forward_grads.resize(n_quadrature_points,
+                                                   numbers::signaling_nan<Tensor<3,spacedim> >());
 
       if (flags & update_jacobian_2nd_derivatives)
-        this->jacobian_2nd_derivatives.resize(n_quadrature_points);
+        this->jacobian_2nd_derivatives.resize(n_quadrature_points,
+                                              numbers::signaling_nan<DerivativeForm<3,dim,spacedim> >());
 
       if (flags & update_jacobian_pushed_forward_2nd_derivatives)
-        this->jacobian_pushed_forward_2nd_derivatives.resize(n_quadrature_points);
+        this->jacobian_pushed_forward_2nd_derivatives.resize(n_quadrature_points,
+                                                             numbers::signaling_nan<Tensor<4,spacedim> >());
 
       if (flags & update_jacobian_3rd_derivatives)
         this->jacobian_3rd_derivatives.resize(n_quadrature_points);
 
       if (flags & update_jacobian_pushed_forward_3rd_derivatives)
-        this->jacobian_pushed_forward_3rd_derivatives.resize(n_quadrature_points);
+        this->jacobian_pushed_forward_3rd_derivatives.resize(n_quadrature_points,
+                                                             numbers::signaling_nan<Tensor<5,spacedim> >());
 
       if (flags & update_inverse_jacobians)
-        this->inverse_jacobians.resize(n_quadrature_points);
+        this->inverse_jacobians.resize(n_quadrature_points,
+                                       numbers::signaling_nan<DerivativeForm<1,spacedim,dim> >());
 
       if (flags & update_boundary_forms)
-        this->boundary_forms.resize(n_quadrature_points);
+        this->boundary_forms.resize(n_quadrature_points,
+                                    numbers::signaling_nan<Tensor<1,spacedim> >());
 
       if (flags & update_normal_vectors)
-        this->normal_vectors.resize(n_quadrature_points);
+        this->normal_vectors.resize(n_quadrature_points,
+                                    numbers::signaling_nan<Tensor<1,spacedim> >());
     }
 
 
@@ -2192,18 +2204,14 @@ namespace internal
                                                         const FiniteElement<dim,spacedim> &fe,
                                                         const UpdateFlags         flags)
     {
-
-      // initialize the table mapping
-      // from shape function number to
-      // the rows in the tables storing
-      // the data by shape function and
+      // initialize the table mapping from shape function number to
+      // the rows in the tables storing the data by shape function and
       // nonzero component
       this->shape_function_to_row_table
         = make_shape_function_to_row_table (fe);
 
-      // count the total number of non-zero
-      // components accumulated over all shape
-      // functions
+      // count the total number of non-zero components accumulated
+      // over all shape functions
       unsigned int n_nonzero_shape_components = 0;
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         n_nonzero_shape_components += fe.n_nonzero_components (i);
@@ -2215,20 +2223,26 @@ namespace internal
       // that we will need to their
       // correct size
       if (flags & update_values)
-        this->shape_values.reinit(n_nonzero_shape_components,
-                                  n_quadrature_points);
+        {
+          this->shape_values.reinit(n_nonzero_shape_components,
+                                    n_quadrature_points);
+          this->shape_values.fill(numbers::signaling_nan<double>());
+        }
 
       if (flags & update_gradients)
         this->shape_gradients.resize (n_nonzero_shape_components,
-                                      std::vector<Tensor<1,spacedim> > (n_quadrature_points));
+                                      std::vector<Tensor<1,spacedim> > (n_quadrature_points,
+                                          numbers::signaling_nan<Tensor<1,spacedim> >()));
 
       if (flags & update_hessians)
         this->shape_hessians.resize (n_nonzero_shape_components,
-                                     std::vector<Tensor<2,spacedim> > (n_quadrature_points));
+                                     std::vector<Tensor<2,spacedim> > (n_quadrature_points,
+                                         numbers::signaling_nan<Tensor<2,spacedim> >()));
 
       if (flags & update_3rd_derivatives)
         this->shape_3rd_derivatives.resize (n_nonzero_shape_components,
-                                            std::vector<Tensor<3,spacedim> > (n_quadrature_points));
+                                            std::vector<Tensor<3,spacedim> > (n_quadrature_points,
+                                                numbers::signaling_nan<Tensor<3,spacedim> >()));
     }
 
 
