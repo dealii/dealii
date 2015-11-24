@@ -64,16 +64,22 @@ namespace hp
  * The most common usage for this object is initializing vectors as in the
  * following code:
  *
- * <code> MGDofHandler<dim> dof_handler(triangulation);
- * dof_handler.distribute_dofs(fesystem);
+ * <code>
+ * DoFHandler<dim> dof_handler(triangulation);
+ * dof_handler.distribute_dofs(fe_system);
+ * dof_handler.distribute_mg_dofs(fe_system);
  * DoFRenumbering::block_wise(dof_handler);
  *
  * BlockVector<double> solution(dof_handler.block_info().global());
  *
- * MGLevelObject<BlockVector<double> > mg_vector(0,
- * triangulation.n_levels()-1); for (unsigned int
- * i=0;i<triangulation.n_levels();++i)
- * mg_vector[i].reinit(dof_handler.block_info().level(i)); </code> In this
+ * MGLevelObject<BlockVector<double> > mg_vector(0, triangulation.n_levels()-1);
+ * for (unsigned int i = 0; i < triangulation.n_levels(); ++i)
+ *   {
+ *     mg_vector[i].reinit(dof_handler.block_info().level(i));
+ *   }
+ * </code>
+ *
+ * In this
  * example, <tt>solution</tt> obtains the block structure needed to represent
  * a finite element function on the DoFHandler. Similarly, all levels of
  * <tt>mg_vector</tt> will have the block structure needed on that level.
