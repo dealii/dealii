@@ -41,7 +41,7 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     /**
-     * This class implements a wrapper to the the Trilinos distributed vector
+     * This class implements a wrapper to the Trilinos distributed vector
      * class Epetra_FEVector. This class is derived from the
      * LinearAlgebra::VectorSpaceVector class. Note however that Epetra only
      * works with Number = double.
@@ -67,11 +67,11 @@ namespace LinearAlgebra
       /**
        * This constructor takes an IndexSet that defines how to distribute the
        * individual components among the MPI processors. Since it also
-       * includes information abtou the size of the vector, this is all we
+       * includes information about the size of the vector, this is all we
        * need to genereate a %parallel vector.
        */
-      Vector(const IndexSet &parallel_partitioner,
-             const MPI_Comm &communicator = MPI_COMM_WORLD);
+      explicit Vector(const IndexSet &parallel_partitioner,
+                      const MPI_Comm &communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -80,7 +80,7 @@ namespace LinearAlgebra
        * filled with zero (false) or left untouched (true).
        */
       void reinit (const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator = MPI_COMM_WORLD,
+                   const MPI_Comm &communicator,
                    const bool      omit_zeroing_entries = false);
 
       /**
@@ -100,28 +100,28 @@ namespace LinearAlgebra
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual VectorSpaceVector<double> &operator*= (const double factor);
+      virtual Vector &operator*= (const double factor);
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual VectorSpaceVector<double> &operator/= (const double factor);
+      virtual Vector &operator/= (const double factor);
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual VectorSpaceVector<double> &operator+= (const VectorSpaceVector<double> &V);
+      virtual Vector &operator+= (const VectorSpaceVector<double> &V);
 
       /**
        * Substract the vector @p V from the present one.
        */
-      virtual VectorSpaceVector<double> &operator-= (const VectorSpaceVector<double> &V);
+      virtual Vector &operator-= (const VectorSpaceVector<double> &V);
 
       /**
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
-      virtual double operator* (const VectorSpaceVector<double> &V);
+      virtual double operator* (const VectorSpaceVector<double> &V) const;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
@@ -166,19 +166,19 @@ namespace LinearAlgebra
        * Returns the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual double l1_norm();
+      virtual double l1_norm() const;
 
       /**
        * Returns the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual double l2_norm();
+      virtual double l2_norm() const;
 
       /**
        * Returns the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual double linfty_norm();
+      virtual double linfty_norm() const;
 
       /**
        * Performs a combined operation of a vector addition and a subsequent
@@ -221,7 +221,7 @@ namespace LinearAlgebra
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode
        */
-      virtual const ::dealii::IndexSet locally_owned_elements() const;
+      virtual ::dealii::IndexSet locally_owned_elements() const;
 
       /**
        * Return a const reference to the underlying Trilinos

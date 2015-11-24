@@ -44,14 +44,14 @@ void test()
   parallel_partitioner_1.compress();
   parallel_partitioner_2.compress();
   LinearAlgebra::EpetraWrappers::Vector a;
-  LinearAlgebra::EpetraWrappers::Vector b(parallel_partitioner_1);
+  LinearAlgebra::EpetraWrappers::Vector b(parallel_partitioner_1, MPI_COMM_WORLD);
   LinearAlgebra::EpetraWrappers::Vector c(b);
 
   AssertThrow(a.size()==0, ExcMessage("Vector has the wrong size."));
   AssertThrow(b.size()==10, ExcMessage("Vector has the wrong size."));
   AssertThrow(c.size()==10, ExcMessage("Vector has the wrong size."));
 
-  a.reinit(parallel_partitioner_2);
+  a.reinit(parallel_partitioner_2, MPI_COMM_WORLD);
   AssertThrow(a.size()==10, ExcMessage("Vector has the wrong size."));
 
   AssertThrow(parallel_partitioner_1==b.locally_owned_elements(),

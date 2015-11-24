@@ -16,6 +16,7 @@
 #include <deal.II/lac/trilinos_epetra_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
+
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
@@ -184,7 +185,7 @@ namespace LinearAlgebra
 
 
 
-    VectorSpaceVector<double> &Vector::operator*= (const double factor)
+    Vector &Vector::operator*= (const double factor)
     {
       AssertIsFinite(factor);
       vector->Scale(factor);
@@ -194,7 +195,7 @@ namespace LinearAlgebra
 
 
 
-    VectorSpaceVector<double> &Vector::operator/= (const double factor)
+    Vector &Vector::operator/= (const double factor)
     {
       AssertIsFinite(factor);
       Assert(factor!=0., ExcZero());
@@ -205,7 +206,7 @@ namespace LinearAlgebra
 
 
 
-    VectorSpaceVector<double> &Vector::operator+= (const VectorSpaceVector<double> &V)
+    Vector &Vector::operator+= (const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=NULL, ExcVectorTypeNotCompatible());
@@ -247,7 +248,7 @@ namespace LinearAlgebra
 
 
 
-    VectorSpaceVector<double> &Vector::operator-= (const VectorSpaceVector<double> &V)
+    Vector &Vector::operator-= (const VectorSpaceVector<double> &V)
     {
       this->add(-1.,V);
 
@@ -256,7 +257,7 @@ namespace LinearAlgebra
 
 
 
-    double Vector::operator* (const VectorSpaceVector<double> &V)
+    double Vector::operator* (const VectorSpaceVector<double> &V) const
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=NULL,
@@ -392,7 +393,7 @@ namespace LinearAlgebra
 
 
 
-    double Vector::l1_norm()
+    double Vector::l1_norm() const
     {
       double norm(0.);
       int ierr = vector->Norm1(&norm);
@@ -403,7 +404,7 @@ namespace LinearAlgebra
 
 
 
-    double Vector::l2_norm()
+    double Vector::l2_norm() const
     {
       double norm(0.);
       int ierr = vector->Norm2(&norm);
@@ -414,7 +415,7 @@ namespace LinearAlgebra
 
 
 
-    double Vector::linfty_norm()
+    double Vector::linfty_norm() const
     {
       double norm(0.);
       int ierr = vector->NormInf(&norm);
@@ -456,7 +457,7 @@ namespace LinearAlgebra
 
 
 
-    const ::dealii::IndexSet Vector::locally_owned_elements() const
+    ::dealii::IndexSet Vector::locally_owned_elements() const
     {
       const Epetra_Map *map = dynamic_cast<const Epetra_Map *>(&(vector->Map()));
       return IndexSet(*map);
@@ -499,10 +500,10 @@ namespace LinearAlgebra
         out.setf(std::ios::fixed, std::ios::floatfield);
 
       if (across)
-        for (size_type i=0; i<size(); ++i)
+        for (size_type i=0; i<vector->MyLength(); ++i)
           out << val[i] << ' ';
       else
-        for (size_type i=0; i<size(); ++i)
+        for (size_type i=0; i<vector->MyLength(); ++i)
           out << val[i] << std::endl;
       out << std::endl;
 

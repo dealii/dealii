@@ -40,9 +40,9 @@ void test()
     }
   parallel_partitioner_1.compress();
   parallel_partitioner_2.compress();
-  LinearAlgebra::EpetraWrappers::Vector a(parallel_partitioner_1);
-  LinearAlgebra::EpetraWrappers::Vector b(parallel_partitioner_1);
-  LinearAlgebra::EpetraWrappers::Vector c(parallel_partitioner_2);
+  LinearAlgebra::EpetraWrappers::Vector a(parallel_partitioner_1, MPI_COMM_WORLD);
+  LinearAlgebra::EpetraWrappers::Vector b(parallel_partitioner_1, MPI_COMM_WORLD);
+  LinearAlgebra::EpetraWrappers::Vector c(parallel_partitioner_2, MPI_COMM_WORLD);
 
   IndexSet read_write_index_set(10);
   if (rank==0)

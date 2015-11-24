@@ -35,6 +35,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace LinearAlgebra
+{
+  class CommunicationPatternBase;
+}
+
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
@@ -218,27 +223,42 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
     /**
-     * Imports all the elements present in the vector's IndexSet from the
-     * input vector @p petsc_vec.
+     * Imports all the elements present in the vector's IndexSet from the input
+     * vector @p petsc_vec. VectorOperation::values @p operation is used to decide
+     * if the elements in @p V should be added to the current vector or replace
+     * the current elements. The last parameter can be used if the same
+     * communication pattern is used multiple times. This can be used to improve
+     * performance.
      */
-    ReadWriteVector<Number> &
-    operator= (const PETScWrappers::MPI::Vector &petsc_vec);
+    void import(const PETScWrappers::MPI::Vector &petsc_vec,
+                VectorOperation::values operation,
+                const CommunicationPatternBase *communication_pattern = NULL);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
     /**
-     * Imports all the elements present in the vector's IndexSet from the
-     * input vector @p trilinos_vec.
+     * Imports all the elements present in the vector's IndexSet from the input
+     * vector @p trilinos_vec. VectorOperation::values @p operation is used to
+     * decide if the elements in @p V should be added to the current vector or
+     * replace the current elements. The last parameter can be used if the same
+     * communication pattern is used multiple times. This can be used to improve
+     * performance.
      */
-    ReadWriteVector<Number> &
-    operator= (const TrilinosWrappers::MPI::Vector &trilinos_vec);
+    void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
+                VectorOperation::values operation,
+                const CommunicationPatternBase *communication_pattern = NULL);
 
     /**
-     * Imports all the elements present in the vector's IndexSet from the input
-     * vector @p epetra_vec.
+     * imports all the elements present in the vector's IndexSet from the input
+     * vector @p epetra_vec. VectorOperation::values @p operation is used to
+     * decide if the elements in @p V should be added to the current vector or
+     * replace the current elements. The last parameter can be used if the same
+     * communication pattern is used multiple times. This can be used to improve
+     * performance.
      */
-    ReadWriteVector<Number> &
-    operator= (const EpetraWrappers::Vector &epetra_vec);
+    void import(const EpetraWrappers::Vector &epetra_vec,
+                VectorOperation::values operation,
+                const CommunicationPatternBase *communication_pattern = NULL);
 #endif
 
     /**
@@ -426,10 +446,14 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_TRILINOS
     /**
      * Imports all the elements present in the vector's IndexSet from the input
-     * vector @p multivector.
+     * vector @p multivector. This is an helper function and it should not be
+     * used directly.
      */
-    ReadWriteVector<Number> &import(const Epetra_MultiVector &multivector,
-                                    const IndexSet           &locally_owned_elements);
+    void import(const Epetra_MultiVector        &multivector,
+                const IndexSet                  &locally_owned_elements,
+                VectorOperation::values          operation,
+                const MPI_Comm                  &mpi_comm,
+                const CommunicationPatternBase  *communication_pattern);
 #endif
 
     /**
@@ -449,9 +473,25 @@ namespace LinearAlgebra
     void resize_val (const size_type new_allocated_size);
 
     /**
+     *
+     */
+    void create_epetra_comm_pattern(const IndexSet &source_index_set,
+                                    const MPI_Comm &mpi_comm);
+
+    /**
      * Indices of the elements stored.
      */
     IndexSet stored_elements;
+
+    /**
+     * Indices of the elements stored on a VectorSpaceVector
+     */
+    std::shared_ptr<IndexSet> source_stored_elements;
+
+    /**
+     *
+     */
+    std::shared_ptr<CommunicationPatternBase> comm_pattern;
 
     /**
      * Pointer to the array of local elements of this vector.
@@ -471,7 +511,9 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
     :
-    val (NULL)
+    source_stored_elements(nullptr),
+    comm_pattern(nullptr),
+    val(nullptr)
   {}
 
 
@@ -481,7 +523,9 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
     Subscriptor(),
-    val (NULL)
+    source_stored_elements(nullptr),
+    comm_pattern(nullptr),
+    val(nullptr)
   {
     this->operator=(v);
   }
@@ -492,7 +536,9 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
     :
-    val (NULL)
+    source_stored_elements(nullptr),
+    comm_pattern(nullptr),
+    val(nullptr)
   {
     reinit (size, false);
   }
@@ -503,7 +549,9 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
     :
-    val (NULL)
+    source_stored_elements(nullptr),
+    comm_pattern(nullptr),
+    val(nullptr)
   {
     reinit (locally_stored_indices);
   }

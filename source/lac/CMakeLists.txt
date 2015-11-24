@@ -111,6 +111,7 @@ IF(DEAL_II_WITH_TRILINOS)
     ${_src}
     trilinos_block_sparse_matrix.cc
     trilinos_block_vector.cc
+    trilinos_epetra_communication_pattern.cc
     trilinos_epetra_vector.cc
     trilinos_parallel_block_vector.cc
     trilinos_precondition.cc
