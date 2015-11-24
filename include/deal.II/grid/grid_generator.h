@@ -870,6 +870,9 @@ namespace GridGenerator
    * boundary indicators of the faces of @p input are going to be assigned to
    * the corresponding side walls in z direction. The bottom and top get the
    * next two free boundary indicators.
+   *
+   * @note The 2d input triangulation @p input must be a coarse mesh that
+   * has no refined cells.
    */
   void
   extrude_triangulation (const Triangulation<2, 2> &input,
