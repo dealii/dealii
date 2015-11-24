@@ -223,7 +223,7 @@ protected:
   get_data(const UpdateFlags                                                    update_flags,
            const Mapping<dim,spacedim>                                         &/*mapping*/,
            const Quadrature<dim>                                               &quadrature,
-           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
   {
     // generate a new data object and
     // initialize some fields
@@ -232,51 +232,58 @@ protected:
 
     const unsigned int n_q_points = quadrature.size();
 
-    // some scratch arrays
-    std::vector<double> values(0);
-    std::vector<Tensor<1,dim> > grads(0);
-    std::vector<Tensor<2,dim> > grad_grads(0);
-    std::vector<Tensor<3,dim> > third_derivatives(0);
-    std::vector<Tensor<4,dim> > fourth_derivatives(0);
+    // initialize some scratch arrays. we need them for the underlying
+    // polynomial to put the values and derivatives of shape functions
+    // to put there, depending on what the user requested
+    std::vector<double> values(update_flags & update_values ?
+                               this->dofs_per_cell : 0);
+    std::vector<Tensor<1,dim> > grads(update_flags & update_gradients ?
+                                      this->dofs_per_cell : 0);
+    std::vector<Tensor<2,dim> > grad_grads(update_flags & update_hessians ?
+                                           this->dofs_per_cell : 0);
+    std::vector<Tensor<3,dim> > third_derivatives(update_flags & update_3rd_derivatives ?
+                                                  this->dofs_per_cell : 0);
+    std::vector<Tensor<4,dim> > fourth_derivatives;   // won't be needed, so leave empty
 
-    // initialize fields only if really
-    // necessary. otherwise, don't
-    // allocate memory
-    if (update_flags & update_values)
-      {
-        values.resize (this->dofs_per_cell);
-        data->shape_values.resize (this->dofs_per_cell,
-                                   std::vector<double> (n_q_points));
-      }
+    // now also initialize fields the fields of this class's own
+    // temporary storage, depending on what we need for the given
+    // update flags.
+    //
+    // there is one exception from the rule: if we are dealing with
+    // cells (i.e., if this function is not called via
+    // get_(sub)face_data()), then we can already store things in the
+    // final location where FEValues::reinit() later wants to see
+    // things. we then don't need the intermediate space. we determine
+    // whether we are on a cell by asking whether the number of
+    // elements in the output array equals the number of quadrature
+    // points (yes, it's a cell) or not (because in that case the
+    // number of quadrature points we use here equals the number of
+    // quadrature points summed over *all* faces or subfaces, whereas
+    // the number of output slots equals the number of quadrature
+    // points on only *one* face)
+    if ((update_flags & update_values)
+        &&
+        !((output_data.shape_values.n_rows() > 0)
+          &&
+          (output_data.shape_values.n_cols() == n_q_points)))
+      data->shape_values.resize (this->dofs_per_cell,
+                                 std::vector<double> (n_q_points));
 
     if (update_flags & update_gradients)
-      {
-        grads.resize (this->dofs_per_cell);
-        data->shape_gradients.resize (this->dofs_per_cell,
-                                      std::vector<Tensor<1,dim> > (n_q_points));
-      }
+      data->shape_gradients.resize (this->dofs_per_cell,
+                                    std::vector<Tensor<1,dim> > (n_q_points));
 
     if (update_flags & update_hessians)
-      {
-        grad_grads.resize (this->dofs_per_cell);
-        data->shape_hessians.resize (this->dofs_per_cell,
-                                     std::vector<Tensor<2,dim> > (n_q_points));
-      }
+      data->shape_hessians.resize (this->dofs_per_cell,
+                                   std::vector<Tensor<2,dim> > (n_q_points));
 
     if (update_flags & update_3rd_derivatives)
-      {
-        third_derivatives.resize (this->dofs_per_cell);
-        data->shape_3rd_derivatives.resize (this->dofs_per_cell,
-                                            std::vector<Tensor<3,dim> > (n_q_points));
-      }
+      data->shape_3rd_derivatives.resize (this->dofs_per_cell,
+                                          std::vector<Tensor<3,dim> > (n_q_points));
 
-    // next already fill those fields
-    // of which we have information by
-    // now. note that the shape
-    // gradients are only those on the
-    // unit cell, and need to be
-    // transformed when visiting an
-    // actual cell
+    // next already fill those fields of which we have information by
+    // now. note that the shape gradients are only those on the unit
+    // cell, and need to be transformed when visiting an actual cell
     if (update_flags & (update_values | update_gradients
                         | update_hessians | update_3rd_derivatives) )
       for (unsigned int i=0; i<n_q_points; ++i)
@@ -286,10 +293,27 @@ protected:
                              third_derivatives,
                              fourth_derivatives);
 
+          // the values of shape functions at quadrature points don't change.
+          // consequently, write these values right into the output array if
+          // we can, i.e., if the output array has the correct size. this is
+          // the case on cells. on faces, we already precompute data on *all*
+          // faces and subfaces, but we later on copy only a portion of it
+          // into the output object; in that case, copy the data from all
+          // faces into the scratch object
           if (update_flags & update_values)
-            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-              data->shape_values[k][i] = values[k];
+            if (output_data.shape_values.n_rows() > 0)
+              {
+                if (output_data.shape_values.n_cols() == n_q_points)
+                  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+                    output_data.shape_values[k][i] = values[k];
+                else
+                  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+                    data->shape_values[k][i] = values[k];
+              }
 
+          // for everything else, derivatives need to be transformed,
+          // so we write them into our scratch space and only later
+          // copy stuff into where FEValues wants it
           if (update_flags & update_gradients)
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_gradients[k][i] = grads[k];
