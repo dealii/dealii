@@ -1108,18 +1108,18 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   void
-  extract_dofs (const DoFHandler<dim,spacedim>   &dof_handler,
-                const ComponentMask &component_mask,
-                std::vector<bool>       &selected_dofs);
+  extract_dofs (const DoFHandler<dim,spacedim> &dof_handler,
+                const ComponentMask            &component_mask,
+                std::vector<bool>              &selected_dofs);
 
   /**
    * The same function as above, but for a hp::DoFHandler.
    */
   template <int dim, int spacedim>
   void
-  extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof_handler,
-                const ComponentMask     &component_mask,
-                std::vector<bool>       &selected_dofs);
+  extract_dofs (const hp::DoFHandler<dim,spacedim> &dof_handler,
+                const ComponentMask                &component_mask,
+                std::vector<bool>                  &selected_dofs);
 
   /**
    * This function is the equivalent to the DoFTools::extract_dofs() functions
@@ -1141,18 +1141,18 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   void
-  extract_dofs (const DoFHandler<dim,spacedim>   &dof_handler,
-                const BlockMask &block_mask,
-                std::vector<bool>       &selected_dofs);
+  extract_dofs (const DoFHandler<dim,spacedim> &dof_handler,
+                const BlockMask                &block_mask,
+                std::vector<bool>              &selected_dofs);
 
   /**
    * The same function as above, but for a hp::DoFHandler.
    */
   template <int dim, int spacedim>
   void
-  extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof_handler,
-                const BlockMask        &block_mask,
-                std::vector<bool>       &selected_dofs);
+  extract_dofs (const hp::DoFHandler<dim,spacedim> &dof_handler,
+                const BlockMask                    &block_mask,
+                std::vector<bool>                  &selected_dofs);
 
   /**
    * Do the same thing as the corresponding extract_dofs() function for one
