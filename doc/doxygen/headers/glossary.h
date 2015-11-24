@@ -1485,7 +1485,16 @@
  *   paper lays out the motivation for this pattern and then proposes different ways
  *   of implementing it. It also compares the performance of different implementations.
  *
- *   The paper is currently in preparation.
+ * The full reference for this paper is as follows:
+ * @code
+@Article{TKB16,
+  author =       {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
+  title =        {\textit{WorkStream} -- a design pattern for multicore-enabled finite element computations},
+  journal =      {accepted for publication in the ACM Trans. Math. Softw.},
+  year =         2015
+}
+ * @endcode
+ * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  * </dd>
  *
  * </dl>
