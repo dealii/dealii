@@ -1884,8 +1884,7 @@ namespace internal
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
-        // set boundary indicators where
-        // given
+        // set boundary indicators where given
         std::vector<CellData<1> >::const_iterator boundary_line
           = subcelldata.boundary_lines.begin();
         std::vector<CellData<1> >::const_iterator end_boundary_line
@@ -1896,13 +1895,11 @@ namespace internal
             std::pair<int,int> line_vertices(std::make_pair(boundary_line->vertices[0],
                                                             boundary_line->vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
-              // line found in this
-              // direction
+              // line found in this direction
               line = needed_lines[line_vertices];
             else
               {
-                // look whether it exists
-                // in reverse direction
+                // look whether it exists in reverse direction
                 std::swap (line_vertices.first, line_vertices.second);
                 if (needed_lines.find(line_vertices) != needed_lines.end())
                   line = needed_lines[line_vertices];
@@ -1912,21 +1909,26 @@ namespace internal
                                                         line_vertices.second));
               }
 
-            // assert that we only set
-            // boundary info once
+            // assert that we only set boundary info once
             AssertThrow (! (line->boundary_id() != 0 &&
                             line->boundary_id() != numbers::internal_face_boundary_id),
                          ExcMultiplySetLineInfoOfLine(line_vertices.first,
                                                       line_vertices.second));
 
-            // Assert that only exterior lines
-            // are given a boundary indicator
-            AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
-                         ExcInteriorLineCantBeBoundary(line->vertex_index(0),
-                                                       line->vertex_index(1),
-                                                       boundary_line->boundary_id));
+            // Assert that only exterior lines are given a boundary
+            // indicator; however, it is possible that someone may
+            // want to give an interior line a manifold id (and thus
+            // lists this line in the subcell_data structure), and we
+            // need to allow that
+            if (boundary_line->boundary_id != numbers::internal_face_boundary_id)
+              {
+                AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
+                             ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                           line->vertex_index(1),
+                                                           boundary_line->boundary_id));
+                line->set_boundary_id (boundary_line->boundary_id);
+              }
 
-            line->set_boundary_id (boundary_line->boundary_id);
             line->set_manifold_id (boundary_line->manifold_id);
           }
 

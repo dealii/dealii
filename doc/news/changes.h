@@ -444,6 +444,20 @@ inconvenience this causes.
   (Martin Kronbichler, 2015/11/26)
   </li>
 
+  <li> New: In 3d, GridGenerator::extract_boundary_mesh() now copies the
+  manifold ids of edges of the volume mesh to the manifold ids of the edges
+  of the extracted surface mesh.
+  <br>
+  (Wolfgang Bangerth, 2015/11/25)
+  </li>
+
+  <li> New: Triangulation::create_triangulation() now accepts subcell-data
+  objects that may include information about interior edges and faces, to
+  facilitate setting manifold indicators on interior edges and faces.
+  <br>
+  (Wolfgang Bangerth, 2015/11/25)
+  </li>
+
   <li> Fixed: GridGenerator::extract_boundary_mesh() in 3d could generate
   surface cells that did not uniformly had a right- or left-handed coordinate
   system associated with them when viewed from one side of the surface. This

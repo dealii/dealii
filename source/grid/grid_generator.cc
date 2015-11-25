@@ -4209,7 +4209,8 @@ namespace GridGenerator
 
     std::vector< bool > touched (get_tria(volume_mesh).n_vertices(), false);
     std::vector< CellData< boundary_dim > > cells;
-    std::vector< Point<spacedim> >      vertices;
+    SubCellData                             subcell_data;
+    std::vector< Point<spacedim> >          vertices;
 
     std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
 
@@ -4258,6 +4259,57 @@ namespace GridGenerator
                 if (i % 2 == 1)
                   std::swap (c_data.vertices[1], c_data.vertices[2]);
 
+              // in 3d, we also need to make sure we copy the manifold
+              // indicators from the edges of the volume mesh to the
+              // edges of the surface mesh
+              //
+              // one might think that we we can also prescribe
+              // boundary indicators for edges, but this is only
+              // possible for edges that aren't just on the boundary
+              // of the domain (all of the edges we consider are!) but
+              // that would actually end up at the boundary of the
+              // surface mesh. there is no easy way to check this, so
+              // we simply don't do it and instead set it to an
+              // invalid value that makes sure
+              // Triangulation::create_triangulation doesn't copy it
+              if (dim == 3)
+                for (unsigned int e=0; e<4; ++e)
+                  {
+                    // see if we already saw this edge from a
+                    // neighboring face, either in this or the reverse
+                    // orientation. if so, skip it.
+                    {
+                      bool edge_found = false;
+                      for (unsigned int i=0; i<subcell_data.boundary_lines.size(); ++i)
+                        if (((subcell_data.boundary_lines[i].vertices[0]
+                              == map_vert_index[face->line(e)->vertex_index(0)])
+                             &&
+                             (subcell_data.boundary_lines[i].vertices[1]
+                              == map_vert_index[face->line(e)->vertex_index(1)]))
+                            ||
+                            ((subcell_data.boundary_lines[i].vertices[0]
+                              == map_vert_index[face->line(e)->vertex_index(1)])
+                             &&
+                             (subcell_data.boundary_lines[i].vertices[1]
+                              == map_vert_index[face->line(e)->vertex_index(0)])))
+                          {
+                            edge_found = true;
+                            break;
+                          }
+                      if (edge_found == true)
+                        continue;   // try next edge of current face
+                    }
+
+                    CellData<1> edge;
+                    edge.vertices[0] = map_vert_index[face->line(e)->vertex_index(0)];
+                    edge.vertices[1] = map_vert_index[face->line(e)->vertex_index(1)];
+                    edge.boundary_id = numbers::internal_face_boundary_id;
+                    edge.manifold_id = face->line(e)->manifold_id();
+
+                    subcell_data.boundary_lines.push_back (edge);
+                  }
+
+
               cells.push_back(c_data);
               mapping.push_back(face);
             }
@@ -4266,7 +4318,7 @@ namespace GridGenerator
     // create level 0 surface triangulation
     Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
     const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
-    .create_triangulation (vertices, cells, SubCellData());
+    .create_triangulation (vertices, cells, subcell_data);
 
     // Make the actual mapping
     for (typename Container<dim-1,spacedim>::active_cell_iterator
