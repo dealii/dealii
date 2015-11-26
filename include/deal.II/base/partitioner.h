@@ -441,7 +441,7 @@ namespace Utilities
     {
       AssertIndexRange (local_index, local_size() + n_ghost_indices_data);
       if (local_index < local_size())
-        return local_range_data.first + local_index;
+        return local_range_data.first + types::global_dof_index(local_index);
       else
         return ghost_indices_data.nth_index_in_set (local_index-local_size());
     }

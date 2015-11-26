@@ -437,6 +437,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: parallel::distributed::Vector now detects of the size of MPI
+  messages exceeds 2GB or if the local range exceeds the size of 32-bit
+  integers and throws an exception about unsupported range of operation.
+  <br>
+  (Martin Kronbichler, 2015/11/26)
+  </li>
+
   <li> Fixed: GridGenerator::extract_boundary_mesh() in 3d could generate
   surface cells that did not uniformly had a right- or left-handed coordinate
   system associated with them when viewed from one side of the surface. This
