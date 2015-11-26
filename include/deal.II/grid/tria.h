@@ -1936,7 +1936,7 @@ public:
    * functions below. It takes an iterator range and returns the sum of values.
    */
   template<typename T>
-  struct sum
+  struct CellWeightSum
   {
     typedef T result_type;
 
@@ -2063,7 +2063,7 @@ public:
      */
     boost::signals2::signal<unsigned int (const cell_iterator &,
                                           const CellStatus),
-                                                Triangulation<dim,spacedim>::sum<unsigned int> > cell_weight;
+                                                CellWeightSum<unsigned int> > cell_weight;
   };
 
   /**

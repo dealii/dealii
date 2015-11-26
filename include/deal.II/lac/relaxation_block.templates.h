@@ -43,7 +43,8 @@ std::size_t
 RelaxationBlock<MatrixType,inverse_type>::AdditionalData::memory_consumption() const
 {
   std::size_t result = sizeof(*this)
-                       + - sizeof(block_list) + block_list.memory_consumption();
+                       + block_list.memory_consumption()
+                       - sizeof(block_list);
   for (unsigned int i=0; i<order.size(); ++i)
     result += MemoryConsumption::memory_consumption(order[i]);
   return result;
