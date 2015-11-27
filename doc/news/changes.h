@@ -437,9 +437,9 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Fixed: parallel::distributed::Vector now detects of the size of MPI
+  <li> Fixed: parallel::distributed::Vector now detects if the size of MPI
   messages exceeds 2GB or if the local range exceeds the size of 32-bit
-  integers and throws an exception about unsupported range of operation.
+  integers and throws an exception informing about the unsupported sizes.
   <br>
   (Martin Kronbichler, 2015/11/26)
   </li>
