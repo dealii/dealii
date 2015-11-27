@@ -144,7 +144,7 @@ namespace parallel
      *
      * This vector class is based on two different number types for indexing.
      * The so-called global index type encodes the overall size of the vector.
-     * Its type is <code>types::global_dof_index</type>. The largest possible
+     * Its type is types::global_dof_index. The largest possible
      * value is <code>2^32-1</code> or approximately four billion in case 64
      * bit integers are disabled at configuration of deal.II (default case) or
      * <code>2^64-1</code> or approximately <code>10^19</code> if 64 bit
@@ -152,18 +152,17 @@ namespace parallel
      * @ref GlobalDoFIndex for further information).
      *
      * The second relevant index type is the local index used within one MPI
-     * rank. As opposed to the global index, the implementation assumes
-     * 32-bit unsigned integers unconditionally. In other words, to actually
-     * use a vector with more than four billion entries, you need to use MPI
-     * with more than one rank (which in general is a safe assumption since
-     * four billion entries consume at least 16 GB of memory for floats or 32
-     * GB of memory for doubles). If more than 4 billion local elements are
-     * present, the implementation tries to detect that, which triggers an
-     * exception will be thrown and aborts the code. Note, however, that the
-     * detection of overflow is tricky and the detection mechanism might fail
-     * in some circumstances. Therefore, it is strongly recommended to not
-     * rely on this class to detect the case if local elements are more than
-     * four billion.
+     * rank. As opposed to the global index, the implementation assumes 32-bit
+     * unsigned integers unconditionally. In other words, to actually use a
+     * vector with more than four billion entries, you need to use MPI with
+     * more than one rank (which in general is a safe assumption since four
+     * billion entries consume at least 16 GB of memory for floats or 32 GB of
+     * memory for doubles) and enable 64-bit indices. If more than 4 billion
+     * local elements are present, the implementation tries to detect that,
+     * which triggers an exception and aborts the code. Note, however, that
+     * the detection of overflow is tricky and the detection mechanism might
+     * fail in some circumstances. Therefore, it is strongly recommended to
+     * not rely on this class to automatically detect the unsupported case.
      *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
