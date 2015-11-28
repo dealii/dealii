@@ -39,38 +39,74 @@ namespace hp
 
 
 /**
- * Base class for finite elements in arbitrary dimensions. This class provides
- * several fields which describe a specific finite element and which are
- * filled by derived classes. It more or less only offers the fields and
- * access functions which makes it possible to copy finite elements without
- * knowledge of the actual type (linear, quadratic, etc). In particular, the
- * functions to fill the data fields of FEValues and its derived classes are
- * declared.
+ * This is the base class for finite elements in arbitrary dimensions. It
+ * declares the interface both in terms of member variables and public
+ * member functions through which properties of a concrete implementation
+ * of a finite element can be accessed. This interface generally consists
+ * of a number of groups of variables and functions that can roughly be
+ * delineated as follows:
+ * - Basic information about the finite element, such as the number of
+ *   degrees of freedom per vertex, edge, or cell. This kind of data
+ *   is stored in the FiniteElementData base class. (Though the
+ *   FiniteElement::get_name() member function also falls into this category.)
+ * - A description of the shape functions and their derivatives on the
+ *   reference cell $[0,1]^d$, if an element is indeed defined by mapping
+ *   shape functions from the reference cell to an actual cell.
+ * - Matrices (and functions that access them) that describe how an
+ *   element's shape functions related to those on parent or child cells
+ *   (restriction or prolongation) or neighboring cells (for hanging
+ *   node constraints), as well as to other finite element spaces
+ *   defined on the same cell (e.g., when doing $p$ refinement).
+ * - Functions that describe the properties of individual shape functions,
+ *   for example which @ref GlossComponent "vector components" of a
+ *   @ref vector_valued "vector-valued finite element's" shape function
+ *   is nonzero, or whether an element is @ref GlossPrimitive "primitive".
+ * - For elements that are interpolatory, such as the common $Q_p$
+ *   Lagrange elements, data that describes where their
+ *   @ref GlossSupport "support points" are located.
+ * - Functions that define the interface to the FEValues class that is
+ *   almost always used to access finite element shape functions from
+ *   user code.
  *
- * The interface of this class is very restrictive. The reason is that finite
- * element values should be accessed only by use of FEValues objects. These,
- * together with FiniteElement are responsible to provide an optimized
- * implementation.
+ * The following sections discuss many of these concepts in more detail,
+ * and outline strategies by which concrete implementations of a finite
+ * element can provide the details necessary for a complete description
+ * of a finite element space.
  *
- * This class declares the shape functions and their derivatives on the unit
- * cell $[0,1]^d$. The means to transform them onto a given cell in physical
- * space is provided by the FEValues class with a Mapping object.
+ * As a general rule, there are three ways by which derived classes
+ * provide this information:
+ * - A number of fields that are generally easy to compute and that
+ *   are initialized by the constructor of this class (or the constructor
+ *   of the FiniteElementData base class) and derived classes therefore
+ *   have to compute in the process of calling this class's constructor.
+ *   This is, specifically, the case for the basic information and parts
+ *   of the descriptive information about shape functions mentioned above.
+ * - Some common matrices that are widely used in the library and for
+ *   which this class provides protected member variables that the
+ *   constructors of derived classes need to fill. The purpose of providing
+ *   these matrices in this class is that (i) they are frequently used,
+ *   and (ii) they are expensive to compute. Consequently, it makes sense
+ *   to only compute them once, rather than every time they are used. In most
+ *   cases, the constructor of the current class already sets them to their
+ *   correct size, and derived classes therefore only have to fill them.
+ *   Examples of this include the matrices that relate the shape functions on
+ *   one cell to the shape functions on neighbors, children, and parents.
+ * - Uncommon information, or information that depends on specific input
+ *   arguments, and that needs to be implemented by derived classes. For
+ *   these, this base class only declares abstract virtual member functions
+ *   and derived classes then have to implement them. Examples of this
+ *   category would include the functions that compute values and
+ *   derivatives of shape functions on the reference cell for which it
+ *   is not possible to tabulate values because there are infinitely
+ *   many points at which one may want to evaluate them. In some cases,
+ *   derived classes may choose to simply not implement <i>all</i> possible
+ *   interfaces (or may not <i>yet</i> have a complete implementation);
+ *   for uncommon functions, there is then often a member function
+ *   derived classes can overload that describes whether a particular
+ *   feature is implemented. An example is whether an element implements
+ *   the information necessary to use it in the $hp$ finite element
+ *   context (see @ref hp "hp finite element support").
  *
- * The different matrices are initialized with the correct size, such that in
- * the derived (concrete) finite element classes, their entries only have to
- * be filled in; no resizing is needed. If the matrices are not defined by a
- * concrete finite element, they should be resized to zero. This way functions
- * using them can find out, that they are missing. On the other hand, it is
- * possible to use finite element classes without implementation of the full
- * functionality, if only part of it is needed. The functionality under
- * consideration here is hanging nodes constraints and grid transfer,
- * respectively.
- *
- * The <tt>spacedim</tt> parameter has to be used if one wants to solve
- * problems in the boundary element method formulation or in an equivalent
- * one, as it is explained in the Triangulation class. If not specified, this
- * parameter takes the default value <tt>=dim</tt> so that this class can be
- * used to solve problems in the finite element method formulation.
  *
  * <h3>Components and blocks</h3>
  *
@@ -132,11 +168,31 @@ namespace hp
  * documentation of the various finite element classes.
  *
  *
- * <h3>Notes on the implementation of derived classes</h3>
+ * <h3>Implementing finite element spaces in derived classes</h3>
  *
- * The following sections list the information to be provided by derived
- * classes, depending on the dimension. They are followed by a list of
- * functions helping to generate these values.
+ * The following sections provide some more guidance for implementing
+ * concrete finite element spaces in derived classes. This includes information
+ * that depends on the dimension for which you want to provide something,
+ * followed by a list of tools helping to generate information in concrete
+ * cases.
+ *
+ * It is important to note that there is a number of intermediate classes
+ * that can do a lot of what is necessary for a complete description of
+ * finite element spaces. For example, the FE_Poly, FE_PolyTensor, and
+ * FE_PolyFace classes in essence build a complete finite element space
+ * if you only provide them with an abstract description of the
+ * polynomial space upon which you want to build an element. Using these
+ * intermediate classes typically makes implementing finite element
+ * descriptions vastly simpler.
+ *
+ * As a general rule, if you want to
+ * implement an element, you will likely want to look at the implementation
+ * of other, similar elements first. Since many of the more complicated
+ * pieces of a finite element interface have to do with how they interact
+ * with mappings, quadrature, and the FEValues class, you will also want
+ * to read through the @ref FE_vs_Mapping_vs_FEValues documentation
+ * module.
+ *
  *
  * <h4>Finite elements in one dimension</h4>
  *
@@ -586,8 +642,8 @@ public:
    *   <code>dofs_per_cell</code> where each element equals the component
    *   mask provided in the single element given.
    */
-  FiniteElement (const FiniteElementData<dim> &fe_data,
-                 const std::vector<bool>      &restriction_is_additive_flags,
+  FiniteElement (const FiniteElementData<dim>     &fe_data,
+                 const std::vector<bool>          &restriction_is_additive_flags,
                  const std::vector<ComponentMask> &nonzero_components);
 
   /**
