@@ -4098,13 +4098,13 @@ FEEvaluationAccess<dim,dim,Number>
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim==2?1:dim,VectorizedArray<Number> >
+Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number>
 ::get_curl (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl;
+  Tensor<1,(dim==2?1:dim),VectorizedArray<Number> > curl;
   switch (dim)
     {
     case 1:
