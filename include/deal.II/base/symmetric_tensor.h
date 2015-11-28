@@ -989,8 +989,13 @@ template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_independent_components])
   :
-  data (array)
-{}
+  data (*reinterpret_cast<const typename base_tensor_type::array_type *>(array))
+{
+  // ensure that the reinterpret_cast above actually works
+  Assert (sizeof(typename base_tensor_type::array_type)
+          == sizeof(array),
+          ExcInternalError());
+}
 
 
 

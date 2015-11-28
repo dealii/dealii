@@ -451,6 +451,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The constructor of SymmetricTensor that takes an array
+  of initializing elements led to a compiler error. This is now
+  fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/11/28)
+  </li>
+
   <li> Fixed: parallel::distributed::Vector now detects if the size of MPI
   messages exceeds 2GB or if the local range exceeds the size of 32-bit
   integers and throws an exception informing about the unsupported sizes.
