@@ -212,7 +212,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-    typename DoFHandler<2>::active_cell_iterator
+    DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -304,7 +304,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-    typename DoFHandler<2>::active_cell_iterator
+    DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -606,7 +606,7 @@ namespace Step52
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
-    typename Triangulation<2>::active_cell_iterator
+    Triangulation<2>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
 
