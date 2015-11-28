@@ -2506,7 +2506,7 @@ namespace DataOutBase
 
       double lambda = - gradient[0] * (v_min[0] - v_max[0]) - gradient[1] * (v_min[1] - v_max[1]);
 
-      Point<6> gradient_parameters(true);
+      Point<6> gradient_parameters;
 
       gradient_parameters[0] = v_min[0];
       gradient_parameters[1] = v_min[1];
@@ -5416,9 +5416,9 @@ namespace DataOutBase
 
 
 // set initial camera position
-    Point<3> camera_position(true);
-    Point<3> camera_direction(true);
-    Point<3> camera_horizontal(true);
+    Point<3> camera_position;
+    Point<3> camera_direction;
+    Point<3> camera_horizontal;
     float camera_focus = 0;
 
     // translate camera from the origin to the initial position
@@ -5498,7 +5498,7 @@ namespace DataOutBase
     n_subdivisions = patch->n_subdivisions;
     n = n_subdivisions + 1;
 
-    Point<3> point(true);
+    Point<3> point;
 
     compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
 
