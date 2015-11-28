@@ -53,7 +53,8 @@ IF("${EXPECT}" STREQUAL "")
 ENDIF()
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-  --build ${BINARY_DIR} --target ${TRGT}
+  --build . --target ${TRGT}
+  WORKING_DIRECTORY ${BINARY_DIR}
   RESULT_VARIABLE _result_code # ignored ;-)
   OUTPUT_VARIABLE _output
   )

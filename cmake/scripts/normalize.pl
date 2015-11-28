@@ -23,6 +23,9 @@
 #  small doubles
 #
 
+# Convert windows to unix line endings. This is necessary to be able to run
+# the testsuite on windows (using cygwin's diff/perl)
+s/\r$//;
 
 # Remove JobID
 
