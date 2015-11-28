@@ -1208,7 +1208,7 @@ namespace internal
     Number tmp [data_dim];
     for (unsigned int i=0; i<data_dim; ++i)
       tmp[i] = perform_double_contraction<dim,Number>(data[i], sdata);
-    return SymmetricTensor<2,dim,Number>(tmp);
+    return dealii::SymmetricTensor<2,dim,Number>(tmp);
   }
 
 
