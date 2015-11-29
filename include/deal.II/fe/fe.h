@@ -57,14 +57,14 @@ namespace hp
  *   (restriction or prolongation) or neighboring cells (for hanging
  *   node constraints), as well as to other finite element spaces
  *   defined on the same cell (e.g., when doing $p$ refinement).
- * - Functions that describe the properties of individual shape functions,
+ * - %Functions that describe the properties of individual shape functions,
  *   for example which @ref GlossComponent "vector components" of a
  *   @ref vector_valued "vector-valued finite element's" shape function
  *   is nonzero, or whether an element is @ref GlossPrimitive "primitive".
  * - For elements that are interpolatory, such as the common $Q_p$
  *   Lagrange elements, data that describes where their
  *   @ref GlossSupport "support points" are located.
- * - Functions that define the interface to the FEValues class that is
+ * - %Functions that define the interface to the FEValues class that is
  *   almost always used to access finite element shape functions from
  *   user code.
  *
