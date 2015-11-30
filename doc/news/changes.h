@@ -167,6 +167,20 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: There is now a function template numbers::signaling_nan() that
+  is used to create invalid floating point objects. These objects can either
+  be scalars, or of type Tensor, SymmetricTensor, or DerivativeForm. The
+  content of these objects is a "signaling NaN" ("NaN" stands for "not a
+  number", and "signaling" implies that at least on platforms where this
+  is supported, any arithmetic operation using them terminates the program).
+  The purpose of this is to use them as markers for uninitialized objects
+  and arrays that are required to be filled in other places, and to trigger
+  an error when this later initialization does not happen before the first
+  use.
+  <br>
+  (Wolfgang Bangerth, Timo Heister, 2015/11/24)
+  </li>
+
   <li> Changed: The function FE_DGPNonparametric::shape_value() and similar
   functions in the same class returned values and derivatives of shape
   functions on the reference cell. However, this element is not defined
@@ -437,6 +451,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The constructor of SymmetricTensor that takes an array
+  of initializing elements led to a compiler error. This is now
+  fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/11/28)
+  </li>
+
   <li> Fixed: parallel::distributed::Vector now detects if the size of MPI
   messages exceeds 2GB or if the local range exceeds the size of 32-bit
   integers and throws an exception informing about the unsupported sizes.
