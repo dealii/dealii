@@ -36,10 +36,9 @@ template <typename T>
 void check ()
 {
   Table<2,T> t;
-  const T x = numbers::signaling_nan<double>();
-  const T array[6] = { x,x,x,x,x,x };
 
-  t.reinit (2,3, &x);
+  t.reinit (2,3);
+  t.fill (numbers::signaling_nan<T>());
 
   deallog << "OK" << std::endl;
 }
