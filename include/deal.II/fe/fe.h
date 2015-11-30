@@ -108,39 +108,66 @@ namespace hp
  *   context (see @ref hp "hp finite element support").
  *
  *
- * <h3>Components and blocks</h3>
+ * <h3>Nomenclature</h3>
  *
- * For vector valued elements shape functions may have nonzero entries in one
- * or several
+ * Finite element classes have to define a large number of different properties
+ * describing  a finite element space. The following subsections describe some
+ * nomenclature that will be used in the documentation below.
+ *
+ * <h4>Components and blocks</h4>
+ *
+ * @ref vector_valued "Vector-valued finite element" are elements used for
+ * systems of partial differential equations. Oftentimes, they are composed
+ * via the FESystem class (which is itself derived from the current class),
+ * but there are also non-composed elements that have multiple components
+ * (for example the FE_Nedelec and FE_RaviartThomas classes, among others).
+ * For any of these vector valued elements, individual shape functions may
+ * be nonzero in one or several
  * @ref GlossComponent "components"
  * of the vector valued function. If the element is
  * @ref GlossPrimitive "primitive",
  * there is indeed a single component with a nonzero entry for each shape
- * function. This component can be determined by system_to_component_index(),
- * the number of components is FiniteElementData::n_components().
+ * function. This component can be determined using the
+ * FiniteElement::system_to_component_index() function.
  *
- * Furthermore, you may want to split your linear system into
- * @ref GlossBlock "blocks"
- * for the use in BlockVector, BlockSparseMatrix, BlockMatrixArray and so on.
+ * On the other hand, if there is at least one shape function that
+ * is nonzero in more than one vector component, then we call the entire
+ * element "non-primitive". The FiniteElement::get_nonzero_components()
+ * can then be used to determine which vector components of a shape
+ * function are nonzero. The number of nonzero components of a shape function
+ * is returned by FiniteElement::n_components(). Whether a shape
+ * function is non-primitive can be queried by
+ * FiniteElement::is_primitive().
+ *
+ * Oftentimes, one may want to split linear system into blocks so that they
+ * reflect the structure of the underlying operator. This is typically not
+ * done based on vector components, but based on the use of
+ * @ref GlossBlock "blocks", and the result is then used to substructure
+ * objects of type BlockVector, BlockSparseMatrix, BlockMatrixArray, and so on.
  * If you use non-primitive elements, you cannot determine the block number by
- * system_to_component_index(). Instead, you can use system_to_block_index(),
- * which will automatically take care of the additional components occupied by
- * vector valued elements. The number of generated blocks can be determined by
- * FiniteElementData::n_blocks().
+ * FiniteElement::system_to_component_index(). Instead, you can use
+ * FiniteElement::system_to_block_index(). The number of blocks of a finite
+ * element can be determined by FiniteElement::n_blocks().
  *
- * If you decide to operate by base element and multiplicity, the function
- * first_block_of_base() will be helpful.
  *
- * <h3>Support points</h3>
+ * <h4>Support points</h4>
  *
- * Since a FiniteElement does not have information on the actual grid cell, it
- * can only provide
- * @ref GlossSupport "support points"
- * on the unit cell. Support points on the actual grid cell must be computed
- * by mapping these points. The class used for this kind of operation is
- * FEValues. In most cases, code of the following type will serve to provide
- * the mapped support points.
+ * Finite elements are frequently defined by defining a polynomial space and
+ * a set of dual functionals. If these functionals involve point evaluations,
+ * then the element is "interpolatory" and it is possible to interpolate
+ * an arbitrary (but sufficiently smooth) function onto the finite element
+ * space by evaluating it at these points. We call these points "support
+ * points".
  *
+ * Most finite elements are defined by mapping from the reference cell to
+ * a concrete cell. Consequently, the support points are then defined on
+ * the reference ("unit") cell, see
+ * @ref GlossSupport "this glossary entry". The support points on a concrete
+ * cell can then be computed by mapping the unit support points, using the
+ * Mapping class interface and derived classes, typically via the FEValues
+ * class.
+ *
+ * A typical code snippet to do so would look as follows:
  * @code
  * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
  * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
@@ -157,15 +184,12 @@ namespace hp
  * Point<dim> mapped_point =
  *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
  * @endcode
- * This is a shortcut, and as all shortcuts should be used cautiously. If the
- * mapping of all support points is needed, the first variant should be
- * preferred for efficiency.
  *
  * @note Finite elements' implementation of the get_unit_support_points()
- * returns these points in the same order as shape functions. As a
- * consequence, the quadrature points accessed above are also ordered in this
- * way. The order of shape functions is typically documented in the class
- * documentation of the various finite element classes.
+ *   function returns these points in the same order as shape functions. As a
+ *   consequence, the quadrature points accessed above are also ordered in this
+ *   way. The order of shape functions is typically documented in the class
+ *   documentation of the various finite element classes.
  *
  *
  * <h3>Implementing finite element spaces in derived classes</h3>
@@ -194,18 +218,25 @@ namespace hp
  * module.
  *
  *
- * <h4>Finite elements in one dimension</h4>
+ * <h4>Interpolation matrices in one dimension</h4>
  *
- * Finite elements in one dimension need only set the #restriction and
- * #prolongation matrices. The constructor of this class in one dimension
- * presets the #interface_constraints matrix to have dimension zero. Changing
- * this behaviour in derived classes is generally not a reasonable idea and
- * you risk getting into trouble.
+ * In one space dimension (i.e., for <code>dim==1</code> and any
+ * value of <code>spacedim</code>),
+ * finite element classes implementing the interface of the current
+ * base class need only set the #restriction and
+ * #prolongation matrices that describe the interpolation of the finite
+ * element space on one cell to that of its parent cell, and to that
+ * on its children, respectively. The constructor of the current class
+ * in one dimension presets the #interface_constraints matrix (used to
+ * describe hanging node constraints at the interface between cells of
+ * different refinement levels) to have size zero because there are no
+ * hanging nodes in 1d.
  *
- * <h4>Finite elements in two dimensions</h4>
+ * <h4>Interpolation matrices in two dimensions</h4>
  *
- * In addition to the fields already present in 1D, a constraint matrix is
- * needed, if the finite element has node values located on edges or vertices.
+ * In addition to the fields discussed above for 1D, a constraint matrix is
+ * needed to describe hanging node constraints if the finite element has
+ * degrees of freedom located on edges or vertices.
  * These constraints are represented by an $m\times n$-matrix
  * #interface_constraints, where <i>m</i> is the number of degrees of freedom
  * on the refined side without the corner vertices (those dofs on the middle
@@ -229,15 +260,23 @@ namespace hp
  * the refined lines, since these must be mapped one-to-one to the appropriate
  * dofs of the vertices of the unrefined line.
  *
- * It should be noted that it is not possible to distribute a constrained
- * degree of freedom to other degrees of freedom which are themselves
- * constrained. Only one level of indirection is allowed. It is not known at
- * the time of this writing whether this is a constraint itself.
+ * Through this construction, the degrees of freedom on the child faces are
+ * constrained to the degrees of freedom on the parent face. The information
+ * so provided is typically consumed by the
+ * DoFTools::make_hanging_node_constraints() function.
+ *
+ * @note The hanging node constraints described by these matrices are only
+ *   relevant to the case where the same finite element space is used on
+ *   neighboring (but differently refined) cells. The case that the finite
+ *   element spaces on different sides of a face are different, i.e.,
+ *   the $hp$ case (see @ref hp "hp finite element support") is handled
+ *   by separate functions. See the FiniteElement::get_face_interpolation_matrix()
+ *   and FiniteElement::get_subface_interpolation_matrix() functions.
  *
  *
- * <h4>Finite elements in three dimensions</h4>
+ * <h4>Interpolation matrices in three dimensions</h4>
  *
- * For the interface constraints, almost the same holds as for the 2D case.
+ * For the interface constraints, the 3d case is similar to the 2d case.
  * The numbering for the indices $n$ on the mother face is obvious and keeps
  * to the usual numbering of degrees of freedom on quadrilaterals.
  *
@@ -315,24 +354,38 @@ namespace hp
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
  *
+ * Using this scheme, child face degrees of freedom are constrained against
+ * parent face degrees of freedom that contain those on the edges of the parent
+ * face; it is possible that some of them are in turn constrained themselves,
+ * leading to longer chains of constraints that the ConstraintMatrix class will
+ * eventually have to sort out. (The constraints described above are used by
+ * the DoFTools::make_hanging_node_constraints() function that constructs a
+ * ConstraintMatrix object.) However, this is of no concern for the
+ * FiniteElement and derived classes since they only act locally on one cell
+ * and its immediate neighbor, and do not see the bigger picture. The
+ * @ref hp_paper details how such chains are handled in practice.
+ *
+ *
  * <h4>Helper functions</h4>
  *
  * Construction of a finite element and computation of the matrices described
- * above may be a tedious task, in particular if it has to be performed for
- * several dimensions. Therefore, some functions in FETools have been provided
- * to help with these tasks.
+ * above is often a tedious task, in particular if it has to be performed for
+ * several dimensions. Most of this work can be avoided by using the
+ * intermediate classes already mentioned above (e.g., FE_Poly, FE_PolyTensor,
+ * etc). Other tasks can be automated by some of the functions in namespace
+ * FETools.
  *
- * <h5>Computing the correct basis from "raw" basis functions</h5>
+ * <h5>Computing the correct basis from a set of linearly independent functions</h5>
  *
- * First, already the basis of the shape function space may be difficult to
- * implement for arbitrary order and dimension. On the other hand, if the
+ * First, it may already be difficult to compute the basis of shape functions
+ * for arbitrary order and dimension. On the other hand, if the
  * @ref GlossNodes "node values"
  * are given, then the duality relation between node functionals and basis
  * functions defines the basis. As a result, the shape function space may be
- * defined with arbitrary "raw" basis functions, such that the actual finite
- * element basis is computed from linear combinations of them. The
+ * defined from a set of linearly independent functions, such that the actual
+ * finite element basis is computed from linear combinations of them. The
  * coefficients of these combinations are determined by the duality of node
- * values.
+ * values and form a matrix.
  *
  * Using this matrix allows the construction of the basis of shape functions
  * in two steps.
@@ -348,15 +401,15 @@ namespace hp
  * <i>w<sub>j</sub></i>.
  * </ol>
  *
- * The function computing the matrix <i>M</i> for you is
- * FETools::compute_node_matrix(). It relies on the existence of
- * #generalized_support_points and implementation of interpolate() with
- * VectorSlice argument. See the
+ * The matrix <i>M</i> may be computed using
+ * FETools::compute_node_matrix(). This function relies on the existence of
+ * #generalized_support_points and an implementation of the
+ * FiniteElement::interpolate() function with
+ * VectorSlice argument. (See the
  * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
- * for more information.
- *
- * The piece of code in the constructor of a finite element responsible for
- * this looks like
+ * for more information.) With this, one can then use the following
+ * piece of code in the constructor of a class derived from FinitElement to
+ * compute the $M$ matrix:
  * @code
  * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
  * FETools::compute_node_matrix(M, *this);
@@ -371,7 +424,7 @@ namespace hp
  * Once you have shape functions, you can define matrices that transfer
  * data from one cell to its children or the other way around. This is
  * a common operation in multigrid, of course, but is also used when
- * interpolating the solution from one mesh to the one after mesh refinement,
+ * interpolating the solution from one mesh to another after mesh refinement,
  * as well as in the definition of some error estimators.
  *
  * To define the prolongation matrices, i.e., those matrices that
@@ -511,12 +564,12 @@ namespace hp
  * child of a face separately. These matrices must be convoluted into a single
  * rectangular constraint matrix, eliminating degrees of freedom on common
  * vertices and edges as well as on the coarse grid vertices. See the
- * discussion above for details.
+ * discussion above for details of this numbering.
  *
  * @ingroup febase fe
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001,
- * 2005
+ * 2005, 2015
  */
 template <int dim, int spacedim=dim>
 class FiniteElement : public Subscriptor,
