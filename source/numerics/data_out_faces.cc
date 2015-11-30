@@ -72,20 +72,20 @@ namespace internal
 
 
 
-template <int dim, class DH>
-DataOutFaces<dim,DH>::DataOutFaces(const bool so)
+template <int dim, typename DoFHandlerType>
+DataOutFaces<dim,DoFHandlerType>::DataOutFaces(const bool so)
   :
   surface_only(so)
 {
-  Assert (dim == DH::dimension,
+  Assert (dim == DoFHandlerType::dimension,
           ExcNotImplemented());
 }
 
 
 
-template <int dim, class DH>
+template <int dim, typename DoFHandlerType>
 void
-DataOutFaces<dim,DH>::
+DataOutFaces<dim,DoFHandlerType>::
 build_one_patch (const FaceDescriptor *cell_and_face,
                  internal::DataOutFaces::ParallelData<dimension, dimension> &data,
                  DataOutBase::Patch<dimension-1,space_dimension>  &patch)
@@ -269,17 +269,17 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 
 
 
-template <int dim, class DH>
-void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions_)
+template <int dim, typename DoFHandlerType>
+void DataOutFaces<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions_)
 {
   build_patches (StaticMappingQ1<dimension>::mapping, n_subdivisions_);
 }
 
 
 
-template <int dim, class DH>
-void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
-                                          const unsigned int n_subdivisions_)
+template <int dim, typename DoFHandlerType>
+void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &mapping,
+                                                      const unsigned int n_subdivisions_)
 {
   // Check consistency of redundant template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
@@ -340,7 +340,7 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
   // now build the patches in parallel
   WorkStream::run (&all_faces[0],
                    &all_faces[0]+all_faces.size(),
-                   std_cxx11::bind(&DataOutFaces<dim,DH>::build_one_patch,
+                   std_cxx11::bind(&DataOutFaces<dim,DoFHandlerType>::build_one_patch,
                                    this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3),
                    std_cxx11::bind(&internal::DataOutFaces::
                                    append_patch_to_list<dim,space_dimension>,
@@ -351,9 +351,9 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
 
 
 
-template <int dim, class DH>
-typename DataOutFaces<dim,DH>::FaceDescriptor
-DataOutFaces<dim,DH>::first_face ()
+template <int dim, typename DoFHandlerType>
+typename DataOutFaces<dim,DoFHandlerType>::FaceDescriptor
+DataOutFaces<dim,DoFHandlerType>::first_face ()
 {
   // simply find first active cell
   // with a face on the boundary
@@ -372,9 +372,9 @@ DataOutFaces<dim,DH>::first_face ()
 
 
 
-template <int dim, class DH>
-typename DataOutFaces<dim,DH>::FaceDescriptor
-DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
+template <int dim, typename DoFHandlerType>
+typename DataOutFaces<dim,DoFHandlerType>::FaceDescriptor
+DataOutFaces<dim,DoFHandlerType>::next_face (const FaceDescriptor &old_face)
 {
   FaceDescriptor face = old_face;
 

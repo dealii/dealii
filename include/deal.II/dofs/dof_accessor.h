@@ -180,8 +180,8 @@ namespace internal
  * @author Wolfgang Bangerth, 1998, 2006, 2008, Timo Heister, Guido Kanschat,
  * 2012, 2013
  */
-template <int structdim, class DH, bool level_dof_access>
-class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim, DH::dimension, DH::space_dimension>::BaseClass
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
+class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::BaseClass
 {
 public:
 
@@ -189,13 +189,13 @@ public:
    * A static variable that allows users of this class to discover the value
    * of the second template argument.
    */
-  static const unsigned int dimension=DH::dimension;
+  static const unsigned int dimension=DoFHandlerType::dimension;
 
   /**
    * A static variable that allows users of this class to discover the value
    * of the third template argument.
    */
-  static const unsigned int space_dimension=DH::space_dimension;
+  static const unsigned int space_dimension=DoFHandlerType::space_dimension;
 
   /**
    * Declare a typedef to the base class to make accessing some of the
@@ -208,7 +208,7 @@ public:
   /**
    * Data type passed by the iterator class.
    */
-  typedef DH AccessorData;
+  typedef DoFHandlerType AccessorData;
 
   /**
    * @name Constructors
@@ -225,10 +225,10 @@ public:
   /**
    * Constructor
    */
-  DoFAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
-               const int                 level,
-               const int                 index,
-               const DH                 *local_data);
+  DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria,
+               const int             level,
+               const int             index,
+               const DoFHandlerType *local_data);
 
   /**
    * Conversion constructor. This constructor exists to make certain
@@ -249,14 +249,14 @@ public:
    * Another conversion operator between objects that don't make sense, just
    * like the previous one.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  DoFAccessor (const DoFAccessor<dim2, DH2, level_dof_access2> &);
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  DoFAccessor (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
    * Copy constructor allowing to switch level access and active access.
    */
   template <bool level_dof_access2>
-  DoFAccessor(const DoFAccessor<structdim, DH, level_dof_access2> &);
+  DoFAccessor(const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &);
   /**
    * @}
    */
@@ -264,20 +264,20 @@ public:
   /**
    * Return a handle on the DoFHandler object which we are using.
    */
-  const DH &
+  const DoFHandlerType &
   get_dof_handler () const;
 
   /**
    * Implement the copy operator needed for the iterator classes.
    */
   template <bool level_dof_access2>
-  void copy_from (const DoFAccessor<structdim, DH, level_dof_access2> &a);
+  void copy_from (const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &a);
 
   /**
    * Copy operator used by the iterator class. Keeps the previously set dof
    * handler, but sets the object coordinates of the TriaAccessor.
    */
-  void copy_from (const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da);
+  void copy_from (const TriaAccessorBase<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension> &da);
 
   /**
    * Tell the caller whether get_active_or_mg_dof_indices() accesses active or
@@ -295,7 +295,7 @@ public:
   /**
    * Return an iterator pointing to the @p c-th child.
    */
-  TriaIterator<DoFAccessor<structdim,DH, level_dof_access> >
+  TriaIterator<DoFAccessor<structdim,DoFHandlerType, level_dof_access> >
   child (const unsigned int c) const;
 
   /**
@@ -303,7 +303,7 @@ public:
    * a line itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DH, level_dof_access>::line_iterator
+  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType, level_dof_access>::line_iterator
   line (const unsigned int i) const;
 
   /**
@@ -311,7 +311,7 @@ public:
    * a quad itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DH, level_dof_access>::quad_iterator
+  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType, level_dof_access>::quad_iterator
   quad (const unsigned int i) const;
 
   /**
@@ -360,7 +360,7 @@ public:
    *
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
-                        const unsigned int fe_index = DH::default_fe_index) const;
+                        const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -370,14 +370,14 @@ public:
    */
   void get_mg_dof_indices (const int level,
                            std::vector<types::global_dof_index> &dof_indices,
-                           const unsigned int fe_index = DH::default_fe_index) const;
+                           const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Sets the level DoF indices that are returned by get_mg_dof_indices.
    */
   void set_mg_dof_indices (const int level,
                            const std::vector<types::global_dof_index> &dof_indices,
-                           const unsigned int fe_index = DH::default_fe_index);
+                           const unsigned int fe_index = DoFHandlerType::default_fe_index);
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -396,19 +396,21 @@ public:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  types::global_dof_index vertex_dof_index (const unsigned int vertex,
-                                            const unsigned int i,
-                                            const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index vertex_dof_index
+  (const unsigned int vertex,
+   const unsigned int i,
+   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Returns the global DoF index of the <code>i</code>th degree of freedom
    * associated with the <code>vertex</code>th vertex on level @p level. Also
    * see vertex_dof_index().
    */
-  types::global_dof_index mg_vertex_dof_index (const int level,
-                                               const unsigned int vertex,
-                                               const unsigned int i,
-                                               const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index mg_vertex_dof_index
+  (const int level,
+   const unsigned int vertex,
+   const unsigned int i,
+   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree of freedom of this object.
@@ -437,8 +439,9 @@ public:
    * produce an exception because no degrees are defined in the interior of
    * the face.
    */
-  types::global_dof_index dof_index (const unsigned int i,
-                                     const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index dof_index
+  (const unsigned int i,
+   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Returns the dof_index on the given level. Also see dof_index.
@@ -495,7 +498,7 @@ public:
    * given @p fe_index. @p fe_index must be used on this object, i.e.
    * <code>fe_index_is_active(fe_index)</code> must return true.
    */
-  const FiniteElement<DH::dimension,DH::space_dimension> &
+  const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
   get_fe (const unsigned int fe_index) const;
 
   /**
@@ -546,7 +549,7 @@ protected:
   /**
    * Store the address of the DoFHandler object to be accessed.
    */
-  DH *dof_handler;
+  DoFHandlerType *dof_handler;
 public:
   /**
    * Compare for equality. Return <tt>true</tt> if the two accessors refer to
@@ -561,19 +564,19 @@ public:
    * an iterator with level access can be equal to one with access to the
    * active degrees of freedom.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  bool operator == (const DoFAccessor<dim2,DH2,level_dof_access2> &) const;
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  bool operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Compare for inequality. The boolean not of operator==().
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  bool operator != (const DoFAccessor<dim2,DH2,level_dof_access2> &) const;
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  bool operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 protected:
   /**
    * Reset the DoF handler pointer.
    */
-  void set_dof_handler (DH *dh);
+  void set_dof_handler (DoFHandlerType *dh);
 
   /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p
@@ -592,9 +595,10 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_dof_index (const unsigned int i,
-                      const types::global_dof_index index,
-                      const unsigned int fe_index = DH::default_fe_index) const;
+  void set_dof_index
+  (const unsigned int i,
+   const types::global_dof_index index,
+   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   void set_mg_dof_index (const int level, const unsigned int i, const types::global_dof_index index) const;
 
@@ -615,12 +619,18 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_vertex_dof_index (const unsigned int vertex,
-                             const unsigned int i,
-                             const types::global_dof_index index,
-                             const unsigned int fe_index = DH::default_fe_index) const;
+  void set_vertex_dof_index
+  (const unsigned int            vertex,
+   const unsigned int            i,
+   const types::global_dof_index index,
+   const unsigned int            fe_index = DoFHandlerType::default_fe_index) const;
 
-  void set_mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const types::global_dof_index index, const unsigned int fe_index = DH::default_fe_index) const;
+  void set_mg_vertex_dof_index
+  (const int level,
+   const unsigned int vertex,
+   const unsigned int i,
+   const types::global_dof_index index,
+   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Iterator classes need to be friends because they need to access
@@ -640,8 +650,8 @@ private:
    * Furthermore it is not implemented and will give a linker error if used
    * anyway.
    */
-  DoFAccessor<structdim,DH, level_dof_access> &
-  operator = (const DoFAccessor<structdim,DH, level_dof_access> &da);
+  DoFAccessor<structdim,DoFHandlerType, level_dof_access> &
+  operator = (const DoFAccessor<structdim,DoFHandlerType, level_dof_access> &da);
 
   /**
    * Make the DoFHandler class a friend so that it can call the set_xxx()
@@ -668,8 +678,8 @@ private:
  *
  * @author Wolfgang Bangerth, 2010
  */
-template <template <int, int> class DH, int spacedim, bool level_dof_access>
-class DoFAccessor<0,DH<1,spacedim>, level_dof_access> : public TriaAccessor<0,1,spacedim>
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+class DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> : public TriaAccessor<0,1,spacedim>
 {
 public:
 
@@ -694,7 +704,7 @@ public:
   /**
    * Data type passed by the iterator class.
    */
-  typedef DH<1,spacedim> AccessorData;
+  typedef DoFHandlerType<1,spacedim> AccessorData;
 
   /**
    * @name Constructors
@@ -724,10 +734,10 @@ public:
    *
    * This iterator can only be called for one-dimensional triangulations.
    */
-  DoFAccessor (const Triangulation<1,spacedim> *tria,
-               const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
-               const unsigned int    vertex_index,
-               const DH<1,spacedim> *dof_handler);
+  DoFAccessor (const Triangulation<1,spacedim>                       *tria,
+               const typename TriaAccessor<0,1,spacedim>::VertexKind  vertex_kind,
+               const unsigned int                                     vertex_index,
+               const DoFHandlerType<1,spacedim>                      *dof_handler);
 
   /**
    * Constructor. This constructor exists in order to maintain interface
@@ -735,9 +745,9 @@ public:
    * anything useful here and so may not actually be called.
    */
   DoFAccessor (const Triangulation<1,spacedim> *,
-               const int = 0,
-               const int = 0,
-               const DH<1,spacedim> *dof_handler = 0);
+               const                             int         = 0,
+               const                             int         = 0,
+               const DoFHandlerType<1,spacedim> *dof_handler = 0);
 
   /**
    * Conversion constructor. This constructor exists to make certain
@@ -758,8 +768,8 @@ public:
    * Another conversion operator between objects that don't make sense, just
    * like the previous one.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  DoFAccessor (const DoFAccessor<dim2, DH2, level_dof_access2> &);
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  DoFAccessor (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
    * @}
@@ -768,20 +778,20 @@ public:
   /**
    * Return a handle on the DoFHandler object which we are using.
    */
-  const DH<1,spacedim> &
+  const DoFHandlerType<1,spacedim> &
   get_dof_handler () const;
 
   /**
    * Copy operator.
    */
-  DoFAccessor<0,DH<1,spacedim>, level_dof_access> &
-  operator = (const DoFAccessor<0,DH<1,spacedim>, level_dof_access> &da);
+  DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &
+  operator = (const DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &da);
 
   /**
    * Implement the copy operator needed for the iterator classes.
    */
   template <bool level_dof_access2>
-  void copy_from (const DoFAccessor<0, DH<1,spacedim>, level_dof_access2> &a);
+  void copy_from (const DoFAccessor<0, DoFHandlerType<1,spacedim>, level_dof_access2> &a);
 
   /**
    * Copy operator used by the iterator class. Keeps the previously set dof
@@ -801,7 +811,7 @@ public:
    * of the current object. The object is invalid because points (as
    * represented by the current class) do not have children.
    */
-  TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access > >
+  TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >
   child (const unsigned int c) const;
 
   /**
@@ -809,7 +819,7 @@ public:
    * a line itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim>, level_dof_access>::line_iterator
+  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
   line (const unsigned int i) const;
 
   /**
@@ -817,7 +827,7 @@ public:
    * a quad itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DH<1,spacedim>, level_dof_access>::quad_iterator
+  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
   quad (const unsigned int i) const;
 
   /**
@@ -968,7 +978,7 @@ public:
    * given @p fe_index. @p fe_index must be used on this object, i.e.
    * <code>fe_index_is_active(fe_index)</code> must return true.
    */
-  const FiniteElement<DH<1,spacedim>::dimension,DH<1,spacedim>::space_dimension> &
+  const FiniteElement<DoFHandlerType<1,spacedim>::dimension,DoFHandlerType<1,spacedim>::space_dimension> &
   get_fe (const unsigned int fe_index) const;
 
   /**
@@ -1019,24 +1029,24 @@ protected:
   /**
    * Store the address of the DoFHandler object to be accessed.
    */
-  DH<1,spacedim> *dof_handler;
+  DoFHandlerType<1,spacedim> *dof_handler;
 
   /**
    * Compare for equality.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  bool operator == (const DoFAccessor<dim2,DH2,level_dof_access2> &) const;
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  bool operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Compare for inequality.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
-  bool operator != (const DoFAccessor<dim2,DH2,level_dof_access2> &) const;
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+  bool operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Reset the DoF handler pointer.
    */
-  void set_dof_handler (DH<1,spacedim> *dh);
+  void set_dof_handler (DoFHandlerType<1,spacedim> *dh);
 
   /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p
@@ -1117,43 +1127,43 @@ protected:
  * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998, Timo Heister, Guido Kanschat, 2012
  */
-template <class DH, bool level_dof_access>
-class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH, level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
+class DoFCellAccessor :  public DoFAccessor<DoFHandlerType::dimension,DoFHandlerType, level_dof_access>
 {
 public:
   /**
-   * Extract dimension from DH.
+   * Extract dimension from DoFHandlerType.
    */
-  static const unsigned int dim = DH::dimension;
+  static const unsigned int dim = DoFHandlerType::dimension;
 
   /**
-   * Extract space dimension from DH.
+   * Extract space dimension from DoFHandlerType.
    */
-  static const unsigned int spacedim = DH::space_dimension;
+  static const unsigned int spacedim = DoFHandlerType::space_dimension;
 
 
   /**
    * Data type passed by the iterator class.
    */
-  typedef DH AccessorData;
+  typedef DoFHandlerType AccessorData;
 
   /**
    * Declare a typedef to the base class to make accessing some of the
    * exception classes simpler.
    */
-  typedef DoFAccessor<DH::dimension,DH, level_dof_access> BaseClass;
+  typedef DoFAccessor<DoFHandlerType::dimension,DoFHandlerType, level_dof_access> BaseClass;
 
   /**
    * Define the type of the container this is part of.
    */
-  typedef DH Container;
+  typedef DoFHandlerType Container;
 
   /**
    * A type for an iterator over the faces of a cell. This is what the face()
    * function returns.
    */
   typedef
-  TriaIterator<DoFAccessor<DH::dimension-1, DH, level_dof_access> >
+  TriaIterator<DoFAccessor<DoFHandlerType::dimension-1, DoFHandlerType, level_dof_access> >
   face_iterator;
 
   /**
@@ -1166,10 +1176,10 @@ public:
   /**
    * Constructor
    */
-  DoFCellAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
-                   const int                 level,
-                   const int                 index,
-                   const AccessorData       *local_data);
+  DoFCellAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria,
+                   const int           level,
+                   const int           index,
+                   const AccessorData *local_data);
 
   /**
    * Conversion constructor. This constructor exists to make certain
@@ -1190,9 +1200,9 @@ public:
    * Another conversion operator between objects that don't make sense, just
    * like the previous one.
    */
-  template <int dim2, class DH2, bool level_dof_access2>
+  template <int dim2, class DoFHandlerType2, bool level_dof_access2>
   explicit
-  DoFCellAccessor (const DoFAccessor<dim2, DH2, level_dof_access2> &);
+  DoFCellAccessor (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
    * @}
@@ -1207,7 +1217,7 @@ public:
    * CellAccessor returns a triangulation cell accessor without access to the
    * DoF data.
    */
-  TriaIterator<DoFCellAccessor<DH, level_dof_access> >
+  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access> >
   parent () const;
 
   /**
@@ -1222,7 +1232,7 @@ public:
    * needed since the neighbor function of the base class returns a cell
    * accessor without access to the DoF data.
    */
-  TriaIterator<DoFCellAccessor<DH, level_dof_access> >
+  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access> >
   neighbor (const unsigned int) const;
 
   /**
@@ -1230,7 +1240,7 @@ public:
    * since the child function of the base class returns a cell accessor
    * without access to the DoF data.
    */
-  TriaIterator<DoFCellAccessor<DH, level_dof_access> >
+  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access> >
   child (const unsigned int) const;
 
   /**
@@ -1248,7 +1258,7 @@ public:
    * function in the base class only returns an iterator with access to the
    * triangulation data).
    */
-  TriaIterator<DoFCellAccessor<DH, level_dof_access> >
+  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access> >
   neighbor_child_on_subface (const unsigned int face_no,
                              const unsigned int subface_no) const;
 
@@ -1381,7 +1391,8 @@ public:
   template <class InputVector, typename number>
   void get_interpolated_dof_values (const InputVector &values,
                                     Vector<number>    &interpolated_values,
-                                    const unsigned int fe_index = DH::default_fe_index) const;
+                                    const unsigned int fe_index
+                                    = DoFHandlerType::default_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you
@@ -1438,7 +1449,8 @@ public:
   template <class OutputVector, typename number>
   void set_dof_values_by_interpolation (const Vector<number> &local_values,
                                         OutputVector         &values,
-                                        const unsigned int fe_index = DH::default_fe_index) const;
+                                        const unsigned int    fe_index
+                                        = DoFHandlerType::default_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the
@@ -1602,7 +1614,7 @@ public:
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
    */
-  const FiniteElement<DH::dimension,DH::space_dimension> &
+  const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
   get_fe () const;
 
   /**
@@ -1664,8 +1676,8 @@ private:
    * Furthermore it is not implemented and will give a linker error if used
    * anyway.
    */
-  DoFCellAccessor<DH, level_dof_access> &
-  operator = (const DoFCellAccessor<DH, level_dof_access> &da);
+  DoFCellAccessor<DoFHandlerType, level_dof_access> &
+  operator = (const DoFCellAccessor<DoFHandlerType, level_dof_access> &da);
 
   /**
    * Make the DoFHandler class a friend so that it can call the
@@ -1676,10 +1688,10 @@ private:
 };
 
 
-template <int sd, class DH, bool level_dof_access>
+template <int sd, typename DoFHandlerType, bool level_dof_access>
 inline
 bool
-DoFAccessor<sd, DH, level_dof_access>::is_level_cell()
+DoFAccessor<sd, DoFHandlerType, level_dof_access>::is_level_cell()
 {
   return level_dof_access;
 }

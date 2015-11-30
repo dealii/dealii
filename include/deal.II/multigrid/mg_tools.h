@@ -81,9 +81,9 @@ namespace MGTools
    * There is no need to consider hanging nodes here, since only one level is
    * considered.
    */
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_sparsity_pattern (const DH           &dof_handler,
+  make_sparsity_pattern (const DoFHandlerType           &dof_handler,
                          SP                 &sparsity,
                          const unsigned int level);
 
@@ -150,11 +150,11 @@ namespace MGTools
    * Result is a vector containing for each level a vector containing the
    * number of dofs for each block (access is <tt>result[level][block]</tt>).
    */
-  template <class DH>
+  template <typename DoFHandlerType>
   void
-  count_dofs_per_block (const DH     &dof_handler,
+  count_dofs_per_block (const DoFHandlerType                               &dof_handler,
                         std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
-                        std::vector<unsigned int>  target_block = std::vector<unsigned int>());
+                        std::vector<unsigned int> target_block = std::vector<unsigned int>());
 
   /**
    * Count the dofs component-wise on each level.

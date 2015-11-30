@@ -109,8 +109,8 @@ public:
    * also read from vectors (but less efficient than with data coming from
    * MatrixFree).
    */
-  template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell);
+  template <typename DoFHandlerType, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell);
 
   /**
    * Initialize the data to the current cell using a TriaIterator object as
@@ -1990,11 +1990,11 @@ FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_in)
 
 
 template <int dim, int n_components_, typename Number>
-template <typename DH, bool level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell)
+::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
 {
   Assert(matrix_info == 0,
          ExcMessage("Cannot use initialization from cell iterator if "

@@ -288,7 +288,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth,
  * 2006, Wolfgang Bangerth 2014
  */
-template<int dim, typename VectorType=Vector<double>, class DH=DoFHandler<dim> >
+template<int dim, typename VectorType=Vector<double>,
+         typename DoFHandlerType=DoFHandler<dim> >
 class SolutionTransfer
 {
 public:
@@ -296,7 +297,7 @@ public:
   /**
    * Constructor, takes the current DoFHandler as argument.
    */
-  SolutionTransfer(const DH &dof);
+  SolutionTransfer(const DoFHandlerType &dof);
 
   /**
    * Destructor
@@ -418,7 +419,7 @@ private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DH,SolutionTransfer<dim,VectorType,DH> > dof_handler;
+  SmartPointer<const DoFHandlerType, SolutionTransfer<dim,VectorType, DoFHandlerType> > dof_handler;
 
   /**
    * Stores the number of DoFs before the refinement and/or coarsening.

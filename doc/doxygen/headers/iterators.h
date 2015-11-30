@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013, 2014 by the deal.II authors
+// Copyright (C) 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -397,9 +397,9 @@ stated in the
   internal::Triangulation::Iterators<3,spacedim> classes for Triangulation
   iterators,
 
-- internal::DoFHandler::Iterators<DH<1,spacedim> >,
-  internal::DoFHandler::Iterators<DH<2,spacedim> >, and
-  internal::DoFHandler::Iterators<DH<3,spacedim> > classes for DoFHandler
+- internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim> >,
+  internal::DoFHandler::Iterators<DoFHandlerType<2,spacedim> >, and
+  internal::DoFHandler::Iterators<DoFHandlerType<3,spacedim> > classes for DoFHandler
   and hp::DoFHandler iterators,
 
 

@@ -37,10 +37,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class DH, bool lda>
+template <typename DoFHandlerType, bool lda>
 template <class InputVector, typename number>
 void
-DoFCellAccessor<DH,lda>::
+DoFCellAccessor<DoFHandlerType,lda>::
 get_interpolated_dof_values (const InputVector &values,
                              Vector<number>    &interpolated_values,
                              const unsigned int fe_index) const
@@ -50,7 +50,7 @@ get_interpolated_dof_values (const InputVector &values,
     // cell unless the finite element we need to interpolate to is different than
     // the one we have on the current cell
     {
-      if ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
            (this->dof_handler)
            != 0)
           ||
@@ -59,7 +59,7 @@ get_interpolated_dof_values (const InputVector &values,
           // or that you specify the correct one
           (fe_index == this->active_fe_index())
           ||
-          (fe_index == DH::default_fe_index))
+          (fe_index == DoFHandlerType::default_fe_index))
         this->get_dof_values (values, interpolated_values);
       else
         {
@@ -86,11 +86,11 @@ get_interpolated_dof_values (const InputVector &values,
       // mesh). consequently, we cannot interpolate from children's FE
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
-      Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+      Assert ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
                (this->dof_handler)
                != 0)
               ||
-              (fe_index != DH::default_fe_index),
+              (fe_index != DoFHandlerType::default_fe_index),
               ExcMessage ("You cannot call this function on non-active cells "
                           "of hp::DoFHandler objects unless you provide an explicit "
                           "finite element index because they do not have naturally "

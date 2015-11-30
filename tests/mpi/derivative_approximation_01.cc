@@ -19,7 +19,7 @@
 /*
  --------------------------------------------------------
  An error occurred in line <3349> of file </ssd/deal-trunk/deal.II/include/deal.II/dofs/dof_accessor.templates.h> in function
-     void dealii::DoFCellAccessor<DH, lda>::get_dof_values(const InputVector&, ForwardIterator, ForwardIterator) const [with InputVector = dealii::TrilinosWrappers::MPI::Vector, ForwardIterator = double*, DH = dealii::DoFHandler<2>, bool level_dof_access = false]
+     void dealii::DoFCellAccessor<DoFHandlerType, lda>::get_dof_values(const InputVector&, ForwardIterator, ForwardIterator) const [with InputVector = dealii::TrilinosWrappers::MPI::Vector, ForwardIterator = double*, DoFHandlerType = dealii::DoFHandler<2>, bool level_dof_access = false]
  The violated condition was:
      this->is_artificial() == false
  The name and call sequence of the exception was:

@@ -50,9 +50,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace DoFTools
 {
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_sparsity_pattern (const DH                  &dof,
+  make_sparsity_pattern (const DoFHandlerType      &dof,
                          SP                        &sparsity,
                          const ConstraintMatrix    &constraints,
                          const bool                 keep_constrained_dofs,
@@ -81,8 +81,8 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                  endc = dof.end();
 
     // In case we work with a distributed sparsity pattern of Trilinos
     // type, we only have to do the work if the current cell is owned by
@@ -109,9 +109,9 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_sparsity_pattern (const DH                  &dof,
+  make_sparsity_pattern (const DoFHandlerType      &dof,
                          const Table<2,Coupling>   &couplings,
                          SP                        &sparsity,
                          const ConstraintMatrix    &constraints,
@@ -143,7 +143,7 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    const hp::FECollection<DH::dimension,DH::space_dimension> fe_collection (dof.get_fe());
+    const hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_collection (dof.get_fe());
 
     // first, for each finite element, build a mask for each dof, not like
     // the one given which represents components. make sure we do the right
@@ -192,8 +192,8 @@ namespace DoFTools
 
 
     std::vector<types::global_dof_index> dofs_on_this_cell(fe_collection.max_dofs_per_cell());
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                  endc = dof.end();
 
     // In case we work with a distributed sparsity pattern of Trilinos
     // type, we only have to do the work if the current cell is owned by
@@ -224,10 +224,10 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_sparsity_pattern (const DH &dof_row,
-                         const DH &dof_col,
+  make_sparsity_pattern (const DoFHandlerType &dof_row,
+                         const DoFHandlerType &dof_col,
                          SP       &sparsity)
   {
     const types::global_dof_index n_dofs_row = dof_row.n_dofs();
@@ -242,20 +242,20 @@ namespace DoFTools
 
 //TODO: Looks like wasteful memory management here
 
-    const std::list<std::pair<typename DH::cell_iterator,
-          typename DH::cell_iterator> >
+    const std::list<std::pair<typename DoFHandlerType::cell_iterator,
+          typename DoFHandlerType::cell_iterator> >
           cell_list
           = GridTools::get_finest_common_cells (dof_row, dof_col);
 
 
-    typename std::list<std::pair<typename DH::cell_iterator,
-             typename DH::cell_iterator> >::const_iterator
+    typename std::list<std::pair<typename DoFHandlerType::cell_iterator,
+             typename DoFHandlerType::cell_iterator> >::const_iterator
              cell_iter = cell_list.begin();
 
     for (; cell_iter!=cell_list.end(); ++cell_iter)
       {
-        const typename DH::cell_iterator cell_row = cell_iter->first;
-        const typename DH::cell_iterator cell_col = cell_iter->second;
+        const typename DoFHandlerType::cell_iterator cell_row = cell_iter->first;
+        const typename DoFHandlerType::cell_iterator cell_col = cell_iter->second;
 
         if (!cell_row->has_children() && !cell_col->has_children())
           {
@@ -276,11 +276,11 @@ namespace DoFTools
           }
         else if (cell_row->has_children())
           {
-            const std::vector<typename DH::active_cell_iterator >
-            child_cells = GridTools::get_active_child_cells<DH> (cell_row);
+            const std::vector<typename DoFHandlerType::active_cell_iterator >
+            child_cells = GridTools::get_active_child_cells<DoFHandlerType> (cell_row);
             for (unsigned int i=0; i<child_cells.size(); i++)
               {
-                const typename DH::cell_iterator
+                const typename DoFHandlerType::cell_iterator
                 cell_row_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
                   cell_row_child->get_fe().dofs_per_cell;
@@ -300,11 +300,11 @@ namespace DoFTools
           }
         else
           {
-            std::vector<typename DH::active_cell_iterator>
-            child_cells = GridTools::get_active_child_cells<DH> (cell_col);
+            std::vector<typename DoFHandlerType::active_cell_iterator>
+            child_cells = GridTools::get_active_child_cells<DoFHandlerType> (cell_col);
             for (unsigned int i=0; i<child_cells.size(); i++)
               {
-                const typename DH::active_cell_iterator
+                const typename DoFHandlerType::active_cell_iterator
                 cell_col_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
                   cell_row->get_fe().dofs_per_cell;
@@ -327,24 +327,24 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
   make_boundary_sparsity_pattern
-  (const DH                                   &dof,
+  (const DoFHandlerType                       &dof,
    const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
    SP                                         &sparsity)
   {
-    if (DH::dimension == 1)
+    if (DoFHandlerType::dimension == 1)
       {
         // there are only 2 boundary indicators in 1d, so it is no
         // performance problem to call the other function
-        typename DH::FunctionMap boundary_ids;
+        typename DoFHandlerType::FunctionMap boundary_ids;
         boundary_ids[0] = 0;
         boundary_ids[1] = 0;
-        make_boundary_sparsity_pattern<DH, SP> (dof,
-                                                boundary_ids,
-                                                dof_to_boundary_mapping,
-                                                sparsity);
+        make_boundary_sparsity_pattern<DoFHandlerType, SP> (dof,
+                                                            boundary_ids,
+                                                            dof_to_boundary_mapping,
+                                                            sparsity);
         return;
       }
 
@@ -360,7 +360,7 @@ namespace DoFTools
         types::global_dof_index max_element = 0;
         for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
-          if ((*i != DH::invalid_dof_index) &&
+          if ((*i != DoFHandlerType::invalid_dof_index) &&
               (*i > max_element))
             max_element = *i;
         AssertDimension (max_element, sparsity.n_rows()-1);
@@ -375,10 +375,10 @@ namespace DoFTools
     // @p{cell->has_boundary_lines}), since we do not support boundaries of
     // dimension dim-2, and so every boundary line is also part of a
     // boundary face.
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                  endc = dof.end();
     for (; cell!=endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
@@ -396,14 +396,14 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void make_boundary_sparsity_pattern
-  (const DH                                              &dof,
-   const typename FunctionMap<DH::space_dimension>::type &boundary_ids,
+  (const DoFHandlerType                                  &dof,
+   const typename FunctionMap<DoFHandlerType::space_dimension>::type &boundary_ids,
    const std::vector<types::global_dof_index>            &dof_to_boundary_mapping,
    SP                                                    &sparsity)
   {
-    if (DH::dimension == 1)
+    if (DoFHandlerType::dimension == 1)
       {
         // first check left, then right boundary point
         for (unsigned int direction=0; direction<2; ++direction)
@@ -415,7 +415,7 @@ namespace DoFTools
 
             // find active cell at that boundary: first go to left/right,
             // then to children
-            typename DH::level_cell_iterator cell = dof.begin(0);
+            typename DoFHandlerType::level_cell_iterator cell = dof.begin(0);
             while (!cell->at_boundary(direction))
               cell = cell->neighbor(direction);
             while (!cell->active())
@@ -442,7 +442,7 @@ namespace DoFTools
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
     Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
-            typename DH::ExcInvalidBoundaryIndicator());
+            typename DoFHandlerType::ExcInvalidBoundaryIndicator());
     Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_ids),
             ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs (boundary_ids)));
     Assert (sparsity.n_cols() == dof.n_boundary_dofs (boundary_ids),
@@ -453,7 +453,7 @@ namespace DoFTools
         types::global_dof_index max_element = 0;
         for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
-          if ((*i != DH::invalid_dof_index) &&
+          if ((*i != DoFHandlerType::invalid_dof_index) &&
               (*i > max_element))
             max_element = *i;
         AssertDimension (max_element, sparsity.n_rows()-1);
@@ -462,10 +462,10 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve (max_dofs_per_face(dof));
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                  endc = dof.end();
     for (; cell!=endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
@@ -484,9 +484,9 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_flux_sparsity_pattern (const DH                  &dof,
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof,
                               SP                        &sparsity,
                               const ConstraintMatrix    &constraints,
                               const bool                 keep_constrained_dofs,
@@ -518,8 +518,8 @@ namespace DoFTools
     std::vector<types::global_dof_index> dofs_on_other_cell;
     dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
     dofs_on_other_cell.reserve (max_dofs_per_cell(dof));
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                  endc = dof.end();
 
     // TODO: in an old implementation, we used user flags before to tag
     // faces that were already touched. this way, we could reduce the work
@@ -548,19 +548,19 @@ namespace DoFTools
                                                    keep_constrained_dofs);
 
           for (unsigned int face = 0;
-               face < GeometryInfo<DH::dimension>::faces_per_cell;
+               face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
                ++face)
             {
-              typename DH::face_iterator cell_face = cell->face(face);
+              typename DoFHandlerType::face_iterator cell_face = cell->face(face);
               if (! cell->at_boundary(face) )
                 {
-                  typename DH::level_cell_iterator neighbor = cell->neighbor(face);
+                  typename DoFHandlerType::level_cell_iterator neighbor = cell->neighbor(face);
 
                   // in 1d, we do not need to worry whether the neighbor
                   // might have children and then loop over those children.
                   // rather, we may as well go straight to to cell behind
                   // this particular cell's most terminal child
-                  if (DH::dimension==1)
+                  if (DoFHandlerType::dimension==1)
                     while (neighbor->has_children())
                       neighbor = neighbor->child(face==0 ? 1 : 0);
 
@@ -570,7 +570,7 @@ namespace DoFTools
                            sub_nr != cell_face->number_of_children();
                            ++sub_nr)
                         {
-                          const typename DH::level_cell_iterator
+                          const typename DoFHandlerType::level_cell_iterator
                           sub_neighbor
                             = cell->neighbor_child_on_subface (face, sub_nr);
 
@@ -634,9 +634,9 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_flux_sparsity_pattern (const DH &dof,
+  make_flux_sparsity_pattern (const DoFHandlerType &dof,
                               SP       &sparsity)
   {
     ConstraintMatrix constraints;
@@ -710,14 +710,14 @@ namespace DoFTools
 
       // implementation of the same function in namespace DoFTools for
       // non-hp DoFHandlers
-      template <class DH, class SP>
+      template <typename DoFHandlerType, class SP>
       void
-      make_flux_sparsity_pattern (const DH                &dof,
+      make_flux_sparsity_pattern (const DoFHandlerType    &dof,
                                   SP                      &sparsity,
                                   const Table<2,Coupling> &int_mask,
                                   const Table<2,Coupling> &flux_mask)
       {
-        const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof.get_fe();
+        const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof.get_fe();
 
         std::vector<types::global_dof_index> dofs_on_this_cell(fe.dofs_per_cell);
         std::vector<types::global_dof_index> dofs_on_other_cell(fe.dofs_per_cell);
@@ -727,13 +727,13 @@ namespace DoFTools
         flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
 
         Table<2,bool> support_on_face(fe.dofs_per_cell,
-                                      GeometryInfo<DH::dimension>::faces_per_cell);
+                                      GeometryInfo<DoFHandlerType::dimension>::faces_per_cell);
         for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-          for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+          for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
             support_on_face(i,f) = fe.has_support_on_face(i,f);
 
-        typename DH::active_cell_iterator cell = dof.begin_active(),
-                                          endc = dof.end();
+        typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                      endc = dof.end();
         for (; cell!=endc; ++cell)
           if (cell->is_locally_owned())
             {
@@ -747,10 +747,10 @@ namespace DoFTools
 
               // Loop over all interior neighbors
               for (unsigned int face = 0;
-                   face < GeometryInfo<DH::dimension>::faces_per_cell;
+                   face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
                    ++face)
                 {
-                  const typename DH::face_iterator
+                  const typename DoFHandlerType::face_iterator
                   cell_face = cell->face(face);
                   if (cell_face->user_flag_set ())
                     continue;
@@ -778,7 +778,7 @@ namespace DoFTools
                     }
                   else
                     {
-                      typename DH::level_cell_iterator
+                      typename DoFHandlerType::level_cell_iterator
                       neighbor = cell->neighbor(face);
                       // Refinement edges are taken care of by coarser
                       // cells
@@ -794,7 +794,7 @@ namespace DoFTools
                                sub_nr != cell_face->n_children();
                                ++sub_nr)
                             {
-                              const typename DH::level_cell_iterator
+                              const typename DoFHandlerType::level_cell_iterator
                               sub_neighbor
                                 = cell->neighbor_child_on_subface (face, sub_nr);
 
@@ -1131,9 +1131,9 @@ namespace DoFTools
 
 
 
-  template <class DH, class SP>
+  template <typename DoFHandlerType, class SP>
   void
-  make_flux_sparsity_pattern (const DH                &dof,
+  make_flux_sparsity_pattern (const DoFHandlerType    &dof,
                               SP                      &sparsity,
                               const Table<2,Coupling> &int_mask,
                               const Table<2,Coupling> &flux_mask)
@@ -1164,13 +1164,15 @@ namespace DoFTools
     // at the beginning of this function.
     std::vector<bool> user_flags;
     dof.get_tria().save_user_flags(user_flags);
-    const_cast<Triangulation<DH::dimension,DH::space_dimension> &>(dof.get_tria()).clear_user_flags ();
+    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
+    (dof.get_tria()).clear_user_flags ();
 
     internal::make_flux_sparsity_pattern (dof, sparsity,
                                           int_mask, flux_mask);
 
     // finally restore the user flags
-    const_cast<Triangulation<DH::dimension,DH::space_dimension> &>(dof.get_tria()).load_user_flags(user_flags);
+    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
+    (dof.get_tria()).load_user_flags(user_flags);
   }
 
 

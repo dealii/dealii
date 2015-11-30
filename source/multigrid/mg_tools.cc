@@ -535,10 +535,10 @@ namespace MGTools
 
 
 
-  template <class DH, class SP>
-  void make_sparsity_pattern (const DH           &dof,
-                              SP                 &sparsity,
-                              const unsigned int  level)
+  template <typename DoFHandlerType, class SP>
+  void make_sparsity_pattern (const DoFHandlerType &dof,
+                              SP                   &sparsity,
+                              const unsigned int    level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
@@ -550,8 +550,8 @@ namespace MGTools
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
-    typename DH::cell_iterator cell = dof.begin(level),
-                               endc = dof.end(level);
+    typename DoFHandlerType::cell_iterator cell = dof.begin(level),
+                                           endc = dof.end(level);
     for (; cell!=endc; ++cell)
       if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
           || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
@@ -1063,14 +1063,14 @@ namespace MGTools
 
 
 
-  template <class DH>
+  template <typename DoFHandlerType>
   void
-  count_dofs_per_block (
-    const DH     &dof_handler,
-    std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
-    std::vector<unsigned int>  target_block)
+  count_dofs_per_block
+  (const DoFHandlerType                               &dof_handler,
+   std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
+   std::vector<unsigned int>                           target_block)
   {
-    const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof_handler.get_fe();
+    const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();
     const unsigned int n_levels = dof_handler.get_tria().n_global_levels();
 
@@ -1121,10 +1121,10 @@ namespace MGTools
         for (unsigned int i=0; i<n_blocks; ++i)
           {
             void (*fun_ptr) (const unsigned int level,
-                             const DH &,
+                             const DoFHandlerType &,
                              const BlockMask &,
                              std::vector<bool> &)
-              = &DoFTools::extract_level_dofs<DH>;
+              = &DoFTools::extract_level_dofs<DoFHandlerType>;
 
             std::vector<bool> tmp(n_blocks, false);
             tmp[i] = true;

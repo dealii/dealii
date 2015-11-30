@@ -44,8 +44,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
-MappingFEField<dim,spacedim,VectorType,DH>::InternalData::InternalData
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalData
 (const FiniteElement<dim,spacedim> &fe,
  const ComponentMask                mask)
   :
@@ -57,9 +57,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::InternalData::InternalData
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 std::size_t
-MappingFEField<dim,spacedim,VectorType,DH>::InternalData::memory_consumption () const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::memory_consumption () const
 {
   Assert (false, ExcNotImplemented());
   return 0;
@@ -67,9 +67,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::InternalData::memory_consumption () 
 
 
 
-template<int dim, int spacedim, class DH, typename VectorType>
+template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 double &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::shape
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
 (const unsigned int qpoint,
  const unsigned int shape_nr)
 {
@@ -80,9 +80,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::shape
 }
 
 
-template<int dim, int spacedim, class DH, typename VectorType>
+template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 const Tensor<1,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -94,9 +94,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::derivative
 
 
 
-template<int dim, int spacedim, class DH, typename VectorType>
+template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 Tensor<1,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr)
 {
@@ -107,9 +107,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::derivative
 }
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 const Tensor<2,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::second_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::second_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -121,9 +121,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::second_derivative
 
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 Tensor<2,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::second_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::second_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr)
 {
@@ -134,9 +134,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::second_derivative
 }
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 const Tensor<3,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::third_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::third_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -148,9 +148,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::third_derivative
 
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 Tensor<3,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::third_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::third_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr)
 {
@@ -161,9 +161,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::third_derivative
 }
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 const Tensor<4,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::fourth_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::fourth_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -175,9 +175,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::fourth_derivative
 
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 Tensor<4,dim> &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::fourth_derivative
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::fourth_derivative
 (const unsigned int qpoint,
  const unsigned int shape_nr)
 {
@@ -189,9 +189,9 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::fourth_derivative
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
-MappingFEField<dim,spacedim,VectorType,DH>::MappingFEField
-(const DH            &euler_dof_handler,
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
+(const DoFHandlerType            &euler_dof_handler,
  const VectorType    &euler_vector,
  const ComponentMask  mask)
   :
@@ -212,9 +212,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::MappingFEField
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
-MappingFEField<dim,spacedim,VectorType,DH>::MappingFEField
-(const MappingFEField<dim,spacedim,VectorType,DH> &mapping)
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
+(const MappingFEField<dim,spacedim,VectorType,DoFHandlerType> &mapping)
   :
   euler_vector(mapping.euler_vector),
   fe(mapping.fe),
@@ -225,10 +225,10 @@ MappingFEField<dim,spacedim,VectorType,DH>::MappingFEField
 
 
 
-template<int dim, int spacedim, class DH, typename VectorType>
+template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 inline
 const double &
-MappingFEField<dim,spacedim,DH,VectorType>::InternalData::shape
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -240,18 +240,18 @@ MappingFEField<dim,spacedim,DH,VectorType>::InternalData::shape
 
 
 
-template <int dim, int spacedim, class DH, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 bool
-MappingFEField<dim,spacedim,DH,VectorType>::preserves_vertex_locations () const
+MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::preserves_vertex_locations () const
 {
   return false;
 }
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 compute_shapes_virtual (const std::vector<Point<dim> >                       &unit_points,
                         typename MappingFEField<dim, spacedim>::InternalData &data) const
 {
@@ -282,9 +282,9 @@ compute_shapes_virtual (const std::vector<Point<dim> >                       &un
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 UpdateFlags
-MappingFEField<dim,spacedim,VectorType,DH>::requires_update_flags (const UpdateFlags in) const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::requires_update_flags (const UpdateFlags in) const
 {
   // add flags if the respective quantities are necessary to compute
   // what we need. note that some flags appear in both conditions and
@@ -341,9 +341,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::requires_update_flags (const UpdateF
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::compute_data
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_data
 (const UpdateFlags      update_flags,
  const Quadrature<dim> &q,
  const unsigned int     n_original_q_points,
@@ -393,9 +393,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::compute_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::compute_face_data
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
 (const UpdateFlags      update_flags,
  const Quadrature<dim> &q,
  const unsigned int     n_original_q_points,
@@ -461,11 +461,11 @@ MappingFEField<dim,spacedim,VectorType,DH>::compute_face_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename
-MappingFEField<dim,spacedim,VectorType,DH>::InternalData *
-MappingFEField<dim,spacedim,VectorType,DH>::get_data (const UpdateFlags      update_flags,
-                                                      const Quadrature<dim> &quadrature) const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_data (const UpdateFlags      update_flags,
+    const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
   this->compute_data (update_flags, quadrature,
@@ -475,9 +475,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::get_data (const UpdateFlags      upd
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename Mapping<dim,spacedim>::InternalDataBase *
-MappingFEField<dim,spacedim,VectorType,DH>::get_face_data
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_face_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
@@ -490,9 +490,9 @@ MappingFEField<dim,spacedim,VectorType,DH>::get_face_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename Mapping<dim,spacedim>::InternalDataBase *
-MappingFEField<dim,spacedim,VectorType,DH>::get_subface_data
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_subface_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
@@ -1273,9 +1273,9 @@ namespace internal
 
 // Note that the CellSimilarity flag is modifiable, since MappingFEField can need to
 // recalculate data even when cells are similar.
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 CellSimilarity::Similarity
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
@@ -1445,9 +1445,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
@@ -1477,9 +1477,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                         const unsigned int                                         face_no,
                         const unsigned int                                         subface_no,
@@ -1513,7 +1513,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 namespace
 {
-  template<int dim, int spacedim, int rank, typename VectorType, class DH>
+  template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
   transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
                    const MappingType                                        mapping_type,
@@ -1521,10 +1521,10 @@ namespace
                    VectorSlice<std::vector<Tensor<rank,spacedim> > >        output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != 0),
             ExcInternalError());
-    const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData
-    &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData &>(mapping_data);
+    const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData
+    &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &>(mapping_data);
 
     switch (mapping_type)
       {
@@ -1575,19 +1575,20 @@ namespace
   }
 
 
-  template<int dim, int spacedim, int rank, typename VectorType, class DH>
+  template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
-  transform_differential_forms(const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >  input,
-                               const MappingType                                                           mapping_type,
-                               const typename Mapping<dim,spacedim>::InternalDataBase                     &mapping_data,
-                               VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                        output)
+  transform_differential_forms
+  (const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >  input,
+   const MappingType                                                           mapping_type,
+   const typename Mapping<dim,spacedim>::InternalDataBase                     &mapping_data,
+   VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                        output)
   {
 
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != 0),
             ExcInternalError());
-    const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData
-    &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DH>::InternalData &>(mapping_data);
+    const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData
+    &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &>(mapping_data);
 
     switch (mapping_type)
       {
@@ -1610,9 +1611,9 @@ namespace
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -1620,14 +1621,14 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
 {
   AssertDimension (input.size(), output.size());
 
-  transform_fields<dim,spacedim,1,VectorType,DH>(input, mapping_type, mapping_data, output);
+  transform_fields<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
 }
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
            const MappingType                                                          mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
@@ -1635,14 +1636,14 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
 {
   AssertDimension (input.size(), output.size());
 
-  transform_differential_forms<dim,spacedim,1,VectorType,DH>(input, mapping_type, mapping_data, output);
+  transform_differential_forms<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
 }
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
            const MappingType,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -1658,9 +1659,9 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
            const MappingType                                                         mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase                   &mapping_data,
@@ -1708,9 +1709,9 @@ transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim>
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const VectorSlice<const std::vector< Tensor<3,dim> > >  input,
            const MappingType                                     /*mapping_type*/,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -1728,9 +1729,9 @@ transform (const VectorSlice<const std::vector< Tensor<3,dim> > >  input,
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<spacedim>
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<dim>                                          &p) const
 {
@@ -1747,9 +1748,9 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<spacedim>
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 do_transform_unit_to_real_cell (const InternalData &data) const
 {
   Point<spacedim> p_real;
@@ -1766,9 +1767,9 @@ do_transform_unit_to_real_cell (const InternalData &data) const
 
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<dim>
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                                     &p) const
 {
@@ -1809,9 +1810,9 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<dim>
-MappingFEField<dim,spacedim,VectorType,DH>::
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 do_transform_real_to_unit_cell
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
  const Point<spacedim>                                     &p,
@@ -1917,39 +1918,39 @@ failure:
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 unsigned int
-MappingFEField<dim,spacedim,VectorType,DH>::get_degree() const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_degree() const
 {
   return fe->degree;
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 ComponentMask
-MappingFEField<dim,spacedim,VectorType,DH>::get_component_mask() const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_component_mask() const
 {
   return this->fe_mask;
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Mapping<dim,spacedim> *
-MappingFEField<dim,spacedim,VectorType,DH>::clone () const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::clone () const
 {
-  return new MappingFEField<dim,spacedim,VectorType,DH>(*this);
+  return new MappingFEField<dim,spacedim,VectorType,DoFHandlerType>(*this);
 }
 
 
-template<int dim, int spacedim, typename VectorType, class DH>
+template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
-MappingFEField<dim,spacedim,VectorType,DH>::update_internal_dofs
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
 (const typename Triangulation<dim,spacedim>::cell_iterator  &cell,
  const typename MappingFEField<dim, spacedim>::InternalData &data) const
 {
   Assert(euler_dof_handler != 0, ExcMessage("euler_dof_handler is empty"));
 
-  typename DH::cell_iterator dof_cell(*cell, euler_dof_handler);
+  typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
   dof_cell->get_dof_indices(data.local_dof_indices);
