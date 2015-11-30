@@ -50,16 +50,36 @@ namespace Utilities
 {
 
   /**
-   * Convert a number @p i to a string, with as many digits as given to fill
+   * Convert a number @p value to a string, with as many digits as given to fill
    * with leading zeros.
    *
    * If the second parameter is left at its default value, the number is not
-   * padded with leading zeros. The result is then the same as of the standard
+   * padded with leading zeros. The result is then the same as if the standard
    * C function <code>itoa()</code> had been called.
+   *
+   * When calling this function signed integers are implicitly converted to
+   * unsigned integers and long integers might experience an overflow.
+   *
+   * @note The use of this function is discouraged and users should use
+   * <code>Utilities::to_string()</code> instead. In its current implementation
+   * the function simply calls <code>to_string<unsigned int>()</code>.
    */
   std::string
-  int_to_string (const unsigned int i,
+  int_to_string (const unsigned int value,
                  const unsigned int digits = numbers::invalid_unsigned_int);
+
+  /**
+   * Convert a number @p value to a string, with as many digits as given to fill
+   * with leading zeros.
+   *
+   * If the second parameter is left at its default value, the number is not
+   * padded with leading zeros. The result is then the same as if the boost
+   * function <code>lexical_cast<std::string>()</code> had been called.
+   */
+  template <typename number>
+  std::string
+  to_string (const number value,
+             const unsigned int digits = numbers::invalid_unsigned_int);
 
   /**
    * Determine how many digits are needed to represent numbers at most as
