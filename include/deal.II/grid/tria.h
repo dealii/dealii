@@ -160,9 +160,15 @@ struct CellData
  * a common number describing the boundary condition to hold on this part of
  * the boundary. The triangulation creation function gives lines not in this
  * list either the boundary indicator zero (if on the boundary) or
- * numbers::internal_face_boundary_id (if in the interior). Explicitly giving
- * a line the indicator numbers::internal_face_boundary_id will result in an
- * error, as well as giving an interior line a boundary indicator.
+ * numbers::internal_face_boundary_id (if in the interior).
+ *
+ * You will get an error if you try to set the boundary indicator of
+ * an interior edge or face, i.e., an edge or face that is not at the
+ * boundary of the mesh. However, one may sometimes want to set the
+ * manifold indicator to an interior object. In this case, set its
+ * boundary indicator to numbers::internal_face_boundary_id, to
+ * indicate that you understand that it is an interior object, but set
+ * its manifold id to the value you want.
  *
  * @ingroup grid
  */
