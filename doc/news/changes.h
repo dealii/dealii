@@ -531,6 +531,13 @@ inconvenience this causes.
   (Martin Kronbichler, 2015/12/05)
   </li>
 
+  <li> Fixed: The GridTools::copy_boundary_to_manifold_id() function
+  only copied boundary indicators from faces, but in 3d forgot about
+  edges. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/11/30)
+  </li>
+
   <li> Fixed: The constructor of SymmetricTensor that takes an array
   of initializing elements led to a compiler error. This is now
   fixed.

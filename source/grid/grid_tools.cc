@@ -3252,24 +3252,50 @@ next_cell:
 #endif
   }
 
+
+
   template <int dim, int spacedim>
   void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
                                     const bool reset_boundary_ids)
   {
+    // in 3d, we not only have to copy boundary ids of faces, but also of edges
+    // because we see them twice (once from each adjacent boundary face),
+    // we cannot immediately reset their boundary ids. thus, copy first
+    // and reset later
+    if (dim >= 3)
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell=tria.begin_active();
+           cell != tria.end(); ++cell)
+        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+          if (cell->face(f)->at_boundary())
+            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+              cell->face(f)->line(e)->set_manifold_id
+              (static_cast<types::manifold_id>(cell->face(f)->line(e)->boundary_id()));
 
-    typename Triangulation<dim,spacedim>::active_cell_iterator
-    cell=tria.begin_active(), endc=tria.end();
-
-    for (; cell != endc; ++cell)
+    // now do cells
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+         cell=tria.begin_active();
+         cell != tria.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
+            // copy boundary to manifold ids
             cell->face(f)->set_manifold_id
             (static_cast<types::manifold_id>(cell->face(f)->boundary_id()));
+
+            // then reset boundary ids if so desired, and in 3d also that
+            // of edges
             if (reset_boundary_ids == true)
-              cell->face(f)->set_boundary_id(0);
+              {
+                cell->face(f)->set_boundary_id(0);
+                if (dim >= 3)
+                  for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+                    cell->face(f)->line(e)->set_boundary_id(0);
+              }
           }
   }
+
+
 
   template <int dim, int spacedim>
   void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
@@ -3285,7 +3311,7 @@ next_cell:
           {
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
               {
-                if (cell->neighbor(f) != endc)
+                if (cell->at_boundary(f) == false)
                   cell->face(f)->set_manifold_id
                   (std::min(cell->material_id(),
                             cell->neighbor(f)->material_id()));

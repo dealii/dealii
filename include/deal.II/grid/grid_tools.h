@@ -1253,17 +1253,19 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Copy boundary ids to manifold ids. The default manifold_id for new
-   * Triangulation objects is numbers::invalid_manifold_id. This function
-   * copies the boundary_ids of the boundary faces to the manifold_ids of the
-   * same faces, allowing the user to change the boundary_ids and use them for
+   * Copy boundary ids to manifold ids on faces and edges at the boundary.
+   * The default manifold_id for new Triangulation objects is
+   * numbers::invalid_manifold_id. This function copies the boundary_ids of
+   * the boundary faces and edges to the manifold_ids of the same faces
+   * and edges, allowing the user to change the boundary_ids and use them for
    * boundary conditions regardless of the geometry, which will use
    * manifold_ids to create new points. Only active cells will be iterated
    * over. This is a function you'd typically call when there is only one
-   * active level on your Triangulation.
+   * active level on your Triangulation. Mesh refinement will then inherit
+   * these indicators to child cells, faces, and edges.
    *
    * The optional parameter @p reset_boundary_ids, indicates whether this
-   * function should reset the boundary_ids of the Triangulation to its
+   * function should reset the boundary_ids of boundary faces and edges to its
    * default value 0 after copying its value to the manifold_id. By default,
    * boundary_ids are left untouched.
    *
