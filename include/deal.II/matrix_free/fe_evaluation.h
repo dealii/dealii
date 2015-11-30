@@ -1132,7 +1132,7 @@ public:
    * Returns the curl of the vector field, $nabla \times v$ after a call to @p
    * evaluate(...,true,...).
    */
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> >
+  Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
   get_curl (const unsigned int q_point) const;
 
   /**
