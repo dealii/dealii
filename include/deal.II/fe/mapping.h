@@ -808,7 +808,7 @@ protected:
    *   returning a less optimistic cell similarity value.
    *
    * @note FEValues ensures that this function is always called with
-   *   the same pair of @p internal_data and @output_data objects. In
+   *   the same pair of @p internal_data and @p output_data objects. In
    *   other words, if an implementation of this function knows that it
    *   has written a piece of data into the output argument in a previous
    *   call, then there is no need to copy it there again in a later
