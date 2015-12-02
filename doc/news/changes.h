@@ -687,6 +687,14 @@ inconvenience this causes.
   (Martin Kronbichler, 2015/12/05)
   </li>
 
+  <li> New: There are now new functions 
+  GridTools::build_triangulation_from_patch() and 
+  GridTools::get_cells_at_coarsest_common_level() that help build patches
+  around individual cells.
+  <br>
+  (Arezou Ghesmati, 2015/12/02)
+  </li>
+
   <li> Fixed: The GridTools::copy_boundary_to_manifold_id() function
   only copied boundary indicators from faces, but in 3d forgot about
   edges. This is now fixed.
