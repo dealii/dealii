@@ -1,0 +1,29 @@
+
+DEAL:1d::patch_cells 1.0: 1.0 1.1 
+DEAL:1d::local_triangulation 1.0: 0.0 0.1 
+DEAL:1d::patch_cells 1.1: 1.1 1.0 
+DEAL:1d::local_triangulation 1.1: 0.0 0.1 
+DEAL:2d::patch_cells 1.0: 1.0 1.1 1.2 
+DEAL:2d::local_triangulation 1.0: 0.0 0.1 0.2 
+DEAL:2d::patch_cells 1.1: 1.1 1.0 1.3 
+DEAL:2d::local_triangulation 1.1: 0.0 0.1 0.2 
+DEAL:2d::patch_cells 1.2: 1.2 1.3 1.0 
+DEAL:2d::local_triangulation 1.2: 0.0 0.1 0.2 
+DEAL:2d::patch_cells 1.3: 1.3 1.2 1.1 
+DEAL:2d::local_triangulation 1.3: 0.0 0.1 0.2 
+DEAL:3d::patch_cells 1.0: 1.0 1.1 1.2 1.4 
+DEAL:3d::local_triangulation 1.0: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.1: 1.1 1.0 1.3 1.5 
+DEAL:3d::local_triangulation 1.1: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.2: 1.2 1.3 1.0 1.6 
+DEAL:3d::local_triangulation 1.2: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.3: 1.3 1.2 1.1 1.7 
+DEAL:3d::local_triangulation 1.3: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.4: 1.4 1.5 1.6 1.0 
+DEAL:3d::local_triangulation 1.4: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.5: 1.5 1.4 1.7 1.1 
+DEAL:3d::local_triangulation 1.5: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.6: 1.6 1.7 1.4 1.2 
+DEAL:3d::local_triangulation 1.6: 0.0 0.1 0.2 0.3 
+DEAL:3d::patch_cells 1.7: 1.7 1.6 1.5 1.3 
+DEAL:3d::local_triangulation 1.7: 0.0 0.1 0.2 0.3 
