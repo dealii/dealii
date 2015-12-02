@@ -232,9 +232,9 @@ namespace TensorAccessors
    *
    * @f[
    *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
-   *   = \sum_{k_1,..,k_{\text{no_contr}}}
-   *     \text{left}_{i_1,..,i_{r1},k_1,..,k_{\text{no_contr}}}
-   *     \text{right}_{j_1,..,j_{r2},k_1,..,k_{\text{no_contr}}}
+   *   = \sum_{k_1,..,k_{\text{no\_contr}}}
+   *     \text{left}_{i_1,..,i_{r1},k_1,..,k_{\text{no\_contr}}}
+   *     \text{right}_{j_1,..,j_{r2},k_1,..,k_{\text{no\_contr}}}
    * @f]
    *
    * Calling this function is equivalent of writing the following low level

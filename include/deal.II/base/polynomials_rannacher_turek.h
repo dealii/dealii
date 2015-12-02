@@ -57,7 +57,7 @@ public:
                        const Point<dim> &p) const;
 
   /**
-   * <tparam>order</tparam>th of basis function @p i at @p p.
+   * <tt>order</tt>-th of basis function @p i at @p p.
    *
    * Consider using compute() instead.
    */

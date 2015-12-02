@@ -319,7 +319,7 @@ namespace Step45
 // on opposite sides of the domain but connected by periodic faces are part of
 // the ghost layer if one of them is stored on the local processor.
 // At this point we need to think about how we want to prescribe periodicity.
-// The vertices $\text{vertices}_2}$ of a face on the left boundary should be
+// The vertices $\text{vertices}_2$ of a face on the left boundary should be
 // matched to the vertices $\text{vertices}_1$ of a face on the lower boundary
 // given by $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
 // matrix $R$ and the offset $b$ are given by
@@ -404,7 +404,7 @@ namespace Step45
 
 // After we provided the mesh with the necessary information for the periodicity
 // constraints, we are now able to actual create them. For describing the
-// matching we are using the same approach as before, i.e the $\text{vertices}_2}$
+// matching we are using the same approach as before, i.e., the $\text{vertices}_2$
 // of a face on the left boundary should be matched to the vertices
 // $\text{vertices}_1$ of a face on the lower boundary given by
 // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation matrix $R$
