@@ -25,7 +25,7 @@
 
 void test()
 {
-  std::string filename("test.txt");
+  const char *filename = "test.txt";
   const unsigned int size(10);
   LinearAlgebra::Vector<double> vec(size);
   for (unsigned int i=0; i<size; ++i)
