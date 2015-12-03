@@ -25,6 +25,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
+#include <cctype>
 #include <cerrno>
 #include <cmath>
 #include <cstddef>
@@ -115,13 +116,29 @@ namespace Utilities
   std::string
   trim(const std::string &input)
   {
-    std::string::size_type start_idx = input.find_first_not_of(" ");
-    if (start_idx == std::string::npos)
-      return "";
+    std::string::size_type left = 0;
+    std::string::size_type right = input.size() - 1;
 
-    std::string::size_type end_idx = input.find_last_not_of(" ");
-    return std::string( input, start_idx, end_idx+1-start_idx);
+    for (; left < input.size(); ++left)
+      {
+        if (!std::isspace(input[left]))
+          {
+            break;
+          }
+      }
+
+    for (; right >= left; --right)
+      {
+        if (!std::isspace(input[right]))
+          {
+            break;
+          }
+      }
+
+    return std::string(input, left, right - left + 1);
   }
+
+
 
   std::string
   dim_string(const int dim, const int spacedim)

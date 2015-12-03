@@ -199,9 +199,12 @@ namespace Utilities
                                 const std::string &to);
 
   /**
-   * Return a string with all spaces at the beginning and end of @p input removed.
+   * Return a string with all standard whitespace characters (including
+   * '<tt>\\t</tt>', '<tt>\\n</tt>', and '<tt>\\r</tt>') at the beginning and
+   * end of @p input removed.
    */
-  std::string trim(const std::string &input);
+  std::string
+  trim(const std::string &input);
 
   /**
    * Generate a random number from a normalized Gaussian probability
