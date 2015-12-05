@@ -4810,8 +4810,8 @@ namespace parallel
     {
       int i, l = quad.level;
       int child_id;
-      const std::vector<types::global_dof_index> perm = triangulation->get_p4est_tree_to_coarse_cell_permutation ();
-      types::global_dof_index dealii_index = perm[treeidx];
+      types::global_dof_index dealii_index =
+        triangulation->get_p4est_tree_to_coarse_cell_permutation()[treeidx];
 
       for (i = 0; i < l; i++)
         {
