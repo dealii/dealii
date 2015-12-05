@@ -451,6 +451,16 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: The method
+  parallel::distributed::Triangulation::fill_vertices_with_ghost_neighbors
+  that is used for distributing DoFs on parallel triangulations previously
+  exhibited quadratic complexity in the number of coarse grid cells. This has
+  been changed into linear complexity calls (apart from a few issues
+  inside p4est).
+  <br>
+  (Martin Kronbichler, 2015/12/05)
+  </li>
+
   <li> Fixed: The constructor of SymmetricTensor that takes an array
   of initializing elements led to a compiler error. This is now
   fixed.
