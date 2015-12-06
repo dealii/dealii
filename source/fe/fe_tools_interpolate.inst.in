@@ -92,6 +92,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	void project_dg<deal_II_dimension>
 	(const DoFHandler<deal_II_dimension> &, const VEC &,
 	 const DoFHandler<deal_II_dimension> &, VEC &);
+#  if deal_II_dimension > 1
       template
 	void extrapolate<deal_II_dimension>
 	(const DoFHandler<deal_II_dimension> &, const VEC &,
@@ -101,6 +102,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	(const DoFHandler<deal_II_dimension> &, const VEC &,
 	 const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
 	 VEC &);
+#  endif
 #endif
       \}
   }
