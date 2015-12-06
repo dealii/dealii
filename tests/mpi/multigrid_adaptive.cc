@@ -162,9 +162,7 @@ namespace Step50
     fe (degree),
     mg_dof_handler (triangulation),
     degree(degree)
-  {
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
-  }
+  {}
 
 
   template <int dim>

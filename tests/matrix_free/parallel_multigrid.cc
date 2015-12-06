@@ -422,7 +422,6 @@ int main (int argc, char **argv)
       deallog.attach(logfile);
       deallog << std::setprecision (4);
     }
-  else
 
   {
     deallog.threshold_double(1.e-10);
