@@ -56,7 +56,6 @@ int main()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-12);
 
   interpolation_conditions(HermiteInterpolation::generate_complete_basis(6));

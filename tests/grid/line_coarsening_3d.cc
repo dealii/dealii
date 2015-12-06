@@ -109,7 +109,6 @@ void check ()
 int main()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   check();
   return 0;
 }

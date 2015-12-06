@@ -44,7 +44,6 @@ int main()
   std::ofstream logfile(logname.c_str());
   logfile.precision(1);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   FullMatrix<double> A(4,4,left);
   LAPACKFullMatrix<double> LA(4,4);

@@ -48,7 +48,6 @@ int
 main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog << std::fixed;
 
   deallog << endl

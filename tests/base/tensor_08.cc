@@ -49,7 +49,6 @@ int main ()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog << std::setprecision(3);
 
   test_select<2>(1.,1.);

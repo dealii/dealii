@@ -119,7 +119,6 @@ int main()
   std::ofstream logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test_rect(4,4,symm);
   test_rect(4,3,rect);

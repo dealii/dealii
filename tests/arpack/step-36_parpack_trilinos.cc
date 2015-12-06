@@ -339,7 +339,6 @@ int main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile,/*do not print job id*/false);
-  deallog.depth_console(0);
   deallog.threshold_double(eps);
 
   try

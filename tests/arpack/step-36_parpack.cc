@@ -343,7 +343,6 @@ int main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile,/*do not print job id*/false);
-  dealii::deallog.depth_console(0);
   dealii::deallog.threshold_double(eps);
 
   try

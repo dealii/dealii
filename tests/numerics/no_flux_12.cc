@@ -109,7 +109,6 @@ int main ()
   logfile.precision (7);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   run<3> ();
 }

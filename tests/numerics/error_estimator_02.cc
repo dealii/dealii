@@ -723,7 +723,6 @@ int main ()
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile);
-  dealii::deallog.depth_console(0);
   dealii::deallog.threshold_double(1e-8);
 
   {

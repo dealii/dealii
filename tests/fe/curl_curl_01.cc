@@ -403,7 +403,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   MaxwellProblem<2> maxwell(4);
   maxwell.run ();

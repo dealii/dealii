@@ -359,7 +359,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   LaplaceProblem<2> laplace_problem_2d(1);

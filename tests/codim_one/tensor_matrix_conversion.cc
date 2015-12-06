@@ -79,7 +79,6 @@ int main ()
 {
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   FullMatrix<double> A1(10,10);
   Tensor<2,3> T1;

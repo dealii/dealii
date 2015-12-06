@@ -444,7 +444,6 @@ int main (int argc, char **argv)
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

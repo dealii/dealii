@@ -28,7 +28,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   // matrix sizes
   const unsigned int m = 3;

@@ -48,7 +48,6 @@ int main ()
 
   ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   {
     // Extract the whole boundary of a hyper-cube

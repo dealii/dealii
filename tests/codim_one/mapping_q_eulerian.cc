@@ -89,7 +89,6 @@ void test(std::string filename, unsigned int degree)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test<1,2>(SOURCE_DIR "/grids/circle_1.inp",1);
   test<1,2>(SOURCE_DIR "/grids/circle_1.inp",2);

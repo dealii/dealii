@@ -36,7 +36,6 @@ main ()
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   FullMatrix<double> A(3,3,entries_A);

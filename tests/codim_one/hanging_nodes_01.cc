@@ -37,7 +37,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   const unsigned int spacedim = 3;
   const unsigned int dim = spacedim-1;

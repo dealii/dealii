@@ -40,7 +40,6 @@ int main ()
   const int spacedim = 3;
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   TorusBoundary<dim, spacedim> boundary (1.5, .5);
   Triangulation<dim, spacedim> tria;

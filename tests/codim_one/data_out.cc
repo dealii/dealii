@@ -76,7 +76,6 @@ void test(std::string filename)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog << "Test<1,2>" << std::endl;
   test<1,2>(SOURCE_DIR "/grids/circle_2.inp");
 

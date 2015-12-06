@@ -631,7 +631,6 @@ int main ()
 
   try
     {
-      deallog.depth_console (0);
 
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();

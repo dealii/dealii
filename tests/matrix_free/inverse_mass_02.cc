@@ -189,7 +189,6 @@ void test ()
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog << std::setprecision (3);
 

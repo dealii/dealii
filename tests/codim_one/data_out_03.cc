@@ -67,7 +67,6 @@ public:
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   int fe_degree =2;
   int mapping_degree = 2;

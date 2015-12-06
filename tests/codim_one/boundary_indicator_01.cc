@@ -51,7 +51,6 @@ int main ()
 {
   ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   // Extract the boundary of 3/4 of a sphere
   {

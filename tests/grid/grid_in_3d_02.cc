@@ -91,7 +91,6 @@ int main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test (SOURCE_DIR "/grid_in_3d_02/747.ucd");

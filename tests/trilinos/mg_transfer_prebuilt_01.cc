@@ -147,10 +147,8 @@ int main(int argc, char **argv)
 
   std::ofstream logfile("output");
   deallog << std::setprecision(6);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   deallog.attach(logfile);
-//  deallog.depth_console (0);
 
   check_simple (FE_DGP<2>(0));
   check_simple (FE_DGP<2>(1));

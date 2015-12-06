@@ -41,7 +41,6 @@ std::ofstream logfile("output");
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   const unsigned int dim = 1;
 

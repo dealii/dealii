@@ -69,7 +69,6 @@ int main ()
 {
   deallog << std::setprecision (2);
   deallog.attach (logfile);
-  deallog.depth_console (0);
   deallog.threshold_double (1e-12);
 
   FE_RaviartThomas<2> fe_2 (1);

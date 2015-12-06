@@ -164,7 +164,6 @@ namespace Step50
     degree(degree)
   {
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
-      deallog.depth_console(0);
   }
 
 

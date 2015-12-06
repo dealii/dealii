@@ -2457,7 +2457,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   using namespace Threads;
   ThreadGroup<X<0> > tg;
   ThreadGroup<X<0>&> tgr;

@@ -148,7 +148,6 @@ void test ()
 int main ()
 {
   initlog();
-  deallog.depth_console(0);
 
   test<2> ();
   test<3> ();

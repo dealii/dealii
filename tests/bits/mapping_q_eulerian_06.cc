@@ -81,7 +81,6 @@ void test(unsigned int degree)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test(1);
   test(2);

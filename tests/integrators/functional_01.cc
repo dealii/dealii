@@ -164,7 +164,6 @@ int main ()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   FE_DGP<2> el2(0);
   FE_DGP<3> el3(0);

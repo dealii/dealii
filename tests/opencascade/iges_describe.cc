@@ -27,7 +27,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges");
   std::vector<TopoDS_Face> faces;

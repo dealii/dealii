@@ -144,7 +144,6 @@ void test (const FiniteElement<dim> &fe,
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog << std::setprecision (2);
 
