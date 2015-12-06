@@ -629,24 +629,26 @@ void Step3::run ()
 // and calling its principle function.
 //
 // Finally, the first line of the function is used to enable output of the
-// deal.II logstream to the screen. Functions like iterative solvers will
-// generate diagnostics (starting residual, number of solver steps, final
-// residual), but the display of the logstream to the screen is disabled by
-// default.
+// deal.II logstream to the screen.  The deallog (which stands for deal-log,
+// not de-allog) variable represents a stream to which some parts of the
+// library write output. For example, iterative solvers will generate
+// diagnostics (starting residual, number of solver steps, final residual) as
+// can be seen when running this tutorial program.
 //
 // The output of deallog can be redirected to the console, to a file, or
-// both. The output is nested in a way so that each function can use a prefix
-// string (separated by colons) for each line of output; if it calls another
-// function, that may also use its prefix which is then printed after the one
-// of the calling function. By running this example (or looking at the
-// "Results" section), you will see the solver statistics prefixed with
-// "DEAL:CG", which is two prefixes.  Since output from functions which are
-// nested deep below is usually not as important as top-level output, you can
-// give the deallog variable a maximal depth of nested output for output to
-// console and file. A depth of 0 (the default) will disable output to the
-// screen, while a value of 2 or higher will cause the solver info to be
-// printed. Imagine that different solvers can be nested, which we will see in
-// step-22 for example, and you might not want to see all this information.
+// both. But both are disabled by default. The output is nested in a way so
+// that each function can use a prefix string (separated by colons) for each
+// line of output; if it calls another function, that may also use its prefix
+// which is then printed after the one of the calling function. By running
+// this example (or looking at the "Results" section), you will see the solver
+// statistics prefixed with "DEAL:CG", which is two prefixes.  Since output
+// from functions which are nested deep below is usually not as important as
+// top-level output, you can give the deallog variable a maximal depth of
+// nested output for output to console and file. A depth of 0 (the default)
+// will disable output to the screen, while a value of 2 or higher will cause
+// the solver info in this example to be printed. Imagine that different
+// solvers can be nested, which we will see in step-22 for example, and you
+// might not want to see all this information.
 int main ()
 {
   deallog.depth_console (2);
