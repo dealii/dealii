@@ -38,14 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: The function <code>Utilities::trim</code> now removes general
+  <li> Changed: The function Utilities::trim() now removes general
   white space characters, such as '<tt>\\r</tt>' and '<tt>\\n</tt>', as well as
   space characters.
   <br>
   (David Wells, 2015/12/05)
   </li>
 
-  <li> Removed: Previously deprecated global instance multithread_info of
+  <li> Removed: The previously deprecated global instance multithread_info of
   MultithreadInfo has been removed (all members of this class are static
   so there is no reason to use/create an instance). The deprecated
   MultithreadInfo::n_cpus member also got removed in favor of
@@ -57,7 +57,7 @@ inconvenience this causes.
   <code>update_support_points</code>, <code>update_support_jacobians</code>,
   and <code>update_support_inverse_jacobians</code> have been removed.
   <code>update_support_points</code> was deprecated in 2013 and has not done
-  anything in a long time (see the commit message for more information). The
+  anything in a long time. The
   other two appeared in 2007 and were never implemented.
   <br>
   (David Wells, 2015/09/16)
@@ -93,9 +93,9 @@ inconvenience this causes.
   (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
-  <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
+  <li> Removed: The Tensor and Point classes no
   longer have a constructor taking a boolean argument. Those were replaced
-  by a default constructor will always initialize underlying values with
+  by a default constructor that will always initialize underlying values with
   zero.
   <br>
   (Matthias Maier, 2015/09/07)
@@ -157,7 +157,9 @@ inconvenience this causes.
   to compute on every cell. Consequently, these two functions have been
   removed and have been replaced by Mapping::requires_update_flags().
   <br>
-  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
+  A similar change has been applied to the FiniteElement class.
+  <br>
+  (Wolfgang Bangerth, 2015/07/20-2015/12/01)
   </li>
 
   <li> Changed: The function DoFRenumbering::random() now produces different
@@ -207,9 +209,10 @@ inconvenience this causes.
 
   <li> Changed: The functionality to distribute cells across processes
   according to a vector of cell weights that was passed in a call to
-  <code>parallel::distributed::Triangulation<dim>::repartition()</code>
+  parallel::distributed::Triangulation::repartition()
   was replaced by a cell-wise signal. This signal is called during
-  <code>execute_coarsening_and_refinement</code> and <code>repartition</code>
+  parallel::distributed::Triangulation::execute_coarsening_and_refinement() and
+  parallel::distributed::Triangulation::repartition()
   if any function is connected to it. It allows to connect a function that
   takes the current cell iterator and a status argument that indicates whether
   this cell will be refined, coarsened or remains unchanged and returns a
@@ -220,7 +223,7 @@ inconvenience this causes.
   (Rene Gassmoeller, 2015/11/02)
   </li>
 
-  <li> New: 2nd derivatives are implemented for polynomials_BDM in 3D.
+  <li> New: 2nd derivatives are implemented for PolynomialsBDM in 3D.
   <br>
   (Alistair Bentley, 2015/10/27)
   </li>
@@ -239,20 +242,22 @@ inconvenience this causes.
   (Lei Qiao, 2015/10/22)
   </li>
 
-  <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
-  ghost cells. Similarly ::level_ghost_owners() for level ghosts.
+  <li> New: parallel::distributed::Triangulation::ghost_owners()
+  returns the set of MPI ranks of the ghost cells. Similarly
+  parallel::distributed::Triangulation::level_ghost_owners() for level
+  ghosts.
   <br>
   (Timo Heister, 2015/09/30)
   </li>
 
-  <li> New: FunctionParser now supports pow(a,b).
+  <li> New: FunctionParser now supports <code>pow(a,b)</code>.
   <br>
   (Timo Heister, 2015/09/30)
   </li>
 
-  <li> Improved: The interface to all deal.II type solvers and
+  <li> Improved: The interfaces to all deal.II type solvers and
   preconditioners have been updated such that they function as expected
-  with the LinearOperator class and its associated functions (i.e.
+  with the LinearOperator class and its associated functions (i.e.,
   linear_operator(), transpose_operator() and inverse_operator()).
   These preconditioners can now be wrapped as a LinearOperator,
   facilitating the construction of approximate matrix inverses such as in
@@ -321,7 +326,7 @@ inconvenience this causes.
   (Matthias Maier, 2015/09/02)
   </li>
 
-  <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
+  <li> Fixed: VectorTools::integrate_difference() for VectorTools::Hdiv_seminorm
   was computed incorrectly.
   <br>
   (Timo Heister, 2015/08/31)
@@ -350,7 +355,6 @@ inconvenience this causes.
   - FunctionTime
   - Function
   - TensorFunction
-
   <br>
   <em>Classes with fixed interface that now fully support complex number
   types (pure template classes without explicit instantiations in the
@@ -359,7 +363,7 @@ inconvenience this causes.
   - PackagedOperation
   - Tensor
   <br>
-  (Matthias Maier, 2015/08/25 - XXX)
+  (Matthias Maier, 2015/08/25)
   </li>
 
   <li> Fixed: The testsuite now properly supports version constraints for
@@ -396,8 +400,8 @@ inconvenience this causes.
 
   <li> New: parallel::shared::Triangulation class which extends
   Triangulation class to automatically partition triangulation when run
-  with MPI. Identical functionality between parallel::shared::Triangulation and
-  parallel::distributed::Triangulation is grouped in the parent class
+  with MPI. Common functionality between parallel::shared::Triangulation and
+  parallel::distributed::Triangulation is implemented in the parent class
   parallel::Triangulation.
   <br>
   (Denis Davydov, 2015/08/14)
@@ -411,8 +415,8 @@ inconvenience this causes.
   (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
   </li>
 
-  <li> New: implemented the gradient method for
-  InterpolatedTensorProductGridData
+  <li> New: The InterpolatedTensorProductGridData::gradient() function
+  is now implemented.
   <br>
   (Daniel Shapero, 2015/08/12)
   </li>
@@ -459,7 +463,7 @@ inconvenience this causes.
 
 <ol>
   <li> Improved: The method
-  parallel::distributed::Triangulation::fill_vertices_with_ghost_neighbors
+  parallel::distributed::Triangulation::fill_vertices_with_ghost_neighbors()
   that is used for distributing DoFs on parallel triangulations previously
   exhibited quadratic complexity in the number of coarse grid cells. This has
   been changed into linear complexity calls (apart from a few issues
