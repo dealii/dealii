@@ -176,6 +176,13 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: There is now much more documentation for the FiniteElement class,
+  in particular detailing what one needs to implement when writing finite
+  element descriptions in derived classes.
+  <br>
+  (Wolfgang Bangerth, 2015/11/29)
+  </li>
+
   <li> New: There is now a function template numbers::signaling_nan() that
   is used to create invalid floating point objects. These objects can either
   be scalars, or of type Tensor, SymmetricTensor, or DerivativeForm. The
