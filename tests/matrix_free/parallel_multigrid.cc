@@ -420,7 +420,6 @@ int main (int argc, char **argv)
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       deallog.attach(logfile);
-      deallog.depth_console(4);
       deallog << std::setprecision (4);
     }
   else

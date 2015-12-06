@@ -39,7 +39,6 @@ int main()
     LogStream log;
 
     log.attach(logfile);
-    log.depth_console(0);
     log.threshold_double(1.e-10);
     log.log_thread_id (false);
 
