@@ -49,7 +49,7 @@ LogStream::LogStream()
   :
   std_out(&std::cerr),
   file(0),
-  std_depth(10000),
+  std_depth(0),
   file_depth(10000),
   print_utime(false),
   diff_utime(false),

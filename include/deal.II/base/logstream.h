@@ -247,7 +247,8 @@ public:
 
 
   /**
-   * Maximum number of levels to be printed on the console. This function
+   * Maximum number of levels to be printed on the console. The default is 0,
+   * which will not generate any output. This function
    * allows one to restrict console output to the highest levels of
    * iterations. Only output with less than <tt>n</tt> prefixes is
    * printed. By calling this function with <tt>n=0</tt>, no console output
