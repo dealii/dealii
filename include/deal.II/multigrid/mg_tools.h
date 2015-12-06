@@ -81,11 +81,11 @@ namespace MGTools
    * There is no need to consider hanging nodes here, since only one level is
    * considered.
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_sparsity_pattern (const DoFHandlerType           &dof_handler,
-                         SP                 &sparsity,
-                         const unsigned int level);
+  make_sparsity_pattern (const DoFHandlerType &dof_handler,
+                         SparsityPatternType  &sparsity,
+                         const unsigned int    level);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
@@ -95,11 +95,11 @@ namespace MGTools
    * and
    * @ref DoFTools
    */
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof_handler,
-                              SP                             &sparsity,
-                              const unsigned int             level);
+                              SparsityPatternType            &sparsity,
+                              const unsigned int              level);
 
   /**
    * Create sparsity pattern for the fluxes at refinement edges. The matrix
@@ -107,11 +107,11 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof_handler,
-                                   SP                             &sparsity,
-                                   const unsigned int             level);
+                                   SparsityPatternType            &sparsity,
+                                   const unsigned int              level);
   /**
    * This function does the same as the other with the same name, but it gets
    * two additional coefficient matrices. A matrix entry will only be
@@ -121,11 +121,11 @@ namespace MGTools
    * There is one matrix for couplings in a cell and one for the couplings
    * occurring in fluxes.
    */
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern (const DoFHandler<dim,spacedim>    &dof,
-                              SP                                &sparsity,
-                              const unsigned int                level,
+                              SparsityPatternType               &sparsity,
+                              const unsigned int                 level,
                               const Table<2,DoFTools::Coupling> &int_mask,
                               const Table<2,DoFTools::Coupling> &flux_mask);
 
@@ -137,11 +137,11 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim>    &dof_handler,
-                                   SP                                &sparsity,
-                                   const unsigned int                level,
+                                   SparsityPatternType               &sparsity,
+                                   const unsigned int                 level,
                                    const Table<2,DoFTools::Coupling> &flux_mask);
 
   /**

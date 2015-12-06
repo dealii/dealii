@@ -127,9 +127,9 @@ namespace PETScWrappers
      * greatly slow down your program. It is therefore significantly more
      * efficient to get memory allocation right from the start.
      */
-    template <typename SparsityType>
-    explicit SparseMatrix (const SparsityType &sparsity_pattern,
-                           const bool          preset_nonzero_locations = true);
+    template <typename SparsityPatternType>
+    explicit SparseMatrix (const SparsityPatternType &sparsity_pattern,
+                           const bool                 preset_nonzero_locations = true);
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not
@@ -187,9 +187,9 @@ namespace PETScWrappers
      * once; nevertheless, given the fact that it is inefficient, the
      * respective flag has a default value equal to @p false.
      */
-    template <typename SparsityType>
-    void reinit (const SparsityType &sparsity_pattern,
-                 const bool          preset_nonzero_locations = true);
+    template <typename SparsityPatternType>
+    void reinit (const SparsityPatternType &sparsity_pattern,
+                 const bool                 preset_nonzero_locations = true);
 
     /**
      * Return a reference to the MPI communicator object in use with this
@@ -257,9 +257,9 @@ namespace PETScWrappers
     /**
      * Same as previous function.
      */
-    template <typename SparsityType>
-    void do_reinit (const SparsityType &sparsity_pattern,
-                    const bool          preset_nonzero_locations);
+    template <typename SparsityPatternType>
+    void do_reinit (const SparsityPatternType &sparsity_pattern,
+                    const bool                 preset_nonzero_locations);
 
     /**
      * To allow calling protected prepare_add() and prepare_set().

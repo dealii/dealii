@@ -373,9 +373,9 @@ namespace TrilinosWrappers
      * parallel, this function uses an ad-hoc partitioning of the rows and
      * columns.
      */
-    template<typename SparsityType>
+    template<typename SparsityPatternType>
     void
-    copy_from (const SparsityType &nontrilinos_sparsity_pattern);
+    copy_from (const SparsityPatternType &nontrilinos_sparsity_pattern);
 
     /**
      * Copy operator. This operation is only allowed for empty objects, to
@@ -568,12 +568,12 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityType>
+    template<typename SparsityPatternType>
     void
-    reinit (const Epetra_Map   &row_parallel_partitioning,
-            const Epetra_Map   &col_parallel_partitioning,
-            const SparsityType &nontrilinos_sparsity_pattern,
-            const bool          exchange_data = false) DEAL_II_DEPRECATED;
+    reinit (const Epetra_Map          &row_parallel_partitioning,
+            const Epetra_Map          &col_parallel_partitioning,
+            const SparsityPatternType &nontrilinos_sparsity_pattern,
+            const bool                 exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -585,11 +585,11 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityType>
+    template<typename SparsityPatternType>
     void
-    reinit (const Epetra_Map   &parallel_partitioning,
-            const SparsityType &nontrilinos_sparsity_pattern,
-            const bool          exchange_data = false) DEAL_II_DEPRECATED;
+    reinit (const Epetra_Map          &parallel_partitioning,
+            const SparsityPatternType &nontrilinos_sparsity_pattern,
+            const bool                 exchange_data = false) DEAL_II_DEPRECATED;
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -800,13 +800,13 @@ namespace TrilinosWrappers
      * constructed. This feature is only implemented for input sparsity
      * patterns of type DynamicSparsityPattern.
      */
-    template<typename SparsityType>
+    template<typename SparsityPatternType>
     void
-    reinit (const IndexSet     &row_parallel_partitioning,
-            const IndexSet     &col_parallel_partitioning,
-            const SparsityType &nontrilinos_sparsity_pattern,
-            const MPI_Comm     &communicator = MPI_COMM_WORLD,
-            const bool          exchange_data = false);
+    reinit (const IndexSet            &row_parallel_partitioning,
+            const IndexSet            &col_parallel_partitioning,
+            const SparsityPatternType &nontrilinos_sparsity_pattern,
+            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+            const bool                 exchange_data = false);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -816,12 +816,12 @@ namespace TrilinosWrappers
      * that is not fully constructed. This feature is only implemented for
      * input sparsity patterns of type DynamicSparsityPattern.
      */
-    template<typename SparsityType>
+    template<typename SparsityPatternType>
     void
-    reinit (const IndexSet     &parallel_partitioning,
-            const SparsityType &nontrilinos_sparsity_pattern,
-            const MPI_Comm     &communicator = MPI_COMM_WORLD,
-            const bool          exchange_data = false);
+    reinit (const IndexSet            &parallel_partitioning,
+            const SparsityPatternType &nontrilinos_sparsity_pattern,
+            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+            const bool                 exchange_data = false);
 //@}
     /**
      * @name Information on the sparsity pattern

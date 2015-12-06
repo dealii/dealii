@@ -480,9 +480,9 @@ SparsityPattern::compress ()
 
 
 
-template <typename DSP>
+template <typename SparsityPatternType>
 void
-SparsityPattern::copy_from (const DSP &dsp)
+SparsityPattern::copy_from (const SparsityPatternType &dsp)
 {
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
@@ -505,8 +505,8 @@ SparsityPattern::copy_from (const DSP &dsp)
     for (size_type row = 0; row<dsp.n_rows(); ++row)
       {
         size_type *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
-        typename DSP::iterator col_num = dsp.begin (row),
-                               end_row = dsp.end (row);
+        typename SparsityPatternType::iterator col_num = dsp.begin (row),
+                                               end_row = dsp.end (row);
 
         for (; col_num != end_row; ++col_num)
           {
@@ -517,7 +517,8 @@ SparsityPattern::copy_from (const DSP &dsp)
       }
 
   // do not need to compress the sparsity pattern since we already have
-  // allocated the right amount of data, and the DSP data is sorted, too.
+  // allocated the right amount of data, and the SparsityPatternType data is sorted,
+  // too.
   compressed = true;
 }
 

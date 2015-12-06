@@ -395,13 +395,13 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_sparsity_pattern (const DoFHandlerType   &dof,
-                         SP                     &sparsity_pattern,
-                         const ConstraintMatrix &constraints = ConstraintMatrix(),
-                         const bool              keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
+  make_sparsity_pattern (const DoFHandlerType      &dof,
+                         SparsityPatternType       &sparsity_pattern,
+                         const ConstraintMatrix    &constraints           = ConstraintMatrix(),
+                         const bool                 keep_constrained_dofs = true,
+                         const types::subdomain_id  subdomain_id          = numbers::invalid_subdomain_id);
 
   /**
    * Locate non-zero entries for vector valued finite elements.  This function
@@ -484,14 +484,14 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
   make_sparsity_pattern (const DoFHandlerType     &dof,
                          const Table<2, Coupling> &coupling,
-                         SP                       &sparsity_pattern,
-                         const ConstraintMatrix   &constraints = ConstraintMatrix(),
+                         SparsityPatternType      &sparsity_pattern,
+                         const ConstraintMatrix   &constraints           = ConstraintMatrix(),
                          const bool                keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id         = numbers::invalid_subdomain_id);
 
   /**
    * Construct a sparsity pattern that allows coupling degrees of freedom on
@@ -513,11 +513,11 @@ namespace DoFTools
    * whereas the ones that correspond to columns come from the second
    * DoFHandler.
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_sparsity_pattern (const DoFHandlerType        &dof_row,
-                         const DoFHandlerType        &dof_col,
-                         SP              &sparsity);
+  make_sparsity_pattern (const DoFHandlerType &dof_row,
+                         const DoFHandlerType &dof_col,
+                         SparsityPatternType  &sparsity);
 
   /**
    * Create the sparsity pattern for boundary matrices. See the general
@@ -529,11 +529,11 @@ namespace DoFTools
    * class that satisfies similar requirements. It is assumed that the size of
    * the sparsity pattern is already correct.
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_boundary_sparsity_pattern (const DoFHandlerType            &dof,
+  make_boundary_sparsity_pattern (const DoFHandlerType                       &dof,
                                   const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                  SP                              &sparsity_pattern);
+                                  SparsityPatternType                        &sparsity_pattern);
 
   /**
    * Write the sparsity structure of the matrix composed of the basis
@@ -551,12 +551,13 @@ namespace DoFTools
    *
    * For the type of the sparsity pattern, the same holds as said above.
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_boundary_sparsity_pattern (const DoFHandlerType &dof,
-                                  const typename FunctionMap<DoFHandlerType::space_dimension>::type &boundary_ids,
-                                  const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                  SP                 &sparsity);
+  make_boundary_sparsity_pattern
+  (const DoFHandlerType                                              &dof,
+   const typename FunctionMap<DoFHandlerType::space_dimension>::type &boundary_ids,
+   const std::vector<types::global_dof_index>                        &dof_to_boundary_mapping,
+   SparsityPatternType                                               &sparsity);
 
   /**
    * Generate sparsity pattern for fluxes, i.e. formulations of the discrete
@@ -566,10 +567,10 @@ namespace DoFTools
    * neighboring elements, the normal couplings and these extra matrix entries
    * are considered.
    */
-  template<typename DoFHandlerType, class SP>
+  template<typename DoFHandlerType, typename SparsityPatternType>
   void
   make_flux_sparsity_pattern (const DoFHandlerType &dof_handler,
-                              SP       &sparsity_pattern);
+                              SparsityPatternType  &sparsity_pattern);
 
   /**
    * This function does the same as the other with the same name, but it gets
@@ -578,13 +579,13 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template<typename DoFHandlerType, class SP>
+  template<typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_flux_sparsity_pattern (const DoFHandlerType        &dof_handler,
-                              SP              &sparsity_pattern,
-                              const ConstraintMatrix   &constraints,
-                              const bool                keep_constrained_dofs = true,
-                              const types::subdomain_id  subdomain_id = numbers::invalid_unsigned_int);
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof_handler,
+                              SparsityPatternType       &sparsity_pattern,
+                              const ConstraintMatrix    &constraints,
+                              const bool                 keep_constrained_dofs = true,
+                              const types::subdomain_id  subdomain_id          = numbers::invalid_unsigned_int);
 
   /**
    * This function does the same as the other with the same name, but it gets
@@ -597,10 +598,10 @@ namespace DoFTools
    *
    * @todo Not implemented for hp::DoFHandler.
    */
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
   make_flux_sparsity_pattern (const DoFHandlerType    &dof,
-                              SP                      &sparsity,
+                              SparsityPatternType     &sparsity,
                               const Table<2,Coupling> &int_mask,
                               const Table<2,Coupling> &flux_mask);
 

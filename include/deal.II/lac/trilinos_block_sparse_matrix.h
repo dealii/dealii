@@ -153,29 +153,29 @@ namespace TrilinosWrappers
      * %parallel distribution of the individual matrices. This function
      * assumes that a quadratic block matrix is generated.
      */
-    template <typename BlockSparsityType>
-    void reinit (const std::vector<Epetra_Map> &input_maps,
-                 const BlockSparsityType       &block_sparsity_pattern,
-                 const bool                   exchange_data = false);
+    template <typename BlockSparsityPatternType>
+    void reinit (const std::vector<Epetra_Map>  &input_maps,
+                 const BlockSparsityPatternType &block_sparsity_pattern,
+                 const bool                      exchange_data = false);
 
     /**
      * Resize the matrix, by using an array of index sets to determine the
      * %parallel distribution of the individual matrices. This function
      * assumes that a quadratic block matrix is generated.
      */
-    template <typename BlockSparsityType>
-    void reinit (const std::vector<IndexSet> &input_maps,
-                 const BlockSparsityType     &block_sparsity_pattern,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD,
-                 const bool                   exchange_data = false);
+    template <typename BlockSparsityPatternType>
+    void reinit (const std::vector<IndexSet>    &input_maps,
+                 const BlockSparsityPatternType &block_sparsity_pattern,
+                 const MPI_Comm                 &communicator  = MPI_COMM_WORLD,
+                 const bool                      exchange_data = false);
 
     /**
      * Resize the matrix and initialize it by the given sparsity pattern.
      * Since no distribution map is given, the result is a block matrix for
      * which all elements are stored locally.
      */
-    template <typename BlockSparsityType>
-    void reinit (const BlockSparsityType &block_sparsity_pattern);
+    template <typename BlockSparsityPatternType>
+    void reinit (const BlockSparsityPatternType &block_sparsity_pattern);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse

@@ -428,11 +428,11 @@ namespace TrilinosWrappers
 
 
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     void
     reinit_sp (const Epetra_Map                         &row_map,
                const Epetra_Map                         &col_map,
-               const SparsityType                       &sp,
+               const SparsityPatternType                &sp,
                const bool                                exchange_data,
                std_cxx11::shared_ptr<Epetra_Map>        &column_space_map,
                std_cxx11::shared_ptr<Epetra_FECrsGraph> &graph,
@@ -485,7 +485,7 @@ namespace TrilinosWrappers
 
             row_indices.resize (row_length, -1);
             {
-              typename SparsityType::iterator p = sp.begin(row);
+              typename SparsityPatternType::iterator p = sp.begin(row);
               // avoid incrementing p over the end of the current row because
               // it is slow for DynamicSparsityPattern in parallel
               for (int col=0; col<row_length; )
@@ -507,7 +507,7 @@ namespace TrilinosWrappers
 
             row_indices.resize (row_length, -1);
             {
-              typename SparsityType::iterator p = sp.begin(row);
+              typename SparsityPatternType::iterator p = sp.begin(row);
               // avoid incrementing p over the end of the current row because
               // it is slow for DynamicSparsityPattern in parallel
               for (int col=0; col<row_length; )
@@ -669,13 +669,13 @@ namespace TrilinosWrappers
 
 
 
-  template<typename SparsityType>
+  template<typename SparsityPatternType>
   void
-  SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
-                           const IndexSet     &col_parallel_partitioning,
-                           const SparsityType &nontrilinos_sparsity_pattern,
-                           const MPI_Comm     &communicator,
-                           const bool          exchange_data)
+  SparsityPattern::reinit (const IndexSet            &row_parallel_partitioning,
+                           const IndexSet            &col_parallel_partitioning,
+                           const SparsityPatternType &nontrilinos_sparsity_pattern,
+                           const MPI_Comm            &communicator,
+                           const bool                 exchange_data)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -687,12 +687,12 @@ namespace TrilinosWrappers
 
 
 
-  template<typename SparsityType>
+  template<typename SparsityPatternType>
   void
-  SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
-                           const SparsityType &nontrilinos_sparsity_pattern,
-                           const MPI_Comm     &communicator,
-                           const bool          exchange_data)
+  SparsityPattern::reinit (const IndexSet            &parallel_partitioning,
+                           const SparsityPatternType &nontrilinos_sparsity_pattern,
+                           const MPI_Comm            &communicator,
+                           const bool                 exchange_data)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
                                                               false);
@@ -702,11 +702,11 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
-  SparsityPattern::reinit (const Epetra_Map   &input_map,
-                           const SparsityType &sp,
-                           const bool          exchange_data)
+  SparsityPattern::reinit (const Epetra_Map          &input_map,
+                           const SparsityPatternType &sp,
+                           const bool                 exchange_data)
   {
     reinit_sp (input_map, input_map, sp, exchange_data,
                column_space_map, graph, nonlocal_graph);
@@ -714,12 +714,12 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
-  SparsityPattern::reinit (const Epetra_Map   &input_row_map,
-                           const Epetra_Map   &input_col_map,
-                           const SparsityType &sp,
-                           const bool          exchange_data)
+  SparsityPattern::reinit (const Epetra_Map          &input_row_map,
+                           const Epetra_Map          &input_col_map,
+                           const SparsityPatternType &sp,
+                           const bool                 exchange_data)
   {
     reinit_sp (input_row_map, input_col_map, sp, exchange_data,
                column_space_map, graph, nonlocal_graph);
@@ -738,9 +738,9 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
-  SparsityPattern::copy_from (const SparsityType &sp)
+  SparsityPattern::copy_from (const SparsityPatternType &sp)
   {
     const Epetra_Map rows (TrilinosWrappers::types::int_type(sp.n_rows()), 0,
                            Utilities::Trilinos::comm_self());

@@ -177,10 +177,10 @@ ChunkSparsityPattern::compress ()
 
 
 
-template <typename SparsityType>
+template <typename SparsityPatternType>
 void
-ChunkSparsityPattern::copy_from (const SparsityType &dsp,
-                                 const size_type     chunk_size)
+ChunkSparsityPattern::copy_from (const SparsityPatternType &dsp,
+                                 const size_type            chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
   this->chunk_size = chunk_size;
@@ -208,7 +208,7 @@ ChunkSparsityPattern::copy_from (const SparsityType &dsp,
       // TODO: This could be made more efficient if we cached the
       // previous column and only called add() if the previous and the
       // current column lead to different chunk columns
-      for (typename SparsityType::iterator col_num = dsp.begin(row);
+      for (typename SparsityPatternType::iterator col_num = dsp.begin(row);
            col_num != dsp.end(row); ++col_num)
         temporary_sp.add (reduced_row, col_num->column()/chunk_size);
     }
@@ -276,9 +276,9 @@ namespace internal
 {
   namespace
   {
-    template <typename SP>
-    void copy_sparsity (const SP        &src,
-                        SparsityPattern &dst)
+    template <typename SparsityPatternType>
+    void copy_sparsity (const SparsityPatternType &src,
+                        SparsityPattern           &dst)
     {
       dst.copy_from(src);
     }
