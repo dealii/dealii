@@ -2203,7 +2203,6 @@ int main (int argc, char *argv[])
 
   try
     {
-      deallog.depth_console(0);
       ParameterHandler prm;
       PlasticityContactProblem<3>::declare_parameters(prm);
       if (argc != 2)

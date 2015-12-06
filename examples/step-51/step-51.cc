@@ -1385,8 +1385,6 @@ int main ()
     {
       using namespace dealii;
 
-      deallog.depth_console (0);
-
       // Now for the three calls to the main class in complete analogy to
       // step-7.
       {

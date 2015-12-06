@@ -1000,8 +1000,6 @@ int main ()
       using namespace dealii;
       using namespace Step22;
 
-      deallog.depth_console (0);
-
       StokesProblem<2> flow_problem(1);
       flow_problem.run ();
     }

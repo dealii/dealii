@@ -2993,7 +2993,6 @@ int main ()
       using namespace dealii;
       using namespace Step14;
 
-      deallog.depth_console (0);
       // Describe the problem we want to solve here by passing a descriptor
       // object to the function doing the rest of the work:
       const unsigned int dim = 2;

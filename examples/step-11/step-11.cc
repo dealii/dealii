@@ -440,7 +440,6 @@ int main ()
 {
   try
     {
-      dealii::deallog.depth_console (0);
       std::cout.precision(5);
 
       // This is the main loop, doing the computations with mappings of linear

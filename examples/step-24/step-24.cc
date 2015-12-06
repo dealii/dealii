@@ -563,8 +563,6 @@ int main ()
       using namespace dealii;
       using namespace Step24;
 
-      deallog.depth_console (0);
-
       TATForwardProblem<2> forward_problem_solver;
       forward_problem_solver.run ();
     }

@@ -1756,8 +1756,6 @@ int main (int argc, char **argv)
       using namespace dealii;
       using namespace Step28;
 
-      deallog.depth_console (0);
-
       std::string filename;
       if (argc < 2)
         filename = "project.prm";

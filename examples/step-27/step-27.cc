@@ -848,8 +848,6 @@ int main ()
       using namespace dealii;
       using namespace Step27;
 
-      deallog.depth_console (0);
-
       LaplaceProblem<2> laplace_problem;
       laplace_problem.run ();
     }

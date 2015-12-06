@@ -3738,8 +3738,6 @@ int main (int argc, char *argv[])
 
   try
     {
-      deallog.depth_console (0);
-
       std::string parameter_filename;
       if (argc>=2)
         parameter_filename = argv[1];

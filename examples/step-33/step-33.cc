@@ -2511,7 +2511,6 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step33;
 
-      deallog.depth_console(0);
       if (argc != 2)
         {
           std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
