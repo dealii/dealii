@@ -469,6 +469,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: both versions of distribute_sparsity_pattern are now plain, not
+  template, functions. This is not a breaking change because each function was
+  instantiated for exactly one template argument.
+  <br>
+  (David Wells, 2015/12/06)
+  </li>
+
   <li> Improved: The method
   parallel::distributed::Triangulation::fill_vertices_with_ghost_neighbors()
   that is used for distributing DoFs on parallel triangulations previously

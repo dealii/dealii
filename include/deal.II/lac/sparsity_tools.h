@@ -19,8 +19,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <vector>
 
@@ -171,14 +172,14 @@ namespace SparsityTools
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Communicate rows in a compressed sparsity pattern over MPI.
+   * Communicate rows in a dynamic sparsity pattern over MPI.
    *
-   * @param dsp is the sparsity pattern that has been built locally and for
-   * which we need to exchange entries with other processors to make sure that
-   * each processor knows all the elements of the rows of a matrix it stores
-   * and that may eventually be written to. This sparsity pattern will be
-   * changed as a result of this function: All entries in rows that belong to
-   * a different processor are sent to them and added there.
+   * @param dsp is a dynamic sparsity pattern that has been built locally and
+   * for which we need to exchange entries with other processors to make sure
+   * that each processor knows all the elements of the rows of a matrix it
+   * stores and that may eventually be written to. This sparsity pattern will
+   * be changed as a result of this function: All entries in rows that belong
+   * to a different processor are sent to them and added there.
    *
    * @param rows_per_cpu determines ownership of rows.
    *
@@ -192,23 +193,23 @@ namespace SparsityTools
    * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
    * computation.
    */
-  template <class DSP_t>
-  void distribute_sparsity_pattern(DSP_t &dsp,
-                                   const std::vector<typename DSP_t::size_type> &rows_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange);
+  void distribute_sparsity_pattern
+  (DynamicSparsityPattern                               &dsp,
+   const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
+   const MPI_Comm                                       &mpi_comm,
+   const IndexSet                                       &myrange);
 
   /**
-   * similar to the function above, but includes support for
-   * BlockDynamicSparsityPattern. @p owned_set_per_cpu is typically
-   * DoFHandler::locally_owned_dofs_per_processor and @p myrange are
+   * similar to the function above, but for BlockDynamicSparsityPattern
+   * instead. @p owned_set_per_cpu is typically
+   * DoFHandler::locally_owned_dofs_per_processor and @p myrange is
    * locally_relevant_dofs.
    */
-  template <class DSP_t>
-  void distribute_sparsity_pattern(DSP_t &dsp,
-                                   const std::vector<IndexSet> &owned_set_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange);
+  void distribute_sparsity_pattern
+  (BlockDynamicSparsityPattern &dsp,
+   const std::vector<IndexSet> &owned_set_per_cpu,
+   const MPI_Comm              &mpi_comm,
+   const IndexSet              &myrange);
 
 #endif
 
