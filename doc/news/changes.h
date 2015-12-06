@@ -38,6 +38,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: deallog console depth is now 0 by default, causing no
+  output to the screen from solvers and other places in the library.
+  <br>
+  (Timo Heister, 2015/12/06)
+  </li>
+
   <li> Changed: The function Utilities::trim() now removes general
   white space characters, such as '<tt>\\r</tt>' and '<tt>\\n</tt>', as well as
   space characters.
@@ -52,6 +58,7 @@ inconvenience this causes.
   MultithreadInfo::n_cores().
   <br>
   (Timo Heister, 2015/11/19)
+  </li>
 
   <li> Removed: The <code>UpdateFlags</code> flags
   <code>update_support_points</code>, <code>update_support_jacobians</code>,
