@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The function <code>Utilities::trim</code> now removes general
+  white space characters, such as '<tt>\\r</tt>' and '<tt>\\n</tt>', as well as
+  space characters.
+  <br>
+  (David Wells, 2015/12/05)
+  </li>
+
   <li> Removed: Previously deprecated global instance multithread_info of
   MultithreadInfo has been removed (all members of this class are static
   so there is no reason to use/create an instance). The deprecated

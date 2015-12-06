@@ -1,9 +1,2 @@
 
-DEAL::trim("Hello World") = "Hello World"
-DEAL::trim("") = ""
-DEAL::trim(" ") = ""
-DEAL::trim("    ") = ""
-DEAL::trim("  middle   ") = "middle"
-DEAL::trim("left   ") = "left"
-DEAL::trim("  right") = "right"
-DEAL::trim("  multiple  words with spaces  ") = "multiple  words with spaces"
+DEAL::OK
