@@ -926,21 +926,11 @@ int main (int argc, char **argv)
 
       // Here is the only real difference: PETSc requires that we initialize
       // it at the beginning of the program, and un-initialize it at the
-      // end. The class MPI_InitFinalize takes care of that. The original code
-      // sits in between, enclosed in braces to make sure that the
-      // <code>elastic_problem</code> variable goes out of scope (and is
-      // destroyed) before PETSc is closed with
-      // <code>PetscFinalize</code>. (If we wouldn't use braces, the
-      // destructor of <code>elastic_problem</code> would run after
-      // <code>PetscFinalize</code>; since the destructor involves calls to
-      // PETSc functions, we would get strange error messages from PETSc.)
+      // end. The class MPI_InitFinalize takes care of that.
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      {
-        deallog.depth_console (0);
 
-        ElasticProblem<2> elastic_problem;
-        elastic_problem.run ();
-      }
+      ElasticProblem<2> elastic_problem;
+      elastic_problem.run ();
     }
   catch (std::exception &exc)
     {
