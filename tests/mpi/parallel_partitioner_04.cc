@@ -99,7 +99,6 @@ int main (int argc, char **argv)
       std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << std::setprecision(4);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       test();

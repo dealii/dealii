@@ -936,8 +936,6 @@ int main ()
       using namespace dealii;
       using namespace Step20;
 
-      deallog.depth_console (0);
-
       MixedLaplaceProblem<2> mixed_laplace_problem(0);
       mixed_laplace_problem.run ();
     }

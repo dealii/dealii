@@ -35,7 +35,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   //      subtract two equal polynomials up to order p_dim
   //      the result evaluated at an arbitrary point

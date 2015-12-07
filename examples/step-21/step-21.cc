@@ -1281,8 +1281,6 @@ int main ()
       using namespace dealii;
       using namespace Step21;
 
-      deallog.depth_console (0);
-
       TwoPhaseFlowProblem<2> two_phase_flow_problem(0);
       two_phase_flow_problem.run ();
     }

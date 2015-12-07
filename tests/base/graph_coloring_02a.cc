@@ -110,7 +110,6 @@ int main()
   deallog<<std::setprecision(4);
   deallog<<std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   check<1> ();
   check<2> ();

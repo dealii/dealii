@@ -764,12 +764,8 @@ int main (int argc, char *argv[])
       using namespace Step45;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-      deallog.depth_console (0);
-
-      {
-        StokesProblem<2> flow_problem(1);
-        flow_problem.run ();
-      }
+      StokesProblem<2> flow_problem(1);
+      flow_problem.run ();
     }
   catch (std::exception &exc)
     {

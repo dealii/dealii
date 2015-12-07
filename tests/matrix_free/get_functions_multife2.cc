@@ -327,7 +327,6 @@ void test ()
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   // need to set quite a loose tolerance because
   // FEValues approximates Hessians with finite
   // differences, which are not so accurate

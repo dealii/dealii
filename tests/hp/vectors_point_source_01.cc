@@ -98,7 +98,6 @@ int main ()
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4) << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   deallog.push ("1d");
   check<1> ();

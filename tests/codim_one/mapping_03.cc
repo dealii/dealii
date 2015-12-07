@@ -61,7 +61,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test<2> (1);
   test<2> (2);

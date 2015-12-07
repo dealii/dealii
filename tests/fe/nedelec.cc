@@ -174,7 +174,6 @@ main()
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   plot_shape_functions<2> (0);
   plot_shape_functions<2> (1);

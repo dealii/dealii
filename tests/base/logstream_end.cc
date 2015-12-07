@@ -33,14 +33,12 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   {
     LogStream log;
 
     log.attach(logfile);
-    log.depth_console(0);
     log.threshold_double(1.e-10);
     log.log_thread_id (false);
 

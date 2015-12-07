@@ -161,7 +161,6 @@ int main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog << std::setprecision (3);
   test<2,1>();

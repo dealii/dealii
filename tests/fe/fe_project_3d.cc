@@ -402,7 +402,6 @@ int main ()
   deallog << std::setprecision(6);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double (1e-8);
 
   const static unsigned dim = 3;

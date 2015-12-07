@@ -33,6 +33,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/conditional_ostream.h>
 
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -116,6 +117,8 @@ namespace Step50
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
+
+    ConditionalOStream                        pcout;
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -229,16 +232,16 @@ namespace Step50
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
     :
+    pcout (std::cout,
+           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
+            == 0)),
     triangulation (MPI_COMM_WORLD,Triangulation<dim>::
                    limit_level_difference_at_vertices,
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     fe (degree),
     mg_dof_handler (triangulation),
     degree(degree)
-  {
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
-      deallog.depth_console(0);
-  }
+  {}
 
 
   // @sect4{LaplaceProblem::setup_system}
@@ -810,6 +813,7 @@ namespace Step50
         solver.solve (system_matrix, solution, system_rhs,
                       preconditioner);
       }
+    pcout << "   CG converged in " << solver_control.last_step() << " iterations." << std::endl;
 
     constraints.distribute (solution);
   }
@@ -916,7 +920,7 @@ namespace Step50
         std::ofstream visit_master (visit_master_filename.c_str());
         data_out.write_visit_record (visit_master, filenames);
 
-        std::cout << "wrote " << pvtu_master_filename << std::endl;
+        std::cout << "   wrote " << pvtu_master_filename << std::endl;
 
       }
   }
@@ -937,7 +941,7 @@ namespace Step50
   {
     for (unsigned int cycle=0; cycle<15; ++cycle)
       {
-        deallog << "Cycle " << cycle << ':' << std::endl;
+        pcout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
@@ -948,31 +952,26 @@ namespace Step50
         else
           refine_grid ();
 
-        deallog << "   Number of active cells:       "
-                << triangulation.n_global_active_cells()
-                << std::endl;
+        pcout << "   Number of active cells:       "
+              << triangulation.n_global_active_cells()
+              << std::endl;
 
         setup_system ();
 
-        deallog << "   Number of degrees of freedom: "
-                << mg_dof_handler.n_dofs()
-                << " (by level: ";
+        pcout << "   Number of degrees of freedom: "
+              << mg_dof_handler.n_dofs()
+              << " (by level: ";
         for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
-          deallog << mg_dof_handler.n_dofs(level)
-                  << (level == triangulation.n_global_levels()-1
-                      ? ")" : ", ");
-        deallog << std::endl;
+          pcout << mg_dof_handler.n_dofs(level)
+                << (level == triangulation.n_global_levels()-1
+                    ? ")" : ", ");
+        pcout << std::endl;
 
         assemble_system ();
         assemble_multigrid ();
 
         solve ();
         output_results (cycle);
-
-        LA::MPI::Vector temp = solution;
-        system_matrix.residual(temp,solution,system_rhs);
-        constraints.set_zero(temp);
-        deallog << "residual " << temp.l2_norm() << std::endl;
       }
   }
 }

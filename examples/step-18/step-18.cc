@@ -1906,12 +1906,9 @@ int main (int argc, char **argv)
       using namespace Step18;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      {
-        deallog.depth_console (0);
 
-        TopLevel<3> elastic_problem;
-        elastic_problem.run ();
-      }
+      TopLevel<3> elastic_problem;
+      elastic_problem.run ();
     }
   catch (std::exception &exc)
     {

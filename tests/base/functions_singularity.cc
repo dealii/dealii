@@ -237,7 +237,6 @@ int main()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   Functions::LSingularityFunction fl;
   Functions::LSingularityGradFunction flg;

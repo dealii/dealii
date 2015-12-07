@@ -38,7 +38,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   FullMatrix<double> A(4,3,rect);
   Householder<double> H(A);

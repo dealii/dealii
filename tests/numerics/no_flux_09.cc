@@ -74,7 +74,6 @@ int main ()
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   check<3> ();
 }

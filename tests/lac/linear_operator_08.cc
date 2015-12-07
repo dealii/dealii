@@ -221,7 +221,6 @@ public:
 int main()
 {
   initlog();
-  deallog.depth_console(0);
   deallog << std::setprecision(10);
 
   // deal.II SparseMatrix

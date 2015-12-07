@@ -62,7 +62,6 @@ int main ()
 {
   ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test ();
 }

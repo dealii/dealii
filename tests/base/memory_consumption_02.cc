@@ -36,7 +36,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   // do not test value type (just pointers) with void
   EqualityWithSizeofTest<void *> a;

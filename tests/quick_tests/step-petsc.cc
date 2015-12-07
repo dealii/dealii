@@ -183,7 +183,6 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        deallog.depth_console (0);
         LaplaceProblem problem;
         problem.run ();
         deallog << "OK" << std::endl;

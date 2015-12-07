@@ -672,8 +672,6 @@ int main()
       using namespace dealii;
       using namespace Step26;
 
-      deallog.depth_console(0);
-
       HeatEquation<2> heat_equation_solver;
       heat_equation_solver.run();
 

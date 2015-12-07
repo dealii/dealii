@@ -115,7 +115,6 @@ void
 BEM<spacedim>::run()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   ConvergenceTable table;
 

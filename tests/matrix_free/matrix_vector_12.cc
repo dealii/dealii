@@ -272,7 +272,6 @@ int main (int argc, char **argv)
       std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << std::setprecision(4);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");
@@ -287,7 +286,6 @@ int main (int argc, char **argv)
     }
   else
     {
-      deallog.depth_console(0);
       test<2,1>();
       test<2,2>();
       test<3,1>();

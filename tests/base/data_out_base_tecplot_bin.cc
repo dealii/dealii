@@ -68,7 +68,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   check_all<1,1>();
   check_all<1,2>();
   check_all<2,2>();

@@ -295,7 +295,6 @@ int main ()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   std::vector<std_cxx11::shared_ptr<FiniteElement<2> > > fe2;
   fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));

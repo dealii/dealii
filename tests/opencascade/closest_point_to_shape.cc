@@ -38,7 +38,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   // A unit circle
   gp_Dir z_axis(0.,0.,1.);

@@ -123,7 +123,6 @@ int main ()
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   deallog.push ("2d");
   check<2> ();

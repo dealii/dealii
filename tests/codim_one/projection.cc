@@ -86,7 +86,6 @@ void test(std::string filename, unsigned int n)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   for (unsigned int n=1; n<5; n++)
     {

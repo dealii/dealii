@@ -632,8 +632,6 @@ int main (int argc, char **argv)
 
   try
     {
-      deallog.depth_console (0);
-
       SineGordonProblem<dimension> sg_problem;
       sg_problem.run ();
     }

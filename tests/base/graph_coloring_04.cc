@@ -99,7 +99,6 @@ int main (int argc, char *argv[])
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   check<2> ();
 

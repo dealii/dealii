@@ -1118,7 +1118,6 @@ int main ()
     {
       using namespace Step37;
 
-      deallog.depth_console(0);
       LaplaceProblem<dimension> laplace_problem;
       laplace_problem.run ();
     }

@@ -239,11 +239,9 @@ int main (int argc, char *argv[])
       using namespace dealii;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-      deallog.depth_console (0);
 
       MPILogInitAll log;
 
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
       {
         deallog << "Test for 2D" << std::endl << std::endl;

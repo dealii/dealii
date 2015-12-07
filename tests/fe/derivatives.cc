@@ -147,7 +147,6 @@ main()
   deallog << std::setprecision(8);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog.push ("1d");
   plot_FE_Q_shape_functions<1>();

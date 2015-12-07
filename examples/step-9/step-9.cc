@@ -1330,8 +1330,6 @@ int main ()
 {
   try
     {
-      dealii::deallog.depth_console (0);
-
       dealii::MultithreadInfo::set_thread_limit();
 
       Step9::AdvectionProblem<2> advection_problem_2d;

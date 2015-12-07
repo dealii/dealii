@@ -28,7 +28,6 @@ int main ()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog << std::setprecision(3);
   deallog.threshold_double(1.e-10);
 

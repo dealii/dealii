@@ -721,8 +721,6 @@ int main ()
       using namespace dealii;
       using namespace Step15;
 
-      deallog.depth_console (0);
-
       MinimalSurfaceProblem<2> laplace_problem_2d;
       laplace_problem_2d.run ();
     }

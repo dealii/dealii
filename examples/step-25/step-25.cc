@@ -714,20 +714,16 @@ namespace Step25
 // @sect3{The <code>main</code> function}
 
 // This is the main function of the program. It creates an object of top-level
-// class and calls its principal function. Also, we suppress some of the
-// library output by setting <code>deallog.depth_console</code> to
-// zero. Furthermore, if exceptions are thrown during the execution of the run
-// method of the <code>SineGordonProblem</code> class, we catch and report
-// them here. For more information about exceptions the reader should consult
-// step-6.
+// class and calls its principal function. If exceptions are thrown during the
+// execution of the run method of the <code>SineGordonProblem</code> class, we
+// catch and report them here. For more information about exceptions the
+// reader should consult step-6.
 int main ()
 {
   try
     {
       using namespace dealii;
       using namespace Step25;
-
-      deallog.depth_console (0);
 
       SineGordonProblem<1> sg_problem;
       sg_problem.run ();

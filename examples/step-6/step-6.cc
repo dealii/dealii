@@ -750,8 +750,6 @@ int main ()
   // try to run the program as we did before...
   try
     {
-      deallog.depth_console (0);
-
       Step6<2> laplace_problem_2d;
       laplace_problem_2d.run ();
     }

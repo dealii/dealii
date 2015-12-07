@@ -1301,8 +1301,6 @@ int main ()
       using namespace dealii;
       using namespace Step7;
 
-      deallog.depth_console (0);
-
       // Now for the three calls to the main class. Each call is blocked into
       // curly braces in order to destroy the respective objects (i.e. the
       // finite element and the HelmholtzProblem object) at the end of the

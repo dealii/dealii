@@ -640,7 +640,6 @@ int main ()
   deallog.attach(logfile);
   deallog << std::setprecision (3);
   deallog.threshold_double(1e-10);
-  deallog.depth_console(0);
 
   {
     deallog.push("2d");

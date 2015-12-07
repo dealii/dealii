@@ -64,7 +64,6 @@ int main ()
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   Triangulation<3> tria;
   StraightBoundary<3> boundary;
