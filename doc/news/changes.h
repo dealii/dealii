@@ -176,6 +176,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: The WorkStream class's design and implementation are now much
+  better documented in the form of a @ref workstream_paper "preprint".
+  <br>
+  (Wolfgang Bangerth, 2015/11/29)
+  </li>
+
   <li> New: There is now much more documentation for the FiniteElement class,
   in particular detailing what one needs to implement when writing finite
   element descriptions in derived classes.
