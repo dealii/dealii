@@ -482,7 +482,15 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Improved: both versions of distribute_sparsity_pattern are now plain, not
+  <li> Improved: Many more functions in namespace GridTools and class
+  InterGridMap are now consistely instantiated also for types
+  parallel::distributed::Triangulation and parallel::shared::Triangulation.
+  <br>
+  (Wolfgang Bangerth, 2015/12/07)
+  </li>
+
+  <li> Improved: Both versions of SparsityTools::distribute_sparsity_pattern()
+  are now plain, not
   template, functions. This is not a breaking change because each function was
   instantiated for exactly one template argument.
   <br>

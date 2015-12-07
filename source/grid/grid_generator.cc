@@ -23,6 +23,7 @@
 #include <deal.II/grid/intergrid_map.h>
 
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <iostream>
 #include <cmath>
@@ -4147,6 +4148,13 @@ namespace GridGenerator
       return tria;
     }
 
+    template<int dim, int spacedim>
+    const Triangulation<dim, spacedim> &
+    get_tria(const parallel::shared::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
     template<int dim, template<int, int> class Container, int spacedim>
     const Triangulation<dim,spacedim> &
     get_tria(const Container<dim,spacedim> &container)
@@ -4165,6 +4173,13 @@ namespace GridGenerator
     template<int dim, int spacedim>
     Triangulation<dim, spacedim> &
     get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, int spacedim>
+    Triangulation<dim, spacedim> &
+    get_tria(parallel::shared::Triangulation<dim, spacedim> &tria)
     {
       return tria;
     }
