@@ -949,12 +949,14 @@ namespace DoFTools
 
     // now add the DoF on the adjacent ghost cells to the IndexSet
 
-    // Note: It is not worth it to cache intermediate data in a set because
-    // add_indices is more efficient. I also benchmarked skipping the
-    // locally_owned_dofs by doing locally_owned_dofs().is_element() but
-    // that is also slower unless 70%+ of the DoFs are locally owned and they
-    // are contiguous. - Timo Heister
+    // Note: For certain meshes (in particular in 3D and with many
+    // processors), it is really necessary to cache intermediate data. After
+    // trying several objects such as std::set, a vector that is always kept
+    // sorted, and a vector that is initially unsorted and sorted once at the
+    // end, the latter has been identified to provide the best performance.
+    // Martin Kronbichler
     std::vector<types::global_dof_index> dof_indices;
+    std::vector<types::global_dof_index> dofs_on_ghosts;
 
     typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
                                                   endc = dof_handler.end();
@@ -963,9 +965,15 @@ namespace DoFTools
         {
           dof_indices.resize(cell->get_fe().dofs_per_cell);
           cell->get_dof_indices(dof_indices);
-          dof_set.add_indices(dof_indices.begin(), dof_indices.end());
+          for (unsigned int i=0; i<dof_indices.size(); ++i)
+            if (!dof_set.is_element(dof_indices[i]))
+              dofs_on_ghosts.push_back(dof_indices[i]);
         }
 
+    // sort, compress out duplicates, fill into index set
+    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
+    dof_set.add_indices(dofs_on_ghosts.begin(), std::unique(dofs_on_ghosts.begin(),
+                                                            dofs_on_ghosts.end()));
     dof_set.compress();
   }
 
@@ -981,12 +989,14 @@ namespace DoFTools
 
     // add the DoF on the adjacent ghost cells to the IndexSet
 
-    // Note: It is not worth it to cache intermediate data in a set because
-    // add_indices is more efficient. I also benchmarked skipping the
-    // locally_owned_dofs by doing locally_owned_dofs().is_element() but
-    // that is also slower unless 70%+ of the DoFs are locally owned and they
-    // are contiguous. - Timo Heister
+    // Note: For certain meshes (in particular in 3D and with many
+    // processors), it is really necessary to cache intermediate data. After
+    // trying several objects such as std::set, a vector that is always kept
+    // sorted, and a vector that is initially unsorted and sorted once at the
+    // end, the latter has been identified to provide the best performance.
+    // Martin Kronbichler
     std::vector<types::global_dof_index> dof_indices;
+    std::vector<types::global_dof_index> dofs_on_ghosts;
 
     typename DoFHandlerType::cell_iterator cell = dof_handler.begin(level),
                                            endc = dof_handler.end(level);
@@ -1001,8 +1011,15 @@ namespace DoFTools
 
         dof_indices.resize(cell->get_fe().dofs_per_cell);
         cell->get_mg_dof_indices(dof_indices);
-        dof_set.add_indices(dof_indices.begin(), dof_indices.end());
+        for (unsigned int i=0; i<dof_indices.size(); ++i)
+          if (!dof_set.is_element(dof_indices[i]))
+            dofs_on_ghosts.push_back(dof_indices[i]);
       }
+
+    // sort, compress out duplicates, fill into index set
+    std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
+    dof_set.add_indices(dofs_on_ghosts.begin(), std::unique(dofs_on_ghosts.begin(),
+                                                            dofs_on_ghosts.end()));
 
     dof_set.compress();
   }
