@@ -1,0 +1,33 @@
+
+DEAL::Normal and inverse multiplication operations
+DEAL:cg::Starting value 1.414213562
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 1.414213562
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 1.414213562
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL::x4a==x4b : 1
+DEAL::Single packaged operation
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL::x5==x6a : 1
+DEAL::x5==x6b : 1
+DEAL::Manual operations
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL:cg::Starting value 5.656854249
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL::x5a==x6a : 1
+DEAL::x5b==x6b_1 : 1
+DEAL::x5c==x6c_1 : 1
+DEAL::x5d==x6d_1 : 1
+DEAL::x5b==x6b_2 : 1
+DEAL::x5c==x6c_2 : 1
+DEAL::x5d==x6d_2 : 1
+DEAL::OK

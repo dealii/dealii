@@ -215,6 +215,20 @@ inconvenience this causes.
   (Luca Heltai, 2015/12/13)
   </li>
 
+  <li> New: A new linear operator representing the Schur complement,
+  namely schur_complement(), has been implemented. Some auxiliary functions
+  that are often used in conjunction with the Schur complement
+  (condense_schur_rhs() and postprocess_schur_solution()) are also provided
+  as a PackagedOperation.
+  An example of this functionality can be found in
+  <code>tests/lac/schur_complement_01.cc</code>.
+  The solution of a multi-component problem (namely step-22) using the
+  schur_complement can be found in
+  <code>tests/lac/schur_complement_03.cc</code> .
+  <br>
+  (Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015/12/07)
+  </li>
+
   <li> New: There is now a function Utilities::to_string that works like
   int_to_string, but is more safe for long integers, negative integers, and
   also handles floating point numbers. The implementation of int_to_string
