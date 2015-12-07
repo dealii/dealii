@@ -53,9 +53,9 @@ namespace GridRefinement
    * cells.
    *
    *
-   * @arg @p current_n_cells is current cell number.
+   * @param[in] current_n_cells The current cell number.
    *
-   * @arg @p max_n_cells is the maximal number of cells. If current cell
+   * @param[in] max_n_cells The maximal number of cells. If current cell
    * number @p current_n_cells is already exceeded maximal cell number @p
    * max_n_cells, refinement fraction of cells will be set to zero and
    * coarsening fraction of cells will be adjusted to reduce cell number to @
@@ -67,9 +67,9 @@ namespace GridRefinement
    * default value of this argument is to impose no limit on the number of
    * cells.
    *
-   * @arg @p top_fraction is the requested fraction of cells to be refined.
+   * @param[in] top_fraction_of_cells The requested fraction of cells to be refined.
    *
-   * @arg @p bottom_fraction is the requested fraction of cells to be
+   * @param[in] bottom_fraction_of_cells The requested fraction of cells to be
    * coarsened.
    *
    * @note Usually you do not need to call this function explicitly. Pass @p
@@ -124,21 +124,24 @@ namespace GridRefinement
    * <tt>C++</tt> standard library, which takes only linear time in the number
    * of elements, rather than <tt>N log N</tt> for sorting all values.
    *
-   * @warning This function only sets the coarsening and refinement flags. The
+   * @note This function only sets the coarsening and refinement flags. The
    * mesh is not changed until you call
    * Triangulation::execute_coarsening_and_refinement().
    *
-   * @arg @p criteria: the refinement criterion computed on each mesh cell.
+   * @param[in,out] triangulation The triangulation whose cells this function is
+   * supposed to mark for coarsening and refinement.
+   *
+   * @param[in] criteria The refinement criterion for each mesh cell.
    * Entries may not be negative.
    *
-   * @arg @p top_fraction_of_cells is the fraction of cells to be refined. If
+   * @param[in] top_fraction_of_cells The fraction of cells to be refined. If
    * this number is zero, no cells will be refined. If it equals one, the
    * result will be flagging for global refinement.
    *
-   * @arg @p bottom_fraction_of_cells is the fraction of cells to be
+   * @param[in] bottom_fraction_of_cells The fraction of cells to be
    * coarsened. If this number is zero, no cells will be coarsened.
    *
-   * @arg @p max_n_cells can be used to specify a maximal number of cells. If
+   * @param[in] max_n_cells This argument can be used to specify a maximal number of cells. If
    * this number is going to be exceeded upon refinement, then refinement and
    * coarsening fractions are going to be adjusted in an attempt to reach the
    * maximum number of cells. Be aware though that through proliferation of
@@ -149,7 +152,7 @@ namespace GridRefinement
   template <int dim, class VectorType, int spacedim>
   void
   refine_and_coarsen_fixed_number
-  (Triangulation<dim,spacedim> &tria,
+  (Triangulation<dim,spacedim> &triangulation,
    const VectorType            &criteria,
    const double                top_fraction_of_cells,
    const double                bottom_fraction_of_cells,
@@ -189,17 +192,20 @@ namespace GridRefinement
    * above, this function only computes the threshold values and then passes
    * over to refine() and coarsen().
    *
-   * @arg @p criteria: the refinement criterion computed on each mesh cell.
+   * @param[in,out] triangulation The triangulation whose cells this function is
+   * supposed to mark for coarsening and refinement.
+   *
+   * @param[in] criteria The refinement criterion computed on each mesh cell.
    * Entries may not be negative.
    *
-   * @arg @p top_fraction is the fraction of the total estimate which should
+   * @param[in] top_fraction The fraction of the total estimate which should
    * be refined. If this number is zero, no cells will be refined. If it
    * equals one, the result will be flagging for global refinement.
    *
-   * @arg @p bottom_fraction is the fraction of the estimate coarsened. If
+   * @param[in] bottom_fraction The fraction of the estimate coarsened. If
    * this number is zero, no cells will be coarsened.
    *
-   * @arg @p max_n_cells can be used to specify a maximal number of cells. If
+   * @param[in] max_n_cells This argument can be used to specify a maximal number of cells. If
    * this number is going to be exceeded upon refinement, then refinement and
    * coarsening fractions are going to be adjusted in an attempt to reach the
    * maximum number of cells. Be aware though that through proliferation of
