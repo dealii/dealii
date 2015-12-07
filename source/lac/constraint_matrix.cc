@@ -1322,31 +1322,31 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
 #endif
 
 
-#define SPARSITY_FUNCTIONS(SparsityType) \
-  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
-      const std::vector<ConstraintMatrix::size_type> &, \
-      SparsityType &,                    \
-      const bool,                        \
-      const Table<2,bool> &, \
-      internal::bool2type<false>) const; \
-  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
-      const std::vector<ConstraintMatrix::size_type> &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
-      SparsityType &,                    \
-      const bool,                        \
+#define SPARSITY_FUNCTIONS(SparsityPatternType)                                      \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      SparsityPatternType &,                                                         \
+      const bool,                                                                    \
+      const Table<2,bool> &,                                                         \
+      internal::bool2type<false>) const;                                             \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      SparsityPatternType &,                                                         \
+      const bool,                                                                    \
       const Table<2,bool> &) const
-#define BLOCK_SPARSITY_FUNCTIONS(SparsityType) \
-  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
-      const std::vector<ConstraintMatrix::size_type> &, \
-      SparsityType &,                    \
-      const bool,                        \
-      const Table<2,bool> &, \
-      internal::bool2type<true>) const; \
-  template void ConstraintMatrix::add_entries_local_to_global<SparsityType> (\
-      const std::vector<ConstraintMatrix::size_type> &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
-      SparsityType &,                    \
-      const bool,                        \
+#define BLOCK_SPARSITY_FUNCTIONS(SparsityPatternType)                                \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      SparsityPatternType &,                                                         \
+      const bool,                                                                    \
+      const Table<2,bool> &,                                                         \
+      internal::bool2type<true>) const;                                              \
+  template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      const std::vector<ConstraintMatrix::size_type> &,                              \
+      SparsityPatternType &,                                                         \
+      const bool,                                                                    \
       const Table<2,bool> &) const
 
 SPARSITY_FUNCTIONS(SparsityPattern);

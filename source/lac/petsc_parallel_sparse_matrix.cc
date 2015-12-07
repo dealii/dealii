@@ -88,10 +88,10 @@ namespace PETScWrappers
 
 
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     SparseMatrix::
     SparseMatrix (const MPI_Comm               &communicator,
-                  const SparsityType           &sparsity_pattern,
+                  const SparsityPatternType    &sparsity_pattern,
                   const std::vector<size_type> &local_rows_per_process,
                   const std::vector<size_type> &local_columns_per_process,
                   const unsigned int            this_process,
@@ -201,11 +201,11 @@ namespace PETScWrappers
 
 
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     void
     SparseMatrix::
     reinit (const MPI_Comm               &communicator,
-            const SparsityType           &sparsity_pattern,
+            const SparsityPatternType    &sparsity_pattern,
             const std::vector<size_type> &local_rows_per_process,
             const std::vector<size_type> &local_columns_per_process,
             const unsigned int            this_process,
@@ -227,13 +227,13 @@ namespace PETScWrappers
                  preset_nonzero_locations);
     }
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     void
     SparseMatrix::
-    reinit (const IndexSet &local_rows,
-            const IndexSet &local_columns,
-            const SparsityType &sparsity_pattern,
-            const MPI_Comm &communicator)
+    reinit (const IndexSet            &local_rows,
+            const IndexSet            &local_columns,
+            const SparsityPatternType &sparsity_pattern,
+            const MPI_Comm            &communicator)
     {
       this->communicator = communicator;
 
@@ -385,12 +385,12 @@ namespace PETScWrappers
     }
 
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     void
     SparseMatrix::
-    do_reinit (const IndexSet &local_rows,
-               const IndexSet &local_columns,
-               const SparsityType         &sparsity_pattern)
+    do_reinit (const IndexSet            &local_rows,
+               const IndexSet            &local_columns,
+               const SparsityPatternType &sparsity_pattern)
     {
       Assert(sparsity_pattern.n_rows()==local_rows.size(),
              ExcMessage("SparsityPattern and IndexSet have different number of rows"));
@@ -472,7 +472,7 @@ namespace PETScWrappers
           {
             PetscInt *ptr = & colnums_in_window[0];
             for (PetscInt i=local_row_start; i<local_row_end; ++i)
-              for (typename SparsityType::iterator p=sparsity_pattern.begin(i);
+              for (typename SparsityPatternType::iterator p=sparsity_pattern.begin(i);
                    p != sparsity_pattern.end(i); ++p, ++ptr)
                 *ptr = p->column();
           }
@@ -546,10 +546,10 @@ namespace PETScWrappers
     }
 
 
-    template <typename SparsityType>
+    template <typename SparsityPatternType>
     void
     SparseMatrix::
-    do_reinit (const SparsityType           &sparsity_pattern,
+    do_reinit (const SparsityPatternType    &sparsity_pattern,
                const std::vector<size_type> &local_rows_per_process,
                const std::vector<size_type> &local_columns_per_process,
                const unsigned int            this_process,
@@ -693,7 +693,7 @@ namespace PETScWrappers
           {
             PetscInt *ptr = & colnums_in_window[0];
             for (size_type i=local_row_start; i<local_row_end; ++i)
-              for (typename SparsityType::iterator p=sparsity_pattern.begin(i);
+              for (typename SparsityPatternType::iterator p=sparsity_pattern.begin(i);
                    p != sparsity_pattern.end(i); ++p, ++ptr)
                 *ptr = p->column();
           }

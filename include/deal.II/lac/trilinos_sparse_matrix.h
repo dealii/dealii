@@ -584,8 +584,8 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityType>
-    void reinit (const SparsityType &sparsity_pattern);
+    template<typename SparsityPatternType>
+    void reinit (const SparsityPatternType &sparsity_pattern);
 
     /**
      * This function reinitializes the Trilinos sparse matrix from a (possibly
@@ -746,10 +746,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityType>
-    void reinit (const Epetra_Map    &parallel_partitioning,
-                 const SparsityType  &sparsity_pattern,
-                 const bool          exchange_data = false) DEAL_II_DEPRECATED;
+    template<typename SparsityPatternType>
+    void reinit (const Epetra_Map          &parallel_partitioning,
+                 const SparsityPatternType &sparsity_pattern,
+                 const bool                 exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * This function is similar to the other initialization function above,
@@ -765,11 +765,11 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityType>
-    void reinit (const Epetra_Map    &row_parallel_partitioning,
-                 const Epetra_Map    &col_parallel_partitioning,
-                 const SparsityType  &sparsity_pattern,
-                 const bool          exchange_data = false) DEAL_II_DEPRECATED;
+    template<typename SparsityPatternType>
+    void reinit (const Epetra_Map          &row_parallel_partitioning,
+                 const Epetra_Map          &col_parallel_partitioning,
+                 const SparsityPatternType &sparsity_pattern,
+                 const bool                 exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -908,11 +908,11 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityType>
-    void reinit (const IndexSet      &parallel_partitioning,
-                 const SparsityType  &sparsity_pattern,
-                 const MPI_Comm      &communicator = MPI_COMM_WORLD,
-                 const bool           exchange_data = false);
+    template<typename SparsityPatternType>
+    void reinit (const IndexSet            &parallel_partitioning,
+                 const SparsityPatternType &sparsity_pattern,
+                 const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+                 const bool                 exchange_data = false);
 
     /**
      * This function is similar to the other initialization function above,
@@ -926,12 +926,12 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityType>
-    void reinit (const IndexSet      &row_parallel_partitioning,
-                 const IndexSet      &col_parallel_partitioning,
-                 const SparsityType  &sparsity_pattern,
-                 const MPI_Comm      &communicator = MPI_COMM_WORLD,
-                 const bool           exchange_data = false);
+    template<typename SparsityPatternType>
+    void reinit (const IndexSet            &row_parallel_partitioning,
+                 const IndexSet            &col_parallel_partitioning,
+                 const SparsityPatternType &sparsity_pattern,
+                 const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+                 const bool                 exchange_data = false);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -2604,12 +2604,12 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   inline
-  void SparseMatrix::reinit (const IndexSet      &parallel_partitioning,
-                             const SparsityType  &sparsity_pattern,
-                             const MPI_Comm      &communicator,
-                             const bool           exchange_data)
+  void SparseMatrix::reinit (const IndexSet            &parallel_partitioning,
+                             const SparsityPatternType &sparsity_pattern,
+                             const MPI_Comm            &communicator,
+                             const bool                 exchange_data)
   {
     reinit (parallel_partitioning, parallel_partitioning,
             sparsity_pattern, communicator, exchange_data);
@@ -2619,12 +2619,12 @@ namespace TrilinosWrappers
 
   template <typename number>
   inline
-  void SparseMatrix::reinit (const IndexSet      &parallel_partitioning,
+  void SparseMatrix::reinit (const IndexSet                       &parallel_partitioning,
                              const ::dealii::SparseMatrix<number> &sparse_matrix,
-                             const MPI_Comm      &communicator,
-                             const double         drop_tolerance,
-                             const bool           copy_values,
-                             const ::dealii::SparsityPattern *use_this_sparsity)
+                             const MPI_Comm                       &communicator,
+                             const double                          drop_tolerance,
+                             const bool                            copy_values,
+                             const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
     reinit (parallel_partitioning, parallel_partitioning, sparse_matrix,

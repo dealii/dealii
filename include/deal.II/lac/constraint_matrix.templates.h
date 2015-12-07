@@ -1957,13 +1957,13 @@ add_this_index:
   // add_entries_local_to_global. In case we keep constrained entries, add all
   // the rows and columns related to the constrained dof, otherwise just add
   // the diagonal
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   inline void
   set_sparsity_diagonals (const internals::GlobalRowsFromLocal &global_rows,
                           const std::vector<size_type>         &local_dof_indices,
                           const Table<2,bool>                  &dof_mask,
                           const bool                            keep_constrained_entries,
-                          SparsityType                         &sparsity_pattern)
+                          SparsityPatternType                  &sparsity_pattern)
   {
     // if we got constraints, need to add the diagonal element and, if the
     // user requested so, also the rest of the entries in rows and columns
@@ -2450,11 +2450,11 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
 
 
 
-template <typename SparsityType>
+template <typename SparsityPatternType>
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                             SparsityType                 &sparsity_pattern,
+                             SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask,
                              internal::bool2type<false> ) const
@@ -2544,12 +2544,12 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
 
 
 
-template <typename SparsityType>
+template <typename SparsityPatternType>
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<size_type> &row_indices,
                              const std::vector<size_type> &col_indices,
-                             SparsityType                 &sparsity_pattern,
+                             SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask) const
 {
@@ -2603,11 +2603,11 @@ add_entries_local_to_global (const std::vector<size_type> &row_indices,
 
 
 
-template <typename SparsityType>
+template <typename SparsityPatternType>
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                             SparsityType                 &sparsity_pattern,
+                             SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask,
                              internal::bool2type<true> ) const

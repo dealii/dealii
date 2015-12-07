@@ -535,9 +535,9 @@ namespace MGTools
 
 
 
-  template <typename DoFHandlerType, class SP>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void make_sparsity_pattern (const DoFHandlerType &dof,
-                              SP                   &sparsity,
+                              SparsityPatternType  &sparsity,
                               const unsigned int    level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
@@ -567,10 +567,10 @@ namespace MGTools
 
 
 
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof,
-                              SP                             &sparsity,
+                              SparsityPatternType            &sparsity,
                               const unsigned int              level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
@@ -635,10 +635,10 @@ namespace MGTools
 
 
 
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof,
-                                   SP                             &sparsity,
+                                   SparsityPatternType            &sparsity,
                                    const unsigned int              level)
   {
     Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
@@ -697,10 +697,10 @@ namespace MGTools
 
 
 
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern (const DoFHandler<dim,spacedim>    &dof,
-                              SP                                &sparsity,
+                              SparsityPatternType               &sparsity,
                               const unsigned int                 level,
                               const Table<2,DoFTools::Coupling> &int_mask,
                               const Table<2,DoFTools::Coupling> &flux_mask)
@@ -877,10 +877,10 @@ namespace MGTools
 
 
 
-  template <int dim, class SP, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim>    &dof,
-                                   SP                                &sparsity,
+                                   SparsityPatternType               &sparsity,
                                    const unsigned int                 level,
                                    const Table<2,DoFTools::Coupling> &flux_mask)
   {

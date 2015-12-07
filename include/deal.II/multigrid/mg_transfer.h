@@ -49,10 +49,10 @@ namespace internal
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VectorType::value_type> Matrix;
 
-    template <class DSP, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DoFHandlerType &)
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const SparsityPatternType &sp, const DoFHandlerType &)
     {
-      sparsity.copy_from (dsp);
+      sparsity.copy_from (sp);
       (void)level;
       matrix.reinit (sparsity);
     }
@@ -65,12 +65,12 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class DSP, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DoFHandlerType &dh)
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
                     dh.locally_owned_mg_dofs(level),
-                    dsp, MPI_COMM_WORLD, true);
+                    sp, MPI_COMM_WORLD, true);
     }
 
   };
@@ -80,12 +80,12 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class DSP, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DoFHandlerType &dh)
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
                     dh.locally_owned_mg_dofs(level),
-                    dsp, MPI_COMM_WORLD, true);
+                    sp, MPI_COMM_WORLD, true);
     }
 
   };
@@ -96,8 +96,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class DSP, typename DoFHandlerType>
-    static void reinit(Matrix &, Sparsity &, int /*level*/, const DSP &, DoFHandlerType &)
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &, Sparsity &, int /*level*/, const SparsityPatternType &, DoFHandlerType &)
     {
     }
   };

@@ -624,8 +624,8 @@ public:
    * content of this object is lost, and the sparsity pattern is in compressed
    * mode afterwards.
    */
-  template <typename CompressedSparsityType>
-  void copy_from (const CompressedSparsityType &dsp);
+  template <typename SparsityPatternType>
+  void copy_from (const SparsityPatternType &dsp);
 
 
   /**
