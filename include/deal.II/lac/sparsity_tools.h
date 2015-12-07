@@ -174,21 +174,23 @@ namespace SparsityTools
   /**
    * Communicate rows in a dynamic sparsity pattern over MPI.
    *
-   * @param dsp is a dynamic sparsity pattern that has been built locally and
-   * for which we need to exchange entries with other processors to make sure
-   * that each processor knows all the elements of the rows of a matrix it
-   * stores and that may eventually be written to. This sparsity pattern will
-   * be changed as a result of this function: All entries in rows that belong
-   * to a different processor are sent to them and added there.
+   * @param dsp A dynamic sparsity pattern that has been built locally and for
+   * which we need to exchange entries with other processors to make sure that
+   * each processor knows all the elements of the rows of a matrix it stores
+   * and that may eventually be written to. This sparsity pattern will be
+   * changed as a result of this function: All entries in rows that belong to
+   * a different processor are sent to them and added there.
    *
-   * @param rows_per_cpu determines ownership of rows.
+   * @param rows_per_cpu A vector containing the number of of rows per CPU for
+   * determining ownership. This is typically the value returned by
+   * DoFHandler::locally_owned_dofs_per_processor.
    *
-   * @param mpi_comm is the MPI communicator that is shared between the
-   * processors that all participate in this operation.
+   * @param mpi_comm The MPI communicator shared between the processors that
+   * participate in this operation.
    *
-   * @param myrange indicates the range of elements stored locally and should
-   * be the one used in the constructor of the DynamicSparsityPattern.  This
-   * should be the locally relevant set.  Only rows contained in myrange are
+   * @param myrange The range of elements stored locally. This should be the
+   * one used in the constructor of the DynamicSparsityPattern, and should
+   * also be the locally relevant set. Only rows contained in myrange are
    * checked in dsp for transfer. This function needs to be used with
    * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
    * computation.
@@ -200,10 +202,13 @@ namespace SparsityTools
    const IndexSet                                       &myrange);
 
   /**
-   * similar to the function above, but for BlockDynamicSparsityPattern
-   * instead. @p owned_set_per_cpu is typically
-   * DoFHandler::locally_owned_dofs_per_processor and @p myrange is
-   * locally_relevant_dofs.
+   * Similar to the function above, but for BlockDynamicSparsityPattern
+   * instead.
+
+   * @param owned_set_per_cpu Typically the value given by
+   * DoFHandler::locally_owned_dofs_per_processor.
+   *
+   * @param myrange Typically the locally relevant DoFs.
    */
   void distribute_sparsity_pattern
   (BlockDynamicSparsityPattern &dsp,
