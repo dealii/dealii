@@ -469,9 +469,13 @@ DEAL_II_NAMESPACE_OPEN
  * implemented in a specialization for 3d. It using sheets instead of strings
  * of cells to work on. If a grid is orientable, then the algorithm is able to
  * do its work in linear time; if it is not orientable, then it aborts in
- * linear time as well. Both algorithms are described in a paper by Agelek,
- * Anderson, Bangerth and Barth, see the publications page of the deal.II
- * library.
+ * linear time as well.
+ *
+ * Both algorithms are described in the paper
+ * "On orienting edges of unstructured two- and three-dimensional meshes",
+ * R. Agelek, M. Anderson, W. Bangerth, W. L. Barth (submitted, 2015).
+ * A preprint is available as <a href="http://arxiv.org/abs/1512.02137">arxiv
+ * 1512.02137</a>.
  *
  *
  * <h3>For the curious</h3>
