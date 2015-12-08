@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,18 +26,18 @@
  * decompositions (ILU). In addition, sparse direct solvers can be used as
  * preconditioners when available.
  *
- * Broadly speaking, preconditioners are operators, which are
- * multiplied with a matrix to improve conditioning. The idea is, that
- * the preconditioned system <i>P<sup>-1</sup>Ax = P<sup>-1</sup>b</i>
- * is much easier to solve than the original system <i>Ax = b</i>.What
- * this means exactly depends on the structure of  the matrix and
- * cannot be discussed here in generality. For symmetric, positive
- * definite matrices <i>A</i> and <i>P</i>, it means that the spectral
- * condition number (the quotient of greatest and smallest eigenvalue)
- * of <i>P<sup>-1</sup>A</i> is much smaller than the one of <i>A</i>.
+ * Broadly speaking, preconditioners are operators, which are multiplied with
+ * a matrix to improve conditioning. The idea is, that the preconditioned
+ * system <i>P<sup>-1</sup>Ax = P<sup>-1</sup>b</i> is much easier to solve
+ * than the original system <i>Ax = b</i>.What this means exactly depends on
+ * the structure of the matrix and cannot be discussed here in generality. For
+ * symmetric, positive definite matrices <i>A</i> and <i>P</i>, it means that
+ * the spectral condition number (the quotient of greatest and smallest
+ * eigenvalue) of <i>P<sup>-1</sup>A</i> is much smaller than the one of
+ * <i>A</i>.
  *
- * At hand of the simplest example, Richardson iteration, implemented
- * in SolverRichardson, the preconditioned iteration looks like
+ * At hand of the simplest example, Richardson iteration, implemented in
+ * SolverRichardson, the preconditioned iteration looks like
  * @f[
  *  x^{k+1} = x^k - P^{-1} \bigl(A x^k - b\bigr).
  * @f]
@@ -120,30 +120,29 @@
  * void  vmult (VECTOR& dst, const VECTOR& src) const;
  * void  Tvmult (VECTOR& dst, const VECTOR& src) const;
  * @endcode
- * These functions apply the preconditioning operator to the source
- * vector $src$ and return the result in $dst$ as $dst=P^{-1}src$ or
- * $dst=P^{-T}src$. Preconditioned iterative
- * dolvers use these <tt>vmult()</tt> functions of the preconditioner.
- * Some solvers may also use <tt>Tvmult()</tt>.
+ * These functions apply the preconditioning operator to the source vector
+ * $src$ and return the result in $dst$ as $dst=P^{-1}src$ or
+ * $dst=P^{-T}src$. Preconditioned iterative dolvers use these
+ * <tt>vmult()</tt> functions of the preconditioner.  Some solvers may also
+ * use <tt>Tvmult()</tt>.
  *
  * <h4>Relaxation methods</h4>
  *
- * Additional to the interface described above, some preconditioners
- * like SOR and Jacobi have been known as iterative methods
- * themselves. For them, an additional interface exists, consisting of
- * the functions
+ * Additional to the interface described above, some preconditioners like SOR
+ * and Jacobi have been known as iterative methods themselves. For them, an
+ * additional interface exists, consisting of the functions
  * @code
  * void  step (VECTOR& dst, const VECTOR& rhs) const;
  * void  Tstep (VECTOR& dst, const VECTOR& rhs) const;
  * @endcode
  *
- * Here, $src$ is a residual vector and $dst$ is the iterate that is
- * supposed to be updated. In other words, the operation performed by
- * these functions is
- * $dst = dst - P^{-1} (A dst - rhs)$ and $dst = dst - P^{-T} (A dst - rhs)$. The
- * functions are called this way because they perform <i>one step</i>
- * of a fixed point (Richardson) iteration. Note that preconditioners
- * store a reference to the original matrix $A$ during initialization.
+ * Here, $src$ is a residual vector and $dst$ is the iterate that is supposed
+ * to be updated. In other words, the operation performed by these functions
+ * is
+ * $dst = dst - P^{-1} (A dst - rhs)$ and $dst = dst - P^{-T} (A dst - rhs)$.
+ * The functions are called this way because they perform <i>one step</i> of a
+ * fixed point (Richardson) iteration. Note that preconditioners store a
+ * reference to the original matrix $A$ during initialization.
  *
  * @ingroup LAC
  * @ingroup Matrices
