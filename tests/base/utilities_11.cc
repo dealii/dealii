@@ -28,33 +28,37 @@
 void test ()
 {
   unsigned long long int i = std::pow(2,33);
-  deallog << Utilities::to_string(i) << std::endl;
-  deallog << Utilities::to_string(i,11) << std::endl;
+  Assert(Utilities::to_string (i)=="8589934592", ExcInternalError());
+  Assert(Utilities::to_string (i,11)=="08589934592", ExcInternalError());
 
   unsigned long long j = std::pow(2,31);
-  deallog << Utilities::to_string (j) << std::endl;
+  Assert(Utilities::to_string(j)=="2147483648", ExcInternalError());
 
   int k = - std::pow(2,30);
-  deallog << Utilities::to_string (k) << std::endl;
-  deallog << Utilities::to_string (k,12) << std::endl;
+  Assert(Utilities::to_string (k)=="-1073741824", ExcInternalError());
+  Assert(Utilities::to_string (k,12)=="-01073741824", ExcInternalError());
 
   long long int l = - std::pow(2,35);
-  deallog << Utilities::to_string (l) << std::endl;
-  deallog << Utilities::to_string (l,13) << std::endl;
+  Assert(Utilities::to_string (l)=="-34359738368", ExcInternalError());
+  Assert(Utilities::to_string (l,13)=="-034359738368", ExcInternalError());
 
   float f (-3.14159265358979323846264338327950288419716939937510);
-  deallog << Utilities::to_string (f) << std::endl;
-  deallog << Utilities::to_string (f,13) << std::endl;
+  Assert(Utilities::to_string (f)=="-3.14159274", ExcInternalError());
+  Assert(Utilities::to_string (f,13)=="-003.14159274", ExcInternalError());
 
   double d (-3.14159265358979323846264338327950288419716939937510);
-  deallog << Utilities::to_string (d) << std::endl;
-  deallog << Utilities::to_string (d,20) << std::endl;
+  Assert(Utilities::to_string (d)=="-3.1415926535897931", ExcInternalError());
+  Assert(Utilities::to_string (d,20)=="-03.1415926535897931", ExcInternalError());
 
-  long double ld (-3.14159265358979323846264338327950288419716939937510);
-  deallog << Utilities::to_string (ld) << std::endl;
-  deallog << Utilities::to_string (ld,24) << std::endl;
+  long double ld (-3.14159265358979323846264338327950288419716939937510L);
+  Assert(Utilities::to_string (ld)=="-3.14159265358979323851", ExcInternalError());
+  Assert(Utilities::to_string (ld,24)=="-03.14159265358979323851", ExcInternalError());
 
+  double ed (-3.1415926535e-115);
+  Assert(Utilities::to_string (ed)=="-3.1415926534999999e-115", ExcInternalError());
+  Assert(Utilities::to_string (ed,24)=="-3.1415926534999999e-115", ExcInternalError());
 
+  deallog << "Ok." << std::endl;
 }
 
 

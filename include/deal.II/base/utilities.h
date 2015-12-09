@@ -62,19 +62,21 @@ namespace Utilities
    *
    * @note The use of this function is discouraged and users should use
    * <code>Utilities::to_string()</code> instead. In its current implementation
-   * the function simply calls <code>to_string<unsigned int>()</code>.
+   * the function simply calls <code>to_string@<unsigned int@>()</code>.
    */
   std::string
   int_to_string (const unsigned int value,
                  const unsigned int digits = numbers::invalid_unsigned_int);
 
   /**
-   * Convert a number @p value to a string, with as many digits as given to fill
-   * with leading zeros.
+   * Convert a number @p value to a string, with @p digits characters.
+   * The string is padded with leading zeros, after a possible minus sign.
+   * Therefore the total number of padding zeros is @p digits minus any signs,
+   * decimal points and digits of @p value.
    *
    * If the second parameter is left at its default value, the number is not
    * padded with leading zeros. The result is then the same as if the boost
-   * function <code>lexical_cast<std::string>()</code> had been called.
+   * function <code>lexical_cast@<std::string@>()</code> had been called.
    */
   template <typename number>
   std::string
