@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2005
  */
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 class MGSmootherBlock
   : public MGSmootherBase<BlockVector<number> >
 {
@@ -71,9 +71,9 @@ public:
    * This function stores pointers to the level matrices and smoothing
    * operator for each level.
    */
-  template <class MGMatrixType, class MGRELAX>
-  void initialize (const MGMatrixType &matrices,
-                   const MGRELAX      &smoothers);
+  template <class MGMatrixType, class MGRelaxationType>
+  void initialize (const MGMatrixType     &matrices,
+                   const MGRelaxationType &smoothers);
 
   /**
    * Empty all vectors.
@@ -122,7 +122,7 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<RELAX, BlockVector<number> > > smoothers;
+  MGLevelObject<PointerMatrix<RelaxationType, BlockVector<number> > > smoothers;
 
   /**
    * Number of smoothing steps.
@@ -162,9 +162,9 @@ private:
 
 #ifndef DOXYGEN
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline
-MGSmootherBlock<MatrixType, RELAX, number>::MGSmootherBlock
+MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock
 (VectorMemory<BlockVector<number> > &mem,
  const unsigned int                  steps,
  const bool                          variable,
@@ -181,9 +181,9 @@ MGSmootherBlock<MatrixType, RELAX, number>::MGSmootherBlock
 {}
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::clear ()
+MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
 {
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
@@ -195,11 +195,11 @@ MGSmootherBlock<MatrixType, RELAX, number>::clear ()
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
-template <class MGMatrixType, class MGRELAX>
+template <typename MatrixType, class RelaxationType, typename number>
+template <class MGMatrixType, class MGRelaxationType>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::initialize (const MGMatrixType &m,
-                                                        const MGRELAX      &s)
+MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixType &m,
+    const MGRelaxationType &s)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -214,56 +214,56 @@ MGSmootherBlock<MatrixType, RELAX, number>::initialize (const MGMatrixType &m,
     }
 }
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::
+MGSmootherBlock<MatrixType, RelaxationType, number>::
 set_steps (const unsigned int s)
 {
   steps = s;
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::
+MGSmootherBlock<MatrixType, RelaxationType, number>::
 set_variable (const bool flag)
 {
   variable = flag;
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::
+MGSmootherBlock<MatrixType, RelaxationType, number>::
 set_symmetric (const bool flag)
 {
   symmetric = flag;
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::
+MGSmootherBlock<MatrixType, RelaxationType, number>::
 set_transpose (const bool flag)
 {
   transpose = flag;
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::
+MGSmootherBlock<MatrixType, RelaxationType, number>::
 set_reverse (const bool flag)
 {
   reverse = flag;
 }
 
 
-template <typename MatrixType, class RELAX, typename number>
+template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RELAX, number>::smooth(const unsigned int   level,
-                                                   BlockVector<number> &u,
-                                                   const BlockVector<number> &rhs) const
+MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(const unsigned int         level,
+                                                            BlockVector<number>       &u,
+                                                            const BlockVector<number> &rhs) const
 {
   deallog.push("Smooth");
 
