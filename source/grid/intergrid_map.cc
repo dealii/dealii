@@ -22,6 +22,8 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -45,10 +47,28 @@ namespace
   }
 
 
-// specialization for grid==tria
+// specialization for triangulation classes
   template <int dim, int spacedim>
   unsigned int
   get_n_levels (const Triangulation<dim, spacedim> &grid)
+  {
+    // if GridClass==Triangulation, then
+    // we can ask directly.
+    return grid.n_levels();
+  }
+
+  template <int dim, int spacedim>
+  unsigned int
+  get_n_levels (const parallel::distributed::Triangulation<dim, spacedim> &grid)
+  {
+    // if GridClass==Triangulation, then
+    // we can ask directly.
+    return grid.n_levels();
+  }
+
+  template <int dim, int spacedim>
+  unsigned int
+  get_n_levels (const parallel::shared::Triangulation<dim, spacedim> &grid)
   {
     // if GridClass==Triangulation, then
     // we can ask directly.
