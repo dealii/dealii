@@ -79,9 +79,9 @@ namespace parallel
       Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
 
 //TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim> *tria
-        = (dynamic_cast<parallel::distributed::Triangulation<dim>*>
-           (const_cast<dealii::Triangulation<dim>*>
+      parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension> *tria
+        = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
+           (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
             (&dof_handler->get_tria())));
       Assert (tria != 0, ExcInternalError());
 
@@ -160,9 +160,9 @@ namespace parallel
              ExcDimensionMismatch(input_vectors.size(), all_out.size()) );
 
 //TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim> *tria
-        = (dynamic_cast<parallel::distributed::Triangulation<dim>*>
-           (const_cast<dealii::Triangulation<dim>*>
+      parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension> *tria
+        = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
+           (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
             (&dof_handler->get_tria())));
       Assert (tria != 0, ExcInternalError());
 
@@ -207,8 +207,8 @@ namespace parallel
     template<int dim, typename VectorType, typename DoFHandlerType>
     void
     SolutionTransfer<dim, VectorType, DoFHandlerType>::
-    pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell_,
-                  const typename Triangulation<dim,dim>::CellStatus /*status*/,
+    pack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell_,
+                  const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus /*status*/,
                   void *data)
     {
       typename VectorType::value_type *data_store = reinterpret_cast<typename VectorType::value_type *>(data);
@@ -232,8 +232,8 @@ namespace parallel
     template<int dim, typename VectorType, typename DoFHandlerType>
     void
     SolutionTransfer<dim, VectorType, DoFHandlerType>::unpack_callback
-    (const typename Triangulation<dim,dim>::cell_iterator &cell_,
-     const typename Triangulation<dim,dim>::CellStatus    /*status*/,
+    (const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell_,
+     const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus    /*status*/,
      const void                                           *data,
      std::vector<VectorType *>                            &all_out)
     {
