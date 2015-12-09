@@ -192,6 +192,12 @@ inconvenience this causes.
   (Rene Gassmoeller, 2015/12/09)
   </li>
 
+  <li> New: There is a new module, @ref Concepts, which describes the meaning
+  behind template parameter type names.
+  <br>
+  (David Wells, 2015/12/09)
+  </li>
+
   <li> New: The WorkStream class's design and implementation are now much
   better documented in the form of a @ref workstream_paper "preprint".
   <br>

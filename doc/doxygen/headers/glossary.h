@@ -575,6 +575,14 @@
  * @ref GlossGhostedVector "vectors with ghost elements".
  *
  *
+ * <dt class="glossary">@anchor GlossConcept <b>Concepts in deal.II</b></dt>
+ *
+ * <dd> There are several places in deal.II where we require that a type in a
+ * template match a certain interface or behave in a certain way: such
+ * constraints are called <em>concepts</em> in C++. See the discussion in
+ * @ref Concepts for more information and a list of concepts in deal.II.
+ * </dd>
+ *
  * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
  *
  * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly

@@ -40,61 +40,6 @@
  * @ingroup LAC
  */
 
-/**
- * Template for matrix classes.
- *
- * @note This is a description of the expectations on the MATRIX
- * template argument. It is not a class by itself.
- *
- * Depending on where the MATRIX is used, its interface is expected to
- * conform to one of the following groups, which can also be found in
- * the overview.
- *
- * <h3>Solver interface</h3>
- *
- * Functions in this group are the minimal interface to use the MATRIX
- * in a linear Solver. Solvers use a matrix only as a linear operator,
- * that is, they map a vector to another. To this end, we either
- * multiply with the matrix itself or its transpose.
- *
- * The function vmult() is the bare necessity in this group. Some
- * solvers use Tvmult() as well, in which case it needs to be
- * implemented. Some derived matrices like PointerMatrix require its
- * existence, in which case it can be implemented empty with an
- * assertion <code>Assert(false, ExcNotImplemented())</code>.
- *
- * If vmult_add() and Tvmult_add() are missing, PointerMatrixAux can
- * be used to provide the missing functionality without implementing
- * it by hand.
- *
- * @ingroup LAC
- */
-template <class VECTOR>
-class MATRIX
-{
-  public:
-                                     /**
-                                      * @name Solver interface
-                                      */
-                                     /*@{*/
-                                     /**
-                                      * The matrix vector product $u = Av$.
-                                      */
-    void vmult(VECTOR& u, const VECTOR& v) const;
-                                     /**
-                                      * The matrix vector product $u = A^Tv$.
-                                      */
-    void Tvmult(VECTOR& u, const VECTOR& v) const;
-                                     /**
-                                      * The matrix vector product $u += Av$.
-                                      */
-    void vmult_add(VECTOR& u, const VECTOR& v) const;
-                                     /**
-                                      * The matrix vector product $u += A^Tv$.
-                                      */
-    void Tvmult_add(VECTOR& u, const VECTOR& v) const;
-                                     /*@}*/
-};
 
 /**
  * @defgroup Matrix1 Basic matrices
@@ -120,7 +65,8 @@ class MATRIX
  * @defgroup Matrix2 Derived matrices
  *
  * These matrices are built on top of the basic matrices. They perform special
- * operations using the interface defined in @ref Solvers.
+ * operations using the interface defined by
+ * @ref ConceptMatrixType "the MatrixType concept".
  *
  * @ingroup Matrices
  */
