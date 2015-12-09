@@ -180,8 +180,8 @@ namespace mg
    * @author Guido Kanschat,
    * @date 2003, 2009, 2010
    */
-  template<class RELAX, typename VectorType>
-  class SmootherRelaxation : public MGLevelObject<RELAX>, public MGSmoother<VectorType>
+  template<class RelaxationType, typename VectorType>
+  class SmootherRelaxation : public MGLevelObject<RelaxationType>, public MGSmoother<VectorType>
   {
   public:
     /**
@@ -196,12 +196,13 @@ namespace mg
      * Initialize for matrices. This function initializes the smoothing
      * operator with the same smoother for each level.
      *
-     * @p additional_data is an object of type @p RELAX::AdditionalData and is
+     * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
      * handed to the initialization function of the relaxation method.
      */
     template <typename MatrixType2>
     void initialize (const MGLevelObject<MatrixType2>     &matrices,
-                     const typename RELAX::AdditionalData &additional_data = typename RELAX::AdditionalData());
+                     const typename RelaxationType::AdditionalData &additional_data
+                     = typename RelaxationType::AdditionalData());
 
     /**
      * Initialize matrices and additional data for each level.
@@ -270,7 +271,7 @@ namespace mg
  *
  * @author Guido Kanschat, 2003
  */
-template<typename MatrixType, class RELAX, typename VectorType>
+template<typename MatrixType, class RelaxationType, typename VectorType>
 class MGSmootherRelaxation : public MGSmoother<VectorType>
 {
 public:
@@ -287,19 +288,20 @@ public:
    * matrices and initializes the smoothing operator with the same smoother
    * for each level.
    *
-   * @p additional_data is an object of type @p RELAX::AdditionalData and is
-   * handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData
+   * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2>
   void initialize (const MGLevelObject<MatrixType2>     &matrices,
-                   const typename RELAX::AdditionalData &additional_data = typename RELAX::AdditionalData());
+                   const typename RelaxationType::AdditionalData &additional_data
+                   = typename RelaxationType::AdditionalData());
 
   /**
    * Initialize for matrices. This function stores pointers to the level
    * matrices and initializes the smoothing operator with the according
    * smoother for each level.
    *
-   * @p additional_data is an object of type @p RELAX::AdditionalData and is
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
    * handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -312,7 +314,7 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the same smoother for each level.
    *
-   * @p additional_data is an object of type @p RELAX::AdditionalData and is
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
    * handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -327,7 +329,7 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the according smoother for each level.
    *
-   * @p additional_data is an object of type @p RELAX::AdditionalData and is
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
    * handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
@@ -351,7 +353,7 @@ public:
   /**
    * Object containing relaxation methods.
    */
-  MGLevelObject<RELAX> smoothers;
+  MGLevelObject<RelaxationType> smoothers;
 
   /**
    * Memory used by this object.
@@ -574,9 +576,9 @@ MGSmoother<VectorType>::set_transpose (const bool flag)
 
 namespace mg
 {
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   inline
-  SmootherRelaxation<RELAX, VectorType>::SmootherRelaxation
+  SmootherRelaxation<RelaxationType, VectorType>::SmootherRelaxation
   (const unsigned int steps,
    const bool         variable,
    const bool         symmetric,
@@ -585,20 +587,20 @@ namespace mg
   {}
 
 
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   inline void
-  SmootherRelaxation<RELAX, VectorType>::clear ()
+  SmootherRelaxation<RelaxationType, VectorType>::clear ()
   {
-    MGLevelObject<RELAX>::clear();
+    MGLevelObject<RelaxationType>::clear();
   }
 
 
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   template <typename MatrixType2>
   inline void
-  SmootherRelaxation<RELAX, VectorType>::initialize
+  SmootherRelaxation<RelaxationType, VectorType>::initialize
   (const MGLevelObject<MatrixType2>     &m,
-   const typename RELAX::AdditionalData &data)
+   const typename RelaxationType::AdditionalData &data)
   {
     const unsigned int min = m.min_level();
     const unsigned int max = m.max_level();
@@ -610,10 +612,10 @@ namespace mg
   }
 
 
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   template <typename MatrixType2, class DATA>
   inline void
-  SmootherRelaxation<RELAX, VectorType>::initialize
+  SmootherRelaxation<RelaxationType, VectorType>::initialize
   (const MGLevelObject<MatrixType2> &m,
    const MGLevelObject<DATA>        &data)
   {
@@ -627,11 +629,11 @@ namespace mg
   }
 
 
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   inline void
-  SmootherRelaxation<RELAX, VectorType>::smooth (const unsigned int level,
-                                                 VectorType         &u,
-                                                 const VectorType   &rhs) const
+  SmootherRelaxation<RelaxationType, VectorType>::smooth (const unsigned int  level,
+                                                          VectorType         &u,
+                                                          const VectorType   &rhs) const
   {
     unsigned int maxlevel = this->max_level();
     unsigned int steps2 = this->steps;
@@ -657,15 +659,15 @@ namespace mg
   }
 
 
-  template <class RELAX, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   inline
   std::size_t
-  SmootherRelaxation<RELAX, VectorType>::
+  SmootherRelaxation<RelaxationType, VectorType>::
   memory_consumption () const
   {
     return sizeof(*this)
-           -sizeof(MGLevelObject<RELAX>)
-           + MGLevelObject<RELAX>::memory_consumption()
+           -sizeof(MGLevelObject<RelaxationType>)
+           + MGLevelObject<RelaxationType>::memory_consumption()
            + this->vector_memory.memory_consumption();
   }
 }
@@ -673,9 +675,9 @@ namespace mg
 
 //----------------------------------------------------------------------//
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 inline
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::MGSmootherRelaxation
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::MGSmootherRelaxation
 (const unsigned int steps,
  const bool         variable,
  const bool         symmetric,
@@ -686,9 +688,9 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::MGSmootherRelaxation
 
 
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::clear ()
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::clear ()
 {
   smoothers.clear();
 
@@ -699,12 +701,12 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::clear ()
 }
 
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 template <typename MatrixType2>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 (const MGLevelObject<MatrixType2>     &m,
- const typename RELAX::AdditionalData &data)
+ const typename RelaxationType::AdditionalData &data)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -719,10 +721,10 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
     }
 }
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const MGLevelObject<DATA>        &data)
 {
@@ -744,10 +746,10 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
     }
 }
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const DATA                       &data,
  const unsigned int                row,
@@ -766,10 +768,10 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
     }
 }
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 template <typename MatrixType2, class DATA>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 (const MGLevelObject<MatrixType2> &m,
  const MGLevelObject<DATA>        &data,
  const unsigned int                row,
@@ -794,9 +796,9 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::initialize
 }
 
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 inline void
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::smooth (const unsigned int  level,
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::smooth (const unsigned int  level,
     VectorType         &u,
     const VectorType   &rhs) const
 {
@@ -825,10 +827,10 @@ MGSmootherRelaxation<MatrixType, RELAX, VectorType>::smooth (const unsigned int 
 
 
 
-template <typename MatrixType, class RELAX, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 inline
 std::size_t
-MGSmootherRelaxation<MatrixType, RELAX, VectorType>::
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::
 memory_consumption () const
 {
   return sizeof(*this)
