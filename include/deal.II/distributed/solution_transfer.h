@@ -219,8 +219,8 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                         const typename Triangulation<dim,dim>::CellStatus status,
+      void pack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                         const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
                          void *data);
 
       /**
@@ -228,8 +228,8 @@ namespace parallel
        * has been packed up previously on the mesh before refinement,
        * coarsening and repartitioning.
        */
-      void unpack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                           const typename Triangulation<dim,dim>::CellStatus status,
+      void unpack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                           const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
                            const void *data,
                            std::vector<VectorType *> &all_out);
 
