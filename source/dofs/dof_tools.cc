@@ -258,7 +258,7 @@ namespace DoFTools
   {
     const unsigned int dim = DoFHandlerType::dimension;
     const unsigned int spacedim = DoFHandlerType::space_dimension;
-    const Triangulation<dim,spacedim> &tria = dof_handler.get_tria();
+    const Triangulation<dim,spacedim> &tria = dof_handler.get_triangulation();
     (void)tria;
 
     AssertDimension (cell_data.size(), tria.n_active_cells());
@@ -522,7 +522,7 @@ namespace DoFTools
                          const std::set<types::boundary_id> &boundary_ids)
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-             (&dof_handler.get_tria())
+             (&dof_handler.get_triangulation())
              == 0),
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
@@ -1005,7 +1005,7 @@ namespace DoFTools
         const types::subdomain_id id = cell->level_subdomain_id();
 
         // skip artificial and own cells (only look at ghost cells)
-        if (id == dof_handler.get_tria().locally_owned_subdomain()
+        if (id == dof_handler.get_triangulation().locally_owned_subdomain()
             || id == numbers::artificial_subdomain_id)
           continue;
 
@@ -1116,7 +1116,7 @@ namespace DoFTools
   get_active_fe_indices (const DoFHandlerType      &dof_handler,
                          std::vector<unsigned int> &active_fe_indices)
   {
-    AssertDimension (active_fe_indices.size(), dof_handler.get_tria().n_active_cells());
+    AssertDimension (active_fe_indices.size(), dof_handler.get_triangulation().n_active_cells());
 
     typename DoFHandlerType::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1133,7 +1133,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_tria()) == 0),
+             (&dof_handler.get_triangulation()) == 0),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any information "
                         "related to a subdomain other than the locally owned one does "
@@ -1192,7 +1192,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_tria()) == 0),
+             (&dof_handler.get_triangulation()) == 0),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any information "
                         "related to a subdomain other than the locally owned one does "
@@ -1256,7 +1256,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_tria()) == 0),
+             (&dof_handler.get_triangulation()) == 0),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any subdomain other "
                         "than the locally owned one does not make sense."));
@@ -1273,10 +1273,10 @@ namespace DoFTools
     // with possibly artifical cells, we need to take "true" subdomain IDs (i.e. without
     // artificial cells). Otherwise we are good to use subdomain_id as stored
     // in cell->subdomain_id().
-    std::vector<types::subdomain_id> cell_owners (dof_handler.get_tria().n_active_cells());
+    std::vector<types::subdomain_id> cell_owners (dof_handler.get_triangulation().n_active_cells());
     if (const parallel::shared::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
         *tr = (dynamic_cast<const parallel::shared::Triangulation<DoFHandlerType::dimension,
-               DoFHandlerType::space_dimension>*> (&dof_handler.get_tria ())))
+               DoFHandlerType::space_dimension>*> (&dof_handler.get_triangulation())))
       {
         cell_owners = tr->get_true_subdomain_ids_of_cells();
         Assert (tr->get_true_subdomain_ids_of_cells().size() == tr->n_active_cells(),
@@ -1362,9 +1362,9 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain.
     Assert (
-      (dof_handler.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof_handler.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
-      (subdomain == dof_handler.get_tria().locally_owned_subdomain()),
+      (subdomain == dof_handler.get_triangulation().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
@@ -1429,8 +1429,8 @@ namespace DoFTools
       bool found = false;
       for (typename Triangulation<DoFHandlerType::dimension,
            DoFHandlerType::space_dimension>::active_cell_iterator
-           cell=dof_handler.get_tria().begin_active();
-           cell!=dof_handler.get_tria().end(); ++cell)
+           cell=dof_handler.get_triangulation().begin_active();
+           cell!=dof_handler.get_triangulation().end(); ++cell)
         if (cell->subdomain_id() == subdomain)
           {
             found = true;
@@ -1643,7 +1643,7 @@ namespace DoFTools
 
     if (const parallel::Triangulation<dim,spacedim> *tria
         = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
-           (&dof_handler.get_tria())))
+           (&dof_handler.get_triangulation())))
       {
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
 
@@ -1721,7 +1721,7 @@ namespace DoFTools
         // this information from all processors
         if (const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria
             = (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-               (&dof_handler.get_tria())))
+               (&dof_handler.get_triangulation())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
             MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0],
@@ -1904,7 +1904,7 @@ namespace DoFTools
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-             (&dof_handler.get_tria())
+             (&dof_handler.get_triangulation())
              ==
              0),
             ExcMessage ("This function can not be used with distributed triangulations."
@@ -1928,7 +1928,7 @@ namespace DoFTools
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-             (&dof_handler.get_tria())
+             (&dof_handler.get_triangulation())
              ==
              0),
             ExcMessage ("This function can not be used with distributed triangulations."
@@ -2116,8 +2116,8 @@ namespace DoFTools
                            const bool            interior_dofs_only,
                            const bool            boundary_dofs)
   {
-    Assert(level > 0 && level < dof_handler.get_tria().n_levels(),
-           ExcIndexRange(level, 1, dof_handler.get_tria().n_levels()));
+    Assert(level > 0 && level < dof_handler.get_triangulation().n_levels(),
+           ExcIndexRange(level, 1, dof_handler.get_triangulation().n_levels()));
 
     typename DoFHandlerType::level_cell_iterator pcell = dof_handler.begin(level-1);
     typename DoFHandlerType::level_cell_iterator endc = dof_handler.end(level-1);
@@ -2188,16 +2188,16 @@ namespace DoFTools
 
     // Vector mapping from vertex index in the triangulation to consecutive
     // block indices on this level The number of cells at a vertex
-    std::vector<unsigned int> vertex_cell_count(dof_handler.get_tria().n_vertices(), 0);
+    std::vector<unsigned int> vertex_cell_count(dof_handler.get_triangulation().n_vertices(), 0);
 
     // Is a vertex at the boundary?
-    std::vector<bool> vertex_boundary(dof_handler.get_tria().n_vertices(), false);
+    std::vector<bool> vertex_boundary(dof_handler.get_triangulation().n_vertices(), false);
 
-    std::vector<unsigned int> vertex_mapping(dof_handler.get_tria().n_vertices(),
+    std::vector<unsigned int> vertex_mapping(dof_handler.get_triangulation().n_vertices(),
                                              numbers::invalid_unsigned_int);
 
     // Estimate for the number of dofs at this point
-    std::vector<unsigned int> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
+    std::vector<unsigned int> vertex_dof_count(dof_handler.get_triangulation().n_vertices(), 0);
 
     // Identify all vertices active on this level and remember some data
     // about them

@@ -177,7 +177,7 @@ inline
 void
 MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 {
-  const unsigned int nlevels = dof.get_tria().n_global_levels();
+  const unsigned int nlevels = dof.get_triangulation().n_global_levels();
 
   boundary_indices.resize(nlevels);
 

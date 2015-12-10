@@ -433,7 +433,7 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler
   :
   cycle_type(cycle),
   minlevel(0),
-  maxlevel(mg_dof_handler.get_tria().n_global_levels()-1),
+  maxlevel(mg_dof_handler.get_triangulation().n_global_levels()-1),
   defect(minlevel,maxlevel),
   solution(minlevel,maxlevel),
   t(minlevel,maxlevel),

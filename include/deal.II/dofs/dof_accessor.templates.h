@@ -725,7 +725,7 @@ namespace internal
                  ?
                  typename
                  internal::Triangulation::Iterators<dim,spacedim>::
-                 raw_cell_iterator (&dof_handler.get_tria(),
+                 raw_cell_iterator (&dof_handler.get_triangulation(),
                                     obj_level,
                                     obj_index)->used()
                  :
@@ -733,7 +733,7 @@ namespace internal
                   ?
                   typename
                   internal::Triangulation::Iterators<dim,spacedim>::
-                  raw_line_iterator (&dof_handler.get_tria(),
+                  raw_line_iterator (&dof_handler.get_triangulation(),
                                      obj_level,
                                      obj_index)->used()
                   :
@@ -777,7 +777,7 @@ namespace internal
                  ?
                  typename
                  internal::Triangulation::Iterators<dim,spacedim>::
-                 raw_cell_iterator (&dof_handler.get_tria(),
+                 raw_cell_iterator (&dof_handler.get_triangulation(),
                                     obj_level,
                                     obj_index)->used()
                  :
@@ -785,7 +785,7 @@ namespace internal
                   ?
                   typename
                   internal::Triangulation::Iterators<dim,spacedim>::
-                  raw_line_iterator (&dof_handler.get_tria(),
+                  raw_line_iterator (&dof_handler.get_triangulation(),
                                      obj_level,
                                      obj_index)->used()
                   :

@@ -1224,7 +1224,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename DoFHandler<dim>::cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
+         (&dofh->get_triangulation(), index.first, index.second, dofh);
 }
 
 
@@ -1252,7 +1252,7 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename hp::DoFHandler<dim>::cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
+         (&dofh->get_triangulation(), index.first, index.second, dofh);
 }
 
 

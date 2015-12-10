@@ -49,7 +49,7 @@ namespace parallel
       dof_handler(&dof, typeid(*this).name())
     {
       Assert (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
-              (&dof_handler->get_tria()) != 0,
+              (&dof_handler->get_triangulation()) != 0,
               ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
     }
 
@@ -82,7 +82,7 @@ namespace parallel
       parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension> *tria
         = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
            (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
-            (&dof_handler->get_tria())));
+            (&dof_handler->get_triangulation())));
       Assert (tria != 0, ExcInternalError());
 
       offset
@@ -163,7 +163,7 @@ namespace parallel
       parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension> *tria
         = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
            (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
-            (&dof_handler->get_tria())));
+            (&dof_handler->get_triangulation())));
       Assert (tria != 0, ExcInternalError());
 
       tria->notify_ready_to_unpack(offset,

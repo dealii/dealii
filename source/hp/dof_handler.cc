@@ -1705,7 +1705,7 @@ namespace hp
   typename DoFHandler<dim,spacedim>::cell_iterator
   DoFHandler<dim, spacedim>::begin(const unsigned int level) const
   {
-    return cell_iterator (*this->get_tria().begin(level),
+    return cell_iterator (*this->get_triangulation().begin(level),
                           this);
   }
 
@@ -1731,7 +1731,7 @@ namespace hp
   typename DoFHandler<dim,spacedim>::cell_iterator
   DoFHandler<dim,spacedim>::end () const
   {
-    return cell_iterator (&this->get_tria(),
+    return cell_iterator (&this->get_triangulation(),
                           -1,
                           -1,
                           this);
@@ -1742,7 +1742,7 @@ namespace hp
   typename DoFHandler<dim,spacedim>::cell_iterator
   DoFHandler<dim,spacedim>::end (const unsigned int level) const
   {
-    return (level == this->get_tria().n_levels()-1 ?
+    return (level == this->get_triangulation().n_levels()-1 ?
             end() :
             begin (level+1));
   }
@@ -1752,7 +1752,7 @@ namespace hp
   typename DoFHandler<dim, spacedim>::active_cell_iterator
   DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
   {
-    return (level == this->get_tria().n_levels()-1 ?
+    return (level == this->get_triangulation().n_levels()-1 ?
             active_cell_iterator(end()) :
             begin_active (level+1));
   }
@@ -2254,8 +2254,8 @@ namespace hp
     // we will mark lines that we have already treated, so first save and clear
     // the user flags on lines and later restore them
     std::vector<bool> user_flags;
-    this->get_tria().save_user_flags_line(user_flags);
-    const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags_line ();
+    this->get_triangulation().save_user_flags_line(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(this->get_triangulation()).clear_user_flags_line ();
 
     // An implementation of the algorithm described in the hp paper, including
     // the modification mentioned later in the "complications in 3-d" subsections
@@ -2433,7 +2433,7 @@ namespace hp
           }
 
     // finally restore the user flags
-    const_cast<Triangulation<dim,spacedim> &>(this->get_tria())
+    const_cast<Triangulation<dim,spacedim> &>(this->get_triangulation())
     .load_user_flags_line(user_flags);
   }
 
@@ -2465,8 +2465,8 @@ namespace hp
     // on quads and later restore
     // them
     std::vector<bool> user_flags;
-    this->get_tria().save_user_flags_quad(user_flags);
-    const_cast<Triangulation<dim,spacedim> &>(this->get_tria()).clear_user_flags_quad ();
+    this->get_triangulation().save_user_flags_quad(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(this->get_triangulation()).clear_user_flags_quad ();
 
     // An implementation of the
     // algorithm described in the hp
@@ -2558,7 +2558,7 @@ namespace hp
           }
 
     // finally restore the user flags
-    const_cast<Triangulation<dim,spacedim> &>(this->get_tria())
+    const_cast<Triangulation<dim,spacedim> &>(this->get_triangulation())
     .load_user_flags_quad(user_flags);
   }
 
@@ -2720,7 +2720,7 @@ namespace hp
     number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
 
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
-        (&this->get_tria())
+        (&this->get_triangulation())
         == 0)
       {
         number_cache.locally_owned_dofs

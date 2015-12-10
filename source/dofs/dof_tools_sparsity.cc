@@ -70,11 +70,11 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
@@ -134,11 +134,11 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
@@ -506,11 +506,11 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
@@ -1164,16 +1164,16 @@ namespace DoFTools
     // this function the Triangulation will be in the same state as it was
     // at the beginning of this function.
     std::vector<bool> user_flags;
-    dof.get_tria().save_user_flags(user_flags);
+    dof.get_triangulation().save_user_flags(user_flags);
     const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_tria()).clear_user_flags ();
+    (dof.get_triangulation()).clear_user_flags ();
 
     internal::make_flux_sparsity_pattern (dof, sparsity,
                                           int_mask, flux_mask);
 
     // finally restore the user flags
     const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_tria()).load_user_flags(user_flags);
+    (dof.get_triangulation()).load_user_flags(user_flags);
   }
 
 

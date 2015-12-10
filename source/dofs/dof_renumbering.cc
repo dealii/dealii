@@ -529,7 +529,7 @@ namespace DoFRenumbering
 
     dof_handler.renumber_dofs (renumbering);
 
-    // for (unsigned int level=0;level<dof_handler.get_tria().n_levels();++level)
+    // for (unsigned int level=0;level<dof_handler.get_triangulation().n_levels();++level)
     //   if (dof_handler.n_dofs(level) != numbers::invalid_dof_index)
     //  component_wise(dof_handler, level, component_order_arg);
   }
@@ -752,7 +752,7 @@ namespace DoFRenumbering
 
     if (const parallel::Triangulation<dim,spacedim> *tria
         = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
-           (&start->get_dof_handler().get_tria())))
+           (&start->get_dof_handler().get_triangulation())))
       {
 #ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
@@ -1039,7 +1039,7 @@ namespace DoFRenumbering
 
     if (const parallel::Triangulation<dim,spacedim> *tria
         = (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
-           (&start->get_dof_handler().get_tria())))
+           (&start->get_dof_handler().get_triangulation())))
       {
 #ifdef DEAL_II_WITH_MPI
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
@@ -1188,7 +1188,7 @@ namespace DoFRenumbering
 
     const parallel::distributed::Triangulation<dim> *tria
       = dynamic_cast<const parallel::distributed::Triangulation<dim>*>
-        (&dof_handler.get_tria());
+        (&dof_handler.get_triangulation());
 
     if (tria)
       {
@@ -1381,9 +1381,9 @@ namespace DoFRenumbering
    const DoFHandlerType                                                      &dof,
    const typename std::vector<typename DoFHandlerType::active_cell_iterator> &cells)
   {
-    Assert(cells.size() == dof.get_tria().n_active_cells(),
+    Assert(cells.size() == dof.get_triangulation().n_active_cells(),
            ExcDimensionMismatch(cells.size(),
-                                dof.get_tria().n_active_cells()));
+                                dof.get_triangulation().n_active_cells()));
 
     types::global_dof_index n_global_dofs = dof.n_dofs();
 
@@ -1469,9 +1469,9 @@ namespace DoFRenumbering
    const unsigned int                                                        level,
    const typename std::vector<typename DoFHandlerType::level_cell_iterator> &cells)
   {
-    Assert(cells.size() == dof.get_tria().n_cells(level),
+    Assert(cells.size() == dof.get_triangulation().n_cells(level),
            ExcDimensionMismatch(cells.size(),
-                                dof.get_tria().n_cells(level)));
+                                dof.get_triangulation().n_cells(level)));
     Assert (new_order.size() == dof.n_dofs(level),
             ExcDimensionMismatch(new_order.size(), dof.n_dofs(level)));
     Assert (reverse.size() == dof.n_dofs(level),
@@ -1527,7 +1527,7 @@ namespace DoFRenumbering
     if (dof_wise_renumbering == false)
       {
         std::vector<typename DoFHandlerType::active_cell_iterator> ordered_cells;
-        ordered_cells.reserve(dof.get_tria().n_active_cells());
+        ordered_cells.reserve(dof.get_triangulation().n_active_cells());
         const CompareDownstream<typename DoFHandlerType::active_cell_iterator,
               DoFHandlerType::space_dimension> comparator(direction);
 
@@ -1635,7 +1635,7 @@ namespace DoFRenumbering
     if (dof_wise_renumbering == false)
       {
         std::vector<typename DoFHandlerType::level_cell_iterator> ordered_cells;
-        ordered_cells.reserve (dof.get_tria().n_cells(level));
+        ordered_cells.reserve (dof.get_triangulation().n_cells(level));
         const CompareDownstream<typename DoFHandlerType::level_cell_iterator,
               DoFHandlerType::space_dimension> comparator(direction);
 
@@ -1794,7 +1794,7 @@ namespace DoFRenumbering
    const bool                                    counter)
   {
     std::vector<typename DoFHandlerType::active_cell_iterator> ordered_cells;
-    ordered_cells.reserve (dof.get_tria().n_active_cells());
+    ordered_cells.reserve (dof.get_triangulation().n_active_cells());
     internal::ClockCells<DoFHandlerType::space_dimension> comparator(center, counter);
 
     typename DoFHandlerType::active_cell_iterator p = dof.begin_active();
@@ -1820,7 +1820,7 @@ namespace DoFRenumbering
                      const bool                                    counter)
   {
     std::vector<typename DoFHandlerType::level_cell_iterator> ordered_cells;
-    ordered_cells.reserve(dof.get_tria().n_active_cells());
+    ordered_cells.reserve(dof.get_triangulation().n_active_cells());
     internal::ClockCells<DoFHandlerType::space_dimension> comparator(center, counter);
 
     typename DoFHandlerType::level_cell_iterator p = dof.begin(level);

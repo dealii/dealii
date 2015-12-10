@@ -375,10 +375,10 @@ namespace internal
       static
       void reserve_space_mg (DoFHandler<1, spacedim> &dof_handler)
       {
-        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        Assert (dof_handler.get_triangulation().n_levels () > 0, ExcMessage ("Invalid triangulation"));
         dof_handler.clear_mg_space ();
 
-        const dealii::Triangulation<1, spacedim> &tria = dof_handler.get_tria ();
+        const dealii::Triangulation<1, spacedim> &tria = dof_handler.get_triangulation();
         const unsigned int &dofs_per_line = dof_handler.get_fe ().dofs_per_line;
         const unsigned int &n_levels = tria.n_levels ();
 
@@ -431,11 +431,11 @@ namespace internal
       static
       void reserve_space_mg (DoFHandler<2, spacedim> &dof_handler)
       {
-        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        Assert (dof_handler.get_triangulation().n_levels () > 0, ExcMessage ("Invalid triangulation"));
         dof_handler.clear_mg_space ();
 
         const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_fe ();
-        const dealii::Triangulation<2, spacedim> &tria = dof_handler.get_tria ();
+        const dealii::Triangulation<2, spacedim> &tria = dof_handler.get_triangulation();
         const unsigned int &n_levels = tria.n_levels ();
 
         for (unsigned int i = 0; i < n_levels; ++i)
@@ -490,11 +490,11 @@ namespace internal
       static
       void reserve_space_mg (DoFHandler<3, spacedim> &dof_handler)
       {
-        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        Assert (dof_handler.get_triangulation().n_levels () > 0, ExcMessage ("Invalid triangulation"));
         dof_handler.clear_mg_space ();
 
         const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_fe ();
-        const dealii::Triangulation<3, spacedim> &tria = dof_handler.get_tria ();
+        const dealii::Triangulation<3, spacedim> &tria = dof_handler.get_triangulation();
         const unsigned int &n_levels = tria.n_levels ();
 
         for (unsigned int i = 0; i < n_levels; ++i)
@@ -832,8 +832,8 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::begin (const unsigned int level) const
 {
-  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().begin(level);
-  if (cell == this->get_tria().end(level))
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_triangulation().begin(level);
+  if (cell == this->get_triangulation().end(level))
     return end(level);
   return cell_iterator (*cell, this);
 }
@@ -860,7 +860,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::end () const
 {
-  return cell_iterator (&this->get_tria(),
+  return cell_iterator (&this->get_triangulation(),
                         -1,
                         -1,
                         this);
@@ -871,7 +871,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::end (const unsigned int level) const
 {
-  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end(level);
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_triangulation().end(level);
   if (cell.state() != IteratorState::valid)
     return end();
   return cell_iterator (*cell, this);
@@ -882,7 +882,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_cell_iterator
 DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
 {
-  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end_active(level);
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_triangulation().end_active(level);
   if (cell.state() != IteratorState::valid)
     return active_cell_iterator(end());
   return active_cell_iterator (*cell, this);
@@ -896,8 +896,8 @@ DoFHandler<dim, spacedim>::begin_mg (const unsigned int level) const
 {
   // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
   //     "levels if mg dofs got distributed."));
-  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().begin(level);
-  if (cell == this->get_tria().end(level))
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_triangulation().begin(level);
+  if (cell == this->get_triangulation().end(level))
     return end_mg(level);
   return level_cell_iterator (*cell, this);
 }
@@ -909,7 +909,7 @@ DoFHandler<dim, spacedim>::end_mg (const unsigned int level) const
 {
   // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
   //     "levels if mg dofs got distributed."));
-  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end(level);
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_triangulation().end(level);
   if (cell.state() != IteratorState::valid)
     return end();
   return level_cell_iterator (*cell, this);
@@ -920,7 +920,7 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::level_cell_iterator
 DoFHandler<dim, spacedim>::end_mg () const
 {
-  return level_cell_iterator (&this->get_tria(), -1, -1, this);
+  return level_cell_iterator (&this->get_triangulation(), -1, -1, this);
 }
 
 
@@ -1427,8 +1427,8 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
     {
       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->get_tria().save_user_flags(user_flags);
-      const_cast<Triangulation<2> &>(this->get_tria()).clear_user_flags ();
+      this->get_triangulation().save_user_flags(user_flags);
+      const_cast<Triangulation<2> &>(this->get_triangulation()).clear_user_flags ();
 
       // flag all lines adjacent to cells of the current
       // level, as those lines logically belong to the same
@@ -1448,7 +1448,7 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
               cell->line(l)->clear_user_flag();
             }
       // finally, restore user flags
-      const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
+      const_cast<Triangulation<2> &>(this->get_triangulation()).load_user_flags (user_flags);
     }
 
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
@@ -1487,8 +1487,8 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
     {
       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->get_tria().save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
+      this->get_triangulation().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_triangulation()).clear_user_flags ();
 
       // flag all lines adjacent to cells of the current
       // level, as those lines logically belong to the same
@@ -1509,7 +1509,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
               cell->line(l)->clear_user_flag();
             }
       // finally, restore user flags
-      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
+      const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
     }
 
   // QUAD DoFs
@@ -1517,8 +1517,8 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
     {
       // save user flags as they will be modified
       std::vector<bool> user_flags;
-      this->get_tria().save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
+      this->get_triangulation().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_triangulation()).clear_user_flags ();
 
       // flag all quads adjacent to cells of the current
       // level, as those lines logically belong to the same
@@ -1538,7 +1538,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
               cell->quad(q)->clear_user_flag();
             }
       // finally, restore user flags
-      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
+      const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
     }
 
   //HEX DoFs
