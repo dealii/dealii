@@ -767,9 +767,9 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
                                      "negative volume. You need to check your mesh which "
                                      "cells these are and how they got there.\n"
                                      "As a hint, of the total ")
-                         + Utilities::int_to_string (cells.size())
+                         + Utilities::to_string (cells.size())
                          + " cells in the mesh, "
-                         + Utilities::int_to_string (n_negative_cells)
+                         + Utilities::to_string (n_negative_cells)
                          + " appear to have a negative volume."));
 }
 

@@ -434,7 +434,7 @@ namespace DoFRenumbering
           {
             Assert (locally_owned.is_element (starting_indices[i]),
                     ExcMessage ("You specified global degree of freedom "
-                                + Utilities::int_to_string(starting_indices[i]) +
+                                + Utilities::to_string(starting_indices[i]) +
                                 " as a starting index, but this index is not among the "
                                 "locally owned ones on this processor."));
             local_starting_indices[i] = locally_owned.index_within_set(starting_indices[i]);
