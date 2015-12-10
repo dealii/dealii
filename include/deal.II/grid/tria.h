@@ -985,7 +985,7 @@ namespace internal
  *           // with the triangulation that we want to be informed about
  *           // mesh refinement
  *           previous_cell = current_cell;
- *           previous_cell.get_tria().signals.post_refinement
+ *           previous_cell->get_triangulation().signals.post_refinement
  *             .connect (std_cxx11::bind (&FEValues<dim>::invalidate_previous_cell,
  *                                        std_cxx11::ref (*this)));
  *         }
