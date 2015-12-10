@@ -52,7 +52,7 @@ void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
 
   // then set up the containers from
   // scratch and fill them with end-iterators
-  const unsigned int n_levels = source_grid.get_tria().n_levels();
+  const unsigned int n_levels = source_grid.get_triangulation().n_levels();
   mapping.resize (n_levels);
   for (unsigned int level=0; level<n_levels; ++level)
     {

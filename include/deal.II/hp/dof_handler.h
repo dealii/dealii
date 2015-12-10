@@ -592,10 +592,16 @@ namespace hp
     const hp::FECollection<dim,spacedim> &get_fe () const;
 
     /**
-     * Return a constant reference to the triangulation underlying this
-     * object.
+     * Return a constant reference to the triangulation underlying this object.
+     *
+     * @deprecated Use get_triangulation() instead.
      */
-    const Triangulation<dim,spacedim> &get_tria () const;
+    const Triangulation<dim,spacedim> &get_tria () const DEAL_II_DEPRECATED;
+
+    /**
+     * Return a constant reference to the triangulation underlying this object.
+     */
+    const Triangulation<dim,spacedim> &get_triangulation () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -1010,6 +1016,7 @@ namespace hp
   }
 
 
+
   template<int dim, int spacedim>
   inline
   const Triangulation<dim,spacedim> &
@@ -1017,6 +1024,18 @@ namespace hp
   {
     return *tria;
   }
+
+
+
+  template<int dim, int spacedim>
+  inline
+  const Triangulation<dim,spacedim> &
+  DoFHandler<dim,spacedim>::get_triangulation () const
+  {
+    return *tria;
+  }
+
+
 
   template<int dim, int spacedim>
   inline

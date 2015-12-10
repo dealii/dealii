@@ -11575,7 +11575,7 @@ Triangulation<dim,spacedim>::locally_owned_subdomain () const
 
 template <int dim, int spacedim>
 Triangulation<dim,spacedim> &
-Triangulation<dim,spacedim>::get_tria ()
+Triangulation<dim,spacedim>::get_triangulation ()
 {
   return *this;
 }
@@ -11584,7 +11584,7 @@ Triangulation<dim,spacedim>::get_tria ()
 
 template <int dim, int spacedim>
 const Triangulation<dim,spacedim> &
-Triangulation<dim,spacedim>::get_tria () const
+Triangulation<dim,spacedim>::get_triangulation () const
 {
   return *this;
 }

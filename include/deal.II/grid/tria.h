@@ -2821,14 +2821,14 @@ public:
    * may not only be a triangulation, but also a DoFHandler, for example).
    */
   Triangulation<dim,spacedim> &
-  get_tria ();
+  get_triangulation ();
 
   /**
    * Return a reference to the current object. This is the const-version
    * of the previous function.
    */
   const Triangulation<dim,spacedim> &
-  get_tria () const;
+  get_triangulation () const;
 
 
   /*

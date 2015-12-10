@@ -4157,7 +4157,7 @@ namespace GridGenerator
     mapping;  // temporary map for level==0
 
 
-    std::vector< bool > touched (volume_mesh.get_tria().n_vertices(), false);
+    std::vector< bool > touched (volume_mesh.get_triangulation().n_vertices(), false);
     std::vector< CellData< boundary_dim > > cells;
     SubCellData                             subcell_data;
     std::vector< Point<spacedim> >          vertices;
@@ -4267,7 +4267,7 @@ namespace GridGenerator
 
     // create level 0 surface triangulation
     Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
-    const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_tria())
+    const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
     .create_triangulation (vertices, cells, subcell_data);
 
     // Make the actual mapping
@@ -4290,7 +4290,7 @@ namespace GridGenerator
 
         if (changed)
           {
-            const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_tria())
+            const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
             .execute_coarsening_and_refinement();
 
             for (typename Container<dim-1,spacedim>::cell_iterator

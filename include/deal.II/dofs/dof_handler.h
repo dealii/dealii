@@ -798,8 +798,15 @@ public:
 
   /**
    * Return a constant reference to the triangulation underlying this object.
+   *
+   * @deprecated Use get_triangulation() instead.
    */
-  const Triangulation<dim,spacedim> &get_tria () const;
+  const Triangulation<dim,spacedim> &get_tria () const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a constant reference to the triangulation underlying this object.
+   */
+  const Triangulation<dim,spacedim> &get_triangulation () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1153,7 +1160,7 @@ template <int dim, int spacedim>
 const IndexSet &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 {
-  Assert(level < this->get_tria().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs"));
+  Assert(level < this->get_triangulation().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs"));
   return mg_number_cache[level].locally_owned_dofs;
 }
 
@@ -1176,7 +1183,7 @@ template <int dim, int spacedim>
 const std::vector<IndexSet> &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned int level) const
 {
-  Assert(level < this->get_tria().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+  Assert(level < this->get_triangulation().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
   return mg_number_cache[level].locally_owned_dofs_per_processor;
 }
 
@@ -1191,6 +1198,7 @@ DoFHandler<dim,spacedim>::get_fe () const
 }
 
 
+
 template <int dim, int spacedim>
 inline
 const Triangulation<dim,spacedim> &
@@ -1199,6 +1207,18 @@ DoFHandler<dim,spacedim>::get_tria () const
   Assert(tria != 0, ExcNotInitialized());
   return *tria;
 }
+
+
+
+template <int dim, int spacedim>
+inline
+const Triangulation<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_triangulation () const
+{
+  Assert(tria != 0, ExcNotInitialized());
+  return *tria;
+}
+
 
 
 template <int dim, int spacedim>

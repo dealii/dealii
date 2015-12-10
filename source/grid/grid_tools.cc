@@ -964,7 +964,7 @@ namespace GridTools
     // triangulation from the
     // container and determine vertices
     // and used vertices
-    const Triangulation<dim, spacedim> &tria = container.get_tria();
+    const Triangulation<dim, spacedim> &tria = container.get_triangulation();
 
     const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
     const std::vector< bool       > &used     = tria.get_used_vertices();
@@ -1010,9 +1010,9 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < container.get_tria().n_vertices(),
-           ExcIndexRange(0,container.get_tria().n_vertices(),vertex));
-    Assert(container.get_tria().get_used_vertices()[vertex],
+    Assert(vertex < container.get_triangulation().n_vertices(),
+           ExcIndexRange(0,container.get_triangulation().n_vertices(),vertex));
+    Assert(container.get_triangulation().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
     // use a set instead of a vector
@@ -1252,7 +1252,7 @@ next_cell:
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_active_cells = container.get_tria().n_active_cells();
+    const unsigned int n_active_cells = container.get_triangulation().n_active_cells();
     bool found = false;
     unsigned int cells_searched = 0;
     while (!found && cells_searched < n_active_cells)
@@ -1380,7 +1380,7 @@ next_cell:
         // the cell and have not searched
         // every cell in the triangulation,
         // we keep on looking.
-        const unsigned int n_cells = container.get_tria().n_cells();
+        const unsigned int n_cells = container.get_triangulation().n_cells();
         bool found = false;
         unsigned int cells_searched = 0;
         while (!found && cells_searched < n_cells)
@@ -1489,7 +1489,7 @@ next_cell:
                                   const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate)
   {
     std::vector<typename Container::active_cell_iterator> active_halo_layer;
-    std::vector<bool> locally_active_vertices_on_subdomain (container.get_tria().n_vertices(),
+    std::vector<bool> locally_active_vertices_on_subdomain (container.get_triangulation().n_vertices(),
                                                             false);
 
     // Find the cells for which the predicate is true
@@ -2225,8 +2225,8 @@ next_cell:
   have_same_coarse_mesh (const Container &mesh_1,
                          const Container &mesh_2)
   {
-    return have_same_coarse_mesh (mesh_1.get_tria(),
-                                  mesh_2.get_tria());
+    return have_same_coarse_mesh (mesh_1.get_triangulation(),
+                                  mesh_2.get_triangulation());
   }
 
 
