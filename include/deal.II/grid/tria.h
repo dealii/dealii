@@ -1425,6 +1425,7 @@ public:
 
   typedef typename IteratorSelector::hex_iterator         hex_iterator;
   typedef typename IteratorSelector::active_hex_iterator  active_hex_iterator;
+
   /**
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
@@ -2810,6 +2811,25 @@ public:
    * subdomain id of those cells that are owned by the current processor.
    */
   virtual types::subdomain_id locally_owned_subdomain () const;
+
+  /**
+   * Return a reference to the current object.
+   *
+   * This doesn't seem to be very useful but allows to write code that
+   * can access the underlying triangulation for anything that satisfies
+   * the @ref GlossMeshAsAContainer "Mesh as a container" concept (which
+   * may not only be a triangulation, but also a DoFHandler, for example).
+   */
+  Triangulation<dim,spacedim> &
+  get_tria ();
+
+  /**
+   * Return a reference to the current object. This is the const-version
+   * of the previous function.
+   */
+  const Triangulation<dim,spacedim> &
+  get_tria () const;
+
 
   /*
    * @}
