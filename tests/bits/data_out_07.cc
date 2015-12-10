@@ -32,7 +32,7 @@ check_this (const DoFHandler<dim> &dof_handler,
             const Vector<double>  &v_cell)
 {
   DataOut<dim> data_out;
-  data_out.attach_triangulation (dof_handler.get_tria());
+  data_out.attach_triangulation (dof_handler.get_triangulation());
   data_out.add_data_vector (v_cell, "cell_data");
   data_out.build_patches ();
 

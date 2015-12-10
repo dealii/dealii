@@ -116,7 +116,7 @@ check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
   print_dofs (dof);
 
   // Check level ordering
-  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<dof.get_triangulation().n_levels(); ++level)
     {
       print_dofs (mgdof, level);
 

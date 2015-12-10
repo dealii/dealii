@@ -265,7 +265,7 @@ namespace Evaluation
              << ".eps"
              << std::ends;
 
-    GridOut().write_eps (dof_handler.get_tria(),
+    GridOut().write_eps (dof_handler.get_triangulation(),
                          deallog.get_file_stream());
   }
 }
@@ -1682,7 +1682,7 @@ namespace LaplaceSolver
         face_integrals[cell->face(face_no)] = -1e20;
 
     error_indicators.reinit (dual_solver.dof_handler
-                             .get_tria().n_active_cells());
+                             .get_triangulation().n_active_cells());
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     Threads::ThreadGroup<> threads;

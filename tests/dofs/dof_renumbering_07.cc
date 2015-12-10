@@ -78,7 +78,7 @@ check_renumbering(DoFHandler<dim> &dof)
   deallog << element.get_name() << std::endl;
 
   DoFRenumbering::boost::Cuthill_McKee(dof);
-  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<dof.get_triangulation().n_levels(); ++level)
     DoFRenumbering::Cuthill_McKee(dof, level);
   print_dofs (dof);
 }

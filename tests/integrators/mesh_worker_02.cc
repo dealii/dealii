@@ -224,7 +224,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   MGLevelObject<SparseMatrix<double> > mg_matrix_dg_up;
   MGLevelObject<SparseMatrix<double> > mg_matrix_dg_down;
 
-  const unsigned int n_levels = mgdofs.get_tria().n_levels();
+  const unsigned int n_levels = mgdofs.get_triangulation().n_levels();
 
   mg_sparsity.resize(0, n_levels-1);
   mg_sparsity_dg_interface.resize(0, n_levels-1);

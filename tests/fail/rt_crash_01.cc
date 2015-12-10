@@ -75,7 +75,7 @@ check_this (const DoFHandler<dim> &dof_handler)
             ExcInternalError());
 
   // Evaluate error
-  Vector<double> cellwise_errors (dof_handler.get_tria ().n_active_cells());
+  Vector<double> cellwise_errors (dof_handler.get_triangulation ().n_active_cells());
   VectorTools::integrate_difference (dof_handler, solution, test_func,
                                      cellwise_errors, quadrature,
                                      VectorTools::L2_norm);

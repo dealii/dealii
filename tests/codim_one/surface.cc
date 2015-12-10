@@ -90,7 +90,7 @@ void test(std::string filename)
   deallog<<"Approximate measure of hyper sphere = "<<area<<std::endl;
   deallog<<"Error = "<<std::fabs(dim*2*numbers::PI-area)<<std::endl;
   deallog << "Average error in norms: "
-          << ( normals/dof_handler.get_tria().n_active_cells()
+          << ( normals/dof_handler.get_triangulation().n_active_cells()
                /fe_values.n_quadrature_points)
           << std::endl;
 

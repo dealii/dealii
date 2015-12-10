@@ -164,7 +164,7 @@ void print(const DoFHandler<dim> &dof, std::vector<std::vector<bool> > &interfac
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  for (unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
+  for (unsigned int l=0; l<dof.get_triangulation().n_levels(); ++l)
     {
       deallog << std::endl;
       deallog << "Level " << l << std::endl;
