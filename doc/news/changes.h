@@ -491,6 +491,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a function Triangulation::get_tria() that
+  allows writing code to get at the underlying triangulation for
+  everything that looks like a container, i.e., both Triangulation
+  or DoFHandler objects.
+  <br>
+  (Wolfgang Bangerth, 2015/12/07)
+  </li>
+
   <li> Improved: Many more functions in namespace GridTools and class
   InterGridMap are now consistely instantiated also for types
   parallel::distributed::Triangulation and parallel::shared::Triangulation.
