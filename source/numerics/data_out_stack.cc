@@ -142,7 +142,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
   // is cell vector: we only need one
   // name
   if ((n_components == 1) ||
-      (vec.size() == dof_handler->get_tria().n_active_cells()))
+      (vec.size() == dof_handler->get_triangulation().n_active_cells()))
     {
       names.resize (1, name);
     }
@@ -172,7 +172,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
           Exceptions::DataOut::ExcNoDoFHandlerSelected ());
   // either cell data and one name,
   // or dof data and n_components names
-  Assert (((vec.size() == dof_handler->get_tria().n_active_cells()) &&
+  Assert (((vec.size() == dof_handler->get_triangulation().n_active_cells()) &&
            (names.size() == 1))
           ||
           ((vec.size() == dof_handler->n_dofs()) &&
@@ -205,13 +205,13 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
       // n_dofs==n_cells, so only
       // bomb out if the next if
       // statement will not be run
-      if (dof_handler->n_dofs() != dof_handler->get_tria().n_active_cells())
+      if (dof_handler->n_dofs() != dof_handler->get_triangulation().n_active_cells())
         Assert (false, ExcVectorNotDeclared (names[0]));
     }
 
   // search cell data
   if ((vec.size() != dof_handler->n_dofs()) ||
-      (dof_handler->n_dofs() == dof_handler->get_tria().n_active_cells()))
+      (dof_handler->n_dofs() == dof_handler->get_triangulation().n_active_cells()))
     {
       typename std::vector<DataVector>::iterator data_vector=cell_data.begin();
       for (; data_vector!=cell_data.end(); ++data_vector)

@@ -756,7 +756,7 @@ namespace DoFRenumbering
    *   renumbered.
    *
    * @pre @p cell_order must have size
-   *   <code>dof_handler.get_tria().n_active_cells()</code>. Every active
+   *   <code>dof_handler.get_triangulation().n_active_cells()</code>. Every active
    *   cell iterator of that triangulation needs to be present in @p cell_order
    *   exactly once.
    */
@@ -790,7 +790,7 @@ namespace DoFRenumbering
    *   renumbered.
    *
    * @pre @p cell_order must have size
-   *   <code>dof_handler.get_tria().n_active_cells()</code>. Every active
+   *   <code>dof_handler.get_triangulation().n_active_cells()</code>. Every active
    *   cell iterator of that triangulation needs to be present in @p cell_order
    *   exactly once.
    * @post For each @p i between zero and <code>dof_handler.n_dofs()</code>,

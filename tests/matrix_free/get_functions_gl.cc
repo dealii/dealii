@@ -53,7 +53,7 @@ void test ()
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
   //          << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;

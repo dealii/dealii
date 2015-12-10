@@ -67,7 +67,7 @@ void check_select(const FiniteElement<dim> &fe,
   for (unsigned int l=0; l<tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l, mg_target_component);
 
-  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_tria().n_levels());
+  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_triangulation().n_levels());
   MGTools::count_dofs_per_component(mgdof, mg_ndofs, true, mg_target_component);
 
   deallog << "Global  dofs:";

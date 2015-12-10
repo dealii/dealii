@@ -81,7 +81,7 @@ public:
         endc = dof_handler.end(level);
         for (; cell!=endc; ++cell)
           {
-            if (dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            if (dof_handler.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
                 && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe = cell->get_fe();
@@ -339,8 +339,8 @@ void do_test (const DoFHandler<dim>  &dof,
   typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,number> LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
-  mg_matrices.resize(0, dof.get_tria().n_levels()-1);
-  for (unsigned int level = 0; level<dof.get_tria().n_levels(); ++level)
+  mg_matrices.resize(0, dof.get_triangulation().n_levels()-1);
+  for (unsigned int level = 0; level<dof.get_triangulation().n_levels(); ++level)
     {
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
@@ -356,8 +356,8 @@ void do_test (const DoFHandler<dim>  &dof,
   mg_smoother;
 
   MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
-  smoother_data.resize(0, dof.get_tria().n_levels()-1);
-  for (unsigned int level = 0; level<dof.get_tria().n_levels(); ++level)
+  smoother_data.resize(0, dof.get_triangulation().n_levels()-1);
+  for (unsigned int level = 0; level<dof.get_triangulation().n_levels(); ++level)
     {
       smoother_data[level].smoothing_range = 15.;
       smoother_data[level].degree = 5;

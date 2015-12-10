@@ -4129,71 +4129,6 @@ namespace GridGenerator
 
 
 
-  // This anonymous namespace contains utility functions to extract the
-  // triangulation from any container such as DoFHandler
-  // and the like
-  namespace
-  {
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const parallel::shared::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(const Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(parallel::shared::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-  }
-
-
-
   template <template <int,int> class Container, int dim, int spacedim>
 #ifndef _MSC_VER
   std::map<typename Container<dim-1,spacedim>::cell_iterator,
@@ -4222,7 +4157,7 @@ namespace GridGenerator
     mapping;  // temporary map for level==0
 
 
-    std::vector< bool > touched (get_tria(volume_mesh).n_vertices(), false);
+    std::vector< bool > touched (volume_mesh.get_triangulation().n_vertices(), false);
     std::vector< CellData< boundary_dim > > cells;
     SubCellData                             subcell_data;
     std::vector< Point<spacedim> >          vertices;
@@ -4332,7 +4267,7 @@ namespace GridGenerator
 
     // create level 0 surface triangulation
     Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
-    const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+    const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
     .create_triangulation (vertices, cells, subcell_data);
 
     // Make the actual mapping
@@ -4355,7 +4290,7 @@ namespace GridGenerator
 
         if (changed)
           {
-            const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+            const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
             .execute_coarsening_and_refinement();
 
             for (typename Container<dim-1,spacedim>::cell_iterator

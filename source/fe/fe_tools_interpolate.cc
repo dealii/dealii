@@ -78,7 +78,7 @@ namespace FETools
                const ConstraintMatrix               &constraints,
                OutVector                            &u2)
   {
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
 
     Assert(u1.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -137,7 +137,7 @@ namespace FETools
     // a cell, which this processor owns,
     // so we have to know the subdomain_id
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     for (; cell1!=endc1; ++cell1, ++cell2)
       if ((cell1->subdomain_id() == subdomain_id)
@@ -283,7 +283,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
                                                             endc = dof1.end();
@@ -351,7 +351,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     typename DoFHandlerType<dim>::active_cell_iterator cell = dof1.begin_active(),
                                                        endc = dof1.end();
@@ -595,7 +595,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
     get_interpolation_difference_matrix(dof1.get_fe(), fe2,
@@ -701,7 +701,7 @@ namespace FETools
                   const DoFHandler<dim,spacedim> &dof2,
                   OutVector &u2)
   {
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -760,7 +760,7 @@ namespace FETools
   {
     Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
@@ -784,7 +784,7 @@ namespace FETools
     }
 
     // then traverse grid bottom up
-    for (unsigned int level=0; level<dof1.get_tria().n_levels()-1; ++level)
+    for (unsigned int level=0; level<dof1.get_triangulation().n_levels()-1; ++level)
       {
         typename DoFHandler<dim,spacedim>::cell_iterator cell=dof2.begin(level),
                                                          endc=dof2.end(level);

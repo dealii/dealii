@@ -132,7 +132,7 @@ void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
     dof_handler.begin_mg(), dof_handler.end_mg(),
     dof_info, info_box, matrix_integrator, assembler);
 
-  const unsigned int nlevels = dof_handler.get_tria().n_levels();
+  const unsigned int nlevels = dof_handler.get_triangulation().n_levels();
   for (unsigned int level=0; level<nlevels; ++level)
     {
       for (unsigned int i=0; i<dof_handler.n_dofs(level); ++i)

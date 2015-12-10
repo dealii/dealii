@@ -123,7 +123,7 @@ namespace MGTools
     // flags. Since we restore them in
     // the end, this cast is safe.
     Triangulation<dim,spacedim> &user_flags_triangulation =
-      const_cast<Triangulation<dim,spacedim>&> (dofs.get_tria());
+      const_cast<Triangulation<dim,spacedim>&> (dofs.get_triangulation());
     user_flags_triangulation.save_user_flags(old_flags);
     user_flags_triangulation.clear_user_flags();
 
@@ -297,7 +297,7 @@ namespace MGTools
     // flags. Since we restore them in
     // the end, this cast is safe.
     Triangulation<dim,spacedim> &user_flags_triangulation =
-      const_cast<Triangulation<dim,spacedim>&> (dofs.get_tria());
+      const_cast<Triangulation<dim,spacedim>&> (dofs.get_triangulation());
     user_flags_triangulation.save_user_flags(old_flags);
     user_flags_triangulation.clear_user_flags();
 
@@ -553,8 +553,8 @@ namespace MGTools
     typename DoFHandlerType::cell_iterator cell = dof.begin(level),
                                            endc = dof.end(level);
     for (; cell!=endc; ++cell)
-      if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-          || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
+      if (dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
+          || cell->level_subdomain_id()==dof.get_triangulation().locally_owned_subdomain())
         {
           cell->get_mg_dof_indices (dofs_on_this_cell);
           // make sparsity pattern for this cell
@@ -641,8 +641,8 @@ namespace MGTools
                                    SparsityPatternType            &sparsity,
                                    const unsigned int              level)
   {
-    Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
-            ExcIndexRange(level, 1, dof.get_tria().n_global_levels()));
+    Assert ((level>=1) && (level<dof.get_triangulation().n_global_levels()),
+            ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
@@ -749,8 +749,8 @@ namespace MGTools
     // same state as it was at the
     // beginning of this function.
     std::vector<bool> user_flags;
-    dof.get_tria().save_user_flags(user_flags);
-    const_cast<Triangulation<dim,spacedim> &>(dof.get_tria()).clear_user_flags ();
+    dof.get_triangulation().save_user_flags(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(dof.get_triangulation()).clear_user_flags ();
 
     for (; cell!=endc; ++cell)
       {
@@ -872,7 +872,7 @@ namespace MGTools
       }
 
     // finally restore the user flags
-    const_cast<Triangulation<dim,spacedim> &>(dof.get_tria()).load_user_flags(user_flags);
+    const_cast<Triangulation<dim,spacedim> &>(dof.get_triangulation()).load_user_flags(user_flags);
   }
 
 
@@ -888,8 +888,8 @@ namespace MGTools
     const unsigned int n_comp = fe.n_components();
     (void)n_comp;
 
-    Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
-            ExcIndexRange(level, 1, dof.get_tria().n_global_levels()));
+    Assert ((level>=1) && (level<dof.get_triangulation().n_global_levels()),
+            ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
@@ -970,7 +970,7 @@ namespace MGTools
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
     const unsigned int n_components = fe.n_components();
-    const unsigned int nlevels = dof_handler.get_tria().n_global_levels();
+    const unsigned int nlevels = dof_handler.get_triangulation().n_global_levels();
 
     Assert (result.size() == nlevels,
             ExcDimensionMismatch(result.size(), nlevels));
@@ -1072,7 +1072,7 @@ namespace MGTools
   {
     const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();
-    const unsigned int n_levels = dof_handler.get_tria().n_global_levels();
+    const unsigned int n_levels = dof_handler.get_triangulation().n_global_levels();
 
     AssertDimension (dofs_per_block.size(), n_levels);
 
@@ -1186,7 +1186,7 @@ namespace MGTools
     if (function_map.size() == 0)
       return;
 
-    const unsigned int n_levels = dof.get_tria().n_global_levels();
+    const unsigned int n_levels = dof.get_triangulation().n_global_levels();
 
     (void)n_levels;
 
@@ -1212,7 +1212,7 @@ namespace MGTools
         endc = dof.end();
         for (; cell!=endc; ++cell)
           {
-            if (dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            if (dof.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
                 && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe = cell->get_fe();
@@ -1246,7 +1246,7 @@ namespace MGTools
         cell = dof.begin(),
         endc = dof.end();
         for (; cell!=endc; ++cell)
-          if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+          if (dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
               || cell->level_subdomain_id()!=numbers::artificial_subdomain_id)
             for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
                  ++face_no)
@@ -1395,14 +1395,14 @@ namespace MGTools
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &component_mask)
   {
-    Assert (boundary_indices.size() == dof.get_tria().n_global_levels(),
+    Assert (boundary_indices.size() == dof.get_triangulation().n_global_levels(),
             ExcDimensionMismatch (boundary_indices.size(),
-                                  dof.get_tria().n_global_levels()));
+                                  dof.get_triangulation().n_global_levels()));
 
     std::vector<std::set<types::global_dof_index> >
-    my_boundary_indices (dof.get_tria().n_global_levels());
+    my_boundary_indices (dof.get_triangulation().n_global_levels());
     make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
-    for (unsigned int i=0; i<dof.get_tria().n_global_levels(); ++i)
+    for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
       {
         boundary_indices[i] = IndexSet (dof.n_dofs(i));
         boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
@@ -1416,9 +1416,9 @@ namespace MGTools
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {
-    Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
+    Assert (non_interface_dofs.size() == mg_dof_handler.get_triangulation().n_global_levels(),
             ExcDimensionMismatch (non_interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_global_levels()));
+                                  mg_dof_handler.get_triangulation().n_global_levels()));
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1435,8 +1435,8 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
-        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+        if (mg_dof_handler.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            && cell->level_subdomain_id()!=mg_dof_handler.get_triangulation().locally_owned_subdomain())
           continue;
 
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
@@ -1485,9 +1485,9 @@ namespace MGTools
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<IndexSet>  &interface_dofs)
   {
-    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
+    Assert (interface_dofs.size() == mg_dof_handler.get_triangulation().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_global_levels()));
+                                  mg_dof_handler.get_triangulation().n_global_levels()));
 
     std::vector<std::vector<types::global_dof_index> >
     tmp_interface_dofs(interface_dofs.size());
@@ -1508,7 +1508,7 @@ namespace MGTools
       {
         // Do not look at artificial level cells (in a serial computation we
         // need to ignore the level_subdomain_id() because it is never set).
-        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+        if (mg_dof_handler.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
             && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
           continue;
 
@@ -1526,7 +1526,7 @@ namespace MGTools
                 neighbor = cell->neighbor(face_nr);
 
                 // only process cell pairs if one or both of them are owned by me (ignore if running in serial)
-                if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+                if (mg_dof_handler.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
                     &&
                     neighbor->level_subdomain_id()==numbers::artificial_subdomain_id)
                   continue;
@@ -1555,7 +1555,7 @@ namespace MGTools
           }
       }
 
-    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
+    for (unsigned int l=0; l<mg_dof_handler.get_triangulation().n_global_levels(); ++l)
       {
         interface_dofs[l].clear();
         std::sort(tmp_interface_dofs[l].begin(), tmp_interface_dofs[l].end());

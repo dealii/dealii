@@ -35,7 +35,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().is_primitive() == false)
     return;
 
-  Vector<double> cell_data (dof_handler.get_tria().n_active_cells());
+  Vector<double> cell_data (dof_handler.get_triangulation().n_active_cells());
   for (unsigned int i=0; i<cell_data.size(); ++i)
     cell_data(i) = i;
 

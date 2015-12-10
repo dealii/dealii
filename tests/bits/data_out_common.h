@@ -90,7 +90,7 @@ check (const FiniteElement<dim> &fe,
   Vector<double> v_node (dof_handler.n_dofs());
   for (unsigned int i=0; i<v_node.size(); ++i) v_node(i) = i;
 
-  Vector<double> v_cell (dof_handler.get_tria().n_active_cells());
+  Vector<double> v_cell (dof_handler.get_triangulation().n_active_cells());
   for (unsigned int i=0; i<v_cell.size(); ++i) v_cell(i) = i;
 
   // call main function in .cc files

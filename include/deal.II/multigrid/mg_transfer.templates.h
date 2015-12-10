@@ -85,7 +85,7 @@ namespace
     const unsigned int n_target_blocks = max_block + 1;
 
     std::vector<std::vector<types::global_dof_index> >
-    ndofs(mg_dof.get_tria().n_levels(),
+    ndofs(mg_dof.get_triangulation().n_levels(),
           std::vector<types::global_dof_index>(n_target_blocks));
     MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
 
@@ -112,7 +112,7 @@ namespace
   {
     const parallel::Triangulation<dim,spacedim> *tria =
       (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
-       (&mg_dof.get_tria()));
+       (&mg_dof.get_triangulation()));
 
     for (unsigned int level=v.min_level();
          level<=v.max_level(); ++level)
@@ -142,7 +142,7 @@ namespace
   {
     const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
       (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-       (&mg_dof.get_tria()));
+       (&mg_dof.get_triangulation()));
     AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
 #ifdef DEAL_II_WITH_P4EST
@@ -179,7 +179,7 @@ MGTransferPrebuilt<VectorType>::copy_to_mg
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
-  for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels(); level != 0;)
     {
       --level;
       VectorType &dst_level = dst[level];
@@ -238,7 +238,7 @@ MGTransferPrebuilt<VectorType>::copy_from_mg
   // have fine level basis
   // functions
   dst = 0;
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
     {
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
@@ -291,7 +291,7 @@ MGTransferPrebuilt<VectorType>::copy_from_mg_add
   // to the coarse level, but
   // have fine level basis
   // functions
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
 

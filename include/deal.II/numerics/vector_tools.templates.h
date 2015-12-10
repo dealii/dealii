@@ -717,7 +717,7 @@ namespace VectorTools
             // function to hold on
             // all parts of the boundary
             const std::vector<types::boundary_id>
-            used_boundary_ids = dof.get_tria().get_boundary_ids();
+            used_boundary_ids = dof.get_triangulation().get_boundary_ids();
 
             typename FunctionMap<spacedim>::type boundary_functions;
             for (unsigned int i=0; i<used_boundary_ids.size(); ++i)
@@ -6388,7 +6388,7 @@ namespace VectorTools
                   ExcDimensionMismatch(weight->n_components, n_components));
         }
 
-      difference.reinit (dof.get_tria().n_active_cells());
+      difference.reinit (dof.get_triangulation().n_active_cells());
 
       switch (norm)
         {
@@ -7071,7 +7071,7 @@ namespace VectorTools
     // over the entire domain
     if (const parallel::Triangulation<dim,spacedim> *
         p_triangulation
-        = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(&dof.get_tria()))
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(&dof.get_triangulation()))
       {
         // The type used to store the elements of the global vector may be a
         // real or a complex number. Do the global reduction always with real
@@ -7191,7 +7191,7 @@ namespace VectorTools
         // carefully selecting the right components.
 
         FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(degree), spacedim);
-        DoFHandlerType dhq(dh.get_tria());
+        DoFHandlerType dhq(dh.get_triangulation());
         dhq.distribute_dofs(feq);
         Vector<double> eulerq(dhq.n_dofs());
         const ComponentMask maskq(spacedim, true);

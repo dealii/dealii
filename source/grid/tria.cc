@@ -11574,6 +11574,24 @@ Triangulation<dim,spacedim>::locally_owned_subdomain () const
 
 
 template <int dim, int spacedim>
+Triangulation<dim,spacedim> &
+Triangulation<dim,spacedim>::get_triangulation ()
+{
+  return *this;
+}
+
+
+
+template <int dim, int spacedim>
+const Triangulation<dim,spacedim> &
+Triangulation<dim,spacedim>::get_triangulation () const
+{
+  return *this;
+}
+
+
+
+template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 {

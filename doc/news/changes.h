@@ -491,6 +491,21 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a function Triangulation::get_triangulation() that
+  allows writing code to get at the underlying triangulation for
+  everything that looks like a container, i.e., both Triangulation
+  or DoFHandler objects.
+  <br>
+  (Wolfgang Bangerth, 2015/12/10)
+  </li>
+
+  <li> Deprecated: The functions DoFHandler::get_tria() and
+  hp::DoFHandler::get_tria() were deprecated. UseDoFHandler::get_triangulation() and
+  hp::DoFHandler::get_triangulation() instead.
+  <br>
+  (Wolfgang Bangerth, 2015/12/10)
+  </li>
+
   <li> Improved: Many more functions in namespace GridTools and class
   InterGridMap are now consistely instantiated also for types
   parallel::distributed::Triangulation and parallel::shared::Triangulation.

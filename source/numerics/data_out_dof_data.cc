@@ -861,7 +861,7 @@ attach_dof_handler (const DoFHandlerType &d)
 
   triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,
   DoFHandlerType::space_dimension> >
-  (&d.get_tria(), typeid(*this).name());
+  (&d.get_triangulation(), typeid(*this).name());
   dofs = SmartPointer<const DoFHandlerType>(&d, typeid(*this).name());
 }
 
@@ -1019,7 +1019,7 @@ add_data_vector (const VectorType                       &vec,
   Assert (vec.size() == dofs->n_dofs(),
           Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
                                                      dofs->n_dofs(),
-                                                     dofs->get_tria().n_active_cells()));
+                                                     dofs->get_triangulation().n_active_cells()));
 
   internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
     = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, &data_postprocessor);
@@ -1100,9 +1100,9 @@ add_data_vector
   // together with its DoFHandler. if we do, we know that we have
   // type_dof_data, which makes things a bit simpler
   if (triangulation == 0)
-    triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> >(&dof_handler.get_tria(), typeid(*this).name());
+    triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> >(&dof_handler.get_triangulation(), typeid(*this).name());
 
-  Assert (&dof_handler.get_tria() == triangulation,
+  Assert (&dof_handler.get_triangulation() == triangulation,
           ExcMessage("The triangulation attached to the DoFHandler does not "
                      "match with the one set previously"));
 

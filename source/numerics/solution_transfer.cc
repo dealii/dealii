@@ -73,7 +73,7 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinem
 
   clear();
 
-  const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
+  const unsigned int n_active_cells = dof_handler->get_triangulation().n_active_cells();
   n_dofs_old=dof_handler->n_dofs();
 
   // efficient reallocation of indices_on_cell
@@ -243,7 +243,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 
   clear();
 
-  const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
+  const unsigned int n_active_cells = dof_handler->get_triangulation().n_active_cells();
   (void)n_active_cells;
   n_dofs_old = dof_handler->n_dofs();
 

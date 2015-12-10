@@ -933,7 +933,7 @@ namespace DoFTools
                 //TODO[TL]: think about this in case of anisotropic
                 //refinement
 
-                Assert (dof_handler.get_tria().get_anisotropic_refinement_flag() ||
+                Assert (dof_handler.get_triangulation().get_anisotropic_refinement_flag() ||
                         ((this_face->child(0)->vertex_index(3) ==
                           this_face->child(1)->vertex_index(2)) &&
                          (this_face->child(0)->vertex_index(3) ==
@@ -2713,7 +2713,7 @@ namespace DoFTools
               {
                 const typename dealii::parallel::Triangulation<dim, spacedim> &tria =
                   dynamic_cast<const typename dealii::parallel::Triangulation<dim, spacedim>&>
-                  (coarse_to_fine_grid_map.get_destination_grid().get_tria ());
+                  (coarse_to_fine_grid_map.get_destination_grid().get_triangulation());
                 communicator = tria.get_communicator ();
                 is_called_in_parallel = true;
               }
@@ -2800,7 +2800,7 @@ namespace DoFTools
 
         // Try to find out whether the grids stem from the same coarse
         // grid. This is a rather crude test, but better than nothing
-        Assert (coarse_grid.get_tria().n_cells(0) == fine_grid.get_tria().n_cells(0),
+        Assert (coarse_grid.get_triangulation().n_cells(0) == fine_grid.get_triangulation().n_cells(0),
                 ExcGridsDontMatch());
 
         // check whether the map correlates the right objects

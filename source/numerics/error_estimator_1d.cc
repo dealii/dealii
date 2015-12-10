@@ -221,24 +221,24 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 {
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
-      (&dof_handler.get_tria())
+      (&dof_handler.get_triangulation())
       != 0)
     Assert ((subdomain_id_ == numbers::invalid_subdomain_id)
             ||
             (subdomain_id_ ==
              dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
-             (dof_handler.get_tria()).locally_owned_subdomain()),
+             (dof_handler.get_triangulation()).locally_owned_subdomain()),
             ExcMessage ("For parallel distributed triangulations, the only "
                         "valid subdomain_id that can be passed here is the "
                         "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id
     = ((dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
-        (&dof_handler.get_tria())
+        (&dof_handler.get_triangulation())
         != 0)
        ?
        dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
-       (dof_handler.get_tria()).locally_owned_subdomain()
+       (dof_handler.get_triangulation()).locally_owned_subdomain()
        :
        subdomain_id_);
 #else
@@ -295,7 +295,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 
   // reserve one slot for each cell and set it to zero
   for (unsigned int n=0; n<n_solution_vectors; ++n)
-    (*errors[n]).reinit (dof_handler.get_tria().n_active_cells());
+    (*errors[n]).reinit (dof_handler.get_triangulation().n_active_cells());
 
   // fields to get the gradients on the present and the neighbor cell.
   //

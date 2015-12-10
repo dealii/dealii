@@ -63,7 +63,7 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index> >
-        new_dofs(mg_dof.get_tria().n_levels(),
+        new_dofs(mg_dof.get_triangulation().n_levels(),
                  std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
         MGTools::count_dofs_per_block (mg_dof, ndofs);
@@ -109,7 +109,7 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index> >
-        new_dofs(mg_dof.get_tria().n_levels(),
+        new_dofs(mg_dof.get_triangulation().n_levels(),
                  std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
         MGTools::count_dofs_per_block (mg_dof, ndofs);
@@ -138,7 +138,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // first, since only one block is
   // selected.
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
@@ -165,7 +165,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // multilevel block is always the
   // first, since only one block is selected.
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
@@ -189,7 +189,7 @@ MGTransferBlock<number>::copy_to_mg (
 {
   reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (unsigned int block=0; block<selected.size(); ++block)
@@ -213,7 +213,7 @@ void MGTransferBlockBase::build_matrices (
   const FiniteElement<dim> &fe = mg_dof.get_fe();
   const unsigned int n_blocks  = fe.n_blocks();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
+  const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
 
   Assert (selected.size() == n_blocks,
           ExcDimensionMismatch(selected.size(), n_blocks));
@@ -480,7 +480,7 @@ void MGTransferBlockSelect<number>::build_matrices (
   std::vector<types::global_dof_index> global_dof_indices (fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (fe.dofs_per_cell);
 
-  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+  for (int level=dof.get_triangulation().n_levels()-1; level>=0; --level)
     {
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
@@ -567,7 +567,7 @@ void MGTransferBlock<number>::build_matrices (
   std::vector<std::vector<types::global_dof_index> > temp_copy_indices (n_blocks);
   std::vector<types::global_dof_index> global_dof_indices (fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (fe.dofs_per_cell);
-  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+  for (int level=dof.get_triangulation().n_levels()-1; level>=0; --level)
     {
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);

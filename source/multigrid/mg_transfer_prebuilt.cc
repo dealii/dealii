@@ -115,7 +115,7 @@ template <int dim, int spacedim>
 void MGTransferPrebuilt<VectorType>::build_matrices
 (const DoFHandler<dim,spacedim>  &mg_dof)
 {
-  const unsigned int n_levels      = mg_dof.get_tria().n_global_levels();
+  const unsigned int n_levels      = mg_dof.get_triangulation().n_global_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
   sizes.resize(n_levels);
@@ -173,8 +173,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
-            ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-              || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
+            ( mg_dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
+              || cell->level_subdomain_id()==mg_dof.get_triangulation().locally_owned_subdomain()
             ))
           {
             cell->get_mg_dof_indices (dof_indices_parent);
@@ -220,8 +220,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
-            (mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-             || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
+            (mg_dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
+             || cell->level_subdomain_id()==mg_dof.get_triangulation().locally_owned_subdomain())
            )
           {
             cell->get_mg_dof_indices (dof_indices_parent);
@@ -301,7 +301,7 @@ MGTransferPrebuilt<VectorType>::fill_and_communicate_copy_indices
   // that will be copied into copy_indices_level_mine
   std::vector<DoFPair> send_data_temp;
 
-  const unsigned int n_levels = mg_dof.get_tria().n_global_levels();
+  const unsigned int n_levels = mg_dof.get_triangulation().n_global_levels();
   copy_indices.resize(n_levels);
   copy_indices_global_mine.resize(n_levels);
   copy_indices_level_mine.resize(n_levels);
@@ -326,7 +326,7 @@ MGTransferPrebuilt<VectorType>::fill_and_communicate_copy_indices
 
       for (; level_cell!=level_end; ++level_cell)
         {
-          if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+          if (mg_dof.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
               &&  (level_cell->level_subdomain_id()==numbers::artificial_subdomain_id
                    ||  level_cell->subdomain_id()==numbers::artificial_subdomain_id)
              )
@@ -376,7 +376,7 @@ MGTransferPrebuilt<VectorType>::fill_and_communicate_copy_indices
 
   const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
     (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-     (&mg_dof.get_tria()));
+     (&mg_dof.get_triangulation()));
   AssertThrow(send_data_temp.size()==0 || tria!=NULL, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
 
 #ifdef DEAL_II_WITH_MPI
