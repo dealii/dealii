@@ -132,31 +132,46 @@ public:
   requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
-   * Since these elements are vector valued, an exception is thrown.
+   * Compute the (scalar) value of shape function @p i at
+   * the given quadrature point @p p.
+   * Since the elements represented by this class are vector
+   * valued, there is no such scalar value and the function therefore
+   * throws an exception.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
 
+  // documentation inherited from the base class
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim> &p,
                                         const unsigned int component) const;
 
   /**
-   * Since these elements are vector valued, an exception is thrown.
+   * Compute the gradient of (scalar) shape function @p i at
+   * the given quadrature point @p p.
+   * Since the elements represented by this class are vector
+   * valued, there is no such scalar value and the function therefore
+   * throws an exception.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
 
+  // documentation inherited from the base class
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim> &p,
                                               const unsigned int component) const;
 
   /**
-   * Since these elements are vector valued, an exception is thrown.
+   * Compute the Hessian of (scalar) shape function @p i at
+   * the given quadrature point @p p.
+   * Since the elements represented by this class are vector
+   * valued, there is no such scalar value and the function therefore
+   * throws an exception.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim> &p) const;
 
+  // documentation inherited from the base class
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,
                                                    const unsigned int component) const;
@@ -389,7 +404,7 @@ protected:
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim > > transformed_shape_grads;
     mutable std::vector<Tensor<2, dim > > untransformed_shape_grads;
-    //for shape_hessian computations
+    // for shape_hessian computations
     mutable std::vector<Tensor<3, spacedim > > transformed_shape_hessians;
     mutable std::vector<Tensor<3, dim > > untransformed_shape_hessian_tensors;
   };
