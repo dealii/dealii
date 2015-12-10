@@ -29,54 +29,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
-{
-// helper function to acquire the number of levels within a grid
-  template <class GridClass>
-  unsigned int
-  get_n_levels (const GridClass &grid)
-  {
-    // all objects we deal with are able
-    // to deliver a pointer to the
-    // underlying triangulation.
-    //
-    // for the triangulation as GridClass
-    // of this object, there is a
-    // specialization of this function
-    return grid.get_tria().n_levels();
-  }
-
-
-// specialization for triangulation classes
-  template <int dim, int spacedim>
-  unsigned int
-  get_n_levels (const Triangulation<dim, spacedim> &grid)
-  {
-    // if GridClass==Triangulation, then
-    // we can ask directly.
-    return grid.n_levels();
-  }
-
-  template <int dim, int spacedim>
-  unsigned int
-  get_n_levels (const parallel::distributed::Triangulation<dim, spacedim> &grid)
-  {
-    // if GridClass==Triangulation, then
-    // we can ask directly.
-    return grid.n_levels();
-  }
-
-  template <int dim, int spacedim>
-  unsigned int
-  get_n_levels (const parallel::shared::Triangulation<dim, spacedim> &grid)
-  {
-    // if GridClass==Triangulation, then
-    // we can ask directly.
-    return grid.n_levels();
-  }
-}
-
-
 template <class GridClass>
 InterGridMap<GridClass>::InterGridMap ()
   :
@@ -100,7 +52,7 @@ void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
 
   // then set up the containers from
   // scratch and fill them with end-iterators
-  const unsigned int n_levels = get_n_levels(source_grid);
+  const unsigned int n_levels = source_grid.get_tria().n_levels();
   mapping.resize (n_levels);
   for (unsigned int level=0; level<n_levels; ++level)
     {

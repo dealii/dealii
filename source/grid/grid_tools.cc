@@ -61,72 +61,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace GridTools
 {
 
-  // This anonymous namespace contains utility functions to extract the
-  // triangulation from any container such as DoFHandler and the like
-  namespace
-  {
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const parallel::shared::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(const Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(parallel::shared::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-  }
-
-
-
   template <int dim, int spacedim>
   double
   diameter (const Triangulation<dim, spacedim> &tria)
@@ -1030,7 +964,7 @@ namespace GridTools
     // triangulation from the
     // container and determine vertices
     // and used vertices
-    const Triangulation<dim, spacedim> &tria = get_tria(container);
+    const Triangulation<dim, spacedim> &tria = container.get_tria();
 
     const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
     const std::vector< bool       > &used     = tria.get_used_vertices();
@@ -1076,9 +1010,9 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < get_tria(container).n_vertices(),
-           ExcIndexRange(0,get_tria(container).n_vertices(),vertex));
-    Assert(get_tria(container).get_used_vertices()[vertex],
+    Assert(vertex < container.get_tria().n_vertices(),
+           ExcIndexRange(0,container.get_tria().n_vertices(),vertex));
+    Assert(container.get_tria().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
     // use a set instead of a vector
@@ -1318,7 +1252,7 @@ next_cell:
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_active_cells = get_tria(container).n_active_cells();
+    const unsigned int n_active_cells = container.get_tria().n_active_cells();
     bool found = false;
     unsigned int cells_searched = 0;
     while (!found && cells_searched < n_active_cells)
@@ -1446,7 +1380,7 @@ next_cell:
         // the cell and have not searched
         // every cell in the triangulation,
         // we keep on looking.
-        const unsigned int n_cells =get_tria(container).n_cells();
+        const unsigned int n_cells = container.get_tria().n_cells();
         bool found = false;
         unsigned int cells_searched = 0;
         while (!found && cells_searched < n_cells)
@@ -1555,7 +1489,7 @@ next_cell:
                                   const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate)
   {
     std::vector<typename Container::active_cell_iterator> active_halo_layer;
-    std::vector<bool> locally_active_vertices_on_subdomain (get_tria(container).n_vertices(),
+    std::vector<bool> locally_active_vertices_on_subdomain (container.get_tria().n_vertices(),
                                                             false);
 
     // Find the cells for which the predicate is true
@@ -2291,8 +2225,8 @@ next_cell:
   have_same_coarse_mesh (const Container &mesh_1,
                          const Container &mesh_2)
   {
-    return have_same_coarse_mesh (get_tria(mesh_1),
-                                  get_tria(mesh_2));
+    return have_same_coarse_mesh (mesh_1.get_tria(),
+                                  mesh_2.get_tria());
   }
 
 
