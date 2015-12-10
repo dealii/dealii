@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 by the deal.II authors
+## Copyright (C) 2014, 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -43,7 +43,7 @@ ENDIF()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(Boost 1.48 COMPONENTS iostreams serialization system thread)
+FIND_PACKAGE(Boost 1.48 COMPONENTS iostreams math serialization system thread)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
