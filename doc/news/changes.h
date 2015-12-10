@@ -183,6 +183,15 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: There is now a function Utilities::to_string that works like
+  int_to_string, but is more safe for long integers, negative integers, and
+  also handles floating point numbers. The implementation of int_to_string
+  was changed to simply call to_string. int_to_string is kept for
+  compatibility, but should only be used for unsigned integers.
+  <br>
+  (Rene Gassmoeller, 2015/12/09)
+  </li>
+
   <li> New: The WorkStream class's design and implementation are now much
   better documented in the form of a @ref workstream_paper "preprint".
   <br>
