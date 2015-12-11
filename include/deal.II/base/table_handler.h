@@ -734,6 +734,11 @@ namespace internal
         char c = 's';
         ar &c & *p;
       }
+    else if (const unsigned long long int *p = boost::get<unsigned long long int>(&value))
+      {
+        char c = 'l';
+        ar &c & *p;
+      }
     else
       Assert (false, ExcInternalError());
   }
@@ -780,6 +785,14 @@ namespace internal
       case 's':
       {
         std::string val;
+        ar &val;
+        value = val;
+        break;
+      }
+
+      case 'l':
+      {
+        unsigned long long int val;
         ar &val;
         value = val;
         break;
