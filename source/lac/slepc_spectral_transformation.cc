@@ -31,38 +31,31 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SLEPcWrappers
 {
-  TransformationBase::TransformationData::~TransformationData ()
-  {}
-
-  TransformationBase::TransformationBase ()
-  {}
+  TransformationBase::TransformationBase (const MPI_Comm &mpi_communicator)
+  {
+    int ierr = STCreate(mpi_communicator, &st);
+    AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+  }
 
   TransformationBase::~TransformationBase ()
-  {}
-
-  void TransformationBase::set_context (EPS &eps)
   {
-    AssertThrow (transformation_data.get() == 0,
-                 SolverBase::ExcSLEPcWrappersUsageError());
-    transformation_data.reset (new TransformationData());
-
-    int ierr = EPSGetST(eps, &transformation_data->st);
-    AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
-
-    set_transformation_type(transformation_data->st);
-
-    // if mat_mode has been set,
-    // pass it to ST object
-    if (mat_mode.get() != 0)
+    if (st!=NULL)
       {
-        int ierr = STSetMatMode(transformation_data->st,*(mat_mode.get()) );
+        int ierr = STDestroy(&st);
         AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
       }
   }
 
   void TransformationBase::set_matrix_mode(const STMatMode mode)
   {
-    mat_mode.reset (new STMatMode(mode));
+    int ierr = STSetMatMode(st,mode);
+    AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+  }
+
+  void TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
+  {
+    int ierr = STSetKSP(st,solver.solver_data->ksp);
+    AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
   /* ------------------- TransformationShift --------------------- */
@@ -73,13 +66,11 @@ namespace SLEPcWrappers
     shift_parameter (shift_parameter)
   {}
 
-  TransformationShift::TransformationShift (const AdditionalData &data)
+  TransformationShift::TransformationShift (const MPI_Comm &mpi_communicator,
+                                            const AdditionalData &data)
     :
+    TransformationBase(mpi_communicator),
     additional_data (data)
-  {}
-
-  void
-  TransformationShift::set_transformation_type (ST &st) const
   {
     int ierr;
     ierr = STSetType (st, const_cast<char *>(STSHIFT));
@@ -97,13 +88,11 @@ namespace SLEPcWrappers
     shift_parameter (shift_parameter)
   {}
 
-  TransformationShiftInvert::TransformationShiftInvert (const AdditionalData &data)
+  TransformationShiftInvert::TransformationShiftInvert (const MPI_Comm &mpi_communicator,
+                                                        const AdditionalData &data)
     :
+    TransformationBase(mpi_communicator),
     additional_data (data)
-  {}
-
-  void
-  TransformationShiftInvert::set_transformation_type (ST &st) const
   {
     int ierr;
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)
@@ -125,14 +114,11 @@ namespace SLEPcWrappers
     shift_parameter (shift_parameter)
   {}
 
-  TransformationSpectrumFolding::TransformationSpectrumFolding (const AdditionalData &data)
+  TransformationSpectrumFolding::TransformationSpectrumFolding (const MPI_Comm &mpi_communicator,
+      const AdditionalData &data)
     :
+    TransformationBase(mpi_communicator),
     additional_data (data)
-  {}
-
-
-  void
-  TransformationSpectrumFolding::set_transformation_type (ST &st) const
   {
 #if DEAL_II_PETSC_VERSION_LT(3,5,0)
     int ierr;
@@ -163,14 +149,11 @@ namespace SLEPcWrappers
   {
   }
 
-  TransformationCayley::TransformationCayley (const double shift,
-                                              const double antishift)
+  TransformationCayley::TransformationCayley (const MPI_Comm &mpi_communicator,
+                                              const AdditionalData &data)
     :
-    additional_data (shift, antishift)
-  {}
-
-  void
-  TransformationCayley::set_transformation_type (ST &st) const
+    TransformationBase(mpi_communicator),
+    additional_data (data)
   {
     int ierr = STSetType (st, const_cast<char *>(STCAYLEY));
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
