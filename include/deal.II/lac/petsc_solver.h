@@ -27,8 +27,19 @@
 
 #  include <petscksp.h>
 
+#ifdef DEAL_II_WITH_SLEPC
+#include <deal.II/lac/slepc_spectral_transformation.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_SLEPC
+namespace SLEPcWrappers
+{
+  // forward declarations
+  class TransformationBase;
+}
+#endif
 
 namespace PETScWrappers
 {
@@ -146,6 +157,12 @@ namespace PETScWrappers
     SolverControl &control() const;
 
     /**
+     * Initialise the solver with the preconditioner.
+     * This function is intended for use with SLEPc spectral transformation class.
+     */
+    void initialise(const PreconditionerBase &preconditioner);
+
+    /**
      * Exception
      */
     DeclException1 (ExcPETScError,
@@ -221,10 +238,9 @@ namespace PETScWrappers
       ~SolverData ();
 
       /**
-       * Objects for Krylov subspace solvers and preconditioners.
+       * Object for Krylov subspace solvers.
        */
       KSP  ksp;
-      PC   pc;
     };
 
     /**
@@ -232,6 +248,11 @@ namespace PETScWrappers
      * in the main solver routine if necessary.
      */
     std_cxx11::shared_ptr<SolverData> solver_data;
+
+    /**
+     * Make the transformation class a friend, since it needs to set the solver.
+     */
+    friend SLEPcWrappers::TransformationBase;
   };
 
 
