@@ -98,7 +98,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup SLEPcWrappers
  *
  * @author Toby D. Young 2008, 2009, 2010, 2011, 2013; and Rickard Armiento
- * 2008.
+ * 2008; and Denis Davydov 2015.
  *
  * @note Various tweaks and enhancements contributed by Eloy Romero and Jose
  * E. Roman 2009, 2010.
@@ -277,21 +277,10 @@ namespace SLEPcWrappers
     const MPI_Comm mpi_communicator;
 
     /**
-     * Function that takes an Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is requested by the derived class.
-     */
-    virtual void set_solver_type (EPS &eps) const = 0;
-
-    /**
      * Reset the solver, and return memory for eigenvectors
      */
     void
     reset ();
-
-    /**
-     * Retrieve the SLEPc solver object that is internally used.
-     */
-    EPS *get_eps ();
 
     /**
      * Solve the linear system for <code>n_eigenpairs</code> eigenstates.
@@ -340,44 +329,19 @@ namespace SLEPcWrappers
     set_matrices (const PETScWrappers::MatrixBase &A,
                   const PETScWrappers::MatrixBase &B);
 
-    /**
-     * Target eigenvalue to solve for.
-     */
-    std_cxx11::shared_ptr<PetscScalar> target_eigenvalue;
+  protected:
 
     /**
-     * Which portion of the spectrum to solve from.
+     * Objects for Eigenvalue Problem Solver.
      */
-    EPSWhich set_which;
-
-    /**
-     * Set the eigenspectrum problem type.
-     */
-    EPSProblemType set_problem;
+    EPS eps;
 
   private:
-
     /**
-     * The matrix $A$ of the generalized eigenvalue problem $Ax=B\lambda x$,
-     * or the standard eigenvalue problem $Ax=\lambda x$.
+     * Convergence.
      */
-    const PETScWrappers::MatrixBase *opA;
+    EPSConvergedReason reason;
 
-    /**
-     * The matrix $B$ of the generalized eigenvalue problem $Ax=B\lambda x$.
-     */
-    const PETScWrappers::MatrixBase *opB;
-
-    /**
-     * An initial vector space used in SLEPc solvers.
-     */
-    std::vector<Vec> initial_space;
-
-    /**
-     * Pointer to an an object that describes transformations that can be
-     * applied to the eigenvalue problem.
-     */
-    SLEPcWrappers::TransformationBase *transformation;
 
     /**
      * A function that can be used in SLEPc as a callback to check on
@@ -393,37 +357,6 @@ namespace SLEPcWrappers
                       PetscReal    residual_norm,
                       PetscReal   *estimated_error,
                       void        *solver_control);
-
-    /**
-     * Objects of this type are explicitly created, but are destroyed when the
-     * surrounding solver object goes out of scope, or when we assign a new
-     * value to the pointer to this object. The respective Destroy functions
-     * are therefore written into the destructor of this object, even though
-     * the object does not have a constructor.
-     */
-    struct SolverData
-    {
-
-      /**
-       * Destructor.
-       */
-      ~SolverData ();
-
-      /**
-       * Objects for Eigenvalue Problem Solver.
-       */
-      EPS eps;
-
-      /**
-       * Convergence.
-       */
-      EPSConvergedReason reason;
-    };
-
-    /**
-     * Pointer to the <code>SolverData</code> object.
-     */
-    std_cxx11::shared_ptr<SolverData> solver_data;
   };
 
   /**
@@ -460,12 +393,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   /**
@@ -512,12 +439,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   /**
@@ -526,7 +447,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    *
-   * @author Toby D. Young 2009; Denis Davydov 2015;
+   * @author Toby D. Young 2009; and Denis Davydov 2015;
    */
   class SolverLanczos : public SolverBase
   {
@@ -563,12 +484,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   /**
@@ -604,12 +519,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   /**
@@ -655,12 +564,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   /**
@@ -696,12 +599,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
 
@@ -739,12 +636,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Eigenvalue Problem Solver context object, and
-     * sets the type of solver that is appropriate for this class.
-     */
-    virtual void set_solver_type (EPS &eps) const;
   };
 
   // --------------------------- inline and template functions -----------
@@ -876,11 +767,25 @@ namespace SLEPcWrappers
   void
   SolverBase::set_initial_space(const std::vector<Vector> &this_initial_space)
   {
-    initial_space.resize(this_initial_space.size());
-    for (unsigned int i = 0; i < initial_space.size(); i++)
+    int ierr;
+    std::vector<Vec> vecs(this_initial_space.size());
+
+    for (unsigned int i = 0; i < this_initial_space.size(); i++)
       {
-        initial_space[i] = this_initial_space[i];
+        vecs[i] = this_initial_space[i];
       }
+
+    // if the eigensolver supports only a single initial vector, but several
+    // guesses are provided, then all except the first one will be discarded.
+    // One could still build a vector that is rich in the directions of all guesses,
+    // by taking a linear combination of them. (TODO: make function virtual?)
+
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+    ierr = EPSSetInitialVector (eps, &vecs[0]);
+#else
+    ierr = EPSSetInitialSpace (eps, vecs.size(), &vecs[0]);
+#endif
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
 }
