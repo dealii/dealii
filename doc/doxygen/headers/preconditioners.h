@@ -73,8 +73,8 @@
  * interface is given by @ref ConceptRelaxationType "the RelaxationType concept".
  * The classes with names starting with <tt>Relaxation</tt> in this module
  * implement this interface, as well as the preconditioners
- * PreconditionJacobi, PreconditionSOR, PreconditionSSORP,
- * reconditionBlockJacobi, PreconditionBlockSOR, and PreconditionBlockSSOR.
+ * PreconditionJacobi, PreconditionSOR, PreconditionBlockJacobi,
+ * PreconditionBlockSOR, and PreconditionBlockSSOR.
  *
  * <h3>The interface</h3>
  *
