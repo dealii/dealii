@@ -137,6 +137,12 @@ namespace PETScWrappers
      */
     PreconditionJacobi ();
 
+    /**
+     * A constructor intended to be used with SLEPc objects.
+     */
+    PreconditionJacobi (const MPI_Comm communicator,
+                        const AdditionalData &additional_data = AdditionalData());
+
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -159,6 +165,13 @@ namespace PETScWrappers
      * Store a copy of the flags for this particular preconditioner.
      */
     AdditionalData additional_data;
+
+    /**
+     * Initializes the preconditioner object without knowing a particular matrix.
+     * This function sets up appropriate parameters to the underlying PETSc object
+     * after it has been created.
+     */
+    void initialize();
   };
 
 

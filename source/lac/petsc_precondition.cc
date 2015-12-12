@@ -101,6 +101,17 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionJacobi -------------------- */
+  PreconditionJacobi::PreconditionJacobi (const MPI_Comm comm,
+                                          const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
+
+    int ierr = PCCreate(comm, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    initialize();
+  }
+
 
   PreconditionJacobi::PreconditionJacobi ()
   {}
@@ -112,6 +123,16 @@ namespace PETScWrappers
     initialize(matrix, additional_data);
   }
 
+  void
+  PreconditionJacobi::initialize()
+  {
+    int ierr;
+    ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
 
   void
   PreconditionJacobi::initialize (const MatrixBase     &matrix_,
@@ -121,15 +142,9 @@ namespace PETScWrappers
     additional_data = additional_data_;
 
     create_pc();
+    initialize();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetFromOptions (pc);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetUp (pc);
+    int ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
