@@ -36,21 +36,26 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * static const unsigned int dimension;
  *
+ *  void compute (const Point<dim>            &unit_point,
+ *                std::vector<double>         &values,
+ *                std::vector<Tensor<1,dim> > &grads,
+ *                std::vector<Tensor<2,dim> > &grad_grads,
+ *                std::vector<Tensor<3,dim> > &third_derivatives,
+ *                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+ *
  * double compute_value (const unsigned int i,
  *                       const Point<dim> &p) const;
  *
- * Tensor<1,dim> compute_grad (const unsigned int i,
- *                             const Point<dim> &p) const;
- *
- * Tensor<2,dim> compute_grad_grad (const unsigned int i,
- *                                  const Point<dim> &p) const;
+ *  template <int order>
+ *  Tensor<order,dim> compute_derivative (const unsigned int i,
+ *                                        const Point<dim> &p) const;
  * @endcode
  * Example classes are TensorProductPolynomials, PolynomialSpace or
  * PolynomialsP.
  *
  * This class is not a fully implemented FiniteElement class. Instead there
  * are several pure virtual functions declared in the FiniteElement and
- * FiniteElement classes which cannot implemented by this class but are left
+ * FiniteElement classes which cannot be implemented by this class but are left
  * for implementation in derived classes.
  *
  * Furthermore, this class assumes that shape functions of the FiniteElement
