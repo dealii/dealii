@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__distributed__shared_tria_h
-#define __deal2__distributed__shared_tria_h
+#ifndef dealii__distributed__shared_tria_h
+#define dealii__distributed__shared_tria_h
 
 
 #include <deal.II/base/config.h>
