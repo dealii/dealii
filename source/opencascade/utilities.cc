@@ -191,13 +191,11 @@ namespace OpenCASCADE
     IFSelect_PrintCount mode = IFSelect_ItemsByEntity;
     reader.PrintCheckLoad (failsonly, mode);
 
-    Handle(TColStd_HSequenceOfTransient) myList = reader.GiveList("iges-faces");
-    //selects all IGES faces in the
-    //file and puts them into a list
-    //called MyList,
-    Standard_Integer nTransFaces = reader.TransferList(myList);
+    Standard_Integer nRoots = reader.TransferRoots();
+    //selects all IGES entities (including non visible ones) in the
+    //file and puts them into a list called MyList,
 
-    AssertThrow(nTransFaces > 0,
+    AssertThrow(nRoots > 0,
                 ExcMessage("Read nothing from file."));
 
     // Handle IGES Scale here.
@@ -236,16 +234,14 @@ namespace OpenCASCADE
     IFSelect_PrintCount mode = IFSelect_ItemsByEntity;
     reader.PrintCheckLoad (failsonly, mode);
 
-    Handle(TColStd_HSequenceOfTransient) myList = reader.GiveList("step-faces");
-    //selects all IGES faces in the
-    //file and puts them into a list
-    //called MyList,
-    Standard_Integer nTransFaces = reader.TransferList(myList);
+    Standard_Integer nRoots = reader.TransferRoots();
+    //selects all IGES entities (including non visible ones) in the
+    //file and puts them into a list called MyList,
 
-    AssertThrow(nTransFaces > 0,
+    AssertThrow(nRoots > 0,
                 ExcMessage("Read nothing from file."));
 
-    // Handle IGES Scale here.
+    // Handle STEP Scale here.
     gp_Pnt Origin;
     gp_Trsf scale;
     scale.SetScale (Origin, scale_factor);
