@@ -183,6 +183,15 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
+  been unified in behaviour, and now they allow to extract *all* elements of 
+  the IGES and STEP files instead of only the faces. This allows the 
+  use of iges files describing edges only to be used as input for some of 
+  the OpenCASCADE Manifold wrappers.
+  <br>
+  (Luca Heltai, 2015/12/13)
+  </li>
+
   <li> New: There is now a function Utilities::to_string that works like
   int_to_string, but is more safe for long integers, negative integers, and
   also handles floating point numbers. The implementation of int_to_string
