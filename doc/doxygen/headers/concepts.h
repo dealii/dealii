@@ -24,14 +24,31 @@
  * their intent. The convention in deal.II for listing constraints on a type
  * is to provide the name of the concept as a <code>typename</code> in a
  * template: for example, the type of a Vector depends on the type of the
- * underlying field, but Vector is not a field element, so it is defined as a
+ * underlying field, and so it is defined as a
  * template:
  * @code
  * template <typename Number>
  * class Vector;
  * @endcode
- * Where @ref ConceptNumber "Number" is understood to be an appropriate field
- * element type.
+ * The point here is that you are creating a vector that can store
+ * elements of type @p Number. But there are some underlying
+ * assumptions on this. For example, the deal.II Vector class is not
+ * intended to be used just as a collection (unlike
+ * <code>std::vector</code>) but defines vector space operations such
+ * as addition of vectors, or the norm of vectors. Consequently, the
+ * data type users can specify for @p Number must satisfy certain
+ * conditions (i.e., it must conform to or "model" a "concept"):
+ * Specifically, the type must denote objects that represent the
+ * elements of what mathematically call a "field" (which you can think
+ * of as, well, "numbers": things we can add, multiply, divide, take
+ * the absolute value of, etc). The point of a concept is then to
+ * describe <em>what conditions a type must satisfy</em> to be a valid
+ * template argument in a given context.
+ *
+ * This page describes these conditions for a number of concepts used
+ * throughout deal.II. Specifically, in the example above, the
+ * @ref ConceptNumber "Number concept" discussed below describes the
+ * types that could be used as argument for the Vector class.
  *
  * <dl>
  *
