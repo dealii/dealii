@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,37 +26,31 @@
  * decompositions (ILU). In addition, sparse direct solvers can be used as
  * preconditioners when available.
  *
- * Broadly speaking, preconditioners are operators, which are
- * multiplied with a matrix to improve conditioning. The idea is, that
- * the preconditioned system <i>P<sup>-1</sup>Ax = P<sup>-1</sup>b</i>
- * is much easier to solve than the original system <i>Ax = b</i>.What
- * this means exactly depends on the structure of  the matrix and
- * cannot be discussed here in generality. For symmetric, positive
- * definite matrices <i>A</i> and <i>P</i>, it means that the spectral
- * condition number (the quotient of greatest and smallest eigenvalue)
- * of <i>P<sup>-1</sup>A</i> is much smaller than the one of <i>A</i>.
+ * Broadly speaking, preconditioners are operators, which are multiplied with
+ * a matrix to improve conditioning. The idea is, that the preconditioned
+ * system <i>P<sup>-1</sup>Ax = P<sup>-1</sup>b</i> is much easier to solve
+ * than the original system <i>Ax = b</i>. What this means exactly depends on
+ * the structure of the matrix and cannot be discussed here in generality. For
+ * symmetric, positive definite matrices <i>A</i> and <i>P</i>, it means that
+ * the spectral condition number (the quotient of greatest and smallest
+ * eigenvalue) of <i>P<sup>-1</sup>A</i> is much smaller than the one of
+ * <i>A</i>.
  *
- * At hand of the simplest example, Richardson iteration, implemented
- * in SolverRichardson, the preconditioned iteration looks like
+ * At hand of the simplest example, Richardson iteration, implemented in
+ * SolverRichardson, the preconditioned iteration looks like
  * @f[
  *  x^{k+1} = x^k - P^{-1} \bigl(A x^k - b\bigr).
  * @f]
  * Accordingly, preconditioning amounts to applying a linear operator to the
  * residual, and consequently, the action of the preconditioner
- * <i>P<sup>-1</sup></i> is implemented as <tt>vmult()</tt>. The
- * generic interface is like for matrices
- * @code
- * class PRECONDITIONER
- * {
- *   template <class VECTOR>
- *   void vmult(VECTOR& dst, const VECTOR& src) const;
+ * <i>P<sup>-1</sup></i> is implemented as <tt>vmult()</tt>.
+ * Templates in deal.II that require a preconditioner indicate the
+ * requirement with
+ * @ref ConceptPreconditionerType "the PreconditionerType concept". In
+ * practice, one can usually treat any matrix-like object which defines
+ * <code>vmult()</code> and <code>Tvmult()</code> as a preconditioner. All
+ * preconditioner classes in this module implement this interface.
  *
- *   template <class VECTOR>
- *   void Tvmult(VECTOR& dst, const VECTOR& src) const;
- * }
- * @endcode
- * It is implemented in all the preconditioner classes in this module.
- * 
  * When used
  * in Krylov space methods, it is up to the method, whether it simply
  * replaces multiplications with <i>A</i> by those with
@@ -76,22 +70,11 @@
  * thus avoiding multiplication with <i>A</i> completely. We call
  * operators mapping the previous iterate <i>x<sup>k</sup></i> to the
  * next iterate in this way relaxation operators. Their generic
- * interface is
- * @code
- * class RELAXATION
- * {
- *   template <class VECTOR>
- *   void step(VECTOR& newstep, const VECTOR& oldstep, const VECTOR& rhs) const;
- *
- *   template <class VECTOR>
- *   void Tstep(VECTOR& newstep, const VECTOR& oldstep, const VECTOR& rhs) const;
- * }
- * @endcode
- * The classes with names starting with <tt>Relaxation</tt> in this
- *   module implement this interface, as well as the preconditioners
- *   PreconditionJacobi, PreconditionSOR, PreconditionSSORP,
- *   reconditionBlockJacobi, PreconditionBlockSOR, and
- *   PreconditionBlockSSOR.
+ * interface is given by @ref ConceptRelaxationType "the RelaxationType concept".
+ * The classes with names starting with <tt>Relaxation</tt> in this module
+ * implement this interface, as well as the preconditioners
+ * PreconditionJacobi, PreconditionSOR, PreconditionBlockJacobi,
+ * PreconditionBlockSOR, and PreconditionBlockSSOR.
  *
  * <h3>The interface</h3>
  *
@@ -111,39 +94,12 @@
  * additional required parameters and sets up the internal structures
  * of the preconditioner.
  *
- * <h4>Application of the preconditioner</h4>
- *
- * Preconditioners in deal.II are just considered linear operators.
- * Therefore, in order to be used by deal.II solvers, preconditioners must
- * conform to the standard matrix interface, namely the functions
- * @code
- * void  vmult (VECTOR& dst, const VECTOR& src) const;
- * void  Tvmult (VECTOR& dst, const VECTOR& src) const;
- * @endcode
- * These functions apply the preconditioning operator to the source
- * vector $src$ and return the result in $dst$ as $dst=P^{-1}src$ or
- * $dst=P^{-T}src$. Preconditioned iterative
- * dolvers use these <tt>vmult()</tt> functions of the preconditioner.
- * Some solvers may also use <tt>Tvmult()</tt>.
- *
  * <h4>Relaxation methods</h4>
  *
- * Additional to the interface described above, some preconditioners
- * like SOR and Jacobi have been known as iterative methods
- * themselves. For them, an additional interface exists, consisting of
- * the functions
- * @code
- * void  step (VECTOR& dst, const VECTOR& rhs) const;
- * void  Tstep (VECTOR& dst, const VECTOR& rhs) const;
- * @endcode
- *
- * Here, $src$ is a residual vector and $dst$ is the iterate that is
- * supposed to be updated. In other words, the operation performed by
- * these functions is
- * $dst = dst - P^{-1} (A dst - rhs)$ and $dst = dst - P^{-T} (A dst - rhs)$. The
- * functions are called this way because they perform <i>one step</i>
- * of a fixed point (Richardson) iteration. Note that preconditioners
- * store a reference to the original matrix $A$ during initialization.
+ * Some preconditioners, like SOR and Jacobi, were used as iterative solvers
+ * long before they were used as preconditioners. Thus, they satisfy both
+ * @ref ConceptMatrixType "MatrixType" and
+ * @ref ConceptRelaxationType "RelaxationType" concepts.
  *
  * @ingroup LAC
  * @ingroup Matrices
