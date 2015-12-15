@@ -98,6 +98,19 @@ namespace SLEPcWrappers
   }
 
   void
+  SolverBase::set_initial_vector (const PETScWrappers::VectorBase &this_initial_vector)
+  {
+    int ierr;
+    Vec vec = this_initial_vector;
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+    ierr = EPSSetInitialVector (eps, &vec);
+#else
+    ierr = EPSSetInitialSpace (eps, 1, &vec);
+#endif
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+
+  void
   SolverBase::set_target_eigenvalue (const PetscScalar &this_target)
   {
     // set target eigenvalues to solve for
