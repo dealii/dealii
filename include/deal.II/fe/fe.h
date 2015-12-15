@@ -2075,19 +2075,6 @@ public:
    */
   DeclException0 (ExcInterpolationNotImplemented);
 
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcBoundaryFaceUsed);
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcJacobiDeterminantHasWrongSign);
-
 protected:
 
   /**
