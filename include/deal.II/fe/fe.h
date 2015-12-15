@@ -961,8 +961,9 @@ public:
    * respectively, consistent with the definition of the associated operator.
    *
    * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcProjectionVoid. You can check whether
-   * this is the case by calling the restriction_is_implemented() or the
+   * class, this function aborts with an exception of type
+   * FiniteElement::ExcProjectionVoid. You can check whether
+   * this would happen by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -991,9 +992,10 @@ public:
    * cells using this matrix array, zero elements in the prolongation matrix
    * are discarded and will not fill up the transfer matrix.
    *
-   * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcEmbeddingVoid. You can check whether
-   * this is the case by calling the prolongation_is_implemented() or the
+   * If prolongation matrices are not implemented in the derived finite element
+   * class, this function aborts with an exception of type
+   * FiniteElement::ExcEmbeddingVoid. You can check whether
+   * this would happen by first calling the prolongation_is_implemented() or the
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -2033,7 +2035,10 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcFEHasNoSupportPoints);
+  DeclExceptionMsg (ExcFEHasNoSupportPoints,
+                    "You are trying to access the support points of a finite "
+                    "element that either has no support points at all, or for "
+                    "which the corresponding tables have not been implemented.");
 
   /**
    * Attempt to access embedding matrices of a finite element that did not
@@ -2041,7 +2046,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcEmbeddingVoid);
+  DeclExceptionMsg (ExcEmbeddingVoid,
+                    "You are trying to access the matrices that describe how "
+                    "to embed a finite element function on one cell into the "
+                    "finite element space on one of its children (i.e., the "
+                    "'embedding' or 'prolongation' matrices). However, the "
+                    "current finite element can either not define this sort of "
+                    "operation, or it has not yet been implemented.");
 
   /**
    * Attempt to access restriction matrices of a finite element that did not
@@ -2050,7 +2061,14 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0 (ExcProjectionVoid);
+  DeclExceptionMsg (ExcProjectionVoid,
+                    "You are trying to access the matrices that describe how "
+                    "to restrict a finite element function from the children "
+                    "of one cell to the finite element space defined on their "
+                    "parent (i.e., the 'restriction' or 'projection' matrices). "
+                    "However, the current finite element can either not define "
+                    "this sort of operation, or it has not yet been "
+                    "implemented.");
 
   /**
    * Exception
@@ -2060,15 +2078,8 @@ public:
                   int, int,
                   << "The interface matrix has a size of " << arg1
                   << "x" << arg2
-                  << ", which is not reasonable in the present dimension.");
-  /**
-   * Exception
-   * @ingroup Exceptions
-   */
-  DeclException2 (ExcComponentIndexInvalid,
-                  int, int,
-                  << "The component-index pair (" << arg1 << ", " << arg2
-                  << ") is invalid, i.e. non-existent.");
+                  << ", which is not reasonable for the current element "
+                  "in the present dimension.");
   /**
    * Exception
    * @ingroup Exceptions
@@ -2212,7 +2223,7 @@ protected:
   /**
    * Store what system_to_component_index() will return.
    */
-  std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int> > system_to_component_table;
 
   /**
    * Map between linear dofs and component dofs on face. This is filled with
@@ -2223,7 +2234,7 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector< std::pair<unsigned int, unsigned int> > face_system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int> > face_system_to_component_table;
 
   /**
    * For each shape function, store to which base element and which instance
@@ -2809,11 +2820,17 @@ unsigned int
 FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
                                                         const unsigned int index) const
 {
-  std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
+  AssertIndexRange(component, this->n_components());
+  const std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
   it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
                  std::pair<unsigned int, unsigned int>(component, index));
 
-  Assert(it != system_to_component_table.end(), ExcComponentIndexInvalid(component, index));
+  Assert(it != system_to_component_table.end(),
+         ExcMessage ("You are asking for the number of the shape function "
+                     "within a system element that corresponds to vector "
+                     "component " + Utilities::int_to_string(component) + " and within this to "
+                     "index " + Utilities::int_to_string(index) + ". But no such "
+                     "shape function exists."));
   return std::distance(system_to_component_table.begin(), it);
 }
 
