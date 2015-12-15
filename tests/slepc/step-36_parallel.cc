@@ -36,7 +36,8 @@ const unsigned int dim = 2;//run in 2d to save time
 
 const double eps = 1e-10;
 
-void test (std::string solver_name)
+void test (std::string solver_name,
+           std::string preconditioner_name)
 {
   const unsigned int global_mesh_refinement_steps = 5;
   const unsigned int number_of_eigenvalues        = 5;
@@ -192,10 +193,36 @@ void test (std::string solver_name)
 
   // test SLEPc by
   {
-    PETScWrappers::PreconditionJacobi preconditioner(mpi_communicator);
+    PETScWrappers::PreconditionerBase *preconditioner;
+
+    dealii::deallog<<preconditioner_name<<std::endl;
+    if (preconditioner_name == "Jacobi")
+      {
+        preconditioner = new PETScWrappers::PreconditionJacobi(mpi_communicator);
+      }
+    else if (preconditioner_name == "Boomer")
+      {
+        PETScWrappers::PreconditionBoomerAMG::AdditionalData data;
+        data.symmetric_operator = true;
+
+        preconditioner = new PETScWrappers::PreconditionBoomerAMG(mpi_communicator,
+                                                                  data);
+      }
+    else if (preconditioner_name == "BlockJacobi")
+      {
+        preconditioner = new PETScWrappers::PreconditionBlockJacobi(mpi_communicator);
+      }
+    else
+      {
+        AssertThrow (false, ExcMessage ("not supported preconditioner"));
+
+        // make compiler happy
+        preconditioner = new PETScWrappers::PreconditionJacobi(mpi_communicator);
+      }
+
     dealii::SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-12,/*log_history*/false,/*log_results*/false);
     PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
-    linear_solver.initialise(preconditioner);
+    linear_solver.initialise(*preconditioner);
 
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       eigenfunctions[i] = PetscScalar();
@@ -204,6 +231,7 @@ void test (std::string solver_name)
 
     dealii::SLEPcWrappers::SolverBase *eigensolver;
 
+    dealii::deallog<<solver_name<<std::endl;
     // Get a handle on the wanted eigenspectrum solver
     if (solver_name == "KrylovSchur")
       {
@@ -239,7 +267,7 @@ void test (std::string solver_name)
     SLEPcWrappers::TransformationShift spectral_transformation(mpi_communicator);
     spectral_transformation.set_solver(linear_solver);
     eigensolver->set_transformation(spectral_transformation);
-    //eigensolver->set_initial_vector(eigenfunctions[0]);
+    eigensolver->set_initial_vector(eigenfunctions[0]);
 
     eigensolver->set_which_eigenpairs (EPS_SMALLEST_REAL);
     eigensolver->set_problem_type (EPS_GHEP);
@@ -254,8 +282,13 @@ void test (std::string solver_name)
                         eigenfunctions,
                         eigenfunctions.size());
 
+    dealii::deallog << "outer iterations: "<< solver_control.last_step ()<<std::endl;
+    dealii::deallog << "last inner iterations: "<<linear_solver_control.last_step()<<std::endl;
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       dealii::deallog << eigenvalues[i] << std::endl;
+
+    delete preconditioner;
+    delete eigensolver;
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
@@ -300,7 +333,9 @@ int main (int argc,char **argv)
     {
       dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ("KrylovSchur");
+        test ("KrylovSchur","Jacobi");
+        test ("KrylovSchur","BlockJacobi");
+        test ("KrylovSchur","Boomer");
 //        test ("GeneralizedDavidson");
 //        test ("JacobiDavidson");
       }
