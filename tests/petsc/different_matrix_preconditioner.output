@@ -1,0 +1,4 @@
+
+DEAL::prec A , matrix A : OK
+DEAL::prec A2, matrix A, A residual : OK
+DEAL::prec A2, matrix A, A2 residual : OK

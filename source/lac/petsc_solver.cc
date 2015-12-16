@@ -83,18 +83,6 @@ namespace PETScWrappers
         ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        // set the matrices involved. the
-        // last argument is irrelevant here,
-        // since we use the solver only once
-        // anyway
-#if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner,
-                                SAME_PRECONDITIONER);
-#else
-        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner);
-#endif
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
         // let derived classes set the solver
         // type, and the preconditioning
         // object set the type of
@@ -102,6 +90,18 @@ namespace PETScWrappers
         set_solver_type (solver_data->ksp);
 
         ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        // setting the preconditioner overwrites the used matrices.
+        // hence, we need to set the matrices after the preconditioner.
+#if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
+        // the last argument is irrelevant here,
+        // since we use the solver only once anyway
+        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner,
+                                SAME_PRECONDITIONER);
+#else
+        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner);
+#endif
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         // then a convergence monitor
