@@ -38,6 +38,16 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Rework: SLEPcWrappers were reworked to allow usage of PETSc solvers
+  and preconditioners inside SLEPc's eigensolvers. To that end extra methods
+  were introduced to PETSc wrappers. Moreover, initialisation of the
+  underlying SLEPc objects is now done inside constructors of the wrapper
+  classes. As a result, one has to provide an MPI communicator to the constructors of
+  spectral transformation classes.
+  <br>
+  (Denis Davydov, 2015/12/29).
+  </li>
+
   <li> Removed the deprecated Operator class in the Algorithms namespace.
   <br>
   (Timo Heister, 2015/12/21)
