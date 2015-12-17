@@ -258,13 +258,6 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::reset ()
-  {
-    //TODO
-  }
-
-
-  void
   SolverBase::get_solver_state (const SolverControl::State state)
   {
     switch (state)

@@ -51,7 +51,7 @@ namespace SLEPcWrappers
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
    *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
-   *  SLEPcWrappers::TransformationShift shift (additional_data);
+   *  SLEPcWrappers::TransformationShift shift (mpi_communicator,additional_data);
    *  eigensolver.set_transformation (shift);
    * @endcode
    * and later calling the <code>solve()</code> function as usual:
@@ -64,7 +64,7 @@ namespace SLEPcWrappers
    * @note These options can also be set at the command line.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009, 2013
+   * @author Toby D. Young 2009, 2013; and Denis Davydov 2015.
    */
   class TransformationBase
   {
@@ -262,9 +262,13 @@ namespace SLEPcWrappers
                       const double antishift_parameter = 0);
 
       /**
-       * Shift and antishift parameter.
+       * Shift parameter.
        */
       const double shift_parameter;
+
+      /**
+       * Antishift parameter.
+       */
       const double antishift_parameter;
     };
 
