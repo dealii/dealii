@@ -351,7 +351,7 @@ namespace Step14
                << std::ends;
 
       std::ofstream out (filename.str().c_str());
-      GridOut().write_eps (dof_handler.get_tria(), out);
+      GridOut().write_eps (dof_handler.get_triangulation(), out);
     }
   }
 
@@ -2365,7 +2365,7 @@ namespace Step14
       // all off to WorkStream::run to compute the estimators for all
       // cells in parallel:
       error_indicators.reinit (DualSolver<dim>::dof_handler
-                               .get_tria().n_active_cells());
+                               .get_triangulation().n_active_cells());
 
       typedef
       std_cxx11::tuple<active_cell_iterator,Vector<float>::iterator>

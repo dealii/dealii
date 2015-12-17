@@ -1018,9 +1018,9 @@ namespace Step9
                                 const Vector<double>  &solution,
                                 Vector<float>         &error_per_cell)
   {
-    Assert (error_per_cell.size() == dof_handler.get_tria().n_active_cells(),
+    Assert (error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
             ExcInvalidVectorLength (error_per_cell.size(),
-                                    dof_handler.get_tria().n_active_cells()));
+                                    dof_handler.get_triangulation().n_active_cells()));
 
     typedef std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
     IteratorTuple;
