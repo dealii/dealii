@@ -1301,7 +1301,7 @@ namespace Step18
       typename Triangulation<dim>::active_cell_iterator
       cell = triangulation.begin_active(),
       endc = triangulation.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+      for (; cell!=endc; ++cell)
         if (cell->is_locally_owned() )
           {
             // On these cells, add up the stresses over all quadrature
@@ -1315,7 +1315,7 @@ namespace Step18
                 .old_stress;
 
             // ...then write the norm of the average to their destination:
-            norm_of_stress(index)
+            norm_of_stress(cell->active_cell_index())
               = (accumulated_stress /
                  quadrature_formula.size()).norm();
           }
@@ -1326,7 +1326,7 @@ namespace Step18
       // elements would not appear in the output file, that we would find out
       // by looking at the graphical output:
         else
-          norm_of_stress(index) = -1e+20;
+          norm_of_stress(cell->active_cell_index()) = -1e+20;
     }
     // Finally attach this vector as well to be treated for output:
     data_out.add_data_vector (norm_of_stress, "norm_of_stress");

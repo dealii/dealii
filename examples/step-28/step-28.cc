@@ -1093,10 +1093,10 @@ namespace Step28
     cell = triangulation.begin_active(),
     endc = triangulation.end();
 
-    for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
-      if (error_indicators(cell_index) > refine_threshold)
+    for (; cell!=endc; ++cell)
+      if (error_indicators(cell->active_cell_index()) > refine_threshold)
         cell->set_refine_flag ();
-      else if (error_indicators(cell_index) < coarsen_threshold)
+      else if (error_indicators(cell->active_cell_index()) < coarsen_threshold)
         cell->set_coarsen_flag ();
 
     SolutionTransfer<dim> soltrans(dof_handler);

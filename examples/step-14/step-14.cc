@@ -1008,8 +1008,8 @@ namespace Step14
     RefinementWeightedKelly<dim>::refine_grid ()
     {
       // First compute some residual based error indicators for all cells by a
-      // method already implemented in the library. What exactly is computed
-      // can be read in the documentation of that class.
+      // method already implemented in the library. What exactly we compute
+      // here is described in more detail in the documentation of that class.
       Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
       KellyErrorEstimator<dim>::estimate (this->dof_handler,
                                           *this->face_quadrature,
@@ -1017,13 +1017,20 @@ namespace Step14
                                           this->solution,
                                           estimated_error_per_cell);
 
-      // Now we are going to weight these indicators by the value of the
-      // function given to the constructor:
+      // Next weigh each entry in the vector of indicators by the value of the
+      // function given to the constructor, evaluated at the cell center. We need
+      // to write the result into the vector entry that corresponds to the current
+      // cell, which we can obtain by asking the cell what its index among all
+      // active cells is using CellAccessor::active_cell_index(). (In reality,
+      // this index is zero for the first cell we handle in the loop, one for the
+      // second cell, etc., and we could as well just keep track of this index
+      // using an integer counter; but using CellAccessor::active_cell_index()
+      // makes this more explicit.)
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
       endc = this->dof_handler.end();
-      for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
-        estimated_error_per_cell(cell_index)
+      for (; cell!=endc; ++cell)
+        estimated_error_per_cell(cell->active_cell_index())
         *= weighting_function->value (cell->center());
 
       GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
