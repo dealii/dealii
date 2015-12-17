@@ -147,7 +147,7 @@ private:
   /**
    * Auxiliary vector.
    */
-  VectorType aux;
+  mutable VectorType aux;
 
   /**
    * Shift parameter.
@@ -249,7 +249,7 @@ ShiftedMatrixGeneralized<MatrixType, MatrixType2, VectorType>::vmult
   if (sigma != 0.)
     {
       aux.reinit(dst);
-      M.vmult(aux, src);
+      M->vmult(aux, src);
       dst.add(sigma, aux);
     }
 }
@@ -266,7 +266,7 @@ ShiftedMatrixGeneralized<MatrixType, MatrixType2, VectorType>::residual
   if (sigma != 0.)
     {
       aux.reinit(dst);
-      M.vmult(aux, src);
+      M->vmult(aux, src);
       dst.add(sigma, aux);
     }
   dst.sadd(-1.,1.,rhs);
