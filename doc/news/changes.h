@@ -513,6 +513,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The implementation of ShiftedMatrixGeneralized contained several
+  errors that prevented it from being compiled. These have now been fixed.
+  <br>
+  (David Wells, 2015/12/18)
+  </li>
+
   <li> New: There is now a function Triangulation::get_triangulation() that
   allows writing code to get at the underlying triangulation for
   everything that looks like a container, i.e., both Triangulation
