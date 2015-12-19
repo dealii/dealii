@@ -452,6 +452,7 @@ namespace PETScWrappers
   /**
    * An implementation of the solver interface using the PETSc GMRES solver.
    *
+   * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, 2004
    */
   class SolverGMRES : public SolverBase
