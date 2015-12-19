@@ -184,9 +184,9 @@ inconvenience this causes.
 <h3>General</h3>
 <ol>
   <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
-  been unified in behaviour, and now they allow to extract *all* elements of 
-  the IGES and STEP files instead of only the faces. This allows the 
-  use of iges files describing edges only to be used as input for some of 
+  been unified in behaviour, and now they allow to extract *all* elements of
+  the IGES and STEP files instead of only the faces. This allows the
+  use of iges files describing edges only to be used as input for some of
   the OpenCASCADE Manifold wrappers.
   <br>
   (Luca Heltai, 2015/12/13)
@@ -532,6 +532,12 @@ inconvenience this causes.
   hp::DoFHandler::get_triangulation() instead.
   <br>
   (Wolfgang Bangerth, 2015/12/10)
+  </li>
+
+  <li> New: parallel::distributed::Vector has now a method to return a shared
+  pointer to the underlying partitioner object.
+  <br>
+  (Martin Kronbichler, 2015/12/07)
   </li>
 
   <li> Improved: Many more functions in namespace GridTools and class
