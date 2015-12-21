@@ -98,41 +98,6 @@ namespace Algorithms
   };
 
   /**
-   * @deprecated This class has been replaced by OperatorBase.
-   *
-   * The abstract base class of all algorithms in this library. An operator is
-   * an object with an operator(), which transforms a set of named vectors
-   * into another set of named vectors.
-   *
-   * Furthermore, an operator can be notified of parameter changes by the
-   * calling routine. The outer iteration can notify() the Operator of an
-   * Event, which could be for instance a change of mesh, a different time
-   * step size or too slow convergence of Newton's method, which would then
-   * trigger reassembling of a matrix or similar things.
-   *
-   * <h3>Usage for nested iterations</h3>
-   *
-   * This is probably the most prominent use for Operator, where an outer
-   * iterative method calls an inner solver and so on. Typically, the
-   * innermost method in such a nested system will have to compute a residual
-   * using values from all outer iterations. Since the depth and order of such
-   * a nesting is hardly predictable when designing a general tool, we use
-   * NamedData to access these vectors. Typically, the first vector in
-   * <tt>out</tt> contains the start vector when operator()() is called, and
-   * the solution when the function returns. The object <tt>in</tt> is
-   * providing additional information and forwarded to the inner Operator
-   * objects of the nested iteration.
-   *
-   * @author Guido Kanschat, 2010
-   */
-  template <typename VectorType>
-  class Operator : public OperatorBase
-  {
-  public:
-    Operator();
-  };
-
-  /**
    * An unary operator base class, intended to output the vectors in AnyData
    * in each step of an iteration.
    *

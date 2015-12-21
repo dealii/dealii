@@ -29,7 +29,7 @@ using namespace dealii;
 using namespace Algorithms;
 
 
-class Explicit : public Operator<Vector<double> >
+class Explicit : public OperatorBase
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
@@ -41,7 +41,7 @@ private:
 };
 
 
-class Implicit : public Operator<Vector<double> >
+class Implicit : public OperatorBase
 {
 public:
   Implicit(const FullMatrix<double> &matrix);

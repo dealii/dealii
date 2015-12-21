@@ -64,14 +64,14 @@ namespace Algorithms
    * @author Guido Kanschat, 2006, 2010
    */
   template <typename VectorType>
-  class Newton : public Operator<VectorType>
+  class Newton : public OperatorBase
   {
   public:
     /**
      * Constructor, receiving the applications computing the residual and
      * solving the linear problem, respectively.
      */
-    Newton (Operator<VectorType> &residual, Operator<VectorType> &inverse_derivative);
+    Newton (OperatorBase &residual, OperatorBase &inverse_derivative);
 
     /**
      * Declare the parameters applicable to Newton's method.
@@ -112,12 +112,12 @@ namespace Algorithms
     /**
      * The operator computing the residual.
      */
-    SmartPointer<Operator<VectorType>, Newton<VectorType> > residual;
+    SmartPointer<OperatorBase, Newton<VectorType> > residual;
 
     /**
      * The operator applying the inverse derivative to the residual.
      */
-    SmartPointer<Operator<VectorType>, Newton<VectorType> > inverse_derivative;
+    SmartPointer<OperatorBase, Newton<VectorType> > inverse_derivative;
 
     /**
      * The operator handling the output in case the debug_vectors is true.
