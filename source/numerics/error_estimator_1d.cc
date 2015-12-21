@@ -187,17 +187,17 @@ estimate (const DoFHandlerType                       &dof_handler,
 template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void KellyErrorEstimator<1,spacedim>::
-estimate (const Mapping<1,spacedim>                  &/*mapping*/,
-          const DoFHandlerType                       &/*dof_handler*/,
+estimate (const Mapping<1,spacedim>                  & /*mapping*/,
+          const DoFHandlerType                       & /*dof_handler*/,
           const hp::QCollection<0> &,
-          const typename FunctionMap<spacedim>::type &/*neumann_bc*/,
-          const std::vector<const InputVector *>     &/*solutions*/,
-          std::vector<Vector<float>*>                &/*errors*/,
-          const ComponentMask                        &/*component_mask_*/,
-          const Function<spacedim>                   */*coefficient*/,
+          const typename FunctionMap<spacedim>::type & /*neumann_bc*/,
+          const std::vector<const InputVector *>     & /*solutions*/,
+          std::vector<Vector<float>*>                & /*errors*/,
+          const ComponentMask                        & /*component_mask_*/,
+          const Function<spacedim>                   * /*coefficient*/,
           const unsigned int,
-          const types::subdomain_id                  /*subdomain_id*/,
-          const types::material_id                   /*material_id*/)
+          const types::subdomain_id                    /*subdomain_id*/,
+          const types::material_id                     /*material_id*/)
 {
   Assert (false, ExcInternalError());
 }
