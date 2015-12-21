@@ -513,6 +513,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: Now all members in the class SparseMatrixEZ are initialized
+  correctly in the constructor. This was causing random crashes before.
+  <br>
+  (Timo Heister, 2015/12/21)
+  </li>
+
   <li> New: There is now a new class ArrayView that presents a chunk of
   memory as if it was an array of fixed size. This is eventually going
   to replace the VectorSlice class which suffers from the defect that
@@ -524,6 +530,12 @@ inconvenience this causes.
   has no actual use for this kind of information.
   <br>
   (Wolfgang Bangerth, 2015/12/20)
+  </li>
+
+  <li> Fixed: Handling of constraints in step-26 was incorrect (hanging nodes
+  were condensed twice) leading to garbage solutions. This is now fixed.
+  <br>
+  (Timo Heister, 2015/12/20)
   </li>
 
   <li> Fixed: The implementation of ShiftedMatrixGeneralized contained several
