@@ -82,6 +82,30 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
+  # Under Windows (MSVC) cmake will always generate multi-configuration
+  # projects. When building on the command line with 'cmake --build .',
+  # release and debug builds of the library are done with the default 'Debug'
+  # configuration. This causes the debug and release .lib to be built inside
+  # ./lib/Debug/. This is not very pretty and confuses example/test projects,
+  # so we just hard-wire the location here. We only really need to set static
+  # lib locations for _DEBUG (no support for dynamic linking, _RELEASE will be
+  # ignored), but we do it anyhow.
+  IF (DEAL_II_MSVC)
+    SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX} PROPERTY
+      LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
+      )
+    SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX} PROPERTY
+      ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
+      )
+    SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX} PROPERTY
+      LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
+      )
+    SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX} PROPERTY
+      ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
+      )
+  ENDIF()
+
+
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     ${DEAL_II_LIBRARIES_${build}}
     ${DEAL_II_LIBRARIES}

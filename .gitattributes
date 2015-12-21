@@ -4,3 +4,5 @@
 /tests/run_test.cmake -export-ignore
 .gitattributes export-ignore
 .travis.yml export-ignore
+/cmake/scripts/run_test.sh text eol=lf
+/tests/**/*output text eol=lf

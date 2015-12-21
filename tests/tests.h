@@ -43,6 +43,20 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
+#ifdef DEAL_II_MSVC
+// Under windows tests will hang and show a debugging dialog box from the
+// debug CRT if an exception is encountered. Disable this:
+#include <stdlib.h>
+
+struct DisableWindowsDebugRuntimeDialog
+{
+  DisableWindowsDebugRuntimeDialog ()
+  {
+    _set_abort_behavior( 0, _WRITE_ABORT_MSG);
+  }
+} deal_II_windows_crt_dialog;
+#endif
+
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
 using namespace dealii;
