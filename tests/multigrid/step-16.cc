@@ -293,15 +293,12 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  std::vector<std::vector<bool> > interface_dofs
-    = mg_constrained_dofs.get_refinement_edge_indices ();
-
   std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
   ConstraintMatrix empty_constraints;
   for (unsigned int level=0; level<triangulation.n_levels(); ++level)
     {
-      boundary_constraints[level].add_lines (interface_dofs[level]);
-      boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+      boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
+      boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));
       boundary_constraints[level].close ();
     }
 
@@ -380,9 +377,9 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int j=0; j<dofs_per_cell; ++j)
-          if (interface_dofs[lvl][local_dof_indices[i]]   // at_refinement_edge(i)
+          if (mg_constrained_dofs.at_refinement_edge(lvl, local_dof_indices[i])
               &&
-              !interface_dofs[lvl][local_dof_indices[j]]   // !at_refinement_edge(j)
+              ! mg_constrained_dofs.at_refinement_edge(lvl, local_dof_indices[j])
               &&
               (
                 (!mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])

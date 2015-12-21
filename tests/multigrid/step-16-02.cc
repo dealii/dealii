@@ -389,21 +389,20 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
       const Coefficient<dim> coefficient;
       std::vector<double>    coefficient_values (n_q_points);
 
-      std::vector<std::vector<bool> > interface_dofs
-        = mg_constrained_dofs.get_refinement_edge_indices ();
-      std::vector<std::vector<bool> > boundary_interface_dofs
-        = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
-
       std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
       std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
       for (unsigned int level=0; level<triangulation.n_levels(); ++level)
         {
-          boundary_constraints[level].add_lines (interface_dofs[level]);
-          boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+          boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
+          boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));
           boundary_constraints[level].close ();
 
+          IndexSet idx =
+            mg_constrained_dofs.get_refinement_edge_indices(level)
+            & mg_constrained_dofs.get_boundary_indices(level);
+
           boundary_interface_constraints[level]
-          .add_lines (boundary_interface_dofs[level]);
+          .add_lines (idx);
           boundary_interface_constraints[level].close ();
         }
 
@@ -435,8 +434,12 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool &use_mw)
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
-                     interface_dofs[cell->level()][local_dof_indices[j]]==false))
+              if (
+                !mg_constrained_dofs.at_refinement_edge(cell->level(),
+                                                        local_dof_indices[i])
+                || mg_constrained_dofs.at_refinement_edge(cell->level(),
+                                                          local_dof_indices[j])
+              )
                 cell_matrix(i,j) = 0;
 
           boundary_interface_constraints[cell->level()]
