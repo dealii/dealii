@@ -513,6 +513,19 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a new class ArrayView that presents a chunk of
+  memory as if it was an array of fixed size. This is eventually going
+  to replace the VectorSlice class which suffers from the defect that
+  its template argument does not encode the type of objects it points
+  to, but instead the type of the underlying container; consequently,
+  where the VectorSlice class is used as a function argument, it
+  automatically ties the type of object the function can be called
+  with (i.e., the underlying container) even if the called function
+  has no actual use for this kind of information.
+  <br>
+  (Wolfgang Bangerth, 2015/12/20)
+  </li>
+
   <li> Fixed: The implementation of ShiftedMatrixGeneralized contained several
   errors that prevented it from being compiled. These have now been fixed.
   <br>
