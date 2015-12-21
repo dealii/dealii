@@ -31,9 +31,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 SparseMatrixEZ<number>::SparseMatrixEZ()
-{
-  n_columns = 0;
-}
+  : n_columns (0),
+    increment (1),
+    saved_default_row_length (0)
+{}
 
 
 template <typename number>

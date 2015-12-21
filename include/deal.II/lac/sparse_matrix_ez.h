@@ -86,7 +86,7 @@ template<typename number> class FullMatrix;
  * If the rows are expected to be filled more or less from first to last,
  * using a @p default_row_length of zero may not be such a bad idea.
  *
- * The name of this matrix is in reverence to a publication of the Internal
+ * The name of this matrix is in reference to a publication of the Internal
  * Revenue Service of the United States of America. I hope some other aliens
  * will appreciate it. By the way, the suffix makes sense by pronouncing it
  * the American way.
