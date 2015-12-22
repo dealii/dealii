@@ -487,7 +487,7 @@ namespace FEValuesViews
     template <int order, int dim, int spacedim, typename Number>
     void
     do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
-                             const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
+                             const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<order,spacedim> >::type> &derivatives)
     {
@@ -520,7 +520,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
-                            const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
+                            const Table<2,dealii::Tensor<2,spacedim> > &shape_hessians,
                             const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<typename ProductType<Number,double>::type>           &laplacians)
     {
@@ -601,7 +601,7 @@ namespace FEValuesViews
     template <int order, int dim, int spacedim, typename Number>
     void
     do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
-                             const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
+                             const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type> &derivatives)
     {
@@ -655,7 +655,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_symmetric_gradients (const ::dealii::Vector<Number> &dof_values,
-                                     const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                                     const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                                      const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                                      std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &symmetric_gradients)
     {
@@ -708,7 +708,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences (const ::dealii::Vector<Number> &dof_values,
-                             const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                             const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,double>::type> &divergences)
     {
@@ -758,7 +758,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_curls (const ::dealii::Vector<Number> &dof_values,
-                       const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                       const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                        std::vector<typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
     {
@@ -950,7 +950,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
-                            const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
+                            const Table<2,dealii::Tensor<2,spacedim> > &shape_hessians,
                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &laplacians)
     {
@@ -1058,7 +1058,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences (const ::dealii::Vector<Number> &dof_values,
-                             const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                             const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
     {
@@ -1202,7 +1202,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences (const ::dealii::Vector<Number> &dof_values,
-                             const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                             const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
     {
@@ -2230,19 +2230,25 @@ namespace internal
         }
 
       if (flags & update_gradients)
-        this->shape_gradients.resize (n_nonzero_shape_components,
-                                      std::vector<Tensor<1,spacedim> > (n_quadrature_points,
-                                          numbers::signaling_nan<Tensor<1,spacedim> >()));
+        {
+          this->shape_gradients.reinit(n_nonzero_shape_components,
+                                       n_quadrature_points);
+          this->shape_gradients.fill (numbers::signaling_nan<Tensor<1,spacedim> >());
+        }
 
       if (flags & update_hessians)
-        this->shape_hessians.resize (n_nonzero_shape_components,
-                                     std::vector<Tensor<2,spacedim> > (n_quadrature_points,
-                                         numbers::signaling_nan<Tensor<2,spacedim> >()));
+        {
+          this->shape_hessians.reinit(n_nonzero_shape_components,
+                                      n_quadrature_points);
+          this->shape_hessians.fill (numbers::signaling_nan<Tensor<2,spacedim> >());
+        }
 
       if (flags & update_3rd_derivatives)
-        this->shape_3rd_derivatives.resize (n_nonzero_shape_components,
-                                            std::vector<Tensor<3,spacedim> > (n_quadrature_points,
-                                                numbers::signaling_nan<Tensor<3,spacedim> >()));
+        {
+          this->shape_3rd_derivatives.reinit(n_nonzero_shape_components,
+                                             n_quadrature_points);
+          this->shape_3rd_derivatives.fill (numbers::signaling_nan<Tensor<3,spacedim> >());
+        }
     }
 
 
@@ -2440,10 +2446,10 @@ namespace internal
   template <int order, int spacedim, typename Number>
   void
   do_function_derivatives (const Number                     *dof_values_ptr,
-                           const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
+                           const dealii::Table<2,Tensor<order,spacedim> > &shape_derivatives,
                            std::vector<Tensor<order,spacedim,Number> > &derivatives)
   {
-    const unsigned int dofs_per_cell = shape_derivatives.size();
+    const unsigned int dofs_per_cell = shape_derivatives.size()[0];
     const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                              shape_derivatives[0].size() : derivatives.size();
     AssertDimension(derivatives.size(), n_quadrature_points);
@@ -2475,7 +2481,7 @@ namespace internal
   template <int order, int dim, int spacedim, typename Number>
   void
   do_function_derivatives (const Number                      *dof_values_ptr,
-                           const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
+                           const dealii::Table<2,Tensor<order,spacedim> > &shape_derivatives,
                            const FiniteElement<dim,spacedim> &fe,
                            const std::vector<unsigned int> &shape_function_to_row_table,
                            VectorSlice<std::vector<std::vector<Tensor<order,spacedim,Number> > > > &derivatives,
@@ -2571,10 +2577,10 @@ namespace internal
   template <int spacedim, typename Number, typename Number2>
   void
   do_function_laplacians (const Number2        *dof_values_ptr,
-                          const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
+                          const dealii::Table<2,Tensor<2,spacedim> > &shape_hessians,
                           std::vector<Number> &laplacians)
   {
-    const unsigned int dofs_per_cell = shape_hessians.size();
+    const unsigned int dofs_per_cell = shape_hessians.size()[0];
     const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                              shape_hessians[0].size() : laplacians.size();
     AssertDimension(laplacians.size(), n_quadrature_points);
@@ -2601,7 +2607,7 @@ namespace internal
   template <int dim, int spacedim, typename VectorType, typename Number>
   void
   do_function_laplacians (const Number                    *dof_values_ptr,
-                          const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
+                          const dealii::Table<2,Tensor<2,spacedim> > &shape_hessians,
                           const FiniteElement<dim,spacedim> &fe,
                           const std::vector<unsigned int> &shape_function_to_row_table,
                           std::vector<VectorType>         &laplacians,
