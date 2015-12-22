@@ -34,14 +34,23 @@ DEAL_II_NAMESPACE_OPEN
 namespace TimeStepping
 {
   /**
-   * Runge-Kutta methods available: - Explicit methods: - FORWARD_EULER: first
-   * order - RK_THIRD_ORDER: third order Runge-Kutta -
-   * RK_CLASSIC_FOURTH_ORDER: classical fourth order Runge-Kutta - Implicit
-   * methods: - BACKWARD_EULER: first order - IMPLICIT_MIDPOINT: second order
-   * - CRANK_NICOLSON: second order - SDIRK_TWO_STAGES: second order -
-   * Embedded explicit methods: - HEUN_EULER: second order - BOGACKI_SHAMPINE:
-   * third order - DOPRI: Dormand-Prince fifth order (method used by ode45 in
-   * MATLAB) - FEHLBERG: fifth order - CASH_KARP: firth order
+   * The following Runge-Kutta methods are available:
+   * - Explicit methods (see ExplicitRungeKutta::initialize):
+   *   - FORWARD_EULER (first order)
+   *   - RK_THIRD_ORDER (third order Runge-Kutta)
+   *   - RK_CLASSIC_FOURTH_ORDER (classical fourth order Runge-Kutta)
+   * - Implicit methods (see ImplicitRungeKutta::initialize):
+   *   - BACKWARD_EULER (first order)
+   *   - IMPLICIT_MIDPOINT (second order)
+   *   - CRANK_NICOLSON (second order)
+   *   - SDIRK_TWO_STAGES (second order)
+   * - Embedded explicit methods (see EmbeddedExplicitRungeKutta::initialize):
+   *   - HEUN_EULER (second order)
+   *   - BOGACKI_SHAMPINE (third order)
+   *   - DOPRI: Dormand-Prince (fifth order, method used by ode45 in
+   *     MATLAB)
+   *   - FEHLBERG (fifth order)
+   *   - CASH_KARP (firth order)
    */
   enum runge_kutta_method { FORWARD_EULER, RK_THIRD_ORDER, RK_CLASSIC_FOURTH_ORDER,
                             BACKWARD_EULER, IMPLICIT_MIDPOINT, CRANK_NICOLSON,
@@ -72,7 +81,7 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~TimeStepping() {};
+    virtual ~TimeStepping() {}
 
     /**
      * Purely virtual function. This function is used to advance from time @p
@@ -117,7 +126,7 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~RungeKutta() {};
+    virtual ~RungeKutta() {}
 
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
@@ -197,7 +206,7 @@ namespace TimeStepping
      * Default constructor. initialize(runge_kutta_method) needs to be called
      * before the object can be used.
      */
-    ExplicitRungeKutta() {};
+    ExplicitRungeKutta() {}
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
@@ -287,7 +296,7 @@ namespace TimeStepping
      * set_newton_solver_parameters(unsigned int,double) need to be called
      * before the object can be used.
      */
-    ImplicitRungeKutta() {};
+    ImplicitRungeKutta() {}
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and
@@ -411,7 +420,7 @@ namespace TimeStepping
      * set_time_adaptation_parameters(double, double, double, double, double,
      * double) need to be called before the object can be used.
      */
-    EmbeddedExplicitRungeKutta() {};
+    EmbeddedExplicitRungeKutta() {}
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and
