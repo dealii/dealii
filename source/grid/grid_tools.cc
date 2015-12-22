@@ -3268,7 +3268,7 @@ next_cell:
            cell != tria.end(); ++cell)
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->face(f)->at_boundary())
-            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+            for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
               cell->face(f)->line(e)->set_manifold_id
               (static_cast<types::manifold_id>(cell->face(f)->line(e)->boundary_id()));
 
@@ -3289,7 +3289,7 @@ next_cell:
               {
                 cell->face(f)->set_boundary_id(0);
                 if (dim >= 3)
-                  for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+                  for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
                     cell->face(f)->line(e)->set_boundary_id(0);
               }
           }
