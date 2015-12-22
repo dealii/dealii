@@ -53,7 +53,7 @@ namespace Algorithms
    * objects. All vectors of <tt>in</tt> are forwarded to the inner Operator
    * objects, with additional information added as follows.
    *
-   * When calling (*#residual)(), the NamedData <tt>in</tt> given to the
+   * When calling (*#residual)(), the AnyData <tt>in</tt> given to the
    * Newton iteration is prepended by a vector <tt>"Newton iterate"</tt>, the
    * current value of the Newton iterate, which can be used to evaluate the
    * residual at this point.

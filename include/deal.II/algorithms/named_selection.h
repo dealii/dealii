@@ -37,7 +37,7 @@ class NamedSelection
 public:
 
   /**
-   * Add a new name to be searched for in NamedData.
+   * Add a new name to be searched for in @p data supplied in initialize().
    *
    * @note Names will be added to the end of the current list.
    */
