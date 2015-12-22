@@ -364,10 +364,10 @@ fill_fe_values
             case mapping_covariant:
             case mapping_contravariant:
             {
-              mapping.transform (fe_data.shape_values[i],
+              mapping.transform (make_array_view(fe_data.shape_values[i]),
                                  mapping_type,
                                  mapping_internal,
-                                 fe_data.transformed_shape_values);
+                                 make_array_view(fe_data.transformed_shape_values));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
@@ -379,10 +379,10 @@ fill_fe_values
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              mapping.transform (fe_data.shape_values[i],
+              mapping.transform (make_array_view(fe_data.shape_values[i]),
                                  mapping_piola,
                                  mapping_internal,
-                                 fe_data.transformed_shape_values);
+                                 make_array_view(fe_data.transformed_shape_values));
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
@@ -392,10 +392,10 @@ fill_fe_values
 
             case mapping_nedelec:
             {
-              mapping.transform (fe_data.shape_values[i],
+              mapping.transform (make_array_view(fe_data.shape_values[i]),
                                  mapping_covariant,
                                  mapping_internal,
-                                 fe_data.transformed_shape_values);
+                                 make_array_view(fe_data.transformed_shape_values));
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
@@ -423,10 +423,10 @@ fill_fe_values
             {
             case mapping_none:
             {
-              mapping.transform (fe_data.shape_grads[i],
+              mapping.transform (make_array_view(fe_data.shape_grads[i]),
                                  mapping_covariant,
                                  mapping_internal,
-                                 fe_data.transformed_shape_grads);
+                                 make_array_view(fe_data.transformed_shape_grads));
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_gradients[first+d][k] = fe_data.transformed_shape_grads[k][d];
@@ -434,10 +434,10 @@ fill_fe_values
             }
             case mapping_covariant:
             {
-              mapping.transform (fe_data.shape_grads[i],
+              mapping.transform (make_array_view(fe_data.shape_grads[i]),
                                  mapping_covariant_gradient,
                                  mapping_internal,
-                                 fe_data.transformed_shape_grads);
+                                 make_array_view(fe_data.transformed_shape_grads));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -455,10 +455,10 @@ fill_fe_values
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
-              mapping.transform (fe_data.untransformed_shape_grads,
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads),
                                  mapping_contravariant_gradient,
                                  mapping_internal,
-                                 fe_data.transformed_shape_grads);
+                                 make_array_view(fe_data.transformed_shape_grads));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -478,10 +478,10 @@ fill_fe_values
             {
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
-              mapping.transform (fe_data.untransformed_shape_grads,
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads),
                                  mapping_piola_gradient,
                                  mapping_internal,
-                                 fe_data.transformed_shape_grads);
+                                 make_array_view(fe_data.transformed_shape_grads));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -514,10 +514,10 @@ fill_fe_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k] = fe_data.shape_grads[i][k];
 
-              mapping.transform (fe_data.untransformed_shape_grads,
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads),
                                  mapping_covariant_gradient,
                                  mapping_internal,
-                                 fe_data.transformed_shape_grads);
+                                 make_array_view(fe_data.transformed_shape_grads));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -553,8 +553,10 @@ fill_fe_values
             case mapping_none:
             {
 
-              mapping.transform(fe_data.shape_grad_grads[i], mapping_covariant_gradient,
-                                mapping_internal, fe_data.transformed_shape_hessians);
+              mapping.transform(make_array_view(fe_data.shape_grad_grads[i]),
+                                mapping_covariant_gradient,
+                                mapping_internal,
+                                make_array_view(fe_data.transformed_shape_hessians));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -575,9 +577,9 @@ fill_fe_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
 
-              mapping.transform(fe_data.untransformed_shape_hessian_tensors,
+              mapping.transform(make_array_view(fe_data.untransformed_shape_hessian_tensors),
                                 mapping_covariant_hessian, mapping_internal,
-                                fe_data.transformed_shape_hessians);
+                                make_array_view(fe_data.transformed_shape_hessians));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -609,9 +611,10 @@ fill_fe_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
 
-              mapping.transform(fe_data.untransformed_shape_hessian_tensors, mapping_contravariant_hessian,
-                                mapping_internal, fe_data.transformed_shape_hessians
-                               );
+              mapping.transform(make_array_view(fe_data.untransformed_shape_hessian_tensors),
+                                mapping_contravariant_hessian,
+                                mapping_internal,
+                                make_array_view(fe_data.transformed_shape_hessians));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -652,9 +655,10 @@ fill_fe_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
 
-              mapping.transform(fe_data.untransformed_shape_hessian_tensors, mapping_piola_hessian,
-                                mapping_internal, fe_data.transformed_shape_hessians
-                               );
+              mapping.transform(make_array_view(fe_data.untransformed_shape_hessian_tensors),
+                                mapping_piola_hessian,
+                                mapping_internal,
+                                make_array_view(fe_data.transformed_shape_hessians));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -714,9 +718,9 @@ fill_fe_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k] = fe_data.shape_grad_grads[i][k];
 
-              mapping.transform(fe_data.untransformed_shape_hessian_tensors,
+              mapping.transform(make_array_view(fe_data.untransformed_shape_hessian_tensors),
                                 mapping_covariant_hessian, mapping_internal,
-                                fe_data.transformed_shape_hessians);
+                                make_array_view(fe_data.transformed_shape_hessians));
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -831,11 +835,9 @@ fill_fe_face_values
             case mapping_covariant:
             case mapping_contravariant:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
-              // Use auxiliary vector
-              // for transformation
-              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
+              mapping.transform (make_array_view(fe_data.shape_values[i], offset, n_q_points),
                                  mapping_type,
                                  mapping_internal,
                                  transformed_shape_values);
@@ -849,10 +851,9 @@ fill_fe_face_values
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
-
-              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
+              mapping.transform (make_array_view(fe_data.shape_values[i], offset, n_q_points),
                                  mapping_piola,
                                  mapping_internal,
                                  transformed_shape_values);
@@ -865,10 +866,9 @@ fill_fe_face_values
 
             case mapping_nedelec:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values(fe_data.transformed_shape_values, offset, n_q_points);
-
-              mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
+              mapping.transform (make_array_view (fe_data.shape_values[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
                                  transformed_shape_values);
@@ -888,14 +888,13 @@ fill_fe_face_values
 
       if (fe_data.update_each & update_gradients)
         {
-          VectorSlice< std::vector<Tensor<2,spacedim> > >
-          transformed_shape_grads (fe_data.transformed_shape_grads, offset, n_q_points);
-
           switch (mapping_type)
             {
             case mapping_none:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              const ArrayView<Tensor<2,spacedim> > transformed_shape_grads
+                = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
+              mapping.transform (make_array_view(fe_data.shape_grads[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -907,7 +906,9 @@ fill_fe_face_values
 
             case mapping_covariant:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              const ArrayView<Tensor<2,spacedim> > transformed_shape_grads
+                = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
+              mapping.transform (make_array_view(fe_data.shape_grads[i], offset, n_q_points),
                                  mapping_covariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -923,11 +924,14 @@ fill_fe_face_values
                   output_data.shape_gradients[first+d][k] = transformed_shape_grads[k][d];
               break;
             }
+
             case mapping_contravariant:
             {
+              const ArrayView<Tensor<2,spacedim> > transformed_shape_grads
+                = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
-              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_contravariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -944,12 +948,15 @@ fill_fe_face_values
 
               break;
             }
+
             case mapping_raviart_thomas:
             case mapping_piola:
             {
+              const ArrayView<Tensor<2,spacedim> > transformed_shape_grads
+                = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
-              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_piola_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -986,7 +993,9 @@ fill_fe_face_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
-              mapping.transform (make_slice (fe_data.untransformed_shape_grads, offset, n_q_points),
+              const ArrayView<Tensor<2,spacedim> > transformed_shape_grads
+                = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
+              mapping.transform (make_array_view (fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_covariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1011,19 +1020,17 @@ fill_fe_face_values
         }
 
       if (fe_data.update_each & update_hessians)
-
         {
-
-          VectorSlice< std::vector<Tensor<3,spacedim> > > transformed_shape_hessians (fe_data.transformed_shape_hessians, offset, n_q_points);
-
           switch (mapping_type)
             {
             case mapping_none:
             {
-
-              mapping.transform(make_slice (fe_data.shape_grad_grads[i], offset, n_q_points),
-                                mapping_covariant_gradient, mapping_internal, transformed_shape_hessians
-                               );
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.shape_grad_grads[i], offset, n_q_points),
+                                mapping_covariant_gradient,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1040,12 +1047,15 @@ fill_fe_face_values
             }
             case mapping_covariant:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1071,14 +1081,18 @@ fill_fe_face_values
               break;
 
             }
+
             case mapping_contravariant:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_contravariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_contravariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1110,17 +1124,20 @@ fill_fe_face_values
                   output_data.shape_hessians[first+d][k] = transformed_shape_hessians[k][d];
 
               break;
-
             }
+
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_piola_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_piola_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1171,17 +1188,19 @@ fill_fe_face_values
                   output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
 
               break;
-
             }
 
             case mapping_nedelec:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1205,7 +1224,6 @@ fill_fe_face_values
                   output_data.shape_hessians[first+d][k] = fe_data.sign_change[i] * transformed_shape_hessians[k][d];
 
               break;
-
             }
 
             default:
@@ -1296,12 +1314,9 @@ fill_fe_subface_values
             case mapping_covariant:
             case mapping_contravariant:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
-
-              // Use auxiliary vector for
-              // transformation
-              mapping.transform (make_slice(fe_data.shape_values[i], offset, n_q_points),
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
+              mapping.transform (make_array_view(fe_data.shape_values[i], offset, n_q_points),
                                  mapping_type,
                                  mapping_internal,
                                  transformed_shape_values);
@@ -1312,26 +1327,30 @@ fill_fe_subface_values
 
               break;
             }
+
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
 
-              mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
-                                mapping_piola, mapping_internal, transformed_shape_values);
+              mapping.transform(make_array_view(fe_data.shape_values[i], offset, n_q_points),
+                                mapping_piola,
+                                mapping_internal,
+                                transformed_shape_values);
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<dim; ++d)
                   output_data.shape_values(first+d,k)
                     = fe_data.sign_change[i] * transformed_shape_values[k][d];
               break;
             }
+
             case mapping_nedelec:
             {
-              VectorSlice< std::vector<Tensor<1,spacedim> > >
-              transformed_shape_values (fe_data.transformed_shape_values, offset, n_q_points);
+              const ArrayView<Tensor<1,spacedim> > transformed_shape_values
+                = make_array_view(fe_data.transformed_shape_values, offset, n_q_points);
 
-              mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
+              mapping.transform (make_array_view (fe_data.shape_values[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
                                  transformed_shape_values);
@@ -1343,6 +1362,7 @@ fill_fe_subface_values
 
               break;
             }
+
             default:
               Assert(false, ExcNotImplemented());
             }
@@ -1350,13 +1370,13 @@ fill_fe_subface_values
 
       if (fe_data.update_each & update_gradients)
         {
-          VectorSlice< std::vector<Tensor<2, spacedim > > >
-          transformed_shape_grads (fe_data.transformed_shape_grads, offset, n_q_points);
+          const ArrayView<Tensor<2, spacedim> > transformed_shape_grads
+            = make_array_view(fe_data.transformed_shape_grads, offset, n_q_points);
           switch (mapping_type)
             {
             case mapping_none:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.shape_grads[i], offset, n_q_points),
                                  mapping_covariant,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1368,7 +1388,7 @@ fill_fe_subface_values
 
             case mapping_covariant:
             {
-              mapping.transform (make_slice(fe_data.shape_grads[i], offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.shape_grads[i], offset, n_q_points),
                                  mapping_covariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1391,7 +1411,7 @@ fill_fe_subface_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
-              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_contravariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1415,7 +1435,7 @@ fill_fe_subface_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
-              mapping.transform (make_slice(fe_data.untransformed_shape_grads, offset, n_q_points),
+              mapping.transform (make_array_view(fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_piola_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1450,7 +1470,7 @@ fill_fe_subface_values
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_grads[k+offset] = fe_data.shape_grads[i][k+offset];
 
-              mapping.transform (make_slice (fe_data.untransformed_shape_grads, offset, n_q_points),
+              mapping.transform (make_array_view (fe_data.untransformed_shape_grads, offset, n_q_points),
                                  mapping_covariant_gradient,
                                  mapping_internal,
                                  transformed_shape_grads);
@@ -1475,19 +1495,16 @@ fill_fe_subface_values
         }
 
       if (fe_data.update_each & update_hessians)
-
         {
-
-          VectorSlice< std::vector<Tensor<3,dim> > > transformed_shape_hessians (fe_data.transformed_shape_hessians, offset, n_q_points);
-
           switch (mapping_type)
             {
             case mapping_none:
             {
-
-              mapping.transform(make_slice (fe_data.shape_grad_grads[i], offset, n_q_points),
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.shape_grad_grads[i], offset, n_q_points),
                                 mapping_covariant_gradient, mapping_internal,
-                                transformed_shape_hessians );
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1504,12 +1521,15 @@ fill_fe_subface_values
             }
             case mapping_covariant:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1535,14 +1555,18 @@ fill_fe_subface_values
               break;
 
             }
+
             case mapping_contravariant:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_contravariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_contravariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1576,15 +1600,19 @@ fill_fe_subface_values
               break;
 
             }
+
             case mapping_raviart_thomas:
             case mapping_piola:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_piola_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_piola_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
@@ -1639,12 +1667,15 @@ fill_fe_subface_values
 
             case mapping_nedelec:
             {
-
               for (unsigned int k=0; k<n_q_points; ++k)
                 fe_data.untransformed_shape_hessian_tensors[k+offset] = fe_data.shape_grad_grads[i][k+offset];
 
-              mapping.transform(make_slice (fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
-                                mapping_covariant_hessian, mapping_internal, transformed_shape_hessians);
+              const ArrayView<Tensor<3,spacedim> > transformed_shape_hessians
+                = make_array_view(fe_data.transformed_shape_hessians, offset, n_q_points);
+              mapping.transform(make_array_view(fe_data.untransformed_shape_hessian_tensors, offset, n_q_points),
+                                mapping_covariant_hessian,
+                                mapping_internal,
+                                transformed_shape_hessians);
 
               for (unsigned int k=0; k<n_q_points; ++k)
                 for (unsigned int d=0; d<spacedim; ++d)
