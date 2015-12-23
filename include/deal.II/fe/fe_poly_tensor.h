@@ -230,9 +230,7 @@ protected:
     if (update_flags & update_values)
       {
         values.resize (this->dofs_per_cell);
-        data->shape_values.resize (this->dofs_per_cell);
-        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-          data->shape_values[i].resize (n_q_points);
+        data->shape_values.reinit (this->dofs_per_cell, n_q_points);
         if (mapping_type != mapping_none)
           data->transformed_shape_values.resize (n_q_points);
       }
@@ -240,9 +238,7 @@ protected:
     if (update_flags & update_gradients)
       {
         grads.resize (this->dofs_per_cell);
-        data->shape_grads.resize (this->dofs_per_cell);
-        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-          data->shape_grads[i].resize (n_q_points);
+        data->shape_grads.reinit (this->dofs_per_cell, n_q_points);
         data->transformed_shape_grads.resize (n_q_points);
 
         if ( (mapping_type == mapping_raviart_thomas)
@@ -258,9 +254,7 @@ protected:
     if (update_flags & update_hessians)
       {
         grad_grads.resize (this->dofs_per_cell);
-        data->shape_grad_grads.resize (this->dofs_per_cell);
-        for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-          data->shape_grad_grads[i].resize (n_q_points);
+        data->shape_grad_grads.reinit (this->dofs_per_cell, n_q_points);
         data->transformed_shape_hessians.resize (n_q_points);
         if ( mapping_type != mapping_none )
           data->untransformed_shape_hessian_tensors.resize(n_q_points);
@@ -380,33 +374,33 @@ protected:
      * Array with shape function values in quadrature points. There is one row
      * for each shape function, containing values for each quadrature point.
      */
-    std::vector<std::vector<Tensor<1,dim> > > shape_values;
+    Table<2,Tensor<1,dim> > shape_values;
 
     /**
      * Array with shape function gradients in quadrature points. There is one
      * row for each shape function, containing values for each quadrature
      * point.
      */
-    std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
+    Table<2,DerivativeForm<1, dim, spacedim> > shape_grads;
 
     /**
         * Array with shape function hessians in quadrature points. There is one
         * row for each shape function, containing values for each quadrature
         * point.
         */
-    std::vector< std::vector< DerivativeForm<2, dim, spacedim> > > shape_grad_grads;
+    Table<2,DerivativeForm<2, dim, spacedim> > shape_grad_grads;
 
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double> sign_change;
-    mutable std::vector<Tensor<1, spacedim> > transformed_shape_values;
+    mutable std::vector<double>                sign_change;
+    mutable std::vector<Tensor<1, spacedim> >  transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim > > transformed_shape_grads;
-    mutable std::vector<Tensor<2, dim > > untransformed_shape_grads;
+    mutable std::vector<Tensor<2, dim > >      untransformed_shape_grads;
     // for shape_hessian computations
     mutable std::vector<Tensor<3, spacedim > > transformed_shape_hessians;
-    mutable std::vector<Tensor<3, dim > > untransformed_shape_hessian_tensors;
+    mutable std::vector<Tensor<3, dim > >      untransformed_shape_hessian_tensors;
   };
 
 
