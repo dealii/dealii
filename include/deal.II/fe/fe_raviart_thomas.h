@@ -176,40 +176,6 @@ private:
   void initialize_restriction ();
 
   /**
-   * Fields of cell-independent data.
-   *
-   * For information about the general purpose of this class, see the
-   * documentation of the base class.
-   */
-  class InternalData : public FiniteElement<dim>::InternalDataBase
-  {
-  public:
-    /**
-     * Array with shape function values in quadrature points. There is one row
-     * for each shape function, containing values for each quadrature point.
-     * Since the shape functions are vector-valued (with as many components as
-     * there are space dimensions), the value is a tensor.
-     *
-     * In this array, we store the values of the shape function in the
-     * quadrature points on the unit cell. The transformation to the real
-     * space cell is then simply done by multiplication with the Jacobian of
-     * the mapping.
-     */
-    std::vector<std::vector<Tensor<1,dim> > > shape_values;
-
-    /**
-     * Array with shape function gradients in quadrature points. There is one
-     * row for each shape function, containing values for each quadrature
-     * point.
-     *
-     * We store the gradients in the quadrature points on the unit cell. We
-     * then only have to apply the transformation (which is a matrix-vector
-     * multiplication) when visiting an actual cell.
-     */
-    std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
-  };
-
-  /**
    * These are the factors multiplied to a function in the
    * #generalized_face_support_points when computing the integration. They are
    * organized such that there is one row for each generalized face support
@@ -220,6 +186,7 @@ private:
    * for more information.
    */
   Table<2, double> boundary_weights;
+
   /**
    * Precomputed factors for interpolation of interior degrees of freedom. The
    * rationale for this Table is the same as for #boundary_weights. Only, this
