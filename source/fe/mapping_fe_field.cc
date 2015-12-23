@@ -1097,10 +1097,10 @@ namespace internal
                     data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d].size(),
                     ExcInternalError());
 
-            mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d],
+            mapping.transform (make_array_view(data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d]),
                                mapping_contravariant,
                                data,
-                               data.aux[d]);
+                               make_array_view(data.aux[d]));
           }
 
         // if dim==spacedim, we can use the unit tangentials to compute the
@@ -1515,10 +1515,10 @@ namespace
 {
   template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
-  transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
+  transform_fields(const ArrayView<const Tensor<rank,dim> >                &input,
                    const MappingType                                        mapping_type,
                    const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
-                   VectorSlice<std::vector<Tensor<rank,spacedim> > >        output)
+                   const ArrayView<Tensor<rank,spacedim> >                 &output)
   {
     AssertDimension (input.size(), output.size());
     Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != 0),
@@ -1578,10 +1578,10 @@ namespace
   template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
   transform_differential_forms
-  (const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >  input,
-   const MappingType                                                           mapping_type,
-   const typename Mapping<dim,spacedim>::InternalDataBase                     &mapping_data,
-   VectorSlice<std::vector<Tensor<rank+1, spacedim> > >                        output)
+  (const ArrayView<const DerivativeForm<rank, dim,spacedim> >  &input,
+   const MappingType                                            mapping_type,
+   const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
+   const ArrayView<Tensor<rank+1, spacedim> >                  &output)
   {
 
     AssertDimension (input.size(), output.size());
@@ -1614,10 +1614,10 @@ namespace
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+transform (const ArrayView<const Tensor<1,dim> >                  &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
+           const ArrayView<Tensor<1,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
 
@@ -1629,10 +1629,10 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
-           const MappingType                                                          mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
-           VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
+transform (const ArrayView<const DerivativeForm<1, dim ,spacedim> > &input,
+           const MappingType                                         mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase   &mapping_data,
+           const ArrayView<Tensor<2,spacedim> >                     &output) const
 {
   AssertDimension (input.size(), output.size());
 
@@ -1644,10 +1644,10 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
-           const MappingType,
+transform (const ArrayView<const Tensor<2, dim> >                 &input,
+           const MappingType                                       ,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
+           const ArrayView<Tensor<2,spacedim> >                   &output) const
 {
   (void)input;
   (void)output;
@@ -1662,12 +1662,11 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-           const MappingType                                                         mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                   &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const
+transform (const ArrayView<const DerivativeForm<2, dim, spacedim> >  &input,
+           const MappingType                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+           const ArrayView<Tensor<3,spacedim> >                      &output) const
 {
-
   AssertDimension (input.size(), output.size());
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
           ExcInternalError());
@@ -1712,10 +1711,10 @@ transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim>
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const VectorSlice<const std::vector< Tensor<3,dim> > >  input,
+transform (const ArrayView<const Tensor<3,dim> >                  &input,
            const MappingType                                     /*mapping_type*/,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
+           const ArrayView<Tensor<3,spacedim> >                   &output) const
 {
 
   (void)input;

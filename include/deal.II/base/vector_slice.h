@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/array_view.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -64,20 +65,34 @@ public:
               unsigned int length);
 
   /**
+   * Conversion operator to an ArrayView object that represents
+   * an array of non-const elements pointing to the same location
+   * as the current object.
+   */
+  operator ArrayView<typename VectorType::value_type *> ();
+
+  /**
+   * Conversion operator to an ArrayView object that represents
+   * an array of const elements pointing to the same location
+   * as the current object.
+   */
+  operator ArrayView<const typename VectorType::value_type *> () const;
+
+  /**
    * Return the length of the slice using the same interface as
    * <tt>std::vector</tt>.
    */
   unsigned int size() const;
 
   /**
-   * Access an element of the slice using the same interface as
-   * <tt>std::vector</tt>.
+   * Return a reference to the $i$th element of the range
+   * represented by the current object.
    */
   typename VectorType::reference operator[] (unsigned int i);
 
   /**
-   * Access an element of a constant slice using the same interface as
-   * <tt>std::vector</tt>.
+   * Return a @p const reference to the $i$th element of the range
+   * represented by the current object.
    */
   typename VectorType::const_reference operator[] (unsigned int i) const;
 
@@ -185,6 +200,22 @@ unsigned int
 VectorSlice<VectorType>::size() const
 {
   return length;
+}
+
+
+template <typename VectorType>
+VectorSlice<VectorType>::
+operator ArrayView<typename VectorType::value_type *> ()
+{
+  return ArrayView<typename VectorType::value_type *> (&v[start], length);
+}
+
+
+template <typename VectorType>
+VectorSlice<VectorType>::
+operator ArrayView<const typename VectorType::value_type *> () const
+{
+  return ArrayView<const typename VectorType::value_type *> (&v[start], length);
 }
 
 
