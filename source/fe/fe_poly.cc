@@ -52,7 +52,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   // we were in get_data()
   if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (make_array_view(fe_data.shape_gradients[k]),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -60,7 +60,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_hessians[k]),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -76,7 +76,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
@@ -111,7 +111,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   // we were in get_data()
   if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (make_array_view(fe_data.shape_gradients[k]),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -119,7 +119,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_hessians[k]),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -135,7 +135,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
@@ -171,7 +171,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   // we were in get_data()
   if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (make_array_view(fe_data.shape_gradients[k]),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -179,7 +179,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_hessians[k]),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -195,7 +195,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
@@ -226,7 +226,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   // we were in get_data()
   if (fe_data.update_each & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (make_array_view(fe_data.shape_gradients[k]),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -234,7 +234,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_hessians[k]),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -250,7 +250,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
   if (fe_data.update_each & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));

@@ -271,20 +271,16 @@ protected:
         !((output_data.shape_values.n_rows() > 0)
           &&
           (output_data.shape_values.n_cols() == n_q_points)))
-      data->shape_values.resize (this->dofs_per_cell,
-                                 std::vector<double> (n_q_points));
+      data->shape_values.reinit (this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_gradients)
-      data->shape_gradients.resize (this->dofs_per_cell,
-                                    std::vector<Tensor<1,dim> > (n_q_points));
+      data->shape_gradients.reinit (this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_hessians)
-      data->shape_hessians.resize (this->dofs_per_cell,
-                                   std::vector<Tensor<2,dim> > (n_q_points));
+      data->shape_hessians.reinit (this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_3rd_derivatives)
-      data->shape_3rd_derivatives.resize (this->dofs_per_cell,
-                                          std::vector<Tensor<3,dim> > (n_q_points));
+      data->shape_3rd_derivatives.reinit (this->dofs_per_cell, n_q_points);
 
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
@@ -432,7 +428,7 @@ protected:
      * under transformation to the real cell, we only need to copy them over
      * when visiting a concrete cell.
      */
-    std::vector<std::vector<double> > shape_values;
+    Table<2,double> shape_values;
 
     /**
      * Array with shape function gradients in quadrature points. There is one
@@ -443,7 +439,7 @@ protected:
      * then only have to apply the transformation (which is a matrix-vector
      * multiplication) when visiting an actual cell.
      */
-    std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+    Table<2,Tensor<1,dim> > shape_gradients;
 
     /**
      * Array with shape function hessians in quadrature points. There is one
@@ -453,7 +449,7 @@ protected:
      * We store the hessians in the quadrature points on the unit cell. We
      * then only have to apply the transformation when visiting an actual cell.
      */
-    std::vector<std::vector<Tensor<2,dim> > > shape_hessians;
+    Table<2,Tensor<2,dim> > shape_hessians;
 
     /**
      * Array with shape function third derivatives in quadrature points. There
@@ -464,7 +460,7 @@ protected:
      * cell. We then only have to apply the transformation when visiting an
      * actual cell.
      */
-    std::vector<std::vector<Tensor<3,dim> > > shape_3rd_derivatives;
+    Table<2,Tensor<3,dim> > shape_3rd_derivatives;
   };
 
   /**

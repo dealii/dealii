@@ -259,7 +259,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
   // we were in get_data()
   if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (make_array_view(fe_data.shape_gradients[k]),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -267,7 +267,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_hessians[k]),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -283,7 +283,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
   if (flags & update_3rd_derivatives && cell_similarity != CellSimilarity::translation)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
@@ -337,7 +337,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
 
   if (flags & update_gradients)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (ArrayView<const Tensor<1,dim> >(&fe_data.shape_gradients[k][offset], quadrature.size()),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -345,8 +345,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
   if (flags & update_hessians)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (ArrayView<const Tensor<2,dim> >(&fe_data.shape_hessians[k][offset],
-                                                           quadrature.size()),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k, offset, quadrature.size()),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -362,8 +361,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
   if (flags & update_3rd_derivatives)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (ArrayView<const Tensor<3,dim> >(&fe_data.shape_3rd_derivatives[k][offset],
-                                                           quadrature.size()),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k, offset, quadrature.size()),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
@@ -419,8 +417,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   if (flags & update_gradients)
     for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-      mapping.transform (ArrayView<const Tensor<1,dim> >(&fe_data.shape_gradients[k][offset],
-                                                         quadrature.size()),
+      mapping.transform (make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                          mapping_covariant,
                          mapping_internal,
                          make_array_view(output_data.shape_gradients, k));
@@ -428,8 +425,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   if (flags & update_hessians)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (ArrayView<const Tensor<2,dim> >(&fe_data.shape_hessians[k][offset],
-                                                           quadrature.size()),
+        mapping.transform (make_array_view(fe_data.shape_hessians, k, offset, quadrature.size()),
                            mapping_covariant_gradient,
                            mapping_internal,
                            make_array_view(output_data.shape_hessians, k));
@@ -445,8 +441,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   if (flags & update_3rd_derivatives)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-        mapping.transform (ArrayView<const Tensor<3,dim> >(&fe_data.shape_3rd_derivatives[k][offset],
-                                                           quadrature.size()),
+        mapping.transform (make_array_view(fe_data.shape_3rd_derivatives, k, offset, quadrature.size()),
                            mapping_covariant_hessian,
                            mapping_internal,
                            make_array_view(output_data.shape_3rd_derivatives, k));
