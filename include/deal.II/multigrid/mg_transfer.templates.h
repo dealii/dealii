@@ -114,12 +114,10 @@ namespace
       (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
        (&mg_dof.get_triangulation()));
 
-    for (unsigned int level=v.min_level();
-         level<=v.max_level(); ++level)
+    for (unsigned int level=v.min_level(); level<=v.max_level(); ++level)
       {
-        const IndexSet vector_index_set = v[level].locally_owned_elements();
-        if (vector_index_set.size() != mg_dof.locally_owned_mg_dofs(level).size() ||
-            mg_dof.locally_owned_mg_dofs(level) != vector_index_set)
+        if (v[level].size() != mg_dof.locally_owned_mg_dofs(level).size() ||
+            v[level].local_size() != mg_dof.locally_owned_mg_dofs(level).n_elements())
           v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria != 0 ?
                           tria->get_communicator() : MPI_COMM_SELF);
         else
@@ -160,18 +158,16 @@ namespace
 
 
 
-/* --------------------- MGTransferPrebuilt -------------- */
-
-
+/* ------------------ MGLevelGlobalTransfer<VectorType> ----------------- */
 
 
 template <typename VectorType>
 template <int dim, class InVector, int spacedim>
 void
-MGTransferPrebuilt<VectorType>::copy_to_mg
+MGLevelGlobalTransfer<VectorType>::copy_to_mg
 (const DoFHandler<dim,spacedim> &mg_dof_handler,
- MGLevelObject<VectorType>     &dst,
- const InVector                &src) const
+ MGLevelObject<VectorType>      &dst,
+ const InVector                 &src) const
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
@@ -182,22 +178,21 @@ MGTransferPrebuilt<VectorType>::copy_to_mg
   for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels(); level != 0;)
     {
       --level;
-      VectorType &dst_level = dst[level];
-
 #ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+      VectorType &dst_level = dst[level];
 
       // first copy local unknowns
-      for (dof_pair_iterator i= copy_indices[level].begin();
+      for (dof_pair_iterator i = copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
-      // Do the same for the indices where the global index is local,
-      // but the local index is not
-      for (dof_pair_iterator i= copy_indices_global_mine[level].begin();
+      // Do the same for the indices where the global index is local, but the
+      // local index is not
+      for (dof_pair_iterator i = copy_indices_global_mine[level].begin();
            i != copy_indices_global_mine[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
@@ -210,7 +205,7 @@ MGTransferPrebuilt<VectorType>::copy_to_mg
 
       if (!first)
         {
-          restrict_and_add (level+1, dst[level], dst[level+1]);
+          this->restrict_and_add (level+1, dst[level], dst[level+1]);
 #ifdef DEBUG_OUTPUT
           std::cout << "copy_to_mg restr&add " << level << " " << dst_level.l2_norm() << std::endl;
 #endif
@@ -225,18 +220,14 @@ MGTransferPrebuilt<VectorType>::copy_to_mg
 template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
-MGTransferPrebuilt<VectorType>::copy_from_mg
+MGLevelGlobalTransfer<VectorType>::copy_from_mg
 (const DoFHandler<dim,spacedim>  &mg_dof_handler,
  OutVector                       &dst,
  const MGLevelObject<VectorType> &src) const
 {
-  // For non-DG: degrees of
-  // freedom in the refinement
-  // face may need special
-  // attention, since they belong
-  // to the coarse level, but
-  // have fine level basis
-  // functions
+  // For non-DG: degrees of freedom in the refinement face may need special
+  // attention, since they belong to the coarse level, but have fine level
+  // basis functions
   dst = 0;
   for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
     {
@@ -247,17 +238,18 @@ MGTransferPrebuilt<VectorType>::copy_from_mg
 #endif
 
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+      const VectorType &src_level = src[level];
 
       // First copy all indices local to this process
-      for (dof_pair_iterator i= copy_indices[level].begin();
+      for (dof_pair_iterator i = copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
-        dst(i->first) = src[level](i->second);
+        dst(i->first) = src_level(i->second);
 
-      // Do the same for the indices where the level index is local,
-      // but the global index is not
-      for (dof_pair_iterator i= copy_indices_level_mine[level].begin();
+      // Do the same for the indices where the level index is local, but the
+      // global index is not
+      for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
            i != copy_indices_level_mine[level].end(); ++i)
-        dst(i->first) = src[level](i->second);
+        dst(i->first) = src_level(i->second);
 
 #ifdef DEBUG_OUTPUT
       {
@@ -279,32 +271,29 @@ MGTransferPrebuilt<VectorType>::copy_from_mg
 template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
-MGTransferPrebuilt<VectorType>::copy_from_mg_add
+MGLevelGlobalTransfer<VectorType>::copy_from_mg_add
 (const DoFHandler<dim,spacedim>  &mg_dof_handler,
  OutVector                       &dst,
  const MGLevelObject<VectorType> &src) const
 {
-  // For non-DG: degrees of
-  // freedom in the refinement
-  // face may need special
-  // attention, since they belong
-  // to the coarse level, but
-  // have fine level basis
-  // functions
+  // For non-DG: degrees of freedom in the refinement face may need special
+  // attention, since they belong to the coarse level, but have fine level
+  // basis functions
   for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
+      const VectorType &src_level = src[level];
 
       // First add all indices local to this process
-      for (dof_pair_iterator i= copy_indices[level].begin();
+      for (dof_pair_iterator i = copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
-        dst(i->first) += src[level](i->second);
+        dst(i->first) += src_level(i->second);
 
-      // Do the same for the indices where the level index is local,
-      // but the global index is not
-      for (dof_pair_iterator i= copy_indices_level_mine[level].begin();
+      // Do the same for the indices where the level index is local, but the
+      // global index is not
+      for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
            i != copy_indices_level_mine[level].end(); ++i)
-        dst(i->first) += src[level](i->second);
+        dst(i->first) += src_level(i->second);
     }
   dst.compress(VectorOperation::add);
 }
@@ -313,24 +302,192 @@ MGTransferPrebuilt<VectorType>::copy_from_mg_add
 
 template <typename VectorType>
 void
-MGTransferPrebuilt<VectorType>::
+MGLevelGlobalTransfer<VectorType>::
 set_component_to_block_map (const std::vector<unsigned int> &map)
 {
   component_to_block_map = map;
 }
 
-template <typename VectorType>
-std::size_t
-MGTransferPrebuilt<VectorType>::memory_consumption () const
+
+
+/* --------- MGLevelGlobalTransfer<parallel::distributed::Vector> ------- */
+
+template <typename Number>
+template <int dim, typename Number2, int spacedim>
+void
+MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_to_mg
+(const DoFHandler<dim,spacedim>                        &mg_dof_handler,
+ MGLevelObject<parallel::distributed::Vector<Number> > &dst,
+ const parallel::distributed::Vector<Number2>          &src) const
 {
-  std::size_t result = sizeof(*this);
-  result += sizeof(unsigned int) * sizes.size();
+  reinit_vector(mg_dof_handler, component_to_block_map, dst);
+  bool first = true;
 
-  for (unsigned int i=0; i<prolongation_matrices.size(); ++i)
-    result += prolongation_matrices[i]->memory_consumption()
-              + prolongation_sparsities[i]->memory_consumption();
+  if (perform_plain_copy)
+    {
+      // In this case, we can simply copy the local range (in parallel by
+      // VectorView)
+      AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
+      VectorView<Number>  dst_view (src.local_size(), dst[dst.max_level()].begin());
+      VectorView<Number2> src_view (src.local_size(), src.begin());
+      static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
+      for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels()-1; level != 0; )
+        {
+          --level;
+          this->restrict_and_add (level+1, dst[level], dst[level+1]);
+        }
+      return;
+    }
 
-  return result;
+  // the ghosted vector should already have the correct local size (but
+  // different parallel layout)
+  AssertDimension(ghosted_global_vector.local_size(), src.local_size());
+
+  // copy the source vector to the temporary vector that we hold for the
+  // purpose of data exchange
+  ghosted_global_vector = src;
+  ghosted_global_vector.update_ghost_values();
+
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels(); level != 0;)
+    {
+      --level;
+
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
+      parallel::distributed::Vector<Number> &dst_level = dst[level];
+
+      // first copy local unknowns
+      for (dof_pair_iterator i = copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
+
+      // Do the same for the indices where the level index is local, but the
+      // global index is not
+      for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
+           i != copy_indices_level_mine[level].end(); ++i)
+        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
+
+      dst_level.compress(VectorOperation::insert);
+
+      if (!first)
+        {
+          this->restrict_and_add (level+1, dst_level, dst[level+1]);
+        }
+
+      first = false;
+    }
+}
+
+
+
+template <typename Number>
+template <int dim, typename Number2, int spacedim>
+void
+MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg
+(const DoFHandler<dim,spacedim>                              &mg_dof_handler,
+ parallel::distributed::Vector<Number2>                      &dst,
+ const MGLevelObject<parallel::distributed::Vector<Number> > &src) const
+{
+  // For non-DG: degrees of freedom in the refinement face may need special
+  // attention, since they belong to the coarse level, but have fine level
+  // basis functions
+
+  if (perform_plain_copy)
+    {
+      // In this case, we can simply copy the local range (in parallel by
+      // VectorView). To avoid having stray data in ghost entries of the
+      // destination, make sure to clear them here.
+      dst.zero_out_ghosts();
+      AssertDimension(dst.local_size(), src[src.max_level()].local_size());
+      VectorView<Number2> dst_view (dst.local_size(), dst.begin());
+      VectorView<Number>  src_view (dst.local_size(), src[src.max_level()].begin());
+      static_cast<Vector<Number2> &>(dst_view) = static_cast<Vector<Number> &>(src_view);
+      return;
+    }
+
+  dst = 0;
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
+    {
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
+
+      // the ghosted vector should already have the correct local size (but
+      // different parallel layout)
+      AssertDimension(ghosted_level_vector[level].local_size(),
+                      src[level].local_size());
+
+      // the first time around, we copy the source vector to the temporary
+      // vector that we hold for the purpose of data exchange
+      parallel::distributed::Vector<Number> &ghosted_vector =
+        ghosted_level_vector[level];
+      ghosted_vector = src[level];
+      ghosted_vector.update_ghost_values();
+
+      // first copy local unknowns
+      for (dof_pair_iterator i = copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst.local_element(i->first) = ghosted_vector.local_element(i->second);
+
+      // Do the same for the indices where the level index is local, but the
+      // global index is not
+      for (dof_pair_iterator i = copy_indices_global_mine[level].begin();
+           i != copy_indices_global_mine[level].end(); ++i)
+        dst.local_element(i->first) = ghosted_vector.local_element(i->second);
+    }
+  dst.compress(VectorOperation::insert);
+}
+
+
+
+template <typename Number>
+template <int dim, typename Number2, int spacedim>
+void
+MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg_add
+(const DoFHandler<dim,spacedim>                              &mg_dof_handler,
+ parallel::distributed::Vector<Number2>                      &dst,
+ const MGLevelObject<parallel::distributed::Vector<Number> > &src) const
+{
+  // For non-DG: degrees of freedom in the refinement face may need special
+  // attention, since they belong to the coarse level, but have fine level
+  // basis functions
+
+  dst.zero_out_ghosts();
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)
+    {
+      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
+
+      // the ghosted vector should already have the correct local size (but
+      // different parallel layout)
+      AssertDimension(ghosted_level_vector[level].local_size(),
+                      src[level].local_size());
+
+      // the first time around, we copy the source vector to the temporary
+      // vector that we hold for the purpose of data exchange
+      parallel::distributed::Vector<Number> &ghosted_vector =
+        ghosted_level_vector[level];
+      ghosted_vector = src[level];
+      ghosted_vector.update_ghost_values();
+
+      // first add local unknowns
+      for (dof_pair_iterator i= copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst.local_element(i->first) += ghosted_vector.local_element(i->second);
+
+      // Do the same for the indices where the level index is local, but the
+      // global index is not
+      for (dof_pair_iterator i= copy_indices_global_mine[level].begin();
+           i != copy_indices_global_mine[level].end(); ++i)
+        dst.local_element(i->first) += ghosted_vector.local_element(i->second);
+    }
+  dst.compress(VectorOperation::add);
+}
+
+
+
+template <typename Number>
+void
+MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::
+set_component_to_block_map (const std::vector<unsigned int> &map)
+{
+  component_to_block_map = map;
 }
 
 
