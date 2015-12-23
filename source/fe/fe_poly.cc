@@ -55,7 +55,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
       mapping.transform (make_array_view(fe_data.shape_gradients[k]),
                          mapping_covariant,
                          mapping_internal,
-                         make_array_view(output_data.shape_gradients[k]));
+                         make_array_view(output_data.shape_gradients, k));
 
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
@@ -63,7 +63,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_hessians[k]),
                            mapping_covariant_gradient,
                            mapping_internal,
-                           make_array_view(output_data.shape_hessians[k]));
+                           make_array_view(output_data.shape_hessians, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -79,7 +79,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
                            mapping_covariant_hessian,
                            mapping_internal,
-                           make_array_view(output_data.shape_3rd_derivatives[k]));
+                           make_array_view(output_data.shape_3rd_derivatives, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
@@ -114,7 +114,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
       mapping.transform (make_array_view(fe_data.shape_gradients[k]),
                          mapping_covariant,
                          mapping_internal,
-                         make_array_view(output_data.shape_gradients[k]));
+                         make_array_view(output_data.shape_gradients, k));
 
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
@@ -122,7 +122,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_hessians[k]),
                            mapping_covariant_gradient,
                            mapping_internal,
-                           make_array_view(output_data.shape_hessians[k]));
+                           make_array_view(output_data.shape_hessians, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -138,7 +138,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
                            mapping_covariant_hessian,
                            mapping_internal,
-                           make_array_view(output_data.shape_3rd_derivatives[k]));
+                           make_array_view(output_data.shape_3rd_derivatives, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
@@ -174,7 +174,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
       mapping.transform (make_array_view(fe_data.shape_gradients[k]),
                          mapping_covariant,
                          mapping_internal,
-                         make_array_view(output_data.shape_gradients[k]));
+                         make_array_view(output_data.shape_gradients, k));
 
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
@@ -182,7 +182,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_hessians[k]),
                            mapping_covariant_gradient,
                            mapping_internal,
-                           make_array_view(output_data.shape_hessians[k]));
+                           make_array_view(output_data.shape_hessians, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -198,7 +198,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
                            mapping_covariant_hessian,
                            mapping_internal,
-                           make_array_view(output_data.shape_3rd_derivatives[k]));
+                           make_array_view(output_data.shape_3rd_derivatives, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);
@@ -229,7 +229,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
       mapping.transform (make_array_view(fe_data.shape_gradients[k]),
                          mapping_covariant,
                          mapping_internal,
-                         make_array_view(output_data.shape_gradients[k]));
+                         make_array_view(output_data.shape_gradients, k));
 
   if (fe_data.update_each & update_hessians && cell_similarity != CellSimilarity::translation)
     {
@@ -237,7 +237,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_hessians[k]),
                            mapping_covariant_gradient,
                            mapping_internal,
-                           make_array_view(output_data.shape_hessians[k]));
+                           make_array_view(output_data.shape_hessians, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         for (unsigned int i=0; i<quadrature.size(); ++i)
@@ -253,7 +253,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
         mapping.transform (make_array_view(fe_data.shape_3rd_derivatives[k]),
                            mapping_covariant_hessian,
                            mapping_internal,
-                           make_array_view(output_data.shape_3rd_derivatives[k]));
+                           make_array_view(output_data.shape_3rd_derivatives, k));
 
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
         correct_third_derivatives(output_data, mapping_data, quadrature.size(), k);

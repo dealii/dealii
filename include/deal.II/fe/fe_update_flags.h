@@ -528,17 +528,17 @@ namespace internal
        * Storage type for gradients. The layout of data is the same as for the
        * #ShapeVector data type.
        */
-      typedef std::vector<std::vector<Tensor<1,spacedim> > > GradientVector;
+      typedef dealii::Table<2,Tensor<1,spacedim> > GradientVector;
 
       /**
        * Likewise for second order derivatives.
        */
-      typedef std::vector<std::vector<Tensor<2,spacedim> > > HessianVector;
+      typedef dealii::Table<2,Tensor<2,spacedim> > HessianVector;
 
       /**
        * And the same also applies to the third order derivatives.
        */
-      typedef std::vector<std::vector<Tensor<3,spacedim> > > ThirdDerivativeVector;
+      typedef dealii::Table<2,Tensor<3,spacedim> > ThirdDerivativeVector;
 
       /**
        * Store the values of the shape functions at the quadrature points. See the

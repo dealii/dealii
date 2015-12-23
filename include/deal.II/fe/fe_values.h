@@ -4140,10 +4140,6 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
           ExcAccessToUninitializedField("update_gradients"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_gradients.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_gradients.size()));
-  Assert (j<this->finite_element_output.shape_gradients[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_gradients[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
@@ -4209,10 +4205,6 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
           ExcAccessToUninitializedField("update_hessians"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_hessians.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_hessians.size()));
-  Assert (j<this->finite_element_output.shape_hessians[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_hessians[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
@@ -4278,10 +4270,6 @@ FEValuesBase<dim,spacedim>::shape_3rd_derivative (const unsigned int i,
           ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_3rd_derivatives.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_3rd_derivatives.size()));
-  Assert (j<this->finite_element_output.shape_3rd_derivatives[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_3rd_derivatives[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:

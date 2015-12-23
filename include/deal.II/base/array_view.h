@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/table.h>
+
 #include <boost/type_traits/remove_cv.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <vector>
 
@@ -195,7 +195,7 @@ ArrayView<ElementType>::operator[](const std::size_t i) const
  * element and the size of the given argument.
  *
  * This function is used for non-@p const references to objects of vector type.
- * Such objects contain elements that can be written. Consequently, the return
+ * Such objects contain elements that can be written to. Consequently, the return
  * type of this function is a view to a set of writable objects.
  *
  * @param[in] vector The vector for which we want to have an array
@@ -245,7 +245,7 @@ make_array_view (const std::vector<ElementType> &vector)
  * @p starting_index-th element and the @p size_of_view as the length of the view.
  *
  * This function is used for non-@p const references to objects of vector type.
- * Such objects contain elements that can be written. Consequently, the return
+ * Such objects contain elements that can be written to. Consequently, the return
  * type of this function is a view to a set of writable objects.
  *
  * @param[in] vector The vector for which we want to have an array
@@ -305,6 +305,144 @@ make_array_view (const std::vector<ElementType> &vector,
                       "create would lead to a view that extends beyond the end "
                       "of the given vector."));
   return ArrayView<const ElementType> (&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a view to an entire row of a Table<2> object. This is equivalent
+ * to initializing an ArrayView object with a pointer to the first
+ * element of the given row, and the length of the row as the length
+ * of the view.
+ *
+ * This function is used for non-@p const references to objects of Table type.
+ * Such objects contain elements that can be written to. Consequently, the
+ * return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] table The Table for which we want to have an array
+ *   view object. The array view corresponds to an <em>entire</em>
+ *   row.
+ * @param[in] row The index of the row into the table to which this view
+ *   should correspond.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<ElementType>
+make_array_view (Table<2,ElementType>                           &table,
+                 const typename Table<2,ElementType>::size_type  row)
+{
+  AssertIndexRange (row, table.size()[0]);
+  return ArrayView<ElementType> (&table[row][0], table.size()[1]);
+}
+
+
+
+/**
+ * Create a view to an entire row of a Table<2> object. This is equivalent
+ * to initializing an ArrayView object with a pointer to the first
+ * element of the given row, and the length of the row as the length
+ * of the view.
+ *
+ * This function is used for @p const references to objects of Table type
+ * because they contain immutable elements. Consequently, the return type
+ * of this function is a view to a set of @p const objects.
+ *
+ * @param[in] table The Table for which we want to have an array
+ *   view object. The array view corresponds to an <em>entire</em>
+ *   row.
+ * @param[in] row The index of the row into the table to which this view
+ *   should correspond.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<const ElementType>
+make_array_view (const Table<2,ElementType>                     &table,
+                 const typename Table<2,ElementType>::size_type  row)
+{
+  AssertIndexRange (row, table.size()[0]);
+  return ArrayView<const ElementType> (&table[row][0], table.size()[1]);
+}
+
+
+
+/**
+ * Create a view to (a part of) a row of a Table<2> object.
+ *
+ * This function is used for non-@p const references to objects of Table type.
+ * Such objects contain elements that can be written to. Consequently, the
+ * return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] table The Table for which we want to have an array
+ *   view object. The array view corresponds to an <em>entire</em>
+ *   row.
+ * @param[in] row The index of the row into the table to which this view
+ *   should correspond.
+ * @param[in] starting_column The index of the column into the given row
+ *   of the table that corresponds to the first element of this view.
+ * @param[in] size_of_view The number of elements this view should have.
+ *   This corresponds to the number of columns in the current row to
+ *   which the view should correspond.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<ElementType>
+make_array_view (Table<2,ElementType>                           &table,
+                 const typename Table<2,ElementType>::size_type  row,
+                 const typename Table<2,ElementType>::size_type  starting_column,
+                 const std::size_t                               size_of_view)
+{
+  AssertIndexRange (row, table.size()[0]);
+  AssertIndexRange (starting_column, table.size()[1]);
+  Assert (starting_column + size_of_view <= table.size()[1],
+          ExcMessage ("The starting index and size of the view you want to "
+                      "create would lead to a view that extends beyond the end "
+                      "of a column of the given table."));
+  return ArrayView<ElementType> (&table[row][starting_column], size_of_view);
+}
+
+
+
+/**
+ * Create a view to (a part of) a row of a Table<2> object.
+ *
+ * This function is used for @p const references to objects of Table type
+ * because they contain immutable elements. Consequently, the return type
+ * of this function is a view to a set of @p const objects.
+ *
+ * @param[in] table The Table for which we want to have an array
+ *   view object. The array view corresponds to an <em>entire</em>
+ *   row.
+ * @param[in] row The index of the row into the table to which this view
+ *   should correspond.
+ * @param[in] starting_column The index of the column into the given row
+ *   of the table that corresponds to the first element of this view.
+ * @param[in] size_of_view The number of elements this view should have.
+ *   This corresponds to the number of columns in the current row to
+ *   which the view should correspond.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<const ElementType>
+make_array_view (const Table<2,ElementType>                     &table,
+                 const typename Table<2,ElementType>::size_type  row,
+                 const typename Table<2,ElementType>::size_type  starting_column,
+                 const std::size_t                               size_of_view)
+{
+  AssertIndexRange (row, table.size()[0]);
+  AssertIndexRange (starting_column, table.size()[1]);
+  Assert (starting_column + size_of_view <= table.size()[1],
+          ExcMessage ("The starting index and size of the view you want to "
+                      "create would lead to a view that extends beyond the end "
+                      "of a column of the given table."));
+  return ArrayView<const ElementType> (&table[row][starting_column], size_of_view);
 }
 
 
