@@ -1,0 +1,311 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 507
+DEAL:2d:cg::Starting value 0.8660
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9428
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9798
+DEAL:2d:cg::Convergence step 4 value 0
+DEAL:2d:cg::Starting value 0.9938
+DEAL:2d:cg::Convergence step 10 value 0
+DEAL:2d:cg::Starting value 0.9983
+DEAL:2d:cg::Failure step 15 value 2.432e-05
+DEAL:2d:cg::Starting value 0.9984
+DEAL:2d:cg::Failure step 15 value 0.001385
+DEAL:2d:cg::Starting value 21.93
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg::Convergence step 5 value 7.812e-07
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 881
+DEAL:2d:cg::Starting value 0.8660
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9428
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9798
+DEAL:2d:cg::Convergence step 4 value 0
+DEAL:2d:cg::Starting value 0.9938
+DEAL:2d:cg::Convergence step 10 value 0
+DEAL:2d:cg::Starting value 0.9983
+DEAL:2d:cg::Failure step 15 value 2.432e-05
+DEAL:2d:cg::Starting value 0.9988
+DEAL:2d:cg::Failure step 15 value 0.002581
+DEAL:2d:cg::Starting value 0.9989
+DEAL:2d:cg::Failure step 15 value 0.0001487
+DEAL:2d:cg::Starting value 27.77
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg::Convergence step 6 value 9.245e-07
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 2147
+DEAL:2d:cg::Starting value 0.8660
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9428
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9798
+DEAL:2d:cg::Convergence step 4 value 0
+DEAL:2d:cg::Starting value 0.9938
+DEAL:2d:cg::Convergence step 10 value 0
+DEAL:2d:cg::Starting value 0.9983
+DEAL:2d:cg::Failure step 15 value 2.432e-05
+DEAL:2d:cg::Starting value 0.9988
+DEAL:2d:cg::Failure step 15 value 0.003288
+DEAL:2d:cg::Starting value 0.9993
+DEAL:2d:cg::Failure step 15 value 0.005495
+DEAL:2d:cg::Starting value 0.9997
+DEAL:2d:cg::Failure step 15 value 0.05100
+DEAL:2d:cg::Starting value 43.26
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg::Convergence step 6 value 1.145e-06
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 6517
+DEAL:2d:cg::Starting value 0.8660
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9428
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d:cg::Starting value 0.9798
+DEAL:2d:cg::Convergence step 4 value 0
+DEAL:2d:cg::Starting value 0.9938
+DEAL:2d:cg::Convergence step 10 value 0
+DEAL:2d:cg::Starting value 0.9983
+DEAL:2d:cg::Failure step 15 value 2.432e-05
+DEAL:2d:cg::Starting value 0.9989
+DEAL:2d:cg::Failure step 15 value 0.005519
+DEAL:2d:cg::Starting value 0.9994
+DEAL:2d:cg::Failure step 15 value 0.01098
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 0.09572
+DEAL:2d:cg::Starting value 0.9999
+DEAL:2d:cg::Failure step 15 value 0.7527
+DEAL:2d:cg::Starting value 76.92
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg:cg::Convergence step 0 value 0
+DEAL:2d:cg::Convergence step 6 value 1.559e-06
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 4259
+DEAL:2d:cg::Starting value 0.9682
+DEAL:2d:cg::Convergence step 2 value 0
+DEAL:2d:cg::Starting value 0.9897
+DEAL:2d:cg::Convergence step 7 value 0
+DEAL:2d:cg::Starting value 0.9970
+DEAL:2d:cg::Failure step 15 value 0.0009642
+DEAL:2d:cg::Starting value 0.9992
+DEAL:2d:cg::Failure step 15 value 0.7055
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 3.190
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 2.417
+DEAL:2d:cg::Starting value 64.26
+DEAL:2d:cg:cg::Starting value 244.2
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.01076
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.0006421
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 4.476e-06
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 2.268e-07
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg::Convergence step 5 value 1.148e-06
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 7457
+DEAL:2d:cg::Starting value 0.9682
+DEAL:2d:cg::Convergence step 2 value 0
+DEAL:2d:cg::Starting value 0.9897
+DEAL:2d:cg::Convergence step 7 value 0
+DEAL:2d:cg::Starting value 0.9970
+DEAL:2d:cg::Failure step 15 value 0.0009642
+DEAL:2d:cg::Starting value 0.9992
+DEAL:2d:cg::Failure step 15 value 0.7055
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 3.190
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 2.388
+DEAL:2d:cg::Starting value 0.9999
+DEAL:2d:cg::Failure step 15 value 1.373
+DEAL:2d:cg::Starting value 83.11
+DEAL:2d:cg:cg::Starting value 372.5
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.04232
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.003840
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 4.562e-05
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 1.847e-06
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg::Convergence step 5 value 6.031e-06
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 18535
+DEAL:2d:cg::Starting value 0.9682
+DEAL:2d:cg::Convergence step 2 value 0
+DEAL:2d:cg::Starting value 0.9897
+DEAL:2d:cg::Convergence step 7 value 0
+DEAL:2d:cg::Starting value 0.9970
+DEAL:2d:cg::Failure step 15 value 0.0009642
+DEAL:2d:cg::Starting value 0.9992
+DEAL:2d:cg::Failure step 15 value 0.7055
+DEAL:2d:cg::Starting value 0.9998
+DEAL:2d:cg::Failure step 15 value 3.190
+DEAL:2d:cg::Starting value 0.9999
+DEAL:2d:cg::Failure step 15 value 2.658
+DEAL:2d:cg::Starting value 0.9999
+DEAL:2d:cg::Failure step 15 value 1.254
+DEAL:2d:cg::Starting value 1.000
+DEAL:2d:cg::Failure step 15 value 2.650
+DEAL:2d:cg::Starting value 131.0
+DEAL:2d:cg:cg::Starting value 862.1
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.2008
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 0.005678
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 5.638e-05
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg:cg::Starting value 2.711e-06
+DEAL:2d:cg:cg::Convergence step 3 value 0
+DEAL:2d:cg::Convergence step 5 value 4.590e-06
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 1103
+DEAL:3d:cg::Starting value 0.9354
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9813
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9960
+DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Starting value 0.9993
+DEAL:3d:cg::Convergence step 13 value 9.706e-11
+DEAL:3d:cg::Starting value 0.9989
+DEAL:3d:cg::Convergence step 14 value 6.535e-11
+DEAL:3d:cg::Starting value 31.21
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg::Convergence step 6 value 3.615e-08
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 3694
+DEAL:3d:cg::Starting value 0.9354
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9813
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9960
+DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Starting value 0.9993
+DEAL:3d:cg::Convergence step 13 value 9.706e-11
+DEAL:3d:cg::Starting value 0.9994
+DEAL:3d:cg::Failure step 15 value 1.839e-08
+DEAL:3d:cg::Starting value 0.9998
+DEAL:3d:cg::Failure step 15 value 7.469e-05
+DEAL:3d:cg::Starting value 55.00
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg::Convergence step 7 value 3.941e-06
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 9566
+DEAL:3d:cg::Starting value 0.9354
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9813
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9960
+DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Starting value 0.9993
+DEAL:3d:cg::Convergence step 13 value 9.706e-11
+DEAL:3d:cg::Starting value 0.9995
+DEAL:3d:cg::Failure step 15 value 1.479e-07
+DEAL:3d:cg::Starting value 0.9999
+DEAL:3d:cg::Failure step 15 value 0.0004644
+DEAL:3d:cg::Starting value 0.9999
+DEAL:3d:cg::Failure step 15 value 1.830e-10
+DEAL:3d:cg::Starting value 76.18
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg:cg::Convergence step 0 value 0
+DEAL:3d:cg::Convergence step 8 value 5.376e-06
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Number of degrees of freedom: 7494
+DEAL:3d:cg::Starting value 0.9813
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9960
+DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Starting value 0.9993
+DEAL:3d:cg::Convergence step 15 value 5.276e-11
+DEAL:3d:cg::Starting value 0.9999
+DEAL:3d:cg::Failure step 15 value 0.001572
+DEAL:3d:cg::Starting value 0.9998
+DEAL:3d:cg::Failure step 15 value 0.0008241
+DEAL:3d:cg::Starting value 82.90
+DEAL:3d:cg:cg::Starting value 7.225
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.01157
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.0009262
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.0001114
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 3.295e-06
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 2.088e-07
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 2.026e-08
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg::Convergence step 7 value 8.696e-07
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Number of degrees of freedom: 26548
+DEAL:3d:cg::Starting value 0.9813
+DEAL:3d:cg::Convergence step 1 value 0
+DEAL:3d:cg::Starting value 0.9960
+DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Starting value 0.9993
+DEAL:3d:cg::Convergence step 15 value 5.276e-11
+DEAL:3d:cg::Starting value 0.9999
+DEAL:3d:cg::Failure step 15 value 0.001572
+DEAL:3d:cg::Starting value 0.9999
+DEAL:3d:cg::Failure step 15 value 0.008306
+DEAL:3d:cg::Starting value 1.000
+DEAL:3d:cg::Failure step 15 value 0.1026
+DEAL:3d:cg::Starting value 152.6
+DEAL:3d:cg:cg::Starting value 17.46
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.008363
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.001190
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 0.0001843
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 8.789e-06
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 7.697e-07
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg:cg::Starting value 6.053e-08
+DEAL:3d:cg:cg::Convergence step 1 value 0
+DEAL:3d:cg::Convergence step 7 value 3.971e-06
