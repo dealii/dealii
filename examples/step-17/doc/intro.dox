@@ -128,8 +128,29 @@ receiving individual messages, but uses higher level operations. For
 example, in the program we will use function calls that take a number
 from each processor, add them all up, and return the sum to all
 processors. Internally, this is implemented using individual messages,
-but to the user this is transparent. In reality, even this is too
-low a level and the program below will not contain any direct
+but to the user this is transparent. We call such operations <i>collectives</i>
+because <i>all</i> processors participate in them. Collectives allow us
+to write programs where not every copy of the executable is doing something
+completely different (this would be incredibly difficult to program) but
+where in essence all copies are doing the same thing (though on different
+data) for themselves, running through the same blocks of code; then they
+communicate data through collectives; and then go back to doing something
+for themselves again running through the same blocks of data. This is the
+key piece to being able to write programs, and it is the key component
+to making sure that programs can run on any number of processors,
+since we do not have to write different code for each of the participating
+processors.
+
+(This is not to say that programs are never written in ways where
+different processors run through different blocks of code in their
+copy of the executable. Programs internally also often communicate
+in other ways than through collectives. But in practice, %parallel finite
+finite element codes almost always follow the scheme where every copy
+of the program runs through the same blocks of code at the same time,
+interspersed by phases where all processors communicate with each other.)
+
+In reality, even the level of calling MPI collective functions is too
+low. Rather, the program below will not contain any direct
 calls to MPI at all, but only deal.II functions that hide this
 communication from users of the deal.II. This has the advantage that
 you don't have to learn the details of MPI and its rather intricate
