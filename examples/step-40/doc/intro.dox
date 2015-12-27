@@ -69,7 +69,7 @@ but apart from that all of its workings are hidden under the surface
 of deal.II.
 
 In essence, what the parallel::distributed::Triangulation class and
-associated parallel::distributed::DoFHandler objects do is to split
+code inside the DoFHandler class do is to split
 the global mesh so that every processor only stores a small bit it
 "owns" along with one layer of "ghost" cells that surround the ones it
 owns. What happens in the rest of the domain on which we want to solve
