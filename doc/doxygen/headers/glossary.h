@@ -1316,8 +1316,7 @@
  *
  * On the other hand, for programs that are parallelized using MPI but
  * where meshes are held distributed across several processors using
- * the parallel::distributed::Triangulation and
- * parallel::distributed::DoFHandler classes, the subdomain id of
+ * the parallel::distributed::Triangulation class, the subdomain id of
  * cells is tied to the processor that owns the cell. In other words,
  * querying the subdomain id of a cell tells you if the cell is owned
  * by the current processor (i.e. if <code>cell-@>subdomain_id() ==
