@@ -1,6 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+<h2>Overview</h2>
 
 This program does not introduce any new mathematical ideas; in fact, all it
 does is to do the exact same computations that step-8
@@ -13,58 +14,175 @@ within an MPI network, the resulting code will even be able to solve the
 problem in %parallel. If you don't know what PETSc is, then this would be a
 good time to take a quick glimpse at their homepage.
 
-
-
 As a prerequisite of this program, you need to have PETSc installed, and if
 you want to run in %parallel on a cluster, you also need <a
 href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
 target="_top">METIS</a> to partition meshes. The installation of deal.II
 together with these two additional libraries is described in the <a
-href="../../readme.html" target="body">README</a> file.
-
-
+href="https://www.dealii.org/developer/readme.html" target="body">README</a> file.
 
 Now, for the details: as mentioned, the program does not compute anything new,
-so the use of finite element classes etc. is exactly the same as before. The
+so the use of finite element classes, etc., is exactly the same as before. The
 difference to previous programs is that we have replaced almost all uses of
 classes <code>Vector</code> and <code>SparseMatrix</code> by their
-near-equivalents <code>PETScWrappers::Vector</code> and
-<code>PETScWrappers::SparseMatrix</code> (for sequential vectors and matrices,
-i.e. objects for which all elements are stored locally on one machine), and
-<code>PETScWrappers::MPI::Vector</code> and
-<code>PETScWrappers::MPI::SparseMatrix</code> for versions of these classes
-where only a part of the matrix or vector is stored on each machine within an
-MPI network. These classes provide an interface that is very similar to that
+near-equivalents <code>PETScWrappers::MPI::Vector</code> and
+<code>PETScWrappers::MPI::SparseMatrix</code> that store data in a way so that
+every processor in the MPI network only stores
+a part of the matrix or vector. More specifically, each processor will
+only store those rows of the matrix that correspond to a degree of
+freedom it "owns". For vectors, they either store only elements that 
+correspond to degrees of freedom the processor owns (this is what is
+necessary for the right hand side), or also some additional elements
+that make sure that every processor has access the solution components
+that live on the cells the processor owns (so-called 
+@ref GlossLocallyActiveDof "locally active DoFs") or also on neighboring cells
+(so-called @ref GlossLocallyRelevantDof "locally relevant DoFs").
+
+The interface the classes from the PETScWrapper namespace provide is very similar to that
 of the deal.II linear algebra classes, but instead of implementing this
 functionality themselves, they simply pass on to their corresponding PETSc
 functions. The wrappers are therefore only used to give PETSc a more modern,
 object oriented interface, and to make the use of PETSc and deal.II objects as
-interchangeable as possible.
-
-
-
-While the sequential PETSc wrappers classes do not have any advantage over
-their deal.II counterparts, the main point of using PETSc is that it can run
+interchangeable as possible. The main point of using PETSc is that it can run
 in %parallel. We will make use of this by partitioning the domain into as many
-blocks (``subdomains'') as there are processes in the MPI network. At the same
-time, PETSc provides dummy MPI stubs that allow to run the same program on a
-single machine if so desired, without any changes.
+blocks ("subdomains") as there are processes in the MPI network. At the same
+time, PETSc also provides dummy MPI stubs, so you can run this program on a
+single machine if PETSc was configured without MPI.
 
 
+<h2>Parallelizing software with MPI</h2>
 
-Note, however, that the only data structures we parallelize are matrices and
-vectors. We do, in particular, not split up the <code>Triangulation</code> and
-<code>DoFHandler</code> classes: each process still has a complete copy of
+Developing software to run in %parallel via MPI requires a bit of a change in
+mindset because one typically has to split up all data structures so that
+every processor only stores a piece of the entire problem. As a consequence,
+you can't typically access all components of a solution vector on each 
+processor -- each processor may simply not have enough memory to hold the
+entire solution vector. Because data is split up or "distributed" across
+processors, we call the programming model used by MPI "distributed memory
+computing" (as opposed to "shared memory computing", which would mean
+that multiple processors can all access all data within one memory
+space, for example whenever multiple cores in a single machine work
+on a common task). Some of the fundamentals of distributed memory
+computing are discussed in the 
+@ref distributed "Parallel computing with multiple processors using distributed memory"
+documentation module, which is itself a sub-module of the
+@ref Parallel "Parallel computing" module. 
+
+In general, to be truly able to scale to large numbers of processors, one
+needs to split between the available processors <i>every</i> data structure
+whose size scales with the size of the overall problem. This includes, for
+example, the triangulation, the matrix, and all global vectors (solution, right
+hand side). If one doesn't split all of these objects, one of those will be
+replicated on all processors and will eventually simply become too large
+if the problem size (and the number of available processors) becomes large.
+(On the other hand, it is completely fine to keep objects with a size that
+is independent of the overall problem size on every processor. For example,
+each copy of the executable will create its own finite element object, or the
+local matrix we use in the assembly.)
+
+In the current program (as well as in the related step-18), we will not go
+quite this far but present a gentler introduction to using MPI. More
+specifically, the only data structures we will parallelize are matrices and
+vectors. We do, however, not split up the Triangulation and
+DoFHandler classes: each process still has a complete copy of
 these objects, and all processes have exact copies of what the other processes
-have. Doing so is slightly, though not much more complicated (from a user
-perspective, it is <i>much</i> more complicated under the hood) to achieve and
-we will show how to do this in step-40.
+have. We will then simply have to mark, in each copy of the triangulation
+on each of the processors, which processor owns which cells. This
+process is called "partitioning" a mesh into @ref GlossSubdomainId "subdomains".
+
+For larger problems, having to store the <i>entire</i> mesh on every processor
+will clearly yield a bottleneck. Splitting up the mesh is slightly, though not
+much more complicated (from a user perspective, though it is <i>much</i> more
+complicated under the hood) to achieve and
+we will show how to do this in step-40 and some other programs.
+
+Philosophically, the way MPI operates is as follows. You typically run a
+program via
+@code
+  mpirun -np 32 ./step-17
+@endcode
+which means to run it on (say) 32 processors. (If you are on a cluster system,
+you typically need to <i>schedule</i> the program to run whenever 32 processors
+become available; this is typically described in the documentation of your
+cluster. But under the hood, whenever those processors become available,
+the same call as above will generally be executed.) What this does is that
+the MPI system will start 32 <i>copies</i> of the <code>step-17</code>
+executable. This may happen on different machines that can't even read
+from each others' memory spaces, or it may happen on the same machine, but
+the end result is the same: each of these 32 copies will run with some
+memory allocated to it by the operating system, and it will not directly
+be able to read the memory of the other 31 copies. In order to collaborate
+in a common task, these 32 copies then have to <i>communicate</i> with
+each other. MPI, short for <i>Message Passing Interface</i>, makes this
+possible by allowing programs to <i>send messages</i>. You can think
+of this as the mail service: you can put a letter to a specific address
+into the mail and it will be delivered. But that's the extent to which
+you can control things. If you want the receiver to do something
+with the content of the letter, for example return to you data you want
+from over there, then two things need to happen: (i) the receiver needs
+to actually go check whether there is anything in her mailbox, and (ii) if
+there is, react appropriately, for example by sending data back. If you
+wait for this return message but the original receiver was distracted
+and not paying attention, then you're out of luck: you'll simply have to
+wait until your requested over there will be worked on. In some cases,
+bugs will lead the original receiver to never check your mail, and in that
+case you will wait forever -- this is called a <i>deadlock</i>. 
+(@dealiiVideoLectureSeeAlso{39,41,41.25,41.5})
+
+In practice, one does not usually program at the level of sending and
+receiving individual messages, but uses higher level operations. For
+example, in the program we will use function calls that take a number
+from each processor, add them all up, and return the sum to all
+processors. Internally, this is implemented using individual messages,
+but to the user this is transparent. We call such operations <i>collectives</i>
+because <i>all</i> processors participate in them. Collectives allow us
+to write programs where not every copy of the executable is doing something
+completely different (this would be incredibly difficult to program) but
+where in essence all copies are doing the same thing (though on different
+data) for themselves, running through the same blocks of code; then they
+communicate data through collectives; and then go back to doing something
+for themselves again running through the same blocks of data. This is the
+key piece to being able to write programs, and it is the key component
+to making sure that programs can run on any number of processors,
+since we do not have to write different code for each of the participating
+processors.
+
+(This is not to say that programs are never written in ways where
+different processors run through different blocks of code in their
+copy of the executable. Programs internally also often communicate
+in other ways than through collectives. But in practice, %parallel finite
+finite element codes almost always follow the scheme where every copy
+of the program runs through the same blocks of code at the same time,
+interspersed by phases where all processors communicate with each other.)
+
+In reality, even the level of calling MPI collective functions is too
+low. Rather, the program below will not contain any direct
+calls to MPI at all, but only deal.II functions that hide this
+communication from users of the deal.II. This has the advantage that
+you don't have to learn the details of MPI and its rather intricate
+function calls. That said, you do have to understand the general
+philosophy behind MPI as outlined above.
 
 
+<h2>What this program does</h2>
 
-The techniques this program demonstrates are: how to use the PETSc wrapper
-classes; how to parallelize operations for jobs running on an MPI network; and
-how to partition the domain into subdomains to parallelize up the work. Since
-all this can only be demonstrated using actual code, let us go straight to the
+The techniques this program then demonstrates are:
+- How to use the PETSc wrapper classes; this will already be visible in the
+  declaration of the principal class of this program, <code>ElasticProblem</code>.
+- How to partition the mesh into subdomains; this happens in the 
+  <code>ElasticProblem::setup_system()</code> function.
+- How to parallelize operations for jobs running on an MPI network; here, this
+  is something one has to pay attention to in a number of places, most
+  notably in the  <code>ElasticProblem::assemble_system()</code> function.
+- How to deal with vectors that store only a subset of vector entries
+  and for which we have to ensure that they store what we need on the
+  current processors. See for example the
+  <code>ElasticProblem::solve()</code> and <code>ElasticProblem::refine_grid()</code>
+  functions.
+- How to deal with status output from programs that run on multiple
+  processors at the same time. This is done via the <code>pcout</code>
+  variable in the program, initialized in the constructor.
+
+Since all this can only be demonstrated using actual code, let us go straight to the
 code without much further ado.
 

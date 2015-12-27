@@ -1299,25 +1299,26 @@
  * While in principle this property
  * can be used in any way application programs deem useful (it is simply an
  * integer associated with each cell that can indicate whatever you want), at
- * least for programs that run in %parallel it usually denotes the processor a
- * cell is associated with.
+ * least for programs that run in %parallel it usually denotes the MPI rank
+ * (or number) of the processor that "owns" this cell.
  *
  * For programs that are parallelized based on MPI but where each processor
- * stores the entire triangulation (as in, for example, step-18, but not in
- * step-32), subdomain ids are assigned to cells by
+ * stores the entire triangulation (as in, for example, step-17 and step-18,
+ * but not in step-40), subdomain ids are assigned to cells by
  * partitioning a mesh, and each MPI process then only works on those cells it
- * "owns", i.e. that belong to a subdomain that the processor is associated with
+ * "owns", i.e., that belong to a subdomain the processor owns
  * (traditionally, this is the case for the subdomain id whose numerical value
  * coincides with the rank of the MPI process within the MPI
  * communicator). Partitioning is typically done using the
  * GridTools::partition() function, but any other method can also be used to
- * do this.
+ * do this. (Alternatively, the parallel::shared::Triangulation class can
+ * partition the mesh automatically using a similar approach.)
  *
  * On the other hand, for programs that are parallelized using MPI but
  * where meshes are held distributed across several processors using
  * the parallel::distributed::Triangulation and
  * parallel::distributed::DoFHandler classes, the subdomain id of
- * cells are tied to the processor that owns the cell. In other words,
+ * cells is tied to the processor that owns the cell. In other words,
  * querying the subdomain id of a cell tells you if the cell is owned
  * by the current processor (i.e. if <code>cell-@>subdomain_id() ==
  * triangulation.parallel::distributed::Triangulation::locally_owned_subdomain()</code>)
