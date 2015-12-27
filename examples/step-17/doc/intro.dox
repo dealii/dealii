@@ -27,9 +27,9 @@ difference to previous programs is that we have replaced almost all uses of
 classes <code>Vector</code> and <code>SparseMatrix</code> by their
 near-equivalents <code>PETScWrappers::MPI::Vector</code> and
 <code>PETScWrappers::MPI::SparseMatrix</code> that store data in a way so that
-every processor in the MPI network on stores
+every processor in the MPI network only stores
 a part of the matrix or vector. More specifically, each processor will
-only store those rows of the matrix that corresponds to a degree of
+only store those rows of the matrix that correspond to a degree of
 freedom it "owns". For vectors, they either store only elements that 
 correspond to degrees of freedom the processor owns (this is what is
 necessary for the right hand side), or also some additional elements
@@ -69,15 +69,21 @@ documentation module, which is itself a sub-module of the
 @ref Parallel "Parallel computing" module. 
 
 In general, to be truly able to scale to large numbers of processors, one
-needs to split <i>every</i> data structure within a program between the
-available processors. Otherwise, there will always be a data structure
-that is replicated on all processors and that will simply become too large
+needs to split between the available processors <i>every</i> data structure
+whose size scales with the size of the overall problem. This includes, for
+example, the triangulation, the matrix, and all global vectors (solution, right
+hand side). If one doesn't split all of these objects, one of those will be
+replicated on all processors and will eventually simply become too large
 if the problem size (and the number of available processors) becomes large.
+(On the other hand, it is completely fine to keep objects with a size that
+is independent of the overall problem size on every processor. For example,
+each copy of the executable will create its own finite element object, or the
+local matrix we use in the assembly.)
 
 In the current program (as well as in the related step-18), we will not go
 quite this far but present a gentler introduction to using MPI. More
 specifically, the only data structures we will parallelize are matrices and
-vectors. We do, in particular, not split up the Triangulation and
+vectors. We do, however, not split up the Triangulation and
 DoFHandler classes: each process still has a complete copy of
 these objects, and all processes have exact copies of what the other processes
 have. We will then simply have to mark, in each copy of the triangulation
@@ -107,11 +113,11 @@ the end result is the same: each of these 32 copies will run with some
 memory allocated to it by the operating system, and it will not directly
 be able to read the memory of the other 31 copies. In order to collaborate
 in a common task, these 32 copies then have to <i>communicate</i> with
-each other. MPI, short for <i>Message Passing Interface</i> makes this
+each other. MPI, short for <i>Message Passing Interface</i>, makes this
 possible by allowing programs to <i>send messages</i>. You can think
 of this as the mail service: you can put a letter to a specific address
 into the mail and it will be delivered. But that's the extent to which
-you can control things. If you want the received to do something
+you can control things. If you want the receiver to do something
 with the content of the letter, for example return to you data you want
 from over there, then two things need to happen: (i) the receiver needs
 to actually go check whether there is anything in her mailbox, and (ii) if
