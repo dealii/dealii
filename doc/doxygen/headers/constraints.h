@@ -446,16 +446,19 @@
  * @f[
  *   (C^T A C + Id_c) \tilde x = C^T (b - A\,k)
  * @f]
- * instead [1] (M. S. Shephard: Linear multipoint constraints applied via
- * transformation as part of a direct stiffness assembly process, 1985).
+ * instead [1] (M. S. Shephard. Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process.
+ * <i>International Journal for Numerical Methods in Engineering</i>
+ * 20(11):2107-2112, 1985).
  *
- * Here, $A$ is a given (unconstrained) system matrix and $b$
- * the corresponding right hand side of a system of linear equations
- * $A\,x=b$. The matrix $C$ describes the homogeneous part of the linear
- * constraints stored in a ConstraintMatrix and the vector $k$ is the
- * vector of corresponding inhomogeneities. More precisely, the
- * ConstraintMatrix::distribute() operation applied on a vector $x$ is the
- * operation
+ * Here, $A$ is a given (unconstrained) system matrix for wich we only
+ * assume that we can apply it to a vector but can not necessarily access
+ * individual matrix entries. $b$ is the corresponding right hand side of a
+ * system of linear equations $A\,x=b$. The matrix $C$ describes the
+ * homogeneous part of the linear constraints stored in a ConstraintMatrix
+ * and the vector $k$ is the vector of corresponding inhomogeneities. More
+ * precisely, the ConstraintMatrix::distribute() operation applied on a
+ * vector $x$ is the operation
  * @f[
     x \leftarrow C\,x+k.
  * @f]

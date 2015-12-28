@@ -34,9 +34,10 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This function takes a ConstraintMatrix @p constraint_matrix and an
  * operator exemplar @p exemplar (this exemplar is usually a linear
- * operator that describes the system matrix) and returns a LinearOperator
- * object associated with the "homogeneous action" of the underlying
- * ConstraintMatrix object:
+ * operator that describes the system matrix - it is only used to create
+ * domain and range vectors of appropriate sizes, its action <tt>vmult</tt>
+ * is never used). A LinearOperator object associated with the "homogeneous
+ * action" of the underlying ConstraintMatrix object is returned:
  *
  * Applying the LinearOperator object on a vector <code>u</code> results in
  * a vector <code>v</code> that stores the result of calling
@@ -52,6 +53,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
+ * @note Currently, this function may not work correctly for distributed data
+ *       structures.
+ *
  * @relates LinearOperator
  * @ingroup constraints
  */
@@ -64,15 +68,19 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
   return_op.vmult_add = [&constraint_matrix](Range &v, const Domain &u)
   {
+    Assert(!dealii::PointerComparison::equal(&v, &u),
+           dealii::ExcMessage("The domain and range vectors must be different "
+                              "storage locations"));
+
     for (auto i : v.locally_owned_elements())
       {
         if (constraint_matrix.is_constrained(i))
           {
-            const auto *entries = constraint_matrix.get_constraint_entries (i);
+            const auto *entries = constraint_matrix.get_constraint_entries(i);
             for (types::global_dof_index j = 0; j < entries->size(); ++j)
               {
                 const auto pos = (*entries)[j].first;
-                v(i) +=  u(pos) * (*entries)[j].second;
+                v(i) += u(pos) * (*entries)[j].second;
               }
           }
         else
@@ -82,6 +90,10 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
   return_op.Tvmult_add = [&constraint_matrix](Domain &v, const Range &u)
   {
+    Assert(!dealii::PointerComparison::equal(&v, &u),
+           dealii::ExcMessage("The domain and range vectors must be different "
+                              "storage locations"));
+
     for (auto i : v.locally_owned_elements())
       {
         if (constraint_matrix.is_constrained(i))
@@ -120,8 +132,10 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
 /**
  * Given a ConstraintMatrix @p constraint_matrix and an operator exemplar
- * @p exemplar, return an LinearOperator that is the projection to the
- * subspace of constrained degrees of freedom.
+ * @p exemplar, return a LinearOperator that is the projection to the
+ * subspace of constrained degrees of freedom, i.e. all entries of the
+ * result vector that correspond to unconstrained degrees of freedom are
+ * set to zero.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
@@ -151,6 +165,10 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
 
   return_op.vmult = [&constraint_matrix](Range &v, const Domain &u)
   {
+    Assert(!dealii::PointerComparison::equal(&v, &u),
+           dealii::ExcMessage("The domain and range vectors must be different "
+                              "storage locations"));
+
     v = 0.;
     for (auto i : v.locally_owned_elements())
       if (constraint_matrix.is_constrained(i))
@@ -159,6 +177,9 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
 
   return_op.Tvmult = [&constraint_matrix](Domain &v, const Range &u)
   {
+    Assert(!dealii::PointerComparison::equal(&v, &u),
+           dealii::ExcMessage("The domain and range vectors must be different "
+                              "storage locations"));
     v = 0.;
     for (auto i : v.locally_owned_elements())
       if (constraint_matrix.is_constrained(i))
@@ -198,6 +219,9 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
+ *
+ * @note Currently, this function may not work correctly for distributed data
+ *       structures.
  *
  * @relates LinearOperator
  * @ingroup constraints
@@ -242,6 +266,9 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
+ *
+ * @note Currently, this function may not work correctly for distributed data
+ *       structures.
  *
  * @relates LinearOperator
  * @ingroup constraints
