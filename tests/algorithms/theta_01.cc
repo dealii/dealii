@@ -30,7 +30,7 @@ using namespace Algorithms;
 
 
 class Explicit
-  : public Operator<Vector<double> >
+  : public OperatorBase
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
@@ -42,7 +42,7 @@ private:
 
 
 class Implicit
-  : public Operator<Vector<double> >
+  : public OperatorBase
 {
 public:
   Implicit(const FullMatrix<double> &matrix);

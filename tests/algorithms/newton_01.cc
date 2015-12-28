@@ -33,7 +33,7 @@ public:
 };
 
 class SquareRootResidual : public
-  Algorithms::Operator<Vector<double> >
+  Algorithms::OperatorBase
 {
   SmartPointer<SquareRoot, SquareRootResidual>
   discretization;
@@ -50,7 +50,7 @@ public:
 };
 
 class SquareRootSolver : public
-  Algorithms::Operator<Vector<double> >
+  Algorithms::OperatorBase
 {
   SmartPointer<SquareRoot, SquareRootSolver>
   solver;

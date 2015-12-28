@@ -30,8 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Store any amount of any type of data accessible by an identifier string.
  *
- * @todo Deprecate access by index after NamedData has been deprecated for
- * long enough, then change to a map.
+ * @todo GK: Deprecate access to AnyData by index and change to a map.
  */
 class AnyData :
   public Subscriptor
@@ -183,7 +182,7 @@ public:
 
   /**
    * Exception indicating that a function expected a vector to have a certain
-   * name, but NamedData had a different name in that position.
+   * name, but we store a different name in that position.
    */
   DeclException2(ExcNameMismatch, int, std::string,
                  << "Name at position " << arg1 << " is not equal to " << arg2);

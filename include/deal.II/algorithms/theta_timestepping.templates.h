@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  ThetaTimestepping<VectorType>::ThetaTimestepping (Operator<VectorType> &e, Operator<VectorType> &i)
+  ThetaTimestepping<VectorType>::ThetaTimestepping (OperatorBase &e, OperatorBase &i)
     : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
   {}
 

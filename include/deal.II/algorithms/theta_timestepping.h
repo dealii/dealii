@@ -187,7 +187,7 @@ namespace Algorithms
    * @date 2010
    */
   template <typename VectorType>
-  class ThetaTimestepping : public Operator<VectorType>
+  class ThetaTimestepping : public OperatorBase
   {
   public:
     /**
@@ -195,8 +195,8 @@ namespace Algorithms
      * #op_implicit. For their meaning, see the description of those
      * variables.
      */
-    ThetaTimestepping (Operator<VectorType> &op_explicit,
-                       Operator<VectorType> &op_implicit);
+    ThetaTimestepping (OperatorBase &op_explicit,
+                       OperatorBase &op_implicit);
 
     /**
      * The timestepping scheme.
@@ -309,7 +309,7 @@ namespace Algorithms
      * vector, $M$ the mass matrix, $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
-    SmartPointer<Operator<VectorType>, ThetaTimestepping<VectorType> > op_explicit;
+    SmartPointer<OperatorBase, ThetaTimestepping<VectorType> > op_explicit;
 
     /**
      * The operator solving the implicit part of the scheme. It will receive
@@ -321,7 +321,7 @@ namespace Algorithms
      * the input data, <i>M</i> the mass matrix, <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
-    SmartPointer<Operator<VectorType>, ThetaTimestepping<VectorType> > op_implicit;
+    SmartPointer<OperatorBase, ThetaTimestepping<VectorType> > op_implicit;
 
     /**
      * The operator writing the output in each time step

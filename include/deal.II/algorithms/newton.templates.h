@@ -28,7 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  Newton<VectorType>::Newton(Operator<VectorType> &residual, Operator<VectorType> &inverse_derivative)
+  Newton<VectorType>::Newton(OperatorBase &residual,
+                             OperatorBase &inverse_derivative)
     :
     residual(&residual), inverse_derivative(&inverse_derivative),
     assemble_now(false),

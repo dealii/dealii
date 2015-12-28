@@ -38,6 +38,11 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed the deprecated Operator class in the Algorithms namespace.
+  <br>
+  (Timo Heister, 2015/12/21)
+  </li>
+
   <li> Changed: deallog console depth is now 0 by default, causing no
   output to the screen from solvers and other places in the library.
   <br>

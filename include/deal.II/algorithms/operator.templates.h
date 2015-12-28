@@ -22,10 +22,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  Operator<VectorType>::Operator()
-  {}
-
-  template <typename VectorType>
   OutputOperator<VectorType>::~OutputOperator()
   {}
 
