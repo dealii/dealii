@@ -103,11 +103,13 @@ program via
 @endcode
 which means to run it on (say) 32 processors. (If you are on a cluster system,
 you typically need to <i>schedule</i> the program to run whenever 32 processors
-become available; this is typically described in the documentation of your
+become available; this will be described in the documentation of your
 cluster. But under the hood, whenever those processors become available,
 the same call as above will generally be executed.) What this does is that
 the MPI system will start 32 <i>copies</i> of the <code>step-17</code>
-executable. This may happen on different machines that can't even read
+executable. (The MPI term for each of these running executables is that you
+have 32 @ref GlossMPIProcess "MPI processes".)
+This may happen on different machines that can't even read
 from each others' memory spaces, or it may happen on the same machine, but
 the end result is the same: each of these 32 copies will run with some
 memory allocated to it by the operating system, and it will not directly
