@@ -310,7 +310,7 @@
  *   additional constraints such as from hanging nodes.
  *
  * Of course, both approaches lead to the same final answer but in different
- * ways. Using approach (i.e., when using use_inhomogeneities_for_rhs = false
+ * ways. Using the first approach (i.e., when using use_inhomogeneities_for_rhs = false
  * in ConstraintMatrix::distribute_local_to_global()), the linear system we
  * build has zero entries in the right hand side in all those places where a
  * degree of freedom is constrained, and some positive value on the matrix
