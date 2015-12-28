@@ -75,7 +75,7 @@ namespace hp
  *
  * The full reference for the paper in which this error estimator is defined
  * is as follows:
- * @code
+ * @code{.bib}
  * @Article{KGZB83,
  *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
  *                   and Babu\v{s}ka, I.},
