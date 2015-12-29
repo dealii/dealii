@@ -356,13 +356,12 @@ protected:
 
 /**
  * Block Jacobi preconditioning. See PreconditionBlock for requirements on the
- * matrix.
+ * matrix. This class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
+ * section on @ref Instantiations in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
@@ -597,7 +596,8 @@ private:
 
 
 /**
- * Block SOR preconditioning.
+ * Block SOR preconditioning. This class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * The functions @p vmult and @p Tvmult execute a (transposed) block-SOR step,
  * based on the blocks in PreconditionBlock. The elements outside the diagonal
@@ -768,7 +768,8 @@ protected:
 
 
 /**
- * Block SSOR preconditioning.
+ * Block SSOR preconditioning. This class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * The functions @p vmult and @p Tvmult execute a block-SSOR step, based on
  * the implementation in PreconditionBlockSOR.  This class requires storage of

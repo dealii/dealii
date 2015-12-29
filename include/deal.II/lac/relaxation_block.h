@@ -234,9 +234,9 @@ protected:
 /**
  * Block Jacobi (additive Schwarz) method with possibly overlapping blocks.
  *
- * This class implements the step() and Tstep() functions expected by
- * SolverRelaxation and MGSmootherRelaxation. They perform an additive Schwarz
- * method on the blocks provided in the block list of AdditionalData.
+ * This class implements the step() and Tstep() functions expected by the
+ * @ref ConceptRelaxationType "relaxation concept". They perform an additive
+ * Schwarz method on the blocks provided in the block list of AdditionalData.
  * Differing from PreconditionBlockJacobi, these blocks may be of varying
  * size, non- contiguous, and overlapping. On the other hand, this class does
  * not implement the preconditioner interface expected by Solver objects.
@@ -318,12 +318,13 @@ public:
 /**
  * Block Gauss-Seidel method with possibly overlapping blocks.
  *
- * This class implements the step() and Tstep() functions expected by
- * SolverRelaxation and MGSmootherRelaxation. They perform a multiplicative
- * Schwarz method on the blocks provided in the block list of AdditionalData.
- * Differing from PreconditionBlockSOR, these blocks may be of varying size,
- * non-contiguous, and overlapping. On the other hand, this class does not
- * implement the preconditioner interface expected by Solver objects.
+ * This class implements the step() and Tstep() functions expected by the
+ * @ref ConceptRelaxationType "relaxation concept". They perform a
+ * multiplicative Schwarz method on the blocks provided in the block list of
+ * AdditionalData.  Differing from PreconditionBlockSOR, these blocks may be
+ * of varying size, non-contiguous, and overlapping. On the other hand, this
+ * class does not implement the preconditioner interface expected by Solver
+ * objects.
  *
  * @ingroup Preconditioners
  * @author Guido Kanschat
@@ -397,13 +398,13 @@ public:
 /**
  * Symmetric block Gauss-Seidel method with possibly overlapping blocks.
  *
- * This class implements the step() and Tstep() functions expected by
- * SolverRelaxation and MGSmootherRelaxation. They perform a multiplicative
- * Schwarz method on the blocks provided in the block list of AdditionalData
- * in symmetric fashion. Differing from PreconditionBlockSSOR, these blocks
- * may be of varying size, non-contiguous, and overlapping. On the other hand,
- * this class does not implement the preconditioner interface expected by
- * Solver objects.
+ * This class implements the step() and Tstep() functions expected by the
+ * @ref ConceptRelaxationType "relaxation concept". They perform a
+ * multiplicative Schwarz method on the blocks provided in the block list of
+ * AdditionalData in symmetric fashion. Differing from PreconditionBlockSSOR,
+ * these blocks may be of varying size, non-contiguous, and overlapping. On
+ * the other hand, this class does not implement the preconditioner interface
+ * expected by Solver objects.
  *
  * @ingroup Preconditioners
  * @author Guido Kanschat

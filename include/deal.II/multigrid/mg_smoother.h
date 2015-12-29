@@ -151,7 +151,7 @@ namespace mg
    * Smoother using relaxation classes.
    *
    * A relaxation class is an object that satisfies the
-   * @ref ConceptRelaxationType "RelaxationType concept".
+   * @ref ConceptRelaxationType "relaxation concept".
    *
    * This class performs smoothing on each level. The operation can be
    * controlled by several parameters. First, the relaxation parameter @p
@@ -231,14 +231,8 @@ namespace mg
 }
 
 /**
- * Smoother using relaxation classes.
- *
- * A relaxation class is an object that has two member functions,
- * @code
- * void  step(VectorType& x, const VectorType& d) const;
- * void Tstep(VectorType& x, const VectorType& d) const;
- * @endcode
- * performing one step of the smoothing scheme.
+ * Smoother using a solver that satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * This class performs smoothing on each level. The operation can be
  * controlled by several parameters. First, the relaxation parameter @p omega
