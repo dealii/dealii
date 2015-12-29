@@ -1159,6 +1159,82 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossMPICommunicator <b>MPI Communicator</b></dt>
+ * <dd>
+ * In the language of the Message Passing Interface (MPI), a communicator
+ * can be thought of as a mail system that allows sending messages to
+ * other members of the mail system. Within each communicator, each
+ * @ref GlossMPIProcess "process" has a
+ * @ref GlossMPIRank "rank" (the equivalent of a house number) that
+ * allows to identify senders and receivers of messages. It is not
+ * possible to send messages via a communicator to receivers that are
+ * not part of this communicator/mail service.
+ *
+ * When starting a parallel program via a command line call such as
+ * @code
+ *  mpirun -np 32 ./step-17
+ * @endcode
+ * (or the equivalent used in the batch submission system used on your
+ * cluster) the MPI system starts 32 copies of the step-17 executable.
+ * Each of these has access to the <code>MPI_COMM_WORLD</code> communicator
+ * that then consists of all 32 processors, each with its own rank. A subset
+ * of processes within this MPI universe can later agree to create other
+ * communicators that allow communication between only a subset of
+ * processes.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossMPIProcess <b>MPI Process</b></dt>
+ * <dd>
+ * When running parallel jobs on distributed memory machines, one
+ * almost always uses MPI. There, a command line call such as
+ * @code
+ *  mpirun -np 32 ./step-17
+ * @endcode
+ * (or the equivalent used in the batch submission system used on your
+ * cluster) starts 32 copies of the step-17 executable. Some of these may actually
+ * run on the same machine, but in general they will be running on different
+ * machines that do not have direct access to each other's memory space.
+ *
+ * In the language of the Message Passing Interface (MPI), each of these
+ * copies of the same executable running on (possibly different) machines
+ * are called <i>processes</i>. The collection of all processes running in
+ * parallel is called the "MPI Universe" and is identified by the
+ * @ref GlossMPICommunicator "MPI communicator" <code>MPI_COMM_WORLD</code>.
+ *
+ * Each process has immediate access only to the objects in its own
+ * memory space. A process can not read from or write into the memory
+ * of other processes. As a consequence, the only way by which
+ * processes can communicate is by sending each other messages. That
+ * said (and as explained in the introduction to step-17), one
+ * typically calls higher level MPI functions in which all processes
+ * that are part of a communicator participate. An example would
+ * be computing the sum over a set of integers where each process
+ * provides one term of the sum.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossMPIRank <b>MPI Rank</b></dt>
+ * <dd>
+ * In the language of the Message Passing Interface (MPI), the <i>rank</i>
+ * of an @ref GlossMPIProcess "MPI process" is the number this process
+ * carries within the set <code>MPI_COMM_WORLD</code> of all processes
+ * currently running as one parallel job. More correctly, it is the
+ * number within an @ref GlossMPICommunicator "MPI communicator" that
+ * groups together a subset of all processes with one parallel job
+ * (where <code>MPI_COMM_WORLD</code> simply denotes the <i>complete</i>
+ * set of processes).
+ *
+ * Within each communicator, each process has a unique rank, distinct from the
+ * all other processes' ranks, that allows
+ * identifying one recipient or sender in MPI communication calls. Each
+ * process, running on one processor, can inquire about its own rank
+ * within a communicator by calling Utilities::MPI::this_mpi_process().
+ * The total number of processes participating in a communicator (i.e.,
+ * the <i>size</i> of the communicator) can be obtained by calling
+ * Utilities::MPI::n_mpi_processes().
+ * </dd>
+ *
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
  * <dd>The "multigrid paper" is a paper by B. Janssen and G. Kanschat, titled
@@ -1299,8 +1375,8 @@
  * While in principle this property
  * can be used in any way application programs deem useful (it is simply an
  * integer associated with each cell that can indicate whatever you want), at
- * least for programs that run in %parallel it usually denotes the MPI rank
- * (or number) of the processor that "owns" this cell.
+ * least for programs that run in %parallel it usually denotes the
+ * @ref GlossMPIRank "MPI rank" of the processor that "owns" this cell.
  *
  * For programs that are parallelized based on MPI but where each processor
  * stores the entire triangulation (as in, for example, step-17 and step-18,
