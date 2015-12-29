@@ -792,7 +792,7 @@
  * namespace and the techniques used in step-40.
  *
  * The full reference for the paper is as follows:
- * @code
+ * @code{.bib}
 @Article{BBHK11,
   author =       {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
@@ -981,7 +981,7 @@
  * elements.
  *
  * The full reference for this paper is as follows:
- * @code
+ * @code{.bib}
 @Article{BK07,
   author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
   title =        {Data Structures and Requirements for hp Finite Element
@@ -1245,15 +1245,15 @@
  * methods.
  *
  * The full reference for this paper is as follows:
- * @code
+ * @code{.bib}
 @article{janssen2011adaptive,
-  title={Adaptive Multilevel Methods with Local Smoothing for H\^{}1-and H\^{}curl-Conforming High Order Finite Element Methods},
-  author={Janssen, B{\"a}rbel and Kanschat, Guido},
-  journal={SIAM Journal on Scientific Computing},
-  volume={33},
-  number={4},
-  pages={2095--2114},
-  year={2011},
+  title=    {Adaptive Multilevel Methods with Local Smoothing for H^1- and H^{curl}-Conforming High Order Finite Element Methods},
+  author=   {Janssen, B{\"a}rbel and Kanschat, Guido},
+  journal=  {SIAM Journal on Scientific Computing},
+  volume=   {33},
+  number=   {4},
+  pages=    {2095--2114},
+  year=     {2011},
   publisher={SIAM}}
  * @endcode
  * See 
@@ -1570,7 +1570,7 @@
  *   of implementing it. It also compares the performance of different implementations.
  *
  * The full reference for this paper is as follows:
- * @code
+ * @code{.bib}
 @Article{TKB16,
   author =       {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
   title =        {\textit{WorkStream} -- a design pattern for multicore-enabled finite element computations},
