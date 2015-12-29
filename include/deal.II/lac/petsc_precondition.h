@@ -152,7 +152,6 @@ namespace PETScWrappers
     PreconditionJacobi (const MPI_Comm communicator,
                         const AdditionalData &additional_data = AdditionalData());
 
-
     /**
      * Initializes the preconditioner object and calculate all data that is
      * necessary for applying it in a solver. This function is automatically

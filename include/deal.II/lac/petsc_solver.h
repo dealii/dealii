@@ -157,10 +157,10 @@ namespace PETScWrappers
     SolverControl &control() const;
 
     /**
-     * Initialise the solver with the preconditioner.
+     * initialize the solver with the preconditioner.
      * This function is intended for use with SLEPc spectral transformation class.
      */
-    void initialise(const PreconditionerBase &preconditioner);
+    void initialize(const PreconditionerBase &preconditioner);
 
     /**
      * Exception

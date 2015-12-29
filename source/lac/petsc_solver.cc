@@ -206,7 +206,7 @@ namespace PETScWrappers
   }
 
   void
-  SolverBase::initialise(const PreconditionerBase &preconditioner)
+  SolverBase::initialize(const PreconditionerBase &preconditioner)
   {
     int ierr;
 

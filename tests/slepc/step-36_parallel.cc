@@ -114,7 +114,7 @@ void test (std::string solver_name,
    mpi_communicator,
    locally_relevant_dofs);
 
-  // Initialise the stiffness and mass matrices
+  // initialize the stiffness and mass matrices
   stiffness_matrix.reinit (locally_owned_dofs,
                            locally_owned_dofs,
                            csp,
@@ -222,7 +222,7 @@ void test (std::string solver_name,
 
     dealii::SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-12,/*log_history*/false,/*log_results*/false);
     PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
-    linear_solver.initialise(*preconditioner);
+    linear_solver.initialize(*preconditioner);
 
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       eigenfunctions[i] = PetscScalar();
