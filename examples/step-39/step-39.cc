@@ -935,6 +935,7 @@ int main()
       using namespace dealii;
       using namespace Step39;
 
+      deallog.depth_console(2);
       std::ofstream logfile("deallog");
       deallog.attach(logfile);
       FE_DGQ<2> fe1(3);
