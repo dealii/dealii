@@ -447,7 +447,8 @@ protected:
 /**
  * Jacobi preconditioner using matrix built-in function.  The <tt>MatrixType</tt>
  * class used is required to have a function <tt>precondition_Jacobi(VectorType&,
- * const VectorType&, double</tt>)
+ * const VectorType&, double</tt>). This class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
  *     // Declare related objects
@@ -522,7 +523,8 @@ public:
  *
  * The MatrixType class used is required to have functions
  * <tt>precondition_SOR(VectorType&, const VectorType&, double)</tt> and
- * <tt>precondition_TSOR(VectorType&, const VectorType&, double)</tt>.
+ * <tt>precondition_TSOR(VectorType&, const VectorType&, double)</tt>. This
+ * class satisfies the @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
  *     // Declare related objects
@@ -578,7 +580,8 @@ public:
 /**
  * SSOR preconditioner using matrix built-in function.  The <tt>MatrixType</tt>
  * class used is required to have a function <tt>precondition_SSOR(VectorType&,
- * const VectorType&, double)</tt>
+ * const VectorType&, double)</tt>. This class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
  *     // Declare related objects

@@ -188,9 +188,9 @@
  * };
  * @endcode
  * where these two member functions perform one step (or the transpose of such
- * a step) of the smoothing scheme. In other words, the operation performed by
- * these functions is
- * $dst = dst - P^{-1} (A dst - rhs)$ and $dst = dst - P^{-T} (A dst - rhs)$.
+ * a step) of the smoothing scheme. In other words, the operations performed by
+ * these functions are
+ * $u = u - P^{-1} (A u - v)$ and $u = u - P^{-T} (A u - v)$.
  * </dd>
  *
  * <dt class="concepts">@anchor ConceptSparsityPatternType <b>SparsityPatternType</b></dt>
