@@ -795,11 +795,9 @@ namespace internal
                         const dealii::Vector<T> &src,
                         dealii::Vector<U>       &dst)
     {
-      const T *q = src.begin()+begin;
-      const T *const end_q = src.begin()+end;
-      U *p = dst.begin()+begin;
-      for (; q!=end_q; ++q, ++p)
-        *p = *q;
+      DEAL_II_OPENMP_SIMD_PRAGMA
+      for (unsigned int i=begin; i<end; ++i)
+        dst.begin()[i] = src.begin()[i];
     }
 
 
