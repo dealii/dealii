@@ -145,7 +145,12 @@ foreach $step (@ARGV)
     my $source;
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
-        print "$source -> $destination\n";
+        print "$source -> $destination";
+        if ($destination =~ /code_gallery/)
+        {
+            print " [style=\"dashed\"]";
+        }
+        print "\n";
     }
 }
 
