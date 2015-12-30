@@ -664,7 +664,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     solver.solve(transpose_operator(op), v, u, preconditioner);
   };
 
-  return_op.Tvmult =
+  return_op.Tvmult_add =
     [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
