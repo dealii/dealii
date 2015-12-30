@@ -526,6 +526,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: inverse_operator() now populates <code>Tvmult</code> and
+  <code>Tvmult_add</code> correctly.
+  <br>
+  (Jean-Paul Pelteret, David Wells, Matthias Maier, 2015/12/30)
+  </li>
+
   <li> Fixed: Now all members in the class SparseMatrixEZ are initialized
   correctly in the constructor. This was causing random crashes before.
   <br>
