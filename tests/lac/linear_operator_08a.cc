@@ -70,15 +70,15 @@ int main()
   for (unsigned int j = 0; j < 1000; ++j)
     {
       // test Tvmult:
-      residual = lo_A_inv_t * b;
+      residual = lo_A_inv_t *b;
       residual -= answer;
       if (residual.l2_norm() > 1e-10)
-          ++n_mistakes;
+        ++n_mistakes;
 
       // test Tvmult_add:
-      residual = lo_A_inv_t * b - answer;
+      residual = lo_A_inv_t *b - answer;
       if (residual.l2_norm() > 1e-10)
-          ++n_mistakes;
+        ++n_mistakes;
     }
 
   deallog.depth_file(3);
