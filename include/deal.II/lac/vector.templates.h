@@ -603,7 +603,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
   if (vec_size != 0)
     {
       allocate();
-      std::copy (v.begin(), v.end(), begin());
+      *this = v;
     }
 }
 #endif
@@ -795,9 +795,11 @@ namespace internal
                         const dealii::Vector<T> &src,
                         dealii::Vector<U>       &dst)
     {
+      const T *src_ptr = src.begin();
+      U *dst_ptr = dst.begin();
       DEAL_II_OPENMP_SIMD_PRAGMA
-      for (unsigned int i=begin; i<end; ++i)
-        dst.begin()[i] = src.begin()[i];
+      for (typename dealii::Vector<T>::size_type i=begin; i<end; ++i)
+        dst_ptr[i] = src_ptr[i];
     }
 
 
