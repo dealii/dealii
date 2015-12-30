@@ -410,52 +410,51 @@ void MGTransferBlockBase::build_matrices (
   // impose boundary conditions
   // but only in the column of
   // the prolongation matrix
-  if (mg_constrained_dofs != 0)
-    if (mg_constrained_dofs->set_boundary_values())
-      {
-        std::vector<types::global_dof_index> constrain_indices;
-        std::vector<std::vector<bool> > constraints_per_block (n_blocks);
-        for (int level=n_levels-2; level>=0; --level)
-          {
-            if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
-              continue;
+  if (mg_constrained_dofs != 0 && mg_constrained_dofs->have_boundary_indices())
+    {
+      std::vector<types::global_dof_index> constrain_indices;
+      std::vector<std::vector<bool> > constraints_per_block (n_blocks);
+      for (int level=n_levels-2; level>=0; --level)
+        {
+          if (mg_constrained_dofs->get_boundary_indices(level).n_elements() == 0)
+            continue;
 
-            // need to delete all the columns in the
-            // matrix that are on the boundary. to achieve
-            // this, create an array as long as there are
-            // matrix columns, and find which columns we
-            // need to filter away.
-            constrain_indices.resize (0);
-            constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-            std::set<types::global_dof_index>::const_iterator dof
-            = mg_constrained_dofs->get_boundary_indices()[level].begin(),
-            endd = mg_constrained_dofs->get_boundary_indices()[level].end();
-            for (; dof != endd; ++dof)
-              constrain_indices[*dof] = 1;
+          // need to delete all the columns in the
+          // matrix that are on the boundary. to achieve
+          // this, create an array as long as there are
+          // matrix columns, and find which columns we
+          // need to filter away.
+          constrain_indices.resize (0);
+          constrain_indices.resize (prolongation_matrices[level]->n(), 0);
+          IndexSet::ElementIterator dof
+          = mg_constrained_dofs->get_boundary_indices(level).begin(),
+          endd = mg_constrained_dofs->get_boundary_indices(level).end();
+          for (; dof != endd; ++dof)
+            constrain_indices[*dof] = 1;
 
-            unsigned int index = 0;
-            for (unsigned int block=0; block<n_blocks; ++block)
-              {
-                const types::global_dof_index n_dofs = prolongation_matrices[level]->block(block, block).m();
-                constraints_per_block[block].resize(0);
-                constraints_per_block[block].resize(n_dofs, 0);
-                for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
-                  constraints_per_block[block][i] = (constrain_indices[index] == 1);
+          unsigned int index = 0;
+          for (unsigned int block=0; block<n_blocks; ++block)
+            {
+              const types::global_dof_index n_dofs = prolongation_matrices[level]->block(block, block).m();
+              constraints_per_block[block].resize(0);
+              constraints_per_block[block].resize(n_dofs, 0);
+              for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
+                constraints_per_block[block][i] = (constrain_indices[index] == 1);
 
-                for (types::global_dof_index i=0; i<n_dofs; ++i)
-                  {
-                    SparseMatrix<double>::iterator
-                    start_row = prolongation_matrices[level]->block(block, block).begin(i),
-                    end_row   = prolongation_matrices[level]->block(block, block).end(i);
-                    for (; start_row != end_row; ++start_row)
-                      {
-                        if (constraints_per_block[block][start_row->column()])
-                          start_row->value() = 0.;
-                      }
-                  }
-              }
-          }
-      }
+              for (types::global_dof_index i=0; i<n_dofs; ++i)
+                {
+                  SparseMatrix<double>::iterator
+                  start_row = prolongation_matrices[level]->block(block, block).begin(i),
+                  end_row   = prolongation_matrices[level]->block(block, block).end(i);
+                  for (; start_row != end_row; ++start_row)
+                    {
+                      if (constraints_per_block[block][start_row->column()])
+                        start_row->value() = 0.;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
