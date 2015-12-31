@@ -50,15 +50,27 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     GET_FILENAME_COMPONENT(_step "${_step}" NAME)
     MESSAGE(STATUS "  Setting up ${_step}")
 
-    # get all source files so we can properly describe the dependencies
-    FILE(GLOB_RECURSE _src_files *)
+    # Get all source files so we can let the perl script work on
+    # them and so we properly describe the dependencies. exclude
+    # meta-files necessary to describe each code gallery project
+    FILE(GLOB_RECURSE _src_files
+         ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/*)
+    STRING(REPLACE "${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/" "" _relative_src_files
+           "${_src_files}")
+    LIST(REMOVE_ITEM _relative_src_files doc/author)
+    LIST(REMOVE_ITEM _relative_src_files doc/tooltip)
+    LIST(REMOVE_ITEM _relative_src_files doc/dependencies)
+    LIST(REMOVE_ITEM _relative_src_files doc/builds-on)
 
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       COMMAND ${PERL_EXECUTABLE}
       ARGS
         ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${_step} ${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR} 
+        ${_step} 
+        ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
+        ${_relative_src_files} 
         > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -67,6 +79,18 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
         ${_src_files}
       )
 
+    # Copy files of interest (non-metadata) to the build directory
+    # so we can link to them, and schedule them for installation
+    FILE(COPY ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
+         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+         PATTERN REGEX "doc/tooltip|doc/dependencies|doc/builds-on" EXCLUDE)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_step}
+            DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/code-gallery
+            COMPONENT documentation
+           )
+
+    # Create a target for this program and add it to the top-level
+    # target of this directory
     ADD_CUSTOM_TARGET(code-gallery_${_step}
       DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
