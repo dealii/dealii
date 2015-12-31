@@ -46,7 +46,35 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
 
   # Now set up targets for each of the code gallery programs
 
-  # ...TODO...
+  FOREACH(_step ${_code_gallery_names})
+    GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+    MESSAGE(STATUS "  Setting up ${_step}")
+
+    # get all source files so we can properly describe the dependencies
+    FILE(GLOB_RECURSE _src_files *)
+
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      COMMAND ${PERL_EXECUTABLE}
+      ARGS
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${_step} ${CMAKE_SOURCE_DIR}
+        > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      WORKING_DIRECTORY
+        ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${_src_files}
+      )
+
+    ADD_CUSTOM_TARGET(code-gallery_${_step}
+      DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      )
+    ADD_DEPENDENCIES(code-gallery code-gallery_${_step})
+
+
+  ENDFOREACH()
 
 ELSE()
   MESSAGE(STATUS "Generating the code-gallery documentation is only possible if the code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
