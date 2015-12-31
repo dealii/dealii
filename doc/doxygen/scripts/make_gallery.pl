@@ -13,27 +13,50 @@
 ##
 ## ---------------------------------------------------------------------
 
-if ($#ARGV != 1) {
-  print "\nUsage: make_gallery.pl gallery cmake_source_dir\n";
+if ($#ARGV < 1) {
+  print "\nUsage: make_gallery.pl cmake_source_dir gallery_name gallery_dir gallery_src_files...\n";
   exit;
 }
 
-$gallery=$ARGV[0];
-$gallery_underscore=$gallery;
-$gallery_underscore=~ s/-/_/;
+my $cmake_source_dir = shift(@ARGV);
 
-$cmake_source_dir=$ARGV[1];
+my $gallery = shift(@ARGV);
+my $gallery_underscore = $gallery;
+$gallery_underscore    =~ s/-/_/;
+
+my $gallery_dir = shift(@ARGV);
+my $author_file = "$gallery_dir/doc/author";
+
+my @src_files = @ARGV;
+
+# read the names of authors; escape '<' and '>' as they
+# appear in the email address. also trim trailing space and
+# newlines
+open AUTHORS, "<$author_file";
+my $authors = <AUTHORS>;
+$authors    =~ s/</&lt;/g; 
+$authors    =~ s/>/&gt;/g; 
+$authors    =~ s/\s*$//g;
 
 print
 "/**
   * \@page code_gallery_$gallery_underscore The $gallery code gallery program
 \@htmlonly
-<table class=\"tutorial\" width=\"50%\">
-<tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>
-<tr><td width=\"50%\" valign=\"top\">
+<p align=\"center\"> 
+  This program was contributed by $authors.
+  <br>
+  It comes without any warranty or support by its authors or the authors of deal.II.
+</p>
+
 \@endhtmlonly
+
+This program consists of the following files (click to inspect):
 ";
 
-print
-"*/
-";
+foreach my $file (@src_files)
+{ 
+  print "- <a href=\"../code-gallery/$gallery/$file\">$file</a>\n";
+}
+print "\n";
+
+print "*/\n";
