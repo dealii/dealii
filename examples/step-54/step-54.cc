@@ -401,7 +401,7 @@ int main ()
       using namespace dealii;
       using namespace Step54;
 
-      const std::string in_mesh_filename = "initial_mesh_3d.vtk";
+      const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
       const std::string cad_file_name = "DTMB-5415_bulbous_bow.iges";
 
       cout << "----------------------------------------------------------" << endl;
@@ -470,4 +470,3 @@ int main ()
 
   return 0;
 }
-
