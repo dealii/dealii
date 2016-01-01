@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013, 2015 by the deal.II authors
+## Copyright (C) 2013, 2015, 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -59,4 +59,45 @@ foreach my $file (@src_files)
 }
 print "\n";
 
+
+# Next go through the list of files and see whether any of these are
+# pictures we could show here:
+my @picture_files;
+foreach my $file (@src_files)
+{ 
+    if ($file =~ /.*\.(png|jpg|gif|svg)/)
+    {
+        push @picture_files, $file;
+    }
+}
+
+if (@picture_files)
+{
+    print "<h2>Pictures from this code gallery program:</h2>\n";
+    print "<p align=\"center\">\n";
+    print "<table>\n";
+
+    # print four pictures per row
+    while (@picture_files)
+    {
+        print "     <tr>\n";
+        for my $i (0 .. 3)
+        {
+            if (@picture_files) 
+            {
+                print "       <td>\n";
+                my $pic = pop(@picture_files);
+                print "         <img width=\"250\" src=\"../code-gallery/$gallery/$pic\">\n";
+                print "       </td>\n";
+            }
+        }
+        print "     </tr>\n";
+    }
+
+    print "</table>\n";
+    print "</p>\n";
+}
+
+
+# end the doxygen input file
 print "*/\n";
