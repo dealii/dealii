@@ -95,6 +95,12 @@ namespace PETScWrappers
         ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+        // make sure the preconditioner has an associated matrix set
+        const Mat B = preconditioner;
+        AssertThrow (B != NULL,
+                     ExcMessage("PETSc preconditioner should have an"
+                                "associated matrix set to be used in solver."));
+
         // setting the preconditioner overwrites the used matrices.
         // hence, we need to set the matrices after the preconditioner.
 #if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
