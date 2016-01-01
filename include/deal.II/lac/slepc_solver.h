@@ -79,7 +79,7 @@ DEAL_II_NAMESPACE_OPEN
  *   PETScWrappers::PreconditionBoomerAMG preconditioner(mpi_communicator, data);
  *   SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-12,false,false);
  *   PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
- *   linear_solver.initialise(preconditioner);
+ *   linear_solver.initialize(preconditioner);
  *   SolverControl solver_control (100, 1e-9,false,false);
  *   SLEPcWrappers::SolverKrylovSchur eigensolver(solver_control,mpi_communicator);
  *   SLEPcWrappers::TransformationShift spectral_transformation(mpi_communicator);
@@ -90,7 +90,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In order to support this usage case, different from PETSc wrappers, the classes
  * in this namespace are written in such a way that the underlying SLEPc objects
- * are initialised in constructors. By doing so one also avoid caching of different
+ * are initialized in constructors. By doing so one also avoid caching of different
  * settings (such as target eigenvalue or type of the problem); instead those are
  * applied straight away when the corresponding functions of the wrapper classes
  * are called.
