@@ -146,6 +146,13 @@ namespace PETScWrappers
                         const AdditionalData &additional_data = AdditionalData());
 
     /**
+     * Same as above but without setting a matrix to form the preconditioner.
+     * Intended to be used with SLEPc objects.
+     */
+    PreconditionJacobi (const MPI_Comm communicator,
+                        const AdditionalData &additional_data = AdditionalData());
+
+    /**
      * Initializes the preconditioner object and calculate all data that is
      * necessary for applying it in a solver. This function is automatically
      * called when calling the constructor with the same arguments and is only
@@ -159,6 +166,13 @@ namespace PETScWrappers
      * Store a copy of the flags for this particular preconditioner.
      */
     AdditionalData additional_data;
+
+    /**
+     * Initializes the preconditioner object without knowing a particular matrix.
+     * This function sets up appropriate parameters to the underlying PETSc object
+     * after it has been created.
+     */
+    void initialize();
   };
 
 
@@ -205,6 +219,14 @@ namespace PETScWrappers
                              const AdditionalData &additional_data = AdditionalData());
 
     /**
+     * Same as above but without setting a matrix to form the preconditioner.
+     * Intended to be used with SLEPc objects.
+     */
+    PreconditionBlockJacobi (const MPI_Comm communicator,
+                             const AdditionalData &additional_data = AdditionalData());
+
+
+    /**
      * Initializes the preconditioner object and calculate all data that is
      * necessary for applying it in a solver. This function is automatically
      * called when calling the constructor with the same arguments and is only
@@ -218,6 +240,14 @@ namespace PETScWrappers
      * Store a copy of the flags for this particular preconditioner.
      */
     AdditionalData additional_data;
+
+    /**
+     * Initializes the preconditioner object without knowing a particular matrix.
+     * This function sets up appropriate parameters to the underlying PETSc object
+     * after it has been created.
+     */
+    void initialize();
+
   };
 
 
@@ -701,6 +731,14 @@ namespace PETScWrappers
                            const AdditionalData &additional_data = AdditionalData());
 
     /**
+     * Same as above but without setting a matrix to form the preconditioner.
+     * Intended to be used with SLEPc objects.
+     */
+    PreconditionBoomerAMG (const MPI_Comm communicator,
+                           const AdditionalData &additional_data = AdditionalData());
+
+
+    /**
      * Initializes the preconditioner object and calculate all data that is
      * necessary for applying it in a solver. This function is automatically
      * called when calling the constructor with the same arguments and is only
@@ -714,6 +752,14 @@ namespace PETScWrappers
      * Store a copy of the flags for this particular preconditioner.
      */
     AdditionalData additional_data;
+
+    /**
+     * Initializes the preconditioner object without knowing a particular matrix.
+     * This function sets up appropriate parameters to the underlying PETSc object
+     * after it has been created.
+     */
+    void initialize();
+
   };
 
 

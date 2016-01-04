@@ -33,14 +33,17 @@ namespace PETScWrappers
 
   SolverBase::SolverData::~SolverData ()
   {
-    // destroy the solver object
+    if (ksp != NULL)
+      {
+        // destroy the solver object
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = KSPDestroy (ksp);
+        int ierr = KSPDestroy (ksp);
 #else
-    int ierr = KSPDestroy (&ksp);
+        int ierr = KSPDestroy (&ksp);
 #endif
 
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
   }
 
 
@@ -91,6 +94,12 @@ namespace PETScWrappers
 
         ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
         AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        // make sure the preconditioner has an associated matrix set
+        const Mat B = preconditioner;
+        AssertThrow (B != NULL,
+                     ExcMessage("PETSc preconditioner should have an"
+                                "associated matrix set to be used in solver."));
 
         // setting the preconditioner overwrites the used matrices.
         // hence, we need to set the matrices after the preconditioner.
@@ -200,6 +209,40 @@ namespace PETScWrappers
 
     // return without failure
     return 0;
+  }
+
+  void
+  SolverBase::initialize(const PreconditionerBase &preconditioner)
+  {
+    int ierr;
+
+    solver_data.reset (new SolverData());
+
+    ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    // let derived classes set the solver
+    // type, and the preconditioning
+    // object set the type of
+    // preconditioner
+    set_solver_type (solver_data->ksp);
+
+    ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    // then a convergence monitor
+    // function. that function simply
+    // checks with the solver_control
+    // object we have in this object for
+    // convergence
+    KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
+                           reinterpret_cast<void *>(&solver_control),
+                           PETSC_NULL);
+
+    // set the command line options provided
+    // by the user to override the defaults
+    ierr = KSPSetFromOptions (solver_data->ksp);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 

@@ -1,0 +1,30 @@
+DEAL::Jacobi
+DEAL::KrylovSchur
+DEAL::outer iterations: 69
+DEAL::last inner iterations: 13
+DEAL::4.93877
+DEAL::12.3707
+DEAL::12.3707
+DEAL::19.8027
+DEAL::24.8370
+DEAL::Ok
+DEAL::BlockJacobi
+DEAL::KrylovSchur
+DEAL::outer iterations: 64
+DEAL::last inner iterations: 5
+DEAL::4.93877
+DEAL::12.3707
+DEAL::12.3707
+DEAL::19.8027
+DEAL::24.8370
+DEAL::Ok
+DEAL::Boomer
+DEAL::KrylovSchur
+DEAL::outer iterations: 63
+DEAL::last inner iterations: 19
+DEAL::4.93877
+DEAL::12.3707
+DEAL::12.3707
+DEAL::19.8027
+DEAL::24.8370
+DEAL::Ok
