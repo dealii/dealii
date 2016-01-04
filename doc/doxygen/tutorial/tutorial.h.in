@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,23 +65,13 @@
  * your mouse pointer over a box, a brief description of the program
  * should appear.
  * @dot
-@@MAP@@
+@@TUTORIAL_MAP@@
  * @enddot
  *
  * <b>Legend:</b><br />
- * <ul>
- *
- * <li><i>Green:</i> programs that show basic techniques;
- *
- * <li><i>Orange:</i> advanced techniques;
- *
- * <li><i>Yellow:</i> applications in fluid dynamics;
- *
- * <li><i>Light blue:</i> applications in solid mechanics;
- *
- * <li><i>Dark blue:</i> time dependent problems.
- *
- * </ul>
+ * @dot
+@@TUTORIAL_LEGEND@@
+ * @enddot
  *
  * <a name="list"></a>
  * <h3>Tutorial programs listed by number</h3>
