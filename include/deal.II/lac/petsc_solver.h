@@ -249,10 +249,12 @@ namespace PETScWrappers
      */
     std_cxx11::shared_ptr<SolverData> solver_data;
 
+#ifdef DEAL_II_WITH_SLEPC
     /**
-     * Make the transformation class a friend, since it needs to set the solver.
+     * Make the transformation class a friend, since it needs to set the KSP solver.
      */
-    friend SLEPcWrappers::TransformationBase;
+    friend class SLEPcWrappers::TransformationBase;
+#endif
   };
 
 
