@@ -230,10 +230,10 @@ private:
                   << "Maximum number " << arg1
                   << " of iterations reached.");
 
-  DeclException1 (ExcArpackNoShifts, int,
-                  << "No shifts could be applied during implicit"
-                  << " Arnoldi update, try increasing the number of"
-                  << " Arnoldi vectors.");
+  DeclExceptionMsg (ExcArpackNoShifts,
+                    "No shifts could be applied during implicit"
+                    " Arnoldi update, try increasing the number of"
+                    " Arnoldi vectors.");
 };
 
 
@@ -515,7 +515,7 @@ void ArpackSolver::solve (const MatrixType1                  &system_matrix,
         }
       else if (info == 3)
         {
-          Assert (false, ExcArpackNoShifts(1));
+          Assert (false, ExcArpackNoShifts());
         }
       else if (info!=0)
         {
