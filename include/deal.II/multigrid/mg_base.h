@@ -119,7 +119,7 @@ public:
  * and numbering of the fine-grid discretization and of the multi-level
  * implementation are independent.
  *
- * If you use multigrid for a single PDF or for your complete system of
+ * If you use multigrid for a single PDE or for your complete system of
  * equations, you will use MGTransferPrebuilt together with Multigrid. The
  * vector types used on the fine grid as well as for the multilevel operations
  * may be Vector or BlockVector. In both cases, MGTransferPrebuilt will
