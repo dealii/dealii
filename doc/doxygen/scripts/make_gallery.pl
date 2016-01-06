@@ -27,7 +27,13 @@ $gallery_underscore    =~ s/-/_/;
 my $gallery_dir = shift(@ARGV);
 my $author_file = "$gallery_dir/doc/author";
 
-my @src_files = @ARGV;
+# next get the source files. sort all markdown files
+# first so that we get to show them first. this makes
+# sense because markdown files typically provide
+# overview information
+my @src_files = grep { $_ =~ m/.*\.(md|markdown)/ } @ARGV;
+push @src_files, sort(grep { !($_ =~ m/.*\.(md|markdown)/) }@ARGV);
+
 
 # read the names of authors; escape '<' and '>' as they
 # appear in the email address. also trim trailing space and
