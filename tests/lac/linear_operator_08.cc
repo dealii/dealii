@@ -42,9 +42,10 @@
 #include <deal.II/lac/solver_relaxation.h>
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/solver_selector.h>
-#include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/iterative_inverse.h>
-
+#ifdef DEAL_II_WITH_UMFPACK
+#include <deal.II/lac/sparse_direct.h>
+#endif
 
 using namespace dealii;
 
@@ -385,6 +386,7 @@ int main()
       const Vector<double> b (rc);
       const Vector<double> x = lo_A_inv*b;
     }
+#ifdef DEAL_II_WITH_UMFPACK
     {
       deallog << "SparseDirectUMFPACK" << std::endl;
       const auto lo_A = linear_operator(A);
@@ -395,6 +397,7 @@ int main()
       const auto lo_A_inv = linear_operator(solver);
       const Vector<double> x = lo_A_inv*b;
     }
+#endif
 //    { // See #1673 and #1784
 //      deallog << "IterativeInverse" << std::endl;
 //
