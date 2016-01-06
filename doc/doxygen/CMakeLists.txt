@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -124,6 +124,7 @@ LIST(APPEND _doxygen_depend
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
 
+# find all tutorial programs so we can add dependencies as appropriate
 FILE(GLOB _deal_ii_steps
   ${CMAKE_SOURCE_DIR}/examples/step-*
   )
@@ -136,6 +137,33 @@ FOREACH(_step ${_deal_ii_steps})
     ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
     )
 ENDFOREACH()
+
+# Also find all code gallery programs (if available) for the same reason.
+# The logic here follows the same as in code-gallery/CMakeLists.txt
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
+  FILE(GLOB _code_gallery_names
+       "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
+  STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
+
+  FOREACH(_step ${_code_gallery_names})
+    GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+
+    LIST(APPEND _doxygen_depend
+      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/${_step}.h
+      )
+    LIST(APPEND _doxygen_input
+      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/${_step}.h
+      )
+    LIST(APPEND _doxygen_input
+      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+      )
+  ENDFOREACH()
+
+  LIST(APPEND _doxygen_depend
+    ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+    )
+ENDIF()
 
 TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
 TO_STRING(_doxygen_input_string ${_doxygen_input})
@@ -162,6 +190,7 @@ ADD_CUSTOM_COMMAND(
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
+    code-gallery
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html

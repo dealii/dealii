@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,9 +43,6 @@
  *     synopsis of each program.
  *   <li> or <b><a href="#topic">grouped by topic</a></b>.
  * </ol>
- * Some of the programs also jointly form
- * the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
- * demonstration suite</a>.
  *
  * The programs are in the <code>examples/</code> directory of your local
  * deal.II installation. After compiling the library itself, if you go into
@@ -56,7 +53,15 @@
  * different directories are based on the 
  * <a href="../../users/cmakelists.html" target="_top">small program Makefile template</a>.
  *
+ * @note Some of the tutorial programs also jointly form
+ *   the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
+ *   demonstration suite</a>. More, often more complex but less well documented,
+ *   deal.II-based programs than the ones that form the tutorial can also be
+ *   found in the @ref CodeGallery .
+ *
+ *
  * <a name="graph"></a>
+ * @anchor TutorialConnectionGraph
  * <h3>Connections between tutorial programs</h3>
  *
  * The following graph shows the connections between tutorial programs and
