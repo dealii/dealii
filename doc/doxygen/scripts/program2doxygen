@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2015 by the deal.II authors
+## Copyright (C) 2006 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,9 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-print " * <a name=\"CommProg\"></a>\n";
-print " * <h1> The commented program</h1>\n";
 
 # ignore comments at the start of the program. this includes subversion
 # tags and copyright notices.
