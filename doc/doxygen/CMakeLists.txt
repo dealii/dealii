@@ -199,6 +199,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+    ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
     ${_doxygen_depend}
   COMMENT "Generating documentation via doxygen."
   VERBATIM
