@@ -44,8 +44,32 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
        "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
   STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
-  # Now set up targets for each of the code gallery programs
+  FOREACH(_step ${_code_gallery_names})
+    GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+    LIST(APPEND _code_gallery_names_sans_dir "${_step}")
+  ENDFOREACH()
 
+  # Describe how to build code-gallery.h:
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
+      ${DEAL_II_CODE_GALLERY_DIRECTORY}
+      ${_code_gallery_names_sans_dir}
+      > ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    DEPENDS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
+      ${_code_gallery_names}
+    )
+  ADD_CUSTOM_TARGET(build_code-gallery_h
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
+  ADD_DEPENDENCIES(code-gallery build_code-gallery_h)
+
+
+  # Now set up targets for each of the code gallery programs
   FOREACH(_step ${_code_gallery_names})
     GET_FILENAME_COMPONENT(_step "${_step}" NAME)
     MESSAGE(STATUS "  Setting up ${_step}")

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -155,7 +155,14 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     LIST(APPEND _doxygen_input
       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/${_step}.h
       )
+    LIST(APPEND _doxygen_input
+      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+      )
   ENDFOREACH()
+
+  LIST(APPEND _doxygen_depend
+    ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+    )
 ENDIF()
 
 TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})

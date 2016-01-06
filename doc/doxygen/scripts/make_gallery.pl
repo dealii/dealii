@@ -56,7 +56,8 @@ print
 
 \@endhtmlonly
 
-This program consists of the following files (click to inspect):
+This program is part of the \@ref CodeGallery \"deal.II code gallery\" and
+consists of the following files (click to inspect):
 ";
 
 foreach my $file (@src_files)
