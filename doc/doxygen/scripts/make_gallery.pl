@@ -114,13 +114,30 @@ if (@picture_files)
 foreach my $file (@src_files)
 { 
     # just copy markdown files as-is, but make sure we update links
+    # that may be inlined. doxygen doesn't seem to understand the
+    # ```...``` form of offset commands, so keep track of that as
+    # well
     if ($file =~ /.*\.(md|markdown)/)
     {
         print "<a name=\"ann-$file\"></a>\n";
         print "<h1>Annotated version of $file</h1>\n";
 
         open MD, "<$gallery_dir/$file";
-        while ($line = <MD>) {
+        my $incode = 0;
+        while ($line = <MD>) 
+        {
+            # replace ``` markdown commands by doxygen equivalents
+            while ($line =~ m/```/)
+            {
+                if ($incode == 0) {
+                    $line =~ s/```/\@code{.sh}/;
+                    $incode = 1;
+                } else {
+                    $line =~ s/```/\@endcode/;
+                    $incode = 0;
+                }
+            }
+
             # update markdown links of the form "[text](./filename)"
             $line =~ s/(\[.*\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
             print "$line";
