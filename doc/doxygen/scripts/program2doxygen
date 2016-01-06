@@ -14,12 +14,17 @@
 ## ---------------------------------------------------------------------
 
 
-# ignore comments at the start of the program. this includes subversion
-# tags and copyright notices.
-$_ = <>;
-while ( m!^/\*!  ||  m!\s*\*! || m/^$/ ) {
-    $_ = <>;
+# skip header lines at the top of the file, such as copyright notices 
+# and license information, if the file is a step-xx.cc tutorial. don't
+# skip for other files such as code-gallery files
+if ($ARGV[0] =~ /step-\d+.cc/)
+{
+  $_ = <>;
+  while ( m!^/\*!  ||  m!\s*\*! || m/^$/ ) {
+      $_ = <>;
+  }
 }
+
 
 # have three states, in which the program can be:
 # comment-mode, program-mode and skip-mode
