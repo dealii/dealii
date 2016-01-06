@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II Authors
+## Copyright (C) 2012 - 2016 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -113,6 +113,10 @@ FOREACH(_step ${_deal_ii_steps})
       ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxyplain
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox

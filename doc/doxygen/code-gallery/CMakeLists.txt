@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015 by the deal.II Authors
+## Copyright (C) 2015, 2016 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -76,6 +76,7 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
         ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS
         ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
         ${_src_files}
       )
 
