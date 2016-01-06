@@ -234,6 +234,14 @@ protected:
   copy_indices_level_mine;
 
   /**
+   * Stores whether the copy operation from the global to the level vector is
+   * actually a plain copy to the finest level. This means that the grid has
+   * no adaptive refinement and the numbering on the finest multigrid level is
+   * the same as in the global case.
+   */
+  bool perform_plain_copy;
+
+  /**
    * The vector that stores what has been given to the
    * set_component_to_block_map() function.
    */

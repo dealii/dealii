@@ -161,6 +161,34 @@ namespace
 /* ------------------ MGLevelGlobalTransfer<VectorType> ----------------- */
 
 
+namespace internal
+{
+  // generic copy function of two different vectors -> need to access each
+  // individual entry
+  template <typename T, typename V>
+  void copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &copy_indices,
+                    const T &src,
+                    V &dst)
+  {
+    // we should have i->second == i->first, therefore we can use the same
+    // function for both copying to mg as well as copying from mg
+    for (std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::
+         const_iterator i = copy_indices.begin(); i != copy_indices.end(); ++i)
+      dst(i->first) = src(i->first);
+    dst.compress(VectorOperation::insert);
+  }
+
+  // specialized copy function for the same vector
+  template <typename T>
+  void copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &,
+                    const T &src,
+                    T &dst)
+  {
+    dst = src;
+  }
+}
+
+
 template <typename VectorType>
 template <int dim, class InVector, int spacedim>
 void
@@ -175,6 +203,24 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
+
+  if (perform_plain_copy)
+    {
+      // if the finest multigrid level covers the whole domain (i.e., no
+      // adaptive refinement) and the numbering of the finest level DoFs and
+      // the global DoFs are the same, we can do a plain copy
+      AssertDimension(dst[dst.max_level()].size(), src.size());
+      internal::copy_vector(copy_indices[dst.max_level()], src, dst[dst.max_level()]);
+
+      // do the initial restriction
+      for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels()-1; level != 0; )
+        {
+          --level;
+          this->restrict_and_add (level+1, dst[level], dst[level+1]);
+        }
+      return;
+    }
+
   for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels(); level != 0;)
     {
       --level;
@@ -225,6 +271,13 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg
  OutVector                       &dst,
  const MGLevelObject<VectorType> &src) const
 {
+  if (perform_plain_copy)
+    {
+      AssertDimension(dst.size(), src[src.max_level()].size());
+      internal::copy_vector(copy_indices[src.max_level()], src[src.max_level()], dst);
+      return;
+    }
+
   // For non-DG: degrees of freedom in the refinement face may need special
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
@@ -331,6 +384,8 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_to_mg
       VectorView<Number>  dst_view (src.local_size(), dst[dst.max_level()].begin());
       VectorView<Number2> src_view (src.local_size(), src.begin());
       static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
+
+      // do the initial restriction
       for (unsigned int level=mg_dof_handler.get_triangulation().n_global_levels()-1; level != 0; )
         {
           --level;
@@ -387,10 +442,6 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg
  parallel::distributed::Vector<Number2>                      &dst,
  const MGLevelObject<parallel::distributed::Vector<Number> > &src) const
 {
-  // For non-DG: degrees of freedom in the refinement face may need special
-  // attention, since they belong to the coarse level, but have fine level
-  // basis functions
-
   if (perform_plain_copy)
     {
       // In this case, we can simply copy the local range (in parallel by
@@ -403,6 +454,10 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg
       static_cast<Vector<Number2> &>(dst_view) = static_cast<Vector<Number> &>(src_view);
       return;
     }
+
+  // For non-DG: degrees of freedom in the refinement face may need special
+  // attention, since they belong to the coarse level, but have fine level
+  // basis functions
 
   dst = 0;
   for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_global_levels(); ++level)

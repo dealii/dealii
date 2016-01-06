@@ -271,6 +271,38 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
 {
   fill_copy_indices(mg_dof, mg_constrained_dofs, copy_indices,
                     copy_indices_global_mine, copy_indices_level_mine);
+
+  // check if we can run a plain copy operation between the global DoFs and
+  // the finest level.
+  perform_plain_copy =
+    (copy_indices.back().size() == mg_dof.locally_owned_dofs().n_elements())
+    &&
+    (mg_dof.locally_owned_dofs().n_elements() ==
+     mg_dof.locally_owned_mg_dofs(mg_dof.get_triangulation().n_global_levels()-1).n_elements());
+  if (perform_plain_copy)
+    {
+      AssertDimension(copy_indices_global_mine.back().size(), 0);
+      AssertDimension(copy_indices_level_mine.back().size(), 0);
+
+      // check whether there is a renumbering of degrees of freedom on
+      // either the finest level or the global dofs, which means that we
+      // cannot apply a plain copy
+      for (unsigned int i=0; i<copy_indices.back().size(); ++i)
+        if (copy_indices.back()[i].first != copy_indices.back()[i].second)
+          {
+            perform_plain_copy = false;
+            break;
+          }
+    }
+  const parallel::Triangulation<dim, spacedim> *ptria =
+    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
+    (&mg_dof.get_tria());
+  const MPI_Comm mpi_communicator = ptria != 0 ? ptria->get_communicator() :
+                                    MPI_COMM_SELF;
+  perform_plain_copy =
+    Utilities::MPI::min(static_cast<int>(perform_plain_copy),
+                        mpi_communicator);
+
 }
 
 
