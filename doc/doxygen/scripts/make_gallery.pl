@@ -58,7 +58,7 @@ foreach my $file (@src_files)
   print "- <a href=\"../code-gallery/$gallery/$file\">$file</a>\n";
   if ($file =~ /.*\.(md|markdown|cc|cpp|cxx|c\+\+|h|hh|hxx)/) 
   {
-      print "  (see <a href=\"#ann-$file\">below</a> for an annotated version)\n";
+      print "  (<a href=\"#ann-$file\">annotated version</a>)\n";
   }
 }
 print "\n";
