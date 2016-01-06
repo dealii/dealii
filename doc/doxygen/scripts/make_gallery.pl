@@ -56,6 +56,10 @@ This program consists of the following files (click to inspect):
 foreach my $file (@src_files)
 { 
   print "- <a href=\"../code-gallery/$gallery/$file\">$file</a>\n";
+  if ($file =~ /.*\.(md|markdown|cc|cpp|cxx|c\+\+|h|hh|hxx)/) 
+  {
+      print "  (see <a href=\"#ann-$file\">below</a> for an annotated version)\n";
+  }
 }
 print "\n";
 
@@ -73,7 +77,7 @@ foreach my $file (@src_files)
 
 if (@picture_files)
 {
-    print "<h2>Pictures from this code gallery program:</h2>\n";
+    print "<h1>Pictures from this code gallery program</h1>\n";
     print "<p align=\"center\">\n";
     print "<table>\n";
 
@@ -96,6 +100,39 @@ if (@picture_files)
 
     print "</table>\n";
     print "</p>\n";
+}
+
+
+# Then go through the list of files again and see which ones we can
+# annotate and copy into the current document
+foreach my $file (@src_files)
+{ 
+    # just copy markdown files as-is, but make sure we update links
+    if ($file =~ /.*\.(md|markdown)/)
+    {
+        print "<a name=\"ann-$file\"></a>\n";
+        print "<h1>Annotated version of $file</h1>\n";
+
+        open MD, "<$gallery_dir/$file";
+        while ($line = <MD>) {
+            # update markdown links of the form "[text](./filename)"
+            $line =~ s/(\[.*\])\(.\//\1\(..\/code-gallery\/$gallery\//g;
+            print "$line";
+        }
+
+        print "\n\n";
+    }
+
+    # annotate source files
+    if ($file =~ /.*\.(cc|cpp|cxx|c\+\+|h|hh|hxx)/)
+    {
+        print "<a name=\"ann-$file\"></a>\n";
+        print "<h1>Annotated version of $file</h1>\n";
+
+        system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$gallery_dir/$file";
+
+        print "\n\n";
+    }
 }
 
 
