@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2015 by the deal.II authors
+ * Copyright (C) 2000 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -54,14 +54,15 @@
 // We are going to query the number of processes and the number of the present
 // process by calling the respective functions in the Utilities::MPI
 // namespace.
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/mpi.h>
 // Then, we are going to replace all linear algebra components that involve
 // the (global) linear system by classes that wrap interfaces similar to our
 // own linear algebra classes around what PETSc offers (PETSc is a library
 // written in C, and deal.II comes with wrapper classes that provide the PETSc
 // functionality with an interface that is similar to the interface we already
 // had for our own linear algebra classes). In particular, we need vectors and
-// matrices that are distributed across several processes in MPI programs (and
+// matrices that are distributed across several
+// @ref GlossMPIProcess "processes" in MPI programs (and
 // simply map to sequential, local vectors and matrices if there is only a
 // single process, i.e. if you are running on only one machine, and without
 // MPI support):
@@ -93,14 +94,13 @@ namespace Step17
 
   // @sect3{The <code>ElasticProblem</code> class template}
 
-  // Here comes the declaration of the main class. As mentioned in the
-  // introduction, almost all of this has been copied verbatim from step-8,
-  // so we only comment on the few differences between the two tutorials.
-  // There is one (cosmetic) change in that we let <code>solve</code> return
-  // a value, namely the number of iterations it took to converge, so that
-  // we can output this to the screen at the appropriate place. In addition,
-  // we introduce a stream-like variable
-  // <code>pcout</code>, explained below:
+  // The first real part of the program is the declaration of the main
+  // class.  As mentioned in the introduction, almost all of this has
+  // been copied verbatim from step-8, so we only comment on the few
+  // differences between the two tutorials.  There is one (cosmetic)
+  // change in that we let <code>solve</code> return a value, namely
+  // the number of iterations it took to converge, so that we can
+  // output this to the screen at the appropriate place.
   template <int dim>
   class ElasticProblem
   {
@@ -116,20 +116,28 @@ namespace Step17
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    // The first variable is basically only for convenience: in parallel
-    // program, if each process outputs status information, then there quickly
-    // is a lot of clutter. Rather, we would want to only have one process
-    // output everything once, for example the one with process number
-    // zero. <code>ConditionalOStream</code> does exactly this: it acts as if
-    // it were a stream, but only forwards to a real, underlying stream if a
-    // flag is set. By setting this condition to
-    // <code>this_mpi_process==0</code>, we make sure that output is only
-    // generated from the first process and that we don't get the same lines
-    // of output over and over again, once per process.
+    // The first difference to step-8 is the introduction of a
+    // stream-like variable <code>pcout</code>. It is, in essence,
+    // just something we use for convenience: in a parallel program,
+    // if each process outputs status information, then there quickly
+    // is a lot of clutter. Rather, we would want to only have one
+    // @ref GlossMPIProcess "process" output everything once, for
+    // example the one with @ref GlossMPIRank "rank" zero. At the same
+    // time, it seems silly to prefix <i>every</i> places where we
+    // create output with an <code>if (my_rank==0)</code> condition.
     //
-    // With this simple trick, we make sure that we don't have to guard each
-    // and every write to <code>std::cout</code> by a prefixed
-    // <code>if(this_mpi_process==0)</code>.
+    // To make this simpler, the ConditionalOStream class does exactly
+    // this under the hood: it acts as if it were a stream, but only
+    // forwards to a real, underlying stream if a flag is set. By
+    // setting this condition to <code>this_mpi_process==0</code>
+    // (where <code>this_mpi_process</code> corresponds to the rank of
+    // an MPI process), we make sure that output is only generated
+    // from the first process and that we don't get the same lines of
+    // output over and over again, once per process. Thus, we can use
+    // <code>pcout</code> everywhere and in every process, but on all
+    // but one process nothing will ever happen to the information
+    // that is piped into the object via
+    // <code>operator&lt;&lt;</code>.
     ConditionalOStream pcout;
 
     // The next few variables are taken verbatim from step-8:
@@ -140,32 +148,34 @@ namespace Step17
 
     ConstraintMatrix     hanging_node_constraints;
 
-    // In step-8, this would have been the place where we would have declared
-    // the member variables for the sparsity pattern, the system matrix, right
-    // hand, and solution vector. We change these declarations to use parallel
-    // PETSc objects instead. Note that we do not use a separate sparsity
-    // pattern, since PETSc manages that as part of its matrix data structures.
+    // In step-8, this would have been the place where we declared the
+    // member variables for the sparsity pattern, the system matrix,
+    // right hand, and solution vector. We change these declarations
+    // to use parallel PETSc objects instead. Note that we do not use
+    // a separate sparsity pattern, since PETSc manages that as part
+    // of its matrix data structures.
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
     PETScWrappers::MPI::Vector       solution;
     PETScWrappers::MPI::Vector       system_rhs;
 
-    // The next change is that we have to declare a variable that indicates
-    // the MPI communicator over which we are supposed to distribute our
-    // computations. Note that if this is a sequential job without support by
-    // MPI, then PETSc provides some dummy type for <code>MPI_Comm</code>, so
-    // we do not have to care here whether the job is really a parallel one:
+    // The next change is that we have to declare a variable that
+    // indicates the @ref GlossMPICommunicator "MPI communicator" over
+    // which we are supposed to distribute our computations.
     MPI_Comm mpi_communicator;
 
-    // Then we have two variables that tell us where in the parallel world we
-    // are. The first of the following variables, <code>n_mpi_processes</code>
-    // tells us how many MPI processes there exist in total, while the second
-    // one, <code>this_mpi_process</code>, indicates which is the number of
-    // the present process within this space of processes. The latter variable
-    // will have a unique value for each process between zero and (less than)
-    // <code>n_mpi_processes</code>. If this program is run on a single
-    // machine without MPI support, then their values are <code>1</code> and
-    // <code>0</code>, respectively.
+    // Then we have two variables that tell us where in the parallel
+    // world we are. The first of the following variables,
+    // <code>n_mpi_processes</code> tells us how many MPI processes
+    // there exist in total, while the second one,
+    // <code>this_mpi_process</code>, indicates which is the number of
+    // the present process within this space of processes (in MPI
+    // language, this corresponds to the @ref GlossMPIRank "rank" of
+    // the process). The latter will have a unique value for each
+    // process between zero and (less than)
+    // <code>n_mpi_processes</code>. If this program is run on a
+    // single machine without MPI support, then their values are
+    // <code>1</code> and <code>0</code>, respectively.
     const unsigned int n_mpi_processes;
     const unsigned int this_mpi_process;
   };
@@ -241,19 +251,20 @@ namespace Step17
 
   // @sect4{ElasticProblem::ElasticProblem}
 
-  // The first step in the actual implementation is the constructor
-  // of the main class. Apart from initializing the same member variables that
-  // we already had in step-8, we here initialize the MPI communicator
-  // variable we shall use with the global MPI communicator linking all
-  // processes together (in more complex applications, one could here use a
-  // communicator object that only links a subset of all processes), and call
-  // the Utilities helper functions to determine the number of processes and
-  // where the present one fits into this picture. In addition, we make sure
+  // The first step in the actual implementation is the constructor of
+  // the main class. Apart from initializing the same member variables
+  // that we already had in step-8, we here initialize the MPI
+  // communicator variable we shall use with the global MPI
+  // communicator linking all processes together (in more complex
+  // applications, one could here use a communicator object that only
+  // links a subset of all processes), and call the Utilities::MPI
+  // helper functions to determine the number of processes and where
+  // the present one fits into this picture. In addition, we make sure
   // that output is only generated by the (globally) first process. As
-  // <code>this_mpi_process</code> is determined after creation of pcout, we
-  // cannot set the condition through the constructor, i.e. by
-  // <code>pcout(std::cout, this_mpi_process==0)</code>, but set the
-  // condition separately.
+  // <code>this_mpi_process</code> is determined after creation of
+  // pcout, we cannot set the condition through the constructor,
+  // i.e. by <code>pcout(std::cout, this_mpi_process==0)</code>, but
+  // set the condition separately.
   template <int dim>
   ElasticProblem<dim>::ElasticProblem ()
     :
@@ -282,58 +293,97 @@ namespace Step17
   // @sect4{ElasticProblem::setup_system}
 
   // Next, the function in which we set up the various variables
-  // for the global linear system to be solved is implemented.
+  // for the global linear system to be solved needs to be implemented.
+  //
+  // However, before we with this, there is one thing to do for a
+  // parallel program: we need to determine which MPI process is
+  // responsible for each of the cells. Splitting cells among
+  // processes, commonly called "partitioning the mesh", is done by
+  // assigning a @ref GlossSubdomainId "subdomain id" to each cell. We
+  // do so by calling into the METIS library that does this in a very
+  // efficient way, trying to minimize the number of nodes on the
+  // interfaces between subdomains. Rather than trying to call METIS
+  // directly, we do this by calling the
+  // GridTools::partition_triangulation() function that does this at a
+  // much higher level of programming.
+  //
+  // @note As mentioned in the introduction, we can avoid this manual
+  //   partitioning step if we used the parallel::shared::Triangulation
+  //   class for the triangulation object instead (as we do in step-18).
+  //   That class does, in essence, everything a regular triangulation
+  //   does, but it then also automatically partitions the mesh after
+  //   every mesh creation or refinement operation.
+  //
+  // Following partitioning, we need to enumerate all degrees of
+  // freedom as usual.  However, we would like to enumerate the
+  // degrees of freedom in a way so that all degrees of freedom
+  // associated with cells in subdomain zero (which resides on process
+  // zero) come before all DoFs associated with cells on subdomain
+  // one, before those on cells on process two, and so on. We need
+  // this since we have to split the global vectors for right hand
+  // side and solution, as well as the matrix into contiguous chunks
+  // of rows that live on each of the processors, and we will want to
+  // do this in a way that requires minimal communication. This
+  // particular enumeration can be obtained by re-ordering degrees of
+  // freedom indices using DoFRenumbering::subdomain_wise().
+  //
+  // The final step of this initial setup is that we get ourselves a
+  // variable that indicates how many degrees of freedom the current
+  // process is responsible for. (This will, in general, be less than
+  // <code>fe.dofs_per_cell</code> times the number of cells the
+  // current process owns because some degrees of freedom live on
+  // interfaces between subdomains, and are consequently only owned by
+  // one of the processes adjacent to this interface.)
+  //
+  // Before we move on, let us recall a fact already discussed in the
+  // introduction: The triangulation we use here is replicated across
+  // all processes, and each process has a complete copy of the entire
+  // triangulation, with all cells. Partitioning only provides a way
+  // to identify which cells out of all each process "owns", but it
+  // knows everything about all of them. Likewise, the DoFHandler
+  // object knows everything about every cell, in particular the
+  // degrees of freedom that live on each cell, whether it is one that
+  // the current process owns or not. This can not scale to large
+  // problems because eventually just storing on every process the
+  // entire mesh and everything that is associated with it, will
+  // become infeasible if the problem is large enough. On the other
+  // hand, if we split the triangulation into parts so that every
+  // process stores only those cells it "owns" but nothing else (or,
+  // at least a sufficiently small fraction of everything else), then
+  // we can solve large problems if only we throw a large enough
+  // number of MPI processes at them. This is what we are going to in
+  // step-40, for example, using the
+  // parallel::distributed::Triangulation class.  On the other hand,
+  // most of the rest of what we demonstrate in the current program
+  // will actually continue to work whether we have the entire
+  // triangulation available, or only a piece of it.
   template <int dim>
   void ElasticProblem<dim>::setup_system ()
   {
-    // Before we even start out setting up the system, there is one thing to
-    // do for a parallel program: we need to assign cells to each of the
-    // processes. We do this by splitting (<code>partitioning</code>) the mesh
-    // cells into as many chunks (<code>subdomains</code>) as there are
-    // processes in this MPI job (if this is a sequential job, then there is
-    // only one job and all cells will get a zero as subdomain
-    // indicator). This is done using an interface to the METIS library that
-    // does this in a very efficient way, trying to minimize the number of
-    // nodes on the interfaces between subdomains. All this is hidden behind
-    // the following call to a deal.II library function:
     GridTools::partition_triangulation (n_mpi_processes, triangulation);
 
-    // As for the linear system: First, we need to generate an enumeration for
-    // the degrees of freedom in our problem. Further below, we will show how
-    // we assign each cell to one of the MPI processes before we even get
-    // here. What we then need to do is to enumerate the degrees of freedom in
-    // a way so that all degrees of freedom associated with cells in subdomain
-    // zero (which resides on process zero) come before all DoFs associated
-    // with cells on subdomain one, before those on cells on process two, and
-    // so on. We need this since we have to split the global vectors for right
-    // hand side and solution, as well as the matrix into contiguous chunks of
-    // rows that live on each of the processors, and we will want to do this
-    // in a way that requires minimal communication. This is done using the
-    // following two functions, which first generates an initial ordering of
-    // all degrees of freedom, and then re-sort them according to above
-    // criterion:
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::subdomain_wise (dof_handler);
 
-    // While we're at it, let us also count how many degrees of freedom there
-    // exist on the present process:
     const types::global_dof_index n_local_dofs
       = DoFTools::count_dofs_with_subdomain_association (dof_handler,
                                                          this_mpi_process);
 
-    // Then we initialize the system matrix, solution, and right hand side
-    // vectors. Since they all need to work in parallel, we have to pass them
-    // an MPI communication object, as well as their global sizes (both
-    // dimensions are equal to the number of degrees of freedom), and also how
-    // many rows out of this global size are to be stored locally
-    // (<code>n_local_dofs</code>). In addition, PETSc needs to know how to
-    // partition the columns in the chunk of the matrix that is stored
-    // locally; for square matrices, the columns should be partitioned in the
-    // same way as the rows (indicated by the second <code>n_local_dofs</code>
-    // in the call) but in the case of rectangular matrices one has to
-    // partition the columns in the same way as vectors are partitioned with
-    // which the matrix is multiplied, while rows have to partitioned in the
-    // same way as destination vectors of matrix-vector multiplications:
+    // Then we initialize the system matrix, solution, and right hand
+    // side vectors. Since they all need to work in parallel, we have
+    // to pass them an MPI communication object, as well as their
+    // global sizes (both dimensions are equal to the <i>total</i>
+    // number of degrees of freedom), and also how many rows out of
+    // this global size are to be stored locally
+    // (<code>n_local_dofs</code>). In addition, PETSc needs to know
+    // how to partition the columns in the chunk of the matrix that is
+    // stored locally; for square matrices, the columns should be
+    // partitioned in the same way as the rows (indicated by the
+    // second <code>n_local_dofs</code> in the call) but in the case
+    // of rectangular matrices one has to partition the columns in the
+    // same way as vectors are partitioned with which the matrix is
+    // multiplied, while rows have to partitioned in the same way as
+    // destination vectors of matrix-vector multiplications:
     system_matrix.reinit (mpi_communicator,
                           dof_handler.n_dofs(),
                           dof_handler.n_dofs(),
@@ -344,8 +394,15 @@ namespace Step17
     solution.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
     system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
 
-    // Finally, we need to initialize the objects denoting hanging node
-    // constraints for the present grid. Note that since PETSc handles the
+    // Finally, we need to initialize the objects denoting hanging
+    // node constraints for the present grid. As with the
+    // triangulation and DoFHandler objects, we will simply store
+    // <i>all</i> constraints on each process; again, this will not
+    // scale, but we show in step-40 how one can work around this by
+    // only storing on each MPI process the constraints for degrees of
+    // freedom that actually matter on this particular process.
+    //
+    // Since PETSc handles the
     // sparsity pattern internally to the matrix, there is no need to set up
     // an independent sparsity pattern here, and to condense it for
     // constraints, as we have done in all other example programs.
@@ -359,48 +416,55 @@ namespace Step17
 
   // @sect4{ElasticProblem::assemble_system}
 
-  // We now assemble the matrix and right hand side of
-  // the problem. There are some things worth mentioning before we go into
-  // detail. First, we will be assembling the system in parallel, i.e. each
-  // process will be responsible for assembling on cells that belong to this
-  // particular processor. Note that the degrees of freedom are split in a way
-  // such that all DoFs in the interior of cells and between cells belonging
-  // to the same subdomain belong to the process that <code>owns</code> the
-  // cell. However, even then we sometimes need to assemble on a cell with a
-  // neighbor that belongs to a different process, and in these cases when we
-  // write the local contributions into the global matrix or right hand side
-  // vector, we actually have to transfer these entries to the other
-  // process. Fortunately, we don't have to do this by hand, PETSc does all
-  // this for us by caching these elements locally, and sending them to the
-  // other processes as necessary when we call the <code>compress()</code>
-  // functions on the matrix and vector at the end of this function.
+  // We now assemble the matrix and right hand side of the
+  // problem. There are some things worth mentioning before we go into
+  // detail. First, we will be assembling the system in parallel,
+  // i.e., each process will be responsible for assembling on cells
+  // that belong to this particular process. Note that the degrees of
+  // freedom are split in a way such that all DoFs in the interior of
+  // cells and between cells belonging to the same subdomain belong to
+  // the process that <code>owns</code> the cell. However, even then
+  // we sometimes need to assemble on a cell with a neighbor that
+  // belongs to a different process, and in these cases when we add up
+  // the local contributions into the global matrix or right hand side
+  // vector, we have to transfer these entries to the process that
+  // owns these elements. Fortunately, we don't have to do this by
+  // hand, PETSc does all this for us by caching these elements
+  // locally, and sending them to the other processes as necessary
+  // when we call the <code>compress()</code> functions on the matrix
+  // and vector at the end of this function.
   //
-  // The second point is that once we have handed over matrix and vector
-  // contributions to PETSc, it is a) hard, and b) very inefficient to get
-  // them back for modifications. This is not only the fault of PETSc, it is
-  // also a consequence of the distributed nature of this program: if an entry
-  // resides on another processor, then it is necessarily expensive to get
-  // it. The consequence of this is that where we previously first assembled
-  // the matrix and right hand side as if there were no hanging node
-  // constraints and boundary values, and then eliminated these in a second
-  // step, we should now try to do that while still assembling the local
-  // systems, and before handing these entries over to PETSc. At least as far
-  // as eliminating hanging nodes is concerned, this is actually possible,
-  // though removing boundary nodes isn't that simple. deal.II provides
-  // functions to do this first part: instead of copying elements by hand into
-  // the global matrix, we use the <code>distribute_local_to_global</code>
-  // functions below to take care of hanging nodes at the same time. The
-  // second step, elimination of boundary nodes, is then done in exactly the
-  // same way as in all previous example programs.
+  // The second point is that once we have handed over matrix and
+  // vector contributions to PETSc, it is a) hard, and b) very
+  // inefficient to get them back for modifications. This is not only
+  // the fault of PETSc, it is also a consequence of the distributed
+  // nature of this program: if an entry resides on another processor,
+  // then it is necessarily expensive to get it. The consequence of
+  // this is that we should not try to first assemble the matrix and
+  // right hand side as if there were no hanging node constraints and
+  // boundary values, and then eliminate these in a second step
+  // (using, for example, ConstraintMatrix::condense()). Rather, we
+  // should try to eliminate hanging node constraints before handing
+  // these entries over to PETSc. This is easy: instead of copying
+  // elements by hand into the global matrix (as we do in step-4), we
+  // use the ConstraintMatrix::distribute_local_to_global() functions
+  // to take care of hanging nodes at the same time. We also already
+  // did this in step-6. The second step, elimination of boundary
+  // nodes, could also be done this way by putting the boundary values
+  // into the same ConstraintMatrix object as hanging nodes (see the
+  // way it is done in step-6, for example); however, it is not
+  // strictly necessary to do this here because eliminating boundary
+  // values can be done with only the data stored on each process
+  // itself, and consequently we use the approach used before in
+  // step-4, i.e., via MatrixTools::apply_boundary_values().
   //
-  // So, here is the actual implementation:
+  // All of this said, here is the actual implementation starting with
+  // the general setup of helper variables.  (Note that we still use
+  // the deal.II full matrix and vector types for the local systems as
+  // these are small and need not be shared across processes.)
   template <int dim>
   void ElasticProblem<dim>::assemble_system ()
   {
-    // The infrastructure to assemble linear systems is the same as in all the
-    // other programs, and in particular unchanged from step-8. Note that we
-    // still use the deal.II full matrix and vector types for the local
-    // systems.
     QGauss<dim>  quadrature_formula(2);
     FEValues<dim> fe_values (fe, quadrature_formula,
                              update_values   | update_gradients |
@@ -424,24 +488,26 @@ namespace Step17
                                              Vector<double>(dim));
 
 
-    // The next thing is the loop over all elements. Note that we do not have
-    // to do all the work: our job here is only to assemble the system on
-    // cells that actually belong to this MPI process, all other cells will be
-    // taken care of by other processes. This is what the if-clause
-    // immediately after the for-loop takes care of: it queries the subdomain
-    // identifier of each cell, which is a number associated with each cell
-    // that tells which process handles it. In more generality, the subdomain
-    // id is used to split a domain into several parts (we do this above, at
-    // the beginning of <code>setup_system</code>), and which allows to
-    // identify which subdomain a cell is living on. In this application, we
-    // have each process handle exactly one subdomain, so we identify the
-    // terms <code>subdomain</code> and <code>MPI process</code> with each
-    // other.
+    // The next thing is the loop over all elements. Note that we do
+    // not have to do <i>all</i> the work on every process: our job
+    // here is only to assemble the system on cells that actually
+    // belong to this MPI process, all other cells will be taken care
+    // of by other processes. This is what the if-clause immediately
+    // after the for-loop takes care of: it queries the subdomain
+    // identifier of each cell, which is a number associated with each
+    // cell that tells us which process owns it. In more generality,
+    // the subdomain id is used to split a domain into several parts
+    // (we do this above, at the beginning of
+    // <code>setup_system()</code>), and which allows to identify
+    // which subdomain a cell is living on. In this application, we
+    // have each process handle exactly one subdomain, so we identify
+    // the terms <code>subdomain</code> and <code>MPI process</code>.
     //
     // Apart from this, assembling the local system is relatively uneventful
-    // if you have understood how this is done in step-8, and only becomes
-    // interesting again once we start distributing it into the global matrix
-    // and right hand sides.
+    // if you have understood how this is done in step-8. As mentioned above,
+    // distributing local contributions into the global matrix
+    // and right hand sides also takes care of hanging node constraints in the
+    // same way as is done in step-6.
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -505,22 +571,6 @@ namespace Step17
                                fe_values.JxW(q_point);
             }
 
-          // Now we have the local system, and need to transfer it into the
-          // global objects. However, as described in the introduction to this
-          // function, we want to avoid any operations to matrix and vector
-          // entries after handing them off to PETSc (i.e. after distributing
-          // to the global objects). Therefore, we will take care of hanging
-          // node constraints already here. This is not quite trivial since
-          // the rows and columns of constrained nodes have to be distributed
-          // to the rows and columns of those nodes to which they are
-          // constrained. This can't be done on a purely local basis (because
-          // the degrees of freedom to which hanging nodes are constrained may
-          // not be associated with the cell we are presently treating, and
-          // are therefore not represented in the local matrix and vector),
-          // but it can be done while distributing the local system to the
-          // global one. This is what the following call does, i.e. we
-          // distribute to the global objects and at the same time make sure
-          // that hanging node constraints are taken care of:
           cell->get_dof_indices (local_dof_indices);
           hanging_node_constraints
           .distribute_local_to_global(cell_matrix, cell_rhs,
@@ -528,66 +578,91 @@ namespace Step17
                                       system_matrix, system_rhs);
         }
 
-    // Now compress the vector and the system matrix:
+    // The next step is to "compress" the vector and the system
+    // matrix. This means that each process sends the additions that
+    // were made above to those entries of the matrix and vector that
+    // the process did not own itself, to the process that owns
+    // them. After receiving these additions from other processes,
+    // each process then adds them to the values it already has.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
     // The global matrix and right hand side vectors have now been
-    // formed. Note that since we took care of this already above, we do not
-    // have to condense away hanging node constraints any more.
+    // formed. We still have to apply boundary values, in the same way as we
+    // did, for example, in step-3, step-4, and a number of other programs.
     //
-    // However, we still have to apply boundary values, in the same way as we
-    // always do:
+    // The last argument to the call to
+    // MatrixTools::apply_boundary_values() below allows for some
+    // optimizations. It controls whether we should also delete
+    // entries (i.e., set them to zero) in the matrix columns
+    // corresponding to boundary nodes, or to keep them (and passing
+    // <code>true</code> means: yes, do eliminate the columns). If we
+    // do eliminate columns, then the resulting matrix will be
+    // symmetric again if it was before; if we don't, then it
+    // won't. The solution of the resulting system should be the same,
+    // though. The only reason why we may want to make the system
+    // symmetric again is that we would like to use the CG method,
+    // which only works with symmetric matrices. The reason why we may
+    // <i>not</i> want to make the matrix symmetric is because this
+    // would require us to write into column entries that actually
+    // reside on other processes, i.e., it involves communicating
+    // data. This is always expensive.
+    //
+    // Experience tells us that CG also works (and works almost as
+    // well) if we don't remove the columns associated with boundary
+    // nodes, which can be explained by the special structure of this
+    // particular non-symmetry. To avoid the expense of communication,
+    // we therefore do not eliminate the entries in the affected
+    // columns.
     std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(dim),
                                               boundary_values);
     MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix, solution,
-                                        system_rhs, false);
-    // The last argument to the call just performed allows for some
-    // optimizations. It controls whether we should also delete the column
-    // corresponding to a boundary node, or keep it (and passing
-    // <code>true</code> means: yes, do eliminate the column). If we
-    // do, then the resulting matrix will be symmetric again if it was before;
-    // if we don't, then it won't. The solution of the resulting system should
-    // be the same, though. The only reason why we may want to make the system
-    // symmetric again is that we would like to use the CG method, which only
-    // works with symmetric matrices.  Experience tells that CG also works
-    // (and works almost as well) if we don't remove the columns associated
-    // with boundary nodes, which can be easily explained by the special
-    // structure of the non-symmetry. Since eliminating columns from dense
-    // matrices is not expensive, though, we let the function do it; not doing
-    // so is more important if the linear system is either non-symmetric
-    // anyway, or we are using the non-local version of this function (as in
-    // all the other example programs before) and want to save a few cycles
-    // during this operation.
+                                        system_matrix,
+                                        solution,
+                                        system_rhs,
+                                        false);
   }
 
 
 
   // @sect4{ElasticProblem::solve}
 
-  // The following function solves the linear system, with its distributed
-  // matrix and vector objects. Fortunately, PETSc offers a variety of
-  // sequential and parallel solvers, for which we have written wrappers that
-  // have almost the same interface as is used for the deal.II solvers used in
-  // all previous example programs.
+  // Having assembled the linear system, we next need to solve
+  // it. PETSc offers a variety of sequential and parallel solvers,
+  // for which we have written wrappers that have almost the same
+  // interface as is used for the deal.II solvers used in all previous
+  // example programs. The following code should therefore look rather
+  // familiar.
+  //
+  // At the top of the function, we set up a convergence monitor, and
+  // assign it the accuracy to which we would like to solve the linear
+  // system. Next, we create an actual solver object using PETSc's CG
+  // solver which also works with parallel (distributed) vectors and
+  // matrices. And finally a preconditioner; we choose to use a block
+  // Jacobi preconditioner which works by computing an incomplete LU
+  // decomposition on each diagonal block of the matrix.  (In other
+  // words, each MPI process computes an ILU from the rows it stores
+  // by throwing away columns that correspond to row indices not
+  // stored locally; this yields a square matrix block from which we
+  // can compute an ILU. That means that if you run the program with
+  // only one process, then you will use an ILU(0) as a
+  // preconditioner, while if it is run on many processes, then we
+  // will have a number of blocks on the diagonal and the
+  // preconditioner is the ILU(0) of each of these blocks. In the
+  // extreme case of one degree of freedom per processor, this
+  // preconditioner is then simply a Jacobi preconditioner since the
+  // diagonal matrix blocks consist of only a single entry. Such a
+  // preconditioner is relatively easy to compute because it does not
+  // require any kind of communication between processors, but it is
+  // in general not very efficient for large numbers of processors.)
+  //
+  // Following this kind of setup, we then solve the linear system:
   template <int dim>
   unsigned int ElasticProblem<dim>::solve ()
   {
-    // First, we have to set up a convergence monitor, and assign it the
-    // accuracy to which we would like to solve the linear system. Next, an
-    // actual solver object using PETSc's CG solver which also works with
-    // parallel (distributed) vectors and matrices. And finally a
-    // preconditioner; we choose to use a block Jacobi preconditioner which
-    // works by computing an incomplete LU decomposition on each block
-    // (i.e. the chunk of matrix that is stored on each MPI process). That
-    // means that if you run the program with only one process, then you will
-    // use an ILU(0) as a preconditioner, while if it is run on many
-    // processes, then we will have a number of blocks on the diagonal and the
-    // preconditioner is the ILU(0) of each of these blocks.
     SolverControl           solver_control (solution.size(),
                                             1e-8*system_rhs.l2_norm());
     PETScWrappers::SolverCG cg (solver_control,
@@ -595,7 +670,6 @@ namespace Step17
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
-    // Then solve the system:
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
 
@@ -604,27 +678,52 @@ namespace Step17
     // need access to the values of the nodes to which it is constrained (for
     // example, for a Q1 element in 2d, we need access to the two nodes on the
     // big side of a hanging node face, to compute the value of the
-    // constrained node in the middle). Since PETSc (and, for that matter, the
-    // MPI model on which it is built) does not allow to query the value of
-    // another node in a simple way if we should need it, what we do here is
-    // to get a copy of the distributed vector where we keep all elements
-    // locally. This is simple, since the deal.II wrappers have a conversion
-    // constructor for the deal.II vector class:
+    // constrained node in the middle).
+    //
+    // The problem is that we have built our vectors (in
+    // <code>setup_system()</code>) in such a way that every process
+    // is responsible for storing only those elements of the solution
+    // vector that correspond to the degrees of freedom this process
+    // "owns". There are, however, cases where in order to compute the
+    // value of the vector entry for a constrained degree of freedom
+    // on one process, we need to access vector entries that are
+    // stored on other processes.  PETSc (and, for that matter, the
+    // MPI model on which it is built) does not allow to simply query
+    // vector entries stored on other processes, so what we do here is
+    // to get a copy of the "distributed" vector where we store all
+    // elements locally. This is simple, since the deal.II wrappers
+    // have a conversion constructor for the deal.II Vector
+    // class. (This conversion of course requires communication, but
+    // in essence every process only needs to send its data to every
+    // other process once in bulk, rather than having to respond to
+    // queries for individual elements):
     Vector<double> localized_solution (solution);
 
-    // Then we distribute hanging node constraints on this local copy, i.e. we
-    // compute the values of all constrained nodes:
+    // Of course, as in previous discussions, it is clear that such a
+    // step cannot scale very far if you wanted to solve large
+    // problems on large numbers of processes, because every process
+    // now stores <i>all elements</i> of the solution vector. (We will
+    // show how to do this better in step-40.)  On the other hand,
+    // distributing hanging node constraints is simple on this local
+    // copy, using the usual function
+    // ConstraintMatrix::distributed(). In particular, we can compute
+    // the values of <i>all</i> constrained degrees of freedom,
+    // whether the current process owns them or not:
     hanging_node_constraints.distribute (localized_solution);
 
-    // Then transfer everything back into the global vector. The following
-    // operation copies those elements of the localized solution that we store
-    // locally in the distributed solution, and does not touch the other
-    // ones. Since we do the same operation on all processors, we end up with
-    // a distributed vector that has all the constrained nodes fixed.
+    // Then transfer everything back into the global vector. The
+    // following operation copies those elements of the localized
+    // solution that we store locally in the distributed solution, and
+    // does not touch the other ones. Since we do the same operation
+    // on all processors, we end up with a distributed vector (i.e., a
+    // vector that on every process only stores the vector entries
+    // corresponding to degrees of freedom that are owned by this
+    // process) that has all the constrained nodes fixed.
+    //
+    // We end the function by returning the number of iterations it
+    // took to converge, to allow for some output.
     solution = localized_solution;
 
-    // Finally return the number of iterations it took to converge, to allow
-    // for some output:
     return solver_control.last_step();
   }
 
@@ -862,7 +961,7 @@ namespace Step17
 
   // @sect4{ElasticProblem::run}
 
-  // Lastly, here is the driver function. It is almost unchanged from step-8,
+  // Lastly, here is the driver function. It is almost completely unchanged from step-8,
   // with the exception that we replace <code>std::cout</code> by the
   // <code>pcout</code> stream. Apart from this, the only other cosmetic
   // change is that we output how many degrees of freedom there are per
@@ -911,10 +1010,10 @@ namespace Step17
 }
 
 
-// @sect3{The <code>main</code>function}
+// @sect3{The <code>main</code> function}
 
 // The <code>main()</code> works the same way as most of the
-// main functions in the other example programs, i.e. it delegates work to the
+// main functions in the other example programs, i.e., it delegates work to the
 // <code>run</code> function of a master object, and only wraps everything
 // into some code to catch exceptions:
 int main (int argc, char **argv)
@@ -924,9 +1023,9 @@ int main (int argc, char **argv)
       using namespace dealii;
       using namespace Step17;
 
-      // Here is the only real difference: PETSc requires that we initialize
-      // it at the beginning of the program, and un-initialize it at the
-      // end. The class MPI_InitFinalize takes care of that.
+      // Here is the only real difference: MPI and PETSc both require that we initialize
+      // these libraries at the beginning of the program, and un-initialize them at the
+      // end. The class MPI_InitFinalize takes care of all of that.
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       ElasticProblem<2> elastic_problem;
