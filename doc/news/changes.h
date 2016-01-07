@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2015 by the deal.II authors
+// Copyright (C) 2014 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -604,7 +604,7 @@ inconvenience this causes.
   InterGridMap are now consistely instantiated also for types
   parallel::distributed::Triangulation and parallel::shared::Triangulation.
   <br>
-  (Wolfgang Bangerth, 2015/12/07)
+  (Gennadiy Rishin, Wolfgang Bangerth, 2015/12/07)
   </li>
 
   <li> Improved: Both versions of SparsityTools::distribute_sparsity_pattern()
