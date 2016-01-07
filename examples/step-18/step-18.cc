@@ -1029,7 +1029,7 @@ namespace Step18
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           cell_matrix = 0;
           cell_rhs = 0;
@@ -1302,7 +1302,7 @@ namespace Step18
       cell = triangulation.begin_active(),
       endc = triangulation.end();
       for (; cell!=endc; ++cell)
-        if (cell->is_locally_owned() )
+        if (cell->is_locally_owned())
           {
             // On these cells, add up the stresses over all quadrature
             // points...
@@ -1702,7 +1702,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         ++our_cells;
 
     triangulation.clear_user_data();
@@ -1735,7 +1735,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           cell->set_user_pointer (&quadrature_point_history[history_index]);
           history_index += quadrature_formula.size();
@@ -1820,7 +1820,7 @@ namespace Step18
     for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           // Next, get a pointer to the quadrature point history data local to
           // the present cell, and, as a defensive measure, make sure that
