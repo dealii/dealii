@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,7 +30,9 @@
 #   DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+#   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
 #   DEAL_II_DEPRECATED
+#   DEAL_II_ALWAYS_INLINE
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 #   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
 #
@@ -313,6 +315,24 @@ IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
+ENDIF()
+
+
+#
+# Do a similar check with the always_inline attribute on functions.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          __attribute__((always_inline)) int fn () { return 0; }
+          int main () { return fn(); }
+  "
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
+  )
+
+IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
+  SET(DEAL_II_ALWAYS_INLINE "__attribute__((always_inline))")
+ELSE()
+  SET(DEAL_II_ALWAYS_INLINE " ")
 ENDIF()
 
 
