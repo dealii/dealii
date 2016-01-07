@@ -274,6 +274,12 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2015/11/20)
   </li>
+  
+  <li> New: There is now a class UncheckedIndex that is used in some of the
+  Tensor interfaces to avoid redundant index checks.
+  <br>
+  (Wolfgang Bangerth, 2015/11/19)
+  </li>
 
   <li> Fixed: Trilinos ML preconditioner is now deterministic when using
   version 12.4 or newer.

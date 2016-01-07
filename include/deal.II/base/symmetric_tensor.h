@@ -1182,20 +1182,20 @@ namespace internal
     switch (dim)
       {
       case 1:
-        return data[0] * sdata[0];
+        return data[unchecked_index(0u)] * sdata[unchecked_index(0u)];
       case 2:
-        return (data[0] * sdata[0] +
-                data[1] * sdata[1] +
-                2*data[2] * sdata[2]);
+        return (data[unchecked_index(0u)] * sdata[unchecked_index(0u)] +
+                data[unchecked_index(1u)] * sdata[unchecked_index(1u)] +
+                2*data[unchecked_index(2u)] * sdata[unchecked_index(2u)]);
       default:
         // Start with the non-diagonal part to avoid some multiplications by
         // 2.
-        Number sum = data[dim] * sdata[dim];
+        Number sum = data[unchecked_index<unsigned int>(dim)] * sdata[unchecked_index<unsigned int>(dim)];
         for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
-          sum += data[d] * sdata[d];
+          sum += data[unchecked_index(d)] * sdata[unchecked_index(d)];
         sum *= 2.;
         for (unsigned int d=0; d<dim; ++d)
-          sum += data[d] * sdata[d];
+          sum += data[unchecked_index(d)] * sdata[unchecked_index(d)];
         return sum;
       }
   }
@@ -1210,9 +1210,9 @@ namespace internal
   {
     const unsigned int data_dim =
       SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components;
-    Number tmp [data_dim];
+    Number tmp[data_dim];
     for (unsigned int i=0; i<data_dim; ++i)
-      tmp[i] = perform_double_contraction<dim,Number>(data[i], sdata);
+      tmp[i] = perform_double_contraction<dim,Number>(data[unchecked_index(i)], sdata);
     return dealii::SymmetricTensor<2,dim,Number>(tmp);
   }
 
@@ -1228,9 +1228,9 @@ namespace internal
     for (unsigned int i=0; i<tmp.dimension; ++i)
       {
         for (unsigned int d=0; d<dim; ++d)
-          tmp[i] += data[d] * sdata[d][i];
+          tmp[unchecked_index(i)] += data[unchecked_index(d)] * sdata[unchecked_index(d)][unchecked_index(i)];
         for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-          tmp[i] += 2 * data[d] * sdata[d][i];
+          tmp[unchecked_index(i)] += 2 * data[unchecked_index(d)] * sdata[unchecked_index(d)][unchecked_index(i)];
       }
     return tmp;
   }
@@ -1250,9 +1250,9 @@ namespace internal
       for (unsigned int j=0; j<data_dim; ++j)
         {
           for (unsigned int d=0; d<dim; ++d)
-            tmp[i][j] += data[i][d] * sdata[d][j];
+            tmp[unchecked_index(i)][unchecked_index(j)] += data[unchecked_index(i)][unchecked_index(d)] * sdata[unchecked_index(d)][unchecked_index(j)];
           for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-            tmp[i][j] += 2 * data[i][d] * sdata[d][j];
+            tmp[unchecked_index(i)][unchecked_index(j)] += 2 * data[unchecked_index(i)][unchecked_index(d)] * sdata[unchecked_index(d)][unchecked_index(j)];
         }
     return tmp;
   }

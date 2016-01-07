@@ -22,6 +22,7 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/unchecked_index.h>
 
 #include <cmath>
 #include <ostream>
@@ -411,6 +412,22 @@ public:
    * Read-only access operator.
    */
   const value_type &operator[](const unsigned int i) const;
+
+  /**
+   * Read-Write access operator. This variation of operator[] does not
+   * check for validity of the index, even in debug mode. You should
+   * only use it in places where you know for other reasons that the
+   * index is correct.
+   */
+  value_type &operator [] (const UncheckedIndex<unsigned int> &i);
+
+  /**
+   * Read-only access operator. This variation of operator[] does not
+   * check for validity of the index, even in debug mode. You should
+   * only use it in places where you know for other reasons that the
+   * index is correct.
+   */
+  const value_type &operator[](const UncheckedIndex<unsigned int> &i) const;
 
   /**
    * Read access using TableIndices <tt>indices</tt>
@@ -842,6 +859,19 @@ namespace internal
 {
   namespace TensorSubscriptor
   {
+    template <typename ArrayElementType>
+    ArrayElementType &
+    subscript (ArrayElementType *,
+               const unsigned int,
+               dealii::internal::int2type<0>)
+    {
+      Assert (false,
+              ExcMessage("It is not possible to access elements of tensors of size zero."));
+      static ArrayElementType dummy_value;
+      return dummy_value;
+    }
+
+
     template <typename ArrayElementType, int dim>
     ArrayElementType &
     subscript (ArrayElementType *values,
@@ -853,10 +883,32 @@ namespace internal
     }
 
 
-    template <typename ArrayElementType>
+    template <typename ArrayElementType, int dim>
+    ArrayElementType &
+    subscript (ArrayElementType *values,
+               const UncheckedIndex<unsigned int> &i,
+               dealii::internal::int2type<dim>)
+    {
+      return values[i.value()];
+    }
+
+
+    template <typename ArrayElementType, typename IndexType>
     ArrayElementType &
     subscript (ArrayElementType *,
                const unsigned int,
+               dealii::internal::int2type<0>)
+    {
+      Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
+      static ArrayElementType t;
+      return t;
+    }
+
+
+    template <typename ArrayElementType, typename IndexType>
+    ArrayElementType &
+    subscript (ArrayElementType *,
+               const UncheckedIndex<unsigned int> &,
                dealii::internal::int2type<0>)
     {
       Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
@@ -880,6 +932,24 @@ template <int rank_, int dim, typename Number>
 inline
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
+{
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
+}
+
+
+template <int rank_, int dim, typename Number>
+inline
+typename Tensor<rank_,dim,Number>::value_type &
+Tensor<rank_,dim,Number>::operator[] (const UncheckedIndex<unsigned int> &i)
+{
+  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
+}
+
+
+template <int rank_, int dim, typename Number>
+inline
+const typename Tensor<rank_,dim,Number>::value_type &
+Tensor<rank_,dim,Number>::operator[] (const UncheckedIndex<unsigned int> &i) const
 {
   return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
 }
@@ -1171,9 +1241,9 @@ template <int rank_, int dim, typename Number>
 inline
 std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
 {
-  for (unsigned int i = 0; i < dim; ++i)
+  for (unsigned int i=0; i<dim; ++i)
     {
-      out << p[i];
+      out << p[unchecked_index(i)];
       if (i != dim - 1)
         out << ' ';
     }
@@ -1342,7 +1412,7 @@ operator * (const Tensor<rank,dim,Number> &t,
   // recurse over the base objects
   Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] * factor;
+    tt[unchecked_index(d)] = t[unchecked_index(d)] * factor;
   return tt;
 }
 
@@ -1388,7 +1458,7 @@ operator / (const Tensor<rank,dim,Number> &t,
   // recurse over the base objects
   Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
   for (unsigned int d=0; d<dim; ++d)
-    tt[d] = t[d] / factor;
+    tt[unchecked_index(d)] = t[unchecked_index(d)] / factor;
   return tt;
 }
 
@@ -1408,7 +1478,7 @@ operator+ (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp (p);
 
   for (unsigned int i=0; i<dim; ++i)
-    tmp[i] += q[i];
+    tmp[unchecked_index(i)] += q[unchecked_index(i)];
 
   return tmp;
 }
@@ -1429,7 +1499,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp (p);
 
   for (unsigned int i=0; i<dim; ++i)
-    tmp[i] -= q[i];
+    tmp[unchecked_index(i)] -= q[unchecked_index(i)];
 
   return tmp;
 }
@@ -1730,8 +1800,8 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
 
   Tensor<1, dim, Number> result;
 
-  result[0] = src[1];
-  result[1] = -src[0];
+  result[unchecked_index(0u)] = src[unchecked_index(1u)];
+  result[unchecked_index(1u)] = -src[unchecked_index(0u)];
 
   return result;
 }
@@ -1757,9 +1827,9 @@ cross_product_3d (const Tensor<1,dim,Number> &src1,
 
   Tensor<1, dim, Number> result;
 
-  result[0] = src1[1]*src2[2] - src1[2]*src2[1];
-  result[1] = src1[2]*src2[0] - src1[0]*src2[2];
-  result[2] = src1[0]*src2[1] - src1[1]*src2[0];
+  result[unchecked_index(0u)] = src1[unchecked_index(1u)]*src2[unchecked_index(2u)] - src1[unchecked_index(2u)]*src2[unchecked_index(1u)];
+  result[unchecked_index(1u)] = src1[unchecked_index(2u)]*src2[unchecked_index(0u)] - src1[unchecked_index(0u)]*src2[unchecked_index(2u)];
+  result[unchecked_index(2u)] = src1[unchecked_index(0u)]*src2[unchecked_index(1u)] - src1[unchecked_index(1u)]*src2[unchecked_index(0u)];
 
   return result;
 }
@@ -1791,11 +1861,11 @@ Number determinant (const Tensor<2,dim,Number> &t)
       Tensor<2,dim-1,Number> minor;
       for (unsigned int i=0; i<dim-1; ++i)
         for (unsigned int j=0; j<dim-1; ++j)
-          minor[i][j] = t[i][j<k ? j : j+1];
+          minor[unchecked_index(i)][unchecked_index(j)] = t[unchecked_index(i)][unchecked_index(j<k ? j : j+1)];
 
       const Number cofactor = ((k % 2 == 0) ? -1. : 1.) * determinant(minor);
 
-      det += t[dim-1][k] * cofactor;
+      det += t[unchecked_index<unsigned int>(dim-1)][unchecked_index(k)] * cofactor;
     }
 
   return ((dim % 2 == 0) ? 1. : -1.) * det;
@@ -1810,7 +1880,7 @@ template <typename Number>
 inline
 Number determinant (const Tensor<2,1,Number> &t)
 {
-  return t[0][0];
+  return t[unchecked_index(0U)][unchecked_index(0U)];
 }
 
 
@@ -1824,9 +1894,9 @@ Number determinant (const Tensor<2,1,Number> &t)
 template <int dim, typename Number>
 Number trace (const Tensor<2,dim,Number> &d)
 {
-  Number t=d[0][0];
+  Number t=d[unchecked_index(0U)][unchecked_index(0U)];
   for (unsigned int i=1; i<dim; ++i)
-    t += d[i][i];
+    t += d[unchecked_index(i)][unchecked_index(i)];
   return t;
 }
 
@@ -1849,41 +1919,41 @@ invert (const Tensor<2,dim,Number> &t)
   switch (dim)
     {
     case 1:
-      return_tensor[0][0] = 1.0/t[0][0];
+      return_tensor[0][0] = 1.0/t[unchecked_index(0U)][unchecked_index(0U)];
       break;
 
     case 2:
       // this is Maple output,
       // thus a bit unstructured
     {
-      const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
+      const Number det = t[unchecked_index(0U)][unchecked_index(0U)]*t[unchecked_index(1U)][unchecked_index(1U)]-t[unchecked_index(1U)][unchecked_index(0U)]*t[unchecked_index(0U)][unchecked_index(1U)];
       const Number t4 = 1.0/det;
-      return_tensor[0][0] = t[1][1]*t4;
-      return_tensor[0][1] = -t[0][1]*t4;
-      return_tensor[1][0] = -t[1][0]*t4;
-      return_tensor[1][1] = t[0][0]*t4;
+      return_tensor[0][0] = t[unchecked_index(1U)][unchecked_index(1U)]*t4;
+      return_tensor[0][1] = -t[unchecked_index(0U)][unchecked_index(1U)]*t4;
+      return_tensor[1][0] = -t[unchecked_index(1U)][unchecked_index(0U)]*t4;
+      return_tensor[1][1] = t[unchecked_index(0U)][unchecked_index(0U)]*t4;
       break;
     }
 
     case 3:
     {
-      const Number t4 = t[0][0]*t[1][1],
-                   t6 = t[0][0]*t[1][2],
-                   t8 = t[0][1]*t[1][0],
-                   t00 = t[0][2]*t[1][0],
-                   t01 = t[0][1]*t[2][0],
-                   t04 = t[0][2]*t[2][0],
-                   det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                          t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
+      const Number t4 = t[unchecked_index(0U)][unchecked_index(0U)]*t[unchecked_index(1U)][unchecked_index(1U)],
+                   t6 = t[unchecked_index(0U)][unchecked_index(0U)]*t[unchecked_index(1U)][unchecked_index(2U)],
+                   t8 = t[unchecked_index(0U)][unchecked_index(1U)]*t[unchecked_index(1U)][unchecked_index(0U)],
+                   t00 = t[unchecked_index(0U)][unchecked_index(2U)]*t[unchecked_index(1U)][unchecked_index(0U)],
+                   t01 = t[unchecked_index(0U)][unchecked_index(1U)]*t[unchecked_index(2U)][unchecked_index(0U)],
+                   t04 = t[unchecked_index(0U)][unchecked_index(2U)]*t[unchecked_index(2U)][unchecked_index(0U)],
+                   det = (t4*t[unchecked_index(2U)][unchecked_index(2U)]-t6*t[unchecked_index(2U)][unchecked_index(1U)]-t8*t[unchecked_index(2U)][unchecked_index(2U)]+
+                          t00*t[unchecked_index(2U)][unchecked_index(1U)]+t01*t[unchecked_index(1U)][unchecked_index(2U)]-t04*t[unchecked_index(1U)][unchecked_index(1U)]),
                          t07 = 1.0/det;
-      return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-      return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
-      return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
-      return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
-      return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
+      return_tensor[0][0] = (t[unchecked_index(1U)][unchecked_index(1U)]*t[unchecked_index(2U)][unchecked_index(2U)]-t[unchecked_index(1U)][unchecked_index(2U)]*t[unchecked_index(2U)][unchecked_index(1U)])*t07;
+      return_tensor[0][1] = (t[unchecked_index(0U)][unchecked_index(2U)]*t[unchecked_index(2U)][unchecked_index(1U)]-t[unchecked_index(0U)][unchecked_index(1U)]*t[unchecked_index(2U)][unchecked_index(2U)])*t07;
+      return_tensor[0][2] = (t[unchecked_index(0U)][unchecked_index(1U)]*t[unchecked_index(1U)][unchecked_index(2U)]-t[unchecked_index(0U)][unchecked_index(2U)]*t[unchecked_index(1U)][unchecked_index(1U)])*t07;
+      return_tensor[1][0] = (t[unchecked_index(1U)][unchecked_index(2U)]*t[unchecked_index(2U)][unchecked_index(0U)]-t[unchecked_index(1U)][unchecked_index(0U)]*t[unchecked_index(2U)][unchecked_index(2U)])*t07;
+      return_tensor[1][1] = (t[unchecked_index(0U)][unchecked_index(0U)]*t[unchecked_index(2U)][unchecked_index(2U)]-t04)*t07;
       return_tensor[1][2] = (t00-t6)*t07;
-      return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
-      return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
+      return_tensor[2][0] = (t[unchecked_index(1U)][unchecked_index(0U)]*t[unchecked_index(2U)][unchecked_index(1U)]-t[unchecked_index(1U)][unchecked_index(1U)]*t[unchecked_index(2U)][unchecked_index(0U)])*t07;
+      return_tensor[2][1] = (t01-t[unchecked_index(0U)][unchecked_index(0U)]*t[unchecked_index(2U)][unchecked_index(1U)])*t07;
       return_tensor[2][2] = (t4-t8)*t07;
 
       break;
@@ -1913,12 +1983,12 @@ transpose (const Tensor<2,dim,Number> &t)
   Tensor<2, dim, Number> tt;
   for (unsigned int i=0; i<dim; ++i)
     {
-      tt[i][i] = t[i][i];
+      tt[unchecked_index(i)][unchecked_index(i)] = t[unchecked_index(i)][unchecked_index(i)];
       for (unsigned int j=i+1; j<dim; ++j)
         {
-          tt[i][j] = t[j][i];
-          tt[j][i] = t[i][j];
-        };
+          tt[unchecked_index(i)][unchecked_index(j)] = t[unchecked_index(j)][unchecked_index(i)];
+          tt[unchecked_index(j)][unchecked_index(i)] = t[unchecked_index(i)][unchecked_index(j)];
+        }
     }
   return tt;
 }
@@ -1941,7 +2011,7 @@ l1_norm (const Tensor<2,dim,Number> &t)
     {
       double sum = 0;
       for (unsigned int i=0; i<dim; ++i)
-        sum += std::fabs(t[i][j]);
+        sum += std::fabs(t[unchecked_index(i)][unchecked_index(j)]);
 
       if (sum > max)
         max = sum;
@@ -1968,7 +2038,7 @@ linfty_norm (const Tensor<2,dim,Number> &t)
     {
       double sum = 0;
       for (unsigned int j=0; j<dim; ++j)
-        sum += std::fabs(t[i][j]);
+        sum += std::fabs(t[unchecked_index(i)][unchecked_index(j)]);
 
       if (sum > max)
         max = sum;
