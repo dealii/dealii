@@ -169,32 +169,33 @@ and $\Delta \mathbf{u}^n$ the incremental displacement for time step
 $n$. In addition, we have to specify initial data $\mathbf{u}(\cdot,0)=\mathbf{u}_0$.
 This way, if we want to solve for the displacement increment, we
 have to solve the following system:
-@f{eqnarray*}
-  - \textrm{div}\   C \varepsilon(\Delta\mathbf{u}^n) &=& \mathbf{f} + \textrm{div}\  \sigma^{n-1}
+@f{align*}
+  - \textrm{div}\   C \varepsilon(\Delta\mathbf{u}^n) &= \mathbf{f} + \textrm{div}\  \sigma^{n-1}
   \qquad
-  \textrm{in}\ \Omega(t_{n-1}),
+  &&\textrm{in}\ \Omega(t_{n-1}),
   \\
-  \Delta \mathbf{u}^n(\mathbf{x},t) &=& \mathbf{d}(\mathbf{x},t_n) - \mathbf{d}(\mathbf{x},t_{n-1})
+  \Delta \mathbf{u}^n(\mathbf{x},t) &= \mathbf{d}(\mathbf{x},t_n) - \mathbf{d}(\mathbf{x},t_{n-1})
   \qquad
-  \textrm{on}\ \Gamma_D\subset\partial\Omega(t_{n-1}),
+  &&\textrm{on}\ \Gamma_D\subset\partial\Omega(t_{n-1}),
   \\
-  \mathbf{n} \ C \varepsilon(\Delta \mathbf{u}^n(\mathbf{x},t)) &=& \mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1})
+  \mathbf{n} \ C \varepsilon(\Delta \mathbf{u}^n(\mathbf{x},t)) &= \mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1})
   \qquad
-  \textrm{on}\ \Gamma_N=\partial\Omega(t_{n-1})\backslash\Gamma_D.
+  &&\textrm{on}\ \Gamma_N=\partial\Omega(t_{n-1})\backslash\Gamma_D.
 @f}
 The weak form of this set of equations, which as usual is the basis for the
 finite element formulation, reads as follows: find $\Delta \mathbf{u}^n \in
 \{v\in H^1(\Omega(t_{n-1}))^d: v|_{\Gamma_D}=\mathbf{d}(\cdot,t_n) - \mathbf{d}(\cdot,t_{n-1})\}$
 such that
 <a name="step_18.linear-system"></a>
-@f{eqnarray*}
+@f{align*}
   (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
-  =
+  &=
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
   -(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
   \\
-  +(\mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1}), \varphi)_{\Gamma_N}
+  &\qquad +(\mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1}), \varphi)_{\Gamma_N}
   \\
+  &\qquad\qquad
   \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.
   \qquad
   \qquad
@@ -328,33 +329,82 @@ Both stress update and rotation are implemented in the function
 
 <h3>Parallel graphical output</h3>
 
-In the step-17 example program, the main bottleneck for %parallel computations
+In step-17, the main bottleneck for %parallel computations as far as run time
+is concerned
 was that only the first processor generated output for the entire domain.
 Since generating graphical output is expensive, this did not scale well when
-large numbers of processors were involved. However, no viable ways around this
-problem were implemented in the library at the time, and the problem was
-deferred to a later version.
+larger numbers of processors were involved. We will address this here.
 
-This functionality has been implemented in the meantime, and this is the time
-to explain its use. Basically, what we need to do is let every process
+Basically, what we need to do is let every process
 generate graphical output for that subset of cells that it owns, write them
 into separate files and have a way to display all files for a certain timestep
-at the same time. This way the code produces one .vtu file per processor per
+at the same time. This way the code produces one <code>.vtu</code> file per process per
 time step. The two common VTK file viewers ParaView and VisIt both support
-opening more than one .vtu file at once. To simplify the process of picking
+opening more than one <code>.vtu</code> file at once. To simplify the process of picking
 the correct files and allow moving around in time, both support record files
 that reference all files for a given timestep. Sadly, the record files have a
 different format between VisIt and Paraview, so we write out both formats.
 
-The code will generate the files solution-TTTT.NNN.vtu, where TTTT is the
-timestep number (starting from 1) and NNN is the processor id (starting from
+The code will generate the files <code>solution-TTTT.NNN.vtu</code>, 
+where <code>TTTT</code> is the
+timestep number (starting from 1) and <code>NNN</code> is the process rank
+(starting from
 0). These files contain the locally owned cells for the timestep and
-processor. The files solution-TTTT.visit is the visit record for timestep
-TTTT, while solution-TTTT.pvtu is the same for ParaView. Finally, the file
-solution.pvd is a special record only supported by ParaView that references
+processor. The files <code>solution-TTTT.visit</code> is the visit record for timestep
+<code>TTTT</code>, while <code>solution-TTTT.pvtu</code> is the same for ParaView. Finally, the file
+<code>solution.pvd</code> is a special record only supported by ParaView that references
 all time steps. So in ParaView, only solution.pvd needs to be opened, while
 one needs to select the group of all .visit files in VisIt for the same
 effect.
+
+
+<h3>A triangulation with automatic partitioning</h3>
+
+In step-17, we used a regular triangulation that was simply replicated on
+every processor, and a corresponding DoFHandler. Both had no idea that they
+were used in a %parallel context -- they just existed in their entirety
+on every processor, and we argued that this was eventually going to be a
+major memory bottleneck.
+
+We do not address this issue here (we will do so in step-40) but make
+the situation slightly more automated. In step-17, we created the triangulation
+and then manually "partitioned" it, i.e., we assigned
+@ref GlossSubdomainId "subdomain ids" to every cell that indicated which
+@ref GlossMPIProcess "MPI process" "owned" the cell. Here, we use a class
+parallel::shared::Triangulation that at least does this part automatically:
+whenever you create or refine such a triangulation, it automatically
+partitions itself among all involved processes (which it knows about because
+you have to tell it about the @ref GlossMPICommunicator "MPI communicator"
+that connects these processes upon construction of the triangulation).
+Otherwise, the parallel::shared::Triangulation looks, for all practical
+purposes, like a regular Triangulation object. 
+
+The convenience of using this class does not only result from being able
+to avoid the manual call to GridTools::partition(). Rather, the DoFHandler
+class now also knows that you want to use it in a parallel context, and
+by default automatically enumerates degrees of freedom in such a way
+that all DoFs owned by process zero come before all DoFs owned by process 1,
+etc. In other words, you can also avoid the call to 
+DoFRenumbering::subdomain_wise().
+
+There are other benefits. For example, because the triangulation knows that
+it lives in a %parallel universe, it also knows that it "owns" certain
+cells (namely, those whose subdomain id equals its MPI rank; previously,
+the triangulation only stored these subdomain ids, but had no way to
+make sense of them). Consequently, in the assembly function, you can
+test whether a cell is "locally owned" (i.e., owned by the current
+process, see @ref GlossLocallyOwnedCell) when you loop over all cells
+using the syntax
+@code
+  if (cell->is_locally_owned())
+@endcode
+This knowledge extends to the DoFHandler object built on such triangulations,
+which can then identify which degrees of freedom are locally owned
+(see @ref GlossLocallyOwnedDofs) via calls such as 
+DoFHandler::n_locally_owned_dofs_per_processor() and
+DoFTools::extract_locally_relevant_dofs(). Finally, the DataOut class
+also knows how to deal with such triangulations and will simply skip
+generating graphical output on cells not locally owned.
 
 
 <h3>Overall structure of the program</h3>
@@ -408,7 +458,7 @@ sequence of operations on the present mesh:
   point $\mathbf{x}_q$ on a given cell. At the top of the implementation of this
   example program, you will find such functions. The first one,
   <code>get_stress_strain_tensor</code>, takes two arguments corresponding to
-  the Lam\'e constants $\lambda$ and $\mu$ and returns the stress-strain tensor
+  the Lam&eacute; constants $\lambda$ and $\mu$ and returns the stress-strain tensor
   for the isotropic case corresponding to these constants (in the program, we
   will choose constants corresponding to steel); it would be simple to replace
   this function by one that computes this tensor for the anisotropic case, or
