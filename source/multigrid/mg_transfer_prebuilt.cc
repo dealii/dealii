@@ -35,7 +35,6 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/multigrid/mg_transfer.templates.h>
 
 #include <algorithm>
 
@@ -47,12 +46,15 @@ MGTransferPrebuilt<VectorType>::MGTransferPrebuilt ()
 {}
 
 
+
 template<typename VectorType>
 MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
   :
-  constraints(&c),
-  mg_constrained_dofs(&mg_c)
-{}
+  constraints(&c)
+{
+  this->mg_constrained_dofs = &mg_c;
+}
+
 
 
 template <typename VectorType>
@@ -60,29 +62,27 @@ MGTransferPrebuilt<VectorType>::~MGTransferPrebuilt ()
 {}
 
 
+
 template <typename VectorType>
 void MGTransferPrebuilt<VectorType>::initialize_constraints
 (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
 {
   constraints = &c;
-  mg_constrained_dofs = &mg_c;
+  this->mg_constrained_dofs = &mg_c;
 }
+
 
 
 template <typename VectorType>
 void MGTransferPrebuilt<VectorType>::clear ()
 {
-  sizes.resize(0);
+  MGLevelGlobalTransfer<VectorType>::clear();
   prolongation_matrices.resize(0);
   prolongation_sparsities.resize(0);
-  copy_indices.resize(0);
-  copy_indices_global_mine.resize(0);
-  copy_indices_level_mine.resize(0);
-  component_to_block_map.resize(0);
   interface_dofs.resize(0);
   constraints = 0;
-  mg_constrained_dofs = 0;
 }
+
 
 
 template <typename VectorType>
@@ -95,6 +95,7 @@ void MGTransferPrebuilt<VectorType>::prolongate (const unsigned int to_level,
 
   prolongation_matrices[to_level-1]->vmult (dst, src);
 }
+
 
 
 template <typename VectorType>
@@ -110,6 +111,7 @@ void MGTransferPrebuilt<VectorType>::restrict_and_add (const unsigned int from_l
 }
 
 
+
 template <typename VectorType>
 template <int dim, int spacedim>
 void MGTransferPrebuilt<VectorType>::build_matrices
@@ -118,9 +120,9 @@ void MGTransferPrebuilt<VectorType>::build_matrices
   const unsigned int n_levels      = mg_dof.get_triangulation().n_global_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
-  sizes.resize(n_levels);
+  this->sizes.resize(n_levels);
   for (unsigned int l=0; l<n_levels; ++l)
-    sizes[l] = mg_dof.n_dofs(l);
+    this->sizes[l] = mg_dof.n_dofs(l);
 
   // reset the size of the array of
   // matrices. call resize(0) first,
@@ -167,8 +169,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       IndexSet level_p1_relevant_dofs;
       DoFTools::extract_locally_relevant_level_dofs(mg_dof, level+1,
                                                     level_p1_relevant_dofs);
-      DynamicSparsityPattern dsp (sizes[level+1],
-                                  sizes[level],
+      DynamicSparsityPattern dsp (this->sizes[level+1],
+                                  this->sizes[level],
                                   level_p1_relevant_dofs);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
@@ -235,9 +237,10 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
 
-                if (mg_constrained_dofs != 0 && mg_constrained_dofs->have_boundary_indices())
+                if (this->mg_constrained_dofs != 0 &&
+                    this->mg_constrained_dofs->have_boundary_indices())
                   for (unsigned int j=0; j<dofs_per_cell; ++j)
-                    if (mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
+                    if (this->mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
                       for (unsigned int i=0; i<dofs_per_cell; ++i)
                         prolongation(i,j) = 0.;
 
@@ -255,221 +258,10 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-  fill_and_communicate_copy_indices(mg_dof);
+  this->fill_and_communicate_copy_indices(mg_dof);
 }
 
-namespace
-{
-  /**
-   * Internal data structure that is used in the MPI communication in fill_and_communicate_copy_indices().
-   * It represents an entry in the copy_indices* map, that associates a level dof index with a global dof index.
-   */
-  struct DoFPair
-  {
-    unsigned int level;
-    types::global_dof_index global_dof_index;
-    types::global_dof_index level_dof_index;
 
-    DoFPair(const unsigned int level,
-            const types::global_dof_index global_dof_index,
-            const types::global_dof_index level_dof_index)
-      :
-      level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
-    {}
-
-    DoFPair()
-    {}
-  };
-}
-
-template <typename VectorType>
-template <int dim, int spacedim>
-void
-MGTransferPrebuilt<VectorType>::fill_and_communicate_copy_indices
-(const DoFHandler<dim,spacedim> &mg_dof)
-{
-  // Now we are filling the variables copy_indices*, which are essentially
-  // maps from global to mgdof for each level stored as a std::vector of
-  // pairs. We need to split this map on each level depending on the ownership
-  // of the global and mgdof, so that we later not access non-local elements
-  // in copy_to/from_mg.
-  // We keep track in the bitfield dof_touched which global dof has
-  // been processed already (on the current level). This is the same as
-  // the multigrid running in serial.
-
-  // map cpu_index -> vector of data
-  // that will be copied into copy_indices_level_mine
-  std::vector<DoFPair> send_data_temp;
-
-  const unsigned int n_levels = mg_dof.get_triangulation().n_global_levels();
-  copy_indices.resize(n_levels);
-  copy_indices_global_mine.resize(n_levels);
-  copy_indices_level_mine.resize(n_levels);
-  IndexSet globally_relevant;
-  DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
-
-  const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
-  std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
-  std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
-
-  for (unsigned int level=0; level<n_levels; ++level)
-    {
-      std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
-      copy_indices[level].clear();
-      copy_indices_level_mine[level].clear();
-      copy_indices_global_mine[level].clear();
-
-      typename DoFHandler<dim,spacedim>::active_cell_iterator
-      level_cell = mg_dof.begin_active(level);
-      const typename DoFHandler<dim,spacedim>::active_cell_iterator
-      level_end  = mg_dof.end_active(level);
-
-      for (; level_cell!=level_end; ++level_cell)
-        {
-          if (mg_dof.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-              &&  (level_cell->level_subdomain_id()==numbers::artificial_subdomain_id
-                   ||  level_cell->subdomain_id()==numbers::artificial_subdomain_id)
-             )
-            continue;
-
-          // get the dof numbers of this cell for the global and the level-wise
-          // numbering
-          level_cell->get_dof_indices (global_dof_indices);
-          level_cell->get_mg_dof_indices (level_dof_indices);
-
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            {
-              // we need to ignore if the DoF is on a refinement edge (hanging node)
-              if (mg_constrained_dofs != 0
-                  && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
-                continue;
-              types::global_dof_index global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
-              //skip if we did this global dof already (on this or a coarser level)
-              if (dof_touched[global_idx])
-                continue;
-              bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
-              bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
-
-
-              if (global_mine && level_mine)
-                {
-                  copy_indices[level].push_back(
-                    std::make_pair (global_dof_indices[i], level_dof_indices[i]));
-                }
-              else if (global_mine)
-                {
-                  copy_indices_global_mine[level].push_back(
-                    std::make_pair (global_dof_indices[i], level_dof_indices[i]));
-
-                  //send this to the owner of the level_dof:
-                  send_data_temp.push_back(DoFPair(level, global_dof_indices[i], level_dof_indices[i]));
-                }
-              else
-                {
-                  // somebody will send those to me
-                }
-
-              dof_touched[global_idx] = true;
-            }
-        }
-    }
-
-  const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
-    (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-     (&mg_dof.get_triangulation()));
-  AssertThrow(send_data_temp.size()==0 || tria!=NULL, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
-
-#ifdef DEAL_II_WITH_MPI
-  if (tria)
-    {
-      // TODO: Searching the owner for every single DoF becomes quite
-      // inefficient. Please fix this, Timo.
-      std::set<unsigned int> neighbors = tria->level_ghost_owners();
-      std::map<int, std::vector<DoFPair> > send_data;
-
-      // * find owners of the level dofs and insert into send_data accordingly
-      for (typename std::vector<DoFPair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
-        {
-          for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
-            {
-              if (mg_dof.locally_owned_mg_dofs_per_processor(dofpair->level)[*it].is_element(dofpair->level_dof_index))
-                {
-                  send_data[*it].push_back(*dofpair);
-                  break;
-                }
-            }
-        }
-
-      // * send
-      std::vector<MPI_Request> requests;
-      {
-        for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
-          {
-            requests.push_back(MPI_Request());
-            unsigned int dest = *it;
-            std::vector<DoFPair> &data = send_data[dest];
-            if (data.size())
-              MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
-            else
-              MPI_Isend(NULL, 0, MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
-          }
-      }
-
-      // * receive
-      {
-        std::vector<DoFPair> receive_buffer;
-        for (unsigned int counter=0; counter<neighbors.size(); ++counter)
-          {
-            MPI_Status status;
-            int len;
-            MPI_Probe(MPI_ANY_SOURCE, 71, tria->get_communicator(), &status);
-            MPI_Get_count(&status, MPI_BYTE, &len);
-
-            if (len==0)
-              {
-                int err = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                                   tria->get_communicator(), &status);
-                AssertThrow(err==MPI_SUCCESS, ExcInternalError());
-                continue;
-              }
-
-            int count = len / sizeof(DoFPair);
-            Assert(static_cast<int>(count * sizeof(DoFPair)) == len, ExcInternalError());
-            receive_buffer.resize(count);
-
-            void *ptr = &receive_buffer[0];
-            int err = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                               tria->get_communicator(), &status);
-            AssertThrow(err==MPI_SUCCESS, ExcInternalError());
-
-            for (unsigned int i=0; i<receive_buffer.size(); ++i)
-              {
-                copy_indices_level_mine[receive_buffer[i].level].push_back(
-                  std::make_pair (receive_buffer[i].global_dof_index, receive_buffer[i].level_dof_index)
-                );
-              }
-          }
-      }
-
-      // * wait for all MPI_Isend to complete
-      if (requests.size() > 0)
-        {
-          MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
-          requests.clear();
-        }
-    }
-#endif
-
-  // Sort the indices. This will produce more reliable debug output for regression texts
-  // and likely won't hurt performance even in release mode.
-  std::less<std::pair<types::global_dof_index, types::global_dof_index> > compare;
-  for (unsigned int level=0; level<copy_indices.size(); ++level)
-    std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
-  for (unsigned int level=0; level<copy_indices_level_mine.size(); ++level)
-    std::sort(copy_indices_level_mine[level].begin(), copy_indices_level_mine[level].end(), compare);
-  for (unsigned int level=0; level<copy_indices_global_mine.size(); ++level)
-    std::sort(copy_indices_global_mine[level].begin(), copy_indices_global_mine[level].end(), compare);
-}
 
 template <typename VectorType>
 void
@@ -483,29 +275,18 @@ MGTransferPrebuilt<VectorType>::print_matrices (std::ostream &os) const
     }
 }
 
-template <typename VectorType>
-void
-MGTransferPrebuilt<VectorType>::print_indices (std::ostream &os) const
-{
-  for (unsigned int level = 0; level<copy_indices.size(); ++level)
-    {
-      for (unsigned int i=0; i<copy_indices[level].size(); ++i)
-        os << "copy_indices[" << level
-           << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
-    }
 
-  for (unsigned int level = 0; level<copy_indices_level_mine.size(); ++level)
-    {
-      for (unsigned int i=0; i<copy_indices_level_mine[level].size(); ++i)
-        os << "copy_ifrom  [" << level
-           << "]\t" << copy_indices_level_mine[level][i].first << '\t' << copy_indices_level_mine[level][i].second << std::endl;
-    }
-  for (unsigned int level = 0; level<copy_indices_global_mine.size(); ++level)
-    {
-      for (unsigned int i=0; i<copy_indices_global_mine[level].size(); ++i)
-        os << "copy_ito    [" << level
-           << "]\t" << copy_indices_global_mine[level][i].first << '\t' << copy_indices_global_mine[level][i].second << std::endl;
-    }
+
+template <typename VectorType>
+std::size_t
+MGTransferPrebuilt<VectorType>::memory_consumption () const
+{
+  std::size_t result = MGLevelGlobalTransfer<VectorType>::memory_consumption();
+  for (unsigned int i=0; i<prolongation_matrices.size(); ++i)
+    result += prolongation_matrices[i]->memory_consumption()
+              + prolongation_sparsities[i]->memory_consumption();
+
+  return result;
 }
 
 

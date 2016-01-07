@@ -542,6 +542,12 @@ inconvenience this causes.
   (Jean-Paul Pelteret, David Wells, Matthias Maier, 2015/12/30)
   </li>
 
+  <li> New: MGTransferPrebuilt with parallel adaptive refinement has been
+  finalized for parallel::distributed::Vector.
+  <br>
+  (Martin Kronbichler, 2015/12/23)
+  </li>
+
   <li> Fixed: Now all members in the class SparseMatrixEZ are initialized
   correctly in the constructor. This was causing random crashes before.
   <br>
