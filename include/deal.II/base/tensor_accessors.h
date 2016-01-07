@@ -183,7 +183,7 @@ namespace TensorAccessors
    * @author Matthias Maier, 2015
    */
   template <int index, int rank, typename T>
-  __attribute__((always_inline)) internal::ReorderedIndexView<index, rank, T>
+  DEAL_II_ALWAYS_INLINE internal::ReorderedIndexView<index, rank, T>
   reordered_index_view(T &t)
   {
 #ifdef DEAL_II_WITH_CXX11
@@ -264,7 +264,7 @@ namespace TensorAccessors
    * @author Matthias Maier, 2015
    */
   template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
-  __attribute__((always_inline)) void contract(T1 &result, const T2 &left, const T3 &right)
+  DEAL_II_ALWAYS_INLINE void contract(T1 &result, const T2 &left, const T3 &right)
   {
 #ifdef DEAL_II_WITH_CXX11
     static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
@@ -393,7 +393,7 @@ namespace TensorAccessors
       value_type;
 
       // Recurse by applying index j directly:
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       value_type operator[](unsigned int j) const
       {
         return value_type(t_[j]);
@@ -422,7 +422,7 @@ namespace TensorAccessors
 
       typedef StoreIndex<rank - 1, internal::Identity<T> > value_type;
 
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       value_type operator[](unsigned int j) const
       {
         return value_type(Identity<T>(t_), j);
@@ -443,7 +443,7 @@ namespace TensorAccessors
 
       typedef typename ReferenceType<typename ValueType<T>::value_type>::type value_type;
 
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       value_type operator[](unsigned int j) const
       {
         return t_[j];
@@ -466,7 +466,7 @@ namespace TensorAccessors
 
       typedef typename ValueType<T>::value_type return_type;
 
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       typename ReferenceType<return_type>::type apply(unsigned int j) const
       {
         return t_[j];
@@ -492,7 +492,7 @@ namespace TensorAccessors
 
       typedef StoreIndex<rank - 1, StoreIndex<rank, S> > value_type;
 
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       value_type operator[](unsigned int j) const
       {
         return value_type(*this, j);
@@ -524,7 +524,7 @@ namespace TensorAccessors
       typedef typename ValueType<typename S::return_type>::value_type return_type;
       typedef return_type value_type;
 
-      inline __attribute__((always_inline))
+      inline DEAL_II_ALWAYS_INLINE
       return_type &operator[](unsigned int j) const
       {
         return s_.apply(j)[i_];
@@ -595,7 +595,7 @@ namespace TensorAccessors
     {
     public:
       template<typename T1, typename T2, typename T3>
-      inline __attribute__((always_inline)) static
+      inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
@@ -623,7 +623,7 @@ namespace TensorAccessors
     {
     public:
       template<typename T1, typename T2, typename T3>
-      inline __attribute__((always_inline)) static
+      inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
@@ -651,7 +651,7 @@ namespace TensorAccessors
     {
     public:
       template<typename T1, typename T2, typename T3>
-      inline __attribute__((always_inline)) static
+      inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
         result = Contract2<no_contr, dim>::template contract2<T1>(left, right);
@@ -667,7 +667,7 @@ namespace TensorAccessors
     {
     public:
       template<typename T1, typename T2, typename T3>
-      inline __attribute__((always_inline)) static
+      inline DEAL_II_ALWAYS_INLINE static
       T1 contract2(const T2 &left, const T3 &right)
       {
         T1 result = T1();
@@ -685,7 +685,7 @@ namespace TensorAccessors
     {
     public:
       template<typename T1, typename T2, typename T3>
-      inline __attribute__((always_inline)) static
+      inline DEAL_II_ALWAYS_INLINE static
       T1 contract2(const T2 &left, const T3 &right)
       {
         return left * right;

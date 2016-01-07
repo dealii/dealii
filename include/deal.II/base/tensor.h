@@ -843,7 +843,7 @@ namespace internal
   namespace TensorSubscriptor
   {
     template <typename ArrayElementType, int dim>
-    inline __attribute__((always_inline))
+    inline DEAL_II_ALWAYS_INLINE
     ArrayElementType &
     subscript (ArrayElementType *values,
                const unsigned int i,
@@ -869,7 +869,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline __attribute__((always_inline))
+inline DEAL_II_ALWAYS_INLINE
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
@@ -878,7 +878,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 
 
 template <int rank_, int dim, typename Number>
-inline __attribute__((always_inline))
+inline DEAL_II_ALWAYS_INLINE
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
@@ -1468,7 +1468,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
-inline __attribute__((always_inline))
+inline DEAL_II_ALWAYS_INLINE
 typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
 operator * (const Tensor<rank_1, dim, Number> &src1,
             const Tensor<rank_2, dim, OtherNumber> &src2)
