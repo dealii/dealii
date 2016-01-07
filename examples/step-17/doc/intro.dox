@@ -94,7 +94,11 @@ For larger problems, having to store the <i>entire</i> mesh on every processor
 will clearly yield a bottleneck. Splitting up the mesh is slightly, though not
 much more complicated (from a user perspective, though it is <i>much</i> more
 complicated under the hood) to achieve and
-we will show how to do this in step-40 and some other programs.
+we will show how to do this in step-40 and some other programs. There are
+numerous occasions where, in the course of discussing how a function of this
+program works, we will comment on the fact that it will not scale to large
+problems and why not. All of these issues will be addressed in step-18 and
+in particular step-40, which scales to very large number of processes.
 
 Philosophically, the way MPI operates is as follows. You typically run a
 program via

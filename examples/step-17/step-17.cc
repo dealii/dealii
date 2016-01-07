@@ -730,35 +730,52 @@ namespace Step17
 
   // @sect4{ElasticProblem::refine_grid}
 
-  // Using some kind of refinement indicator, the mesh can be refined. The problem
-  // is basically the same as with distributing hanging node constraints: in order to
-  // compute the error indicator, we need access to all elements of the
-  // solution vector. We then compute the indicators for the cells that belong
-  // to the present process, but then we need to distribute the refinement
-  // indicators into a distributed vector so that all processes have the
-  // values of the refinement indicator for all cells. But then, in order for
-  // each process to refine its copy of the mesh, they need to have access to
-  // all refinement indicators locally, so they have to copy the global vector
-  // back into a local one. That's a little convoluted, but thinking about it
-  // quite straightforward nevertheless. So here's how we do it:
+  // Using some kind of refinement indicator, the mesh can be
+  // refined. The problem is basically the same as with distributing
+  // hanging node constraints: in order to compute the error indicator
+  // (even if we were just interested in the indicator on the cells
+  // the current process owns), we need access to more elements of the
+  // solution vector than just those the current processor stores. To
+  // make this happen, we do essentially what we did in
+  // <code>solve()</code> already, namely get a <i>complete</i> copy
+  // of the solution vector onto every process, and use that to
+  // compute. This is, in itself expensive as explained above, and it
+  // is particular unnecessary since we had just created and then
+  // destroyed such a vector in <code>solve()</code>, but efficiency
+  // is not the point of this program and so let us opt for a design
+  // in which every function is as self-contained as possible.
+  //
+  // Once we have such a "localized" vector that contains <i>all</i>
+  // elements of the solution vector, we can compute the indicators
+  // for the cells that belong to the present process. In fact, we
+  // could of course compute <i>all</i> refinement indicators since
+  // our Triangulation and DoFHandler objects store information about
+  // all cells, and since we have a complete copy of the solution
+  // vector. But in the interest in showing how to operate in
+  // %parallel, let us demonstrate how one would operate if one were
+  // to only compute <i>some</i> error indicators and then exchange
+  // the remaining ones with the other processes. (Ultimately, each
+  // process needs a complete set of refinement indicators because
+  // every process needs to refine their mesh, and needs to refine it
+  // in exactly the same way as all of the other processes.)
+  //
+  // So, to do all of this, we need to:
+  // - First, get a local copy of the distributed solution vector.
+  // - Second, create a vector to store the refinement indicators.
+  // - Third, let the KellyErrorEstimator compute refinement
+  //   indicators for all cells belonging to the present
+  //   subdomain/process. The last argument of the call indicates
+  //   which subdomain we are interested in. The three arguments
+  //   before it are various other default arguments that one usually
+  //   doesn't need (and doesn't state values for, but rather uses the
+  //   defaults), but which we have to state here explicitly since we
+  //   want to modify the value of a following argument (i.e. the one
+  //   indicating the subdomain).
   template <int dim>
   void ElasticProblem<dim>::refine_grid ()
   {
-    // So, first part: get a local copy of the distributed solution
-    // vector. This is necessary since the error estimator needs to get at the
-    // value of neighboring cells even if they do not belong to the subdomain
-    // associated with the present MPI process:
     const Vector<double> localized_solution (solution);
 
-    // Second part: set up a vector of error indicators for all cells and let
-    // the Kelly class compute refinement indicators for all cells belonging
-    // to the present subdomain/process. Note that the last argument of the
-    // call indicates which subdomain we are interested in. The three
-    // arguments before it are various other default arguments that one
-    // usually doesn't need (and doesn't state values for, but rather uses the
-    // defaults), but which we have to state here explicitly since we want to
-    // modify the value of a following argument (i.e. the one indicating the
-    // subdomain):
     Vector<float> local_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(2),
@@ -770,43 +787,49 @@ namespace Step17
                                         MultithreadInfo::n_threads(),
                                         this_mpi_process);
 
-    // Now all processes have computed error indicators for their own cells
-    // and stored them in the respective elements of the
-    // <code>local_error_per_cell</code> vector. The elements of this vector
-    // for cells not on the present process are zero. However, since all
-    // processes have a copy of a copy of the entire triangulation and need to
-    // keep these copies in sync, they need the values of refinement
-    // indicators for all cells of the triangulation. Thus, we need to
-    // distribute our results. We do this by creating a distributed vector
-    // where each process has its share, and sets the elements it has
-    // computed. We will then later generate a local sequential copy of this
-    // distributed vector to allow each process to access all elements of this
-    // vector.
+    // Now all processes have computed error indicators for their own
+    // cells and stored them in the respective elements of the
+    // <code>local_error_per_cell</code> vector. The elements of this
+    // vector for cells not owned by the present process are
+    // zero. However, since all processes have a copy of the entire
+    // triangulation and need to keep these copies in sync, they need
+    // the values of refinement indicators for all cells of the
+    // triangulation. Thus, we need to distribute our results. We do
+    // this by creating a distributed vector where each process has
+    // its share, and sets the elements it has computed. Consequently,
+    // when you view this vector as one that lives across all
+    // processes, then every element of this vector has been set
+    // once. We can then assign this parallel vector to a local,
+    // non-parallel vector on each process, making <i>all</i> error
+    // indicators available on every process.
     //
     // So in the first step, we need to set up a parallel vector. For
-    // simplicity, every process will own a chunk with as many elements as
-    // this process owns cells, so that the first chunk of elements is stored
-    // with process zero, the next chunk with process one, and so on. It is
-    // important to remark, however, that these elements are not necessarily
-    // the ones we will write to. This is so, since the order in which cells
-    // are arranged, i.e. the order in which the elements of the vector
-    // correspond to cells, is not ordered according to the subdomain these
-    // cells belong to. In other words, if on this process we compute
-    // indicators for cells of a certain subdomain, we may write the results
-    // to more or less random elements if the distributed vector, that do not
-    // necessarily lie within the chunk of vector we own on the present
-    // process. They will subsequently have to be copied into another
-    // process's memory space then, an operation that PETSc does for us when
-    // we call the <code>compress</code> function. This inefficiency could be
-    // avoided with some more code, but we refrain from it since it is not a
-    // major factor in the program's total runtime.
+    // simplicity, every process will own a chunk with as many
+    // elements as this process owns cells, so that the first chunk of
+    // elements is stored with process zero, the next chunk with
+    // process one, and so on. It is important to remark, however,
+    // that these elements are not necessarily the ones we will write
+    // to. This is so, since the order in which cells are arranged,
+    // i.e., the order in which the elements of the vector correspond
+    // to cells, is not ordered according to the subdomain these cells
+    // belong to. In other words, if on this process we compute
+    // indicators for cells of a certain subdomain, we may write the
+    // results to more or less random elements of the distributed
+    // vector; in particular, they may not necessarily lie within the
+    // chunk of vector we own on the present process. They will
+    // subsequently have to be copied into another process's memory
+    // space, an operation that PETSc does for us when we call the
+    // <code>compress()</code> function. This inefficiency could be
+    // avoided with some more code, but we refrain from it since it is
+    // not a major factor in the program's total runtime.
     //
-    // So here's how we do it: count how many cells belong to this process,
-    // set up a distributed vector with that many elements to be stored
-    // locally, and copy over the elements we computed locally, then compress
-    // the result. In fact, we really only copy the elements that are nonzero,
-    // so we may miss a few that we computed to zero, but this won't hurt
-    // since the original values of the vector is zero anyway.
+    // So here's how we do it: count how many cells belong to this
+    // process, set up a distributed vector with that many elements to
+    // be stored locally, and copy over the elements we computed
+    // locally, then compress the result. In fact, we really only copy
+    // the elements that are nonzero, so we may miss a few that we
+    // computed to zero, but this won't hurt since the original values
+    // of the vector is zero anyway.
     const unsigned int n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
                                                            this_mpi_process);
@@ -821,12 +844,15 @@ namespace Step17
     distributed_all_errors.compress (VectorOperation::insert);
 
 
-    // So now we have this distributed vector out there that contains the
-    // refinement indicators for all cells. To use it, we need to obtain a
-    // local copy...
+    // So now we have this distributed vector that contains the
+    // refinement indicators for all cells. To use it, we need to
+    // obtain a local copy and then use it to mark cells for
+    // refinement or coarsening, and actually do the refinement and
+    // coarsening. It is important to recognize that <i>every</i>
+    // process does this to its own copy of the triangulation, and
+    // does it in exactly the same way.
     const Vector<float> localized_all_errors (distributed_all_errors);
 
-    // ...which we can the subsequently use to finally refine the grid:
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      localized_all_errors,
                                                      0.3, 0.03);
@@ -836,76 +862,95 @@ namespace Step17
 
   // @sect4{ElasticProblem::output_results}
 
-  // This is actually the same as done in step-8 before, with two small
-  // differences. First, all processes call this function, but not all of them
-  // need to do the work associated with generating output. In fact, they
-  // shouldn't, since we would try to write to the same file multiple times at
-  // once. So we let only the first job do this, and all the other ones idle
-  // around during this time (or start their work for the next iteration, or
-  // simply yield their CPUs to other jobs that happen to run at the same
-  // time). The second thing is that we not only output the solution vector,
-  // but also a vector that indicates which subdomain each cell belongs
-  // to. This will make for some nice pictures of partitioned domains.
+  // The final function of significant interest is the one that
+  // creates graphical output. This works the same way as in step-8,
+  // with two small differences. Before discussing these, let us state
+  // the general philosophy this function will work: we intend for all
+  // of the data to be generated on a single process, and subsequently
+  // written to a file. This is, as many other parts of this program
+  // already discussed, not something that will scale. Previously, we
+  // had argued that we will get into trouble with triangulations,
+  // DoFHandlers, and copies of the solution vector where every
+  // process has to store all of the data, and that there will come to
+  // be a point where each process simply doesn't have enough memory
+  // to store that much data. Here, the situation is different: it's
+  // not only the memory, but also the run time that's a problem. If
+  // one process is responsible for processing <i>all</i> of the data
+  // while all of the other processes do nothing, then this one
+  // function will eventually come to dominate the overall run time of
+  // the program.  In particular, the time this function takes is
+  // going to be proportional to the overall size of the problem
+  // (counted in the number of cells, or the number of degrees of
+  // freedom), independent of the number of processes we throw at it.
   //
-  // In practice, the present implementation of the output function is a major
-  // bottleneck of this program, since generating graphical output is
-  // expensive and doing so only on one process does, of course, not scale if
-  // we significantly increase the number of processes. In effect, this
-  // function will consume most of the run-time if you go to very large
-  // numbers of unknowns and processes, and real applications should limit the
-  // number of times they generate output through this function.
+  // Such situations need to be avoided, and we will show in step-18
+  // and step-40 how to address this issue. For the current problem,
+  // the solution is to have each process generate output data only
+  // for its own local cells, and write them to separate files, one
+  // file per process. This is how step-18 operates. Alternatively,
+  // one could simply leave everything in a set of independent files
+  // and let the visualization software read all of them (possibly
+  // also using multiple processors) and create a single visualization
+  // out of all of them; this is the path step-40, step-32, and all
+  // other parallel programs developed later on take.
   //
-  // The solution to this is to have each process generate output data only
-  // for it's own local cells, and write them to separate files, one file per
-  // process. This would distribute the work of generating the output to all
-  // processes equally. In a second step, separate from running this program,
-  // we would then take all the output files for a given cycle and merge these
-  // parts into one single output file. This has to be done sequentially, but
-  // can be done on a different machine, and should be relatively
-  // cheap. However, the necessary functionality for this is not yet
-  // implemented in the library, and since we are too close to the next
-  // release, we do not want to do such major destabilizing changes any
-  // more. This has been fixed in the meantime, though, and a better way to do
-  // things is explained in the step-18 example program.
+  // More specifically for the current function, all processes call
+  // this function, but not all of them need to do the work associated
+  // with generating output. In fact, they shouldn't, since we would
+  // try to write to the same file multiple times at once. So we let
+  // only the first process do this, and all the other ones idle
+  // around during this time (or start their work for the next
+  // iteration, or simply yield their CPUs to other jobs that happen
+  // to run at the same time). The second thing is that we not only
+  // output the solution vector, but also a vector that indicates
+  // which subdomain each cell belongs to. This will make for some
+  // nice pictures of partitioned domains.
+  //
+  // To implement this, process zero needs a complete set of solution
+  // components in a local vector. Just as with the previous function,
+  // the efficient way to do this would be to re-use the vector
+  // already created in the <code>solve()</code> function, but to keep
+  // things more self-contained, we simply re-create one here from the
+  // distributed solution vector.
+  //
+  // An important thing to realize is that we do this localization
+  // operation on all processes, not only the one that actually needs
+  // the data. This can't be avoided, however, with the communication
+  // model of MPI: MPI does not have a way to query data on another
+  // process, both sides have to initiate a communication at the same
+  // time. So even though most of the processes do not need the
+  // localized solution, we have to place the statement converting the
+  // distributed into a localized vector so that all processes execute
+  // it.
+  //
+  // (Part of this work could in fact be avoided. What we do is
+  // send the local parts of all processes to all other processes. What we
+  // would really need to do is to initiate an operation on all processes
+  // where each process simply sends its local chunk of data to process
+  // zero, since this is the only one that actually needs it, i.e., we need
+  // something like a gather operation. PETSc can do this, but for
+  // simplicity's sake we don't attempt to make use of this here. We don't,
+  // since what we do is not very expensive in the grand scheme of things:
+  // it is one vector communication among all processes , which has to be
+  // compared to the number of communications we have to do when solving the
+  // linear system, setting up the block-ILU for the preconditioner, and
+  // other operations.)
   template <int dim>
   void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   {
-    // One point to realize is that when we want to generate output on process
-    // zero only, we need to have access to all elements of the solution
-    // vector. So we need to get a local copy of the distributed vector, which
-    // is in fact simple:
     const Vector<double> localized_solution (solution);
-    // The thing to notice, however, is that we do this localization operation
-    // on all processes, not only the one that actually needs the data. This
-    // can't be avoided, however, with the communication model of MPI: MPI
-    // does not have a way to query data on another process, both sides have
-    // to initiate a communication at the same time. So even though most of
-    // the processes do not need the localized solution, we have to place the
-    // call here so that all processes execute it.
-    //
-    // (In reality, part of this work can in fact be avoided. What we do is
-    // send the local parts of all processes to all other processes. What we
-    // would really need to do is to initiate an operation on all processes
-    // where each process simply sends its local chunk of data to process
-    // zero, since this is the only one that actually needs it, i.e. we need
-    // something like a gather operation. PETSc can do this, but for
-    // simplicity's sake we don't attempt to make use of this here. We don't,
-    // since what we do is not very expensive in the grand scheme of things:
-    // it is one vector communication among all processes , which has to be
-    // compared to the number of communications we have to do when solving the
-    // linear system, setting up the block-ILU for the preconditioner, and
-    // other operations.)
 
-    // This being done, process zero goes ahead with setting up the output
-    // file as in step-8, and attaching the (localized) solution vector to the
-    // output object:. (The code to generate the output file name is stolen
-    // and slightly modified from step-5, since we expect that we can do a
-    // number of cycles greater than 10, which is the maximum of what the code
-    // in step-8 could handle.)
+    // This being done, process zero goes ahead with setting up the
+    // output file as in step-8, and attaching the (localized)
+    // solution vector to the output object. (The code to generate the
+    // output file name is stolen and slightly modified from step-5,
+    // since we expect that we can do a number of cycles greater than
+    // 10, which is the maximum of what the code in step-8 could
+    // handle.)
     if (this_mpi_process == 0)
       {
         std::ostringstream filename;
-        filename << "solution-" << cycle << ".gmv";
+        filename << "solution-" << cycle << ".vtk";
 
         std::ofstream output (filename.str().c_str());
 
@@ -933,40 +978,40 @@ namespace Step17
 
         data_out.add_data_vector (localized_solution, solution_names);
 
-        // The only thing we do here additionally is that we also output one
-        // value per cell indicating which subdomain (i.e. MPI process) it
-        // belongs to. This requires some conversion work, since the data the
-        // library provides us with is not the one the output class expects,
-        // but this is not difficult. First, set up a vector of integers, one
-        // per cell, that is then filled by the number of subdomain each cell
-        // is in:
+        // The only other thing we do here is that we also output one
+        // value per cell indicating which subdomain (i.e., MPI
+        // process) it belongs to. This requires some conversion work,
+        // since the data the library provides us with is not the one
+        // the output class expects, but this is not difficult. First,
+        // set up a vector of integers, one per cell, that is then
+        // filled by the subdomain id of each cell.
+        //
+        // The elements of this vector are then converted to a
+        // floating point vector in a second step, and this vector is
+        // added to the DataOut object, which then goes off creating
+        // output in VTK format:
         std::vector<unsigned int> partition_int (triangulation.n_active_cells());
         GridTools::get_subdomain_association (triangulation, partition_int);
 
-        // Then convert this integer vector into a floating point vector just
-        // as the output functions want to see:
         const Vector<double> partitioning(partition_int.begin(),
                                           partition_int.end());
 
-        // And finally add this vector as well:
         data_out.add_data_vector (partitioning, "partitioning");
 
-        // This all being done, generate the intermediate format and write it
-        // out in GMV output format:
         data_out.build_patches ();
-        data_out.write_gmv (output);
+        data_out.write_vtk (output);
       }
   }
 
 
   // @sect4{ElasticProblem::run}
 
-  // Lastly, here is the driver function. It is almost completely unchanged from step-8,
-  // with the exception that we replace <code>std::cout</code> by the
-  // <code>pcout</code> stream. Apart from this, the only other cosmetic
-  // change is that we output how many degrees of freedom there are per
-  // process, and how many iterations it took for the linear solver to
-  // converge:
+  // Lastly, here is the driver function. It is almost completely
+  // unchanged from step-8, with the exception that we replace
+  // <code>std::cout</code> by the <code>pcout</code> stream. Apart
+  // from this, the only other cosmetic change is that we output how
+  // many degrees of freedom there are per process, and how many
+  // iterations it took for the linear solver to converge:
   template <int dim>
   void ElasticProblem<dim>::run ()
   {
@@ -1012,10 +1057,10 @@ namespace Step17
 
 // @sect3{The <code>main</code> function}
 
-// The <code>main()</code> works the same way as most of the
-// main functions in the other example programs, i.e., it delegates work to the
-// <code>run</code> function of a master object, and only wraps everything
-// into some code to catch exceptions:
+// The <code>main()</code> works the same way as most of the main
+// functions in the other example programs, i.e., it delegates work to
+// the <code>run</code> function of a master object, and only wraps
+// everything into some code to catch exceptions:
 int main (int argc, char **argv)
 {
   try
@@ -1023,9 +1068,10 @@ int main (int argc, char **argv)
       using namespace dealii;
       using namespace Step17;
 
-      // Here is the only real difference: MPI and PETSc both require that we initialize
-      // these libraries at the beginning of the program, and un-initialize them at the
-      // end. The class MPI_InitFinalize takes care of all of that.
+      // Here is the only real difference: MPI and PETSc both require
+      // that we initialize these libraries at the beginning of the
+      // program, and un-initialize them at the end. The class
+      // MPI_InitFinalize takes care of all of that.
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       ElasticProblem<2> elastic_problem;
