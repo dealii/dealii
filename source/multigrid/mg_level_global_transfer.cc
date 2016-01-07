@@ -312,11 +312,9 @@ void
 MGLevelGlobalTransfer<VectorType>::clear()
 {
   sizes.resize(0);
-  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  empty0, empty1, empty2;
-  copy_indices.swap(empty0);
-  copy_indices_global_mine.swap(empty1);
-  copy_indices_level_mine.swap(empty2);
+  copy_indices.clear();
+  copy_indices_global_mine.clear();
+  copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
   mg_constrained_dofs = 0;
 }
@@ -505,11 +503,9 @@ void
 MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::clear()
 {
   sizes.resize(0);
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
-  empty0, empty1, empty2;
-  copy_indices.swap(empty0);
-  copy_indices_global_mine.swap(empty1);
-  copy_indices_level_mine.swap(empty2);
+  copy_indices.clear();
+  copy_indices_global_mine.clear();
+  copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
   mg_constrained_dofs = 0;
   ghosted_global_vector.reinit(0);
@@ -566,6 +562,11 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::memory_consumptio
 
 // explicit instantiation
 #include "mg_level_global_transfer.inst"
+
+// create two additional instantiations currently not supported by the
+// automatic template instantiation scheme
+template class MGLevelGlobalTransfer<parallel::distributed::Vector<float> >;
+template class MGLevelGlobalTransfer<parallel::distributed::Vector<long double> >;
 
 
 DEAL_II_NAMESPACE_CLOSE

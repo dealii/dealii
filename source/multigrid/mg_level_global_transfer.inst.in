@@ -40,17 +40,27 @@ for (deal_II_dimension : DIMENSIONS; V1,V2 : DEAL_II_VEC_TEMPLATES; S1, S2 : REA
                                                         const MGLevelObject<V1<S1> >&) const;
   }
 
-for (deal_II_dimension : DIMENSIONS; S2 : REAL_SCALARS)
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template
+      void MGLevelGlobalTransfer< parallel::distributed::Vector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+        const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
+    template
+      void MGLevelGlobalTransfer< parallel::distributed::Vector<long double> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+        const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
+  }
+
+for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
   {
     template void
-      MGLevelGlobalTransfer<parallel::distributed::Vector<double> >::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&, MGLevelObject<parallel::distributed::Vector<double> >&, const parallel::distributed::Vector<S2>&) const;
+      MGLevelGlobalTransfer<parallel::distributed::Vector<S1> >::copy_to_mg (
+        const DoFHandler<deal_II_dimension>&, MGLevelObject<parallel::distributed::Vector<S1> >&, const parallel::distributed::Vector<S2>&) const;
     template void
-      MGLevelGlobalTransfer<parallel::distributed::Vector<double> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, parallel::distributed::Vector<S2>&,
-        const MGLevelObject<parallel::distributed::Vector<double> >&) const;
+      MGLevelGlobalTransfer<parallel::distributed::Vector<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, parallel::distributed::Vector<S2>&,
+        const MGLevelObject<parallel::distributed::Vector<S1> >&) const;
     template void
-      MGLevelGlobalTransfer<parallel::distributed::Vector<double> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, parallel::distributed::Vector<S2>&,
-        const MGLevelObject<parallel::distributed::Vector<double> >&) const;
+      MGLevelGlobalTransfer<parallel::distributed::Vector<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, parallel::distributed::Vector<S2>&,
+        const MGLevelObject<parallel::distributed::Vector<S1> >&) const;
   }
 
 for(deal_II_dimension : DIMENSIONS)
