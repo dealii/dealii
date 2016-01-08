@@ -1192,7 +1192,7 @@ template <int dim, typename Number>
 inline
 std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 {
-  out << static_cast<Number>(p);
+  out << static_cast<const Number &>(p);
   return out;
 }
 

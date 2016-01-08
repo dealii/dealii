@@ -199,7 +199,9 @@ inconvenience this causes.
 <h3>General</h3>
 <ol>
   <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
-  longer returns by value, but rather by reference.
+  longer returns by value, but rather by reference. Tensor::operator<< for
+  dim==0 now accesses values by reference instead of making a copy. This is
+  useful when non-trivial number types are stored.
   <br>
   (Jean-Paul Pelteret, 2016/01/08)
   </li>
