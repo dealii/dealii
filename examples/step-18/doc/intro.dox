@@ -346,12 +346,14 @@ that reference all files for a given timestep. Sadly, the record files have a
 different format between VisIt and Paraview, so we write out both formats.
 
 The code will generate the files <code>solution-TTTT.NNN.vtu</code>, 
-where <code>TTTT</code> is the
-timestep number (starting from 1) and <code>NNN</code> is the process rank
-(starting from
+where <code>TTTT</code> is the timestep number (starting from 1) and 
+<code>NNN</code> is the process rank (starting from
 0). These files contain the locally owned cells for the timestep and
-processor. The files <code>solution-TTTT.visit</code> is the visit record for timestep
-<code>TTTT</code>, while <code>solution-TTTT.pvtu</code> is the same for ParaView. Finally, the file
+processor. The files <code>solution-TTTT.visit</code> is the visit record
+for timestep <code>TTTT</code>, while <code>solution-TTTT.pvtu</code> is
+the same for ParaView. (More recent versions of Visit can actually read
+<code>.pvtu</code> files as well, but it doesn't hurt to output both
+kinds of record files.) Finally, the file
 <code>solution.pvd</code> is a special record only supported by ParaView that references
 all time steps. So in ParaView, only solution.pvd needs to be opened, while
 one needs to select the group of all .visit files in VisIt for the same
@@ -405,6 +407,16 @@ DoFHandler::n_locally_owned_dofs_per_processor() and
 DoFTools::extract_locally_relevant_dofs(). Finally, the DataOut class
 also knows how to deal with such triangulations and will simply skip
 generating graphical output on cells not locally owned.
+
+Of course, as has been noted numerous times in the discussion in step-17,
+keeping the entire triangulation on every process will not scale: large
+problems may simply not fit into each process's memory any more, even if
+we have sufficiently many processes around to solve them in a reasonable
+time. In such cases, the parallel::shared::Triangulation is no longer
+a reasonable basis for computations and we will show in step-40 how the
+parallel::distributed::Triangulation class can be used to work around
+this, namely by letting each process store only a <i>part</i> of the
+triangulation.
 
 
 <h3>Overall structure of the program</h3>
