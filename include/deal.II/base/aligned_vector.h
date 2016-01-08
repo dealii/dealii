@@ -290,10 +290,13 @@ namespace internal
   public:
     /**
      * Constructor. Issues a parallel call if there are sufficiently many
-     * elements, otherwise work in serial. Copies the data from source to
-     * destination and then calls destructor on the source. If the optional
-     * argument copy_source is set to true, the source is left untouched
-     * instead.
+     * elements, otherwise works in serial. Copies the data from the half-open
+     * interval between @p source_begin and @p source_end to array starting at
+     * @p destination (by calling the copy constructor with placement new). If
+     * copy_source is set to @p true, the elements from the source array are
+     * simply copied. If it is set to @p false, the data is moved between the
+     * two arrays by invoking the destructor on the source range (preparing
+     * for a subsequent call to free).
      */
     AlignedVectorMove (T *source_begin,
                        T *source_end,
@@ -329,7 +332,8 @@ namespace internal
       else if (copy_source_ == false)
         for (std::size_t i=begin; i<end; ++i)
           {
-            // initialize memory (copy construct), and destruct
+            // initialize memory (copy construct by placement new), and
+            // destruct the source
             new (&destination_[i]) T(source_[i]);
             source_[i].~T();
           }
@@ -411,6 +415,7 @@ namespace internal
         for (std::size_t i=begin; i<end; ++i)
           new (&destination_[i]) T(element_);
       else
+        // otherwise, simply perform copy assignment
         for (std::size_t i=begin; i<end; ++i)
           destination_[i] = element_;
     }
@@ -470,7 +475,7 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
   _end_data (0),
   _end_allocated (0)
 {
-  // do not invalidate old data
+  // copy the data from vec
   resize_fast (vec._end_data - vec._data);
   internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
 }
@@ -498,7 +503,9 @@ AlignedVector<T>::resize_fast (const size_type size_in)
   const size_type old_size = size();
   if (std_cxx11::is_trivial<T>::value == false && size_in < old_size)
     {
-      // call destructor on fields that are released
+      // call destructor on fields that are released. doing it backward
+      // releases the elements in reverse order as compared to how they were
+      // created
       while (_end_data != _data+size_in)
         (--_end_data)->~T();
     }
@@ -522,7 +529,9 @@ AlignedVector<T>::resize (const size_type size_in,
   const size_type old_size = size();
   if (std_cxx11::is_trivial<T>::value == false && size_in < old_size)
     {
-      // call destructor on fields that are released
+      // call destructor on fields that are released. doing it backward
+      // releases the elements in reverse order as compared to how they were
+      // created
       while (_end_data != _data+size_in)
         (--_end_data)->~T();
     }
