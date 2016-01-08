@@ -14,14 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-// check that Table<N,ComplicatedType> works properties (this really tests the
-// data type underlying the values field of Table and that
-// fill()/resize_fast() works properly).
+// check that AlignedVector::fill() does correctly call the destructor and
+// constructor on a complicated class
 
 // NOTE: The number of calls to the constructor/destructor depends on the
-// actual implementation of TableBase. When that is changed, this test will
-// typically fail even if the implementation of TableBase is correct. When
-// adjusting the output, make sure to check this test with valgrind.
+// actual implementation of AlignedVector. When that is changed, this test
+// will typically fail even if the implementation in AlignedVector is
+// otherwise correct. When adjusting the output, make sure to check this test
+// with valgrind.
 
 #include "../tests.h"
 
@@ -65,15 +65,16 @@ private:
 int main()
 {
   initlog();
-  dealii::Table<2,Function> table;
-  table.reinit(dealii::TableIndices<2>(2,1));
-  table[1][0].do_test();
-  table[0][0].do_test();
-  table.reinit(dealii::TableIndices<2>(1,1), false);
-  table[0][0].do_test();
-  table.reinit(dealii::TableIndices<2>(1,1), true);
-  table[0][0].do_test();
-  table.reinit(0,0);
-  table.reinit(dealii::TableIndices<2>(2,2));
-  table[0][1].do_test();
+  AlignedVector<Function> vec;
+  vec.resize(2);
+  vec[1].do_test();
+  vec[0].do_test();
+  vec[0].do_test();
+  vec.fill(Function());
+  vec.resize(1);
+  vec[0].do_test();
+  vec.resize(3);
+  vec[0].do_test();
+  vec.fill(Function());
+  vec[0].do_test();
 }
