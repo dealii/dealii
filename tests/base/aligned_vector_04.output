@@ -1,0 +1,22 @@
+
+DEAL::Construct object
+DEAL::Destruct with size 0
+DEAL::Resize vector to 2
+DEAL::Resize vector to 2
+DEAL::Resize vector to 3
+DEAL::Construct object
+DEAL::Destruct with size 0
+DEAL::Construct object
+DEAL::Destruct with size 0
+DEAL::Destruct with size 0
+DEAL::Resize vector to 2
+DEAL::Construct object
+DEAL::Destruct with size 2
+DEAL::Destruct with size 0
+DEAL::Resize vector to 3
+DEAL::Construct object
+DEAL::Destruct with size 0
+DEAL::Resize vector to 2
+DEAL::Destruct with size 0
+DEAL::Destruct with size 0
+DEAL::Destruct with size 2
