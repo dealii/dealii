@@ -550,6 +550,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: AlignedVector<T>::fill() (and thus, Table<N,T>::reinit) did not
+  correctly call the destructor of T() and could leak memory for complicated
+  class types that depend on their constructor to free memory.
+  <br>
+  (Martin Kronbichler, 2016/01/08)
+  </li>
+
   <li> Fixed: inverse_operator() now populates <code>Tvmult</code> and
   <code>Tvmult_add</code> correctly.
   <br>
