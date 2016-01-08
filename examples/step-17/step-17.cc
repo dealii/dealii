@@ -329,10 +329,10 @@ namespace Step17
   //
   // The final step of this initial setup is that we get ourselves a
   // variable that indicates how many degrees of freedom the current
-  // process is responsible for. (This will, in general, be less than
-  // <code>fe.dofs_per_cell</code> times the number of cells the
-  // current process owns because some degrees of freedom live on
-  // interfaces between subdomains, and are consequently only owned by
+  // process is responsible for. (Note that a degree of freedom is not
+  // necessarily owned by the process that owns a cells just because
+  // the degree of freedom lives on this cell: some degrees of freedom
+  // live on interfaces between subdomains, and are consequently only owned by
   // one of the processes adjacent to this interface.)
   //
   // Before we move on, let us recall a fact already discussed in the
@@ -345,7 +345,7 @@ namespace Step17
   // degrees of freedom that live on each cell, whether it is one that
   // the current process owns or not. This can not scale to large
   // problems because eventually just storing on every process the
-  // entire mesh and everything that is associated with it, will
+  // entire mesh, and everything that is associated with it, will
   // become infeasible if the problem is large enough. On the other
   // hand, if we split the triangulation into parts so that every
   // process stores only those cells it "owns" but nothing else (or,
@@ -429,7 +429,7 @@ namespace Step17
   // the local contributions into the global matrix or right hand side
   // vector, we have to transfer these entries to the process that
   // owns these elements. Fortunately, we don't have to do this by
-  // hand, PETSc does all this for us by caching these elements
+  // hand: PETSc does all this for us by caching these elements
   // locally, and sending them to the other processes as necessary
   // when we call the <code>compress()</code> functions on the matrix
   // and vector at the end of this function.

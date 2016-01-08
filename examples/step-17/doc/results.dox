@@ -11,10 +11,10 @@ most basic way to run MPI programs is using a command line like
 @endcode
 to run the step-17 executable with 32 processors. 
 
-(If you work on a cluster,
-there is typically a step in between where you need to set up a job script,
-submit the script to a scheduler that then executes the script whenever it
-can allocate 32 unused processors for your job. How to write such job
+(If you work on a cluster, then there is typically a step in between where you
+need to set up a job script and submit the script to a scheduler. The scheduler
+will execute the script whenever it can allocate 32 unused processors for your
+job. How to write such job
 scripts differs from cluster to cluster, and you should find the documentation
 of your cluster to see how to do this. On my system, I have to use the command
 <code>qsub</code> with a whole host of options to run a job in parallel.)
@@ -180,7 +180,7 @@ though.
 
 
 Finally, here are some results for a 3d simulation. You can repeat these by
-first changing
+changing
 @code
         ElasticProblem<2> elastic_problem;
 @endcode
@@ -188,8 +188,7 @@ to
 @code
         ElasticProblem<3> elastic_problem;
 @endcode
-in the main function, and then in the Makefile, change the reference to the 2d
-libraries to their 3d counterparts. If you then run the program in parallel,
+in the main function. If you then run the program in parallel,
 you get something similar to this (this is for a job with 16 processes):
 @code
 Cycle 0:
