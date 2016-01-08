@@ -198,6 +198,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
+  longer returns by value, but rather by reference.
+  <br>
+  (Jean-Paul Pelteret, 2016/01/08)
+  </li>
+
   <li> New: constrained_linear_operator() and constrained_right_hand_side()
   provide a generic mechanism of applying constraints to a LinearOperator.
   A detailed explanation with example code is given in the @ref constraints
