@@ -415,7 +415,7 @@ public:
   /**
    * Read access using TableIndices <tt>indices</tt>
    */
-  Number operator [] (const TableIndices<rank_> &indices) const;
+  const Number &operator [] (const TableIndices<rank_> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
@@ -887,7 +887,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 
 template <int rank_, int dim, typename Number>
 inline
-Number
+const Number &
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
@@ -1192,7 +1192,7 @@ template <int dim, typename Number>
 inline
 std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 {
-  out << static_cast<Number>(p);
+  out << static_cast<const Number &>(p);
   return out;
 }
 
