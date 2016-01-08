@@ -1631,8 +1631,8 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
   :
   Subscriptor ()
 {
-  values = src.values;
   reinit (src.table_size, true);
+  values = src.values;
 }
 
 
