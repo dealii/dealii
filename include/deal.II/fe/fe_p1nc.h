@@ -149,6 +149,101 @@ protected:
 
 
 
+
+
+
+
+
+// Nonparametric version of P1 Nonconforming FE
+class FE_P1NCNonparametric : public FiniteElement<2,2>
+{
+private:
+
+
+  static
+  std::vector<ComponentMask>
+  get_nonzero_component();
+
+
+  static
+  std::vector<unsigned int>
+  get_dpo_vector ();
+
+
+
+  virtual FiniteElement<2,2>::InternalDataBase *
+  get_data (const UpdateFlags update_flags,
+            const Mapping<2,2> &,
+            const Quadrature<2> &) const ;
+
+
+
+
+  virtual
+  void
+  fill_fe_values (const Mapping<2,2>                                &mapping,
+                  const Triangulation<2,2>::cell_iterator           &cell,
+                  const Quadrature<2>                               &quadrature,
+                  const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                  const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                  const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                  internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
+                  const CellSimilarity::Similarity                   cell_similarity) const;
+
+
+
+
+  virtual
+  void
+  fill_fe_face_values (const Mapping<2,2>                                &mapping,
+                       const Triangulation<2,2>::cell_iterator           &cell,
+                       const unsigned int                                 face_no,
+                       const Quadrature<1>                               &quadrature,
+                       const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                       const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                       const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                       internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+
+
+
+
+  virtual
+  void
+  fill_fe_subface_values (const Mapping<2,2>                                &mapping,
+                          const Triangulation<2,2>::cell_iterator           &cell,
+                          const unsigned int                                 face_no,
+                          const unsigned int                                 sub_no,
+                          const Quadrature<1>                               &quadrature,
+                          const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                          const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+
+
+
+public:
+  FE_P1NCNonparametric() ;
+
+  virtual std::string get_name () const ;
+
+  virtual UpdateFlags     update_once (const UpdateFlags flags) const ;
+
+  virtual UpdateFlags     update_each (const UpdateFlags flags) const ;
+
+  virtual FiniteElement<2,2> *clone () const ;
+
+  virtual ~FE_P1NCNonparametric ();
+
+
+protected:
+
+  void initialize_constraints () ;
+
+};
+
+
+
+
 /** @}*/
 
 DEAL_II_NAMESPACE_CLOSE

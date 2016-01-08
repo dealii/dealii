@@ -474,4 +474,274 @@ void FE_P1NCParametric::initialize_constraints ()
 
 
 
+
+
+
+
+
+// FE_P1NCNonparametric
+
+std::vector<ComponentMask>
+FE_P1NCNonparametric::get_nonzero_component()
+{
+  const unsigned int dofs_per_cell = 4;
+  std::vector<ComponentMask> masks (dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    masks[i] = ComponentMask(1,true);
+  return masks;
+}
+
+
+std::vector<unsigned int>
+FE_P1NCNonparametric::get_dpo_vector ()
+{
+  std::vector<unsigned int> dpo(3);
+  dpo[0] = 1; // dofs per object: vertex
+  dpo[1] = 0; // line
+  dpo[2] = 0; // quad
+  return dpo;
+}
+
+
+FiniteElement<2,2>::InternalDataBase *
+FE_P1NCNonparametric::get_data (const UpdateFlags update_flags,
+                                const Mapping<2,2> &,
+                                const Quadrature<2> &) const
+{
+  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+
+  data->update_once = update_once(update_flags);
+  data->update_each = update_each(update_flags);
+  data->update_flags = data->update_once | data->update_each;
+
+  return data;
+
+
+
+
+}
+
+
+
+void
+FE_P1NCNonparametric::fill_fe_values (const Mapping<2,2>                                &mapping,
+                                      const Triangulation<2,2>::cell_iterator           &cell,
+                                      const Quadrature<2>                               &quadrature,
+                                      const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                                      const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                                      const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                                      internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
+                                      const CellSimilarity::Similarity                   cell_similarity) const
+
+{
+  const UpdateFlags flags(fe_internal.current_update_flags()) ;
+
+  const unsigned int n_q_points = mapping_data.quadrature_points.size();
+
+  std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
+
+
+
+  // edge midpoints
+  std::vector<Point<2> > mpt(4) ;
+
+  mpt[0](0) = (cell->vertex(0)(0) + cell->vertex(2)(0))/2.0 ;
+  mpt[0](1) = (cell->vertex(0)(1) + cell->vertex(2)(1))/2.0 ;
+
+  mpt[1](0) = (cell->vertex(1)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[1](1) = (cell->vertex(1)(1) + cell->vertex(3)(1))/2.0 ;
+
+  mpt[2](0) = (cell->vertex(0)(0) + cell->vertex(1)(0))/2.0 ;
+  mpt[2](1) = (cell->vertex(0)(1) + cell->vertex(1)(1))/2.0 ;
+
+  mpt[3](0) = (cell->vertex(2)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))/2.0 ;
+
+  // center point
+  Point<2> cpt ;
+  cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))/4.0 ;
+  cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))/4.0 ;
+
+
+  // basis functions with a half value: phi(x,y) = ax + by + c
+  std::vector<double> a(4), b(4), c(4) ;
+  double det ;
+
+  det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1)) ;
+
+  a[0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[1] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[2] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+  a[3] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+
+  b[0] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[2] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+  b[3] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+
+  c[0] = 0.25 - cpt(0)*a[0] - cpt(1)*b[0] ;
+  c[1] = 0.25 - cpt(0)*a[1] - cpt(1)*b[1] ;
+  c[2] = 0.25 - cpt(0)*a[2] - cpt(1)*b[2] ;
+  c[3] = 0.25 - cpt(0)*a[3] - cpt(1)*b[3] ;
+
+
+
+  // compute basis functions
+  if (flags & (update_values | update_gradients))
+    for (unsigned int i=0; i<n_q_points; ++i)
+      {
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              {
+                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                output_data.shape_values[k][i] = values[k];
+              }
+
+            if (flags & update_gradients)
+              {
+                grads[k][0] = a[k] ;
+                grads[k][1] = b[k] ;
+                output_data.shape_gradients[k][i] = grads[k];
+              }
+          }
+
+      }
+
+  // When this function is called for the graphic out,
+  // MappingRelatedData does not work properly.
+  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
+  // This is a temporary solution. It needs to be fixed fundamentally.
+  if (n_q_points==0)
+    {
+      for (unsigned int i=0; i<quadrature.size(); ++i)
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            Point<2> realquadrature ;
+
+            realquadrature = mapping.transform_unit_to_real_cell(cell, quadrature.point(i)) ;
+            values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+            output_data.shape_values[k][i] = values[k];
+
+          }
+    }
+
+}
+
+
+void
+FE_P1NCNonparametric::fill_fe_face_values (const Mapping<2,2>                                &mapping,
+                                           const Triangulation<2,2>::cell_iterator           &cell,
+                                           const unsigned int                                 face_no,
+                                           const Quadrature<1>                               &quadrature,
+                                           const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                                           const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                                           const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                                           internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+
+
+{}
+
+
+
+
+
+
+void
+FE_P1NCNonparametric::fill_fe_subface_values (const Mapping<2,2>                                &mapping,
+                                              const Triangulation<2,2>::cell_iterator           &cell,
+                                              const unsigned int                                 face_no,
+                                              const unsigned int                                 sub_no,
+                                              const Quadrature<1>                               &quadrature,
+                                              const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                                              const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                                              const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                                              internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+
+{}
+
+
+
+FE_P1NCNonparametric::FE_P1NCNonparametric()
+  :
+  FiniteElement<2,2>(FiniteElementData<2>(get_dpo_vector(),
+                                          1,
+                                          1,
+                                          FiniteElementData<2>::L2,
+                                          numbers::invalid_unsigned_int),
+                     std::vector<bool> (1, false),
+                     get_nonzero_component())
+{
+
+  // face support points: 2 end vertices
+  unit_face_support_points.resize(2);
+  unit_face_support_points[0][0] = 0.0 ;
+  unit_face_support_points[1][0] = 1.0 ;
+
+
+  // CONSTRAINTS MATRIX INITIALIZATION
+  initialize_constraints () ;
+}
+
+
+
+std::string FE_P1NCNonparametric::get_name () const
+{
+  return "FE_P1NCNonparametric";
+}
+
+
+
+UpdateFlags     FE_P1NCNonparametric::update_once (const UpdateFlags flags) const
+{
+  return (update_default );
+
+}
+
+UpdateFlags     FE_P1NCNonparametric::update_each (const UpdateFlags flags) const
+{
+  UpdateFlags out = (update_default | (flags & update_values) | (flags & update_quadrature_points)) ;
+
+  if (flags & update_gradients)
+    out |= update_gradients | update_covariant_transformation | update_JxW_values;
+  if (flags & update_cell_normal_vectors)
+    out |= update_cell_normal_vectors | update_JxW_values;
+
+  return out;
+}
+
+
+FiniteElement<2,2> *FE_P1NCNonparametric::clone () const
+{
+  return new FE_P1NCNonparametric(*this);
+}
+
+FE_P1NCNonparametric::~FE_P1NCNonparametric () {}
+
+
+
+
+void FE_P1NCNonparametric::initialize_constraints ()
+{
+
+  std::vector<Point<1> > constraint_points;
+
+  // Add midpoint
+  constraint_points.push_back (Point<1> (0.5));
+
+  // coefficient relation between children and mother
+  interface_constraints
+  .TableBase<2,double>::reinit (interface_constraints_size());
+
+
+  interface_constraints(0,0) = 0.5 ;
+  interface_constraints(0,1) = 0.5 ;
+
+}
+
+
+
+
+
 DEAL_II_NAMESPACE_CLOSE
