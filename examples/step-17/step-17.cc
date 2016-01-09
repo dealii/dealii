@@ -15,6 +15,7 @@
 
  *
  * Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004
+ *         Wolfgang Bangerth, Texas A&M University, 2016
  */
 
 // @sect3{Include files}
