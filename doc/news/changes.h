@@ -206,6 +206,13 @@ inconvenience this causes.
   (Jean-Paul Pelteret, 2016/01/08)
   </li>
 
+  <li> New: The documentation of step-17 has been completely rewritten,
+  and many aspects of how one has to think when writing parallel programs
+  have been much better documented now.
+  <br>
+  (Wolfgang Bangerth, 2016/01/07)
+  </li>
+
   <li> New: constrained_linear_operator() and constrained_right_hand_side()
   provide a generic mechanism of applying constraints to a LinearOperator.
   A detailed explanation with example code is given in the @ref constraints
