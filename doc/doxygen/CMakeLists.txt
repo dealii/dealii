@@ -155,15 +155,20 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     LIST(APPEND _doxygen_input
       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/${_step}.h
       )
-    LIST(APPEND _doxygen_input
-      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
-      )
   ENDFOREACH()
-
-  LIST(APPEND _doxygen_depend
-    ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
-    )
 ENDIF()
+
+
+# always make the doxygen run depend on the code-gallery.h file
+# (whether generated from the code gallery or copied from
+# no-code-gallery.h; both happen in code-gallery/CMakeLists.txt)
+LIST(APPEND _doxygen_input
+  ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+)
+LIST(APPEND _doxygen_depend
+  ${CMAKE_CURRENT_BINARY_DIR}/code-gallery/code-gallery.h
+)
+
 
 TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
 TO_STRING(_doxygen_input_string ${_doxygen_input})
@@ -194,6 +199,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+    ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
     ${_doxygen_depend}
   COMMENT "Generating documentation via doxygen."
   VERBATIM

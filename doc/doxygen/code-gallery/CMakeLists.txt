@@ -126,6 +126,16 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
   ENDFOREACH()
 
 ELSE()
-  MESSAGE(STATUS "Generating the code-gallery documentation is only possible if the code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
+
+  # no copy of the code gallery is available. say so. but also
+  # install a file that creates a doxygen page we can link to
+  # nonetheless, so we don't get bad doxygen references
+  MESSAGE(STATUS "Setting up code gallery documentation.")
+  MESSAGE(STATUS "  Skipping as no code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
+
+  FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/no-code-gallery.h
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  FILE(RENAME ${CMAKE_CURRENT_BINARY_DIR}/no-code-gallery.h
+       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
 ENDIF()
 
