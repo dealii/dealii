@@ -71,8 +71,8 @@ DEAL_II_NAMESPACE_OPEN
  * Assuming that $ A,D $ are both square and invertible, we could
  * then perform one of two possible substitutions,
  * @f{eqnarray*}
-     (3) \quad x &=& A^{-1}(f - By) \quad \textnormal{from} \quad (1) \\
-     (4) \quad y &=& D^{-1}(g - Cx) \quad \textnormal{from} \quad (2) ,
+     (3) \quad x &=& A^{-1}(f - By) \quad \text{from} \quad (1) \\
+     (4) \quad y &=& D^{-1}(g - Cx) \quad \text{from} \quad (2) ,
  * @f}
  * which amount to performing block Gaussian elimination on
  * this system of equations.
