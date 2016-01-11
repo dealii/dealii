@@ -1902,11 +1902,24 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
       return;
     }
 
-  // if new size is nonzero: if necessary allocate additional memory, and if
-  // not fast resize, zero out all values/default initialize them)
-  values.resize_fast (new_size);
+  // adjust values field. If it was empty before, we can simply call resize(),
+  // which can set all the data fields. Otherwise, select the fast resize and
+  // manually fill in all the elements as required by the design of this
+  // class. (Selecting another code for the empty case ensures that we touch
+  // the memory only once for non-trivial classes that need to initialize the
+  // memory also in resize_fast.)
   if (!omit_default_initialization)
-    values.fill(T());
+    {
+      if (values.empty())
+        values.resize(new_size, T());
+      else
+        {
+          values.resize_fast(new_size);
+          values.fill(T());
+        }
+    }
+  else
+    values.resize_fast (new_size);
 }
 
 
