@@ -355,18 +355,17 @@ template <int dim, typename DoFHandlerType>
 typename DataOutFaces<dim,DoFHandlerType>::FaceDescriptor
 DataOutFaces<dim,DoFHandlerType>::first_face ()
 {
-  // simply find first active cell
-  // with a face on the boundary
+  // simply find first active cell with a face on the boundary
   typename Triangulation<dimension,space_dimension>::active_cell_iterator cell = this->triangulation->begin_active();
   for (; cell != this->triangulation->end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dimension>::faces_per_cell; ++f)
-      if (!surface_only || cell->face(f)->at_boundary())
-        return FaceDescriptor(cell, f);
+    if (cell->is_locally_owned())
+      for (unsigned int f=0; f<GeometryInfo<dimension>::faces_per_cell; ++f)
+        if (!surface_only || cell->face(f)->at_boundary())
+          return FaceDescriptor(cell, f);
 
-  // ups, triangulation has no
-  // boundary? impossible!
-  Assert (false, ExcInternalError());
-
+  // just return an invalid descriptor if we haven't found a locally
+  // owned face. this can happen in parallel where all boundary
+  // faces are owned by other processors
   return FaceDescriptor();
 }
 
@@ -378,14 +377,16 @@ DataOutFaces<dim,DoFHandlerType>::next_face (const FaceDescriptor &old_face)
 {
   FaceDescriptor face = old_face;
 
-  // first check whether the present cell has more faces on the boundary
+  // first check whether the present cell has more faces on the boundary. since
+  // we started with this face, its cell must clearly be locally owned
+  Assert (face.first->is_locally_owned(), ExcInternalError());
   for (unsigned int f=face.second+1; f<GeometryInfo<dimension>::faces_per_cell; ++f)
     if (!surface_only || face.first->face(f)->at_boundary())
       // yup, that is so, so return it
       {
         face.second = f;
         return face;
-      };
+      }
 
   // otherwise find the next active cell that has a face on the boundary
 
@@ -399,17 +400,21 @@ DataOutFaces<dim,DoFHandlerType>::next_face (const FaceDescriptor &old_face)
   // while there are active cells
   while (active_cell != this->triangulation->end())
     {
-      // check all the faces of this active cell
-      for (unsigned int f=0; f<GeometryInfo<dimension>::faces_per_cell; ++f)
-        if (!surface_only || active_cell->face(f)->at_boundary())
-          {
-            face.first  = active_cell;
-            face.second = f;
-            return face;
-          };
-      // the present cell had no faces on the boundary, so check next cell
+      // check all the faces of this active cell. but skip it altogether
+      // if it isn't locally owned
+      if (active_cell->is_locally_owned())
+        for (unsigned int f=0; f<GeometryInfo<dimension>::faces_per_cell; ++f)
+          if (!surface_only || active_cell->face(f)->at_boundary())
+            {
+              face.first  = active_cell;
+              face.second = f;
+              return face;
+            }
+
+      // the present cell had no faces on the boundary (or was not locally
+      // owned), so check next cell
       ++active_cell;
-    };
+    }
 
   // we fell off the edge, so return with invalid pointer
   face.first  = this->triangulation->end();
