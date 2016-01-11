@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,6 +86,7 @@
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+#cmakedefine DEAL_II_ALWAYS_INLINE @DEAL_II_ALWAYS_INLINE@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 
 

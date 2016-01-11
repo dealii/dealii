@@ -213,6 +213,13 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2016/01/07)
   </li>
 
+  <li> New: deal.II now provides a string <code>DEAL_II_ALWAYS_INLINE</code>
+  that, when supported by the compiler, can be used to annotate functions
+  to ensure that the compiler always inlines them.
+  <br>
+  (Matthias Maier, Wolfgang Bangerth, 2016/01/07)
+  </li>
+
   <li> New: constrained_linear_operator() and constrained_right_hand_side()
   provide a generic mechanism of applying constraints to a LinearOperator.
   A detailed explanation with example code is given in the @ref constraints
