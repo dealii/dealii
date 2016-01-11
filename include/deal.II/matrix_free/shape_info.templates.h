@@ -314,25 +314,25 @@ namespace internal
         for (unsigned int q=0; q<stride; ++q)
           {
             shape_val_evenodd[i*stride+q] =
-              0.5 * (shape_values[i*n_q_points_1d+q] +
-                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_values[i*n_q_points_1d+q] +
+                             shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_val_evenodd[(fe_degree-i)*stride+q] =
-              0.5 * (shape_values[i*n_q_points_1d+q] -
-                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_values[i*n_q_points_1d+q] -
+                             shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
 
             shape_gra_evenodd[i*stride+q] =
-              0.5 * (shape_gradients[i*n_q_points_1d+q] +
-                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_gradients[i*n_q_points_1d+q] +
+                             shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_gra_evenodd[(fe_degree-i)*stride+q] =
-              0.5 * (shape_gradients[i*n_q_points_1d+q] -
-                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_gradients[i*n_q_points_1d+q] -
+                             shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
 
             shape_hes_evenodd[i*stride+q] =
-              0.5 * (shape_hessians[i*n_q_points_1d+q] +
-                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_hessians[i*n_q_points_1d+q] +
+                             shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_hes_evenodd[(fe_degree-i)*stride+q] =
-              0.5 * (shape_hessians[i*n_q_points_1d+q] -
-                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+              Number(0.5) * (shape_hessians[i*n_q_points_1d+q] -
+                             shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
           }
       if (fe_degree % 2 == 0)
         for (unsigned int q=0; q<stride; ++q)
