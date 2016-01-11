@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -183,7 +183,8 @@ namespace TensorAccessors
    * @author Matthias Maier, 2015
    */
   template <int index, int rank, typename T>
-  DEAL_II_ALWAYS_INLINE internal::ReorderedIndexView<index, rank, T>
+  inline DEAL_II_ALWAYS_INLINE
+  internal::ReorderedIndexView<index, rank, T>
   reordered_index_view(T &t)
   {
 #ifdef DEAL_II_WITH_CXX11
@@ -264,7 +265,8 @@ namespace TensorAccessors
    * @author Matthias Maier, 2015
    */
   template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
-  DEAL_II_ALWAYS_INLINE void contract(T1 &result, const T2 &left, const T3 &right)
+  inline DEAL_II_ALWAYS_INLINE
+  void contract(T1 &result, const T2 &left, const T3 &right)
   {
 #ifdef DEAL_II_WITH_CXX11
     static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
