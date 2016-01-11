@@ -9,7 +9,7 @@ most basic way to run MPI programs is using a command line like
 @code
   mpirun -np 32 ./step-17
 @endcode
-to run the step-17 executable with 32 processors. 
+to run the step-17 executable with 32 processors.
 
 (If you work on a cluster, then there is typically a step in between where you
 need to set up a job script and submit the script to a scheduler. The scheduler

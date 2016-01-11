@@ -98,7 +98,7 @@ we will show how to do this in step-40 and some other programs. There are
 numerous occasions where, in the course of discussing how a function of this
 program works, we will comment on the fact that it will not scale to large
 problems and why not. All of these issues will be addressed in step-18 and
-in particular step-40, which scales to very large number of processes.
+in particular step-40, which scales to very large numbers of processes.
 
 Philosophically, the way MPI operates is as follows. You typically run a
 program via

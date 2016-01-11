@@ -124,7 +124,7 @@ namespace Step17
 
     // Then we have two variables that tell us where in the parallel
     // world we are. The first of the following variables,
-    // <code>n_mpi_processes</code> tells us how many MPI processes
+    // <code>n_mpi_processes</code>, tells us how many MPI processes
     // there exist in total, while the second one,
     // <code>this_mpi_process</code>, indicates which is the number of
     // the present process within this space of processes (in MPI
@@ -304,7 +304,7 @@ namespace Step17
   // GridTools::partition_triangulation() function that does this at a
   // much higher level of programming.
   //
-  // @note As mentioned in the introduction, we can avoid this manual
+  // @note As mentioned in the introduction, we could avoid this manual
   //   partitioning step if we used the parallel::shared::Triangulation
   //   class for the triangulation object instead (as we do in step-18).
   //   That class does, in essence, everything a regular triangulation
@@ -327,7 +327,7 @@ namespace Step17
   // The final step of this initial setup is that we get ourselves a
   // variable that indicates how many degrees of freedom the current
   // process is responsible for. (Note that a degree of freedom is not
-  // necessarily owned by the process that owns a cells just because
+  // necessarily owned by the process that owns a cell just because
   // the degree of freedom lives on this cell: some degrees of freedom
   // live on interfaces between subdomains, and are consequently only owned by
   // one of the processes adjacent to this interface.)
