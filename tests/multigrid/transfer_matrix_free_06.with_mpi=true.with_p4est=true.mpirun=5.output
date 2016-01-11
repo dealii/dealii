@@ -1,0 +1,178 @@
+
+DEAL::FE: FESystem<2>[FE_Q<2>(1)^2]
+DEAL::no. cells: 250
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff prolongate   l6: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::Diff restrict     l6: 0
+DEAL::Diff restrict add l6: 0
+DEAL::
+DEAL::no. cells: 1887
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff prolongate   l6: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::Diff restrict     l6: 0
+DEAL::Diff restrict add l6: 0
+DEAL::
+DEAL::FE: FESystem<2>[FE_Q<2>(QGaussLobatto(4))^2]
+DEAL::no. cells: 88
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::
+DEAL::no. cells: 510
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::
+DEAL::FE: FESystem<3>[FE_Q<3>(1)^2]
+DEAL::no. cells: 15
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::
+DEAL::FE: FESystem<3>[FE_Q<3>(QGaussLobatto(4))^2]
+DEAL::no. cells: 1
+DEAL::
+DEAL::no. cells: 223
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::
+DEAL::FE: FESystem<2>[FE_Q<2>(2)^2]
+DEAL::no. cells: 250
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff prolongate   l6: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::Diff restrict     l6: 0
+DEAL::Diff restrict add l6: 0
+DEAL::
+DEAL::no. cells: 1887
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff prolongate   l5: 0
+DEAL::Diff prolongate   l6: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::Diff restrict     l5: 0
+DEAL::Diff restrict add l5: 0
+DEAL::Diff restrict     l6: 0
+DEAL::Diff restrict add l6: 0
+DEAL::
+DEAL::FE: FESystem<3>[FE_Q<3>(2)^2]
+DEAL::no. cells: 15
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::
