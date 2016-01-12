@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1299,6 +1299,157 @@
  *     <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
+ *
+ * <dt class="glossary">@anchor GlossParallelScaling <b>Parallel scaling</b></dt>
+ * <dd>When we say that a parallel program "scales", what we mean is that the
+ * program does not become unduly slow (or takes unduly much memory) if we
+ * make the problem it solves larger, and that run time and memory consumption
+ * decrease proportionally if we keep the problem size the same but increase
+ * the number of processors (or cores) that work on it.
+ *
+ * More specifically, think of a problem whose size is given by a number $N$
+ * (which could be the number of cells, the number of unknowns, or some other
+ * indicative quantity such as the number of CPU cycles necessary to solve
+ * it) and for which you have $P$ processors available for solution. In an
+ * ideal world, the program would then require a run time of ${\cal O}(N/P)$,
+ * and this would imply that we could reduce the run time to any desired
+ * value by just providing more processors. Likewise, for a program to be
+ * scalable, its overall memory consumption needs to be ${\cal O}(N)$ and on
+ * each involved process needs to be ${\cal O}(N/P)$, again
+ * implying that we can fit any problem into the fixed amount of memory
+ * computers attach to each processor, by just providing
+ * sufficiently many processors.
+ *
+ * For practical assessments of scalability, we often distinguish between
+ * "strong" and "weak" scalability. These assess asymptotic statements
+ * such as ${\cal O}(N/P)$ run time in the limits $N\rightarrow \infty$
+ * and/or $P\rightarrow \infty$. Specifically, when we say that a program
+ * is "strongly scalable", we mean that if we have a problem of fixed
+ * size $N$, then we can reduce the run time and memory consumption (on
+ * every processor) inversely proportional to $P$ by just throwing more
+ * processors at the problem. In particular, strong scalability implies
+ * that if we provide twice as many processors, then run time and memory
+ * consumption on every process will be reduced by a factor of two. In
+ * other words, we can solve the <i>same problem</i> faster and faster
+ * by providing more and more processors.
+ *
+ * Conversely, "weak scalability" means that if we increase the problem
+ * size $N$ by a fixed factor, and increase the number of processors
+ * $P$ available to solve the problem by the same factor, then the
+ * overall run time (and the memory consumption on every processor)
+ * remains the same. In other words, we can solve <i>larger and larger
+ * problems</i> within the same amount of wallclock time by providing
+ * more and more processors.
+ *
+ * No program is truly scalable in this theoretical sense. Rather, all programs
+ * cease to scale once either $N$ or $P$ grows larger than certain limits.
+ * We therefore often say things such as "the program scales up to
+ * 4,000 cores", or "the program scales up to $10^{8}$ unknowns". There are
+ * a number of reasons why programs cannot scale without limit; these can
+ * all be illustrated by just looking at the (relatively simple) step-17
+ * tutorial program:
+ * - Sequential sections: Many programs have sections of code that
+ *   either cannot or are not parallelized, i.e., where one processor has to do
+ *   a certain, fixed amount of work that does not decrease just because
+ *   there are a total of $P$ processors around. In step-17, this is
+ *   the case when generating graphical output: one processor creates
+ *   the graphical output for the entire problem, i.e., it needs to do
+ *   ${\cal O}(N)$ work. That means that this function has a run time
+ *   of ${\cal O}(N)$, regardless of $P$, and consequently the overall
+ *   program will not be able to achieve ${\cal O}(N/P)$ run time but
+ *   have a run time that can be described as $c_1N/P + c_2N$ where
+ *   the first term comes from scalable operations such as assembling
+ *   the linear system, and the latter from generating graphical
+ *   output on process 0. If $c_2$ is sufficiently small, then the
+ *   program might look like it scales strongly for small numbers of
+ *   processors, but eventually strong scalability will cease. In
+ *   addition, the program can not scale weakly either because
+ *   increasing the size $N$ of the problem while increasing the
+ *   number of processors $P$ at the same rate does not keep the
+ *   run time of this one function constant.
+ * - Duplicated data structures: In step-17, each processor stores the entire
+ *   mesh. That is, each processor has to store a data structure of size
+ *   ${\cal O}(N)$, regardless of $P$. Eventually, if we make the problem
+ *   size large enough, this will overflow each processor's memory space
+ *   even if we increase the number of processors. It is thus clear that such
+ *   a replicated data structure prevents a program from scaling weakly.
+ *   But it also prevents it from scaling strongly because in order to
+ *   create an object of size ${\cal O}(N)$, one has to at the very
+ *   least write into ${\cal O}(N)$ memory locations, costing
+ *   ${\cal O}(N)$ in CPU time. Consequently, there is a component of the
+ *   overall algorithm that does not behave as ${\cal O}(N/P)$ if we
+ *   provide more and more processors.
+ * - Communication: If, to pick just one example, you want to compute
+ *   the $l_2$ norm of a vector of which all MPI processes store a few
+ *   entries, then every process needs to compute the sum of squares of
+ *   its own entries (which will require ${\cal O}(N/P)$ time, and
+ *   consequently scale perfectly), but then every process needs to
+ *   send their partial sum to one process that adds them all up and takes
+ *   the square root. In the very best case, sending a message that
+ *   contains a single number takes a constant amount of time,
+ *   regardless of the overall number of processes. Thus, again, every
+ *   program that does communication cannot scale strongly because
+ *   there are parts of the program whose CPU time requirements do
+ *   not decrease with the number of processors $P$ you allocate for
+ *   a fixed size $N$. In reality, the situation is actually even
+ *   worse: the more processes are participating in a communication
+ *   step, the longer it will generally take, for example because
+ *   the one process that has to add everyone's contributions has
+ *   to add everything up, requiring ${\cal O}(P)$ time. In other words,
+ *   CPU time <i>increases</i> with the number of processes, therefore
+ *   not only preventing a program from scaling strongly, but also from
+ *   scaling weakly. (In reality, MPI libraries do not implement $l_2$
+ *   norms by sending every message to one process that then adds everything
+ *   up; rather, they do pairwise reductions on a tree that doesn't
+ *   grow the run time as ${\cal O}(P)$ but as ${\cal O}(\log_2 P)$,
+ *   at the expense of more messages sent around. Be that as it may,
+ *   the fundamental point is that as you add more processors, the
+ *   run time will grow with $P$ regardless of the way the operation
+ *   is actually implemented, and it can therefore not scale.)
+ *
+ * These, and other reasons that prevent programs from scaling perfectly can
+ * be summarized in <a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">
+ * <i>Amdahl's law</i></a> that states that if a fraction $\alpha$
+ * of a program's overall work $W$ can be parallelized, i.e., it can be
+ * run in ${\cal O}(\alpha W/P)$ time, and a fraction $1-\alpha$ of the
+ * program's work can not be parallelized (i.e., it consists either of
+ * work that only one process can do, such as generating graphical output
+ * in step-17; or that every process has to execute in a replicated way,
+ * such as sending a message with a local contribution to a dedicated
+ * process for accumulation), then the overall run time of the program
+ * will be
+ * @f{align*}
+ *   T = {\cal O}\left(\alpha \frac WP + (1-\alpha)W \right).
+ * @f}
+ * Consequently, the "speedup" you get, i.e., the factor by which your
+ * programs run faster on $P$ processors compared to running the program
+ * on a single process (assuming this is possible) would be
+ * @f{align*}
+ *   S = \frac{W}{\alpha \frac WP + (1-\alpha)W}
+ *     = \frac{P}{\alpha + (1-\alpha)P}.
+ * @f}
+ * If $\alpha<1$, which it is for all practically existing programs,
+ * then $S\rightarrow \frac{1}{1-\alpha}$ as $P\rightarrow \infty$, implying
+ * that there is a point where it does not pay off in any significant way
+ * any more to throw more processors at the problem.
+ *
+ * In practice, what matters is <i>up to which problem size</i> or
+ * <i>up to which number of processes</i> or <i>down to which size
+ * of local problems ${\cal}(N/P)$</i> a program scales. For deal.II,
+ * experience shows that on most clusters with a reasonable fast
+ * network, one can solve problems up to a few billion unknowns,
+ * up to a few thousand processors, and down to somewhere between
+ * 40,000 and 100,000 unknowns per process. The last number is the
+ * most relevant: if you have a problem with, say, $10^8$ unknowns,
+ * then it makes sense to solve it on 1000-2500 processors since the
+ * number of degrees of freedom each process handles remains at more
+ * than 40,000. Consequently, there is enough work every process
+ * has to do so that the ${\cal O}(1)$ time for communication does
+ * not dominate. But it doesn't make sense to solve such a problem with
+ * 10,000 or 100,000 processors, since each of these processor's local
+ * problem becomes so small that they spend most of their time waiting
+ * for communication, rather than doing work on their part of the work.
+ * </dd>
  *
  * <dt class="glossary">@anchor GlossPeriodicConstraints <b>Periodic boundary
  * conditions</b></dt>
