@@ -137,6 +137,9 @@ namespace pdd
     // make sure the following works in parallel
     data_out.build_patches ();
 
+    // on processor 0 also output some data so we can compare
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
+      data_out.write_vtk (deallog.get_file_stream());
 
     // Then generate the output for the faces.
     DataOutFaces<dim> data_out_faces;
@@ -144,6 +147,10 @@ namespace pdd
     data_out_faces.add_data_vector (solution, "u");
     // make sure the following works in parallel
     data_out_faces.build_patches (fe.degree);
+
+    // on processor 0 also output some data so we can compare
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
+      data_out_faces.write_vtk (deallog.get_file_stream());
   }
   // @sect4{PDDProblem::run}
 
