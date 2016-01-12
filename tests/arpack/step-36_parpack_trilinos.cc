@@ -249,7 +249,7 @@ void test ()
     std::vector<std::complex<double> > lambda(eigenfunctions.size());
 
     for (unsigned int i=0; i < eigenvalues.size(); i++)
-      eigenfunctions[i] = PetscScalar();
+      eigenfunctions[i] = 0.;
 
     SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
     SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
