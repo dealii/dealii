@@ -70,7 +70,9 @@ documentation module, which is itself a sub-module of the
 
 In general, to be truly able to scale to large numbers of processors, one
 needs to split between the available processors <i>every</i> data structure
-whose size scales with the size of the overall problem. This includes, for
+whose size scales with the size of the overall problem. (For a definition
+of what it means for a program to "scale", see 
+@ref GlossParallelScaling "this glossary entry.) This includes, for
 example, the triangulation, the matrix, and all global vectors (solution, right
 hand side). If one doesn't split all of these objects, one of those will be
 replicated on all processors and will eventually simply become too large

@@ -39,7 +39,9 @@ part to the whole. A simple way to do that was shown in step-17 and
 step-18, where we show how a program can use <a
 href="http://www.mpi-forum.org/" target="_top">MPI</a> to parallelize
 assembling the linear system, storing it, solving it, and computing
-error estimators. All of these operations scale relatively trivially,
+error estimators. All of these operations scale relatively trivially
+(for a definition of what it means for an operation to "scale", see 
+@ref GlossParallelScaling "this glossary entry),
 but there was one significant drawback: for this to be moderately
 simple to implement, each MPI processor had to keep its own copy of
 the entire Triangulation and DoFHandler objects. Consequently, while

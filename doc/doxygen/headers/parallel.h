@@ -28,8 +28,8 @@
  * A namespace in which we define classes and algorithms that deal
  * with running in %parallel on shared memory machines when deal.II is
  * configured to use multiple threads (see @ref threads), as well as
- * running things in %parallel on %distributed memory machines (see @ref
- * distributed).
+ * running things in %parallel on %distributed memory machines (see
+ * @ref distributed).
  *
  * @ingroup threads
  * @author Wolfgang Bangerth, 2008, 2009

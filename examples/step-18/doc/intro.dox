@@ -333,7 +333,9 @@ In step-17, the main bottleneck for %parallel computations as far as run time
 is concerned
 was that only the first processor generated output for the entire domain.
 Since generating graphical output is expensive, this did not scale well when
-larger numbers of processors were involved. We will address this here.
+larger numbers of processors were involved. We will address this here. (For a
+definition of what it means for a program to "scale", see 
+@ref GlossParallelScaling "this glossary entry.)
 
 Basically, what we need to do is let every process
 generate graphical output for that subset of cells that it owns, write them

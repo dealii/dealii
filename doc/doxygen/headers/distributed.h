@@ -79,6 +79,9 @@
  * program to massively parallel computations and thereby explains the use of
  * the topic discussed here to more complicated applications.
  *
+ * For a discussion of what we consider "scalable" programs, see
+ * @ref GlossParallelScaling "this glossary entry".
+ *
  *
  * <h4>Distributed triangulations</h4>
  *

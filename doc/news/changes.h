@@ -198,6 +198,13 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: The glossary now contains a long entry describing what
+  the term "scalability" means in the context of finite element codes.
+  See @ref GlossParallelScaling.
+  <br>
+  (Wolfgang Bangerth, 2016/01/11)
+  </li>
+
   <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
   longer returns by value, but rather by reference. Tensor::operator<< for
   dim==0 now accesses values by reference instead of making a copy. This is
