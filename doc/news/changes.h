@@ -572,6 +572,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: The DataOutFaces class should now also work with triangulations
+  of type parallel::distributed::Triangulation.
+  <br>
+  (Heikki Virtanen, Wolfgang Bangerth, 2016/01/11)
+  </li>
+
   <li> Fixed: AlignedVector<T>::fill() (and thus, Table<N,T>::reinit) did not
   correctly call the destructor of T() and could leak memory for complicated
   class types that depend on their constructor to free memory.
