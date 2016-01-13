@@ -579,6 +579,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: DoFTools::extract_dofs() are now instantiated also for
+  codimension different from zero.
+  <br>
+  (Alberto Sartori, 2016/01/13)
+  </li>
+
   <li> Fixed: The DataOutFaces class should now also work with triangulations
   of type parallel::distributed::Triangulation.
   <br>
