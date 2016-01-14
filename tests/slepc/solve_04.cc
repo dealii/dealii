@@ -50,10 +50,9 @@ check_solve( SolverType &solver,
       // reset vectors and set them as initial space
       // to avoid dependency on random numbers:
       for (unsigned int i = 0; i < u.size(); i++)
-        {
-          u[i] = 0.0;
-          u[i][i] = 1.0;
-        }
+        for (unsigned int j=0; j<u[i].size(); ++j)
+          u[i][j] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+
       solver.set_initial_space(u);
       // solve
       solver.solve(A,v,u,v.size());
@@ -86,7 +85,8 @@ int main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   {
-    SolverControl control(500, 1000*PETSC_MACHINE_EPSILON);
+    SolverControl control(500,1e-12 /*1000*PETSC_MACHINE_EPSILON*/,false,false);
+
 
     const unsigned int size = 31;
     unsigned int dim = (size-1);
@@ -126,15 +126,21 @@ int main(int argc, char **argv)
     }
 
     {
-      SLEPcWrappers::SolverJacobiDavidson solver(control);
-      check_solve (solver, control, A,u,v);
-    }
-
-    {
       SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
       SLEPcWrappers::SolverGeneralizedDavidson solver(control,PETSC_COMM_SELF,data);
       check_solve (solver, control, A,u,v);
     }
+
+    // set extra settings for JD; Otherwise, at least on OSX,
+    // the number of eigensolver iterations is different between debug and release modes!
+    PetscOptionsSetValue("-st_ksp_type","cg");
+    PetscOptionsSetValue("-st_pc_type", "jacobi");
+    PetscOptionsSetValue("-st_ksp_max_it", "10");
+    {
+      SLEPcWrappers::SolverJacobiDavidson solver(control);
+      check_solve (solver, control, A,u,v);
+    }
+
   }
 
 }

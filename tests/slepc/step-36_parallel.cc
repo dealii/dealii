@@ -11,7 +11,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -99,7 +99,7 @@ void test (std::string solver_name,
                                                     constraints);
   constraints.close ();
 
-  dealii::CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+  dealii::DynamicSparsityPattern csp (locally_relevant_dofs);
   // Fill in ignoring all cells that are not locally owned
   dealii::DoFTools::make_sparsity_pattern (dof_handler, csp,
                                            constraints,
@@ -127,7 +127,13 @@ void test (std::string solver_name,
 
   eigenfunctions.resize (5);
   for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-    eigenfunctions[i].reinit (locally_owned_dofs, mpi_communicator);//without ghost dofs
+    {
+      eigenfunctions[i].reinit (locally_owned_dofs, mpi_communicator);//without ghost dofs
+      for (unsigned int j=0; j<locally_owned_dofs.n_elements(); ++j)
+        eigenfunctions[i][locally_owned_dofs.nth_index_in_set(j)] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+
+      eigenfunctions[i].compress(dealii::VectorOperation::insert);
+    }
 
   eigenvalues.resize (eigenfunctions.size ());
 
@@ -220,14 +226,11 @@ void test (std::string solver_name,
         preconditioner = new PETScWrappers::PreconditionJacobi(mpi_communicator);
       }
 
-    dealii::SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-12,/*log_history*/false,/*log_results*/false);
+    dealii::SolverControl linear_solver_control (dof_handler.n_dofs(), 1e-15,/*log_history*/false,/*log_results*/false);
     PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
     linear_solver.initialize(*preconditioner);
 
-    for (unsigned int i=0; i < eigenvalues.size(); i++)
-      eigenfunctions[i] = PetscScalar();
-
-    dealii::SolverControl solver_control (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
+    dealii::SolverControl solver_control (100, 1e-11,/*log_history*/false,/*log_results*/false);
 
     dealii::SLEPcWrappers::SolverBase *eigensolver;
 
@@ -264,17 +267,15 @@ void test (std::string solver_name,
                                                                     mpi_communicator);
       }
 
-    SLEPcWrappers::TransformationShift spectral_transformation(mpi_communicator);
+    SLEPcWrappers::TransformationShiftInvert::AdditionalData additional_data(4.0);
+    SLEPcWrappers::TransformationShiftInvert spectral_transformation(mpi_communicator,additional_data);
     spectral_transformation.set_solver(linear_solver);
     eigensolver->set_transformation(spectral_transformation);
-    eigensolver->set_initial_vector(eigenfunctions[0]);
+    // Set the initial vector. This is optional, if not done the initial vector is set to random values
+    eigensolver->set_initial_space(eigenfunctions);
 
     eigensolver->set_which_eigenpairs (EPS_SMALLEST_REAL);
     eigensolver->set_problem_type (EPS_GHEP);
-
-    //zero constrained DoFs
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      constraints.set_zero (eigenfunctions[i]);
 
     eigensolver->solve (stiffness_matrix,
                         mass_matrix,
@@ -294,7 +295,7 @@ void test (std::string solver_name,
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
     // b) x_j*B*x_i=\delta_{ij}
     {
-      const double precision = 1e-5; // ridiculously small...
+      const double precision = 1e-5;
       PETScWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
       for (unsigned int i=0; i < eigenfunctions.size(); ++i)
         {

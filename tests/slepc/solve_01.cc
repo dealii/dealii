@@ -48,12 +48,11 @@ check_solve( SolverType &solver,
     {
       solver.set_problem_type(EPS_GHEP);
       // reset vectors and set them as initial space
-      // to avoid dependency on random numbers:
+      // to avoid dependency on SLEPc random numbers:
       for (unsigned int i = 0; i < u.size(); i++)
-        {
-          u[i] = 0.0;
-          u[i][i] = 1.0;
-        }
+        for (unsigned int j=0; j<u[i].size(); ++j)
+          u[i][j] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+
       solver.set_initial_space(u);
 
       solver.solve(A,B,v,u,v.size());
@@ -86,7 +85,7 @@ int main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   {
-    SolverControl control(1000, 1000*PETSC_MACHINE_EPSILON);
+    SolverControl control(5000, 1e-11 /*1000*PETSC_MACHINE_EPSILON*/,false,false);
 
     const unsigned int size = 46;
     unsigned int dim = (size-1)*(size-1);
@@ -109,6 +108,10 @@ int main(int argc, char **argv)
                                           PETScWrappers::Vector(dim));
     std::vector<PetscScalar> v(n_eigenvalues);
 
+    PetscOptionsSetValue("-st_ksp_type","cg");
+    PetscOptionsSetValue("-st_pc_type", "jacobi");
+    PetscOptionsSetValue("-st_ksp_tol", "1e-15");
+
     {
       SLEPcWrappers::SolverKrylovSchur solver(control);
       check_solve (solver, control, A,B,u,v);
@@ -124,19 +127,22 @@ int main(int argc, char **argv)
       check_solve (solver, control, A,B,u,v);
     }
 
+    PetscOptionsSetValue("-st_ksp_type","preonly");
     {
       SLEPcWrappers::SolverGeneralizedDavidson solver(control);
       check_solve (solver, control, A,B,u,v);
     }
 
     {
-      SLEPcWrappers::SolverJacobiDavidson solver(control);
+      SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
+      SLEPcWrappers::SolverGeneralizedDavidson solver(control,PETSC_COMM_SELF,data);
       check_solve (solver, control, A,B,u,v);
     }
 
+    PetscOptionsSetValue("-st_ksp_type","cg");
+    PetscOptionsSetValue("-st_ksp_max_it", "10");
     {
-      SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
-      SLEPcWrappers::SolverGeneralizedDavidson solver(control,PETSC_COMM_SELF,data);
+      SLEPcWrappers::SolverJacobiDavidson solver(control);
       check_solve (solver, control, A,B,u,v);
     }
   }
