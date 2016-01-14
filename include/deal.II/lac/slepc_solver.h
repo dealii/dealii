@@ -213,6 +213,8 @@ namespace SLEPcWrappers
 
     /**
      * Set the initial vector space for the solver.
+     *
+     * By default, SLEPc initializes the starting vector or the initial subspace randomly.
      */
     template <typename Vector>
     void
