@@ -100,6 +100,9 @@ namespace SLEPcWrappers
   void
   SolverBase::set_initial_vector (const PETScWrappers::VectorBase &this_initial_vector)
   {
+    Assert(this_initial_vector.l2_norm()>0.0,
+           ExcMessage("Initial vector should be nonzero."));
+
     int ierr;
     Vec vec = this_initial_vector;
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)

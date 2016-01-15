@@ -2,29 +2,26 @@
 DEAL::Size 46 Unknowns 2025
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers17SolverKrylovSchurE
-DEAL::Convergence step 23 value 0
-DEAL::Solver stopped after 23 iterations
+DEAL::Solver stopped after 18 iterations
 DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers13SolverArnoldiE
-DEAL::Convergence step 80 value 0
-DEAL::Solver stopped after 80 iterations
+DEAL::Solver stopped after 63 iterations
 DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers13SolverLanczosE
-DEAL::Convergence step 79 value 0
-DEAL::Solver stopped after 79 iterations
+DEAL::Solver stopped after 60 iterations
 DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
-DEAL::Solver stopped after 278 iterations
+DEAL::Solver stopped after 334 iterations
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
+DEAL::Solver stopped after 504 iterations
 DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers20SolverJacobiDavidsonE
-DEAL::Solver stopped after 40 iterations
-DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
-DEAL::
-DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
-DEAL::Solver stopped after 581 iterations
+DEAL::Solver stopped after 58 iterations
 DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
 DEAL::
