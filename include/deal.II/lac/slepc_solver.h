@@ -791,6 +791,8 @@ namespace SLEPcWrappers
 
     for (unsigned int i = 0; i < this_initial_space.size(); i++)
       {
+        Assert(this_initial_space[i].l2_norm()>0.0,
+               ExcMessage("Initial vectors should be nonzero."));
         vecs[i] = this_initial_space[i];
       }
 
