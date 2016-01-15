@@ -100,7 +100,7 @@ null_operator(const LinearOperator<Domain, Range> &);
  * @endcode
  *
  * @note This class makes heavy use of <code>std::function</code> objects
- * and lambda functions. This flexibiliy comes with a run-time penalty.
+ * and lambda functions. This flexibility comes with a run-time penalty.
  * Only use this object to encapsulate matrix object of medium to large
  * size (as a rule of thumb, sparse matrices with a size $1000\times1000$,
  * or larger).
