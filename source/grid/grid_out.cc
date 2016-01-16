@@ -971,8 +971,8 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
   ...
   $ENDELM
   */
-  out << "$NOD" << std::endl
-      << n_vertices << std::endl;
+  out << "$NOD" << '\n'
+      << n_vertices << '\n';
 
   // actually write the vertices.
   // note that we shall number them
@@ -985,16 +985,16 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
             << vertices[i];
         for (unsigned int d=spacedim+1; d<=3; ++d)
           out << " 0";             // fill with zeroes
-        out << std::endl;
+        out << '\n';
       }
 
   // Write cells preamble
-  out << "$ENDNOD" << std::endl
-      << "$ELM" << std::endl
-      << tria.n_active_cells() + ( (msh_flags.write_faces ?
-                                    n_boundary_faces(tria) :0 ) +
-                                   ( msh_flags.write_lines ?
-                                     n_boundary_lines(tria) : 0 ) ) << std::endl;
+  out << "$ENDNOD" << '\n'
+      << "$ELM" << '\n'
+      << tria.n_active_cells() + ((msh_flags.write_faces ?
+                                   n_boundary_faces(tria) : 0) +
+                                  (msh_flags.write_lines ?
+                                   n_boundary_lines(tria) : 0)) << '\n';
 
   /*
     elm-type
@@ -1060,7 +1060,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
            ++vertex)
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
-      out << std::endl;
+      out << '\n';
     }
 
   // write faces and lines with
@@ -1071,7 +1071,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
   if (msh_flags.write_lines)
     write_msh_lines (tria, next_index, out);
 
-  out << "$ENDELM" << std::endl;
+  out << "$ENDELM\n";
 
   // make sure everything now gets to
   // disk
