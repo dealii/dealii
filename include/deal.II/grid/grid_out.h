@@ -931,7 +931,7 @@ public:
    * boundary indicators explicitly, which is done by this flag.
    *
    * Names and values of further flags controlling the output can be found in
-   * the documentation of the GridOut::Msh() class.
+   * the documentation of the GridOutFlags::Msh() class.
    *
    * Works also in the codimension one case.
    */
@@ -954,7 +954,7 @@ public:
    * done by this flag.
    *
    * Names and values of further flags controlling the output can be found in
-   * the documentation of the GridOut::Ucd() class.
+   * the documentation of the GridOutFlags::Ucd() class.
    *
    * Works also for the codimension one case.
    */
