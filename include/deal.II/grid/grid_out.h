@@ -1302,8 +1302,18 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since cells and faces are continuously numbered, the @p starting_index
-   * for the numbering of the faces is passed also.
+   * Since, in GMSH, geometric elements are continuously numbered, this
+   * function requires a parameter @p next_element_index providing the next
+   * geometric element number. This index should have a numerical value equal
+   * to one more than the index previously used to write a geometric element
+   * to @p out.
+   *
+   * @returns The next unused geometric element index.
+   *
+   * @warning @p next_element_index should be (at least) one larger than the
+   * current number of triangulation elements (lines, cells, faces) that have
+   * been written to @p out. GMSH will not load the saved file correctly if
+   * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
    * write_msh function, since it needs special treatment for the case
@@ -1313,26 +1323,30 @@ private:
    * compiling the function for <tt>dim==1</tt>. Bad luck.
    */
   template <int dim, int spacedim>
-  void write_msh_faces (const Triangulation<dim,spacedim> &tria,
-                        const unsigned int        starting_index,
-                        std::ostream             &out) const;
+  unsigned int
+  write_msh_faces (const Triangulation<dim,spacedim> &tria,
+                   const unsigned int                 next_element_index,
+                   std::ostream                      &out) const;
 
   /**
    * Declaration of the specialization of above function for 1d. Does nothing.
    */
-  void write_msh_faces (const Triangulation<1,1> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_faces (const Triangulation<1,1>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
   /**
    * Declaration of the specialization of above function for 1d, 2sd. Does
    * nothing.
    */
-  void write_msh_faces (const Triangulation<1,2> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
-  void write_msh_faces (const Triangulation<1,3> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_faces (const Triangulation<1,2>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
+  unsigned int
+  write_msh_faces (const Triangulation<1,3>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
 
 
 
@@ -1341,8 +1355,18 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since cells and faces are continuously numbered, the @p starting_index
-   * for the numbering of the lines is passed also.
+   * Since, in GMSH, geometric elements are continuously numbered, this
+   * function requires a parameter @p next_element_index providing the next
+   * geometric element number. This index should have a numerical value equal
+   * to one more than the index previously used to write a geometric element
+   * to @p out.
+   *
+   * @returns The next unused geometric element index.
+   *
+   * @warning @p next_element_index should be (at least) one larger than the
+   * current number of triangulation elements (lines, cells, faces) that have
+   * been written to @p out. GMSH will not load the saved file correctly if
+   * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
    * write_msh function, since it needs special treatment for the case
@@ -1352,40 +1376,46 @@ private:
    * when compiling the function for <tt>dim==1/2</tt>. Bad luck.
    */
   template <int dim, int spacedim>
-  void write_msh_lines (const Triangulation<dim,spacedim> &tria,
-                        const unsigned int        starting_index,
-                        std::ostream             &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<dim,spacedim> &tria,
+                   const unsigned int                 next_element_index,
+                   std::ostream                      &out) const;
 
   /**
    * Declaration of the specialization of above function for 1d. Does nothing.
    */
-  void write_msh_lines (const Triangulation<1,1> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<1,1>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
 
   /**
    * Declaration of the specialization of above function for 1d, 2sd. Does
    * nothing.
    */
-  void write_msh_lines (const Triangulation<1,2> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
-  void write_msh_lines (const Triangulation<1,3> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<1,2>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<1,3>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
   /**
    * Declaration of the specialization of above function for 2d. Does nothing.
    */
-  void write_msh_lines (const Triangulation<2,2> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<2,2>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
   /**
    * Declaration of the specialization of above function for 2d, 3sd. Does
    * nothing.
    */
-  void write_msh_lines (const Triangulation<2,3> &tria,
-                        const unsigned int      starting_index,
-                        std::ostream           &out) const;
+  unsigned int
+  write_msh_lines (const Triangulation<2,3>      &tria,
+                   const unsigned int             next_element_index,
+                   std::ostream                  &out) const;
 
   /**
    * Write the grid information about faces to @p out. Only those faces are
