@@ -662,7 +662,7 @@ namespace GridOutFlags
 
     Coloring coloring;
 
-    /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perpspective view).
+    /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perspective view).
     bool convert_level_number_to_height;
 
     /// The factor determining the vertical distance between levels (default = 0.3)
@@ -1010,7 +1010,7 @@ public:
    * Polygons are either at depth 900-level or at 900+@p material_id,
    * depending on the flag @p level_depth. Accordingly, boundary edges are at
    * depth 800-level or at 800+@p boundary_id. Therefore, boundary edges are
-   * alway in front of cells.
+   * always in front of cells.
    *
    * Not implemented for the codimension one case.
    */
