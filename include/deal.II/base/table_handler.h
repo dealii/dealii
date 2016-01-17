@@ -234,7 +234,7 @@ namespace internal
  *
  * Padding the column with default elements makes sure that after the addition
  * the column has as many entries as the longest other column. In other words,
- * if we have skipped previous invokations of add_value() for a given key,
+ * if we have skipped previous invocations of add_value() for a given key,
  * then the padding will enter default values into this column.
  *
  * The algorithm as described will fail if you try to skip adding values for a
