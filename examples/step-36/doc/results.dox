@@ -34,31 +34,17 @@ correspond to pairs $(m,n)=(1,1)$, $(1,2)$ and $(2,1)$, $(2,2)$, and
 $(3,1)$. A visualization of the corresponding eigenfunctions would
 look like this:
 
-<TABLE WIDTH="100%">
+<table width="80%">
 <tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt="">
-</td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
 </tr>
 
 <tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt="">
-</td>
-<td>
-</td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
+<td></td>
 </tr>
 </table>
 
@@ -120,31 +106,17 @@ circle of the potential):
 
 The first five eigenfunctions are now like this:
 
-<TABLE WIDTH="100%">
+<table width="80%">
 <tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt="">
-</td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
 </tr>
 
 <tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt="">
-</td>
-<td>
-</td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
+<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
+<td></td>
 </tr>
 </table>
 
