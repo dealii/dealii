@@ -192,7 +192,7 @@ namespace GridRefinement
    * above, this function only computes the threshold values and then passes
    * over to refine() and coarsen().
    *
-   * @param[in,out] triangulation The triangulation whose cells this function is
+   * @param[in,out] tria The triangulation whose cells this function is
    * supposed to mark for coarsening and refinement.
    *
    * @param[in] criteria The refinement criterion computed on each mesh cell.

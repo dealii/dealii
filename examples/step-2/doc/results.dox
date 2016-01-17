@@ -9,15 +9,10 @@ zero or not depends on the equation under consideration, but the
 indicated positions in the matrix tell us which shape functions can
 and which can't couple when discretizing a local, i.e. differential,
 equation):
-<TABLE WIDTH="60%" ALIGN="center">
+<table style="width:60%" align="center">
   <tr>
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt="">
-    </td>
-
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt="">
-    </td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt=""></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt=""></td>
   </tr>
 </table>
 

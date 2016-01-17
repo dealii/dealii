@@ -147,6 +147,7 @@ given mesh using a smooth function. An example of its use is also given in the
 results section of step-38 but let us show a simpler example here:
 In the function <code>grid_5()</code> of the current program, we perturb the y
 coordinate of a mesh with a sine curve:
+
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -176,6 +177,7 @@ of this tutorial:
 Finally, the function GridTools::distort_random allows you to move vertices in the
 mesh (optionally ignoring boundary nodes) by a random amount. This is
 demonstrated in <code>grid_7()</code> and the result is as follows:
+
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -211,20 +213,12 @@ to make sure that cells line up correctly and no unpaired nodes exist in the
 merged Triangulation.
 
 These are the input meshes and the output mesh:
-<TABLE WIDTH="80%" ALIGN="center">
-  <tr>
-    <td ALIGN="center">
-        <img
-	src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png"
-	alt="" height="200px"> input mesh 1
-    </td>
-    <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px"> input mesh 2
-    </td>
 
-    <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px"> merged mesh
-    </td>
+<table width="80%" align="center">
+  <tr>
+    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
+    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
+    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
   </tr>
 </table>
 

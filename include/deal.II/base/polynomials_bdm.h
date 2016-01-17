@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  *   Note: the curl of a scalar function is given by $\text{curl}(f(x,y)) =
  *   \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
  *
- *   <dd> The basis used to construct the $BDM_{1}$ shape functions is
+ *   The basis used to construct the $BDM_{1}$ shape functions is
  *   @f{align*}
  *     \phi_0 = \begin{pmatrix} 1 \\ 0 \end{pmatrix},
  *     \phi_1 = \begin{pmatrix} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{pmatrix},
@@ -65,7 +65,7 @@ DEAL_II_NAMESPACE_OPEN
  *     \phi_7 = \begin{pmatrix} 2xy \\ -y^2 \end{pmatrix}.
  *   @f}
  *
- *   <dd> The dimension of the $BDM_{k}$ space is
+ *   The dimension of the $BDM_{k}$ space is
  * $(k+1)(k+2)+2$, with $k+1$ unknowns per
  * edge and $k(k-1)$ interior unknowns.
  *
@@ -81,13 +81,12 @@ DEAL_II_NAMESPACE_OPEN
  *        \begin{pmatrix}0\\zx^{i+1}y^{k-i}\\0\end{pmatrix})
  *        , p_{k} \in (P_{k})^{3} \}$.
  *
- *   <dd> Note: the 3D description of $BDM_{k}$ is not unique.
- *        See <i>Mixed and Hybrid Finite Element Methods</i> page 122
- *        for an alternative definition.
+ *   Note: the 3D description of $BDM_{k}$ is not unique.  See <i>Mixed and
+ *   Hybrid Finite Element Methods</i> page 122 for an alternative definition.
  *
- *   <dd> The dimension of the $BDM_{k}$ space is
- *        $\dfrac{(k+1)(k+2)(k+3)}{2} + 3(k+1)$, with $\dfrac{(k+1)(k+2)}{2}$
- *        unknowns per face and $\dfrac{(k-1)k(k+1)}{2}$ interior unknowns.
+ *   The dimension of the $BDM_{k}$ space is
+ *   $\dfrac{(k+1)(k+2)(k+3)}{2}+3(k+1)$, with $\dfrac{(k+1)(k+2)}{2}$
+ *   unknowns per face and $\dfrac{(k-1)k(k+1)}{2}$ interior unknowns.
  *
  *</dl>
  *

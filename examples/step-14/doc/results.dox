@@ -71,38 +71,21 @@ differently.
 
 
 Looking at the grids that are produced in the course of subsequent
-refinement, these are some of them:
-<table align="center">
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.png" alt="">
-    </td>
+refinement, here are some of them:
 
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.png" alt="">
-    </td>
+<table width="80%" align="center">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.png" alt="" width="100%"></td>
   </tr>
-
   <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.png" alt="">
-    </td>
-
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.png" alt="">
-    </td>
-
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.png" alt="">
-    </td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.png" alt="" width="100%"></td>
   </tr>
 </table>
+
 Note the subtle interplay between resolving the corner singularities,
 and resolving around the point of evaluation. It will be rather
 difficult to generate such a mesh by hand, as this would involve to
@@ -141,15 +124,10 @@ close to each other, even for such a complicated quantity as the point
 value:
 
 
-<table align="center">
+<table width="80%" align="center">
   <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error.png" alt="">
-    </td>
-
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error-estimation.png" alt="">
-    </td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error-estimation.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -255,37 +233,20 @@ evaluation shows this:
 </table>
 This time, the grids in refinement cycles 0, 5, 6, 7, 8, and 9 look
 like this:
-<table align="center">
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.png" alt="">
-    </td>
 
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.png" alt="">
-    </td>
+<table align="center" width="80%">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.png" alt="" width="100%"></td>
   </tr>
-
   <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.png" alt="">
-    </td>
-
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.png" alt="">
-    </td>
-
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.png" alt="">
-    </td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.png" alt="" width="100%"></td>
   </tr>
 </table>
+
 Note the asymmetry of the grids compared with those we obtained for
 the point evaluation, which is due to the directionality of the
 x-derivative for which we tailored the refinement criterion.
@@ -306,17 +267,14 @@ in the result.
 In the left part of the following chart, you again see the convergence
 of the error towards this extrapolated value, while on the right you
 see a comparison of true and estimated error:
-<table align="center">
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error.png" alt="">
-    </td>
 
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error-estimation.png" alt="">
-    </td>
+<table width="80%" align="center">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error-estimation.png" alt="" width="100%"></td>
   </tr>
 </table>
+
 After an initial phase where the true error changes its sign, the
 estimated error matches it quite well, again. Also note the dramatic
 improvement in the error when using the estimated error to correct the
@@ -337,29 +295,26 @@ are better than those we had previously.
 
 First, the meshes after 9 and 10 adaptive refinement cycles,
 respectively, look like this:
-<table align="center">
-  <tr>
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-9.png" alt="">
-    </td>
 
-    <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-10.png" alt="">
-    </td>
+<table width="80%" align="center">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-9.png" alt="" width="100%"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-10.png" alt="" width="100%"></td>
   </tr>
 </table>
+
 The features of the solution can still be seen slightly, but since the
 solution is smooth, the roughness of the dual solution entirely
 dominates the mesh refinement criterion, and leads to strongly
 concentrated meshes. The solution after the seventh refinement step is
 like so:
-<table align="center">
+
+<table width="80%" align="center">
   <tr>
-    <td width="50%" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.png" alt="">
-    </td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.png" alt="" width="100%"></td>
   </tr>
 </table>
+
 Obviously, the solution is worse at some places, but the mesh
 refinement process should have taken care that these places are not
 important for computing the point value.
