@@ -64,6 +64,12 @@ ENDIF()
 # Call the system FindMPI.cmake module:
 #
 
+# in case MPIEXEC is specified first call find_program() so that in case of success 
+# its subsequent runs inside FIND_PACKAGE(MPI) do not alter the desired result.
+IF(DEFINED ENV{MPIEXEC})
+  FIND_PROGRAM(MPIEXEC $ENV{MPIEXEC})
+ENDIF()
+
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(MPI)
