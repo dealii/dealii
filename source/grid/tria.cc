@@ -1065,8 +1065,10 @@ namespace internal
      * dim==3. However, their implementation is largly independent of the
      * spacedim template parameter. So we would like to write things like
      *
+     * @code
      * template <int spacedim>
      * void Triangulation<1,spacedim>::create_triangulation (...) {...}
+     * @endcode
      *
      * Unfortunately, C++ doesn't allow this: member functions of class
      * templates have to be either not specialized at all, or fully
@@ -1074,21 +1076,25 @@ namespace internal
      * solution would be to just duplicate the bodies of the functions and
      * have equally implemented functions
      *
+     * @code
      * template <>
      * void Triangulation<1,1>::create_triangulation (...) {...}
      *
      * template <>
      * void Triangulation<1,2>::create_triangulation (...) {...}
+     * @endcode
      *
      * but that is clearly an unsatisfactory solution. Rather, what we do
      * is introduce the current Implementation class in which we can write
      * these functions as member templates over spacedim, i.e. we can have
      *
+     * @code
      * template <int dim_, int spacedim_>
      * template <int spacedim>
      * void Triangulation<dim_,spacedim_>::Implementation::
      *            create_triangulation (...,
      *                                  Triangulation<1,spacedim> &tria ) {...}
+     * @endcode
      *
      * The outer template parameters are here unused, only the inner
      * ones are of real interest.

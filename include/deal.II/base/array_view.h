@@ -254,7 +254,7 @@ make_array_view (const std::vector<ElementType> &vector)
  *   vector that will be part of this view.
  * @param[in] size_of_view
  *
- * @pre <code>starting_index + size_of_view <= vector.size()
+ * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *
  * @relates ArrayView
  */
@@ -289,7 +289,7 @@ make_array_view (std::vector<ElementType> &vector,
  *   vector that will be part of this view.
  * @param[in] size_of_view
  *
- * @pre <code>starting_index + size_of_view <= vector.size()
+ * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *
  * @relates ArrayView
  */

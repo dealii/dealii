@@ -1098,6 +1098,7 @@ public:
    *
    * where @f[ J^{\dagger} = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
    * @f]
+   * </ul>
    *
    * Hessians of spacedim-vector valued differentiable functions are
    * transformed this way (After subtraction of the product of the

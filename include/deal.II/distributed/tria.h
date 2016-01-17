@@ -921,7 +921,7 @@ namespace parallel
        * weights before repartitioning occurs. Called from
        * execute_coarsening_and_refinement() and repartition().
        *
-       * @param return A vector of unsigned integers representing the weight or
+       * @return A vector of unsigned integers representing the weight or
        * computational load of every cell after the refinement/coarsening/
        * repartition cycle. Note that the number of entries does not need to
        * be equal to either n_active_cells or n_locally_owned_active_cells,

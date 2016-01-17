@@ -47,7 +47,7 @@ namespace LinearAlgebra
    * C++ standard library, this class implements an element of a vector space
    * suitable for numerical computations.
    *
-   * @authod Bruno Turcksin, 2015.
+   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class Vector : public ReadWriteVector<Number>, public VectorSpaceVector<Number>

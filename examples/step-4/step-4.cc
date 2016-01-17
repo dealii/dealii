@@ -179,7 +179,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 }
 
 
-// As boundary values, we choose x*x+y*y in 2D, and x*x+y*y+z*z in 3D. This
+// As boundary values, we choose $x^2+y^2$ in 2D, and $x^2+y^2+z^2$ in 3D. This
 // happens to be equal to the square of the vector from the origin to the
 // point at which we would like to evaluate the function, irrespective of the
 // dimension. So that is what we return:

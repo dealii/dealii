@@ -978,7 +978,7 @@ namespace GridGenerator
    *   dim==2, then the cells are quadrilaterals that either live in the
    *   plane, or form a surface in a higher-dimensional space. The dimension
    *   of the cells of the surface mesh is consequently dim-1.
-   * @param spacedim The dimension of the space in which both the volume and
+   * @tparam spacedim The dimension of the space in which both the volume and
    *   the surface mesh live.
    *
    * @param[in] volume_mesh A container of cells that define the volume mesh.

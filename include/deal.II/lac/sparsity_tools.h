@@ -204,9 +204,13 @@ namespace SparsityTools
   /**
    * Similar to the function above, but for BlockDynamicSparsityPattern
    * instead.
+   *
+   * @param[in,out] dsp The locally built sparsity pattern to be modified.
 
    * @param owned_set_per_cpu Typically the value given by
    * DoFHandler::locally_owned_dofs_per_processor.
+   *
+   * @param mpi_comm The MPI communicator to use.
    *
    * @param myrange Typically the locally relevant DoFs.
    */
