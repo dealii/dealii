@@ -101,6 +101,71 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2)
+  {
+    push_back(fe1);
+    push_back(fe2);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3,
+                                            const FiniteElement<dim,spacedim> &fe4)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+    push_back(fe4);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3,
+                                            const FiniteElement<dim,spacedim> &fe4,
+                                            const FiniteElement<dim,spacedim> &fe5)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+    push_back(fe4);
+    push_back(fe5);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::
+  FECollection (const std::vector<const FiniteElement<dim,spacedim>*>  &fes)
+  {
+    Assert (fes.size() > 0,
+            ExcMessage ("Need to pass at least one finite element."));
+
+    for (unsigned int i = 0; i < fes.size(); ++i)
+      push_back(*fes[i]);
+  }
+
+
+
+  template <int dim, int spacedim>
   FECollection<dim,spacedim>::
   FECollection (const FECollection<dim,spacedim> &fe_collection)
     :
