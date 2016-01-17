@@ -1190,13 +1190,16 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
       out << '\n';
     }
 
-  // write faces and lines with
-  // non-zero boundary indicator
-  unsigned int next_index = tria.n_active_cells()+1;
+  // write faces and lines with non-zero boundary indicator
+  unsigned int next_element_index = tria.n_active_cells()+1;
   if (ucd_flags.write_faces)
-    write_ucd_faces (tria, next_index, out);
+    {
+      next_element_index = write_ucd_faces (tria, next_element_index, out);
+    }
   if (ucd_flags.write_lines)
-    write_ucd_lines (tria, next_index, out);
+    {
+      next_element_index = write_ucd_lines (tria, next_element_index, out);
+    }
 
   // make sure everything now gets to
   // disk
@@ -2764,7 +2767,7 @@ GridOut::write_msh_lines (const Triangulation<dim,spacedim> &tria,
           &&
           (cell->line(l)->user_flag_set() == false))
         {
-          out << current_element_index << " 1 ";
+          out << next_element_index << " 1 ";
           out << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << ' '
               << static_cast<unsigned int>(cell->line(l)->boundary_id())
@@ -2793,80 +2796,89 @@ GridOut::write_msh_lines (const Triangulation<dim,spacedim> &tria,
 
 
 
-void GridOut::write_ucd_faces (const Triangulation<1> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_faces (const Triangulation<1> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
 }
 
-void GridOut::write_ucd_faces (const Triangulation<1,2> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_faces (const Triangulation<1,2> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
 }
 
-void GridOut::write_ucd_faces (const Triangulation<1,3> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_faces (const Triangulation<1,3> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
 }
 
-void GridOut::write_ucd_lines (const Triangulation<1> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_lines (const Triangulation<1> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
 }
 
-void GridOut::write_ucd_lines (const Triangulation<1,2> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_lines (const Triangulation<1,2> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
-}
-
-
-void GridOut::write_ucd_lines (const Triangulation<1,3> &,
-                               const unsigned int,
-                               std::ostream &) const
-{
-  return;
+  return next_element_index;
 }
 
 
-void GridOut::write_ucd_lines (const Triangulation<2> &,
-                               const unsigned int,
-                               std::ostream &) const
+unsigned int
+GridOut::write_ucd_lines (const Triangulation<1,3> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
 }
 
-void GridOut::write_ucd_lines (const Triangulation<2,3> &,
-                               const unsigned int,
-                               std::ostream &) const
+
+unsigned int
+GridOut::write_ucd_lines (const Triangulation<2> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
 {
-  return;
+  return next_element_index;
+}
+
+unsigned int
+GridOut::write_ucd_lines (const Triangulation<2,3> &,
+                          const unsigned int next_element_index,
+                          std::ostream &) const
+{
+  return next_element_index;
 }
 
 
 
 template <int dim, int spacedim>
-void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
-                               const unsigned int        starting_index,
-                               std::ostream             &out) const
+unsigned int
+GridOut::write_ucd_faces (const Triangulation<dim,spacedim> &tria,
+                          const unsigned int                 next_element_index,
+                          std::ostream                      &out) const
 {
+  unsigned int current_element_index = next_element_index;
   typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
-  unsigned int index=starting_index;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if (face->at_boundary() &&
         (face->boundary_id() != 0))
       {
-        out << index << "  "
+        out << current_element_index << "  "
             << static_cast<unsigned int>(face->boundary_id())
             << "  ";
         switch (dim)
@@ -2885,17 +2897,20 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
           out << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1 << ' ';
         out << '\n';
 
-        ++index;
+        ++current_element_index;
       }
+  return current_element_index;
 }
 
 
 
 template <int dim, int spacedim>
-void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
-                               const unsigned int        starting_index,
-                               std::ostream             &out) const
+unsigned int
+GridOut::write_ucd_lines(const Triangulation<dim, spacedim> &tria,
+                         const unsigned int                  next_element_index,
+                         std::ostream                       &out) const
 {
+  unsigned int current_element_index = next_element_index;
   // save the user flags for lines so
   // we can use these flags to track
   // which ones we've already taken
@@ -2907,7 +2922,6 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
   .clear_user_flags_line ();
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
-  unsigned int index=starting_index;
 
   for (cell=tria.begin_active(), endc=tria.end();
        cell != endc; ++cell)
@@ -2918,7 +2932,7 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
           &&
           (cell->line(l)->user_flag_set() == false))
         {
-          out << index << "  "
+          out << current_element_index << "  "
               << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << "  line    ";
           // note: vertex numbers in ucd format are 1-base
@@ -2930,7 +2944,7 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
           // move on to the next line
           // but mark the current one
           // as taken care of
-          ++index;
+          ++current_element_index;
           cell->line(l)->set_user_flag();
         }
 
@@ -2938,6 +2952,7 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
   // flags for the lines
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
   .load_user_flags_line (line_flags);
+  return current_element_index;
 }
 
 
