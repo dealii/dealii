@@ -1196,8 +1196,7 @@ namespace Patterns
  *
  *
  *     void LinEq::declare_parameters (ParameterHandler &prm) {
- *                                        // declare parameters for the linear
- *                                        // solver in a subsection
+ *       // declare parameters for the linear solver in a subsection
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
@@ -1221,7 +1220,7 @@ namespace Patterns
  *
  *
  *     void Problem::declare_parameters (ParameterHandler &prm) {
- *                                        // first some global parameter entries
+ *       // first some global parameter entries
  *       prm.declare_entry ("Output file",
  *                          "out",
  *                          Patterns::Anything(),
@@ -1235,8 +1234,7 @@ namespace Patterns
  *                          "Elasticity",
  *                          Patterns::Anything());
  *
- *                                        // declare parameters for the
- *                                        // first equation
+ *       // declare parameters for the first equation
  *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
@@ -1246,8 +1244,7 @@ namespace Patterns
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
  *
- *                                        // declare parameters for the
- *                                        // second equation
+ *       // declare parameters for the second equation
  *       prm.enter_subsection ("Equation 2");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
@@ -1258,24 +1255,22 @@ namespace Patterns
  *
  *
  *     void Problem::get_parameters (ParameterHandler &prm) {
- *                                        // entries of the problem class
+ *       // entries of the problem class
  *       outfile = prm.get ("Output file");
  *
  *       std::string equation1 = prm.get ("Equation 1"),
  *              equation2 = prm.get ("Equation 2");
  *
- *                                        // get parameters for the
- *                                        // first equation
+ *       // get parameters for the first equation
  *       prm.enter_subsection ("Equation 1");
  *       Matrix1 = prm.get ("Matrix type");
- *       eq1.get_parameters (prm);         // for eq1
+ *       eq1.get_parameters (prm); // for eq1
  *       prm.leave_subsection ();
  *
- *                                        // get parameters for the
- *                                        // second equation
+ *       // get parameters for the second equation
  *       prm.enter_subsection ("Equation 2");
  *       Matrix2 = prm.get ("Matrix type");
- *       eq2.get_parameters (prm);         // for eq2
+ *       eq2.get_parameters (prm); // for eq2
  *       prm.leave_subsection ();
  *
  *       std::cout << "  Problem: outfile=" << outfile << std::endl
@@ -1292,21 +1287,20 @@ namespace Patterns
  *
  *       p.declare_parameters (prm);
  *
- *                                        // read input from "prmtest.prm"; giving
- *                                        // argv[1] would also be a good idea
+ *       // read input from "prmtest.prm"; giving argv[1] would also be a
+ *       // good idea
  *       prm.read_input ("prmtest.prm");
  *
- *                                        // print parameters to std::cout as ASCII text
+ *       // print parameters to std::cout as ASCII text
  *       std::cout << std::endl << std::endl;
  *       prm.print_parameters (std::cout, ParameterHandler::Text);
  *
- *                                        // get parameters into the program
+ *       // get parameters into the program
  *       std::cout << std::endl << std::endl
  *                 << "Getting parameters:" << std::endl;
  *       p.get_parameters (prm);
  *
- *                                        // now run the program with these
- *                                        // input parameters
+ *       // now run the program with these input parameters
  *       p.do_something ();
  *     }
  *   @endcode
@@ -1314,13 +1308,13 @@ namespace Patterns
  *
  * This is the input file (named "prmtest.prm"):
  *   @code
- *                                 # first declare the types of equations
+ *     # first declare the types of equations
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
  *
  *     subsection Equation 1
  *       set Matrix type = Sparse
- *       subsection Linear solver    # parameters for linear solver 1
+ *       subsection Linear solver # parameters for linear solver 1
  *         set Solver                       = Gauss-Seidel
  *         set Maximum number of iterations = 40
  *       end
