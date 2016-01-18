@@ -2820,28 +2820,6 @@ bool MultipleParameterLoop::read_input (std::istream &input,
 
 
 
-bool MultipleParameterLoop::read_input (const std::string &filename,
-                                        bool optional,
-                                        bool write_compact)
-{
-  return ParameterHandler::read_input (filename, optional, write_compact);
-  // don't call init_branches, since this read_input
-  // function calls
-  // MultipleParameterLoop::read_input(std::istream &, std::ostream &)
-  // which itself calls init_branches.
-}
-
-
-
-bool MultipleParameterLoop::read_input_from_string (const char *s)
-{
-  bool x = ParameterHandler::read_input (s);
-  init_branches ();
-  return x;
-}
-
-
-
 void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
 {
   for (unsigned int run_no=0; run_no<n_branches; ++run_no)

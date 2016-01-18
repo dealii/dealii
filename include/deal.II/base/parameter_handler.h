@@ -2264,30 +2264,23 @@ public:
    * from; this is only used when creating output for error messages.
    *
    * Return whether the read was successful.
+   *
+   * @note Of the three <tt>read_input</tt> functions implemented by
+   * ParameterHandler, this is the only one overridden with new behavior by
+   * this class. This is because the other two <tt>read_input</tt> functions
+   * just reformat their inputs and then call this version.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file");
 
   /**
-   * Read input from a file the name of which is given. The PathSearch class
-   * "PARAMETERS" is used to find the file.
-   *
-   * Return whether the read was successful.
-   *
-   * Unless <tt>optional</tt> is <tt>true</tt>, this function will
-   * automatically generate the requested file with default values if the file
-   * did not exist. This file will not contain additional comments if
-   * <tt>write_stripped_file</tt> is <tt>true</tt>.
+   * Overriding virtual functions which are overloaded (like
+   * ParameterHandler::read_input, which has two different sets of input
+   * argument types) causes the non-overridden functions to be hidden. Get
+   * around this by explicitly using both variants of
+   * ParameterHandler::read_input and then overriding the one we care about.
    */
-  virtual bool read_input (const std::string &FileName,
-                           const bool optional = false,
-                           const bool write_stripped_file = false);
-
-  /**
-   * Read input from a string in memory. The lines in memory have to be
-   * separated by <tt>@\n</tt> characters.
-   */
-  virtual bool read_input_from_string (const char *s);
+  using ParameterHandler::read_input;
 
   /**
    * run the central loop.
