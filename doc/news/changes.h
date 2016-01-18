@@ -579,6 +579,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: GridOut::write_msh() and GridOut::write_ucd() used the same
+  geometric element numbers for lines and faces. This caused visualization
+  programs to ignore parts with repeated geometric element numbers. This is now
+  fixed.
+  <br>
+  (David Wells, 2016/01/16)
+  </li>
+
   <li> New: DoFTools::extract_dofs() are now instantiated also for
   codimension different from zero.
   <br>
