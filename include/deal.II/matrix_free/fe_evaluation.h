@@ -6020,9 +6020,11 @@ namespace internal
                 if (integrate_grad == true)
                   eval.template gradients<0,false,true> (gradients_quad[c][0], temp1);
                 eval.template values<1,false,false>(temp1, temp2);
-                eval.template values<0,false,false> (gradients_quad[c][d1], temp1);
                 if (integrate_grad == true)
-                  eval.template gradients<1,false,true>(temp1, temp2);
+                  {
+                    eval.template values<0,false,false> (gradients_quad[c][d1], temp1);
+                    eval.template gradients<1,false,true>(temp1, temp2);
+                  }
                 eval.template values<2,false,false> (temp2, values_dofs[c]);
               }
             else if (integrate_grad == true)
