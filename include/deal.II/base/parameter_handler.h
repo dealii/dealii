@@ -32,18 +32,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: Allow long input lines to be broken by appending a backslash character
-
-
-// public classes; to be declared below
-class ParameterHandler;
-class MultipleParameterLoop;
-
-
-
-// forward declaration
+// forward declarations for interfaces and friendship
 class LogStream;
-
+class MultipleParameterLoop;
 
 
 /**
