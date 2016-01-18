@@ -1173,29 +1173,32 @@ namespace Patterns
  *
  *     using namespace dealii;
  *
- *     class LinEq {
- *       public:
- *         static void declare_parameters (ParameterHandler &prm);
- *         void get_parameters (ParameterHandler &prm);
- *       private:
- *         std::string Method;
- *         int    MaxIterations;
+ *     class LinEq
+ *     {
+ *     public:
+ *       static void declare_parameters (ParameterHandler &prm);
+ *       void get_parameters (ParameterHandler &prm);
+ *     private:
+ *       std::string Method;
+ *       int    MaxIterations;
  *     };
  *
  *
- *     class Problem {
- *       private:
- *         LinEq eq1, eq2;
- *         std::string Matrix1, Matrix2;
- *         std::string outfile;
- *       public:
- *         static void declare_parameters (ParameterHandler &prm);
- *         void get_parameters (ParameterHandler &prm);
+ *     class Problem
+ *     {
+ *     private:
+ *       LinEq eq1, eq2;
+ *       std::string Matrix1, Matrix2;
+ *       std::string outfile;
+ *     public:
+ *       static void declare_parameters (ParameterHandler &prm);
+ *       void get_parameters (ParameterHandler &prm);
  *     };
  *
  *
  *
- *     void LinEq::declare_parameters (ParameterHandler &prm) {
+ *     void LinEq::declare_parameters (ParameterHandler &prm)
+ *     {
  *       // declare parameters for the linear solver in a subsection
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
@@ -1209,7 +1212,8 @@ namespace Patterns
  *     }
  *
  *
- *     void LinEq::get_parameters (ParameterHandler &prm) {
+ *     void LinEq::get_parameters (ParameterHandler &prm)
+ *     {
  *       prm.enter_subsection ("Linear solver");
  *       Method        = prm.get ("Solver");
  *       MaxIterations = prm.get_integer ("Maximum number of iterations");
@@ -1219,7 +1223,8 @@ namespace Patterns
  *
  *
  *
- *     void Problem::declare_parameters (ParameterHandler &prm) {
+ *     void Problem::declare_parameters (ParameterHandler &prm)
+ *     {
  *       // first some global parameter entries
  *       prm.declare_entry ("Output file",
  *                          "out",
@@ -1254,7 +1259,8 @@ namespace Patterns
  *     }
  *
  *
- *     void Problem::get_parameters (ParameterHandler &prm) {
+ *     void Problem::get_parameters (ParameterHandler &prm)
+ *     {
  *       // entries of the problem class
  *       outfile = prm.get ("Output file");
  *
@@ -1273,15 +1279,16 @@ namespace Patterns
  *       eq2.get_parameters (prm); // for eq2
  *       prm.leave_subsection ();
  *
- *       std::cout << "  Problem: outfile=" << outfile << std::endl
- *            << "           eq1="     << equation1 << ", eq2=" << equation2 << std::endl
- *            << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
+ *       std::cout << "  Problem: outfile=" << outfile << '\n'
+ *                 << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
+ *                 << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
  *     }
  *
  *
  *
  *
- *     void main () {
+ *     int main ()
+ *     {
  *       ParameterHandler prm;
  *       Problem p;
  *
@@ -2051,41 +2058,45 @@ private:
  * is created which is then called. Taking the classes of the example for the
  * ParameterHandler class, the extended program would look like this:
  *   @code
- *     class HelperClass : public MultipleParameterLoop::UserClass {
- *       public:
- *         HelperClass ();
+ *     class HelperClass : public MultipleParameterLoop::UserClass
+ *     {
+ *     public:
+ *       HelperClass ();
  *
- *         virtual void create_new (const unsigned int run_no);
- *         virtual void run (ParameterHandler &prm);
+ *       virtual void create_new (const unsigned int run_no);
+ *       virtual void run (ParameterHandler &prm);
  *
- *         static void declare_parameters (ParameterHandler &prm);
- *       private:
- *         Problem *p;
+ *       static void declare_parameters (ParameterHandler &prm);
+ *     private:
+ *       std_cxx11::shared_ptr<Problem> p;
  *     };
  *
  *
  *     HelperClass::HelperClass () : p(0) {}
  *
  *
- *     void HelperClass::create_new (const unsigned int run_no) {
- *       if (p) delete p;
- *       p = new Problem;
+ *     void HelperClass::create_new (const unsigned int run_no)
+ *     {
+ *       p.reset(new Problem());
  *     }
  *
  *
- *     void HelperClass::declare_parameters (ParameterHandler &prm) {
+ *     void HelperClass::declare_parameters (ParameterHandler &prm)
+ *     {
  *       Problem::declare_parameters (prm);
  *     }
  *
  *
- *     void HelperClass::run (ParameterHandler &prm) {
+ *     void HelperClass::run (ParameterHandler &prm)
+ *     {
  *       p->get_parameters (prm);
  *       p->do_useful_work ();
  *     }
  *
  *
  *
- *     int main () {
+ *     int main ()
+ *     {
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
  *       HelperClass::declare_parameters (prm);
