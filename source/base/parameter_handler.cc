@@ -1341,7 +1341,7 @@ bool ParameterHandler::read_input (std::istream &input,
   unsigned int current_line_n = 0;
   bool status = true;
 
-  while (getline (input, line))
+  while (std::getline (input, line))
     {
       ++current_line_n;
       status &= scan_line (line, filename, current_line_n);
