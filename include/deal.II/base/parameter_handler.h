@@ -1982,20 +1982,20 @@ private:
   std::string get_current_full_path (const std::string &name) const;
 
   /**
-   * Scan one line of input. <tt>input_filename</tt> and <tt>lineno</tt> are
-   * the name of the input file and the current number of the line presently
-   * scanned (for the logs if there are messages). Return <tt>false</tt> if
-   * line contained stuff that could not be understood, the uppermost
-   * subsection was to be left by an <tt>END</tt> or <tt>end</tt> statement, a
-   * value for a non-declared entry was given or the entry value did not match
-   * the regular expression. <tt>true</tt> otherwise.
+   * Scan one line of input. <tt>input_filename</tt> and <tt>current_line_n</tt>
+   * are the name of the input file and the current number of the line presently
+   * scanned (for the logs if there are messages). Return <tt>false</tt> if line
+   * contained stuff that could not be understood, the uppermost subsection was
+   * to be left by an <tt>END</tt> or <tt>end</tt> statement, a value for a
+   * non-declared entry was given or the entry value did not match the regular
+   * expression. <tt>true</tt> otherwise.
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
    */
   bool scan_line (std::string         line,
                   const std::string  &input_filename,
-                  const unsigned int  lineno);
+                  const unsigned int  current_line_n);
 
   friend class MultipleParameterLoop;
 };

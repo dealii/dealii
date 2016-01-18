@@ -1338,13 +1338,13 @@ bool ParameterHandler::read_input (std::istream &input,
   std::vector<std::string> saved_path = subsection_path;
 
   std::string line;
-  int lineno=0;
+  unsigned int current_line_n = 0;
   bool status = true;
 
   while (getline (input, line))
     {
-      ++lineno;
-      status &= scan_line (line, filename, lineno);
+      ++current_line_n;
+      status &= scan_line (line, filename, current_line_n);
     }
 
   if (status && (saved_path != subsection_path))
@@ -2559,7 +2559,7 @@ ParameterHandler::log_parameters_section (LogStream &out)
 bool
 ParameterHandler::scan_line (std::string         line,
                              const std::string  &input_filename,
-                             const unsigned int  lineno)
+                             const unsigned int  current_line_n)
 {
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
@@ -2588,7 +2588,7 @@ ParameterHandler::scan_line (std::string         line,
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: There is no such subsection to be entered: "
                     << demangle(get_current_full_path(subsection)) << std::endl;
@@ -2615,7 +2615,7 @@ ParameterHandler::scan_line (std::string         line,
 
       if (line.size()>0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: invalid content after 'end'!" << std::endl;
           return false;
@@ -2623,7 +2623,7 @@ ParameterHandler::scan_line (std::string         line,
 
       if (subsection_path.size() == 0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: There is no subsection to leave here!" << std::endl;
           return false;
@@ -2646,7 +2646,7 @@ ParameterHandler::scan_line (std::string         line,
       std::string::size_type pos = line.find("=");
       if (pos == std::string::npos)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: invalid format of set expression!" << std::endl;
           return false;
@@ -2663,7 +2663,7 @@ ParameterHandler::scan_line (std::string         line,
         {
           if (entries->get<std::string>(path + path_separator + "deprecation_status") == "true")
             {
-              std::cerr << "Warning in line <" << lineno
+              std::cerr << "Warning in line <" << current_line_n
                         << "> of file <" << input_filename
                         << ">: You are using the deprecated spelling <"
                         << entry_name
@@ -2689,7 +2689,7 @@ ParameterHandler::scan_line (std::string         line,
                 = entries->get<unsigned int> (path + path_separator + "pattern");
               if (!patterns[pattern_index]->match(entry_value))
                 {
-                  std::cerr << "Line <" << lineno
+                  std::cerr << "Line <" << current_line_n
                             << "> of file <" << input_filename
                             << ">:" << std::endl
                             << "    The entry value" << std::endl
@@ -2709,7 +2709,7 @@ ParameterHandler::scan_line (std::string         line,
         }
       else
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: No such entry was declared:" << std::endl
                     << "    " << entry_name << std::endl
@@ -2735,7 +2735,7 @@ ParameterHandler::scan_line (std::string         line,
       // the remainder must then be a filename
       if (line.size() == 0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << "> is an include statement but does not name a file!"
                     << std::endl;
@@ -2746,7 +2746,7 @@ ParameterHandler::scan_line (std::string         line,
       std::ifstream input (line.c_str());
       if (!input)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << "> is an include statement but the file <"
                     << line << "> could not be opened!"
@@ -2759,7 +2759,7 @@ ParameterHandler::scan_line (std::string         line,
     }
 
   // this line matched nothing known
-  std::cerr << "Line <" << lineno
+  std::cerr << "Line <" << current_line_n
             << "> of file <" << input_filename
             << ">: This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
             << "    " << line << std::endl;
