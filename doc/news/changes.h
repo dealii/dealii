@@ -198,6 +198,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: hp::FECollection now has constructors which take
+  multiple finite elements as arguments.
+  <br>
+  (Angel Rodriguez, 2016/01/18)
+  </li>
+
   <li> New: The glossary now contains a long entry describing what
   the term "scalability" means in the context of finite element codes.
   See @ref GlossParallelScaling.
