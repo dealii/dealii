@@ -3405,9 +3405,6 @@ namespace parallel
           // processor, also mark them.
           for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(); cell!=this->end(); ++cell)
             {
-              if (cell->level_subdomain_id() == numbers::artificial_subdomain_id)
-                continue;
-
               bool cell_level_mine = cell->level_subdomain_id() == this->locally_owned_subdomain();
 
               for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
