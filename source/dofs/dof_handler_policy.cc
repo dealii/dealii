@@ -1533,6 +1533,26 @@ namespace internal
 
                 }
 
+              // Finally, if we are neighboring a coarser cell, add them to
+              // the destination list
+              if (dealii_cell->active())
+                {
+                  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+                    {
+                      if (dealii_cell->at_boundary(f))
+                        continue;
+                      typename DoFHandler<dim,spacedim>::level_cell_iterator neighbor = dealii_cell->neighbor(f);
+                      if (neighbor->level()>=level)
+                        continue;
+
+                      dealii::types::subdomain_id dest = neighbor->level_subdomain_id();
+                      Assert(dest != dealii::numbers::artificial_subdomain_id, ExcInternalError());
+                      if (dest != tria.locally_owned_subdomain())
+                        send_to.insert(dest);
+
+                    }
+                }
+
 
               // send if we have something to send
               if (send_to.size() > 0)
@@ -1981,24 +2001,23 @@ namespace internal
           cellmap_t;
           cellmap_t needs_to_get_cells;
 
-          if (level < tr->n_levels())
-            for (typename DoFHandler<dim,spacedim>::level_cell_iterator
-                 cell = dof_handler.begin(0);
-                 cell != dof_handler.end(0);
-                 ++cell)
-              {
-                typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-                internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          for (typename DoFHandler<dim,spacedim>::level_cell_iterator
+               cell = dof_handler.begin(0);
+               cell != dof_handler.end(0);
+               ++cell)
+            {
+              typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+              internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
-                fill_mg_dofindices_recursively<dim,spacedim>
-                (*tr,
-                 coarse_cell_to_p4est_tree_permutation[cell->index()],
-                 cell,
-                 p4est_coarse_cell,
-                 vertices_with_ghost_neighbors,
-                 needs_to_get_cells,
-                 level);
-              }
+              fill_mg_dofindices_recursively<dim,spacedim>
+              (*tr,
+               coarse_cell_to_p4est_tree_permutation[cell->index()],
+               cell,
+               p4est_coarse_cell,
+               vertices_with_ghost_neighbors,
+               needs_to_get_cells,
+               level);
+            }
 
 
           //sending
@@ -2032,44 +2051,42 @@ namespace internal
             }
 
 
-          // mark all own cells, that miss some
-          // dof_data and collect the neighbors
-          // that are going to send stuff to us
+          // mark all own cells, that miss some dof_data and collect the
+          // neighbors that are going to send stuff to us
           std::set<dealii::types::subdomain_id> senders;
-          if (level < tr->n_levels())
-            {
-              std::vector<dealii::types::global_dof_index> local_dof_indices;
-              typename DoFHandler<dim,spacedim>::level_cell_iterator
-              cell, endc = dof_handler.end(level);
+          {
+            std::vector<dealii::types::global_dof_index> local_dof_indices;
+            typename DoFHandler<dim,spacedim>::level_cell_iterator
+            cell, endc = dof_handler.end(level);
 
-              for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                {
-                  if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
-                    {
-                      //artificial
-                    }
-                  else if (cell->level_subdomain_id()==dof_handler.get_triangulation().locally_owned_subdomain())
-                    {
-                      //own
-                      local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-                      cell->get_mg_dof_indices (local_dof_indices);
-                      if (local_dof_indices.end() !=
-                          std::find (local_dof_indices.begin(),
-                                     local_dof_indices.end(),
-                                     DoFHandler<dim,spacedim>::invalid_dof_index))
-                        cell->set_user_flag();
-                      else
-                        cell->clear_user_flag();
-                    }
-                  else
-                    {
-                      //ghost
-                      if (cell->user_flag_set())
-                        senders.insert(cell->level_subdomain_id());
-                    }
-                }
+            for (cell = dof_handler.begin(level); cell != endc; ++cell)
+              {
+                if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
+                  {
+                    //artificial
+                  }
+                else if (cell->level_subdomain_id()==dof_handler.get_triangulation().locally_owned_subdomain())
+                  {
+                    //own
+                    local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+                    cell->get_mg_dof_indices (local_dof_indices);
+                    if (local_dof_indices.end() !=
+                        std::find (local_dof_indices.begin(),
+                                   local_dof_indices.end(),
+                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                      cell->set_user_flag();
+                    else
+                      cell->clear_user_flag();
+                  }
+                else
+                  {
+                    //ghost
+                    if (cell->user_flag_set())
+                      senders.insert(cell->level_subdomain_id());
+                  }
+              }
 
-            }
+          }
 
 
           //* 5. receive ghostcelldata
