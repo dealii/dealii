@@ -26,11 +26,11 @@ DEAL:0::{[0,17], 21}
 DEAL:0::ok ok 
 DEAL:0::Level 3:
 DEAL:0::get_refinement_edge_indices:
-DEAL:0::{}
+DEAL:0::{0, 2, [6,7]}
 DEAL:0::get_boundary_indices:
-DEAL:0::{}
+DEAL:0::{[0,1]}
 DEAL:0::relevant:
-DEAL:0::{}
+DEAL:0::{[0,3], [6,7]}
 DEAL:0::ok ok 
 
 DEAL:1::FE_Q<2>(1)

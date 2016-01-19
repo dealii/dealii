@@ -3400,25 +3400,40 @@ namespace parallel
           // unless the neighbor is active and coarser. It can end up on a
           // different processor. Luckily, the level_subdomain_id can be
           // figured out without communication, because the cell is active
-          // (and so level_subdomain_id=subdomain_id):
+          // (and so level_subdomain_id=subdomain_id). Finally, also consider
+          // the opposite case: if we are the coarser neighbor for another
+          // processor, also mark them.
           for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(); cell!=this->end(); ++cell)
             {
-              if (cell->level_subdomain_id()!=this->locally_owned_subdomain())
+              if (cell->level_subdomain_id() == numbers::artificial_subdomain_id)
                 continue;
+
+              bool cell_level_mine = cell->level_subdomain_id() == this->locally_owned_subdomain();
 
               for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
                 {
-                  if (cell->face(f)->at_boundary())
+                  if (cell->face(f)->at_boundary() || cell->neighbor(f)->level() >= cell->level())
                     continue;
-                  if (cell->neighbor(f)->level() < cell->level()
-                      &&
-                      cell->neighbor(f)->level_subdomain_id()!=this->locally_owned_subdomain())
+
+                  bool neighbor_level_mine = cell->neighbor(f)->level_subdomain_id() == this->locally_owned_subdomain();
+
+                  if (cell_level_mine && !neighbor_level_mine)
                     {
+                      // set the neighbor level_id up
                       Assert(cell->neighbor(f)->active(), ExcInternalError());
                       Assert(cell->neighbor(f)->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
                       Assert(cell->neighbor(f)->level_subdomain_id() == numbers::artificial_subdomain_id
                              || cell->neighbor(f)->level_subdomain_id() == cell->neighbor(f)->subdomain_id(), ExcInternalError());
                       cell->neighbor(f)->set_level_subdomain_id(cell->neighbor(f)->subdomain_id());
+                    }
+                  else if (!cell_level_mine && neighbor_level_mine)
+                    {
+                      // set the current cell up because it is a neighbor for us
+                      Assert(cell->active(), ExcInternalError());
+                      Assert(cell->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
+                      Assert(cell->level_subdomain_id() == numbers::artificial_subdomain_id
+                             || cell->level_subdomain_id() == cell->subdomain_id(), ExcInternalError());
+                      cell->set_level_subdomain_id(cell->subdomain_id());
                     }
                 }
 
