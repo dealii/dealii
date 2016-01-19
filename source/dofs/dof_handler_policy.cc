@@ -1542,7 +1542,7 @@ namespace internal
                       if (dealii_cell->at_boundary(f))
                         continue;
                       typename DoFHandler<dim,spacedim>::level_cell_iterator neighbor = dealii_cell->neighbor(f);
-                      if (neighbor->level()>=level)
+                      if (neighbor->level()>=dealii_cell->level())
                         continue;
 
                       dealii::types::subdomain_id dest = neighbor->level_subdomain_id();
