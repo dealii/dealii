@@ -3025,7 +3025,8 @@ next_cell:
                                        ExcInternalError());
                               }
                           }
-                        // The parent cell which its children are added into map, should be deleted from map
+                        // The parent cell whose children were added
+                        // into the map should be deleted from the map
                         patch_to_global_tria_map_tmp.erase(cell);
                       }
                   }
