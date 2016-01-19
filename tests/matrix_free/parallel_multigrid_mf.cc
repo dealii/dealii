@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014-2015 by the deal.II authors
+// Copyright (C) 2014-2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,7 +12,6 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
-
 
 
 // same test as parallel_multigrid but using matrix-free transfer operations
@@ -43,8 +42,6 @@
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
-
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, typename number=double>

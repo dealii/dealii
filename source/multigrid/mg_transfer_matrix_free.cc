@@ -340,7 +340,10 @@ void MGTransferMatrixFree<dim,Number>::build
           bool cell_is_remote = !consider_cell;
           for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
             if (cell->child(c)->level_subdomain_id()==tria.locally_owned_subdomain())
-              consider_cell = true;
+              {
+                consider_cell = true;
+                break;
+              }
 
           if (!consider_cell)
             continue;

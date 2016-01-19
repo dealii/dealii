@@ -90,10 +90,10 @@ public:
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param src is a vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
    *
-   * @arg dst has as many elements as there are degrees of freedom on the
+   * @param dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
   virtual void prolongate (const unsigned int                           to_level,
@@ -102,17 +102,17 @@ public:
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
-   * <tt>from_level-1</tt> using the transpose operation of the @p prolongate
+   * <tt>from_level-1</tt> using the transpose operation of the prolongate()
    * method. If the region covered by cells on level <tt>from_level</tt> is
    * smaller than that of level <tt>from_level-1</tt> (local refinement), then
    * some degrees of freedom in <tt>dst</tt> are active and will not be
    * altered. For the other degrees of freedom, the result of the restriction
    * is added.
    *
-   * @arg src is a vector with as many elements as there are degrees of
+   * @param src is a vector with as many elements as there are degrees of
    * freedom on the finer level involved.
    *
-   * @arg dst has as many elements as there are degrees of freedom on the
+   * @param dst has as many elements as there are degrees of freedom on the
    * coarser level.
    */
   virtual void restrict_and_add (const unsigned int from_level,
@@ -170,13 +170,13 @@ private:
   std::vector<std::vector<unsigned int> > level_dof_indices;
 
   /**
-   * Stores the connectivity from parent to child cell numbers.
+   * Stores the connectivity from parent to child cell numbers for each level.
    */
   std::vector<std::vector<std::pair<unsigned int,unsigned int> > > parent_child_connect;
 
   /**
    * Stores the number of cells owned on a given process (sets the bounds for
-   * the worker loops).
+   * the worker loops) for each level.
    */
   std::vector<unsigned int> n_owned_level_cells;
 
@@ -198,11 +198,16 @@ private:
    * elements they appear. We store the data in vectorized form to allow for
    * cheap access. Moreover, we utilize the fact that we only need to store
    * <tt>3<sup>dim</sup></tt> indices.
+   *
+   * Data is organized in terms of each level (outer vector) and the cells on
+   * each level (inner vector).
    */
   std::vector<AlignedVector<VectorizedArray<Number> > > weights_on_refined;
 
   /**
-   * Stores the local indices of Dirichlet boundary conditions on cells.
+   * Stores the local indices of Dirichlet boundary conditions on cells for
+   * all levels (outer index), the cells within the levels (second index), and
+   * the indices on the cell (inner index).
    */
   std::vector<std::vector<std::vector<unsigned short> > > dirichlet_indices;
 
