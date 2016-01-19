@@ -37,7 +37,7 @@ void check(const unsigned int fe_degree)
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...
-  unsigned int sizes [] = {1, 2, 3, 4};
+  unsigned int sizes [] = {1, 2, 3};
   for (unsigned int cycle=0; cycle<sizeof(sizes)/sizeof(unsigned int); ++cycle)
     {
       unsigned int n_refinements = 0;
@@ -48,7 +48,7 @@ void check(const unsigned int fe_degree)
             n_refinements += 1;
             n_subdiv /= 2;
           }
-      n_refinements += 6-2*dim;
+      n_refinements += 3-dim;
       if (fe_degree < 3)
         n_refinements += 1;
 
@@ -154,7 +154,8 @@ void check(const unsigned int fe_degree)
 
 int main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
+  // no threading in this test...
+  Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();
 
   check<2,double>(1);

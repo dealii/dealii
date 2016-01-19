@@ -131,7 +131,8 @@ void check(const unsigned int fe_degree)
 
 int main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
+  // no threading in this test...
+  Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();
 
   check<2,double>(1);

@@ -1,95 +1,5 @@
 
 DEAL::FE: FE_DGQ<2>(1)
-DEAL::no. cells: 250
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::
-DEAL::no. cells: 868
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff prolongate   l7: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::Diff restrict     l7: 0
-DEAL::Diff restrict add l7: 0
-DEAL::
-DEAL::no. cells: 1887
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::
-DEAL::no. cells: 3388
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff prolongate   l7: 0
-DEAL::Diff prolongate   l8: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::Diff restrict     l7: 0
-DEAL::Diff restrict add l7: 0
-DEAL::Diff restrict     l8: 0
-DEAL::Diff restrict add l8: 0
-DEAL::
-DEAL::FE: FE_DGQArbitraryNodes<2>(QGaussLobatto(4))
 DEAL::no. cells: 88
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
@@ -144,14 +54,27 @@ DEAL::Diff restrict add l4: 0
 DEAL::Diff restrict     l5: 0
 DEAL::Diff restrict add l5: 0
 DEAL::
-DEAL::no. cells: 868
+DEAL::FE: FE_DGQArbitraryNodes<2>(QGaussLobatto(4))
+DEAL::no. cells: 34
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
+DEAL::
+DEAL::no. cells: 88
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
 DEAL::Diff prolongate   l3: 0
 DEAL::Diff prolongate   l4: 0
 DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff prolongate   l7: 0
 DEAL::Diff restrict     l1: 0
 DEAL::Diff restrict add l1: 0
 DEAL::Diff restrict     l2: 0
@@ -162,10 +85,20 @@ DEAL::Diff restrict     l4: 0
 DEAL::Diff restrict add l4: 0
 DEAL::Diff restrict     l5: 0
 DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::Diff restrict     l7: 0
-DEAL::Diff restrict add l7: 0
+DEAL::
+DEAL::no. cells: 141
+DEAL::Diff prolongate   l1: 0
+DEAL::Diff prolongate   l2: 0
+DEAL::Diff prolongate   l3: 0
+DEAL::Diff prolongate   l4: 0
+DEAL::Diff restrict     l1: 0
+DEAL::Diff restrict add l1: 0
+DEAL::Diff restrict     l2: 0
+DEAL::Diff restrict add l2: 0
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
+DEAL::Diff restrict     l4: 0
+DEAL::Diff restrict add l4: 0
 DEAL::
 DEAL::FE: FE_DGQ<3>(1)
 DEAL::no. cells: 15
@@ -207,26 +140,6 @@ DEAL::Diff restrict add l3: 0
 DEAL::Diff restrict     l4: 0
 DEAL::Diff restrict add l4: 0
 DEAL::
-DEAL::no. cells: 3599
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::
 DEAL::FE: FE_DGQArbitraryNodes<3>(QGaussLobatto(4))
 DEAL::no. cells: 1
 DEAL::
@@ -249,7 +162,8 @@ DEAL::Diff restrict add l2: 0
 DEAL::Diff restrict     l3: 0
 DEAL::Diff restrict add l3: 0
 DEAL::
-DEAL::no. cells: 694
+DEAL::FE: FE_DGQ<2>(2)
+DEAL::no. cells: 88
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
 DEAL::Diff prolongate   l3: 0
@@ -266,7 +180,6 @@ DEAL::Diff restrict add l4: 0
 DEAL::Diff restrict     l5: 0
 DEAL::Diff restrict add l5: 0
 DEAL::
-DEAL::FE: FE_DGQ<2>(2)
 DEAL::no. cells: 250
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
@@ -287,14 +200,12 @@ DEAL::Diff restrict add l5: 0
 DEAL::Diff restrict     l6: 0
 DEAL::Diff restrict add l6: 0
 DEAL::
-DEAL::no. cells: 868
+DEAL::no. cells: 510
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
 DEAL::Diff prolongate   l3: 0
 DEAL::Diff prolongate   l4: 0
 DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff prolongate   l7: 0
 DEAL::Diff restrict     l1: 0
 DEAL::Diff restrict add l1: 0
 DEAL::Diff restrict     l2: 0
@@ -305,56 +216,6 @@ DEAL::Diff restrict     l4: 0
 DEAL::Diff restrict add l4: 0
 DEAL::Diff restrict     l5: 0
 DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::Diff restrict     l7: 0
-DEAL::Diff restrict add l7: 0
-DEAL::
-DEAL::no. cells: 1887
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::
-DEAL::no. cells: 3388
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff prolongate   l7: 0
-DEAL::Diff prolongate   l8: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
-DEAL::Diff restrict     l7: 0
-DEAL::Diff restrict add l7: 0
-DEAL::Diff restrict     l8: 0
-DEAL::Diff restrict add l8: 0
 DEAL::
 DEAL::FE: FE_DGQ<3>(2)
 DEAL::no. cells: 15
@@ -395,24 +256,4 @@ DEAL::Diff restrict     l3: 0
 DEAL::Diff restrict add l3: 0
 DEAL::Diff restrict     l4: 0
 DEAL::Diff restrict add l4: 0
-DEAL::
-DEAL::no. cells: 3599
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
 DEAL::
