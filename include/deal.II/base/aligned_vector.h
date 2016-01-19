@@ -429,7 +429,7 @@ namespace internal
     // copy assignment operation
     void copy_construct_or_assign(const std::size_t begin,
                                   const std::size_t end,
-                                  internal::bool2type<false>) const
+                                  ::dealii::internal::bool2type<false>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         destination_[i] = element_;
@@ -438,7 +438,7 @@ namespace internal
     // copy constructor (memory initialization)
     void copy_construct_or_assign(const std::size_t begin,
                                   const std::size_t end,
-                                  internal::bool2type<true>) const
+                                  ::dealii::internal::bool2type<true>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         new (&destination_[i]) T(element_);
