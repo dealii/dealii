@@ -47,10 +47,10 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain> linear_operator (const Matrix &);
 
-template <typename Domain = Vector<double>,
-          typename Range = Domain>
-LinearOperator<Domain, Range>
-null_operator(const LinearOperator<Domain, Range> &);
+template <typename Range = Vector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+null_operator(const LinearOperator<Range, Domain> &);
 
 
 /**
