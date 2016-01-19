@@ -170,13 +170,16 @@ namespace
       {
         // TODO: Searching the owner for every single DoF becomes quite
         // inefficient. Please fix this, Timo.
+        // The list of neighbors is symmetric (our neighbors have us as a neighbor),
+        // so we can use it to send and to know how many messages we will get.
         std::set<unsigned int> neighbors = tria->level_ghost_owners();
         std::map<int, std::vector<DoFPair> > send_data;
 
         // * find owners of the level dofs and insert into send_data accordingly
         for (typename std::vector<DoFPair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
           {
-            for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+            std::set<unsigned int>::iterator it;
+            for (it = neighbors.begin(); it != neighbors.end(); ++it)
               {
                 if (mg_dof.locally_owned_mg_dofs_per_processor(dofpair->level)[*it].is_element(dofpair->level_dof_index))
                   {
@@ -184,6 +187,9 @@ namespace
                     break;
                   }
               }
+            // Is this level dof not owned by any of our neighbors? That
+            // would certainly be a bug!
+            Assert(it!=neighbors.end(), ExcMessage("could not find DoF owner."));
           }
 
         // * send
@@ -194,6 +200,9 @@ namespace
               requests.push_back(MPI_Request());
               unsigned int dest = *it;
               std::vector<DoFPair> &data = send_data[dest];
+              // If there is nothing to send, we still need to send a message, because
+              // the receiving end will be waitng. In that case we just send
+              // an empty message.
               if (data.size())
                 MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
               else
@@ -203,6 +212,7 @@ namespace
 
         // * receive
         {
+          // We should get one message from each of our neighbors
           std::vector<DoFPair> receive_buffer;
           for (unsigned int counter=0; counter<neighbors.size(); ++counter)
             {
@@ -243,10 +253,16 @@ namespace
             MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
             requests.clear();
           }
+#ifdef DEBUG
+        // Make sure in debug mode, that everybody sent/received all packages
+        // on this level. If a deadlock occurs here, the list of expected
+        // senders is not computed correctly.
+        MPI_Barrier(tria->get_communicator());
+#endif
       }
 #endif
 
-    // Sort the indices. This will produce more reliable debug output for regression texts
+    // Sort the indices. This will produce more reliable debug output for regression tests
     // and likely won't hurt performance even in release mode.
     std::less<std::pair<types::global_dof_index, types::global_dof_index> > compare;
     for (unsigned int level=0; level<copy_indices.size(); ++level)
