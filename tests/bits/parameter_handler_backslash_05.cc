@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,27 +26,41 @@ int main ()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  ParameterHandler prm;
-  prm.enter_subsection ("Testing");
-  prm.declare_entry ("Function_1",
-                     "a",
-                     Patterns::List(Patterns::Selection("a|b|c")));
-  prm.declare_entry ("Function_2",
-                     "d",
-                     Patterns::List(Patterns::Selection("d|e|f")));
-  prm.leave_subsection ();
+  for (unsigned int i = 0; i < 2; ++i)
+    {
+      ParameterHandler prm;
+      prm.enter_subsection ("Testing");
+      prm.declare_entry ("Function_1",
+                         "a",
+                         Patterns::List(Patterns::Selection("a|b|c")));
+      prm.declare_entry ("Function_2",
+                         "d",
+                         Patterns::List(Patterns::Selection("d|e|f")));
+      prm.leave_subsection ();
 
-  prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
 
-  std::string list_1;
-  std::string list_2;
-  prm.enter_subsection ("Testing");
-  list_1 = prm.get ("Function_1");
-  list_2 = prm.get ("Function_2");
-  prm.leave_subsection ();
+      // test both relevant read_input functions
+      if (i == 0)
+        {
+          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+        }
+      else
+        {
+          std::ifstream input_stream
+          (SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+          prm.read_input(input_stream);
+        }
 
-  deallog << list_1 << std::endl;
-  deallog << list_2 << std::endl;
+      std::string list_1;
+      std::string list_2;
+      prm.enter_subsection ("Testing");
+      list_1 = prm.get ("Function_1");
+      list_2 = prm.get ("Function_2");
+      prm.leave_subsection ();
+
+      deallog << list_1 << std::endl;
+      deallog << list_2 << std::endl;
+    }
 
   return 0;
 }
