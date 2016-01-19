@@ -90,7 +90,7 @@ void check(const unsigned int fe_degree)
           v2.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
           v3.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
           for (unsigned int i=0; i<v1.local_size(); ++i)
-            v1.local_element(i) = (double)rand()/RAND_MAX;
+            v1.local_element(i) = (double)Testing::rand()/RAND_MAX;
           v1_cpy = v1;
           transfer.prolongate(level, v2, v1);
           transfer_ref.prolongate(level, v3, v1_cpy);
@@ -108,7 +108,7 @@ void check(const unsigned int fe_degree)
           v2.reinit(mgdof.locally_owned_mg_dofs(level-1), MPI_COMM_WORLD);
           v3.reinit(mgdof.locally_owned_mg_dofs(level-1), MPI_COMM_WORLD);
           for (unsigned int i=0; i<v1.local_size(); ++i)
-            v1.local_element(i) = (double)rand()/RAND_MAX;
+            v1.local_element(i) = (double)Testing::rand()/RAND_MAX;
           v1_cpy = v1;
           transfer.restrict_and_add(level, v2, v1);
           transfer_ref.restrict_and_add(level, v3, v1_cpy);
