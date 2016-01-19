@@ -32,18 +32,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: Allow long input lines to be broken by appending a backslash character
-
-
-// public classes; to be declared below
-class ParameterHandler;
-class MultipleParameterLoop;
-
-
-
-// forward declaration
+// forward declarations for interfaces and friendship
 class LogStream;
-
+class MultipleParameterLoop;
 
 
 /**
@@ -1182,31 +1173,33 @@ namespace Patterns
  *
  *     using namespace dealii;
  *
- *     class LinEq {
- *       public:
- *         static void declare_parameters (ParameterHandler &prm);
- *         void get_parameters (ParameterHandler &prm);
- *       private:
- *         std::string Method;
- *         int    MaxIterations;
+ *     class LinEq
+ *     {
+ *     public:
+ *       static void declare_parameters (ParameterHandler &prm);
+ *       void get_parameters (ParameterHandler &prm);
+ *     private:
+ *       std::string Method;
+ *       int    MaxIterations;
  *     };
  *
  *
- *     class Problem {
- *       private:
- *         LinEq eq1, eq2;
- *         std::string Matrix1, Matrix2;
- *         std::string outfile;
- *       public:
- *         static void declare_parameters (ParameterHandler &prm);
- *         void get_parameters (ParameterHandler &prm);
+ *     class Problem
+ *     {
+ *     private:
+ *       LinEq eq1, eq2;
+ *       std::string Matrix1, Matrix2;
+ *       std::string outfile;
+ *     public:
+ *       static void declare_parameters (ParameterHandler &prm);
+ *       void get_parameters (ParameterHandler &prm);
  *     };
  *
  *
  *
- *     void LinEq::declare_parameters (ParameterHandler &prm) {
- *                                        // declare parameters for the linear
- *                                        // solver in a subsection
+ *     void LinEq::declare_parameters (ParameterHandler &prm)
+ *     {
+ *       // declare parameters for the linear solver in a subsection
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
@@ -1219,7 +1212,8 @@ namespace Patterns
  *     }
  *
  *
- *     void LinEq::get_parameters (ParameterHandler &prm) {
+ *     void LinEq::get_parameters (ParameterHandler &prm)
+ *     {
  *       prm.enter_subsection ("Linear solver");
  *       Method        = prm.get ("Solver");
  *       MaxIterations = prm.get_integer ("Maximum number of iterations");
@@ -1229,8 +1223,9 @@ namespace Patterns
  *
  *
  *
- *     void Problem::declare_parameters (ParameterHandler &prm) {
- *                                        // first some global parameter entries
+ *     void Problem::declare_parameters (ParameterHandler &prm)
+ *     {
+ *       // first some global parameter entries
  *       prm.declare_entry ("Output file",
  *                          "out",
  *                          Patterns::Anything(),
@@ -1244,8 +1239,7 @@ namespace Patterns
  *                          "Elasticity",
  *                          Patterns::Anything());
  *
- *                                        // declare parameters for the
- *                                        // first equation
+ *       // declare parameters for the first equation
  *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
@@ -1255,8 +1249,7 @@ namespace Patterns
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
  *
- *                                        // declare parameters for the
- *                                        // second equation
+ *       // declare parameters for the second equation
  *       prm.enter_subsection ("Equation 2");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
@@ -1266,56 +1259,55 @@ namespace Patterns
  *     }
  *
  *
- *     void Problem::get_parameters (ParameterHandler &prm) {
- *                                        // entries of the problem class
+ *     void Problem::get_parameters (ParameterHandler &prm)
+ *     {
+ *       // entries of the problem class
  *       outfile = prm.get ("Output file");
  *
  *       std::string equation1 = prm.get ("Equation 1"),
  *              equation2 = prm.get ("Equation 2");
  *
- *                                        // get parameters for the
- *                                        // first equation
+ *       // get parameters for the first equation
  *       prm.enter_subsection ("Equation 1");
  *       Matrix1 = prm.get ("Matrix type");
- *       eq1.get_parameters (prm);         // for eq1
+ *       eq1.get_parameters (prm); // for eq1
  *       prm.leave_subsection ();
  *
- *                                        // get parameters for the
- *                                        // second equation
+ *       // get parameters for the second equation
  *       prm.enter_subsection ("Equation 2");
  *       Matrix2 = prm.get ("Matrix type");
- *       eq2.get_parameters (prm);         // for eq2
+ *       eq2.get_parameters (prm); // for eq2
  *       prm.leave_subsection ();
  *
- *       std::cout << "  Problem: outfile=" << outfile << std::endl
- *            << "           eq1="     << equation1 << ", eq2=" << equation2 << std::endl
- *            << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
+ *       std::cout << "  Problem: outfile=" << outfile << '\n'
+ *                 << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
+ *                 << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
  *     }
  *
  *
  *
  *
- *     void main () {
+ *     int main ()
+ *     {
  *       ParameterHandler prm;
  *       Problem p;
  *
  *       p.declare_parameters (prm);
  *
- *                                        // read input from "prmtest.prm"; giving
- *                                        // argv[1] would also be a good idea
+ *       // read input from "prmtest.prm"; giving argv[1] would also be a
+ *       // good idea
  *       prm.read_input ("prmtest.prm");
  *
- *                                        // print parameters to std::cout as ASCII text
+ *       // print parameters to std::cout as ASCII text
  *       std::cout << std::endl << std::endl;
  *       prm.print_parameters (std::cout, ParameterHandler::Text);
  *
- *                                        // get parameters into the program
+ *       // get parameters into the program
  *       std::cout << std::endl << std::endl
  *                 << "Getting parameters:" << std::endl;
  *       p.get_parameters (prm);
  *
- *                                        // now run the program with these
- *                                        // input parameters
+ *       // now run the program with these input parameters
  *       p.do_something ();
  *     }
  *   @endcode
@@ -1323,13 +1315,13 @@ namespace Patterns
  *
  * This is the input file (named "prmtest.prm"):
  *   @code
- *                                 # first declare the types of equations
+ *     # first declare the types of equations
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
  *
  *     subsection Equation 1
  *       set Matrix type = Sparse
- *       subsection Linear solver    # parameters for linear solver 1
+ *       subsection Linear solver # parameters for linear solver 1
  *         set Solver                       = Gauss-Seidel
  *         set Maximum number of iterations = 40
  *       end
@@ -1990,20 +1982,20 @@ private:
   std::string get_current_full_path (const std::string &name) const;
 
   /**
-   * Scan one line of input. <tt>input_filename</tt> and <tt>lineno</tt> are
-   * the name of the input file and the current number of the line presently
-   * scanned (for the logs if there are messages). Return <tt>false</tt> if
-   * line contained stuff that could not be understood, the uppermost
-   * subsection was to be left by an <tt>END</tt> or <tt>end</tt> statement, a
-   * value for a non-declared entry was given or the entry value did not match
-   * the regular expression. <tt>true</tt> otherwise.
+   * Scan one line of input. <tt>input_filename</tt> and <tt>current_line_n</tt>
+   * are the name of the input file and the current number of the line presently
+   * scanned (for the logs if there are messages). Return <tt>false</tt> if line
+   * contained stuff that could not be understood, the uppermost subsection was
+   * to be left by an <tt>END</tt> or <tt>end</tt> statement, a value for a
+   * non-declared entry was given or the entry value did not match the regular
+   * expression. <tt>true</tt> otherwise.
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
    */
   bool scan_line (std::string         line,
                   const std::string  &input_filename,
-                  const unsigned int  lineno);
+                  const unsigned int  current_line_n);
 
   friend class MultipleParameterLoop;
 };
@@ -2066,41 +2058,45 @@ private:
  * is created which is then called. Taking the classes of the example for the
  * ParameterHandler class, the extended program would look like this:
  *   @code
- *     class HelperClass : public MultipleParameterLoop::UserClass {
- *       public:
- *         HelperClass ();
+ *     class HelperClass : public MultipleParameterLoop::UserClass
+ *     {
+ *     public:
+ *       HelperClass ();
  *
- *         virtual void create_new (const unsigned int run_no);
- *         virtual void run (ParameterHandler &prm);
+ *       virtual void create_new (const unsigned int run_no);
+ *       virtual void run (ParameterHandler &prm);
  *
- *         static void declare_parameters (ParameterHandler &prm);
- *       private:
- *         Problem *p;
+ *       static void declare_parameters (ParameterHandler &prm);
+ *     private:
+ *       std_cxx11::shared_ptr<Problem> p;
  *     };
  *
  *
  *     HelperClass::HelperClass () : p(0) {}
  *
  *
- *     void HelperClass::create_new (const unsigned int run_no) {
- *       if (p) delete p;
- *       p = new Problem;
+ *     void HelperClass::create_new (const unsigned int run_no)
+ *     {
+ *       p.reset(new Problem());
  *     }
  *
  *
- *     void HelperClass::declare_parameters (ParameterHandler &prm) {
+ *     void HelperClass::declare_parameters (ParameterHandler &prm)
+ *     {
  *       Problem::declare_parameters (prm);
  *     }
  *
  *
- *     void HelperClass::run (ParameterHandler &prm) {
+ *     void HelperClass::run (ParameterHandler &prm)
+ *     {
  *       p->get_parameters (prm);
  *       p->do_useful_work ();
  *     }
  *
  *
  *
- *     int main () {
+ *     int main ()
+ *     {
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
  *       HelperClass::declare_parameters (prm);
@@ -2268,30 +2264,23 @@ public:
    * from; this is only used when creating output for error messages.
    *
    * Return whether the read was successful.
+   *
+   * @note Of the three <tt>read_input</tt> functions implemented by
+   * ParameterHandler, this is the only one overridden with new behavior by
+   * this class. This is because the other two <tt>read_input</tt> functions
+   * just reformat their inputs and then call this version.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file");
 
   /**
-   * Read input from a file the name of which is given. The PathSearch class
-   * "PARAMETERS" is used to find the file.
-   *
-   * Return whether the read was successful.
-   *
-   * Unless <tt>optional</tt> is <tt>true</tt>, this function will
-   * automatically generate the requested file with default values if the file
-   * did not exist. This file will not contain additional comments if
-   * <tt>write_stripped_file</tt> is <tt>true</tt>.
+   * Overriding virtual functions which are overloaded (like
+   * ParameterHandler::read_input, which has two different sets of input
+   * argument types) causes the non-overridden functions to be hidden. Get
+   * around this by explicitly using both variants of
+   * ParameterHandler::read_input and then overriding the one we care about.
    */
-  virtual bool read_input (const std::string &FileName,
-                           const bool optional = false,
-                           const bool write_stripped_file = false);
-
-  /**
-   * Read input from a string in memory. The lines in memory have to be
-   * separated by <tt>@\n</tt> characters.
-   */
-  virtual bool read_input_from_string (const char *s);
+  using ParameterHandler::read_input;
 
   /**
    * run the central loop.

@@ -439,7 +439,7 @@ inconvenience this causes.
 
   <li> Improved: Allow continuation lines in ParameterHandler.
   <br>
-  (Alberto Sartori, 2015/09/04)
+  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18)
   </li>
 
   <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
