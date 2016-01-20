@@ -87,7 +87,7 @@ void make_mesh (Triangulation<dim,spacedim> &tria)
   boundary_ids.insert (1);
   boundary_ids.insert (2);
   GridGenerator::extract_boundary_mesh (volume_mesh, tria,
-                                            boundary_ids);
+                                        boundary_ids);
   tria.refine_global (2);
 }
 
@@ -119,7 +119,7 @@ check ()
   Vector<float> error (tria.n_active_cells());
 
   KellyErrorEstimator<dim,spacedim>::estimate (mapping, dof, q_face,
-					       typename FunctionMap<spacedim>::type(),
+                                               typename FunctionMap<spacedim>::type(),
                                                v, error);
   deallog << "Estimated error indicators:" << std::endl;
   for (unsigned int i=0; i<error.size(); ++i)
@@ -135,14 +135,14 @@ check ()
                               "error");
     data_out.build_patches ();
     std::string filename = spacedim == 2 ?
-          "solution-2d-" :
-          "solution-3d-";
+                           "solution-2d-" :
+                           "solution-3d-";
     filename += Utilities::int_to_string(0,2) + ".vtk";
     std::ofstream output (filename.c_str());
     data_out.write_vtk (output);
-    
+
   }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -150,7 +150,7 @@ check ()
 int main ()
 {
   initlog();
-  
+
   deallog.push ("1d");
   check<1,2> ();
   deallog.pop();
