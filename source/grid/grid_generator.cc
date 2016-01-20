@@ -4131,15 +4131,15 @@ namespace GridGenerator
 
 
 
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
 #ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
+  std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+      typename MeshType<dim,spacedim>::face_iterator>
 #else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+  typename ExtractBoundaryMesh<MeshType,dim,spacedim>::return_type
 #endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
+      extract_boundary_mesh (const MeshType<dim,spacedim>       &volume_mesh,
+                             MeshType<dim-1,spacedim>           &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids)
   {
 // This function works using the following assumption:
@@ -4147,15 +4147,15 @@ namespace GridGenerator
 //    the order of cells passed in using the CellData argument; also,
 //    that it will not reorder the vertices.
 
-    std::map<typename Container<dim-1,spacedim>::cell_iterator,
-        typename Container<dim,spacedim>::face_iterator>
+    std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+        typename MeshType<dim,spacedim>::face_iterator>
         surface_to_volume_mapping;
 
     const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
 
     // First create surface mesh and mapping
     // from only level(0) cells of volume_mesh
-    std::vector<typename Container<dim,spacedim>::face_iterator>
+    std::vector<typename MeshType<dim,spacedim>::face_iterator>
     mapping;  // temporary map for level==0
 
 
@@ -4166,13 +4166,13 @@ namespace GridGenerator
 
     std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
 
-    for (typename Container<dim,spacedim>::cell_iterator
+    for (typename MeshType<dim,spacedim>::cell_iterator
          cell = volume_mesh.begin(0);
          cell != volume_mesh.end(0);
          ++cell)
       for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
         {
-          const typename Container<dim,spacedim>::face_iterator
+          const typename MeshType<dim,spacedim>::face_iterator
           face = cell->face(i);
 
           if ( face->at_boundary()
@@ -4273,7 +4273,7 @@ namespace GridGenerator
     .create_triangulation (vertices, cells, subcell_data);
 
     // Make the actual mapping
-    for (typename Container<dim-1,spacedim>::active_cell_iterator
+    for (typename MeshType<dim-1,spacedim>::active_cell_iterator
          cell = surface_mesh.begin(0);
          cell!=surface_mesh.end(0); ++cell)
       surface_to_volume_mapping[cell] = mapping.at(cell->index());
@@ -4282,7 +4282,7 @@ namespace GridGenerator
       {
         bool changed = false;
 
-        for (typename Container<dim-1,spacedim>::active_cell_iterator
+        for (typename MeshType<dim-1,spacedim>::active_cell_iterator
              cell = surface_mesh.begin_active(); cell!=surface_mesh.end(); ++cell)
           if (surface_to_volume_mapping[cell]->has_children() == true )
             {
@@ -4295,7 +4295,7 @@ namespace GridGenerator
             const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
             .execute_coarsening_and_refinement();
 
-            for (typename Container<dim-1,spacedim>::cell_iterator
+            for (typename MeshType<dim-1,spacedim>::cell_iterator
                  surface_cell = surface_mesh.begin(); surface_cell!=surface_mesh.end(); ++surface_cell)
               for (unsigned int c=0; c<surface_cell->n_children(); c++)
                 if (surface_to_volume_mapping.find(surface_cell->child(c)) == surface_to_volume_mapping.end())

@@ -52,28 +52,6 @@
  *
  * <dl>
  *
- * <dt class="concepts">@anchor ConceptContainerType <b>ContainerType</b></dt>
- *
- * <dd>
-
- * There are several algorithms (e.g.,
- * GridTools::find_active_cell_around_point) in deal.II that can operate on
- * either a Triangulation or a DoFHandler, as both classes may be considered
- * to be collections of cells: see the @ref GlossMeshAsAContainer
- * "glossary entry" for a further discussion of this idea. %Functions that may
- * be called with either class indicate this by accepting a template parameter
- * like
- * @code
- * template <template <int, int> class Container>
- * @endcode
- * or
- * @code
- * template <typename Container>
- * @endcode
- * which is usually required to have a <code>typedef</code> named
- * <code>active_cell_iterator</code>.
- * </dd>
- *
  * <dt class="concepts">@anchor ConceptDoFHandlerType <b>DoFHandlerType</b></dt>
  *
  * <dd>
@@ -125,6 +103,27 @@
  * template concept. One can use the PointerMatrixAux class to implement
  * <code>vmult_add</code> and <code>Tvmult_add</code> instead of implementing
  * them manually.
+ * </dd>
+ *
+ * <dt class="concepts">@anchor ConceptMeshType <b>MeshType</b></dt>
+ *
+ * <dd>
+ * There are several algorithms (e.g.,
+ * GridTools::find_active_cell_around_point) in deal.II that can operate on
+ * either a Triangulation or a DoFHandler, as both classes may be considered
+ * to be collections of cells: see the @ref GlossMeshAsAContainer
+ * "glossary entry" for a further discussion of this idea. %Functions that may
+ * be called with either class indicate this by accepting a template parameter
+ * like
+ * @code
+ * template <template <int, int> class MeshType>
+ * @endcode
+ * or
+ * @code
+ * template <typename MeshType>
+ * @endcode
+ * which is usually required to have a <code>typedef</code> named
+ * <code>active_cell_iterator</code>.
  * </dd>
  *
  * <dt class="concepts">@anchor ConceptNumber <b>Number</b></dt>

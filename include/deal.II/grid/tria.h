@@ -2817,7 +2817,7 @@ public:
    *
    * This doesn't seem to be very useful but allows to write code that
    * can access the underlying triangulation for anything that satisfies
-   * the @ref GlossMeshAsAContainer "Mesh as a container" concept (which
+   * the @ref GlossMeshAsAContainer "MeshType as a container" concept (which
    * may not only be a triangulation, but also a DoFHandler, for example).
    */
   Triangulation<dim,spacedim> &

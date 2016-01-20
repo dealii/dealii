@@ -48,7 +48,7 @@ namespace hp
   template <int dim, int spacedim> class MappingCollection;
 }
 class ConstraintMatrix;
-template <class GridClass> class InterGridMap;
+template <class MeshType> class InterGridMap;
 template <int dim, int spacedim> class Mapping;
 
 namespace GridTools

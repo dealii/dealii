@@ -77,7 +77,8 @@ namespace GridGenerator
                    const bool                    colorize= false);
 
   /**
-   * \brief Mesh of a d-simplex with (d+1) vertices and mesh cells, resp.
+   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells,
+   * resp.
    *
    * The @p vertices argument contains a vector with all d+1 vertices of the
    * simplex. They must be given in an order such that the vectors from the
@@ -935,12 +936,12 @@ namespace GridGenerator
   // doing some contortion with the return type using the following
   // intermediate type. This is only used when using MS VC++ and uses
   // the direct way of doing it otherwise
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
     typedef
-    std::map<typename Container<dim-1,spacedim>::cell_iterator,
-        typename Container<dim,spacedim>::face_iterator>
+    std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+        typename MeshType<dim,spacedim>::face_iterator>
         return_type;
   };
 #endif
@@ -970,15 +971,14 @@ namespace GridGenerator
    * vertices.
    *
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * @tparam MeshType A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer "meshes as containers").
    * The map that is returned will be between cell iterators pointing into the
    * container describing the surface mesh and face iterators of the volume
-   * mesh container. If the Container argument is DoFHandler of
+   * mesh container. If the MeshType argument is DoFHandler of
    * hp::DoFHandler, then the function will re-build the triangulation
    * underlying the second argument and return a map between appropriate
-   * iterators into the Container arguments. However, the function will not
+   * iterators into the MeshType arguments. However, the function will not
    * actually distribute degrees of freedom on this newly created surface
    * mesh.
    * @tparam dim The dimension of the cells of the volume mesh. For example, if
@@ -1017,15 +1017,15 @@ namespace GridGenerator
    * accommodate different geometry descriptions in the case of curved
    * boundaries (but this is not currently implemented).
    */
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
 #ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
+  std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+      typename MeshType<dim,spacedim>::face_iterator>
 #else
   typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
 #endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
+      extract_boundary_mesh (const MeshType<dim,spacedim>       &volume_mesh,
+                             MeshType<dim-1,spacedim>           &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
 

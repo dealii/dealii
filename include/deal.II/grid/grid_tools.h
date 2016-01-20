@@ -43,11 +43,11 @@ class SparsityPattern;
 
 namespace internal
 {
-  template<int dim, int spacedim, class Container>
+  template<int dim, int spacedim, class MeshType>
   class ActiveCellIterator
   {
   public:
-    typedef typename Container::active_cell_iterator type;
+    typedef typename MeshType::active_cell_iterator type;
   };
 
   template<int dim, int spacedim>
@@ -342,18 +342,17 @@ namespace GridTools
    * Find and return the number of the used vertex in a given mesh that is
    * located closest to a given point.
    *
-   * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see
-   * @ref GlossMeshAsAContainer).
+   * @param mesh A variable of a type that satisfies the requirements of
+   * a mesh container (see @ref GlossMeshAsAContainer).
    * @param p The point for which we want to find the closest vertex.
    * @return The index of the closest vertex found.
    *
    * @author Ralf B. Schulz, 2006
    */
-  template <int dim, template <int, int> class Container, int spacedim>
+  template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
-  find_closest_vertex (const Container<dim, spacedim> &container,
-                       const Point<spacedim>     &p);
+  find_closest_vertex (const MeshType<dim, spacedim> &mesh,
+                       const Point<spacedim>         &p);
 
   /**
    * Find and return a vector of iterators to active cells that surround a
@@ -363,9 +362,8 @@ namespace GridTools
    * adjacent cells that are returned. However, it will always be either a
    * vertex of a cell or be a hanging node located on a face or an edge of it.
    *
-   * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see
-   * @ref GlossMeshAsAContainer).
+   * @param mesh A variable of a type that satisfies the requirements of
+   * the @ref GlossMeshAsAContainer "MeshType concept".
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells.
    * @return A vector of cells that lie adjacent to the given vertex.
@@ -379,14 +377,14 @@ namespace GridTools
    * right thing with anisotropically refined meshes. It needs to be checked
    * for this case.
    */
-  template<int dim, template <int, int> class Container, int spacedim>
+  template<int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
-  std::vector<typename Container<dim, spacedim>::active_cell_iterator>
+  std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
-  std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type>
+  std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type>
 #endif
-  find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
-                                 const unsigned int    vertex_index);
+  find_cells_adjacent_to_vertex (const MeshType<dim,spacedim> &container,
+                                 const unsigned int            vertex_index);
 
 
   /**
@@ -401,12 +399,10 @@ namespace GridTools
    * simultaneously delivers the local coordinate of the given point without
    * additional computational cost.
    *
-   * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see
-   * @ref GlossMeshAsAContainer).
+   * @param mesh A variable of a type that satisfies the requirements of
+   * the @ref GlossMeshAsAContainer "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
-   * @return An iterator into the mesh container that points to the
-   * surrounding cell.
+   * @return An iterator into the mesh that points to the surrounding cell.
    *
    * @note If the point requested does not lie in any of the cells of the mesh
    * given, then this function throws an exception of type
@@ -423,14 +419,14 @@ namespace GridTools
    * evaluating the solution) may not be possible and you will have to decide
    * what to do in that case.
    */
-  template <int dim, template <int,int> class Container, int spacedim>
+  template <int dim, template <int,int> class MeshType, int spacedim>
 #ifndef _MSC_VER
-  typename Container<dim,spacedim>::active_cell_iterator
+  typename MeshType<dim,spacedim>::active_cell_iterator
 #else
-  typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type
+  typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
 #endif
-  find_active_cell_around_point (const Container<dim,spacedim>  &container,
-                                 const Point<spacedim> &p);
+  find_active_cell_around_point (const MeshType<dim,spacedim> &mesh,
+                                 const Point<spacedim>        &p);
 
   /**
    * Find and return an iterator to the active cell that surrounds a given
@@ -451,11 +447,10 @@ namespace GridTools
    *
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
-   * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see
-   * @ref GlossMeshAsAContainer).
+   * @param mesh A variable of a type that satisfies the requirements of
+   * the @ref GlossMeshAsAContainer "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
-   * @return An pair of an iterator into the mesh container that points to the
+   * @return An pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
    * the reference coordinates of that cell. This local position might be
    * located slightly outside an actual unit cell, due to numerical roundoff.
@@ -478,15 +473,15 @@ namespace GridTools
    * evaluating the solution) may not be possible and you will have to decide
    * what to do in that case.
    */
-  template <int dim, template<int, int> class Container, int spacedim>
+  template <int dim, template<int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
-  std::pair<typename Container<dim, spacedim>::active_cell_iterator, Point<dim> >
+  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
 #else
-  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type, Point<dim> >
+  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type, Point<dim> >
 #endif
-  find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
-                                 const Container<dim,spacedim> &container,
-                                 const Point<spacedim>     &p);
+  find_active_cell_around_point (const Mapping<dim,spacedim>  &mapping,
+                                 const MeshType<dim,spacedim> &mesh,
+                                 const Point<spacedim>        &p);
 
   /**
    * A version of the previous function where we use that mapping on a given
@@ -511,9 +506,9 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator, Point<dim> >
-  find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
-                                 const hp::DoFHandler<dim,spacedim> &container,
-                                 const Point<spacedim>     &p);
+  find_active_cell_around_point (const hp::MappingCollection<dim,spacedim> &mapping,
+                                 const hp::DoFHandler<dim,spacedim>        &mesh,
+                                 const Point<spacedim>                     &p);
 
   /**
    * Return a list of all descendants of the given cell that are active. For
@@ -524,42 +519,40 @@ namespace GridTools
    * If the current cell is already active, then the returned list is empty
    * (because the cell has no children that may be active).
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
-   * @param cell An iterator pointing to a cell of the mesh container.
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @param cell An iterator pointing to a cell of the mesh.
    * @return A list of active descendants of the given cell
    *
-   * @note Since in C++ the type of the Container template argument can not be
+   * @note Since in C++ the MeshType template argument can not be
    * deduced from a function call, you will have to specify it after the
    * function name, as for example in
    * @code
    *   GridTools::get_active_child_cells<DoFHandler<dim> > (cell)
    * @endcode
    */
-  template <class Container>
-  std::vector<typename Container::active_cell_iterator>
-  get_active_child_cells (const typename Container::cell_iterator &cell);
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  get_active_child_cells (const typename MeshType::cell_iterator &cell);
 
   /**
    * Extract the active cells around a given cell @p cell and return them in
    * the vector @p active_neighbors.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
-   * @param[in] cell An iterator pointing to a cell of the mesh container.
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @param[in] cell An iterator pointing to a cell of the mesh.
    * @param[out] active_neighbors A list of active descendants of the given
    * cell
    */
-  template <class Container>
+  template <class MeshType>
   void
-  get_active_neighbors (const typename Container::active_cell_iterator        &cell,
-                        std::vector<typename Container::active_cell_iterator> &active_neighbors);
+  get_active_neighbors (const typename MeshType::active_cell_iterator        &cell,
+                        std::vector<typename MeshType::active_cell_iterator> &active_neighbors);
 
   /**
    * Extract and return the active cell layer around a subdomain (set of active
-   * cells) in the @p container (i.e. those that share a common set of vertices
+   * cells) in the @p mesh (i.e. those that share a common set of vertices
    * with the subdomain but are not a part of it).
    * Here, the "subdomain" consists of exactly all of those cells for which the
    * @p predicate returns @p true.
@@ -594,9 +587,9 @@ namespace GridTools
    * true only for locally owned cells. This means that the halo layer will
    * not contain any artificial cells.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
-   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation,
    * DoFHandler, or hp::DoFHandler).
    * @param[in] predicate A function  (or object of a type with an operator())
    * defining the subdomain around which the halo layer is to be extracted. It
@@ -606,10 +599,11 @@ namespace GridTools
    *
    * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
    */
-  template <class Container>
-  std::vector<typename Container::active_cell_iterator>
-  compute_active_cell_halo_layer (const Container                                                                    &container,
-                                  const std_cxx11::function<bool (const typename Container::active_cell_iterator &)> &predicate);
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  compute_active_cell_halo_layer
+  (const MeshType                                                                    &mesh,
+   const std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> &predicate);
 
   /**
    * Extract and return ghost cells which are the active cell layer
@@ -618,17 +612,17 @@ namespace GridTools
    * ghost cells on a processor, but for parallel::distributed::Triangulation
    * this will return all the ghost cells.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
-   * @param[in] container A mesh container (i.e. objects of type Triangulation,
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation,
    * DoFHandler, or hp::DoFHandler).
    * @return A list of ghost cells
    *
    * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
    */
-  template <class Container>
-  std::vector<typename Container::active_cell_iterator>
-  compute_ghost_cell_halo_layer (const Container &container);
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  compute_ghost_cell_halo_layer (const MeshType &mesh);
 
 
   /**
@@ -842,7 +836,7 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Given two mesh containers (i.e. objects of type Triangulation,
+   * Given two meshes (i.e. objects of type Triangulation,
    * DoFHandler, or hp::DoFHandler) that are based on the same coarse mesh,
    * this function figures out a set of cells that are matched between the two
    * meshes and where at most one of the meshes is more refined on this cell.
@@ -866,15 +860,14 @@ namespace GridTools
    * does also not necessarily coincide with the order in which cells are
    * traversed in one, or both, of the meshes given as arguments.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
    */
-  template <typename Container>
-  std::list<std::pair<typename Container::cell_iterator,
-      typename Container::cell_iterator> >
-      get_finest_common_cells (const Container &mesh_1,
-                               const Container &mesh_2);
+  template <typename MeshType>
+  std::list<std::pair<typename MeshType::cell_iterator,
+      typename MeshType::cell_iterator> >
+      get_finest_common_cells (const MeshType &mesh_1,
+                               const MeshType &mesh_2);
 
   /**
    * Return true if the two triangulations are based on the same coarse mesh.
@@ -896,14 +889,13 @@ namespace GridTools
    * have_same_coarse_mesh for all types of containers representing
    * triangulations or the classes built on triangulations.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
    */
-  template <typename Container>
+  template <typename MeshType>
   bool
-  have_same_coarse_mesh (const Container &mesh_1,
-                         const Container &mesh_2);
+  have_same_coarse_mesh (const MeshType &mesh_1,
+                         const MeshType &mesh_2);
 
   /*@}*/
   /**
@@ -954,13 +946,12 @@ namespace GridTools
    * loops over all subfaces of current face adds the neighbors behind these
    * sub-faces to the list to be returned.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
-   * In C++, the compiler can not determine the type of <code>Container</code>
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
+   * In C++, The <code>MeshType</code> template argument can not be deduced
    * from the function call. You need to specify it as an explicit template
    * argument following the function name.
-   * @param[in] cell An iterator pointing to a cell of the mesh container.
+   * @param[in] cell An iterator pointing to a cell of the mesh.
    * @return A list of active cells that form the patch around the given cell
    *
    * @note Patches are often used in defining error estimators that require
@@ -978,9 +969,9 @@ namespace GridTools
    *
    * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
    */
-  template <class Container>
-  std::vector<typename Container::active_cell_iterator>
-  get_patch_around_cell(const typename Container::active_cell_iterator &cell);
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  get_patch_around_cell(const typename MeshType::active_cell_iterator &cell);
 
 
   /*@}*/
@@ -997,12 +988,12 @@ namespace GridTools
   // doing some contortion with the return type using the following
   // intermediate type. This is only used when using MS VC++ and uses
   // the direct way of doing it otherwise
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
     typedef
-    std::map<typename Container<dim-1,spacedim>::cell_iterator,
-        typename Container<dim,spacedim>::face_iterator>
+    std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+        typename MeshType<dim,spacedim>::face_iterator>
         return_type;
   };
 #endif
@@ -1147,7 +1138,7 @@ namespace GridTools
 
   /**
    * This function will collect periodic face pairs on the coarsest mesh
-   * level of the given @p container (a Triangulation or DoFHandler) and
+   * level of the given @p mesh (a Triangulation or DoFHandler) and
    * add them to the vector @p matched_pairs leaving the original contents
    * intact.
    *
@@ -1186,9 +1177,8 @@ namespace GridTools
    * and step-45). Second, @p matrix will be stored in the
    * PeriodicFacePair collection @p matched_pairs for further use.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref GlossMeshAsAContainer "MeshType concept".
    *
    * @note The created std::vector can be used in
    * DoFTools::make_periodicity_constraints() and in
@@ -1202,16 +1192,16 @@ namespace GridTools
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
-  template <typename CONTAINER>
+  template <typename MeshType>
   void
   collect_periodic_faces
-  (const CONTAINER                                                   &container,
-   const types::boundary_id                                           b_id1,
-   const types::boundary_id                                           b_id2,
-   const int                                                          direction,
-   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const Tensor<1,CONTAINER::space_dimension>                        &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
+  (const MeshType                            &mesh,
+   const types::boundary_id                   b_id1,
+   const types::boundary_id                   b_id2,
+   const int                                  direction,
+   std::vector<PeriodicFacePair<typename MeshType::cell_iterator> > &matched_pairs,
+   const Tensor<1,MeshType::space_dimension> &offset = dealii::Tensor<1,MeshType::space_dimension>(),
+   const FullMatrix<double>                  &matrix = FullMatrix<double>());
 
 
   /**
@@ -1236,15 +1226,15 @@ namespace GridTools
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
-  template <typename CONTAINER>
+  template <typename MeshType>
   void
   collect_periodic_faces
-  (const CONTAINER                                                   &container,
-   const types::boundary_id                                           b_id,
-   const int                                                          direction,
-   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,CONTAINER::space_dimension>                &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>());
+  (const MeshType                                    &mesh,
+   const types::boundary_id                           b_id,
+   const int                                          direction,
+   std::vector<PeriodicFacePair<typename MeshType::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,MeshType::space_dimension> &offset = dealii::Tensor<1,MeshType::space_dimension>(),
+   const FullMatrix<double>                          &matrix = FullMatrix<double>());
 
   /*@}*/
   /**
@@ -1461,11 +1451,11 @@ namespace GridTools
 
 
 
-  template <class Container>
-  std::vector<typename Container::active_cell_iterator>
-  get_active_child_cells (const typename Container::cell_iterator &cell)
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  get_active_child_cells (const typename MeshType::cell_iterator &cell)
   {
-    std::vector<typename Container::active_cell_iterator> child_cells;
+    std::vector<typename MeshType::active_cell_iterator> child_cells;
 
     if (cell->has_children())
       {
@@ -1473,8 +1463,8 @@ namespace GridTools
              child<cell->n_children(); ++child)
           if (cell->child (child)->has_children())
             {
-              const std::vector<typename Container::active_cell_iterator>
-              children = get_active_child_cells<Container> (cell->child(child));
+              const std::vector<typename MeshType::active_cell_iterator>
+              children = get_active_child_cells<MeshType> (cell->child(child));
               child_cells.insert (child_cells.end(),
                                   children.begin(), children.end());
             }
@@ -1487,23 +1477,23 @@ namespace GridTools
 
 
 
-  template <class Container>
+  template <class MeshType>
   void
-  get_active_neighbors(const typename Container::active_cell_iterator        &cell,
-                       std::vector<typename Container::active_cell_iterator> &active_neighbors)
+  get_active_neighbors(const typename MeshType::active_cell_iterator        &cell,
+                       std::vector<typename MeshType::active_cell_iterator> &active_neighbors)
   {
     active_neighbors.clear ();
-    for (unsigned int n=0; n<GeometryInfo<Container::dimension>::faces_per_cell; ++n)
+    for (unsigned int n=0; n<GeometryInfo<MeshType::dimension>::faces_per_cell; ++n)
       if (! cell->at_boundary(n))
         {
-          if (Container::dimension == 1)
+          if (MeshType::dimension == 1)
             {
               // check children of neighbor. note
               // that in 1d children of the neighbor
               // may be further refined. In 1d the
               // case is simple since we know what
               // children bound to the present cell
-              typename Container::cell_iterator
+              typename MeshType::cell_iterator
               neighbor_child = cell->neighbor(n);
               if (!neighbor_child->active())
                 {
