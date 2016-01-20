@@ -3069,11 +3069,13 @@ namespace GridGenerator
                const Point<3> &p,
                const double inner_radius,
                const double outer_radius,
-               const unsigned int n,
+               const unsigned int n_cells,
                const bool colorize)
   {
     Assert ((inner_radius > 0) && (inner_radius < outer_radius),
             ExcInvalidRadii ());
+
+    const unsigned int n = (n_cells==0) ? 6 : n_cells;
 
     const double irad = inner_radius/std::sqrt(3.0);
     const double orad = outer_radius/std::sqrt(3.0);
