@@ -81,16 +81,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In practice, use of this class is as follows:
  * @verbatim
- *                   // have two grids, which are derived from the
- *                   // same coarse grid
+ *   // have two grids, which are derived from the same coarse grid
  *   Triangulation<dim> tria1, tria2;
  *   DoFHandler<dim> dof_handler_1(tria1), dof_handler_2(tria2);
  *   ...
- *                   // do something with these objects, e.g.
- *                   // refine the triangulations differently,
- *                   // distribute degrees of freedom, etc
+ *   // do something with these objects, e.g. refine the triangulations
+ *   // differently, distribute degrees of freedom, etc
  *   ...
- *                   // create the mapping
+ *   // create the mapping
  *   InterGridMap<DoFHandler<dim> > grid_1_to_2_map;
  *   grid_1_to_2_map.make_mapping (dof_handler_1,
  *                                 dof_handler_2);
@@ -98,9 +96,8 @@ DEAL_II_NAMESPACE_OPEN
  *   typename DoFHandler<dim>::cell_iterator cell = dof_handler_1.begin(),
  *                                           endc = dof_handler_1.end();
  *   for (; cell!=endc; ++cell)
- *                    // now do something with the cell of dof_handler_2
- *                    // corresponding to @p cell (which is one of
- *                    // dof_handler_1
+ *     // now do something with the cell of dof_handler_2 corresponding to
+ *     // @p cell (which is one of dof_handler_1
  *     f( grid_1_to_2_map[cell]);
  * @endverbatim
  *
