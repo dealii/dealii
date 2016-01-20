@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014-2015 by the deal.II authors
+// Copyright (C) 2014-2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,9 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-
-// test running a multigrid solver on continuous FE_Q finite elements with
-// MatrixFree data structures (otherwise similar to step-37)
+// same test as parallel_multigrid but using matrix-free transfer operations
+// (and including single-precision multigrid preconditioning)
 
 #include "../tests.h"
 
@@ -35,7 +34,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_smoother.h>
@@ -44,13 +43,13 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
-std::ofstream logfile("output");
-
 
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, typename number=double>
 class LaplaceOperator : public Subscriptor
 {
 public:
+  typedef number value_type;
+
   LaplaceOperator() {};
 
   void initialize (const Mapping<dim> &mapping,
@@ -247,12 +246,14 @@ private:
 
 
 
-template <typename MatrixType>
-class MGTransferPrebuiltMF : public MGTransferPrebuilt<parallel::distributed::Vector<double> >
+template <int dim, typename MatrixType>
+class MGTransferPrebuiltMF : public MGTransferMatrixFree<dim, typename MatrixType::value_type>
 {
 public:
-  MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace)
+  MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace,
+                       const MGConstrainedDoFs &mg_constrained_dofs)
     :
+    MGTransferMatrixFree<dim, typename MatrixType::value_type>(mg_constrained_dofs),
     laplace_operator (laplace)
   {};
 
@@ -260,16 +261,16 @@ public:
    * Overload copy_to_mg from MGTransferPrebuilt to get the vectors compatible
    * with MatrixFree and bypass the crude initialization in MGTransferPrebuilt
    */
-  template <int dim, class InVector, int spacedim>
+  template <class InVector, int spacedim>
   void
   copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
-              MGLevelObject<parallel::distributed::Vector<double> > &dst,
+              MGLevelObject<parallel::distributed::Vector<typename MatrixType::value_type> > &dst,
               const InVector &src) const
   {
     for (unsigned int level=dst.min_level();
          level<=dst.max_level(); ++level)
       laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferPrebuilt<parallel::distributed::Vector<double> >::copy_to_mg(mg_dof, dst, src);
+    MGLevelGlobalTransfer<parallel::distributed::Vector<typename MatrixType::value_type> >::copy_to_mg(mg_dof, dst, src);
   }
 
 private:
@@ -290,11 +291,11 @@ public:
   }
 
   virtual void operator() (const unsigned int   level,
-                           parallel::distributed::Vector<double> &dst,
-                           const parallel::distributed::Vector<double> &src) const
+                           parallel::distributed::Vector<Number> &dst,
+                           const parallel::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
-    SolverCG<parallel::distributed::Vector<double> > solver_coarse (solver_control);
+    SolverCG<parallel::distributed::Vector<Number> > solver_coarse (solver_control);
     solver_coarse.solve (*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
@@ -307,27 +308,17 @@ public:
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void do_test (const DoFHandler<dim>  &dof)
 {
-  if (types_are_equal<number,float>::value == true)
-    {
-      deallog.push("float");
-      deallog.threshold_double(1e-6);
-    }
-  else
-    {
-      deallog.threshold_double(5.e-11);
-    }
-
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
   MappingQ<dim> mapping(fe_degree+1);
-  LaplaceOperator<dim,fe_degree,n_q_points_1d,number> fine_matrix;
+  LaplaceOperator<dim,fe_degree,n_q_points_1d,double> fine_matrix;
   std::set<types::boundary_id> dirichlet_boundaries;
   dirichlet_boundaries.insert(0);
   fine_matrix.initialize(mapping, dof, dirichlet_boundaries);
 
-  parallel::distributed::Vector<number> in, sol;
+  parallel::distributed::Vector<double> in, sol;
   fine_matrix.initialize_dof_vector(in);
   fine_matrix.initialize_dof_vector(sol);
 
@@ -344,8 +335,14 @@ void do_test (const DoFHandler<dim>  &dof)
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
 
-  MGTransferPrebuiltMF<LevelMatrixType> mg_transfer(mg_matrices);
-  mg_transfer.build_matrices(dof);
+  MGConstrainedDoFs mg_constrained_dofs;
+  ZeroFunction<dim> zero_function;
+  typename FunctionMap<dim>::type dirichlet_boundary;
+  dirichlet_boundary[0] = &zero_function;
+  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+
+  MGTransferPrebuiltMF<dim,LevelMatrixType> mg_transfer(mg_matrices, mg_constrained_dofs);
+  mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType,number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
@@ -364,34 +361,37 @@ void do_test (const DoFHandler<dim>  &dof)
       smoother_data[level].matrix_diagonal_inverse =
         mg_matrices[level].get_matrix_diagonal_inverse();
     }
+
+  // temporarily disable deallog for the setup of the preconditioner that
+  // involves a CG solver for eigenvalue estimation
+  deallog.depth_file(0);
   mg_smoother.initialize(mg_matrices, smoother_data);
 
-  mg::Matrix<parallel::distributed::Vector<double> >
+  mg::Matrix<parallel::distributed::Vector<number> >
   mg_matrix(mg_matrices);
 
-  Multigrid<parallel::distributed::Vector<double> > mg(dof,
+  Multigrid<parallel::distributed::Vector<number> > mg(dof,
                                                        mg_matrix,
                                                        mg_coarse,
                                                        mg_transfer,
                                                        mg_smoother,
                                                        mg_smoother);
-  PreconditionMG<dim, parallel::distributed::Vector<double>,
-                 MGTransferPrebuiltMF<LevelMatrixType> >
+  PreconditionMG<dim, parallel::distributed::Vector<number>,
+                 MGTransferPrebuiltMF<dim,LevelMatrixType> >
                  preconditioner(dof, mg, mg_transfer);
 
   {
+    // avoid output from inner (coarse-level) solver
+    deallog.depth_file(2);
     ReductionControl control(30, 1e-20, 1e-7);
     SolverCG<parallel::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
-
-  if (types_are_equal<number,float>::value == true)
-    deallog.pop();
 }
 
 
 
-template <int dim, int fe_degree>
+template <int dim, int fe_degree, typename number>
 void test ()
 {
   for (unsigned int i=5; i<8; ++i)
@@ -406,7 +406,7 @@ void test ()
       dof.distribute_dofs(fe);
       dof.distribute_mg_dofs(fe);
 
-      do_test<dim, fe_degree, fe_degree+1, double> (dof);
+      do_test<dim, fe_degree, fe_degree+1, number> (dof);
     }
 }
 
@@ -416,21 +416,15 @@ int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision (4);
-    }
+  mpi_initlog();
+  deallog.threshold_double(1e-9);
 
   {
-    deallog.threshold_double(1.e-10);
-    deallog.push("2d");
-    test<2,1>();
-    test<2,2>();
-    deallog.pop();
-    deallog.push("3d");
-    test<3,1>();
-    test<3,2>();
-    deallog.pop();
+    test<2,1,double>();
+    test<2,2,float>();
+
+    test<3,1,double>();
+    test<3,2,float>();
+
   }
 }
