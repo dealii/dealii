@@ -198,6 +198,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: The new class MGTransferMatrixFree implements multigrid level
+  transfer using local polynomial embedding and restriction with tensor
+  product evaluation techniques. This is a faster and less memory-demanding
+  alternative to MGTransferPrebuilt.
+  <br>
+  (Martin Kronbichler, 2016/01/20)
+  </li>
+
   <li> New: hp::FECollection now has constructors which take
   multiple finite elements as arguments.
   <br>
