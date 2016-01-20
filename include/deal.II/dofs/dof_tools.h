@@ -1933,11 +1933,13 @@ namespace DoFTools
    * DoFTools::get_dofs_on_patch() will then help to make the connection
    * between global degrees of freedom and the local ones.
    *
-   * @tparam Container A type that is either DoFHandler or hp::DoFHandler. In
-   * C++, the compiler can not determine the type of <code>DoFHandlerType</code> from the
-   * function call. You need to specify it as an explicit template argument
-   * following the function name.
+   * @tparam DoFHandlerType A type that is either DoFHandler or
+   * hp::DoFHandler. In C++, the compiler can not determine the type of
+   * <code>DoFHandlerType</code> from the function call. You need to specify it
+   * as an explicit template argument following the function name.
+   *
    * @param patch A collection of cells within an object of type DoFHandlerType
+   *
    * @return The number of degrees of freedom associated with the cells of
    * this patch.
    *
@@ -1985,11 +1987,13 @@ namespace DoFTools
    * one considers the index into this array a local DoF index, then the local
    * system that results retains the block structure of the global system.
    *
-   * @tparam Container A type that is either DoFHandler or hp::DoFHandler. In
-   * C++, the compiler can not determine the type of <code>DoFHandlerType</code> from the
-   * function call. You need to specify it as an explicit template argument
-   * following the function name.
+   * @tparam DoFHandlerType A type that is either DoFHandler or
+   * hp::DoFHandler. In C++, the compiler can not determine the type of
+   * <code>DoFHandlerType</code> from the function call. You need to specify it
+   * as an explicit template argument following the function name.
+   *
    * @param patch A collection of cells within an object of type DoFHandlerType
+   *
    * @return A list of those global degrees of freedom located on the patch,
    * as defined above.
    *

@@ -558,7 +558,7 @@ namespace VectorTools
                                  VectorType                          &u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
-           ExcMessage ("The two containers must represent triangulations that "
+           ExcMessage ("The two DoF handlers must represent triangulations that "
                        "have the same coarse meshes"));
 
     InterGridMap<DoFHandlerType<dim, spacedim> > intergridmap;
@@ -581,7 +581,7 @@ namespace VectorTools
                                  VectorType                          &u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
-           ExcMessage ("The two containers must represent triangulations that "
+           ExcMessage ("The two DoF handlers must represent triangulations that "
                        "have the same coarse meshes"));
 
     InterGridMap<DoFHandlerType<dim, spacedim> > intergridmap;
