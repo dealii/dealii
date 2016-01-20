@@ -80,10 +80,10 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Usage</h3>
  *
  * In practice, use of this class is as follows:
- * @verbatim
+ * @code
  *   // have two grids, which are derived from the same coarse grid
  *   Triangulation<dim> tria1, tria2;
- *   DoFHandler<dim> dof_handler_1(tria1), dof_handler_2(tria2);
+ *   DoFHandler<dim> dof_handler_1 (tria1), dof_handler_2 (tria2);
  *   ...
  *   // do something with these objects, e.g. refine the triangulations
  *   // differently, distribute degrees of freedom, etc
@@ -97,9 +97,9 @@ DEAL_II_NAMESPACE_OPEN
  *                                           endc = dof_handler_1.end();
  *   for (; cell!=endc; ++cell)
  *     // now do something with the cell of dof_handler_2 corresponding to
- *     // @p cell (which is one of dof_handler_1's cells)
- *     f( grid_1_to_2_map[cell]);
- * @endverbatim
+ *     // cell (which is one of dof_handler_1's cells)
+ *     f (grid_1_to_2_map[cell]);
+ * @endcode
  *
  * Note that the template parameters to this class have to be given as
  * <tt>InterGridMap<DoFHandler<2> ></tt>, which here is DoFHandler (and could
