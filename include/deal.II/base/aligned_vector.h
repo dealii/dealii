@@ -418,7 +418,7 @@ namespace internal
         std::memset ((void *)(destination_+begin), 0, (end-begin)*sizeof(T));
       else
         copy_construct_or_assign(begin, end,
-                                 internal::bool2type<initialize_memory>());
+                                 ::dealii::internal::bool2type<initialize_memory>());
     }
 
   private:
