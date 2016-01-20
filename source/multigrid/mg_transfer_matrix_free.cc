@@ -719,19 +719,21 @@ namespace
                              VectorizedArray<Number> *data)
   {
     Assert(degree > 0, ExcNotImplemented());
-    const unsigned int loop_length = 2*degree+1;
+    const int loop_length = 2*degree+1;
     unsigned int degree_to_3 [loop_length];
     degree_to_3[0] = 0;
-    for (unsigned int i=1; i<loop_length-1; ++i)
+    for (int i=1; i<loop_length-1; ++i)
       degree_to_3[i] = 1;
     degree_to_3[loop_length-1] = 2;
     for (unsigned int c=0; c<n_components; ++c)
-      for (unsigned int k=0; k<(dim>2 ? loop_length : 1); ++k)
-        for (unsigned int j=0; j<(dim>1 ? loop_length : 1); ++j)
+      for (int k=0; k<(dim>2 ? loop_length : 1); ++k)
+        for (int j=0; j<(dim>1 ? loop_length : 1); ++j)
           {
             const unsigned int shift = 9*degree_to_3[k] + 3*degree_to_3[j];
             data[0] *= weights[shift];
-            for (unsigned int i=1; i<loop_length-1; ++i)
+            // loop bound as int avoids compiler warnings in case loop_length
+            // == 1 (polynomial degree 0)
+            for (int i=1; i<loop_length-1; ++i)
               data[i] *= weights[shift+1];
             data[loop_length-1] *= weights[shift+2];
             data += loop_length;
