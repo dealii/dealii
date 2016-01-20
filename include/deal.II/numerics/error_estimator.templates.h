@@ -355,15 +355,6 @@ namespace internal
                          n_components       = parallel_data.finite_element.n_components(),
                          n_solution_vectors = parallel_data.psi.size();
 
-      if (face->at_boundary() == false)
-        {
-//          // compute the jump in the gradients
-//          for (unsigned int n=0; n<n_solution_vectors; ++n)
-//            for (unsigned int component=0; component<n_components; ++component)
-//              for (unsigned int p=0; p<n_q_points; ++p)
-//                parallel_data.psi[n][p][component] -= parallel_data.neighbor_psi[n][p][component];
-        }
-
       // now psi contains the following:
       // - for an internal face, psi=[grad u]
       // - for a neumann boundary face, psi=grad u
