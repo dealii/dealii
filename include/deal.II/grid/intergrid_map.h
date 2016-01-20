@@ -97,7 +97,7 @@ DEAL_II_NAMESPACE_OPEN
  *                                           endc = dof_handler_1.end();
  *   for (; cell!=endc; ++cell)
  *     // now do something with the cell of dof_handler_2 corresponding to
- *     // @p cell (which is one of dof_handler_1
+ *     // @p cell (which is one of dof_handler_1's cells)
  *     f( grid_1_to_2_map[cell]);
  * @endverbatim
  *
