@@ -548,9 +548,11 @@ namespace GridGenerator
    * both the faces and the edges of these boundaries. If the flag is @p
    * false, both have indicator zero.
    *
-   * Attach a SphericalManifold for correct placement of vertices upon refinement
-   * and higher order mappings. Alternatively, attach a HyperShellBoundary to the
-   * inner and outer boundary.
+   * You should attach a SphericalManifold to the cells and faces for correct
+   * placement of vertices upon refinement and to be able to use higher order
+   * mappings. Alternatively, it is also possible to attach a HyperShellBoundary
+   * to the inner and outer boundary. This will create inferior meshes as
+   * described below.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
@@ -564,8 +566,10 @@ namespace GridGenerator
    *
    * While the SphericalManifold, that is demonstrated in the documentation of the
    * @ref manifold "documentation module on manifolds", creates reasonable meshes
-   * for any number of @p n_cells, the situation is less than ideal when only attaching
-   * a HyperShellBoundary. Then, the 3d meshes give rise to the following meshes
+   * for any number of @p n_cells if attached to all cells and boundaries, the
+   * situation is less than ideal when only attaching a HyperShellBoundary. Then,
+   * only vertices on the boundaries are placed at the correct distance from the
+   * center. As an example, the 3d meshes give rise to the following meshes
    * upon one refinement:
    *
    * @image html hypershell3d-6.png
