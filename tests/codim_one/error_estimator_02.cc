@@ -48,7 +48,7 @@ public:
   virtual double value (const Point<dim>   &p,
                         const unsigned int  component) const
   {
-    return p(0)*p(0)+p(0)*p(1);
+    return p(0)*p(0)+2.0*p(0)*p(1);
   }
 
   virtual void   vector_value (const Point<dim>   &p,
@@ -89,6 +89,13 @@ void make_mesh (Triangulation<dim,spacedim> &tria)
   GridGenerator::extract_boundary_mesh (volume_mesh, tria,
                                         boundary_ids);
   tria.refine_global (2);
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell = tria.begin_active();
+  for (; cell != tria.end(); ++cell)
+    if (cell->center()[1]<1e-10 &&
+        (spacedim!=3 || cell->center()[2]<0.5))
+      cell->set_refine_flag();
+  tria.execute_coarsening_and_refinement ();
 }
 
 
@@ -109,9 +116,6 @@ check ()
 
   MappingQ<dim,spacedim> mapping(3);
   Quadrature<dim-1> &q_face = get_q_face<dim>();
-
-  std::map<types::boundary_id,const Function<spacedim>*> neumann_bc;
-  neumann_bc[0] = &function;
 
   Vector<double> v (dof.n_dofs());
   VectorTools::interpolate (mapping, dof, function, v);
@@ -149,12 +153,12 @@ check ()
 
 int main ()
 {
-  initlog();
+  initlog(true);
 
-  deallog.push ("1d");
+  deallog.push ("<1,2>");
   check<1,2> ();
   deallog.pop();
-  deallog.push ("2d");
+  deallog.push ("<2,3>");
   check<2,3> ();
   deallog.pop();
 }
