@@ -319,6 +319,8 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 
   const QTrapez<1> quadrature;
   const hp::QCollection<1> q_collection(quadrature);
+  const QGauss<0> face_quadrature(1);
+  const hp::QCollection<0> q_face_collection(face_quadrature);
 
   const hp::FECollection<1,spacedim> fe (dof_handler.get_fe());
 
@@ -327,6 +329,8 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 
   hp::FEValues<1,spacedim> fe_values (mapping_collection, fe, q_collection,
                                       update_gradients);
+  hp::FEFaceValues<1,spacedim> fe_face_values (/*mapping_collection,*/ fe, q_face_collection,
+      update_normal_vectors);
 
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
@@ -345,6 +349,11 @@ estimate (const Mapping<1,spacedim>                  &mapping,
         for (unsigned int n=0; n<n_solution_vectors; ++n)
           (*errors[n])(cell->active_cell_index()) = 0;
 
+        fe_values.reinit (cell);
+        for (unsigned int s=0; s<n_solution_vectors; ++s)
+          fe_values.get_present_fe_values()
+          .get_function_gradients (*solutions[s], gradients_here[s]);
+
         // loop over the two points bounding this line. n==0 is left point,
         // n==1 is right point
         for (unsigned int n=0; n<2; ++n)
@@ -355,12 +364,9 @@ estimate (const Mapping<1,spacedim>                  &mapping,
               while (neighbor->has_children())
                 neighbor = neighbor->child(n==0 ? 1 : 0);
 
-            // now get the gradients on the both sides of the point
-            fe_values.reinit (cell);
-
-            for (unsigned int s=0; s<n_solution_vectors; ++s)
-              fe_values.get_present_fe_values()
-              .get_function_gradients (*solutions[s], gradients_here[s]);
+            fe_face_values.reinit (cell, n);
+            Tensor<1,spacedim> normal =
+              fe_face_values.get_present_fe_values().get_all_normal_vectors()[0];
 
             if (neighbor.state() == IteratorState::valid)
               {
@@ -371,12 +377,15 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                   .get_function_gradients (*solutions[s],
                                            gradients_neighbor[s]);
 
-                // extract the gradients of all the components. [0] means:
-                // x-derivative, which is the only one here
+                fe_face_values.reinit (neighbor, n==0 ? 1 : 0);
+                Tensor<1,spacedim> neighbor_normal =
+                  fe_face_values.get_present_fe_values().get_all_normal_vectors()[0];
+
+                // extract the gradient in normal direction of all the components.
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
                   for (unsigned int c=0; c<n_components; ++c)
                     grad_neighbor[s](c)
-                      = gradients_neighbor[s][n==0 ? 1 : 0][c][0];
+                      = - (gradients_neighbor[s][n==0 ? 1 : 0][c]*neighbor_normal);
               }
             else if (neumann_bc.find(n) != neumann_bc.end())
               // if Neumann b.c., then fill the gradients field which will be
@@ -424,9 +433,9 @@ estimate (const Mapping<1,spacedim>                  &mapping,
               for (unsigned int component=0; component<n_components; ++component)
                 if (component_mask[component] == true)
                   {
-                    // get gradient here. [0] means x-derivative (there is no
-                    // other component in 1d)
-                    const double grad_here = gradients_here[s][n][component][0];
+                    // get gradient here
+                    const double grad_here = gradients_here[s][n][component]
+                                             * normal;
 
                     const double jump = ((grad_here - grad_neighbor[s](component)) *
                                          coefficient_values(component));
