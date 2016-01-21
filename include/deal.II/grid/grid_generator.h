@@ -970,17 +970,16 @@ namespace GridGenerator
    * boundary object you may want to use to determine the location of new
    * vertices.
    *
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref ConceptMeshType "MeshType concept". The map that is returned will be
+   * between cell iterators pointing into the container describing the surface
+   * mesh and face iterators of the volume mesh container. If MeshType is
+   * DoFHandler or hp::DoFHandler, then the function will re-build the
+   * triangulation underlying the second argument and return a map between
+   * appropriate iterators into the MeshType arguments. However, the function
+   * will not actually distribute degrees of freedom on this newly created
+   * surface mesh.
    *
-   * @tparam MeshType A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer "meshes as containers").
-   * The map that is returned will be between cell iterators pointing into the
-   * container describing the surface mesh and face iterators of the volume
-   * mesh container. If the MeshType argument is DoFHandler of
-   * hp::DoFHandler, then the function will re-build the triangulation
-   * underlying the second argument and return a map between appropriate
-   * iterators into the MeshType arguments. However, the function will not
-   * actually distribute degrees of freedom on this newly created surface
-   * mesh.
    * @tparam dim The dimension of the cells of the volume mesh. For example, if
    *   dim==2, then the cells are quadrilaterals that either live in the
    *   plane, or form a surface in a higher-dimensional space. The dimension

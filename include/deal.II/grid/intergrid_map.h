@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * on the first grid will point to cell 1 on the second grid.
  *
  * @tparam MeshType This class may be used with any class that satisfies the
- * @ref GlossMeshAsAContainer "MeshType concept". The extension to other classes
+ * @ref ConceptMeshType "MeshType concept". The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
  *

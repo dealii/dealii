@@ -69,8 +69,8 @@ namespace hp
 
   /**
    * Manage the distribution and numbering of the degrees of freedom for hp-
-   * FEM algorithms. This class satisfies the requirements outlined in
-   * @ref GlossMeshAsAContainer "Meshes as containers".
+   * FEM algorithms. This class satisfies the
+   * @ref ConceptMeshType "MeshType concept" requirements.
    *
    * The purpose of this class is to allow for an enumeration of degrees of
    * freedom in the same way as the ::DoFHandler class, but it allows to use a

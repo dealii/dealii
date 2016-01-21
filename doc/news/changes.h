@@ -308,7 +308,7 @@ inconvenience this causes.
   shadow class names. Additionally, template type names are now much more
   consistent across deal.II.
   <br>
-  (David Wells, 2015/10/18 - 2015/12/09)
+  (David Wells, 2015/10/18 - 2016/01/23)
   </li>
 
   <li> New: The WorkStream class's design and implementation are now much

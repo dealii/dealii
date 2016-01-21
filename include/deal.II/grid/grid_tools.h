@@ -343,7 +343,7 @@ namespace GridTools
    * located closest to a given point.
    *
    * @param mesh A variable of a type that satisfies the requirements of
-   * a mesh container (see @ref GlossMeshAsAContainer).
+   * the @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the closest vertex.
    * @return The index of the closest vertex found.
    *
@@ -363,7 +363,7 @@ namespace GridTools
    * vertex of a cell or be a hanging node located on a face or an edge of it.
    *
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref GlossMeshAsAContainer "MeshType concept".
+   * the @ref ConceptMeshType "MeshType concept".
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells.
    * @return A vector of cells that lie adjacent to the given vertex.
@@ -400,7 +400,7 @@ namespace GridTools
    * additional computational cost.
    *
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref GlossMeshAsAContainer "MeshType concept".
+   * the @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An iterator into the mesh that points to the surrounding cell.
    *
@@ -448,7 +448,7 @@ namespace GridTools
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref GlossMeshAsAContainer "MeshType concept".
+   * the @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
@@ -520,7 +520,7 @@ namespace GridTools
    * (because the cell has no children that may be active).
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    * @param cell An iterator pointing to a cell of the mesh.
    * @return A list of active descendants of the given cell
    *
@@ -540,7 +540,7 @@ namespace GridTools
    * the vector @p active_neighbors.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    * @param[in] cell An iterator pointing to a cell of the mesh.
    * @param[out] active_neighbors A list of active descendants of the given
    * cell
@@ -588,7 +588,7 @@ namespace GridTools
    * not contain any artificial cells.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    * @param[in] mesh A mesh (i.e. objects of type Triangulation,
    * DoFHandler, or hp::DoFHandler).
    * @param[in] predicate A function  (or object of a type with an operator())
@@ -613,7 +613,7 @@ namespace GridTools
    * this will return all the ghost cells.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    * @param[in] mesh A mesh (i.e. objects of type Triangulation,
    * DoFHandler, or hp::DoFHandler).
    * @return A list of ghost cells
@@ -861,7 +861,7 @@ namespace GridTools
    * traversed in one, or both, of the meshes given as arguments.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    */
   template <typename MeshType>
   std::list<std::pair<typename MeshType::cell_iterator,
@@ -890,7 +890,7 @@ namespace GridTools
    * triangulations or the classes built on triangulations.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    */
   template <typename MeshType>
   bool
@@ -947,10 +947,10 @@ namespace GridTools
    * sub-faces to the list to be returned.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
-   * In C++, The <code>MeshType</code> template argument can not be deduced
-   * from the function call. You need to specify it as an explicit template
-   * argument following the function name.
+   * @ref ConceptMeshType "MeshType concept".
+   * In C++, the compiler can not determine <code>MeshType</code> from the
+   * function call. You need to specify it as an explicit template argument
+   * following the function name.
    * @param[in] cell An iterator pointing to a cell of the mesh.
    * @return A list of active cells that form the patch around the given cell
    *
@@ -1178,7 +1178,7 @@ namespace GridTools
    * PeriodicFacePair collection @p matched_pairs for further use.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref GlossMeshAsAContainer "MeshType concept".
+   * @ref ConceptMeshType "MeshType concept".
    *
    * @note The created std::vector can be used in
    * DoFTools::make_periodicity_constraints() and in

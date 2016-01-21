@@ -1131,34 +1131,6 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossMeshAsAContainer <b>Meshes as containers</b></dt>
- * <dd>
- * Meshes can be thought of as arrays of vertices and connectivities, but a
- * more fruitful view is to consider them as <i>collections of cells</i>. In C++,
- * collections are often called <i>containers</i> (typical containers are std::vector,
- * std::list, etc.) and they are characterized by the ability iterate over the
- * elements of the collection.
- *
- * Triangulations and objects of type DoFHandler or hp::DoFHandler can all be
- * considered as containers of cells. In fact, the most important parts of the
- * public interface of these classes consists simply of the ability to get
- * iterators to their elements, using functions such as Triangulation::begin_active(),
- * Triangulation::end() and their counterparts in DoFHandler and hp::DoFHandler. Since
- * these parts of the interface are generic, i.e., the functions have the same name
- * in all classes, it is possible to write operations that do not actually care whether
- * they work on a triangulation or a DoF handler object. Examples about, for example,
- * in the GridTools namespace, underlining the power of the abstraction that meshes
- * and DoF handlers can all be considered simply as collections (containers) of cells.
- *
- * On the other hand, meshes are non-standard containers unlike std::vector or std::list
- * in that they can be sliced several ways. For example, one can iterate over the
- * subset of active cells or over all cells; likewise, cells are organized into levels
- * and one can get iterator ranges for only the cells on one level. Generally, however,
- * all classes that implement the containers-of-cells concept use the same function
- * names to provide the same functionality.
- * </dd>
- *
- *
  * <dt class="glossary">@anchor GlossMPICommunicator <b>MPI Communicator</b></dt>
  * <dd>
  * In the language of the Message Passing Interface (MPI), a communicator

@@ -66,8 +66,9 @@ namespace internal
 
 /**
  * Manage the distribution and numbering of the degrees of freedom for non-
- * multigrid algorithms. This class satisfies the requirements outlined in
- * @ref GlossMeshAsAContainer "Meshes as containers".
+ * multigrid algorithms. This class satisfies the
+ * @ref ConceptMeshType "MeshType concept" requirements.
+ *
  * It is first used in the step-2 tutorial program.
  *
  * For each vertex, line, quad, etc, this class stores a list of the indices
