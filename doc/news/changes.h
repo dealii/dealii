@@ -198,6 +198,14 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Fixed: A bug in the Neumann boundary handling of KellyErrorEstimator
+  in 1d has been fixed and KellyErrorEstimator now correctly handles
+  codimension one problems by using the correct normals from the manifold
+  inside the gradient jump computation.
+  <br>
+  (Andrea Bonito, Timo Heister, 2016/01/21)
+  </li>
+
   <li> New: The new class MGTransferMatrixFree implements multigrid level
   transfer using local polynomial embedding and restriction with tensor
   product evaluation techniques. This is a faster and less memory-demanding
