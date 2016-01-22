@@ -1,0 +1,7 @@
+# Whitespace characters after '\'s are ignored.
+#----------------------------------------------
+subsection Testing # note the spaces and tab at the end of the next line.
+  set Function = a,\      	
+                 b,\
+                 c
+end

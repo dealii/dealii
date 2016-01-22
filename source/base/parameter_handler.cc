@@ -1346,6 +1346,9 @@ bool ParameterHandler::read_input (std::istream &input,
   while (std::getline (input, input_line))
     {
       ++current_line_n;
+      // Trim the whitespace at the ends of the line here instead of in
+      // scan_line. This makes the continuation line logic a lot simpler.
+      input_line = Utilities::trim (input_line);
 
       // check whether or not the current line should be joined with the next
       // line before calling scan_line.
