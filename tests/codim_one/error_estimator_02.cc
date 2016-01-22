@@ -39,6 +39,7 @@
 #include <fstream>
 
 
+// function is x^2+2xy
 template<int dim>
 class MyFunction : public Function<dim>
 {
@@ -49,6 +50,33 @@ public:
                         const unsigned int  component) const
   {
     return p(0)*p(0)+2.0*p(0)*p(1);
+  }
+
+  virtual void   vector_value (const Point<dim>   &p,
+                               Vector<double>     &values) const
+  {
+    values(0) = value(p,0);
+    values(1) = value(p,1);
+  }
+};
+
+
+// normal derivative of function above is 0 except for x=1, y=1 with n=(0,1,0)
+template<int dim>
+class MyNormalDerivative : public Function<dim>
+{
+public:
+  MyNormalDerivative () : Function<dim>(1) {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component) const
+  {
+    double val = 0.0;
+    if (abs(p(1)-1.0)<1e-5)
+      val = 2.0;
+
+    deallog << "evaluate normal derivative at " << p << " with value " << val << std::endl;
+    return val;
   }
 
   virtual void   vector_value (const Point<dim>   &p,
@@ -122,8 +150,14 @@ check ()
 
   Vector<float> error (tria.n_active_cells());
 
+  std::map<types::boundary_id,const Function<spacedim>*> neumann_bc;
+  MyNormalDerivative<spacedim> function_normal;
+  neumann_bc[0] = &function_normal;
+  neumann_bc[1] = &function_normal;
+
+  deallog << "estimating..." << std::endl;
   KellyErrorEstimator<dim,spacedim>::estimate (mapping, dof, q_face,
-                                               typename FunctionMap<spacedim>::type(),
+                                               neumann_bc,
                                                v, error);
   deallog << "Estimated error indicators:" << std::endl;
   for (unsigned int i=0; i<error.size(); ++i)

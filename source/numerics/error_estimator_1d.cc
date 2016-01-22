@@ -394,7 +394,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                 if (n_components==1)
                   {
                     const double
-                    v = neumann_bc.find(n)->second->value(cell->vertex(0));
+                    v = neumann_bc.find(n)->second->value(cell->vertex(n));
 
                     for (unsigned int s=0; s<n_solution_vectors; ++s)
                       grad_neighbor[s](0) = v;
@@ -402,7 +402,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                 else
                   {
                     Vector<double> v(n_components);
-                    neumann_bc.find(n)->second->vector_value(cell->vertex(0), v);
+                    neumann_bc.find(n)->second->vector_value(cell->vertex(n), v);
 
                     for (unsigned int s=0; s<n_solution_vectors; ++s)
                       grad_neighbor[s] = v;
