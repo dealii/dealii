@@ -187,6 +187,10 @@ check ()
 
 int main ()
 {
+  // do not run multithreaded estimate() because that would break the order of the
+  // function evaluations that we log above
+  MultithreadInfo::set_thread_limit(1);
+
   initlog(true);
 
   deallog.push ("<1,2>");
