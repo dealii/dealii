@@ -38,7 +38,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim> (
     deg,
     FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
+                           dim, deg+1, FiniteElementData<dim>::Hdiv),
     get_ria_vector (deg),
     std::vector<ComponentMask>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
                                std::vector<bool>(dim,true)))
