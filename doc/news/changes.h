@@ -76,7 +76,8 @@ inconvenience this causes.
   (David Wells, 2015/12/05)
   </li>
 
-  <li> Removed: The previously deprecated global instance multithread_info of
+  <li> Removed: The previously deprecated global instance
+  <code>multithread_info</code> of
   MultithreadInfo has been removed (all members of this class are static
   so there is no reason to use/create an instance). The deprecated
   MultithreadInfo::n_cpus member also got removed in favor of
@@ -154,8 +155,8 @@ inconvenience this causes.
   now returns a Tensor, rather than a Point.
   <br>
   In a similar spirit, the FEValues::get_normal_vectors() function that
-  still returns a vector of Points has been deprecated and a new function,
-  FEValues::get_all_normal_vectors(), that returns a vector of tensors,
+  still returns a vector of Points has been deprecated, and a new function,
+  FEValues::get_all_normal_vectors() that returns a vector of tensors,
   has been added. This was necessary since there is no way to change the
   return type of the existing function in a backward compatible way. The
   old function will be removed in the next version, and the new function
@@ -176,7 +177,11 @@ inconvenience this causes.
   functions has been changed, in an effort to clarify which of these contain
   input information and which contain output information for these functions.
   The same has been done for the corresponding functions in the Mapping
-  class hierarchy. As part of a general overhaul, the FEValuesData class
+  class hierarchy.
+  <br>
+  Likewise the signature of FiniteElement::get_data() has been changed.
+  <br>
+  As part of a general overhaul, the FEValuesData class
   has also been removed.
   <br>
   (Wolfgang Bangerth, 2015/07/20-2015/08/13)
@@ -184,7 +189,7 @@ inconvenience this causes.
 
   <li> Changed: The functions update_once() and update_each() in the
   Mapping classes computed information that was, in essence, only of use
-  internally. No external piece of code actually needed to know which
+  internally. No external code actually needed to know which
   pieces of information a mapping could compute once and which they needed
   to compute on every cell. Consequently, these two functions have been
   removed and have been replaced by Mapping::requires_update_flags().
@@ -208,43 +213,6 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
-  <li> Fixed: A bug in the Neumann boundary handling of KellyErrorEstimator
-  in 1d has been fixed and KellyErrorEstimator now correctly handles
-  codimension one problems by using the correct normals from the manifold
-  inside the gradient jump computation.
-  <br>
-  (Andrea Bonito, Timo Heister, 2016/01/21)
-  </li>
-
-  <li> New: The new class MGTransferMatrixFree implements multigrid level
-  transfer using local polynomial embedding and restriction with tensor
-  product evaluation techniques. This is a faster and less memory-demanding
-  alternative to MGTransferPrebuilt.
-  <br>
-  (Martin Kronbichler, 2016/01/20)
-  </li>
-
-  <li> New: hp::FECollection now has constructors which take
-  multiple finite elements as arguments.
-  <br>
-  (Angel Rodriguez, 2016/01/18)
-  </li>
-
-  <li> New: The glossary now contains a long entry describing what
-  the term "scalability" means in the context of finite element codes.
-  See @ref GlossParallelScaling.
-  <br>
-  (Wolfgang Bangerth, 2016/01/11)
-  </li>
-
-  <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
-  longer returns by value, but rather by reference. Tensor::operator<< for
-  dim==0 now accesses values by reference instead of making a copy. This is
-  useful when non-trivial number types are stored.
-  <br>
-  (Jean-Paul Pelteret, 2016/01/08)
-  </li>
-
   <li> New: The documentation of step-17 has been completely rewritten,
   and many aspects of how one has to think when writing parallel programs
   have been much better documented now.
@@ -259,47 +227,7 @@ inconvenience this causes.
   (Matthias Maier, Wolfgang Bangerth, 2016/01/07)
   </li>
 
-  <li> New: constrained_linear_operator() and constrained_right_hand_side()
-  provide a generic mechanism of applying constraints to a LinearOperator.
-  A detailed explanation with example code is given in the @ref constraints
-  module.
-  <br>
-  (Mauro Bardelloni, Matthias Maier, 2015/10/25 - 2015/12/27)
-  </li>
-
-  <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
-  been unified in behaviour, and now they allow to extract *all* elements of
-  the IGES and STEP files instead of only the faces. This allows the
-  use of iges files describing edges only to be used as input for some of
-  the OpenCASCADE Manifold wrappers.
-  <br>
-  (Luca Heltai, 2015/12/13)
-  </li>
-
-  <li> New: A new linear operator representing the Schur complement,
-  namely schur_complement(), has been implemented. Some auxiliary functions
-  that are often used in conjunction with the Schur complement
-  (condense_schur_rhs() and postprocess_schur_solution()) are also provided
-  as a PackagedOperation.
-  An example of this functionality can be found in
-  <code>tests/lac/schur_complement_01.cc</code>.
-  The solution of a multi-component problem (namely step-22) using the
-  schur_complement can be found in
-  <code>tests/lac/schur_complement_03.cc</code> .
-  <br>
-  (Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015/12/07)
-  </li>
-
-  <li> New: There is now a function Utilities::to_string that works like
-  int_to_string, but is more safe for long integers, negative integers, and
-  also handles floating point numbers. The implementation of int_to_string
-  was changed to simply call to_string. int_to_string is kept for
-  compatibility, but should only be used for unsigned integers.
-  <br>
-  (Rene Gassmoeller, 2015/12/09)
-  </li>
-
-  <li> New: There is a new module, @ref Concepts, which describes the meaning
+  <li> New: There is a new documentation module, @ref Concepts, which describes the meaning
   behind template parameter type names.
   <br>
   (David Wells, 2015/12/09)
@@ -350,12 +278,6 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/11/20)
   </li>
 
-  <li> Fixed: Trilinos ML preconditioner is now deterministic when using
-  version 12.4 or newer.
-  <br>
-  (Timo Heister, 2015/11/16)
-  </li>
-
   <li> Changed: The functionality to distribute cells across processes
   according to a vector of cell weights that was passed in a call to
   parallel::distributed::Triangulation::repartition()
@@ -370,11 +292,6 @@ inconvenience this causes.
   approximately equal.
   <br>
   (Rene Gassmoeller, 2015/11/02)
-  </li>
-
-  <li> New: 2nd derivatives are implemented for PolynomialsBDM in 3D.
-  <br>
-  (Alistair Bentley, 2015/10/27)
   </li>
 
   <li> New: Preliminary support for parallel, adaptive, geometric multigrid is
@@ -395,11 +312,6 @@ inconvenience this causes.
   returns the set of MPI ranks of the ghost cells. Similarly
   parallel::distributed::Triangulation::level_ghost_owners() for level
   ghosts.
-  <br>
-  (Timo Heister, 2015/09/30)
-  </li>
-
-  <li> New: FunctionParser now supports <code>pow(a,b)</code>.
   <br>
   (Timo Heister, 2015/09/30)
   </li>
@@ -463,22 +375,11 @@ inconvenience this causes.
   (Wolfgang Bangerth, Matthias Maier, 2015/09/06)
   </li>
 
-  <li> Improved: Allow continuation lines in ParameterHandler.
-  <br>
-  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18)
-  </li>
-
   <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
   up (a lot of unnecessary partial template specializations have been
   removed). The specialization Tensor<1,dim,Number> has been removed.
   <br>
   (Matthias Maier, 2015/09/02)
-  </li>
-
-  <li> Fixed: VectorTools::integrate_difference() for VectorTools::Hdiv_seminorm
-  was computed incorrectly.
-  <br>
-  (Timo Heister, 2015/08/31)
   </li>
 
   <li> Improved: The testsuite now supports multiple comparison files.
@@ -522,18 +423,6 @@ inconvenience this causes.
   (Matthias Maier, 2015/08/25)
   </li>
 
-  <li> Fixed: The GridIn class was not instantiated for the
-  <code>dim==1,spacedim==3</code> case. This is now fixed.
-  <br>
-  (Wolfgang Bangerth, 2015/08/25)
-  </li>
-
-  <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
-  associated with vertices. This is now fixed.
-  <br>
-  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
-  </li>
-
   <li> Improved: The interface and documentation for periodic boundary
   conditions have been restructured. A
   @ref GlossPeriodicConstraints "glossary entry" has been written.
@@ -562,12 +451,6 @@ inconvenience this causes.
   function.
   <br>
   (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
-  </li>
-
-  <li> New: The InterpolatedTensorProductGridData::gradient() function
-  is now implemented.
-  <br>
-  (Daniel Shapero, 2015/08/12)
   </li>
 
   <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
@@ -611,6 +494,83 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: A bug in the Neumann boundary handling of KellyErrorEstimator
+  in 1d has been fixed and KellyErrorEstimator now correctly handles
+  codimension one problems by using the correct normals from the manifold
+  inside the gradient jump computation.
+  <br>
+  (Andrea Bonito, Timo Heister, 2016/01/21)
+  </li>
+
+  <li> New: The new class MGTransferMatrixFree implements multigrid level
+  transfer using local polynomial embedding and restriction with tensor
+  product evaluation techniques. This is a faster and less memory-demanding
+  alternative to MGTransferPrebuilt.
+  <br>
+  (Martin Kronbichler, 2016/01/20)
+  </li>
+
+  <li> New: hp::FECollection now has constructors which take
+  multiple finite elements as arguments.
+  <br>
+  (Angel Rodriguez, 2016/01/18)
+  </li>
+
+  <li> New: The glossary now contains a long entry describing what
+  the term "scalability" means in the context of finite element codes.
+  See @ref GlossParallelScaling.
+  <br>
+  (Wolfgang Bangerth, 2016/01/11)
+  </li>
+
+  <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
+  longer returns by value, but rather by reference. Tensor::operator<< for
+  dim==0 now accesses values by reference instead of making a copy. This is
+  useful when non-trivial number types are stored.
+  <br>
+  (Jean-Paul Pelteret, 2016/01/08)
+  </li>
+
+  <li> New: constrained_linear_operator() and constrained_right_hand_side()
+  provide a generic mechanism of applying constraints to a LinearOperator.
+  A detailed explanation with example code is given in the @ref constraints
+  module.
+  <br>
+  (Mauro Bardelloni, Matthias Maier, 2015/10/25 - 2015/12/27)
+  </li>
+
+  <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
+  been unified in behaviour, and now they allow to extract *all* elements of
+  the IGES and STEP files instead of only the faces. This allows the
+  use of iges files describing edges only to be used as input for some of
+  the OpenCASCADE Manifold wrappers.
+  <br>
+  (Luca Heltai, 2015/12/13)
+  </li>
+
+  <li> New: A new linear operator representing the Schur complement,
+  namely schur_complement(), has been implemented. Some auxiliary functions
+  that are often used in conjunction with the Schur complement
+  (condense_schur_rhs() and postprocess_schur_solution()) are also provided
+  as a PackagedOperation.
+  An example of this functionality can be found in
+  <code>tests/lac/schur_complement_01.cc</code>.
+  The solution of a multi-component problem (namely step-22) using the
+  schur_complement can be found in
+  <code>tests/lac/schur_complement_03.cc</code> .
+  <br>
+  (Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015/12/07)
+  </li>
+
+  <li> New: There is now a function Utilities::to_string that works like
+  int_to_string, but is more safe for long integers, negative integers, and
+  also handles floating point numbers. The implementation of int_to_string
+  was changed to simply call to_string. int_to_string is kept for
+  compatibility, but should only be used for unsigned integers.
+  <br>
+  (Rene Gassmoeller, 2015/12/09)
+  </li>
+
   <li> Fixed: GridOut::write_msh() and GridOut::write_ucd() used the same
   geometric element numbers for lines and faces. This caused visualization
   programs to ignore parts with repeated geometric element numbers. This is now
@@ -772,6 +732,12 @@ inconvenience this causes.
   (Daniel Weygand, Wolfgang Bangerth, 2015/11/22)
   </li>
 
+  <li> Fixed: Trilinos ML preconditioner is now deterministic when using
+  version 12.4 or newer.
+  <br>
+  (Timo Heister, 2015/11/16)
+  </li>
+
   <li> New: Extra parameters to GD and Lanczos SLEPc solvers. Also added unit tests.
   <br>
   (Denis Davydov, 2015/11/09)
@@ -787,6 +753,11 @@ inconvenience this causes.
   compiling bundled boost.
   <br>
   (Lukas Korous, 2015/11/01)
+  </li>
+
+  <li> New: 2nd derivatives are implemented for PolynomialsBDM in 3D.
+  <br>
+  (Alistair Bentley, 2015/10/27)
   </li>
 
   <li> Fixed: PolynomialsBDM::degree() now returns the correct value.
@@ -830,6 +801,11 @@ inconvenience this causes.
   are used in typical meshes.
   <br>
   (Aslan Kosakian, 2015/10/06)
+  </li>
+
+  <li> New: FunctionParser now supports <code>pow(a,b)</code>.
+  <br>
+  (Timo Heister, 2015/09/30)
   </li>
 
   <li> New: DoFTools::locally_relevant_dofs_per_subdomain() can be used
@@ -909,6 +885,11 @@ inconvenience this causes.
   (Timo Heister, 2015/09/05)
   </li>
 
+  <li> Improved: Allow continuation lines in ParameterHandler.
+  <br>
+  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18)
+  </li>
+
   <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
   in a .svg file which can be opened in a web browser.
   <br>
@@ -959,10 +940,28 @@ inconvenience this causes.
   (Denis Davydov, 2015/08/31)
   </li>
 
+  <li> Fixed: VectorTools::integrate_difference() for VectorTools::Hdiv_seminorm
+  was computed incorrectly.
+  <br>
+  (Timo Heister, 2015/08/31)
+  </li>
+
   <li> New: Jacobian second and third derivatives are now computed by the mapping classes and can be
   accessed through FEValues in much the same way as the Jacobian and Jacobian gradient.
   <br>
   (Maien Hamed, 2015/08/28-2015/08/31)
+  </li>
+
+  <li> Fixed: The GridIn class was not instantiated for the
+  <code>dim==1,spacedim==3</code> case. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/08/25)
+  </li>
+
+  <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
+  associated with vertices. This is now fixed.
+  <br>
+  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
   </li>
 
   <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
@@ -1010,6 +1009,12 @@ inconvenience this causes.
   by finite differencing.
   <br>
   (Maien Hamed, 2015/08/01-2015/08/09)
+  </li>
+
+  <li> New: The InterpolatedTensorProductGridData::gradient() function
+  is now implemented.
+  <br>
+  (Daniel Shapero, 2015/08/12)
   </li>
 
   <li> New: There is now a function Mapping::project_real_point_to_unit_point_on_face()
