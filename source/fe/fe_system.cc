@@ -2449,8 +2449,6 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
 
   unsigned int degree = 0; // degree is the maximal degree of the components
 
-  unsigned int summed_multiplicities = 0;
-
   for (unsigned int i=0; i<fes.size(); i++)
     if (multiplicities[i]>0)
       {
@@ -2462,8 +2460,6 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
         multiplied_n_components+=fes[i]->n_components() * multiplicities[i];
 
         degree = std::max(degree, fes[i]->tensor_degree() );
-
-        summed_multiplicities += multiplicities[i];
       }
 
   // assume conformity of the first finite element and then take away
@@ -2497,8 +2493,7 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
   return FiniteElementData<dim> (dpo,
                                  multiplied_n_components,
                                  degree,
-                                 total_conformity,
-                                 summed_multiplicities);
+                                 total_conformity);
 }
 
 

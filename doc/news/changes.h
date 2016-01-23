@@ -38,6 +38,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The constructor of FiniteElementData had a last argument
+  <code>n_blocks</code> that was not actually used by the class to
+  initialize anything. It has been removed. In addition, the default
+  constructor of FiniteElementData has also been removed given that it
+  only creates a dysfunctional element.
+  <br>
+  (Wolfgang Bangerth, 2016/01/23).
+  </li>
+
   <li> Rework: SLEPcWrappers were reworked to allow usage of PETSc solvers
   and preconditioners inside SLEPc's eigensolvers. To that end extra methods
   were introduced to PETSc wrappers. Moreover, initialization of the
@@ -48,7 +57,7 @@ inconvenience this causes.
   (Denis Davydov, 2015/12/29).
   </li>
 
-  <li> Removed the deprecated Operator class in the Algorithms namespace.
+  <li> Removed: The deprecated Operator class in the Algorithms namespace.
   <br>
   (Timo Heister, 2015/12/21)
   </li>

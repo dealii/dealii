@@ -340,14 +340,11 @@ public:
    *   $H_\text{div}$ conforming; finally, completely discontinuous
    *   elements (implemented by the FE_DGQ class) are only $L_2$
    *   conforming.
-   *
-   * @param[in] n_blocks obsolete and ignored.
    */
   FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                      const unsigned int               n_components,
                      const unsigned int               degree,
-                     const Conformity                 conformity = unknown,
-                     const unsigned int               n_blocks = numbers::invalid_unsigned_int);
+                     const Conformity                 conformity = unknown);
 
   /**
    * Number of dofs per vertex.

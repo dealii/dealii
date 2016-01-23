@@ -23,8 +23,7 @@ FiniteElementData<dim>::
 FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                    const unsigned int n_components,
                    const unsigned int degree,
-                   const Conformity conformity,
-                   const unsigned int)
+                   const Conformity conformity)
   :
   dofs_per_vertex(dofs_per_object[0]),
   dofs_per_line(dofs_per_object[1]),
