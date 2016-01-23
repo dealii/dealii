@@ -57,7 +57,8 @@ inconvenience this causes.
   (Denis Davydov, 2015/12/29).
   </li>
 
-  <li> Removed: The deprecated Operator class in the Algorithms namespace.
+  <li> Removed: The deprecated Operator class in the Algorithms namespace has been
+  removed.
   <br>
   (Timo Heister, 2015/12/21)
   </li>
