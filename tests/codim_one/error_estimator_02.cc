@@ -72,7 +72,7 @@ public:
                         const unsigned int  component) const
   {
     double val = 0.0;
-    if (abs(p(1)-1.0)<1e-5)
+    if (std::abs(p(1)-1.0)<1e-5)
       val = 2.0;
 
     deallog << "evaluate normal derivative at " << p << " with value " << val << std::endl;
