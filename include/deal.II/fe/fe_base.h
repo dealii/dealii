@@ -311,13 +311,6 @@ public:
   BlockIndices block_indices_data;
 
   /**
-   * Default constructor. Constructs an element with no dofs. Checking
-   * n_dofs_per_cell() is therefore a good way to check if something went
-   * wrong.
-   */
-  FiniteElementData ();
-
-  /**
    * Constructor, computing all necessary values from the distribution of dofs
    * to geometrical objects.
    *

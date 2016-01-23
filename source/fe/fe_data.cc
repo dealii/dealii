@@ -18,28 +18,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim>
-FiniteElementData<dim>::FiniteElementData ()
-  :
-  dofs_per_vertex(0),
-  dofs_per_line(0),
-  dofs_per_quad(0),
-  dofs_per_hex(0),
-  first_line_index(0),
-  first_quad_index(0),
-  first_hex_index(0),
-  first_face_line_index(0),
-  first_face_quad_index(0),
-  dofs_per_face(0),
-  dofs_per_cell (0),
-  components(0),
-  degree(0),
-  conforming_space(unknown),
-  cached_primitivity(false)
-{}
-
-
-
 template <int dim>
 FiniteElementData<dim>::
 FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
