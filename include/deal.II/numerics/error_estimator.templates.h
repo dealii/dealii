@@ -152,6 +152,11 @@ namespace internal
       std::vector<Tensor<1,spacedim> > normal_vectors;
 
       /**
+      * Normal vectors of the opposing face.
+      */
+      std::vector<Tensor<1,spacedim> > neighbor_normal_vectors;
+
+      /**
        * Two arrays needed for the values of coefficients in the jumps, if
        * they are given.
        */
@@ -234,11 +239,13 @@ namespace internal
       fe_face_values_neighbor (mapping,
                                finite_element,
                                face_quadratures,
-                               update_gradients),
+                               update_gradients|
+                               update_normal_vectors),
       fe_subface_values (mapping,
                          finite_element,
                          face_quadratures,
-                         update_gradients),
+                         update_gradients|
+                         update_normal_vectors),
       phi (n_solution_vectors,
            std::vector<std::vector<number> >
            (face_quadratures.max_n_quadrature_points(),
@@ -252,6 +259,7 @@ namespace internal
                     (face_quadratures.max_n_quadrature_points(),
                      std::vector<Tensor<1,spacedim,number> > (fe.n_components()))),
       normal_vectors (face_quadratures.max_n_quadrature_points()),
+      neighbor_normal_vectors (face_quadratures.max_n_quadrature_points()),
       coefficient_values1 (face_quadratures.max_n_quadrature_points()),
       coefficient_values (face_quadratures.max_n_quadrature_points(),
                           dealii::Vector<double> (fe.n_components())),
@@ -273,6 +281,7 @@ namespace internal
       const unsigned int n_components = finite_element.n_components();
 
       normal_vectors.resize(n_q_points);
+      neighbor_normal_vectors.resize(n_q_points);
       coefficient_values1.resize(n_q_points);
       coefficient_values.resize(n_q_points);
       JxW_values.resize(n_q_points);
@@ -346,15 +355,6 @@ namespace internal
                          n_components       = parallel_data.finite_element.n_components(),
                          n_solution_vectors = parallel_data.psi.size();
 
-      if (face->at_boundary() == false)
-        {
-          // compute the jump in the gradients
-          for (unsigned int n=0; n<n_solution_vectors; ++n)
-            for (unsigned int component=0; component<n_components; ++component)
-              for (unsigned int p=0; p<n_q_points; ++p)
-                parallel_data.psi[n][p][component] -= parallel_data.neighbor_psi[n][p][component];
-        }
-
       // now psi contains the following:
       // - for an internal face, psi=[grad u]
       // - for a neumann boundary face, psi=grad u
@@ -375,6 +375,18 @@ namespace internal
             parallel_data.phi[n][point][component]
               = (parallel_data.psi[n][point][component] *
                  parallel_data.normal_vectors[point]);
+
+      if (face->at_boundary() == false)
+        {
+          // compute the jump in the gradients
+
+          for (unsigned int n=0; n<n_solution_vectors; ++n)
+            for (unsigned int component=0; component<n_components; ++component)
+              for (unsigned int p=0; p<n_q_points; ++p)
+                parallel_data.phi[n][p][component]
+                += (parallel_data.neighbor_psi[n][p][component] *
+                    parallel_data.neighbor_normal_vectors[p]);
+        }
 
       // if a coefficient was given: use that to scale the jump in the
       // gradient
@@ -445,6 +457,8 @@ namespace internal
                     parallel_data.phi[n][point][component] -= g[point](component);
             }
         }
+
+
 
 
       // now phi contains the following:
@@ -659,6 +673,10 @@ namespace internal
               .get_function_gradients (*solutions[n],
                                        parallel_data.neighbor_psi[n]);
             }
+
+          parallel_data.neighbor_normal_vectors =
+            fe_face_values_neighbor.get_present_fe_values().get_all_normal_vectors();
+
         }
       else
         {
@@ -669,7 +687,9 @@ namespace internal
 
       // now go to the generic function that does all the other things
       local_face_integrals[face] =
-        integrate_over_face (parallel_data, face, fe_face_values_cell);
+        integrate_over_face (parallel_data, face,
+                             fe_face_values_cell);
+
       for (unsigned int i = 0; i < local_face_integrals[face].size(); i++)
         local_face_integrals[face][i] *= factor;
     }
@@ -761,6 +781,9 @@ namespace internal
             .get_function_gradients (*solutions[n], parallel_data.neighbor_psi[n]);
 
           // call generic evaluate function
+          parallel_data.neighbor_normal_vectors =
+            fe_subface_values.get_present_fe_values().get_all_normal_vectors();
+
           local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
             integrate_over_face (parallel_data, face, fe_face_values);
           for (unsigned int i = 0; i < local_face_integrals[neighbor_child->face(neighbor_neighbor)].size(); i++)

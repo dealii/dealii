@@ -1,0 +1,197 @@
+
+DEAL:<1,2>::estimating...
+DEAL:<1,2>::evaluate normal derivative at 1.00000 1.00000 with value 2.00000
+DEAL:<1,2>::evaluate normal derivative at 0.00000 0.00000 with value 0.00000
+DEAL:<1,2>::Estimated error indicators:
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::0
+DEAL:<1,2>::OK
+DEAL:<2,3>::estimating...
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.0173580 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.0825024 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.167498 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.232642 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.267358 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.332502 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.417498 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.482642 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.0173580 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.0825024 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.167498 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.232642 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.267358 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.332502 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.417498 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.482642 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.517358 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.582502 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.667498 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.732642 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.767358 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.832502 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.917498 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.982642 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.0173580 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.0825024 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.167498 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.232642 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.267358 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.332502 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.417498 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.482642 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.517358 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.582502 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.667498 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.732642 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.517358 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.582502 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.667498 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.732642 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.767358 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.832502 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.917498 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 0.982642 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.767358 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.832502 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.917498 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 1.00000 1.00000 0.982642 with value 2.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.517358 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.582502 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.667498 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.732642 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.0173580 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.0825024 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.167498 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.232642 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.767358 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.832502 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.917498 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.982642 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.267358 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.332502 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.417498 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.482642 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.517358 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.582502 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.667498 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.732642 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.767358 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.832502 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.917498 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.982642 0.00000 1.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00867898 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.0412512 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.0837488 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.116321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.00867898 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.0412512 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.0837488 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.116321 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.133679 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.166251 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.208749 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.241321 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.133679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.166251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.208749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.241321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.258679 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.291251 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.333749 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.366321 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.383679 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.416251 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.458749 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.00000 0.00000 0.491321 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.258679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.291251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.333749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.366321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.383679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.416251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.458749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.491321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.508679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.541251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.583749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.616321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.633679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.666251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.708749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.741321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.758679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.791251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.833749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.866321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.883679 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.916251 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.958749 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::evaluate normal derivative at 0.991321 0.00000 0.00000 with value 0.00000
+DEAL:<2,3>::Estimated error indicators:
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::0
+DEAL:<2,3>::OK
