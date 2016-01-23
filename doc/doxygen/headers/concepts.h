@@ -52,28 +52,6 @@
  *
  * <dl>
  *
- * <dt class="concepts">@anchor ConceptContainerType <b>ContainerType</b></dt>
- *
- * <dd>
-
- * There are several algorithms (e.g.,
- * GridTools::find_active_cell_around_point) in deal.II that can operate on
- * either a Triangulation or a DoFHandler, as both classes may be considered
- * to be collections of cells: see the @ref GlossMeshAsAContainer
- * "glossary entry" for a further discussion of this idea. %Functions that may
- * be called with either class indicate this by accepting a template parameter
- * like
- * @code
- * template <template <int, int> class Container>
- * @endcode
- * or
- * @code
- * template <typename Container>
- * @endcode
- * which is usually required to have a <code>typedef</code> named
- * <code>active_cell_iterator</code>.
- * </dd>
- *
  * <dt class="concepts">@anchor ConceptDoFHandlerType <b>DoFHandlerType</b></dt>
  *
  * <dd>
@@ -125,6 +103,71 @@
  * template concept. One can use the PointerMatrixAux class to implement
  * <code>vmult_add</code> and <code>Tvmult_add</code> instead of implementing
  * them manually.
+ * </dd>
+ *
+ * <dt class="concepts">@anchor ConceptMeshType <b>MeshType</b></dt>
+ *
+ * <dd>
+ * Meshes can be thought of as arrays of vertices and connectivities, but a
+ * more fruitful view is to consider them as <i>collections of cells</i>. In
+ * C++, collections are often called <i>containers</i> (typical containers are
+ * std::vector, std::list, etc.) and they are characterized by the ability to
+ * iterate over the elements of the collection. The <tt>MeshType</tt> concept
+ * refers to any container which defines appropriate methods (such as
+ * DoFHandler::begin_active()) and <tt>typedefs</tt> (such as
+ * DoFHandler::active_cell_iterator) for managing collections of cells.
+ *
+ * Triangulation&nnbsp;s, DoFHandler&nnbsp;s, and hp::DoFHandler&nnbsp;s may
+ * all be considered as containers of cells. In fact, the most important parts
+ * of the public interface of these classes consists simply of the ability to
+ * get iterators to their elements. Since these parts of the interface are
+ * generic, i.e., the functions have the same name in all classes, it is
+ * possible to write operations that do not actually care whether they work on
+ * a triangulation or a DoF handler object. Examples abound, for example, in
+ * the GridTools namespace, underlining the power of the abstraction that
+ * meshes and DoF handlers can all be considered simply as collections
+ * (containers) of cells.
+ *
+ * On the other hand, meshes are non-standard containers unlike std::vector or
+ * std::list in that they can be sliced several ways. For example, one can
+ * iterate over the subset of active cells or over all cells; likewise, cells
+ * are organized into levels and one can get iterator ranges for only the
+ * cells on one level. Generally, however, all classes that implement the
+ * containers-of-cells concept use the same function names to provide the same
+ * functionality.
+ *
+ * %Functions that may be called with either class indicate this by accepting
+ * a template parameter like
+ * @code
+ * template <template <int, int> class MeshType>
+ * @endcode
+ * or
+ * @code
+ * template <typename MeshType>
+ * @endcode
+ * The classes that satisfy this concept are collectively referred to as
+ * <em>mesh classes</em>. The exact definition of <tt>MeshType</tt> relies a
+ * lot on library internals, but it can be summarized as any class with the
+ * following properties:
+ * <ol>
+ *   <li>A <tt>typedef</tt> named <tt>active_cell_iterator</tt>.
+ *   </li>
+ *   <li>A method <tt>get_triangulation()</tt> which returns a reference to
+ *   the underlying geometrical description (one of the Triangulation classes)
+ *   of the collection of cells. If the mesh happens to be a Triangulation,
+ *   then the mesh just returns a reference to itself.
+ *   </li>
+ *   <li>A method <tt>begin_active()</tt> which returns an iterator pointing
+ *   to the first active cell.
+ *   </li>
+ *   <li>A static member value <tt>dimension</tt> containing the dimension in
+ *       which the object lives.
+ *   </li>
+ *   <li>A static member value <tt>space_dimension</tt> containing the dimension
+ *       of the object (e.g., a 2D surface in a 3D setting would have
+ *       <tt>space_dimension = 2</tt>).
+ *   </li>
+ * </ol>
  * </dd>
  *
  * <dt class="concepts">@anchor ConceptNumber <b>Number</b></dt>

@@ -66,10 +66,10 @@ DEAL_II_NAMESPACE_OPEN
  * valid keys. For example, the mapping for the mother cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
  *
- * The implementation of this class is such that not only cell iterators into
- * triangulations can be mapped, but also iterators into objects of type
- * DoFHandler or hp::DoFHandler. The extension to other classes offering
- * iterator functions and some minor additional requirements is simple.
+ * @tparam MeshType This class may be used with any class that satisfies the
+ * @ref ConceptMeshType "MeshType concept". The extension to other classes
+ * offering iterator functions and some minor additional requirements is
+ * simple.
  *
  * Note that this class could in principle be based on the C++
  * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data
@@ -108,7 +108,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <class GridClass>
+template <class MeshType>
 class InterGridMap : public Subscriptor
 {
 public:
@@ -116,7 +116,7 @@ public:
   /**
    * Typedef to the iterator type of the grid class under consideration.
    */
-  typedef typename GridClass::cell_iterator cell_iterator;
+  typedef typename MeshType::cell_iterator cell_iterator;
 
   /**
    * Constructor setting the class name arguments in the SmartPointer members.
@@ -126,8 +126,8 @@ public:
   /**
    * Create the mapping between the two grids.
    */
-  void make_mapping (const GridClass &source_grid,
-                     const GridClass &destination_grid);
+  void make_mapping (const MeshType &source_grid,
+                     const MeshType &destination_grid);
 
   /**
    * Access operator: give a cell on the source grid and receive the
@@ -145,12 +145,12 @@ public:
   /**
    * Return a pointer to the source grid.
    */
-  const GridClass &get_source_grid () const;
+  const MeshType &get_source_grid () const;
 
   /**
    * Return a pointer to the destination grid.
    */
-  const GridClass &get_destination_grid () const;
+  const MeshType &get_destination_grid () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -179,12 +179,12 @@ private:
   /**
    * Store a pointer to the source grid.
    */
-  SmartPointer<const GridClass,InterGridMap<GridClass> > source_grid;
+  SmartPointer<const MeshType,InterGridMap<MeshType> > source_grid;
 
   /**
    * Likewise for the destination grid.
    */
-  SmartPointer<const GridClass,InterGridMap<GridClass> > destination_grid;
+  SmartPointer<const MeshType,InterGridMap<MeshType> > destination_grid;
 
   /**
    * Set the mapping for the pair of cells given. These shall match in level
