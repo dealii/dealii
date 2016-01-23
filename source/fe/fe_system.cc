@@ -123,7 +123,7 @@ namespace
   multiply_dof_numbers (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                         const std::vector<unsigned int>                       &multiplicities)
   {
-    Assert (fes.size() == multiplicities.size(), ExcDimensionMismatch (fes.size(), multiplicities.size()));
+    AssertDimension(fes.size(), multiplicities.size());
 
     unsigned int multiplied_dofs_per_vertex = 0;
     unsigned int multiplied_dofs_per_line = 0;
@@ -175,10 +175,17 @@ namespace
     if (dim>1) dpo.push_back(multiplied_dofs_per_quad);
     if (dim>2) dpo.push_back(multiplied_dofs_per_hex);
 
+    BlockIndices block_indices (0,0);
+
+    for (unsigned int base=0; base < fes.size(); ++base)
+      for (unsigned int m = 0; m < multiplicities[base]; ++m)
+        block_indices.push_back(fes[base]->dofs_per_cell);
+
     return FiniteElementData<dim> (dpo,
                                    multiplied_n_components,
                                    degree,
-                                   total_conformity);
+                                   total_conformity,
+                                   block_indices);
   }
 
   /**
@@ -225,7 +232,7 @@ namespace
   compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                          const std::vector<unsigned int>              &multiplicities)
   {
-    Assert (fes.size() == multiplicities.size(), ExcInternalError());
+    AssertDimension(fes.size(), multiplicities.size());
 
     // first count the number of dofs and components that will emerge from the
     // given FEs
@@ -391,7 +398,7 @@ namespace
   compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                               const std::vector<unsigned int>              &multiplicities)
   {
-    Assert (fes.size() == multiplicities.size(), ExcInternalError());
+    AssertDimension(fes.size(), multiplicities.size());
 
     // first count the number of dofs and components that will emerge from the
     // given FEs
@@ -666,6 +673,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 }
 
 
+
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                   const unsigned int        n1,
@@ -701,6 +709,8 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   multiplicities.push_back(n4);
   initialize(fes, multiplicities);
 }
+
+
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
@@ -759,6 +769,7 @@ FESystem<dim,spacedim>::FESystem (
 {
   initialize(fes, multiplicities);
 }
+
 
 
 template <int dim, int spacedim>
@@ -1756,12 +1767,10 @@ FESystem<dim,spacedim>::build_cell_tables()
   this->face_system_to_component_table.resize(this->dofs_per_face);
 
   unsigned int total_index = 0;
-  this->block_indices_data.reinit(0,0);
 
   for (unsigned int base=0; base < this->n_base_elements(); ++base)
     for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
       {
-        this->block_indices_data.push_back(base_element(base).dofs_per_cell);
         for (unsigned int k=0; k<base_element(base).n_components(); ++k)
           this->component_to_base_table[total_index++]
             = std::make_pair(std::make_pair(base,k), m);
