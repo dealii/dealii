@@ -34,15 +34,18 @@
 // and you prefer using Trilinos in this example:
 // #define FORCE_USE_OF_TRILINOS
 
-// This will either import PETSc or TrilinosWrappers into the namespace LA:
+// This will either import PETSc or TrilinosWrappers into the namespace
+// LA. Note that we are defining the macro USE_PETSC_LA so that we can detect
+// if we are using PETSc (see solve() for an example where this is necessary)
 namespace LA
 {
 #if defined(DEAL_II_WITH_PETSC) && !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
+#  define USE_PETSC_LA
 #elif defined(DEAL_II_WITH_TRILINOS)
   using namespace dealii::LinearAlgebraTrilinos;
 #else
-#error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
+#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
 #endif
 }
 
