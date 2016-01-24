@@ -185,31 +185,10 @@ template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
 FE_Poly<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
-  return update_once(flags) | update_each(flags);
-}
-
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_Poly<PolynomialType,dim,spacedim>::update_once (const UpdateFlags flags) const
-{
-  // for this kind of elements, only
-  // the values can be precomputed
-  // once and for all. set this flag
-  // if the values are requested at
-  // all
-  return (update_default | (flags & update_values));
-}
-
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_Poly<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags) const
-{
   UpdateFlags out = update_default;
 
+  if (flags & update_values)
+    out |= update_values;
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
