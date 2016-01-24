@@ -1421,19 +1421,6 @@ namespace internal
  * </ul>
  *
  *
- * <h3>UpdateFlags</h3>
- *
- * The UpdateFlags object handed to the constructor is used to determine which
- * of the data fields to compute. This way, it is possible to avoid expensive
- * computations of useless derivatives.  In the beginning, these flags are
- * processed through the functions Mapping::update_once(),
- * Mapping::update_each(), FiniteElement::update_once()
- * FiniteElement::update_each(). All the results are bit-wise or'd and
- * determine the fields actually computed. This enables Mapping and
- * FiniteElement to schedule auxiliary data fields for updating. Still, it is
- * recommended to give <b>all</b> needed update flags to FEValues.
- *
- *
  * <h3>Internals about the implementation</h3>
  *
  * The mechanisms by which this class work are discussed on the page on
