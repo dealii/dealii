@@ -49,12 +49,6 @@ DEAL_II_NAMESPACE_OPEN
  * which cannot be implemented by this class but are left for implementation
  * in derived classes.
  *
- * Furthermore, this class assumes that shape functions of the FiniteElement
- * under consideration do <em>not</em> depend on the actual shape of the cells
- * in real space, i.e. update_once() includes <tt>update_values</tt>. For
- * FiniteElements whose shape functions depend on the cells in real space, the
- * update_once() and update_each() functions must be overloaded.
- *
  * @author Guido Kanschat, 2009
  */
 template <class PolynomialType, int dim=PolynomialType::dimension+1, int spacedim=dim>
@@ -106,7 +100,7 @@ protected:
     // generate a new data object and
     // initialize some fields
     InternalData *data = new InternalData;
-    data->update_each = update_once(update_flags) | update_each(update_flags);  // FIX: only update_each required
+    data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 
@@ -190,53 +184,6 @@ protected:
                           const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
                           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
-
-  /**
-   * Determine the values that need to be computed on the unit cell to be able
-   * to compute all values required by <tt>flags</tt>.
-   *
-   * For the purpose of this function, refer to the documentation in
-   * FiniteElement.
-   *
-   * This class assumes that shape functions of this FiniteElement do
-   * <em>not</em> depend on the actual shape of the cells in real space.
-   * Therefore, the effect in this element is as follows: if
-   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the result.
-   * All other flags of the result are cleared, since everything else must be
-   * computed for each cell.
-   */
-  UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * Determine the values that need to be computed on every cell to be able to
-   * compute all values required by <tt>flags</tt>.
-   *
-   * For the purpose of this function, refer to the documentation in
-   * FiniteElement.
-   *
-   * This class assumes that shape functions of this FiniteElement do
-   * <em>not</em> depend on the actual shape of the cells in real space.
-   *
-   * The effect in this element is as follows:
-   * <ul>
-   *
-   * <li> if <tt>update_gradients</tt> is set, the result will contain
-   * <tt>update_gradients</tt> and <tt>update_covariant_transformation</tt>.
-   * The latter is required to transform the gradient on the unit cell to the
-   * real cell. Remark, that the action required by
-   * <tt>update_covariant_transformation</tt> is actually performed by the
-   * Mapping object used in conjunction with this finite element.
-   *
-   * <li> if <tt>update_hessians</tt> is set, the result will contain
-   * <tt>update_hessians</tt> and <tt>update_covariant_transformation</tt>.
-   * The rationale is the same as above and no higher derivatives of the
-   * transformation are required, since we use difference quotients for the
-   * actual computation.
-   *
-   * </ul>
-   */
-  UpdateFlags update_each (const UpdateFlags flags) const;
-
 
   /**
    * Fields of cell-independent data.
