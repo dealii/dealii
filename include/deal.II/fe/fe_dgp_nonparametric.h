@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -633,12 +633,6 @@ private:
    * Allow access from other dimensions.
    */
   template <int, int> friend class FE_DGPNonparametric;
-
-  /**
-   * Allows @p MappingQ class to access to build_renumbering function.
-   */
-  template <int, int> friend class MappingQ;
-//    friend class MappingQ<dim>;
 };
 
 /*@}*/
