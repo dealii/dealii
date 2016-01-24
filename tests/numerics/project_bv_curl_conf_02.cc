@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the Alexander Grayver & deal.II authors
+// Copyright (C) 2014 - 2015 by the Alexander Grayver & deal.II authors
 //
 // This file is part of the deal.II library.
 //

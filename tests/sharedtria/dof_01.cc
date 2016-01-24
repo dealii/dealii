@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: dof_handler_number_cache.cc 31761 2013-11-22 14:42:37Z heister $
 //
-// Copyright (C) 2008 - 2013, 2015 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
