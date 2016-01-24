@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013, 2015 by the deal.II authors
+// Copyright (C) 2006 - 2013, 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -172,7 +172,7 @@
  * sufficient to evaluate the values of shape functions on a particular cell.)
  * 
  * To accommodate this structure, both mappings and finite element classes
- * internally split the update flags into two sets commonly referenced as
+ * may internally split the update flags into two sets commonly referenced as
  * <code>update_once</code> and <code>update_each</code>. The former contains
  * all those pieces of information that can be pre-computed once at the
  * time the FEValues object starts to interact with a mapping or
@@ -246,15 +246,11 @@
  * </ul>
  * 
  * This is, where the actual data fields for FEValues, stored in
- * FEValuesData objects is computed. These functions call the function in
- * Mapping first, such that all the mapping data required by the finite
- * element is available. Then, the FiniteElement function is called.
- * 
- * When this happens for the first time after initialization, all the
- * values specified by Mapping::InternalDataBase::update_once or
- * Mapping::InternalDataBase::update_each are filled. After that, only
- * the values specified by Mapping::InternalDataBase::update_each will be
- * updated.
+ * internal::FEValues::MappingRelatedData and
+ * internal::FEValues::FiniteElementRelatedData objects, are
+ * computed. These functions call the function in Mapping first, such
+ * that all the mapping data required by the finite element is
+ * available. Then, the FiniteElement function is called.
  * 
  * @ingroup feall
  */
