@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: 3d_refinement_01.cc 31349 2013-10-20 19:07:06Z maier $
 //
-// Copyright (C) 2008 - 2013, 2015 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
