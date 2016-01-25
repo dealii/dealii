@@ -53,23 +53,6 @@ template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
 FE_PolyFace<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
-  return update_once(flags) | update_each(flags);
-}
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_PolyFace<PolynomialType,dim,spacedim>::update_once (const UpdateFlags) const
-{
-  return update_default;
-}
-
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_PolyFace<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags) const
-{
   UpdateFlags out = flags & update_values;
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;

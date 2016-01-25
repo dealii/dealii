@@ -239,28 +239,6 @@ template <int dim, int spacedim>
 UpdateFlags
 FE_DGPNonparametric<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
-  return update_once(flags) | update_each(flags);
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_DGPNonparametric<dim,spacedim>::update_once (const UpdateFlags) const
-{
-  // for this kind of elements, only
-  // the values can be precomputed
-  // once and for all. set this flag
-  // if the values are requested at
-  // all
-  return update_default;
-}
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_DGPNonparametric<dim,spacedim>::update_each (const UpdateFlags flags) const
-{
   UpdateFlags out = flags;
 
   if (flags & (update_values | update_gradients | update_hessians))
@@ -268,6 +246,7 @@ FE_DGPNonparametric<dim,spacedim>::update_each (const UpdateFlags flags) const
 
   return out;
 }
+
 
 
 //---------------------------------------------------------------------------
@@ -283,8 +262,9 @@ get_data (const UpdateFlags                                                    u
           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // generate a new data object
-  typename FiniteElement<dim,spacedim>::InternalDataBase *data = new typename FiniteElement<dim,spacedim>::InternalDataBase;
-  data->update_each = update_once(update_flags) | update_each(update_flags);   // FIX: only update_each required
+  typename FiniteElement<dim,spacedim>::InternalDataBase *data
+    = new typename FiniteElement<dim,spacedim>::InternalDataBase;
+  data->update_each = requires_update_flags(update_flags);
 
   // other than that, there is nothing we can add here as discussed
   // in the general documentation of this class

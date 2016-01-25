@@ -846,15 +846,6 @@ public:
   virtual std::size_t memory_consumption () const;
 
 protected:
-  /**
-   * Compute flags for initial update only.
-   */
-  UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * Compute flags for update on each cell.
-   */
-  UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * @p clone function instead of a copy constructor.

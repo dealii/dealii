@@ -184,20 +184,6 @@ protected:
   MappingType mapping_type;
 
 
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed only
-   * for the reference cell. Make sure, that #mapping_type is set by the
-   * derived class, such that this function can operate correctly.
-   */
-  UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed in
-   * each cell cell. Make sure, that #mapping_type is set by the derived
-   * class, such that this function can operate correctly.
-   */
-  UpdateFlags update_each (const UpdateFlags flags) const;
-
   /* NOTE: The following function has its definition inlined into the class declaration
      because we otherwise run into a compiler error with MS Visual Studio. */
   virtual
@@ -210,7 +196,7 @@ protected:
     // generate a new data object and
     // initialize some fields
     InternalData *data = new InternalData;
-    data->update_each = update_each(update_flags) | update_once(update_flags);  // FIX: only update_each required
+    data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 

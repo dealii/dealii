@@ -442,25 +442,7 @@ FE_FaceQ<1,spacedim>::get_constant_modes () const
 
 template <int spacedim>
 UpdateFlags
-FE_FaceQ<1,spacedim>::update_once (const UpdateFlags) const
-{
-  return update_default;
-}
-
-
-
-template <int spacedim>
-UpdateFlags
 FE_FaceQ<1,spacedim>::requires_update_flags (const UpdateFlags flags) const
-{
-  return update_once(flags) | update_each(flags);
-}
-
-
-
-template <int spacedim>
-UpdateFlags
-FE_FaceQ<1,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = flags & update_values;
   if (flags & update_gradients)

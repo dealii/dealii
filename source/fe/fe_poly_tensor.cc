@@ -1721,29 +1721,6 @@ template <class PolynomialType, int dim, int spacedim>
 UpdateFlags
 FE_PolyTensor<PolynomialType,dim,spacedim>::requires_update_flags(const UpdateFlags flags) const
 {
-  return update_once(flags) | update_each(flags);
-}
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_PolyTensor<PolynomialType,dim,spacedim>::update_once (const UpdateFlags flags) const
-{
-  const bool values_once = (mapping_type == mapping_none);
-
-  UpdateFlags out = update_default;
-
-  if (values_once && (flags & update_values))
-    out |= update_values;
-
-  return out;
-}
-
-
-template <class PolynomialType, int dim, int spacedim>
-UpdateFlags
-FE_PolyTensor<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags) const
-{
   UpdateFlags out = update_default;
 
   switch (mapping_type)
@@ -1825,7 +1802,6 @@ FE_PolyTensor<PolynomialType,dim,spacedim>::update_each (const UpdateFlags flags
 
   return out;
 }
-
 
 
 // explicit instantiations
