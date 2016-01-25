@@ -1350,12 +1350,12 @@ bool ParameterHandler::read_input (std::istream &input,
       // scan_line. This makes the continuation line logic a lot simpler.
       input_line = Utilities::trim (input_line);
 
-      // check whether or not the current line should be joined with the next
+      // Check whether or not the current line should be joined with the next
       // line before calling scan_line.
       if (input_line.length() != 0 &&
           input_line.find_last_of('\\') == input_line.length() - 1)
         {
-          input_line.erase(input_line.length() - 1); // remove the last '\'
+          input_line.erase (input_line.length() - 1); // remove the last '\'
           is_concatenated = true;
 
           fully_concatenated_line += input_line;
@@ -1367,7 +1367,7 @@ bool ParameterHandler::read_input (std::istream &input,
           fully_concatenated_line += input_line;
           is_concatenated = false;
         }
-      // finally, if neither the previous nor current lines are continuations,
+      // Finally, if neither the previous nor current lines are continuations,
       // then the current input line is entirely concatenated.
       else
         {
