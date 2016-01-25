@@ -209,8 +209,7 @@ namespace DoFTools
   };
 
   /**
-   * @name Functions to support code that generically uses both DoFHandler and
-   * hp::DoFHandler
+   * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
    * @{
    */
   /**
@@ -1185,8 +1184,7 @@ namespace DoFTools
    */
 
   /**
-   * @name Identifying subsets of degrees of freedom with particular
-   * properties
+   * @name Identifying subsets of degrees of freedom with particular properties
    * @{
    */
 
