@@ -19,6 +19,16 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * Test that ParameterHandler can read parameters of the form
+ *
+ *     set Function = a, \
+ *                    b, \
+ *                    c
+ *
+ * correctly. The main point of this test is to exercise the
+ * backslash-handling part of ParameterHandler.
+ */
 
 int main ()
 {

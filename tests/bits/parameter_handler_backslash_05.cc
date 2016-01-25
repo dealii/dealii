@@ -19,6 +19,17 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * Test that ParameterHandler will stop a line continuation if a completely
+ * blank line follows one with a '\', such as
+ *
+ *     set Function_1 = a, \
+ *
+ *                      b, \
+ *                      c
+ *
+ * This should *not* be parsed as 'Function_1 = a, b, c'.
+ */
 
 int main ()
 {

@@ -19,6 +19,18 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * If a parameter file line ends in a '\', then the whitespace at at the
+ * beginning of the next line is ignored when joining the lines. For example,
+ * the input
+ *
+ *      set value = val\
+ *                  u\
+ *                  e
+ *
+ * is parsed as 'set value = value'.
+ */
+
 
 int main ()
 {
