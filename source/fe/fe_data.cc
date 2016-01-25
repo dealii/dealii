@@ -21,9 +21,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 FiniteElementData<dim>::
 FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
-                   const unsigned int n_components,
-                   const unsigned int degree,
-                   const Conformity conformity)
+                   const unsigned int               n_components,
+                   const unsigned int               degree,
+                   const Conformity                 conformity,
+                   const BlockIndices              &block_indices)
   :
   dofs_per_vertex(dofs_per_object[0]),
   dofs_per_line(dofs_per_object[1]),
@@ -56,7 +57,11 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
   components(n_components),
   degree(degree),
   conforming_space(conformity),
-  block_indices_data(1, dofs_per_cell)
+  block_indices_data(block_indices.size() == 0
+                     ?
+                     BlockIndices(1, dofs_per_cell)
+                     :
+                     block_indices)
 {
   Assert(dofs_per_object.size()==dim+1, ExcDimensionMismatch(dofs_per_object.size()-1,dim));
 }

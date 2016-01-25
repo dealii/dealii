@@ -308,7 +308,7 @@ public:
    * element. For an element which is not an FESystem, this contains only a
    * single block with length #dofs_per_cell.
    */
-  BlockIndices block_indices_data;
+  const BlockIndices block_indices_data;
 
   /**
    * Constructor, computing all necessary values from the distribution of dofs
@@ -340,11 +340,19 @@ public:
    *   $H_\text{div}$ conforming; finally, completely discontinuous
    *   elements (implemented by the FE_DGQ class) are only $L_2$
    *   conforming.
+   *
+   * @param[in] block_indices An argument that describes how the base elements
+   *   of a finite element are grouped. The default value constructs a single
+   *   block that consists of all @p dofs_per_cell degrees of freedom. This
+   *   is appropriate for all "atomic" elements (including non-primitive ones)
+   *   and these can therefore omit this argument. On the other hand, composed
+   *   elements such as FESystem will want to pass a different value here.
    */
   FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                      const unsigned int               n_components,
                      const unsigned int               degree,
-                     const Conformity                 conformity = unknown);
+                     const Conformity                 conformity = unknown,
+                     const BlockIndices              &block_indices = BlockIndices());
 
   /**
    * Number of dofs per vertex.
