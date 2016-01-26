@@ -1,0 +1,40 @@
+
+DEAL:: procs = 1
+DEAL::0 0 0 0 0 0 0 
+DEAL:: procs = 2
+DEAL::0 1 0 1 0 1 0 
+DEAL:: procs = 3
+DEAL::0 1 0 2 2 1 1 
+DEAL:: procs = 4
+DEAL::0 2 0 3 1 2 1 
+DEAL:: procs = 5
+DEAL::1 3 0 2 2 4 3 
+DEAL:: procs = 6
+DEAL::1 3 0 5 1 5 2 
+DEAL:: procs = 7
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 8
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 9
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 10
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 11
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 12
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 13
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 14
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 15
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 16
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 17
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 18
+DEAL::2 3 0 6 2 5 4 
+DEAL:: procs = 19
+DEAL::2 3 0 6 2 5 4 
+DEAL::OK
