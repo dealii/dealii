@@ -82,13 +82,19 @@ namespace SparsityTools
     dummy;                                    // the numbers of edges cut by the
     // resulting partition
 
+    // We can not partition n items into more than n parts. METIS will
+    // generate non-sensical output (everything is owned by a single process)
+    // and complain with a message (but won't return an error code!):
+    // ***Cannot bisect a graph with 0 vertices!
+    // ***You are trying to partition a graph into too many parts!
+    nparts = std::min(n, nparts);
+
     // use default options for METIS
     idx_t options[METIS_NOPTIONS];
     METIS_SetDefaultOptions (options);
 
-    // one more nuisance: we have to copy our
-    // own data to arrays that store signed
-    // integers :-(
+    // one more nuisance: we have to copy our own data to arrays that store
+    // signed integers :-(
     std::vector<idx_t> int_rowstart(1);
     int_rowstart.reserve(sparsity_pattern.n_rows()+1);
     std::vector<idx_t> int_colnums;
@@ -106,12 +112,10 @@ namespace SparsityTools
     // Make use of METIS' error code.
     int ierr;
 
-    // Select which type of partitioning to
-    // create
+    // Select which type of partitioning to create
 
-    // Use recursive if the number of
-    // partitions is less than or equal to 8
-    if (n_partitions <= 8)
+    // Use recursive if the number of partitions is less than or equal to 8
+    if (nparts <= 8)
       ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
                                       NULL, NULL, NULL,
                                       &nparts,NULL,NULL,&options[0],
@@ -124,14 +128,11 @@ namespace SparsityTools
                                  &nparts,NULL,NULL,&options[0],
                                  &dummy,&int_partition_indices[0]);
 
-    // If metis returns normally, an
-    // error code METIS_OK=1 is
-    // returned from the above
-    // functions (see metish.h)
+    // If metis returns normally, an error code METIS_OK=1 is returned from
+    // the above functions (see metish.h)
     AssertThrow (ierr == 1, ExcMETISError (ierr));
 
-    // now copy back generated indices into the
-    // output array
+    // now copy back generated indices into the output array
     std::copy (int_partition_indices.begin(),
                int_partition_indices.end(),
                partition_indices.begin());
