@@ -1,0 +1,7 @@
+
+DEAL::Number of cells: 1024
+DEAL::Number of DoFs: 1089
+DEAL::Number of DoFs per level: 4 9 25 81 289 1089 
+DEAL::Number of cells: 32768
+DEAL::Number of DoFs: 35937
+DEAL::Number of DoFs per level: 8 27 125 729 4913 35937 
