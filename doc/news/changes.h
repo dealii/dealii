@@ -213,6 +213,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> Fixed: Partitioning using METIS now works correctly with more
+  domains than cells.
+  <br>
+  (Timo Heister, 2016/01/26)
+  </li>
+
   <li> New: The documentation of step-17 has been completely rewritten,
   and many aspects of how one has to think when writing parallel programs
   have been much better documented now.
