@@ -57,7 +57,7 @@ namespace SparsityTools
                                  sparsity_pattern.n_rows()));
 
     // check for an easy return
-    if (n_partitions == 1)
+    if (n_partitions == 1 || (sparsity_pattern.n_rows()==1))
       {
         std::fill_n (partition_indices.begin(), partition_indices.size(), 0U);
         return;
