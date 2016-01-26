@@ -1584,6 +1584,20 @@ namespace DataOutBase
 
 
 
+  template <int dim, int spacedim>
+  void
+  Patch<dim,spacedim>::swap (Patch<dim,spacedim> &other_patch)
+  {
+    std::swap (vertices, other_patch.vertices);
+    std::swap (neighbors, other_patch.neighbors);
+    std::swap (patch_index, other_patch.patch_index);
+    std::swap (n_subdivisions, other_patch.n_subdivisions);
+    data.swap (other_patch.data);
+    std::swap (points_are_available, other_patch.points_are_available);
+  }
+
+
+
   UcdFlags::UcdFlags (const bool write_preamble)
     :
     write_preamble (write_preamble)
@@ -2113,10 +2127,10 @@ namespace DataOutBase
 
 //----------------------------------------------------------------------//
 
-  template <int dim, int spacedim, typename STREAM>
+  template <int dim, int spacedim, typename StreamType>
   void
   write_nodes (const std::vector<Patch<dim,spacedim> > &patches,
-               STREAM &out)
+               StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
@@ -2154,10 +2168,10 @@ namespace DataOutBase
     out.flush_points ();
   }
 
-  template <int dim, int spacedim, typename STREAM>
+  template <int dim, int spacedim, typename StreamType>
   void
   write_cells (const std::vector<Patch<dim,spacedim> > &patches,
-               STREAM &out)
+               StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
@@ -2196,13 +2210,13 @@ namespace DataOutBase
   }
 
 
-  template <int dim, int spacedim, class STREAM>
+  template <int dim, int spacedim, class StreamType>
   void
-  write_data (
-    const std::vector<Patch<dim,spacedim> > &patches,
-    unsigned int n_data_sets,
-    const bool double_precision,
-    STREAM &out)
+  write_data
+  (const std::vector<Patch<dim,spacedim> > &patches,
+   unsigned int                             n_data_sets,
+   const bool                               double_precision,
+   StreamType                              &out)
   {
     Assert (dim<=3, ExcNotImplemented());
     unsigned int count = 0;
@@ -2492,7 +2506,7 @@ namespace DataOutBase
 
       double lambda = - gradient[0] * (v_min[0] - v_max[0]) - gradient[1] * (v_min[1] - v_max[1]);
 
-      Point<6> gradient_parameters(true);
+      Point<6> gradient_parameters;
 
       gradient_parameters[0] = v_min[0];
       gradient_parameters[1] = v_min[1];
@@ -5402,9 +5416,9 @@ namespace DataOutBase
 
 
 // set initial camera position
-    Point<3> camera_position(true);
-    Point<3> camera_direction(true);
-    Point<3> camera_horizontal(true);
+    Point<3> camera_position;
+    Point<3> camera_direction;
+    Point<3> camera_horizontal;
     float camera_focus = 0;
 
     // translate camera from the origin to the initial position
@@ -5484,7 +5498,7 @@ namespace DataOutBase
     n_subdivisions = patch->n_subdivisions;
     n = n_subdivisions + 1;
 
-    Point<3> point(true);
+    Point<3> point;
 
     compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
 

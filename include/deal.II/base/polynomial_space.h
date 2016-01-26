@@ -116,8 +116,8 @@ public:
   /**
    * Prints the list of the indices to <tt>out</tt>.
    */
-  template <class STREAM>
-  void output_indices(STREAM &out) const;
+  template <class StreamType>
+  void output_indices(StreamType &out) const;
 
   /**
    * Sets the ordering of the polynomials. Requires
@@ -299,9 +299,9 @@ PolynomialSpace<dim>::degree() const
 
 
 template <int dim>
-template <class STREAM>
+template <class StreamType>
 void
-PolynomialSpace<dim>::output_indices(STREAM &out) const
+PolynomialSpace<dim>::output_indices(StreamType &out) const
 {
   unsigned int ix[dim];
   for (unsigned int i=0; i<n_pols; ++i)

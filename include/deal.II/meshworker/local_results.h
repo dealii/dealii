@@ -321,8 +321,8 @@ namespace MeshWorker
      *
      * @note This function is usually only called by the assembler.
      */
-    template <class MATRIX>
-    void initialize_matrices(const MatrixBlockVector<MATRIX> &matrices,
+    template <typename MatrixType>
+    void initialize_matrices(const MatrixBlockVector<MatrixType> &matrices,
                              bool both);
 
     /**
@@ -332,8 +332,8 @@ namespace MeshWorker
      *
      * @note This function is usually only called by the assembler.
      */
-    template <class MATRIX>
-    void initialize_matrices(const MGMatrixBlockVector<MATRIX> &matrices,
+    template <typename MatrixType>
+    void initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices,
                              bool both);
 
     /**
@@ -349,8 +349,8 @@ namespace MeshWorker
      */
     void reinit(const BlockIndices &local_sizes);
 
-    template <class STREAM>
-    void print_debug(STREAM &os) const;
+    template <class StreamType>
+    void print_debug(StreamType &os) const;
 
     /**
      * The memory used by this object.
@@ -416,11 +416,11 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class MATRIX>
+  template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices(
-    const MatrixBlockVector<MATRIX> &matrices,
-    bool both)
+  LocalResults<number>::initialize_matrices
+  (const MatrixBlockVector<MatrixType> &matrices,
+   bool                                 both)
   {
     M1.resize(matrices.size());
     if (both)
@@ -442,18 +442,18 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class MATRIX>
+  template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices(
-    const MGMatrixBlockVector<MATRIX> &matrices,
-    bool both)
+  LocalResults<number>::initialize_matrices
+  (const MGMatrixBlockVector<MatrixType> &matrices,
+   bool                                   both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
     for (unsigned int i=0; i<matrices.size(); ++i)
       {
-        const MGLevelObject<MatrixBlock<MATRIX> > &o = matrices.block(i);
+        const MGLevelObject<MatrixBlock<MatrixType> > &o = matrices.block(i);
         const unsigned int row = o[o.min_level()].row;
         const unsigned int col = o[o.min_level()].column;
 
@@ -640,9 +640,9 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class STREAM>
+  template <class StreamType>
   void
-  LocalResults<number>::print_debug(STREAM &os) const
+  LocalResults<number>::print_debug(StreamType &os) const
   {
     os << "J: " << J.size() << std::endl;
     os << "R: " << R.size() << std::endl;

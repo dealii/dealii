@@ -53,8 +53,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2010
  */
-template <class VECTOR = Vector<double> >
-class SolverRelaxation : public Solver<VECTOR>
+template <typename VectorType = Vector<double> >
+class SolverRelaxation : public Solver<VectorType>
 {
 public:
   /**
@@ -79,48 +79,47 @@ public:
    * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
    * residual.
    */
-  template<class MATRIX, class RELAXATION>
+  template<typename MatrixType, class RelaxationType>
   void
-  solve (const MATRIX &A,
-         VECTOR &x,
-         const VECTOR &b,
-         const RELAXATION &R);
+  solve (const MatrixType     &A,
+         VectorType           &x,
+         const VectorType     &b,
+         const RelaxationType &R);
 };
 
 //----------------------------------------------------------------------//
 
-template <class VECTOR>
-SolverRelaxation<VECTOR>::SolverRelaxation(SolverControl &cn,
-                                           const AdditionalData &)
+template <class VectorType>
+SolverRelaxation<VectorType>::SolverRelaxation (SolverControl        &cn,
+                                                const AdditionalData &)
   :
-  Solver<VECTOR> (cn)
+  Solver<VectorType> (cn)
 {}
 
 
 
-template <class VECTOR>
-SolverRelaxation<VECTOR>::~SolverRelaxation()
+template <class VectorType>
+SolverRelaxation<VectorType>::~SolverRelaxation()
 {}
 
 
-template <class VECTOR>
-template <class MATRIX, class RELAXATION>
+template <class VectorType>
+template <typename MatrixType, class RelaxationType>
 void
-SolverRelaxation<VECTOR>::solve (
-  const MATRIX &A,
-  VECTOR &x,
-  const VECTOR &b,
-  const RELAXATION &R)
+SolverRelaxation<VectorType>::solve (const MatrixType     &A,
+                                     VectorType           &x,
+                                     const VectorType     &b,
+                                     const RelaxationType &R)
 {
-  GrowingVectorMemory<VECTOR> mem;
+  GrowingVectorMemory<VectorType> mem;
   SolverControl::State conv=SolverControl::iterate;
 
   // Memory allocation
-  typename VectorMemory<VECTOR>::Pointer Vr(mem);
-  VECTOR &r  = *Vr;
+  typename VectorMemory<VectorType>::Pointer Vr(mem);
+  VectorType &r  = *Vr;
   r.reinit(x);
-  typename VectorMemory<VECTOR>::Pointer Vd(mem);
-  VECTOR &d  = *Vd;
+  typename VectorMemory<VectorType>::Pointer Vd(mem);
+  VectorType &d  = *Vd;
   d.reinit(x);
 
   deallog.push("Relaxation");

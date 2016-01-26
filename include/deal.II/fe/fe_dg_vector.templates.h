@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,16 +23,16 @@ DEAL_II_NAMESPACE_OPEN
 
 //TODO:[GK] deg+1 is wrong here and should be fixed after FiniteElementData was cleaned up
 
-template <class POLY, int dim, int spacedim>
-FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
+template <class PolynomialType, int dim, int spacedim>
+FE_DGVector<PolynomialType,dim,spacedim>::FE_DGVector (
   const unsigned int deg, MappingType map)
   :
-  FE_PolyTensor<POLY, dim, spacedim>(
+  FE_PolyTensor<PolynomialType, dim, spacedim>(
     deg,
     FiniteElementData<dim>(
-      get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
-    std::vector<bool>(POLY::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(POLY::compute_n_pols(deg),
+      get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2),
+    std::vector<bool>(PolynomialType::compute_n_pols(deg), true),
+    std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
                                ComponentMask(dim,true)))
 {
   this->mapping_type = map;
@@ -47,17 +47,17 @@ FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 FiniteElement<dim, spacedim> *
-FE_DGVector<POLY,dim,spacedim>::clone() const
+FE_DGVector<PolynomialType,dim,spacedim>::clone() const
 {
-  return new FE_DGVector<POLY, dim, spacedim>(*this);
+  return new FE_DGVector<PolynomialType, dim, spacedim>(*this);
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 std::string
-FE_DGVector<POLY,dim,spacedim>::get_name() const
+FE_DGVector<PolynomialType,dim,spacedim>::get_name() const
 {
   std::ostringstream namebuf;
   namebuf << "FE_DGVector_" << this->poly_space.name()
@@ -66,59 +66,60 @@ FE_DGVector<POLY,dim,spacedim>::get_name() const
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
-FE_DGVector<POLY,dim,spacedim>::get_dpo_vector (const unsigned int deg)
+FE_DGVector<PolynomialType,dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1);
-  dpo[dim] = POLY::compute_n_pols(deg);
+  dpo[dim] = PolynomialType::compute_n_pols(deg);
 
   return dpo;
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 bool
-FE_DGVector<POLY,dim,spacedim>::has_support_on_face (const unsigned int,
-                                                     const unsigned int) const
+FE_DGVector<PolynomialType,dim,spacedim>::has_support_on_face
+(const unsigned int,
+ const unsigned int) const
 {
   return true;
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double> &,
-  const std::vector<double> &) const
+FE_DGVector<PolynomialType,dim,spacedim>::interpolate
+(std::vector<double> &,
+ const std::vector<double> &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double> & /*local_dofs*/,
-  const std::vector<Vector<double> > & /*values*/,
-  unsigned int /*offset*/) const
+FE_DGVector<PolynomialType,dim,spacedim>::interpolate
+(std::vector<double> & /*local_dofs*/,
+ const std::vector<Vector<double> > & /*values*/,
+ unsigned int /*offset*/) const
 {
   Assert(false, ExcNotImplemented());
 }
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 void
-FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double> & /*local_dofs*/,
-  const VectorSlice<const std::vector<std::vector<double> > > & /*values*/) const
+FE_DGVector<PolynomialType,dim,spacedim>::interpolate
+(std::vector<double> & /*local_dofs*/,
+ const VectorSlice<const std::vector<std::vector<double> > > & /*values*/) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template <class POLY, int dim, int spacedim>
+template <class PolynomialType, int dim, int spacedim>
 std::size_t
-FE_DGVector<POLY,dim,spacedim>::memory_consumption() const
+FE_DGVector<PolynomialType,dim,spacedim>::memory_consumption() const
 {
   Assert(false, ExcNotImplemented());
   return 0;

@@ -24,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Select data from NamedData corresponding to the attached name.
+ * Select data from AnyData corresponding to the attached name.
  *
  * Given a list of names to search for (provided by add()), objects of this
  * class provide an index list of the selected data.
@@ -37,7 +37,7 @@ class NamedSelection
 public:
 
   /**
-   * Add a new name to be searched for in NamedData.
+   * Add a new name to be searched for in @p data supplied in initialize().
    *
    * @note Names will be added to the end of the current list.
    */
@@ -58,7 +58,7 @@ public:
 
 
   /**
-   * Return the corresponding index in the NamedData object supplied to the
+   * Return the corresponding index in the AnyData object supplied to the
    * last initialize(). It is an error if initialize() has not been called
    * before.
    *

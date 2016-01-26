@@ -168,6 +168,11 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element.  The size of the matrix is then
@@ -235,9 +240,10 @@ protected:
 
   virtual
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Mapping<1,spacedim> &/*mapping*/,
-            const Quadrature<1> &/*quadrature*/) const
+  get_data (const UpdateFlags                                                  /*update_flags*/,
+            const Mapping<1,spacedim>                                         &/*mapping*/,
+            const Quadrature<1>                                               &/*quadrature*/,
+            dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     return new typename FiniteElement<1, spacedim>::InternalDataBase;
   }
@@ -245,25 +251,20 @@ protected:
   typename FiniteElement<1,spacedim>::InternalDataBase *
   get_face_data(const UpdateFlags update_flags,
                 const Mapping<1,spacedim> &/*mapping*/,
-                const Quadrature<0> &quadrature) const
+                const Quadrature<0> &quadrature,
+                dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     // generate a new data object and initialize some fields
     typename FiniteElement<1,spacedim>::InternalDataBase *data =
       new typename FiniteElement<1,spacedim>::InternalDataBase;
+    data->update_each = requires_update_flags(update_flags);
 
-    // check what needs to be initialized only once and what on every
-    // cell/face/subface we visit
-    data->update_once = update_once(update_flags);
-    data->update_each = update_each(update_flags);
-    data->update_flags = data->update_once | data->update_each;
-
-    const UpdateFlags flags(data->update_flags);
     const unsigned int n_q_points = quadrature.size();
     AssertDimension(n_q_points, 1);
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (flags & update_gradients || flags & update_hessians)
+    if (data->update_each & update_gradients || data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
@@ -272,99 +273,55 @@ protected:
   }
 
   typename FiniteElement<1,spacedim>::InternalDataBase *
-  get_subface_data(const UpdateFlags update_flags,
-                   const Mapping<1,spacedim> &mapping,
-                   const Quadrature<0> &quadrature) const
+  get_subface_data(const UpdateFlags                                                  update_flags,
+                   const Mapping<1,spacedim>                                         &mapping,
+                   const Quadrature<0>                                               &quadrature,
+                   dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const
   {
-    return get_face_data(update_flags, mapping, quadrature);
+    return get_face_data(update_flags, mapping, quadrature, output_data);
   }
 
   virtual
   void
-  fill_fe_values (const Mapping<1,spacedim>                              &mapping,
-                  const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                  const Quadrature<1>                                     &quadrature,
-                  const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                  const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data,
-                  const CellSimilarity::Similarity                          cell_similarity) const;
+  fill_fe_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                   cell_similarity,
+                  const Quadrature<1>                                               &quadrature,
+                  const Mapping<1,spacedim>                                         &mapping,
+                  const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                  const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                  const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_face_values (const Mapping<1,spacedim>                               &mapping,
-                       const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<0>                                   &quadrature,
-                       const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                       const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
+  fill_fe_face_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                       const unsigned int                                                 face_no,
+                       const Quadrature<0>                                               &quadrature,
+                       const Mapping<1,spacedim>                                         &mapping,
+                       const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                       const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                       const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<1,spacedim>                               &mapping,
-                          const typename Triangulation<1,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         sub_no,
-                          const Quadrature<0>                                   &quadrature,
-                          const typename Mapping<1,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename FiniteElement<1,spacedim>::InternalDataBase    &fe_internal,
-                          const internal::FEValues::MappingRelatedData<1,spacedim> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<1,spacedim> &output_data) const;
-
-
-  /**
-   * Determine the values that need to be computed on the unit cell to be able
-   * to compute all values required by <tt>flags</tt>.
-   *
-   * For the purpose of this function, refer to the documentation in
-   * FiniteElement.
-   *
-   * This class assumes that shape functions of this FiniteElement do
-   * <em>not</em> depend on the actual shape of the cells in real space.
-   * Therefore, the effect in this element is as follows: if
-   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the result.
-   * All other flags of the result are cleared, since everything else must be
-   * computed for each cell.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * Determine the values that need to be computed on every cell to be able to
-   * compute all values required by <tt>flags</tt>.
-   *
-   * For the purpose of this function, refer to the documentation in
-   * FiniteElement.
-   *
-   * This class assumes that shape functions of this FiniteElement do
-   * <em>not</em> depend on the actual shape of the cells in real space.
-   *
-   * The effect in this element is as follows:
-   * <ul>
-   *
-   * <li> if <tt>update_gradients</tt> is set, the result will contain
-   * <tt>update_gradients</tt> and <tt>update_covariant_transformation</tt>.
-   * The latter is required to transform the gradient on the unit cell to the
-   * real cell. Remark, that the action required by
-   * <tt>update_covariant_transformation</tt> is actually performed by the
-   * Mapping object used in conjunction with this finite element.
-   *
-   * <li> if <tt>update_hessians</tt> is set, the result will contain
-   * <tt>update_hessians</tt> and <tt>update_covariant_transformation</tt>.
-   * The rationale is the same as above and no higher derivatives of the
-   * transformation are required, since we use difference quotients for the
-   * actual computation.
-   *
-   * </ul>
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  fill_fe_subface_values (const typename Triangulation<1,spacedim>::cell_iterator           &cell,
+                          const unsigned int                                                 face_no,
+                          const unsigned int                                                 sub_no,
+                          const Quadrature<0>                                               &quadrature,
+                          const Mapping<1,spacedim>                                         &mapping,
+                          const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
+                          const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                          const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
 private:
   /**
    * Return vector with dofs per vertex, line, quad, hex.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
+  static
+  std::vector<unsigned int>
+  get_dpo_vector (const unsigned int deg);
 };
 
 

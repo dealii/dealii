@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -76,7 +76,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     ENDIF()
     FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}${_delim}${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR}${_delim}\$ENV{PATH}\")\n"
-      "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
+      "EXECUTE_PROCESS(COMMAND ${CMAKE_BUILD_TYPE}\\\\${TARGET_RUN}\n"
       "  RESULT_VARIABLE _return_value\n"
       "  )\n"
       "IF(NOT \"\${_return_value}\" STREQUAL \"0\")\n"

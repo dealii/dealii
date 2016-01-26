@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014-2015 by the deal.II authors
+// Copyright (C) 2014 - 2016-2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,7 +81,7 @@ public:
         endc = dof_handler.end(level);
         for (; cell!=endc; ++cell)
           {
-            if (dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            if (dof_handler.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
                 && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe = cell->get_fe();
@@ -247,11 +247,11 @@ private:
 
 
 
-template <typename MATRIX>
+template <typename MatrixType>
 class MGTransferPrebuiltMF : public MGTransferPrebuilt<parallel::distributed::Vector<double> >
 {
 public:
-  MGTransferPrebuiltMF(const MGLevelObject<MATRIX> &laplace)
+  MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace)
     :
     laplace_operator (laplace)
   {};
@@ -273,18 +273,18 @@ public:
   }
 
 private:
-  const MGLevelObject<MATRIX> &laplace_operator;
+  const MGLevelObject<MatrixType> &laplace_operator;
 };
 
 
 
-template<typename MATRIX, typename Number>
+template<typename MatrixType, typename Number>
 class MGCoarseIterative : public MGCoarseGridBase<parallel::distributed::Vector<Number> >
 {
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MATRIX &matrix)
+  void initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
@@ -298,15 +298,14 @@ public:
     solver_coarse.solve (*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
-  const MATRIX *coarse_matrix;
+  const MatrixType *coarse_matrix;
 };
 
 
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof,
-              const bool              also_test_parallel = false)
+void do_test (const DoFHandler<dim>  &dof)
 {
   if (types_are_equal<number,float>::value == true)
     {
@@ -339,8 +338,8 @@ void do_test (const DoFHandler<dim>  &dof,
   typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,number> LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
-  mg_matrices.resize(0, dof.get_tria().n_levels()-1);
-  for (unsigned int level = 0; level<dof.get_tria().n_levels(); ++level)
+  mg_matrices.resize(0, dof.get_triangulation().n_global_levels()-1);
+  for (unsigned int level = 0; level<dof.get_triangulation().n_global_levels(); ++level)
     {
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
@@ -356,8 +355,8 @@ void do_test (const DoFHandler<dim>  &dof,
   mg_smoother;
 
   MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
-  smoother_data.resize(0, dof.get_tria().n_levels()-1);
-  for (unsigned int level = 0; level<dof.get_tria().n_levels(); ++level)
+  smoother_data.resize(0, dof.get_triangulation().n_global_levels()-1);
+  for (unsigned int level = 0; level<dof.get_triangulation().n_global_levels(); ++level)
     {
       smoother_data[level].smoothing_range = 15.;
       smoother_data[level].degree = 5;
@@ -407,7 +406,7 @@ void test ()
       dof.distribute_dofs(fe);
       dof.distribute_mg_dofs(fe);
 
-      do_test<dim, fe_degree, fe_degree+1, double> (dof, true);
+      do_test<dim, fe_degree, fe_degree+1, double> (dof);
     }
 }
 
@@ -420,11 +419,8 @@ int main (int argc, char **argv)
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       deallog.attach(logfile);
-      deallog.depth_console(4);
       deallog << std::setprecision (4);
     }
-  else
-    deallog.depth_console(0);
 
   {
     deallog.threshold_double(1.e-10);

@@ -508,7 +508,6 @@ int main ()
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   {
     deallog.push("2d");

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -283,64 +283,87 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
-   * Return the value of the @p ith shape function at the point @p p. See the
-   * FiniteElement base class for more information about the semantics of this
-   * function.
+   * This function is intended to return the value of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_value(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
 
   /**
-   * Return the value of the @p componentth vector component of the @p ith
-   * shape function at the point @p p. See the FiniteElement base class for
-   * more information about the semantics of this function.
+   * This function is intended to return the value of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_value_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim> &p,
                                         const unsigned int component) const;
 
   /**
-   * Return the gradient of the @p ith shape function at the point @p p. See
-   * the FiniteElement base class for more information about the semantics of
-   * this function.
+   * This function is intended to return the gradient of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
 
   /**
-   * Return the gradient of the @p componentth vector component of the @p ith
-   * shape function at the point @p p. See the FiniteElement base class for
-   * more information about the semantics of this function.
+   * This function is intended to return the gradient of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim> &p,
                                               const unsigned int component) const;
 
   /**
-   * Return the tensor of second derivatives of the @p ith shape function at
-   * point @p p on the unit cell.  See the FiniteElement base class for more
-   * information about the semantics of this function.
+   * This function is intended to return the Hessian of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
+   *
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_grad(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim> &p) const;
 
   /**
-   * Return the second derivative of the @p componentth vector component of
-   * the @p ith shape function at the point @p p. See the FiniteElement base
-   * class for more information about the semantics of this function.
+   * This function is intended to return the Hessian of a shape function
+   * at a point on the reference cell. However, since the current element
+   * does not implement shape functions by mapping from a reference cell,
+   * no shape functions exist on the reference cell.
    *
-   * Since this element is scalar, the returned value is the same as if the
-   * function without the @p _component suffix were called, provided that the
-   * specified component is zero.
+   * Consequently, as discussed in the corresponding function in the base
+   * class, FiniteElement::shape_grad_grad_component(), this function throws an exception
+   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,
@@ -525,43 +548,44 @@ protected:
    */
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags,
-            const Mapping<dim,spacedim> &mapping,
-            const Quadrature<dim> &quadrature) const;
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
-                  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                  const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
-                  const CellSimilarity::Similarity                           cell_similarity) const;
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                     cell_similarity,
+                  const Quadrature<dim>                                               &quadrature,
+                  const Mapping<dim,spacedim>                                         &mapping,
+                  const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_face_values (const Mapping<dim,spacedim>                               &mapping,
-                       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                       const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                       const unsigned int                                                   face_no,
+                       const Quadrature<dim-1>                                             &quadrature,
+                       const Mapping<dim,spacedim>                                         &mapping,
+                       const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim,spacedim>                               &mapping,
-                          const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         sub_no,
-                          const Quadrature<dim-1>                                   &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                          const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                          const unsigned int                                                   face_no,
+                          const unsigned int                                                   sub_no,
+                          const Quadrature<dim-1>                                             &quadrature,
+                          const Mapping<dim,spacedim>                                         &mapping,
+                          const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
 private:
 
@@ -571,29 +595,9 @@ private:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
-
-  /**
-   * Given a set of flags indicating what quantities are requested from a @p
-   * FEValues object, return which of these can be precomputed once and for
-   * all. Often, the values of shape function at quadrature points can be
-   * precomputed, for example, in which case the return value of this function
-   * would be the logical and of the input @p flags and @p update_values.
-   *
-   * For the present kind of finite element, this is exactly the case.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * This is the opposite to the above function: given a set of flags
-   * indicating what we want to know, return which of these need to be
-   * computed each time we visit a new cell.
-   *
-   * If for the computation of one quantity something else is also required
-   * (for example, we often need the covariant transformation when gradients
-   * need to be computed), include this in the result as well.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+  static
+  std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
   /**
    * Degree of the polynomials.
@@ -609,12 +613,6 @@ private:
    * Allow access from other dimensions.
    */
   template <int, int> friend class FE_DGPNonparametric;
-
-  /**
-   * Allows @p MappingQ class to access to build_renumbering function.
-   */
-  template <int, int> friend class MappingQ;
-//    friend class MappingQ<dim>;
 };
 
 /*@}*/

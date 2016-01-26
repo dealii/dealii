@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,6 @@ int main ()
   std::ofstream logfile ("output");
   deallog << std::setprecision(8) << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   deallog.push ("2d");
   check<2> ();

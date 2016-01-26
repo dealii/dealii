@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,6 +66,50 @@ namespace hp
      * mappings the same way.
      */
     explicit FECollection (const FiniteElement<dim,spacedim> &fe);
+
+    /**
+     * Constructor. This constructor creates a FECollection from two
+     * finite elements.
+     */
+    FECollection (const FiniteElement<dim,spacedim> &fe1,
+                  const FiniteElement<dim,spacedim> &fe2);
+
+    /**
+     * Constructor. This constructor creates a FECollection from three
+     * finite elements.
+     */
+    FECollection (const FiniteElement<dim,spacedim> &fe1,
+                  const FiniteElement<dim,spacedim> &fe2,
+                  const FiniteElement<dim,spacedim> &fe3);
+
+    /**
+     * Constructor. This constructor creates a FECollection from four
+     * finite elements.
+     */
+    FECollection (const FiniteElement<dim,spacedim> &fe1,
+                  const FiniteElement<dim,spacedim> &fe2,
+                  const FiniteElement<dim,spacedim> &fe3,
+                  const FiniteElement<dim,spacedim> &fe4);
+
+    /**
+     * Constructor. This constructor creates a FECollection from five
+     * finite elements.
+     */
+    FECollection (const FiniteElement<dim,spacedim> &fe1,
+                  const FiniteElement<dim,spacedim> &fe2,
+                  const FiniteElement<dim,spacedim> &fe3,
+                  const FiniteElement<dim,spacedim> &fe4,
+                  const FiniteElement<dim,spacedim> &fe5);
+
+    /**
+     * Constructor. Same as above but for any number of elements. Pointers
+     * to the elements are passed in a vector to this constructor.
+     * As above, the finite element objects pointed to by the argument are
+     * not actually used other than to create copies internally. Consequently,
+     * you can delete these pointers immediately again after calling this
+     * constructor.
+     */
+    FECollection (const std::vector<const FiniteElement<dim,spacedim>*> &fes);
 
     /**
      * Copy constructor.

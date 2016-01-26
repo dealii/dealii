@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,18 +17,22 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   mg_base.cc
+  mg_level_global_transfer.cc
   mg_tools.cc
   mg_transfer_block.cc
   mg_transfer_component.cc
+  mg_transfer_matrix_free.cc
   mg_transfer_prebuilt.cc
   multigrid.cc
   )
 
 SET(_inst
   mg_base.inst.in
+  mg_level_global_transfer.inst.in
   mg_tools.inst.in
   mg_transfer_block.inst.in
   mg_transfer_component.inst.in
+  mg_transfer_matrix_free.inst.in
   mg_transfer_prebuilt.inst.in
   multigrid.inst.in
   )

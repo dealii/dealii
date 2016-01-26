@@ -39,72 +39,135 @@ namespace hp
 
 
 /**
- * Base class for finite elements in arbitrary dimensions. This class provides
- * several fields which describe a specific finite element and which are
- * filled by derived classes. It more or less only offers the fields and
- * access functions which makes it possible to copy finite elements without
- * knowledge of the actual type (linear, quadratic, etc). In particular, the
- * functions to fill the data fields of FEValues and its derived classes are
- * declared.
+ * This is the base class for finite elements in arbitrary dimensions. It
+ * declares the interface both in terms of member variables and public
+ * member functions through which properties of a concrete implementation
+ * of a finite element can be accessed. This interface generally consists
+ * of a number of groups of variables and functions that can roughly be
+ * delineated as follows:
+ * - Basic information about the finite element, such as the number of
+ *   degrees of freedom per vertex, edge, or cell. This kind of data
+ *   is stored in the FiniteElementData base class. (Though the
+ *   FiniteElement::get_name() member function also falls into this category.)
+ * - A description of the shape functions and their derivatives on the
+ *   reference cell $[0,1]^d$, if an element is indeed defined by mapping
+ *   shape functions from the reference cell to an actual cell.
+ * - Matrices (and functions that access them) that describe how an
+ *   element's shape functions related to those on parent or child cells
+ *   (restriction or prolongation) or neighboring cells (for hanging
+ *   node constraints), as well as to other finite element spaces
+ *   defined on the same cell (e.g., when doing $p$ refinement).
+ * - %Functions that describe the properties of individual shape functions,
+ *   for example which @ref GlossComponent "vector components" of a
+ *   @ref vector_valued "vector-valued finite element's" shape function
+ *   is nonzero, or whether an element is @ref GlossPrimitive "primitive".
+ * - For elements that are interpolatory, such as the common $Q_p$
+ *   Lagrange elements, data that describes where their
+ *   @ref GlossSupport "support points" are located.
+ * - %Functions that define the interface to the FEValues class that is
+ *   almost always used to access finite element shape functions from
+ *   user code.
  *
- * The interface of this class is very restrictive. The reason is that finite
- * element values should be accessed only by use of FEValues objects. These,
- * together with FiniteElement are responsible to provide an optimized
- * implementation.
+ * The following sections discuss many of these concepts in more detail,
+ * and outline strategies by which concrete implementations of a finite
+ * element can provide the details necessary for a complete description
+ * of a finite element space.
  *
- * This class declares the shape functions and their derivatives on the unit
- * cell $[0,1]^d$. The means to transform them onto a given cell in physical
- * space is provided by the FEValues class with a Mapping object.
+ * As a general rule, there are three ways by which derived classes
+ * provide this information:
+ * - A number of fields that are generally easy to compute and that
+ *   are initialized by the constructor of this class (or the constructor
+ *   of the FiniteElementData base class) and derived classes therefore
+ *   have to compute in the process of calling this class's constructor.
+ *   This is, specifically, the case for the basic information and parts
+ *   of the descriptive information about shape functions mentioned above.
+ * - Some common matrices that are widely used in the library and for
+ *   which this class provides protected member variables that the
+ *   constructors of derived classes need to fill. The purpose of providing
+ *   these matrices in this class is that (i) they are frequently used,
+ *   and (ii) they are expensive to compute. Consequently, it makes sense
+ *   to only compute them once, rather than every time they are used. In most
+ *   cases, the constructor of the current class already sets them to their
+ *   correct size, and derived classes therefore only have to fill them.
+ *   Examples of this include the matrices that relate the shape functions on
+ *   one cell to the shape functions on neighbors, children, and parents.
+ * - Uncommon information, or information that depends on specific input
+ *   arguments, and that needs to be implemented by derived classes. For
+ *   these, this base class only declares abstract virtual member functions
+ *   and derived classes then have to implement them. Examples of this
+ *   category would include the functions that compute values and
+ *   derivatives of shape functions on the reference cell for which it
+ *   is not possible to tabulate values because there are infinitely
+ *   many points at which one may want to evaluate them. In some cases,
+ *   derived classes may choose to simply not implement <i>all</i> possible
+ *   interfaces (or may not <i>yet</i> have a complete implementation);
+ *   for uncommon functions, there is then often a member function
+ *   derived classes can overload that describes whether a particular
+ *   feature is implemented. An example is whether an element implements
+ *   the information necessary to use it in the $hp$ finite element
+ *   context (see @ref hp "hp finite element support").
  *
- * The different matrices are initialized with the correct size, such that in
- * the derived (concrete) finite element classes, their entries only have to
- * be filled in; no resizing is needed. If the matrices are not defined by a
- * concrete finite element, they should be resized to zero. This way functions
- * using them can find out, that they are missing. On the other hand, it is
- * possible to use finite element classes without implementation of the full
- * functionality, if only part of it is needed. The functionality under
- * consideration here is hanging nodes constraints and grid transfer,
- * respectively.
  *
- * The <tt>spacedim</tt> parameter has to be used if one wants to solve
- * problems in the boundary element method formulation or in an equivalent
- * one, as it is explained in the Triangulation class. If not specified, this
- * parameter takes the default value <tt>=dim</tt> so that this class can be
- * used to solve problems in the finite element method formulation.
+ * <h3>Nomenclature</h3>
  *
- * <h3>Components and blocks</h3>
+ * Finite element classes have to define a large number of different properties
+ * describing  a finite element space. The following subsections describe some
+ * nomenclature that will be used in the documentation below.
  *
- * For vector valued elements shape functions may have nonzero entries in one
- * or several
+ * <h4>Components and blocks</h4>
+ *
+ * @ref vector_valued "Vector-valued finite element" are elements used for
+ * systems of partial differential equations. Oftentimes, they are composed
+ * via the FESystem class (which is itself derived from the current class),
+ * but there are also non-composed elements that have multiple components
+ * (for example the FE_Nedelec and FE_RaviartThomas classes, among others).
+ * For any of these vector valued elements, individual shape functions may
+ * be nonzero in one or several
  * @ref GlossComponent "components"
  * of the vector valued function. If the element is
  * @ref GlossPrimitive "primitive",
  * there is indeed a single component with a nonzero entry for each shape
- * function. This component can be determined by system_to_component_index(),
- * the number of components is FiniteElementData::n_components().
+ * function. This component can be determined using the
+ * FiniteElement::system_to_component_index() function.
  *
- * Furthermore, you may want to split your linear system into
- * @ref GlossBlock "blocks"
- * for the use in BlockVector, BlockSparseMatrix, BlockMatrixArray and so on.
+ * On the other hand, if there is at least one shape function that
+ * is nonzero in more than one vector component, then we call the entire
+ * element "non-primitive". The FiniteElement::get_nonzero_components()
+ * can then be used to determine which vector components of a shape
+ * function are nonzero. The number of nonzero components of a shape function
+ * is returned by FiniteElement::n_components(). Whether a shape
+ * function is non-primitive can be queried by
+ * FiniteElement::is_primitive().
+ *
+ * Oftentimes, one may want to split linear system into blocks so that they
+ * reflect the structure of the underlying operator. This is typically not
+ * done based on vector components, but based on the use of
+ * @ref GlossBlock "blocks", and the result is then used to substructure
+ * objects of type BlockVector, BlockSparseMatrix, BlockMatrixArray, and so on.
  * If you use non-primitive elements, you cannot determine the block number by
- * system_to_component_index(). Instead, you can use system_to_block_index(),
- * which will automatically take care of the additional components occupied by
- * vector valued elements. The number of generated blocks can be determined by
- * FiniteElementData::n_blocks().
+ * FiniteElement::system_to_component_index(). Instead, you can use
+ * FiniteElement::system_to_block_index(). The number of blocks of a finite
+ * element can be determined by FiniteElement::n_blocks().
  *
- * If you decide to operate by base element and multiplicity, the function
- * first_block_of_base() will be helpful.
  *
- * <h3>Support points</h3>
+ * <h4>Support points</h4>
  *
- * Since a FiniteElement does not have information on the actual grid cell, it
- * can only provide
- * @ref GlossSupport "support points"
- * on the unit cell. Support points on the actual grid cell must be computed
- * by mapping these points. The class used for this kind of operation is
- * FEValues. In most cases, code of the following type will serve to provide
- * the mapped support points.
+ * Finite elements are frequently defined by defining a polynomial space and
+ * a set of dual functionals. If these functionals involve point evaluations,
+ * then the element is "interpolatory" and it is possible to interpolate
+ * an arbitrary (but sufficiently smooth) function onto the finite element
+ * space by evaluating it at these points. We call these points "support
+ * points".
  *
+ * Most finite elements are defined by mapping from the reference cell to
+ * a concrete cell. Consequently, the support points are then defined on
+ * the reference ("unit") cell, see
+ * @ref GlossSupport "this glossary entry". The support points on a concrete
+ * cell can then be computed by mapping the unit support points, using the
+ * Mapping class interface and derived classes, typically via the FEValues
+ * class.
+ *
+ * A typical code snippet to do so would look as follows:
  * @code
  * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
  * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
@@ -121,35 +184,59 @@ namespace hp
  * Point<dim> mapped_point =
  *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
  * @endcode
- * This is a shortcut, and as all shortcuts should be used cautiously. If the
- * mapping of all support points is needed, the first variant should be
- * preferred for efficiency.
  *
  * @note Finite elements' implementation of the get_unit_support_points()
- * returns these points in the same order as shape functions. As a
- * consequence, the quadrature points accessed above are also ordered in this
- * way. The order of shape functions is typically documented in the class
- * documentation of the various finite element classes.
+ *   function returns these points in the same order as shape functions. As a
+ *   consequence, the quadrature points accessed above are also ordered in this
+ *   way. The order of shape functions is typically documented in the class
+ *   documentation of the various finite element classes.
  *
  *
- * <h3>Notes on the implementation of derived classes</h3>
+ * <h3>Implementing finite element spaces in derived classes</h3>
  *
- * The following sections list the information to be provided by derived
- * classes, depending on the dimension. They are followed by a list of
- * functions helping to generate these values.
+ * The following sections provide some more guidance for implementing
+ * concrete finite element spaces in derived classes. This includes information
+ * that depends on the dimension for which you want to provide something,
+ * followed by a list of tools helping to generate information in concrete
+ * cases.
  *
- * <h4>Finite elements in one dimension</h4>
+ * It is important to note that there is a number of intermediate classes
+ * that can do a lot of what is necessary for a complete description of
+ * finite element spaces. For example, the FE_Poly, FE_PolyTensor, and
+ * FE_PolyFace classes in essence build a complete finite element space
+ * if you only provide them with an abstract description of the
+ * polynomial space upon which you want to build an element. Using these
+ * intermediate classes typically makes implementing finite element
+ * descriptions vastly simpler.
  *
- * Finite elements in one dimension need only set the #restriction and
- * #prolongation matrices. The constructor of this class in one dimension
- * presets the #interface_constraints matrix to have dimension zero. Changing
- * this behaviour in derived classes is generally not a reasonable idea and
- * you risk getting into trouble.
+ * As a general rule, if you want to
+ * implement an element, you will likely want to look at the implementation
+ * of other, similar elements first. Since many of the more complicated
+ * pieces of a finite element interface have to do with how they interact
+ * with mappings, quadrature, and the FEValues class, you will also want
+ * to read through the @ref FE_vs_Mapping_vs_FEValues documentation
+ * module.
  *
- * <h4>Finite elements in two dimensions</h4>
  *
- * In addition to the fields already present in 1D, a constraint matrix is
- * needed, if the finite element has node values located on edges or vertices.
+ * <h4>Interpolation matrices in one dimension</h4>
+ *
+ * In one space dimension (i.e., for <code>dim==1</code> and any
+ * value of <code>spacedim</code>),
+ * finite element classes implementing the interface of the current
+ * base class need only set the #restriction and
+ * #prolongation matrices that describe the interpolation of the finite
+ * element space on one cell to that of its parent cell, and to that
+ * on its children, respectively. The constructor of the current class
+ * in one dimension presets the #interface_constraints matrix (used to
+ * describe hanging node constraints at the interface between cells of
+ * different refinement levels) to have size zero because there are no
+ * hanging nodes in 1d.
+ *
+ * <h4>Interpolation matrices in two dimensions</h4>
+ *
+ * In addition to the fields discussed above for 1D, a constraint matrix is
+ * needed to describe hanging node constraints if the finite element has
+ * degrees of freedom located on edges or vertices.
  * These constraints are represented by an $m\times n$-matrix
  * #interface_constraints, where <i>m</i> is the number of degrees of freedom
  * on the refined side without the corner vertices (those dofs on the middle
@@ -173,15 +260,23 @@ namespace hp
  * the refined lines, since these must be mapped one-to-one to the appropriate
  * dofs of the vertices of the unrefined line.
  *
- * It should be noted that it is not possible to distribute a constrained
- * degree of freedom to other degrees of freedom which are themselves
- * constrained. Only one level of indirection is allowed. It is not known at
- * the time of this writing whether this is a constraint itself.
+ * Through this construction, the degrees of freedom on the child faces are
+ * constrained to the degrees of freedom on the parent face. The information
+ * so provided is typically consumed by the
+ * DoFTools::make_hanging_node_constraints() function.
+ *
+ * @note The hanging node constraints described by these matrices are only
+ *   relevant to the case where the same finite element space is used on
+ *   neighboring (but differently refined) cells. The case that the finite
+ *   element spaces on different sides of a face are different, i.e.,
+ *   the $hp$ case (see @ref hp "hp finite element support") is handled
+ *   by separate functions. See the FiniteElement::get_face_interpolation_matrix()
+ *   and FiniteElement::get_subface_interpolation_matrix() functions.
  *
  *
- * <h4>Finite elements in three dimensions</h4>
+ * <h4>Interpolation matrices in three dimensions</h4>
  *
- * For the interface constraints, almost the same holds as for the 2D case.
+ * For the interface constraints, the 3d case is similar to the 2d case.
  * The numbering for the indices $n$ on the mother face is obvious and keeps
  * to the usual numbering of degrees of freedom on quadrilaterals.
  *
@@ -259,24 +354,38 @@ namespace hp
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
  *
+ * Using this scheme, child face degrees of freedom are constrained against
+ * parent face degrees of freedom that contain those on the edges of the parent
+ * face; it is possible that some of them are in turn constrained themselves,
+ * leading to longer chains of constraints that the ConstraintMatrix class will
+ * eventually have to sort out. (The constraints described above are used by
+ * the DoFTools::make_hanging_node_constraints() function that constructs a
+ * ConstraintMatrix object.) However, this is of no concern for the
+ * FiniteElement and derived classes since they only act locally on one cell
+ * and its immediate neighbor, and do not see the bigger picture. The
+ * @ref hp_paper details how such chains are handled in practice.
+ *
+ *
  * <h4>Helper functions</h4>
  *
  * Construction of a finite element and computation of the matrices described
- * above may be a tedious task, in particular if it has to be performed for
- * several dimensions. Therefore, some functions in FETools have been provided
- * to help with these tasks.
+ * above is often a tedious task, in particular if it has to be performed for
+ * several dimensions. Most of this work can be avoided by using the
+ * intermediate classes already mentioned above (e.g., FE_Poly, FE_PolyTensor,
+ * etc). Other tasks can be automated by some of the functions in namespace
+ * FETools.
  *
- * <h5>Computing the correct basis from "raw" basis functions</h5>
+ * <h5>Computing the correct basis from a set of linearly independent functions</h5>
  *
- * First, already the basis of the shape function space may be difficult to
- * implement for arbitrary order and dimension. On the other hand, if the
+ * First, it may already be difficult to compute the basis of shape functions
+ * for arbitrary order and dimension. On the other hand, if the
  * @ref GlossNodes "node values"
  * are given, then the duality relation between node functionals and basis
  * functions defines the basis. As a result, the shape function space may be
- * defined with arbitrary "raw" basis functions, such that the actual finite
- * element basis is computed from linear combinations of them. The
+ * defined from a set of linearly independent functions, such that the actual
+ * finite element basis is computed from linear combinations of them. The
  * coefficients of these combinations are determined by the duality of node
- * values.
+ * values and form a matrix.
  *
  * Using this matrix allows the construction of the basis of shape functions
  * in two steps.
@@ -292,15 +401,15 @@ namespace hp
  * <i>w<sub>j</sub></i>.
  * </ol>
  *
- * The function computing the matrix <i>M</i> for you is
- * FETools::compute_node_matrix(). It relies on the existence of
- * #generalized_support_points and implementation of interpolate() with
- * VectorSlice argument. See the
+ * The matrix <i>M</i> may be computed using
+ * FETools::compute_node_matrix(). This function relies on the existence of
+ * #generalized_support_points and an implementation of the
+ * FiniteElement::interpolate() function with
+ * VectorSlice argument. (See the
  * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
- * for more information.
- *
- * The piece of code in the constructor of a finite element responsible for
- * this looks like
+ * for more information.) With this, one can then use the following
+ * piece of code in the constructor of a class derived from FinitElement to
+ * compute the $M$ matrix:
  * @code
  * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
  * FETools::compute_node_matrix(M, *this);
@@ -315,7 +424,7 @@ namespace hp
  * Once you have shape functions, you can define matrices that transfer
  * data from one cell to its children or the other way around. This is
  * a common operation in multigrid, of course, but is also used when
- * interpolating the solution from one mesh to the one after mesh refinement,
+ * interpolating the solution from one mesh to another after mesh refinement,
  * as well as in the definition of some error estimators.
  *
  * To define the prolongation matrices, i.e., those matrices that
@@ -455,12 +564,12 @@ namespace hp
  * child of a face separately. These matrices must be convoluted into a single
  * rectangular constraint matrix, eliminating degrees of freedom on common
  * vertices and edges as well as on the coarse grid vertices. See the
- * discussion above for details.
+ * discussion above for details of this numbering.
  *
  * @ingroup febase fe
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001,
- * 2005
+ * 2005, 2015
  */
 template <int dim, int spacedim=dim>
 class FiniteElement : public Subscriptor,
@@ -520,16 +629,6 @@ public:
     virtual ~InternalDataBase ();
 
     /**
-     * Values updated by the constructor or by reinit.
-     */
-    UpdateFlags          update_flags;
-
-    /**
-     * Values computed by constructor.
-     */
-    UpdateFlags          update_once;
-
-    /**
      * A set of update flags specifying the kind of information that
      * an implementation of the FiniteElement interface needs to compute on
      * each cell or face, i.e., in FiniteElement::fill_fe_values() and
@@ -548,29 +647,9 @@ public:
     UpdateFlags          update_each;
 
     /**
-     * If <tt>first_cell==true</tt> this function returns @p update_flags,
-     * i.e. <tt>update_once|update_each</tt>. If <tt>first_cell==false</tt> it
-     * returns @p update_each.
-     */
-    UpdateFlags  current_update_flags() const;
-
-    /**
-     * Set the @p first_cell flag to @p false. Used by the @p FEValues class
-     * to indicate that we have already done the work on the first cell.
-     */
-    virtual void clear_first_cell ();
-
-    /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
-
-  private:
-    /**
-     * Initially set to true, but reset to false when clear_first_cell()
-     * is called.
-     */
-    bool first_cell;
   };
 
 public:
@@ -616,8 +695,8 @@ public:
    *   <code>dofs_per_cell</code> where each element equals the component
    *   mask provided in the single element given.
    */
-  FiniteElement (const FiniteElementData<dim> &fe_data,
-                 const std::vector<bool>      &restriction_is_additive_flags,
+  FiniteElement (const FiniteElementData<dim>     &fe_data,
+                 const std::vector<bool>          &restriction_is_additive_flags,
                  const std::vector<ComponentMask> &nonzero_components);
 
   /**
@@ -684,9 +763,17 @@ public:
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_value_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value (const unsigned int  i,
                               const Point<dim>   &p) const;
@@ -712,9 +799,17 @@ public:
    * should throw an exception of type ExcShapeFunctionNotPrimitive. In that
    * case, use the shape_grad_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
@@ -740,9 +835,17 @@ public:
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_grad_grad_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim>   &p) const;
@@ -766,11 +869,19 @@ public:
    * than one non-zero component (which we refer to with the term non-
    * primitive), then derived classes implementing this function should throw
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * shape_3rd_derivative_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
                                               const Point<dim>   &p) const;
@@ -794,11 +905,19 @@ public:
    * than one non-zero component (which we refer to with the term non-
    * primitive), then derived classes implementing this function should throw
    * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * shape_4th_derivative_component() function.
    *
-   * An ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
-   * FiniteElement under consideration depends on the shape of the cell in
-   * real space.
+   * Implementations of this function should throw an exception of type
+   * ExcUnitShapeValuesDoNotExist if the shape functions of the
+   * FiniteElement under consideration depend on the shape of the cell in
+   * real space, i.e., if the shape functions are not defined by
+   * mapping from the reference cell. Some non-conforming elements are
+   * defined this way, as is the FE_DGPNonparametric class, to name just
+   * one example.
+   *
+   * The default implementation of this virtual function does exactly
+   * this, i.e., it simply throws an exception of type
+   * ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
                                               const Point<dim>   &p) const;
@@ -842,8 +961,9 @@ public:
    * respectively, consistent with the definition of the associated operator.
    *
    * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcProjectionVoid. You can check whether
-   * this is the case by calling the restriction_is_implemented() or the
+   * class, this function aborts with an exception of type
+   * FiniteElement::ExcProjectionVoid. You can check whether
+   * this would happen by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -872,9 +992,10 @@ public:
    * cells using this matrix array, zero elements in the prolongation matrix
    * are discarded and will not fill up the transfer matrix.
    *
-   * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcEmbeddingVoid. You can check whether
-   * this is the case by calling the prolongation_is_implemented() or the
+   * If prolongation matrices are not implemented in the derived finite element
+   * class, this function aborts with an exception of type
+   * FiniteElement::ExcEmbeddingVoid. You can check whether
+   * this would happen by first calling the prolongation_is_implemented() or the
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -1901,7 +2022,12 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcUnitShapeValuesDoNotExist);
+  DeclExceptionMsg (ExcUnitShapeValuesDoNotExist,
+                    "You are trying to access the values or derivatives of shape functions "
+                    "on the reference cell of an element that does not define its shape "
+                    "functions through mapping from the reference cell. Consequently, "
+                    "you cannot ask for shape function values or derivatives on the "
+                    "reference cell.");
 
   /**
    * Attempt to access support points of a finite element that is not
@@ -1909,7 +2035,10 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcFEHasNoSupportPoints);
+  DeclExceptionMsg (ExcFEHasNoSupportPoints,
+                    "You are trying to access the support points of a finite "
+                    "element that either has no support points at all, or for "
+                    "which the corresponding tables have not been implemented.");
 
   /**
    * Attempt to access embedding matrices of a finite element that did not
@@ -1917,7 +2046,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcEmbeddingVoid);
+  DeclExceptionMsg (ExcEmbeddingVoid,
+                    "You are trying to access the matrices that describe how "
+                    "to embed a finite element function on one cell into the "
+                    "finite element space on one of its children (i.e., the "
+                    "'embedding' or 'prolongation' matrices). However, the "
+                    "current finite element can either not define this sort of "
+                    "operation, or it has not yet been implemented.");
 
   /**
    * Attempt to access restriction matrices of a finite element that did not
@@ -1926,7 +2061,14 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0 (ExcProjectionVoid);
+  DeclExceptionMsg (ExcProjectionVoid,
+                    "You are trying to access the matrices that describe how "
+                    "to restrict a finite element function from the children "
+                    "of one cell to the finite element space defined on their "
+                    "parent (i.e., the 'restriction' or 'projection' matrices). "
+                    "However, the current finite element can either not define "
+                    "this sort of operation, or it has not yet been "
+                    "implemented.");
 
   /**
    * Exception
@@ -1936,33 +2078,13 @@ public:
                   int, int,
                   << "The interface matrix has a size of " << arg1
                   << "x" << arg2
-                  << ", which is not reasonable in the present dimension.");
-  /**
-   * Exception
-   * @ingroup Exceptions
-   */
-  DeclException2 (ExcComponentIndexInvalid,
-                  int, int,
-                  << "The component-index pair (" << arg1 << ", " << arg2
-                  << ") is invalid, i.e. non-existent.");
+                  << ", which is not reasonable for the current element "
+                  "in the present dimension.");
   /**
    * Exception
    * @ingroup Exceptions
    */
   DeclException0 (ExcInterpolationNotImplemented);
-
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcBoundaryFaceUsed);
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcJacobiDeterminantHasWrongSign);
 
 protected:
 
@@ -2088,7 +2210,7 @@ protected:
   /**
    * Store what system_to_component_index() will return.
    */
-  std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int> > system_to_component_table;
 
   /**
    * Map between linear dofs and component dofs on face. This is filled with
@@ -2099,7 +2221,7 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector< std::pair<unsigned int, unsigned int> > face_system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int> > face_system_to_component_table;
 
   /**
    * For each shape function, store to which base element and which instance
@@ -2199,113 +2321,425 @@ protected:
   compute_n_nonzero_components (const std::vector<ComponentMask> &nonzero_components);
 
   /**
-   * Determine the values a finite element should compute on initialization of
-   * data for FEValues.
+   * Given a set of update flags, compute which other quantities <i>also</i>
+   * need to be computed in order to satisfy the request by the given flags.
+   * Then return the combination of the original set of flags and those
+   * just computed.
    *
-   * Given a set of flags indicating what quantities are requested from a
-   * FEValues object, update_once() and update_each() compute which values
-   * must really be computed. Then, the <tt>fill_*_values</tt> functions are
-   * called with the result of these.
-   *
-   * Furthermore, values must be computed either on the unit cell or on the
-   * physical cell. For instance, the function values of FE_Q do only depend
-   * on the quadrature points on the unit cell. Therefore, this flags will be
-   * returned by update_once(). The gradients require computation of the
-   * covariant transformation matrix. Therefore, @p
-   * update_covariant_transformation and @p update_gradients will be returned
-   * by update_each().
-   *
-   * For an example see the same function in the derived class FE_Q.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-
-  /**
-   * Complementary function for update_once().
-   *
-   * While update_once() returns the values to be computed on the unit cell
-   * for yielding the required data, this function determines the values that
-   * must be recomputed on each cell.
-   *
-   * Refer to update_once() for more details.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
-
-  /**
-   * Prepare internal data structures and fill in values independent of the
-   * cell. Returns a pointer to an object of which the caller of this function
-   * then has to assume ownership (which includes destruction when it is no
-   * more needed).
+   * As an example, if @p update_flags contains update_gradients
+   * a finite element class will typically
+   * require the computation of the inverse of the Jacobian matrix in order to
+   * rotate the gradient of shape functions on the reference cell to the
+   * real cell. It would then return not just
+   * update_gradients, but also update_covariant_transformation, the flag that
+   * makes the mapping class produce the inverse of the Jacobian matrix.
    *
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
+   *
+   * @see UpdateFlags
    */
-  virtual InternalDataBase *
-  get_data (const UpdateFlags      flags,
-            const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const = 0;
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const = 0;
 
   /**
-   * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell. Returns a pointer to an object of which
-   * the caller of this function then has to assume ownership (which includes
-   * destruction when it is no more needed).
+   * Create an internal data object and return a pointer to it of which the
+   * caller of this function then assumes ownership. This object will
+   * then be passed to the FiniteElement::fill_fe_values() every time
+   * the finite element shape functions and their derivatives are evaluated
+   * on a concrete cell. The object created here is therefore used by
+   * derived classes as a place for scratch objects that are used in
+   * evaluating shape functions, as well as to store information that
+   * can be pre-computed once and re-used on every cell (e.g., for
+   * evaluating the values and gradients of shape functions on the
+   * reference cell, for later re-use when transforming these values to
+   * a concrete cell).
+   *
+   * This function is the first one called in the process of initializing
+   * a FEValues object for a given mapping and finite element object. The
+   * returned object will later be passed to FiniteElement::fill_fe_values()
+   * for a concrete cell, which will itself place its output into an object
+   * of type internal::FEValues::FiniteElementRelatedData. Since there may
+   * be data that can already be computed in its <i>final</i> form on the
+   * reference cell, this function also receives a reference to the
+   * internal::FEValues::FiniteElementRelatedData object as its last argument.
+   * This output argument is guaranteed to always be the same one when used
+   * with the InternalDataBase object returned by this function. In other
+   * words, the subdivision of scratch data and final data in the returned
+   * object and the @p output_data object is as follows: If data can be
+   * pre-computed on the reference cell in the exact form in which it
+   * will later be needed on a concrete cell, then this function should
+   * already emplace it in the @p output_data object. An example are the
+   * values of shape functions at quadrature points for the usual
+   * Lagrange elements which on a concrete cell are identical to the
+   * ones on the reference cell. On the other hand, if some data can
+   * be pre-computed to make computations on a concrete cell <i>cheaper</i>,
+   * then it should be put into the returned object for later re-use
+   * in a derive class's implementation of FiniteElement::fill_fe_values().
+   * An example are the gradients of shape functions on the reference
+   * cell for Lagrange elements: to compute the gradients of the shape
+   * functions on a concrete cell, one has to multiply the gradients on
+   * the reference cell by the inverse of the Jacobian of the mapping;
+   * consequently, we cannot already compute the gradients on a concrete
+   * cell at the time the current function is called, but we can at least
+   * pre-compute the gradients on the reference cell, and store it
+   * in the object returned.
+   *
+   * An extensive discussion of the interaction between this function and
+   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * module. See also the documentation of the InternalDataBase class.
+   *
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_values() is called
+   *   what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
    */
-  virtual InternalDataBase *
-  get_face_data (const UpdateFlags        flags,
-                 const Mapping<dim,spacedim>      &mapping,
-                 const Quadrature<dim-1> &quadrature) const;
+  virtual
+  InternalDataBase *
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
-   * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell. Returns a pointer to an
-   * object of which the caller of this function then has to assume ownership
-   * (which includes destruction when it is no more needed).
+   * Like get_data(), but return an object that will later be used for
+   * evaluating shape function information at quadrature points on faces
+   * of cells. The object will then be used in calls to implementations of
+   * FiniteElement::fill_fe_face_values(). See the documentation of get_data()
+   * for more information.
+   *
+   * The default implementation of this function converts the face quadrature
+   * into a cell quadrature with appropriate quadrature point locations,
+   * and with that calls the get_data() function above that has to be
+   * implemented in derived classes.
+   *
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_face_values() is called
+   *   what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_face_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
    */
-  virtual InternalDataBase *
-  get_subface_data (const UpdateFlags        flags,
-                    const Mapping<dim,spacedim>      &mapping,
-                    const Quadrature<dim-1> &quadrature) const;
+  virtual
+  InternalDataBase *
+  get_face_data (const UpdateFlags                                                    update_flags,
+                 const Mapping<dim,spacedim>                                         &mapping,
+                 const Quadrature<dim-1>                                             &quadrature,
+                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
-   * To be written.
+   * Like get_data(), but return an object that will later be used for
+   * evaluating shape function information at quadrature points on children
+   * of faces of cells. The object will then be used in calls to
+   * implementations of FiniteElement::fill_fe_subface_values(). See the
+   * documentation of get_data() for more information.
+   *
+   * The default implementation of this function converts the face quadrature
+   * into a cell quadrature with appropriate quadrature point locations,
+   * and with that calls the get_data() function above that has to be
+   * implemented in derived classes.
+   *
+   * @param[in] update_flags A set of UpdateFlags values that describe
+   *   what kind of information the FEValues object requests the finite
+   *   element to compute. This set of flags may also include information
+   *   that the finite element can not compute, e.g., flags that pertain
+   *   to data produced by the mapping. An implementation of this function
+   *   needs to set up all data fields in the returned object that are
+   *   necessary to produce the finite-element related data specified by
+   *   these flags, and may already pre-compute part of this information
+   *   as discussed above. Elements may want to store these update flags
+   *   (or a subset of these flags) in InternalDataBase::update_each so
+   *   they know at the time when FinitElement::fill_fe_subface_values()
+   *   is called what they are supposed to compute
+   * @param[in] mapping A reference to the mapping used for computing
+   *   values and derivatives of shape functions.
+   * @param[in] quadrature A reference to the object that describes where
+   *   the shape functions should be evaluated.
+   * @param[out] output_data A reference to the object that FEValues
+   *   will use in conjunction with the object returned here and where
+   *   an implementation of FiniteElement::fill_fe_subface_values() will place
+   *   the requested information. This allows the current function
+   *   to already pre-compute pieces of information that can be computed
+   *   on the reference cell, as discussed above. FEValues guarantees
+   *   that this output object and the object returned by the current
+   *   function will always be used together.
+   * @return A pointer to an object of a type derived from InternalDataBase
+   *   and that derived classes can use to store scratch data that can
+   *   be pre-computed, or for scratch arrays that then only need to
+   *   be allocated once. The calling site assumes ownership of this
+   *   object and will delete it when it is no longer necessary.
+   */
+  virtual
+  InternalDataBase *
+  get_subface_data (const UpdateFlags                                                    update_flags,
+                    const Mapping<dim,spacedim>                                         &mapping,
+                    const Quadrature<dim-1>                                             &quadrature,
+                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  /**
+   * Compute information about the shape functions on the cell denoted
+   * by the first argument. Derived classes will have to implement this
+   * function based on the kind of element they represent. It is called
+   * by FEValues::reinit().
+   *
+   * Conceptually, this function evaluates shape functions and their
+   * derivatives at the quadrature points represented by the mapped
+   * locations of those described by the quadrature argument to this
+   * function. In many cases, computing derivatives of shape functions
+   * (and in some cases also computing values of shape functions)
+   * requires making use of the mapping from the reference to the real
+   * cell; this information can either be taken from the @p mapping_data
+   * object that has been filled for the current cell before this
+   * function is called, or by calling the member functions of a
+   * Mapping object with the @p mapping_internal object that also
+   * corresponds to the current cell.
+   *
+   * The information computed by this function is used to fill the various
+   * member variables of the output argument of this function. Which of
+   * the member variables of that structure should be filled is determined
+   * by the update flags stored in the
+   * FiniteElement::InternalDataBase::update_each field of the object
+   * passed to this function. These flags are typically set by
+   * FiniteElement::get_data(), FiniteElement::get_face_date() and
+   * FiniteElement::get_subface_data() (or, more specifically, implementations
+   * of these functions in derived classes).
    *
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
    * module.
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] cell_similarity Whether or not the cell given as first
+   *   argument is simply a translation, rotation, etc of the cell for
+   *   which this function was called the most recent time. This
+   *   information is computed simply by matching the vertices (as stored
+   *   by the Triangulation) between the previous and the current cell.
+   *   The value passed here may be modified by implementations of
+   *   this function and should then be returned (see the discussion of the
+   *   return value of this function).
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   *
+   * @note FEValues ensures that this function is always called with
+   *   the same pair of @p fe_internal and @p output_data objects. In
+   *   other words, if an implementation of this function knows that it
+   *   has written a piece of data into the output argument in a previous
+   *   call, then there is no need to copy it there again in a later
+   *   call if the implementation knows that this is the same value.
    */
   virtual
   void
-  fill_fe_values (const Mapping<dim,spacedim>                                         &mapping,
-                  const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                     cell_similarity,
                   const Quadrature<dim>                                               &quadrature,
+                  const Mapping<dim,spacedim>                                         &mapping,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const InternalDataBase                                              &fe_internal,
                   const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data,
-                  const CellSimilarity::Similarity                                     cell_similarity) const = 0;
+                  const InternalDataBase                                              &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
+  /**
+   * This function is the equivalent to FiniteElement::fill_fe_values(),
+   * but for faces of cells. See there for an extensive discussion
+   * of its purpose. It is called by FEFaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face we are currently considering,
+   *   indexed among the faces of the cell specified by the previous argument.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   */
   virtual
   void
-  fill_fe_face_values (const Mapping<dim,spacedim>                                         &mapping,
-                       const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                        const unsigned int                                                   face_no,
                        const Quadrature<dim-1>                                             &quadrature,
+                       const Mapping<dim,spacedim>                                         &mapping,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const InternalDataBase                                              &fe_internal,
                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const InternalDataBase                                              &fe_internal,
                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
+  /**
+   * This function is the equivalent to FiniteElement::fill_fe_values(),
+   * but for the children of faces of cells. See there for an extensive
+   * discussion of its purpose. It is called by FESubfaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face we are currently considering,
+   *   indexed among the faces of the cell specified by the previous argument.
+   * @param[in] sub_no The number of the subface, i.e., the number of the child
+   *   of a face, that we are currently considering,
+   *   indexed among the children of the face specified by the previous
+   *   argument.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object. The
+   *   current object is then responsible for evaluating shape functions
+   *   at the mapped locations of the quadrature points represented by
+   *   this object.
+   * @param[in] mapping A reference to the mapping object used to map
+   *   from the reference cell to the current cell. This object was used
+   *   to compute the information in the @p mapping_data object before the
+   *   current function was called. It is also the mapping object that
+   *   created the @p mapping_internal object via Mapping::get_data().
+   *   You will need the reference to this mapping object most often
+   *   to call Mapping::transform() to transform gradients and
+   *   higher derivatives from the reference to the current cell.
+   * @param[in] mapping_internal An object specific to the mapping
+   *   object. What the mapping chooses to store in there is of no
+   *   relevance to the current function, but you may have to pass
+   *   a reference to this object to certain functions of the
+   *   Mapping class (e.g., Mapping::transform()) if you need to
+   *   call them from the current function.
+   * @param[in] mapping_data The output object into which the
+   *   Mapping::fill_fe_values() function wrote the mapping information
+   *   corresponding to the current cell. This includes, for example,
+   *   Jacobians of the mapping that may be of relevance to the
+   *   current function, as well as other information that FEValues::reinit()
+   *   requested from the mapping.
+   * @param[in] fe_internal A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the FiniteElement::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p fe_internal object.
+   */
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim,spacedim>                                         &mapping,
-                          const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
                           const unsigned int                                                   face_no,
                           const unsigned int                                                   sub_no,
                           const Quadrature<dim-1>                                             &quadrature,
+                          const Mapping<dim,spacedim>                                         &mapping,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const InternalDataBase                                              &fe_internal,
                           const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const InternalDataBase                                              &fe_internal,
                           dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   friend class InternalDataBase;
@@ -2373,11 +2807,17 @@ unsigned int
 FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
                                                         const unsigned int index) const
 {
-  std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
+  AssertIndexRange(component, this->n_components());
+  const std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
   it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
                  std::pair<unsigned int, unsigned int>(component, index));
 
-  Assert(it != system_to_component_table.end(), ExcComponentIndexInvalid(component, index));
+  Assert(it != system_to_component_table.end(),
+         ExcMessage ("You are asking for the number of the shape function "
+                     "within a system element that corresponds to vector "
+                     "component " + Utilities::int_to_string(component) + " and within this to "
+                     "index " + Utilities::int_to_string(index) + ". But no such "
+                     "shape function exists."));
   return std::distance(system_to_component_table.begin(), it);
 }
 

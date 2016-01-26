@@ -32,6 +32,12 @@ void test ()
   GridGenerator::hyper_cube (tria);
   tria.refine_global (2);
 
+  for (typename Triangulation<2>::vertex_iterator
+       vertex_it = tria.begin_vertex(); vertex_it != tria.end_vertex();
+       ++vertex_it)
+    deallog << vertex_it->center() <<std::endl;
+  deallog << std::endl;
+
   for (typename Triangulation<2>::active_cell_iterator
        cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
@@ -56,7 +62,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test ();
 

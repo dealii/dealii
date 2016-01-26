@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/grid/intergrid_map.h>
 
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <iostream>
 #include <cmath>
@@ -3068,11 +3069,13 @@ namespace GridGenerator
                const Point<3> &p,
                const double inner_radius,
                const double outer_radius,
-               const unsigned int n,
+               const unsigned int n_cells,
                const bool colorize)
   {
     Assert ((inner_radius > 0) && (inner_radius < outer_radius),
             ExcInvalidRadii ());
+
+    const unsigned int n = (n_cells==0) ? 6 : n_cells;
 
     const double irad = inner_radius/std::sqrt(3.0);
     const double orad = outer_radius/std::sqrt(3.0);
@@ -4128,66 +4131,15 @@ namespace GridGenerator
 
 
 
-  // This anonymous namespace contains utility functions to extract the
-  // triangulation from any container such as DoFHandler
-  // and the like
-  namespace
-  {
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &
-    get_tria(const parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(const Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, int spacedim>
-    Triangulation<dim, spacedim> &
-    get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
-    {
-      return tria;
-    }
-
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim,spacedim> &
-    get_tria(Container<dim,spacedim> &container)
-    {
-      return container.get_tria();
-    }
-  }
-
-
-
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
 #ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
+  std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+      typename MeshType<dim,spacedim>::face_iterator>
 #else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+  typename ExtractBoundaryMesh<MeshType,dim,spacedim>::return_type
 #endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
+      extract_boundary_mesh (const MeshType<dim,spacedim>       &volume_mesh,
+                             MeshType<dim-1,spacedim>           &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids)
   {
 // This function works using the following assumption:
@@ -4195,34 +4147,32 @@ namespace GridGenerator
 //    the order of cells passed in using the CellData argument; also,
 //    that it will not reorder the vertices.
 
-    std::map<typename Container<dim-1,spacedim>::cell_iterator,
-        typename Container<dim,spacedim>::face_iterator>
+    std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+        typename MeshType<dim,spacedim>::face_iterator>
         surface_to_volume_mapping;
 
     const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
 
     // First create surface mesh and mapping
     // from only level(0) cells of volume_mesh
-    std::vector<typename Container<dim,spacedim>::face_iterator>
+    std::vector<typename MeshType<dim,spacedim>::face_iterator>
     mapping;  // temporary map for level==0
 
 
-    std::vector< bool > touched (get_tria(volume_mesh).n_vertices(), false);
+    std::vector< bool > touched (volume_mesh.get_triangulation().n_vertices(), false);
     std::vector< CellData< boundary_dim > > cells;
-    std::vector< Point<spacedim> >      vertices;
+    SubCellData                             subcell_data;
+    std::vector< Point<spacedim> >          vertices;
 
     std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
 
-    unsigned int v_index;
-    CellData< boundary_dim > c_data;
-
-    for (typename Container<dim,spacedim>::cell_iterator
+    for (typename MeshType<dim,spacedim>::cell_iterator
          cell = volume_mesh.begin(0);
          cell != volume_mesh.end(0);
          ++cell)
       for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
         {
-          const typename Container<dim,spacedim>::face_iterator
+          const typename MeshType<dim,spacedim>::face_iterator
           face = cell->face(i);
 
           if ( face->at_boundary()
@@ -4230,10 +4180,12 @@ namespace GridGenerator
                (boundary_ids.empty() ||
                 ( boundary_ids.find(face->boundary_id()) != boundary_ids.end())) )
             {
+              CellData< boundary_dim > c_data;
+
               for (unsigned int j=0;
                    j<GeometryInfo<boundary_dim>::vertices_per_cell; ++j)
                 {
-                  v_index = face->vertex_index(j);
+                  const unsigned int v_index = face->vertex_index(j);
 
                   if ( !touched[v_index] )
                     {
@@ -4246,6 +4198,70 @@ namespace GridGenerator
                   c_data.material_id = static_cast<types::material_id>(face->boundary_id());
                 }
 
+              // if we start from a 3d mesh, then we have copied the
+              // vertex information in the same order in which they
+              // appear in the face; however, this means that we
+              // impart a coordinate system that is right-handed when
+              // looked at *from the outside* of the cell if the
+              // current face has index 0, 2, 4 within a 3d cell, but
+              // right-handed when looked at *from the inside* for the
+              // other faces. we fix this by flipping opposite
+              // vertices if we are on a face 1, 3, 5
+              if (dim == 3)
+                if (i % 2 == 1)
+                  std::swap (c_data.vertices[1], c_data.vertices[2]);
+
+              // in 3d, we also need to make sure we copy the manifold
+              // indicators from the edges of the volume mesh to the
+              // edges of the surface mesh
+              //
+              // one might think that we we can also prescribe
+              // boundary indicators for edges, but this is only
+              // possible for edges that aren't just on the boundary
+              // of the domain (all of the edges we consider are!) but
+              // that would actually end up at the boundary of the
+              // surface mesh. there is no easy way to check this, so
+              // we simply don't do it and instead set it to an
+              // invalid value that makes sure
+              // Triangulation::create_triangulation doesn't copy it
+              if (dim == 3)
+                for (unsigned int e=0; e<4; ++e)
+                  {
+                    // see if we already saw this edge from a
+                    // neighboring face, either in this or the reverse
+                    // orientation. if so, skip it.
+                    {
+                      bool edge_found = false;
+                      for (unsigned int i=0; i<subcell_data.boundary_lines.size(); ++i)
+                        if (((subcell_data.boundary_lines[i].vertices[0]
+                              == map_vert_index[face->line(e)->vertex_index(0)])
+                             &&
+                             (subcell_data.boundary_lines[i].vertices[1]
+                              == map_vert_index[face->line(e)->vertex_index(1)]))
+                            ||
+                            ((subcell_data.boundary_lines[i].vertices[0]
+                              == map_vert_index[face->line(e)->vertex_index(1)])
+                             &&
+                             (subcell_data.boundary_lines[i].vertices[1]
+                              == map_vert_index[face->line(e)->vertex_index(0)])))
+                          {
+                            edge_found = true;
+                            break;
+                          }
+                      if (edge_found == true)
+                        continue;   // try next edge of current face
+                    }
+
+                    CellData<1> edge;
+                    edge.vertices[0] = map_vert_index[face->line(e)->vertex_index(0)];
+                    edge.vertices[1] = map_vert_index[face->line(e)->vertex_index(1)];
+                    edge.boundary_id = numbers::internal_face_boundary_id;
+                    edge.manifold_id = face->line(e)->manifold_id();
+
+                    subcell_data.boundary_lines.push_back (edge);
+                  }
+
+
               cells.push_back(c_data);
               mapping.push_back(face);
             }
@@ -4253,11 +4269,11 @@ namespace GridGenerator
 
     // create level 0 surface triangulation
     Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
-    const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
-    .create_triangulation (vertices, cells, SubCellData());
+    const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
+    .create_triangulation (vertices, cells, subcell_data);
 
     // Make the actual mapping
-    for (typename Container<dim-1,spacedim>::active_cell_iterator
+    for (typename MeshType<dim-1,spacedim>::active_cell_iterator
          cell = surface_mesh.begin(0);
          cell!=surface_mesh.end(0); ++cell)
       surface_to_volume_mapping[cell] = mapping.at(cell->index());
@@ -4266,7 +4282,7 @@ namespace GridGenerator
       {
         bool changed = false;
 
-        for (typename Container<dim-1,spacedim>::active_cell_iterator
+        for (typename MeshType<dim-1,spacedim>::active_cell_iterator
              cell = surface_mesh.begin_active(); cell!=surface_mesh.end(); ++cell)
           if (surface_to_volume_mapping[cell]->has_children() == true )
             {
@@ -4276,10 +4292,10 @@ namespace GridGenerator
 
         if (changed)
           {
-            const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+            const_cast<Triangulation<dim-1,spacedim>&>(surface_mesh.get_triangulation())
             .execute_coarsening_and_refinement();
 
-            for (typename Container<dim-1,spacedim>::cell_iterator
+            for (typename MeshType<dim-1,spacedim>::cell_iterator
                  surface_cell = surface_mesh.begin(); surface_cell!=surface_mesh.end(); ++surface_cell)
               for (unsigned int c=0; c<surface_cell->n_children(); c++)
                 if (surface_to_volume_mapping.find(surface_cell->child(c)) == surface_to_volume_mapping.end())

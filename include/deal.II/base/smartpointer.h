@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
  * Smart pointers avoid destruction of an object in use. They can be used just
  * like a pointer (i.e. using the <tt>*</tt> and <tt>-></tt> operators and
  * through casting) but make sure that the object pointed to is not deleted in
- * the course of use of the pointer by signalling the pointee its use.
+ * the course of use of the pointer by signaling the pointee its use.
  *
  * Objects pointed to, i.e. the class T, should inherit Subscriptor or must
  * implement the same functionality. Null pointers are an exception from this

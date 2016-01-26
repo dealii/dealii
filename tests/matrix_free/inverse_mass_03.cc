@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ std::ofstream logfile("output");
 
 
 
-template <int dim, int fe_degree, typename Number, typename VECTOR=Vector<Number> >
+template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number> >
 class MatrixFreeTest
 {
 public:
@@ -50,9 +50,9 @@ public:
   {};
 
   void
-  local_mass_operator (const MatrixFree<dim,Number>  &data,
-                       VECTOR       &dst,
-                       const VECTOR &src,
+  local_mass_operator (const MatrixFree<dim,Number>               &data,
+                       VectorType                                 &dst,
+                       const VectorType                           &src,
                        const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,3,Number> fe_eval (data);
@@ -77,9 +77,9 @@ public:
   }
 
   void
-  local_inverse_mass_operator (const MatrixFree<dim,Number>  &data,
-                               VECTOR       &dst,
-                               const VECTOR &src,
+  local_inverse_mass_operator (const MatrixFree<dim,Number>               &data,
+                               VectorType                                 &dst,
+                               const VectorType                           &src,
                                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,3,Number> fe_eval (data);
@@ -104,19 +104,19 @@ public:
       }
   }
 
-  void vmult (VECTOR       &dst,
-              const VECTOR &src) const
+  void vmult (VectorType   &dst,
+              const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VECTOR>::local_mass_operator,
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_mass_operator,
                     this, dst, src);
   };
 
-  void apply_inverse (VECTOR       &dst,
-                      const VECTOR &src) const
+  void apply_inverse (VectorType   &dst,
+                      const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VECTOR>::local_inverse_mass_operator,
+    data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_inverse_mass_operator,
                     this, dst, src);
   };
 
@@ -204,7 +204,6 @@ void test ()
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog << std::setprecision (3);
 

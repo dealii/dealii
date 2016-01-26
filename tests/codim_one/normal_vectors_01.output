@@ -13,18 +13,18 @@ DEAL::  Edge centered at 0.00000 0.500000 1.00000
 DEAL::    normal_vector=0.00000 0.00000 1.00000
 DEAL::    normal_vector=0.00000 0.00000 1.00000
 DEAL::Face centered at 1.00000 0.500000 0.500000
-DEAL::  Edge centered at 1.00000 0.00000 0.500000
-DEAL::    normal_vector=0.00000 -1.00000 0.00000
-DEAL::    normal_vector=0.00000 -1.00000 0.00000
-DEAL::  Edge centered at 1.00000 1.00000 0.500000
-DEAL::    normal_vector=0.00000 1.00000 0.00000
-DEAL::    normal_vector=0.00000 1.00000 0.00000
 DEAL::  Edge centered at 1.00000 0.500000 0.00000
 DEAL::    normal_vector=0.00000 0.00000 -1.00000
 DEAL::    normal_vector=0.00000 0.00000 -1.00000
 DEAL::  Edge centered at 1.00000 0.500000 1.00000
 DEAL::    normal_vector=0.00000 0.00000 1.00000
 DEAL::    normal_vector=0.00000 0.00000 1.00000
+DEAL::  Edge centered at 1.00000 0.00000 0.500000
+DEAL::    normal_vector=0.00000 -1.00000 0.00000
+DEAL::    normal_vector=0.00000 -1.00000 0.00000
+DEAL::  Edge centered at 1.00000 1.00000 0.500000
+DEAL::    normal_vector=0.00000 1.00000 0.00000
+DEAL::    normal_vector=0.00000 1.00000 0.00000
 DEAL::Face centered at 0.500000 0.00000 0.500000
 DEAL::  Edge centered at 0.500000 0.00000 0.00000
 DEAL::    normal_vector=0.00000 0.00000 -1.00000
@@ -39,18 +39,18 @@ DEAL::  Edge centered at 1.00000 0.00000 0.500000
 DEAL::    normal_vector=1.00000 0.00000 0.00000
 DEAL::    normal_vector=1.00000 0.00000 0.00000
 DEAL::Face centered at 0.500000 1.00000 0.500000
-DEAL::  Edge centered at 0.500000 1.00000 0.00000
-DEAL::    normal_vector=0.00000 0.00000 -1.00000
-DEAL::    normal_vector=0.00000 0.00000 -1.00000
-DEAL::  Edge centered at 0.500000 1.00000 1.00000
-DEAL::    normal_vector=0.00000 0.00000 1.00000
-DEAL::    normal_vector=0.00000 0.00000 1.00000
 DEAL::  Edge centered at 0.00000 1.00000 0.500000
 DEAL::    normal_vector=-1.00000 0.00000 0.00000
 DEAL::    normal_vector=-1.00000 0.00000 0.00000
 DEAL::  Edge centered at 1.00000 1.00000 0.500000
 DEAL::    normal_vector=1.00000 0.00000 0.00000
 DEAL::    normal_vector=1.00000 0.00000 0.00000
+DEAL::  Edge centered at 0.500000 1.00000 0.00000
+DEAL::    normal_vector=0.00000 0.00000 -1.00000
+DEAL::    normal_vector=0.00000 0.00000 -1.00000
+DEAL::  Edge centered at 0.500000 1.00000 1.00000
+DEAL::    normal_vector=0.00000 0.00000 1.00000
+DEAL::    normal_vector=0.00000 0.00000 1.00000
 DEAL::Face centered at 0.500000 0.500000 0.00000
 DEAL::  Edge centered at 0.00000 0.500000 0.00000
 DEAL::    normal_vector=-1.00000 0.00000 0.00000
@@ -65,15 +65,15 @@ DEAL::  Edge centered at 0.500000 1.00000 0.00000
 DEAL::    normal_vector=0.00000 1.00000 0.00000
 DEAL::    normal_vector=0.00000 1.00000 0.00000
 DEAL::Face centered at 0.500000 0.500000 1.00000
-DEAL::  Edge centered at 0.00000 0.500000 1.00000
-DEAL::    normal_vector=-1.00000 0.00000 0.00000
-DEAL::    normal_vector=-1.00000 0.00000 0.00000
-DEAL::  Edge centered at 1.00000 0.500000 1.00000
-DEAL::    normal_vector=1.00000 0.00000 0.00000
-DEAL::    normal_vector=1.00000 0.00000 0.00000
 DEAL::  Edge centered at 0.500000 0.00000 1.00000
 DEAL::    normal_vector=0.00000 -1.00000 0.00000
 DEAL::    normal_vector=0.00000 -1.00000 0.00000
 DEAL::  Edge centered at 0.500000 1.00000 1.00000
 DEAL::    normal_vector=0.00000 1.00000 0.00000
 DEAL::    normal_vector=0.00000 1.00000 0.00000
+DEAL::  Edge centered at 0.00000 0.500000 1.00000
+DEAL::    normal_vector=-1.00000 0.00000 0.00000
+DEAL::    normal_vector=-1.00000 0.00000 0.00000
+DEAL::  Edge centered at 1.00000 0.500000 1.00000
+DEAL::    normal_vector=1.00000 0.00000 0.00000
+DEAL::    normal_vector=1.00000 0.00000 0.00000

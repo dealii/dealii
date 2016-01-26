@@ -101,6 +101,17 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionJacobi -------------------- */
+  PreconditionJacobi::PreconditionJacobi (const MPI_Comm comm,
+                                          const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
+
+    int ierr = PCCreate(comm, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    initialize();
+  }
+
 
   PreconditionJacobi::PreconditionJacobi ()
   {}
@@ -112,6 +123,16 @@ namespace PETScWrappers
     initialize(matrix, additional_data);
   }
 
+  void
+  PreconditionJacobi::initialize()
+  {
+    int ierr;
+    ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
 
   void
   PreconditionJacobi::initialize (const MatrixBase     &matrix_,
@@ -121,20 +142,25 @@ namespace PETScWrappers
     additional_data = additional_data_;
 
     create_pc();
+    initialize();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetFromOptions (pc);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetUp (pc);
+    int ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
   /* ----------------- PreconditionBlockJacobi -------------------- */
+  PreconditionBlockJacobi::PreconditionBlockJacobi (const MPI_Comm comm,
+                                                    const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
+
+    int ierr = PCCreate(comm, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    initialize();
+  }
+
 
   PreconditionBlockJacobi::PreconditionBlockJacobi ()
   {}
@@ -148,6 +174,18 @@ namespace PETScWrappers
   }
 
   void
+  PreconditionBlockJacobi::initialize()
+  {
+    int ierr;
+    ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+  void
   PreconditionBlockJacobi::initialize (const MatrixBase     &matrix_,
                                        const AdditionalData &additional_data_)
   {
@@ -155,15 +193,9 @@ namespace PETScWrappers
     additional_data = additional_data_;
 
     create_pc();
+    initialize();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetFromOptions (pc);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = PCSetUp (pc);
+    int ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -419,6 +451,24 @@ namespace PETScWrappers
   PreconditionBoomerAMG::PreconditionBoomerAMG ()
   {}
 
+  PreconditionBoomerAMG::PreconditionBoomerAMG (const MPI_Comm comm,
+                                                const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
+
+    int ierr = PCCreate(comm, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+#ifdef PETSC_HAVE_HYPRE
+    initialize();
+#else // PETSC_HAVE_HYPRE
+    (void)pc;
+    Assert (false,
+            ExcMessage ("Your PETSc installation does not include a copy of "
+                        "the hypre package necessary for this preconditioner."));
+#endif
+  }
+
 
   PreconditionBoomerAMG::PreconditionBoomerAMG (const MatrixBase     &matrix,
                                                 const AdditionalData &additional_data)
@@ -426,17 +476,9 @@ namespace PETScWrappers
     initialize(matrix, additional_data);
   }
 
-
   void
-  PreconditionBoomerAMG::initialize (const MatrixBase     &matrix_,
-                                     const AdditionalData &additional_data_)
+  PreconditionBoomerAMG::initialize ()
   {
-    matrix = static_cast<Mat>(matrix_);
-    additional_data = additional_data_;
-
-#ifdef PETSC_HAVE_HYPRE
-    create_pc();
-
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -475,8 +517,20 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
 
-    ierr = PCSetUp (pc);
+  void
+  PreconditionBoomerAMG::initialize (const MatrixBase     &matrix_,
+                                     const AdditionalData &additional_data_)
+  {
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+
+#ifdef PETSC_HAVE_HYPRE
+    create_pc();
+    initialize ();
+
+    int ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else // PETSC_HAVE_HYPRE

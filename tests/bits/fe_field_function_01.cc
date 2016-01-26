@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,7 +88,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test<1>();
   test<2>();

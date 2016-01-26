@@ -160,8 +160,8 @@ namespace Functions
    * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
-            typename DH=DoFHandler<dim>,
-            typename VECTOR=Vector<double> >
+            typename DoFHandlerType=DoFHandler<dim>,
+            typename VectorType=Vector<double> >
   class FEFieldFunction :  public Function<dim>
   {
   public:
@@ -173,16 +173,16 @@ namespace Functions
      * mapping is specified, that is what is used to find out where the points
      * lay. Otherwise the standard Q1 mapping is used.
      */
-    FEFieldFunction (const DH           &dh,
-                     const VECTOR       &data_vector,
-                     const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping);
+    FEFieldFunction (const DoFHandlerType &dh,
+                     const VectorType     &data_vector,
+                     const Mapping<dim>   &mapping = StaticMappingQ1<dim>::mapping);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you
      * can tell this object by calling this function. This will speed things
      * up a little.
      */
-    void set_active_cell (const typename DH::active_cell_iterator &newcell);
+    void set_active_cell (const typename DoFHandlerType::active_cell_iterator &newcell);
 
     /**
      * Get one vector value at the given point. It is inefficient to use
@@ -219,7 +219,7 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual double value (const Point< dim >     &p,
+    virtual double value (const Point< dim > &p,
                           const unsigned int  component = 0)    const;
 
     /**
@@ -408,10 +408,11 @@ namespace Functions
      * set of points.
      */
     unsigned int
-    compute_point_locations(const std::vector<Point<dim> > &points,
-                            std::vector<typename DH::active_cell_iterator > &cells,
-                            std::vector<std::vector<Point<dim> > > &qpoints,
-                            std::vector<std::vector<unsigned int> > &maps) const;
+    compute_point_locations
+    (const std::vector<Point<dim> >                              &points,
+     std::vector<typename DoFHandlerType::active_cell_iterator > &cells,
+     std::vector<std::vector<Point<dim> > >                      &qpoints,
+     std::vector<std::vector<unsigned int> >                     &maps) const;
 
     /**
      * @deprecated Use VectorTools::ExcPointNotAvailableHere instead.
@@ -423,18 +424,18 @@ namespace Functions
      * Typedef holding the local cell_hint.
      */
     typedef
-    Threads::ThreadLocalStorage <typename DH::active_cell_iterator >
+    Threads::ThreadLocalStorage <typename DoFHandlerType::active_cell_iterator >
     cell_hint_t;
 
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
+    SmartPointer<const DoFHandlerType,FEFieldFunction<dim, DoFHandlerType, VectorType> > dh;
 
     /**
      * A reference to the actual data vector.
      */
-    const VECTOR &data_vector;
+    const VectorType &data_vector;
 
     /**
      * A reference to the mapping being used.
@@ -457,8 +458,8 @@ namespace Functions
      * uninitialized boost::optional object.
      */
     boost::optional<Point<dim> >
-    get_reference_coordinates (const typename DH::active_cell_iterator &cell,
-                               const Point<dim>                        &point) const;
+    get_reference_coordinates (const typename DoFHandlerType::active_cell_iterator &cell,
+                               const Point<dim>                                    &point) const;
   };
 }
 

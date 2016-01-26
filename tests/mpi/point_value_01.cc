@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,7 +108,6 @@ int main(int argc, char *argv[])
     {
       std::ofstream logfile("output");
       deallog.attach(logfile, false);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");

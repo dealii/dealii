@@ -292,32 +292,32 @@ public:
    * used, which gets the partitioning information builtin into the
    * DoFHandler.
    */
-  template <typename DH, typename Quadrature>
+  template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>     &mapping,
-               const DH               &dof_handler,
+               const DoFHandlerType   &dof_handler,
                const ConstraintMatrix &constraint,
                const IndexSet         &locally_owned_dofs,
-               const Quadrature       &quad,
+               const QuadratureType   &quad,
                const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but with index set stored
    * in the DoFHandler for describing the locally owned degrees of freedom.
    */
-  template <typename DH, typename Quadrature>
+  template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>     &mapping,
-               const DH               &dof_handler,
+               const DoFHandlerType   &dof_handler,
                const ConstraintMatrix &constraint,
-               const Quadrature       &quad,
+               const QuadratureType   &quad,
                const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but using a $Q_1$ mapping.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const DH               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const DoFHandlerType   &dof_handler,
                const ConstraintMatrix &constraint,
-               const Quadrature       &quad,
+               const QuadratureType   &quad,
                const AdditionalData    additional_data = AdditionalData());
 
   /**
@@ -346,12 +346,12 @@ public:
    * used, which gets the partitioning information from the DoFHandler. This
    * is the most general initialization function.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const Mapping<dim>                         &mapping,
-               const std::vector<const DH *>               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>                          &mapping,
+               const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<IndexSet>                &locally_owned_set,
-               const std::vector<Quadrature>              &quad,
+               const std::vector<IndexSet>                 &locally_owned_set,
+               const std::vector<QuadratureType>           &quad,
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
@@ -359,20 +359,20 @@ public:
    * description of the locally owned range of degrees of freedom is taken
    * from the DoFHandler.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const Mapping<dim>                         &mapping,
-               const std::vector<const DH *>               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>                          &mapping,
+               const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<Quadrature>              &quad,
+               const std::vector<QuadratureType>           &quad,
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const std::vector<const DH *>               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<Quadrature>              &quad,
+               const std::vector<QuadratureType>           &quad,
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
@@ -382,20 +382,20 @@ public:
    * as might be necessary when several components in a vector-valued problem
    * are integrated together based on the same quadrature formula.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const Mapping<dim>                         &mapping,
-               const std::vector<const DH *>               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>                          &mapping,
+               const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
-               const Quadrature                           &quad,
+               const QuadratureType                        &quad,
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
    */
-  template <typename DH, typename Quadrature>
-  void reinit (const std::vector<const DH *>               &dof_handler,
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
-               const Quadrature                           &quad,
+               const QuadratureType                        &quad,
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
@@ -730,8 +730,8 @@ public:
    * Prints a detailed summary of memory consumption in the different
    * structures of this class to the given output stream.
    */
-  template <typename STREAM>
-  void print_memory_consumption(STREAM &out) const;
+  template <typename StreamType>
+  void print_memory_consumption(StreamType &out) const;
 
   /**
    * Prints a summary of this class to the given output stream. It is focused
@@ -1224,7 +1224,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename DoFHandler<dim>::cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
+         (&dofh->get_triangulation(), index.first, index.second, dofh);
 }
 
 
@@ -1252,7 +1252,7 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename hp::DoFHandler<dim>::cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
+         (&dofh->get_triangulation(), index.first, index.second, dofh);
 }
 
 
@@ -1425,10 +1425,10 @@ namespace internal
 {
   namespace MatrixFree
   {
-    template <typename DH>
+    template <typename DoFHandlerType>
     inline
     std::vector<IndexSet>
-    extract_locally_owned_index_sets (const std::vector<const DH *> &dofh,
+    extract_locally_owned_index_sets (const std::vector<const DoFHandlerType *> &dofh,
                                       const unsigned int level)
     {
       std::vector<IndexSet> locally_owned_set;
@@ -1462,16 +1462,16 @@ namespace internal
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const DH               &dof_handler,
-       const ConstraintMatrix &constraints_in,
-       const Quad             &quad,
+reinit(const DoFHandlerType                                  &dof_handler,
+       const ConstraintMatrix                                &constraints_in,
+       const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<const DH *>               dof_handlers;
+  std::vector<const DoFHandlerType *>   dof_handlers;
   std::vector<const ConstraintMatrix *> constraints;
-  std::vector<Quad>          quads;
+  std::vector<QuadratureType>           quads;
 
   dof_handlers.push_back(&dof_handler);
   constraints.push_back (&constraints_in);
@@ -1487,17 +1487,17 @@ reinit(const DH               &dof_handler,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const Mapping<dim>     &mapping,
-       const DH               &dof_handler,
-       const ConstraintMatrix &constraints_in,
-       const Quad             &quad,
+reinit(const Mapping<dim>                                    &mapping,
+       const DoFHandlerType                                  &dof_handler,
+       const ConstraintMatrix                                &constraints_in,
+       const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<const DH *>               dof_handlers;
+  std::vector<const DoFHandlerType *>   dof_handlers;
   std::vector<const ConstraintMatrix *> constraints;
-  std::vector<Quad>          quads;
+  std::vector<QuadratureType>           quads;
 
   dof_handlers.push_back(&dof_handler);
   constraints.push_back (&constraints_in);
@@ -1513,11 +1513,11 @@ reinit(const Mapping<dim>     &mapping,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const std::vector<const DH *>               &dof_handler,
+reinit(const std::vector<const DoFHandlerType *>   &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
-       const std::vector<Quad>                    &quad,
+       const std::vector<QuadratureType>           &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
@@ -1531,14 +1531,14 @@ reinit(const std::vector<const DH *>               &dof_handler,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const std::vector<const DH *>               &dof_handler,
-       const std::vector<const ConstraintMatrix *> &constraint,
-       const Quad                                 &quad,
+reinit(const std::vector<const DoFHandlerType *>             &dof_handler,
+       const std::vector<const ConstraintMatrix *>           &constraint,
+       const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<Quad> quads;
+  std::vector<QuadratureType> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
@@ -1550,15 +1550,15 @@ reinit(const std::vector<const DH *>               &dof_handler,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const Mapping<dim>                         &mapping,
-       const std::vector<const DH *>               &dof_handler,
-       const std::vector<const ConstraintMatrix *> &constraint,
-       const Quad                                 &quad,
+reinit(const Mapping<dim>                                    &mapping,
+       const std::vector<const DoFHandlerType *>             &dof_handler,
+       const std::vector<const ConstraintMatrix *>           &constraint,
+       const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<Quad> quads;
+  std::vector<QuadratureType> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
@@ -1570,12 +1570,12 @@ reinit(const Mapping<dim>                         &mapping,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const Mapping<dim>                         &mapping,
-       const std::vector<const DH *>  &dof_handler,
-       const std::vector<const ConstraintMatrix *> &constraint,
-       const std::vector<Quad>              &quad,
+reinit(const Mapping<dim>                                   &mapping,
+       const std::vector<const DoFHandlerType *>            &dof_handler,
+       const std::vector<const ConstraintMatrix *>          &constraint,
+       const std::vector<QuadratureType>                    &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
@@ -1588,13 +1588,13 @@ reinit(const Mapping<dim>                         &mapping,
 
 
 template <int dim, typename Number>
-template <typename DH, typename Quad>
+template <typename DoFHandlerType, typename QuadratureType>
 void MatrixFree<dim,Number>::
-reinit(const Mapping<dim>                         &mapping,
-       const std::vector<const DH *>               &dof_handler,
-       const std::vector<const ConstraintMatrix *> &constraint,
-       const std::vector<IndexSet>                &locally_owned_set,
-       const std::vector<Quad>                    &quad,
+reinit(const Mapping<dim>                                    &mapping,
+       const std::vector<const DoFHandlerType *>             &dof_handler,
+       const std::vector<const ConstraintMatrix *>           &constraint,
+       const std::vector<IndexSet>                           &locally_owned_set,
+       const std::vector<QuadratureType>                     &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   // find out whether we use a hp Quadrature or a standard quadrature

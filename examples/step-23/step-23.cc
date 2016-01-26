@@ -640,8 +640,6 @@ int main ()
       using namespace dealii;
       using namespace Step23;
 
-      deallog.depth_console (0);
-
       WaveEquation<2> wave_equation_solver;
       wave_equation_solver.run ();
     }

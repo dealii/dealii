@@ -121,7 +121,7 @@ void initialize (const DoFHandler<dim> &dof,
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   std::vector<types::global_dof_index> face_indices(dofs_per_face);
 
-  for (unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
+  for (unsigned int l=0; l<dof.get_triangulation().n_levels(); ++l)
     {
       for (typename DoFHandler<dim>::cell_iterator
            cell = dof.begin_mg(l);
@@ -153,7 +153,7 @@ void print (const DoFHandler<dim> &dof,
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  for (unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
+  for (unsigned int l=0; l<dof.get_triangulation().n_levels(); ++l)
     {
       deallog << std::endl;
       deallog << "Level " << l << std::endl;
@@ -288,7 +288,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   //check_simple (FESystem<2>(FE_Q<2>(1), 2));

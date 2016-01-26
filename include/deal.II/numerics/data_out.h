@@ -146,7 +146,7 @@ namespace internal
  *
  * @pre This class only makes sense if the first template argument,
  * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim == DH::dimension</code>. This
+ * second template argument, i.e., if <code>dim == DoFHandlerType::dimension</code>. This
  * redundancy is a historical relic from the time where the library had only a
  * single DoFHandler class and this class consequently only a single template
  * argument.
@@ -154,16 +154,18 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim, class DH=DoFHandler<dim> >
-class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
+template <int dim, typename DoFHandlerType=DoFHandler<dim> >
+class DataOut : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>
 {
 public:
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DH,DH::dimension,DH::space_dimension>::cell_iterator cell_iterator;
-  typedef typename DataOut_DoFData<DH,DH::dimension,DH::space_dimension>::active_cell_iterator active_cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::cell_iterator
+  cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::active_cell_iterator
+  active_cell_iterator;
 
   /**
    * Enumeration describing the region of the domain in which curved cells
@@ -243,7 +245,7 @@ public:
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
+  virtual void build_patches (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
                               const unsigned int n_subdivisions = 0,
                               const CurvedCellRegion curved_region = curved_boundary);
 
@@ -286,13 +288,17 @@ private:
   /**
    * Build one patch. This function is called in a WorkStream context.
    *
-   * The result is written into the patch variable.
+   * The first argument here is the iterator, the second the scratch data object.
+   * All following are tied to particular values when calling WorkStream::run().
+   * The function does not take a CopyData object but rather allocates one
+   * on its own stack for memory access efficiency reasons.
    */
-  void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
-                        internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
-                        ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
-                        const CurvedCellRegion curved_cell_region,
-                        std::vector<dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches);
+  void build_one_patch
+  (const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
+   internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
+   const unsigned int                                            n_subdivisions,
+   const CurvedCellRegion                                        curved_cell_region,
+   std::vector<DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> > &patches);
 };
 
 

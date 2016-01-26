@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,23 +27,23 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class VECTOR>
-MGTransferBase<VECTOR>::~MGTransferBase()
+template <typename VectorType>
+MGTransferBase<VectorType>::~MGTransferBase()
 {}
 
 
-template <class VECTOR>
-MGMatrixBase<VECTOR>::~MGMatrixBase()
+template <typename VectorType>
+MGMatrixBase<VectorType>::~MGMatrixBase()
 {}
 
 
-template <class VECTOR>
-MGSmootherBase<VECTOR>::~MGSmootherBase()
+template <typename VectorType>
+MGSmootherBase<VectorType>::~MGSmootherBase()
 {}
 
 
-template <class VECTOR>
-MGCoarseGridBase<VECTOR>::~MGCoarseGridBase()
+template <typename VectorType>
+MGCoarseGridBase<VectorType>::~MGCoarseGridBase()
 {}
 
 

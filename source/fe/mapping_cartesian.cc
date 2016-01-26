@@ -339,10 +339,8 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
-  // convert data object to internal
-  // data for this class. fails with
-  // an exception if that is not
-  // possible
+  // convert data object to internal data for this class. fails with
+  // an exception if that is not possible
   Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
@@ -353,11 +351,8 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 output_data.quadrature_points,
                 dummy);
 
-  // compute Jacobian
-  // determinant. all values are
-  // equal and are the product of the
-  // local lengths in each coordinate
-  // direction
+  // compute Jacobian determinant. all values are equal and are the
+  // product of the local lengths in each coordinate direction
   if (data.update_each & (update_JxW_values | update_volume_elements))
     if (cell_similarity != CellSimilarity::translation)
       {
@@ -369,8 +364,8 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
             output_data.JxW_values[i] = J * quadrature.weight(i);
       }
-  // "compute" Jacobian at the quadrature
-  // points, which are all the same
+  // "compute" Jacobian at the quadrature points, which are all the
+  // same
   if (data.update_each & update_jacobians)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
@@ -379,50 +374,47 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           for (unsigned int j=0; j<dim; ++j)
             output_data.jacobians[i][j][j] = data.cell_extents[j];
         }
-  // "compute" the derivative of the Jacobian
-  // at the quadrature points, which are all
-  // zero of course
+  // "compute" the derivative of the Jacobian at the quadrature
+  // points, which are all zero of course
   if (data.update_each & update_jacobian_grads)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
-        output_data.jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
+        output_data.jacobian_grads[i] = DerivativeForm<2,dim,spacedim>();
 
   if (data.update_each & update_jacobian_pushed_forward_grads)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_pushed_forward_grads.size(); ++i)
-        output_data.jacobian_pushed_forward_grads[i]=Tensor<3,spacedim>();
+        output_data.jacobian_pushed_forward_grads[i] = Tensor<3,spacedim>();
 
-  // "compute" the hessian of the Jacobian
-  // at the quadrature points, which are all
-  // also zero of course
+  // "compute" the hessian of the Jacobian at the quadrature points,
+  // which are all also zero of course
   if (data.update_each & update_jacobian_2nd_derivatives)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_2nd_derivatives.size(); ++i)
-        output_data.jacobian_2nd_derivatives[i]=DerivativeForm<3,dim,spacedim>();
+        output_data.jacobian_2nd_derivatives[i] = DerivativeForm<3,dim,spacedim>();
 
   if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_pushed_forward_2nd_derivatives.size(); ++i)
-        output_data.jacobian_pushed_forward_2nd_derivatives[i]=Tensor<4,spacedim>();
+        output_data.jacobian_pushed_forward_2nd_derivatives[i] = Tensor<4,spacedim>();
 
   if (data.update_each & update_jacobian_3rd_derivatives)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_3rd_derivatives.size(); ++i)
-        output_data.jacobian_3rd_derivatives[i]=DerivativeForm<4,dim,spacedim>();
+        output_data.jacobian_3rd_derivatives[i] = DerivativeForm<4,dim,spacedim>();
 
   if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.jacobian_pushed_forward_3rd_derivatives.size(); ++i)
-        output_data.jacobian_pushed_forward_3rd_derivatives[i]=Tensor<5,spacedim>();
+        output_data.jacobian_pushed_forward_3rd_derivatives[i] = Tensor<5,spacedim>();
 
-  // "compute" inverse Jacobian at the
-  // quadrature points, which are all
-  // the same
+  // "compute" inverse Jacobian at the quadrature points, which are
+  // all the same
   if (data.update_each & update_inverse_jacobians)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
         {
-          output_data.inverse_jacobians[i]=Tensor<2,dim>();
+          output_data.inverse_jacobians[i] = Tensor<2,dim>();
           for (unsigned int j=0; j<dim; ++j)
             output_data.inverse_jacobians[j][j]=1./data.cell_extents[j];
         }
@@ -455,10 +447,8 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                 output_data.quadrature_points,
                 output_data.normal_vectors);
 
-  // first compute Jacobian
-  // determinant, which is simply the
-  // product of the local lengths
-  // since the jacobian is diagonal
+  // first compute Jacobian determinant, which is simply the product
+  // of the local lengths since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0; d<dim; ++d)
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
@@ -488,6 +478,30 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
           output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
+  if (data.update_each & update_jacobian_grads)
+    for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
+      output_data.jacobian_grads[i] = DerivativeForm<2,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_grads)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_grads.size(); ++i)
+      output_data.jacobian_pushed_forward_grads[i] = Tensor<3,spacedim>();
+
+  if (data.update_each & update_jacobian_2nd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_2nd_derivatives.size(); ++i)
+      output_data.jacobian_2nd_derivatives[i] = DerivativeForm<3,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_2nd_derivatives.size(); ++i)
+      output_data.jacobian_pushed_forward_2nd_derivatives[i] = Tensor<4,spacedim>();
+
+  if (data.update_each & update_jacobian_3rd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_3rd_derivatives.size(); ++i)
+      output_data.jacobian_3rd_derivatives[i] = DerivativeForm<4,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_3rd_derivatives.size(); ++i)
+      output_data.jacobian_pushed_forward_3rd_derivatives[i] = Tensor<5,spacedim>();
+
   if (data.update_each & update_inverse_jacobians)
     for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
@@ -509,10 +523,8 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                         internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
-  // convert data object to internal
-  // data for this class. fails with
-  // an exception if that is not
-  // possible
+  // convert data object to internal data for this class. fails with
+  // an exception if that is not possible
   Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
@@ -521,10 +533,8 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                 output_data.quadrature_points,
                 output_data.normal_vectors);
 
-  // first compute Jacobian
-  // determinant, which is simply the
-  // product of the local lengths
-  // since the jacobian is diagonal
+  // first compute Jacobian determinant, which is simply the product
+  // of the local lengths since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0; d<dim; ++d)
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
@@ -532,16 +542,10 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   if (data.update_each & update_JxW_values)
     {
-      // Here,
-      // cell->face(face_no)->n_children()
-      // would be the right choice,
-      // but unfortunately the
-      // current function is also
-      // called for faces without
-      // children (see
-      // tests/fe/mapping.cc). Add
-      // following switch to avoid
-      // diffs in tests/fe/mapping.OK
+      // Here, cell->face(face_no)->n_children() would be the right
+      // choice, but unfortunately the current function is also called
+      // for faces without children (see tests/fe/mapping.cc). Add
+      // following switch to avoid diffs in tests/fe/mapping.OK
       const unsigned int n_subfaces=
         cell->face(face_no)->has_children() ?
         cell->face(face_no)->n_children() :
@@ -570,6 +574,30 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
           output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
+  if (data.update_each & update_jacobian_grads)
+    for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
+      output_data.jacobian_grads[i] = DerivativeForm<2,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_grads)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_grads.size(); ++i)
+      output_data.jacobian_pushed_forward_grads[i] = Tensor<3,spacedim>();
+
+  if (data.update_each & update_jacobian_2nd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_2nd_derivatives.size(); ++i)
+      output_data.jacobian_2nd_derivatives[i] = DerivativeForm<3,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_2nd_derivatives.size(); ++i)
+      output_data.jacobian_pushed_forward_2nd_derivatives[i] = Tensor<4,spacedim>();
+
+  if (data.update_each & update_jacobian_3rd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_3rd_derivatives.size(); ++i)
+      output_data.jacobian_3rd_derivatives[i] = DerivativeForm<4,dim,spacedim>();
+
+  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
+    for (unsigned int i=0; i<output_data.jacobian_pushed_forward_3rd_derivatives.size(); ++i)
+      output_data.jacobian_pushed_forward_3rd_derivatives[i] = Tensor<5,spacedim>();
+
   if (data.update_each & update_inverse_jacobians)
     for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
@@ -585,10 +613,10 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::
-transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+transform (const ArrayView<const Tensor<1,dim> >                  &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
+           const ArrayView<Tensor<1,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
@@ -640,10 +668,10 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::
-transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-           const MappingType                                                       mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                 &mapping_data,
-           VectorSlice<std::vector<Tensor<2,spacedim> > >                          output) const
+transform (const ArrayView<const DerivativeForm<1, dim,spacedim> > &input,
+           const MappingType                                        mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+           const ArrayView<Tensor<2,spacedim> >                    &output) const
 {
   AssertDimension (input.size(), output.size());
   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
@@ -741,10 +769,10 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> >
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::
-transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+transform (const ArrayView<const Tensor<2, dim> >                 &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<2, spacedim> > >         output) const
+           const ArrayView<Tensor<2, spacedim> >                  &output) const
 {
 
   AssertDimension (input.size(), output.size());
@@ -842,10 +870,10 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::
-transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-           const MappingType                                                         mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                   &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const
+transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
+           const MappingType                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+           const ArrayView<Tensor<3,spacedim> >                      &output) const
 {
 
   AssertDimension (input.size(), output.size());
@@ -880,10 +908,10 @@ transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim>
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::
-transform (const VectorSlice<const std::vector< Tensor<3,dim> > >  input,
+transform (const ArrayView<const  Tensor<3,dim> >                 &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
+           const ArrayView<Tensor<3,spacedim> >                   &output) const
 {
 
   AssertDimension (input.size(), output.size());

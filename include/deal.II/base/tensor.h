@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -415,7 +415,7 @@ public:
   /**
    * Read access using TableIndices <tt>indices</tt>
    */
-  Number operator [] (const TableIndices<rank_> &indices) const;
+  const Number &operator [] (const TableIndices<rank_> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
@@ -843,6 +843,7 @@ namespace internal
   namespace TensorSubscriptor
   {
     template <typename ArrayElementType, int dim>
+    inline DEAL_II_ALWAYS_INLINE
     ArrayElementType &
     subscript (ArrayElementType *values,
                const unsigned int i,
@@ -868,7 +869,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline
+inline DEAL_II_ALWAYS_INLINE
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
@@ -877,7 +878,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 
 
 template <int rank_, int dim, typename Number>
-inline
+inline DEAL_II_ALWAYS_INLINE
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
@@ -887,7 +888,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 
 template <int rank_, int dim, typename Number>
 inline
-Number
+const Number &
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
@@ -1192,7 +1193,7 @@ template <int dim, typename Number>
 inline
 std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 {
-  out << static_cast<Number>(p);
+  out << static_cast<const Number &>(p);
   return out;
 }
 
@@ -1444,7 +1445,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
 
 /**
  * The dot product (single contraction) for tensors: Return a tensor of
- * rank $(\text{rank_1} + \text{rank_2} - 2)$ that is the contraction of
+ * rank $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of
  * the last index of a tensor @p src1 of rank @p rank_1 with the first
  * index of a tensor @p src2 of rank @p rank_2:
  * @f[
@@ -1467,7 +1468,7 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
 operator * (const Tensor<rank_1, dim, Number> &src1,
             const Tensor<rank_2, dim, OtherNumber> &src2)
@@ -1484,7 +1485,7 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 /**
  * Generic contraction of a pair of indices of two tensors of arbitrary
- * rank: Return a tensor of rank $(\text{rank_1} + \text{rank_2} - 2)$ that
+ * rank: Return a tensor of rank $(\text{rank}_1 + \text{rank}_2 - 2)$ that
  * is the contraction of index @p index_1 of a tensor @p src1 of rank
  * @p rank_1 with the index @p index_2 of a tensor @p src2 of rank @p rank_2:
  * @f[
@@ -1503,7 +1504,7 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * @endcode
  *
  * @note The position of the index is counted from 0, i.e.,
- * $0\le\text{index_i}<\text{range_i}$.
+ * $0\le\text{index}_i<\text{range}_i$.
  *
  * @note In case the contraction yields a tensor of rank 0 the scalar
  * number is returned as an unwrapped number type.
@@ -1545,7 +1546,7 @@ contract (const Tensor<rank_1, dim, Number> &src1,
 /**
  * Generic contraction of two pairs of indices of two tensors of
  * arbitrary rank: Return a tensor of rank
- * $(\text{rank_1} + \text{rank_2} - 4)$ that is the contraction of index
+ * $(\text{rank}_1 + \text{rank}_2 - 4)$ that is the contraction of index
  * @p index_1 with index @p index_2, and index @p index_3 with index
  * @p index_4 of a tensor @p src1 of rank @p rank_1 and a tensor @p src2 of
  * rank @p rank_2:
@@ -1566,7 +1567,7 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * @endcode
  *
  * @note The position of the index is counted from 0, i.e.,
- * $0\le\text{index_i}<\text{range_i}$.
+ * $0\le\text{index}_i<\text{range}_i$.
  *
  * @note In case the contraction yields a tensor of rank 0 the scalar
  * number is returned as an unwrapped number type.
@@ -1653,7 +1654,7 @@ scalar_product (const Tensor<rank, dim, Number> &left,
 /**
  * Full contraction of three tensors: Return a scalar number that is the
  * result of a full contraction of a tensor @p left of rank @p rank_1, a
- * tensor @p middle of rank $(\text{rank_1}+\text{rank_2})$ and a tensor @p
+ * tensor @p middle of rank $(\text{rank}_1+\text{rank}_2)$ and a tensor @p
  * right of rank @p rank_2:
  * @f[
  *   \sum_{i_1,..,i_{r1},j_1,..,j_{r2}}
@@ -1681,7 +1682,7 @@ contract3 (const Tensor<rank_1, dim, T1> &left,
 
 /**
  * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
- * tensor of rank $(\text{rank_1} + \text{rank_2})$:
+ * tensor of rank $(\text{rank}_1 + \text{rank}_2)$:
  * @f[
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \text{left}_{i_1,..,i_{r1}}\,\text{right}_{j_1,..,j_{r2}.}

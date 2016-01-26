@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -160,9 +160,15 @@ struct CellData
  * a common number describing the boundary condition to hold on this part of
  * the boundary. The triangulation creation function gives lines not in this
  * list either the boundary indicator zero (if on the boundary) or
- * numbers::internal_face_boundary_id (if in the interior). Explicitly giving
- * a line the indicator numbers::internal_face_boundary_id will result in an
- * error, as well as giving an interior line a boundary indicator.
+ * numbers::internal_face_boundary_id (if in the interior).
+ *
+ * You will get an error if you try to set the boundary indicator of
+ * an interior edge or face, i.e., an edge or face that is not at the
+ * boundary of the mesh. However, one may sometimes want to set the
+ * manifold indicator to an interior object. In this case, set its
+ * boundary indicator to numbers::internal_face_boundary_id, to
+ * indicate that you understand that it is an interior object, but set
+ * its manifold id to the value you want.
  *
  * @ingroup grid
  */
@@ -428,9 +434,8 @@ namespace internal
  * dependent of the dimension and there only exist specialized versions for
  * distinct dimensions.
  *
- * This class satisfies the requirements outlined in
- * @ref GlossMeshAsAContainer "Meshes as containers".
- *
+ * This class satisfies the @ref ConceptMeshType "MeshType concept"
+ * requirements.
  *
  * <h3>Structure and iterators</h3>
  *
@@ -979,7 +984,7 @@ namespace internal
  *           // with the triangulation that we want to be informed about
  *           // mesh refinement
  *           previous_cell = current_cell;
- *           previous_cell.get_tria().signals.post_refinement
+ *           previous_cell->get_triangulation().signals.post_refinement
  *             .connect (std_cxx11::bind (&FEValues<dim>::invalidate_previous_cell,
  *                                        std_cxx11::ref (*this)));
  *         }
@@ -1408,6 +1413,9 @@ public:
   typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
   typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
+  typedef typename IteratorSelector::vertex_iterator        vertex_iterator;
+  typedef typename IteratorSelector::active_vertex_iterator active_vertex_iterator;
+
   typedef typename IteratorSelector::line_iterator        line_iterator;
   typedef typename IteratorSelector::active_line_iterator active_line_iterator;
 
@@ -1416,6 +1424,7 @@ public:
 
   typedef typename IteratorSelector::hex_iterator         hex_iterator;
   typedef typename IteratorSelector::active_hex_iterator  active_hex_iterator;
+
   /**
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
@@ -1899,6 +1908,62 @@ public:
    * @{
    */
 
+
+  /**
+   * Used to inform functions in derived classes how the cell with the given
+   * cell_iterator is going to change. Note that this may me different than
+   * the refine_flag() and coarsen_flag() in the cell_iterator in parallel
+   * calculations because of refinement constraints that this machine does not
+   * see.
+   */
+  enum CellStatus
+  {
+    /**
+     * The cell will not be refined or coarsened and might or might not
+     * move to a different processor.
+     */
+    CELL_PERSIST,
+    /**
+     * The cell will be or was refined.
+     */
+    CELL_REFINE,
+    /**
+     * The children of this cell will be or were coarsened into this cell.
+     */
+    CELL_COARSEN,
+    /**
+     * Invalid status. Will not occur for the user.
+     */
+    CELL_INVALID
+  };
+
+  /**
+   * A structure used to accumulate the results of the cell_weights slot
+   * functions below. It takes an iterator range and returns the sum of values.
+   */
+  template<typename T>
+  struct CellWeightSum
+  {
+    typedef T result_type;
+
+    template<typename InputIterator>
+    T operator()(InputIterator first, InputIterator last) const
+    {
+      // If there are no slots to call, just return the
+      // default-constructed value
+      if (first == last)
+        return T();
+
+      T sum = *first++;
+      while (first != last)
+        {
+          sum += *first++;
+        }
+
+      return sum;
+    }
+  };
+
   /**
    * A structure that has boost::signal objects for a number of actions that a
    * triangulation can do to itself. Please refer to the
@@ -1978,6 +2043,33 @@ public:
      * @p post_refinement_on_cell are not connected to this signal.
      */
     boost::signals2::signal<void ()> any_change;
+
+    /**
+     * This signal is triggered for each cell during every automatic or manual
+     * repartitioning. This signal is
+     * somewhat special in that it is only triggered for distributed parallel
+     * calculations and only if functions are connected to it. It is intended to
+     * allow a weighted repartitioning of the domain to balance the computational
+     * load across processes in a different way than balancing the number of cells.
+     * Any connected function is expected to take an iterator to a cell, and a
+     * CellStatus argument that indicates whether this cell is going to be refined,
+     * coarsened or left untouched (see the documentation of the CellStatus enum
+     * for more information). The function is expected to return an unsigned
+     * integer, which is interpreted as the additional computational load of this
+     * cell. If this cell is going to be coarsened, the signal is called for the
+     * parent cell and you need to provide the weight of the future parent
+     * cell. If this cell is going to be refined the function should return a
+     * weight, which will be equally assigned to every future child
+     * cell of the current cell. As a reference a value of 1000 is added for
+     * every cell to the total weight. This means a signal return value of 1000
+     * (resulting in a weight of 2000) means that it is twice as expensive for
+     * a process to handle this particular cell. If several functions are
+     * connected to this signal, their return values will be summed to calculate
+     * the final weight.
+     */
+    boost::signals2::signal<unsigned int (const cell_iterator &,
+                                          const CellStatus),
+                                                CellWeightSum<unsigned int> > cell_weight;
   };
 
   /**
@@ -2464,6 +2556,38 @@ public:
    * @}
    */
 
+  /*---------------------------------------*/
+  /*---------------------------------------*/
+
+  /**
+   * @name Vertex iterator functions
+   * @{
+   */
+
+  /**
+   * Iterator to the first used vertex. This function can only be used if dim is
+   * not one.
+   */
+  vertex_iterator        begin_vertex() const;
+
+  /**
+   * Iterator to the first active vertex. Because all vertices are active,
+   * begin_vertex() and begin_active_vertex() return the same vertex. This
+   * function can only be used if dim is not one.
+   */
+  active_vertex_iterator begin_active_vertex() const;
+
+  /**
+   * Iterator past the end; this iterator serves for comparisons of iterators
+   * with past-the-end or before-the-beginning states. This function can only be
+   * used if dim is not one.
+   */
+  vertex_iterator        end_vertex() const;
+
+  /*
+   * @}
+   */
+
   /**
    * @name Information about the triangulation
    * @{
@@ -2686,6 +2810,25 @@ public:
    * subdomain id of those cells that are owned by the current processor.
    */
   virtual types::subdomain_id locally_owned_subdomain () const;
+
+  /**
+   * Return a reference to the current object.
+   *
+   * This doesn't seem to be very useful but allows to write code that
+   * can access the underlying triangulation for anything that satisfies
+   * the @ref ConceptMeshType "MeshType concept" (which may not only be a
+   * triangulation, but also a DoFHandler, for example).
+   */
+  Triangulation<dim,spacedim> &
+  get_triangulation ();
+
+  /**
+   * Return a reference to the current object. This is the const-version
+   * of the previous function.
+   */
+  const Triangulation<dim,spacedim> &
+  get_triangulation () const;
+
 
   /*
    * @}
@@ -2951,6 +3094,7 @@ private:
    */
   typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
   typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
+  typedef typename IteratorSelector::raw_vertex_iterator          raw_vertex_iterator;
   typedef typename IteratorSelector::raw_line_iterator            raw_line_iterator;
   typedef typename IteratorSelector::raw_quad_iterator            raw_quad_iterator;
   typedef typename IteratorSelector::raw_hex_iterator             raw_hex_iterator;

@@ -35,8 +35,8 @@
 
 using namespace dealii;
 
-template <class DOFINFO, class MATRIX>
-void test(DOFINFO &info, MeshWorker::Assembler::MatrixSimple<MATRIX> &ass)
+template <class DOFINFO, typename MatrixType>
+void test(DOFINFO &info, MeshWorker::Assembler::MatrixSimple<MatrixType> &ass)
 {
   ass.initialize_info(info, false);
   deallog << "No faces" << std::endl;
@@ -52,7 +52,6 @@ int main()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   Triangulation<2,2> tr;
   GridGenerator::hyper_cube(tr);

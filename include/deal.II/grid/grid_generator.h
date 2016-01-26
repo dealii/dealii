@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,8 @@ namespace GridGenerator
                    const bool                    colorize= false);
 
   /**
-   * \brief Mesh of a d-simplex with (d+1) vertices and mesh cells, resp.
+   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells,
+   * resp.
    *
    * The @p vertices argument contains a vector with all d+1 vertices of the
    * simplex. They must be given in an order such that the vectors from the
@@ -548,15 +549,29 @@ namespace GridGenerator
    * both the faces and the edges of these boundaries. If the flag is @p
    * false, both have indicator zero.
    *
+   * You should attach a SphericalManifold to the cells and faces for correct
+   * placement of vertices upon refinement and to be able to use higher order
+   * mappings. Alternatively, it is also possible to attach a HyperShellBoundary
+   * to the inner and outer boundary. This will create inferior meshes as
+   * described below.
+   *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only certain numbers are allowed, 6 for a surface based on a
+   * In 3d, only certain numbers are allowed, 6 (or the default 0) for a surface based on a
    * hexahedron (i.e. 6 panels on the inner sphere extruded in radial
    * direction to form 6 cells), 12 for the rhombic dodecahedron, and 96 (see
-   * below). These give rise to the following meshes upon one refinement:
+   * below).
+   *
+   * While the SphericalManifold, that is demonstrated in the documentation of the
+   * @ref manifold "documentation module on manifolds", creates reasonable meshes
+   * for any number of @p n_cells if attached to all cells and boundaries, the
+   * situation is less than ideal when only attaching a HyperShellBoundary. Then,
+   * only vertices on the boundaries are placed at the correct distance from the
+   * center. As an example, the 3d meshes give rise to the following meshes
+   * upon one refinement:
    *
    * @image html hypershell3d-6.png
    * @image html hypershell3d-12.png
@@ -579,13 +594,6 @@ namespace GridGenerator
    *
    * @image html hyper_shell_12_cut.png
    * @image html hyper_shell_96_cut.png
-   *
-   * A different way to approach the problem with distorted cells is to attach
-   * appropriate manifold descriptions to the geometry created by this
-   * function. In the current context, this would involve the
-   * SphericalManifold class. An example of how this works and what it leads
-   * to is shown in the documentation of the
-   * @ref manifold "documentation module on manifolds".
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
@@ -870,6 +878,9 @@ namespace GridGenerator
    * boundary indicators of the faces of @p input are going to be assigned to
    * the corresponding side walls in z direction. The bottom and top get the
    * next two free boundary indicators.
+   *
+   * @note The 2d input triangulation @p input must be a coarse mesh that
+   * has no refined cells.
    */
   void
   extrude_triangulation (const Triangulation<2, 2> &input,
@@ -925,12 +936,12 @@ namespace GridGenerator
   // doing some contortion with the return type using the following
   // intermediate type. This is only used when using MS VC++ and uses
   // the direct way of doing it otherwise
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
     typedef
-    std::map<typename Container<dim-1,spacedim>::cell_iterator,
-        typename Container<dim,spacedim>::face_iterator>
+    std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+        typename MeshType<dim,spacedim>::face_iterator>
         return_type;
   };
 #endif
@@ -952,25 +963,49 @@ namespace GridGenerator
    * mesh. The surface mesh is then refined in the same way as the faces of
    * the volume mesh are. In order to ensure that the surface mesh has the
    * same vertices as the volume mesh, it is therefore important that you
-   * assign appropriate boundary objects through Triangulation::set_boundary
+   * assign appropriate boundary objects through Triangulation::set_boundary()
    * to the surface mesh object before calling this function. If you don't,
    * the refinement will happen under the assumption that all faces are
    * straight (i.e using the StraightBoundary class) rather than any curved
    * boundary object you may want to use to determine the location of new
    * vertices.
    *
+   * @tparam MeshType A type that satisfies the requirements of the
+   * @ref ConceptMeshType "MeshType concept". The map that is returned will be
+   * between cell iterators pointing into the container describing the surface
+   * mesh and face iterators of the volume mesh container. If MeshType is
+   * DoFHandler or hp::DoFHandler, then the function will re-build the
+   * triangulation underlying the second argument and return a map between
+   * appropriate iterators into the MeshType arguments. However, the function
+   * will not actually distribute degrees of freedom on this newly created
+   * surface mesh.
    *
-   * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see
-   * @ref GlossMeshAsAContainer).
-   * The map that is returned will be between cell iterators pointing into the
-   * container describing the surface mesh and face iterators of the volume
-   * mesh container. If the Container argument is DoFHandler of
-   * hp::DoFHandler, then the function will re-build the triangulation
-   * underlying the second argument and return a map between appropriate
-   * iterators into the Container arguments. However, the function will not
-   * actually distribute degrees of freedom on this newly created surface
-   * mesh.
+   * @tparam dim The dimension of the cells of the volume mesh. For example, if
+   *   dim==2, then the cells are quadrilaterals that either live in the
+   *   plane, or form a surface in a higher-dimensional space. The dimension
+   *   of the cells of the surface mesh is consequently dim-1.
+   * @tparam spacedim The dimension of the space in which both the volume and
+   *   the surface mesh live.
+   *
+   * @param[in] volume_mesh A container of cells that define the volume mesh.
+   * @param[out] surface_mesh A container whose associated triangulation
+   *   will be built to consist of the cells that correspond to the (selected
+   *   portion of) the boundary of the volume mesh.
+   * @param[in] boundary_ids A list of boundary indicators denoting that subset
+   *   of faces of volume cells for which this function should extract
+   *   the surface mesh. If left at its default, i.e., if the set is empty,
+   *   then the function operates on <i>all</i> boundary faces.
+   *
+   * @return A map that for each cell of the surface mesh (key) returns an
+   *   iterator to the corresponding face of a cell of the volume mesh (value).
+   *   The keys include both active and non-active cells of the surface mesh.
+   *   For dim=2 (i.e., where volume cells are quadrilaterals and surface
+   *   cells are lines), the order of vertices of surface cells and the
+   *   corresponding volume faces match. For dim=3 (i.e., where volume cells
+   *   are hexahedra and surface cells are quadrilaterals), the order of
+   *   vertices may not match in order to ensure that each surface cell
+   *   has a right-handed coordinate system when viewed from one of the
+   *   two sides of the surface connecting the cells of the surface mesh.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as
@@ -979,17 +1014,17 @@ namespace GridGenerator
    * extend the function to also copy boundary indicators from finer level
    * faces to their corresponding surface mesh cells, for example to
    * accommodate different geometry descriptions in the case of curved
-   * boundaries.
+   * boundaries (but this is not currently implemented).
    */
-  template <template <int,int> class Container, int dim, int spacedim>
+  template <template <int,int> class MeshType, int dim, int spacedim>
 #ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
+  std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
+      typename MeshType<dim,spacedim>::face_iterator>
 #else
   typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
 #endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
+      extract_boundary_mesh (const MeshType<dim,spacedim>       &volume_mesh,
+                             MeshType<dim-1,spacedim>           &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
 

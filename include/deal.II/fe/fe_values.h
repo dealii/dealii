@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1421,19 +1421,6 @@ namespace internal
  * </ul>
  *
  *
- * <h3>UpdateFlags</h3>
- *
- * The UpdateFlags object handed to the constructor is used to determine which
- * of the data fields to compute. This way, it is possible to avoid expensive
- * computations of useless derivatives.  In the beginning, these flags are
- * processed through the functions Mapping::update_once(),
- * Mapping::update_each(), FiniteElement::update_once()
- * FiniteElement::update_each(). All the results are bit-wise or'd and
- * determine the fields actually computed. This enables Mapping and
- * FiniteElement to schedule auxiliary data fields for updating. Still, it is
- * recommended to give <b>all</b> needed update flags to FEValues.
- *
- *
  * <h3>Internals about the implementation</h3>
  *
  * The mechanisms by which this class work are discussed on the page on
@@ -2810,8 +2797,8 @@ public:
    * associated with this object. It is assumed that the finite element used
    * by the given cell is also the one used by this FEValues object.
    */
-  template <template <int,int> class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell);
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,level_dof_access> > &cell);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given cell
@@ -3019,8 +3006,8 @@ public:
    * Reinitialize the gradients, Jacobi determinants, etc for the face with
    * number @p face_no of @p cell and the given finite element.
    */
-  template <template <int,int> class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell,
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,level_dof_access> > &cell,
                const unsigned int face_no);
 
   /**
@@ -3131,10 +3118,10 @@ public:
    * associated with this object. It is assumed that the finite element used
    * by the given cell is also the one used by this FESubfaceValues object.
    */
-  template <template <int,int> class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH<dim,spacedim>,level_dof_access> > &cell,
-               const unsigned int                    face_no,
-               const unsigned int                    subface_no);
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>,level_dof_access> > &cell,
+               const unsigned int face_no,
+               const unsigned int subface_no);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given
@@ -4140,10 +4127,6 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
           ExcAccessToUninitializedField("update_gradients"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_gradients.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_gradients.size()));
-  Assert (j<this->finite_element_output.shape_gradients[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_gradients[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
@@ -4209,10 +4192,6 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
           ExcAccessToUninitializedField("update_hessians"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_hessians.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_hessians.size()));
-  Assert (j<this->finite_element_output.shape_hessians[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_hessians[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:
@@ -4278,10 +4257,6 @@ FEValuesBase<dim,spacedim>::shape_3rd_derivative (const unsigned int i,
           ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->finite_element_output.shape_3rd_derivatives.size(),
-          ExcIndexRange (i, 0, this->finite_element_output.shape_3rd_derivatives.size()));
-  Assert (j<this->finite_element_output.shape_3rd_derivatives[0].size(),
-          ExcIndexRange (j, 0, this->finite_element_output.shape_3rd_derivatives[0].size()));
 
   // if the entire FE is primitive,
   // then we can take a short-cut:

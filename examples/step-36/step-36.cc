@@ -483,12 +483,8 @@ int main (int argc, char **argv)
       AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
                   ExcMessage("This program can only be run in serial, use ./step-36"));
 
-      {
-        deallog.depth_console (0);
-
-        EigenvalueProblem<2> problem ("step-36.prm");
-        problem.run ();
-      }
+      EigenvalueProblem<2> problem ("step-36.prm");
+      problem.run ();
     }
 
   // All the while, we are watching out if any exceptions should have been

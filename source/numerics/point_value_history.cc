@@ -93,7 +93,7 @@ PointValueHistory<dim>::PointValueHistory (const DoFHandler<dim> &dof_handler,
     = std::vector<std::vector <double> > (n_indep, std::vector <double> (0));
   indep_names = std::vector <std::string> ();
 
-  tria_listener = dof_handler.get_tria().signals.any_change.connect (std_cxx11::bind (&PointValueHistory<dim>::tria_change_listener,
+  tria_listener = dof_handler.get_triangulation().signals.any_change.connect (std_cxx11::bind (&PointValueHistory<dim>::tria_change_listener,
                   std_cxx11::ref(*this)));
 }
 
@@ -123,7 +123,7 @@ PointValueHistory<dim>::PointValueHistory (const PointValueHistory &point_value_
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+      tria_listener = dof_handler->get_triangulation().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
                       std_cxx11::ref(*this)));
     }
 }
@@ -155,7 +155,7 @@ PointValueHistory<dim>::operator= (const PointValueHistory &point_value_history)
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+      tria_listener = dof_handler->get_triangulation().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
                       std_cxx11::ref(*this)));
     }
 
@@ -562,9 +562,9 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-template <class VECTOR>
+template <typename VectorType>
 void PointValueHistory<dim>
-::evaluate_field (const std::string &vector_name, const VECTOR &solution)
+::evaluate_field (const std::string &vector_name, const VectorType &solution)
 {
   // must be closed to add data to internal
   // members.
@@ -615,9 +615,12 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-template <class VECTOR>
+template <typename VectorType>
 void PointValueHistory<dim>
-::evaluate_field(const std::vector <std::string> &vector_names, const VECTOR &solution, const DataPostprocessor< dim> &data_postprocessor, const Quadrature<dim> &quadrature)
+::evaluate_field (const std::vector <std::string> &vector_names,
+                  const VectorType                &solution,
+                  const DataPostprocessor< dim>   &data_postprocessor,
+                  const Quadrature<dim>           &quadrature)
 {
   // must be closed to add data to internal
   // members.
@@ -658,9 +661,9 @@ void PointValueHistory<dim>
         {
           // Extract data for the
           // PostProcessor object
-          std::vector< typename VECTOR::value_type > uh (n_quadrature_points, 0.0);
-          std::vector< Tensor< 1, dim, typename VECTOR::value_type > > duh (n_quadrature_points, Tensor <1, dim, typename VECTOR::value_type> ());
-          std::vector< Tensor< 2, dim, typename VECTOR::value_type > > dduh (n_quadrature_points, Tensor <2, dim, typename VECTOR::value_type> ());
+          std::vector< typename VectorType::value_type > uh (n_quadrature_points, 0.0);
+          std::vector< Tensor< 1, dim, typename VectorType::value_type > > duh (n_quadrature_points, Tensor <1, dim, typename VectorType::value_type> ());
+          std::vector< Tensor< 2, dim, typename VectorType::value_type > > dduh (n_quadrature_points, Tensor <2, dim, typename VectorType::value_type> ());
           std::vector<Point<dim> > dummy_normals (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -691,7 +694,7 @@ void PointValueHistory<dim>
 
           // Call compute_derived_quantities_vector
           // or compute_derived_quantities_scalar
-          // TODO this function should also operate with typename VECTOR::value_type
+          // TODO this function should also operate with typename VectorType::value_type
           data_postprocessor.
           compute_derived_quantities_scalar(std::vector< double > (1, uh[selected_point]),
                                             std::vector< Tensor< 1, dim > > (1, Tensor< 1, dim >(duh[selected_point]) ),
@@ -704,9 +707,9 @@ void PointValueHistory<dim>
       else     // The case of a vector FE
         {
           // Extract data for the PostProcessor object
-          std::vector< Vector< typename VECTOR::value_type > > uh (n_quadrature_points, Vector <typename VECTOR::value_type> (n_components));
-          std::vector< std::vector< Tensor< 1, dim, typename VECTOR::value_type > > > duh (n_quadrature_points, std::vector< Tensor< 1, dim, typename VECTOR::value_type > > (n_components,  Tensor< 1, dim, typename VECTOR::value_type >()));
-          std::vector< std::vector< Tensor< 2, dim, typename VECTOR::value_type > > > dduh (n_quadrature_points, std::vector< Tensor< 2, dim, typename VECTOR::value_type > > (n_components,  Tensor< 2, dim, typename VECTOR::value_type >()));
+          std::vector< Vector< typename VectorType::value_type > > uh (n_quadrature_points, Vector <typename VectorType::value_type> (n_components));
+          std::vector< std::vector< Tensor< 1, dim, typename VectorType::value_type > > > duh (n_quadrature_points, std::vector< Tensor< 1, dim, typename VectorType::value_type > > (n_components,  Tensor< 1, dim, typename VectorType::value_type >()));
+          std::vector< std::vector< Tensor< 2, dim, typename VectorType::value_type > > > dduh (n_quadrature_points, std::vector< Tensor< 2, dim, typename VectorType::value_type > > (n_components,  Tensor< 2, dim, typename VectorType::value_type >()));
           std::vector<Point<dim> > dummy_normals  (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -739,9 +742,9 @@ void PointValueHistory<dim>
           // FIXME: We need tmp vectors below because the data
           // postprocessors are not equipped to deal with anything but
           // doubles (scalars and tensors).
-          const Vector< typename VECTOR::value_type >                        &uh_s   = uh[selected_point];
-          const std::vector< Tensor< 1, dim, typename VECTOR::value_type > > &duh_s  = duh[selected_point];
-          const std::vector< Tensor< 2, dim, typename VECTOR::value_type > > &dduh_s = dduh[selected_point];
+          const Vector< typename VectorType::value_type >                        &uh_s   = uh[selected_point];
+          const std::vector< Tensor< 1, dim, typename VectorType::value_type > > &duh_s  = duh[selected_point];
+          const std::vector< Tensor< 2, dim, typename VectorType::value_type > > &dduh_s = dduh[selected_point];
           std::vector< Tensor< 1, dim > > tmp_d (duh_s.size());
           for (unsigned int i = 0; i < duh_s.size(); i++)
             tmp_d[i] = duh_s[i];
@@ -794,9 +797,12 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-template <class VECTOR>
+template <typename VectorType>
 void PointValueHistory<dim>
-::evaluate_field(const std::string &vector_name, const VECTOR &solution, const DataPostprocessor<dim> &data_postprocessor, const Quadrature<dim> &quadrature)
+::evaluate_field (const std::string            &vector_name,
+                  const VectorType             &solution,
+                  const DataPostprocessor<dim> &data_postprocessor,
+                  const Quadrature<dim>        &quadrature)
 {
   std::vector <std::string> vector_names;
   vector_names.push_back (vector_name);
@@ -806,9 +812,10 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-template <class VECTOR>
+template <typename VectorType>
 void PointValueHistory<dim>
-::evaluate_field_at_requested_location(const std::string &vector_name, const VECTOR &solution)
+::evaluate_field_at_requested_location (const std::string &vector_name,
+                                        const VectorType  &solution)
 {
   // must be closed to add data to internal
   // members.
@@ -1349,4 +1356,3 @@ void PointValueHistory<dim>
 
 
 DEAL_II_NAMESPACE_CLOSE
-

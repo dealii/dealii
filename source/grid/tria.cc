@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -994,8 +994,8 @@ namespace internal
                     << "The input data for creating a triangulation contained "
                     << "information about a line with indices "
                     << arg1 << " and " << arg2
-                    << "that is supposed to have boundary indicator "
-                    << arg3
+                    << " that is described to have boundary indicator "
+                    << (int)arg3
                     << ". However, this is an internal line not located on the "
                     << "boundary. You cannot assign a boundary indicator to it."
                     << std::endl
@@ -1025,8 +1025,8 @@ namespace internal
                     << "The input data for creating a triangulation contained "
                     << "information about a quad with indices "
                     << arg1 << ", " << arg2 << ", " << arg3 << ", and " << arg4
-                    << "that is supposed to have boundary indicator "
-                    << arg5
+                    << " that is described to have boundary indicator "
+                    << (int)arg5
                     << ". However, this is an internal quad not located on the "
                     << "boundary. You cannot assign a boundary indicator to it."
                     << std::endl
@@ -1065,8 +1065,10 @@ namespace internal
      * dim==3. However, their implementation is largly independent of the
      * spacedim template parameter. So we would like to write things like
      *
+     * @code
      * template <int spacedim>
      * void Triangulation<1,spacedim>::create_triangulation (...) {...}
+     * @endcode
      *
      * Unfortunately, C++ doesn't allow this: member functions of class
      * templates have to be either not specialized at all, or fully
@@ -1074,21 +1076,25 @@ namespace internal
      * solution would be to just duplicate the bodies of the functions and
      * have equally implemented functions
      *
+     * @code
      * template <>
      * void Triangulation<1,1>::create_triangulation (...) {...}
      *
      * template <>
      * void Triangulation<1,2>::create_triangulation (...) {...}
+     * @endcode
      *
      * but that is clearly an unsatisfactory solution. Rather, what we do
      * is introduce the current Implementation class in which we can write
      * these functions as member templates over spacedim, i.e. we can have
      *
+     * @code
      * template <int dim_, int spacedim_>
      * template <int spacedim>
      * void Triangulation<dim_,spacedim_>::Implementation::
      *            create_triangulation (...,
      *                                  Triangulation<1,spacedim> &tria ) {...}
+     * @endcode
      *
      * The outer template parameters are here unused, only the inner
      * ones are of real interest.
@@ -1884,8 +1890,7 @@ namespace internal
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
-        // set boundary indicators where
-        // given
+        // set boundary indicators where given
         std::vector<CellData<1> >::const_iterator boundary_line
           = subcelldata.boundary_lines.begin();
         std::vector<CellData<1> >::const_iterator end_boundary_line
@@ -1896,13 +1901,11 @@ namespace internal
             std::pair<int,int> line_vertices(std::make_pair(boundary_line->vertices[0],
                                                             boundary_line->vertices[1]));
             if (needed_lines.find(line_vertices) != needed_lines.end())
-              // line found in this
-              // direction
+              // line found in this direction
               line = needed_lines[line_vertices];
             else
               {
-                // look whether it exists
-                // in reverse direction
+                // look whether it exists in reverse direction
                 std::swap (line_vertices.first, line_vertices.second);
                 if (needed_lines.find(line_vertices) != needed_lines.end())
                   line = needed_lines[line_vertices];
@@ -1912,21 +1915,26 @@ namespace internal
                                                         line_vertices.second));
               }
 
-            // assert that we only set
-            // boundary info once
+            // assert that we only set boundary info once
             AssertThrow (! (line->boundary_id() != 0 &&
                             line->boundary_id() != numbers::internal_face_boundary_id),
                          ExcMultiplySetLineInfoOfLine(line_vertices.first,
                                                       line_vertices.second));
 
-            // Assert that only exterior lines
-            // are given a boundary indicator
-            AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
-                         ExcInteriorLineCantBeBoundary(line->vertex_index(0),
-                                                       line->vertex_index(1),
-                                                       boundary_line->boundary_id));
+            // Assert that only exterior lines are given a boundary
+            // indicator; however, it is possible that someone may
+            // want to give an interior line a manifold id (and thus
+            // lists this line in the subcell_data structure), and we
+            // need to allow that
+            if (boundary_line->boundary_id != numbers::internal_face_boundary_id)
+              {
+                AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
+                             ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                           line->vertex_index(1),
+                                                           boundary_line->boundary_id));
+                line->set_boundary_id (boundary_line->boundary_id);
+              }
 
-            line->set_boundary_id (boundary_line->boundary_id);
             line->set_manifold_id (boundary_line->manifold_id);
           }
 
@@ -10605,6 +10613,62 @@ Triangulation<dim,spacedim>::end_face () const
 }
 
 
+/*------------------------ Vertex iterator functions ------------------------*/
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::vertex_iterator
+Triangulation<dim,spacedim>::begin_vertex() const
+{
+  if (dim==1)
+    {
+      // This does not work if dim==1 because TriaAccessor<0,1,spacedim> does not
+      // implement operator++
+      Assert(false, ExcNotImplemented());
+      return raw_vertex_iterator();
+    }
+  else
+    {
+      vertex_iterator i = raw_vertex_iterator(const_cast<Triangulation<dim, spacedim>*>(this),
+                                              0,
+                                              0);
+      if (i.state() != IteratorState::valid)
+        return i;
+      // This loop will end because every triangulation has used vertices.
+      while (i->used() == false)
+        if ((++i).state() != IteratorState::valid)
+          return i;
+      return i;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::active_vertex_iterator
+Triangulation<dim,spacedim>::begin_active_vertex() const
+{
+  return begin_vertex();
+}
+
+
+
+template <int dim, int spacedim>
+typename Triangulation<dim,spacedim>::vertex_iterator
+Triangulation<dim,spacedim>::end_vertex() const
+{
+  if (dim==1)
+    {
+      Assert(false, ExcNotImplemented());
+      return raw_vertex_iterator();
+    }
+  else
+    return raw_vertex_iterator(const_cast<Triangulation<dim, spacedim>*>(this),
+                               -1,
+                               numbers::invalid_unsigned_int);
+}
+
+
 
 
 /*------------------------ Line iterator functions ------------------------*/
@@ -11511,6 +11575,24 @@ types::subdomain_id
 Triangulation<dim,spacedim>::locally_owned_subdomain () const
 {
   return numbers::invalid_subdomain_id;
+}
+
+
+
+template <int dim, int spacedim>
+Triangulation<dim,spacedim> &
+Triangulation<dim,spacedim>::get_triangulation ()
+{
+  return *this;
+}
+
+
+
+template <int dim, int spacedim>
+const Triangulation<dim,spacedim> &
+Triangulation<dim,spacedim>::get_triangulation () const
+{
+  return *this;
 }
 
 

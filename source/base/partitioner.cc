@@ -113,6 +113,9 @@ namespace Utilities
                            (locally_owned_indices.nth_index_in_set(0),
                             locally_owned_indices.nth_index_in_set(0) +
                             locally_owned_indices.n_elements());
+      AssertThrow (local_range_data.second-local_range_data.first <
+                   static_cast<types::global_dof_index>(std::numeric_limits<unsigned int>::max()),
+                   ExcMessage("Index overflow: This class supports at most 2^32-1 locally owned vector entries"));
       locally_owned_range_data.set_size (locally_owned_indices.size());
       locally_owned_range_data.add_range (local_range_data.first, local_range_data.second);
       locally_owned_range_data.compress();
@@ -138,6 +141,9 @@ namespace Utilities
         ghost_indices_data.set_size(locally_owned_range_data.size());
       ghost_indices_data.subtract_set (locally_owned_range_data);
       ghost_indices_data.compress();
+      AssertThrow (ghost_indices_data.n_elements() <
+                   static_cast<types::global_dof_index>(std::numeric_limits<unsigned int>::max()),
+                   ExcMessage("Index overflow: This class supports at most 2^32-1 ghost elements"));
       n_ghost_indices_data = ghost_indices_data.n_elements();
 
       have_ghost_indices =

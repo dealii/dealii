@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@ int main ()
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test1<1> (true);

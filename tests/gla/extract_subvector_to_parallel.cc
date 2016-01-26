@@ -15,7 +15,7 @@
 
 
 
-// test the various VECTOR::extract_subvector_to functions for
+// test the various extract_subvector_to functions for
 // parallel vectors and block vectors
 
 #include "../tests.h"
@@ -28,8 +28,8 @@
 #include <vector>
 
 
-template <class Vector>
-void set (Vector &vector)
+template <typename VectorType>
+void set (VectorType &vector)
 {
   for (unsigned int i=0; i<vector.size(); ++i)
     if (vector.locally_owned_elements().is_element(i))
@@ -38,25 +38,25 @@ void set (Vector &vector)
 }
 
 
-template <class Vector>
-void test (Vector &vector)
+template <typename VectorType>
+void test (VectorType &vector)
 {
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   // select every other element
-  std::vector<typename Vector::size_type> indices;
+  std::vector<typename VectorType::size_type> indices;
   for (unsigned int j=0; j<vector.size()/2; ++j)
     indices.push_back (2*j);
 
   // do the extraction with the function that takes indices, then
   // assert correctness
-  std::vector<typename Vector::value_type> values1 (indices.size());
+  std::vector<typename VectorType::value_type> values1 (indices.size());
   vector.extract_subvector_to (indices, values1);
   for (unsigned int j=0; j<vector.size()/2; ++j)
     AssertThrow (values1[j] == 2*j, ExcInternalError());
 
   // do the same with the version of the function that takes iterators
-  std::vector<typename Vector::value_type> values2 (indices.size());
+  std::vector<typename VectorType::value_type> values2 (indices.size());
   vector.extract_subvector_to (indices.begin(),
                                indices.end(),
                                values2.begin());

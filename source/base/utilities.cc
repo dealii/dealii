@@ -25,6 +25,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
+#include <cctype>
 #include <cerrno>
 #include <cmath>
 #include <cstddef>
@@ -80,14 +81,28 @@ namespace Utilities
   std::string
   int_to_string (const unsigned int value, const unsigned int digits)
   {
+    return to_string(value,digits);
+  }
+
+  template <typename number>
+  std::string
+  to_string (const number value, const unsigned int digits)
+  {
     std::string lc_string = boost::lexical_cast<std::string>(value);
 
     if (digits == numbers::invalid_unsigned_int)
       return lc_string;
     else if (lc_string.size() < digits)
       {
-        std::string padding(digits - lc_string.size(), '0');
-        lc_string.insert(0, padding);
+        // We have to add the padding zeroes in front of the number
+        const unsigned int padding_position = (lc_string[0] == '-')
+                                              ?
+                                              1
+                                              :
+                                              0;
+
+        const std::string padding(digits - lc_string.size(), '0');
+        lc_string.insert(padding_position, padding);
       }
     return lc_string;
   }
@@ -115,13 +130,29 @@ namespace Utilities
   std::string
   trim(const std::string &input)
   {
-    std::string::size_type start_idx = input.find_first_not_of(" ");
-    if (start_idx == std::string::npos)
-      return "";
+    std::string::size_type left = 0;
+    std::string::size_type right = input.size() - 1;
 
-    std::string::size_type end_idx = input.find_last_not_of(" ");
-    return std::string( input, start_idx, end_idx+1-start_idx);
+    for (; left < input.size(); ++left)
+      {
+        if (!std::isspace(input[left]))
+          {
+            break;
+          }
+      }
+
+    for (; right >= left; --right)
+      {
+        if (!std::isspace(input[right]))
+          {
+            break;
+          }
+      }
+
+    return std::string(input, left, right - left + 1);
   }
+
+
 
   std::string
   dim_string(const int dim, const int spacedim)
@@ -802,6 +833,16 @@ namespace Utilities
   }
 
 #endif
+
+  template std::string to_string<int> (int, unsigned int);
+  template std::string to_string<long int> (long int, unsigned int);
+  template std::string to_string<long long int> (long long int, unsigned int);
+  template std::string to_string<unsigned int> (unsigned int, unsigned int);
+  template std::string to_string<unsigned long int> (unsigned long int, unsigned int);
+  template std::string to_string<unsigned long long int> (unsigned long long int, unsigned int);
+  template std::string to_string<float> (float, unsigned int);
+  template std::string to_string<double> (double, unsigned int);
+  template std::string to_string<long double> (long double, unsigned int);
 
 }
 

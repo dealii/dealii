@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@
 #include <fstream>
 
 
-template <class Vector, class Matrix, class Sparsity>
+template <typename VectorType, class Matrix, class Sparsity>
 class LaplaceProblem
 {
 public:
@@ -64,7 +64,7 @@ public:
   void reinit_sparsity ();
   void reinit_vectors ();
 
-  Vector       solution;
+  VectorType solution;
 
 private:
   void make_grid_and_dofs ();
@@ -73,19 +73,19 @@ private:
 
   const unsigned int n_blocks;
 
-  Triangulation<2>     triangulation;
-  FE_Q<2>              fe;
-  DoFHandler<2>        dof_handler;
+  Triangulation<2>   triangulation;
+  FE_Q<2>            fe;
+  DoFHandler<2>      dof_handler;
 
-  Sparsity      sparsity_pattern;
-  Matrix        system_matrix;
+  Sparsity           sparsity_pattern;
+  Matrix             system_matrix;
 
-  Vector       system_rhs;
+  VectorType         system_rhs;
 };
 
 
-template <class Vector, class Matrix, class Sparsity>
-LaplaceProblem<Vector,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blocks) :
+template <typename VectorType, class Matrix, class Sparsity>
+LaplaceProblem<VectorType,Matrix,Sparsity>::LaplaceProblem (const unsigned int n_blocks) :
   n_blocks (n_blocks),
   fe(1),
   dof_handler (triangulation)
@@ -113,8 +113,8 @@ LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProble
 
 
 
-template <class Vector, class Matrix, class Sparsity>
-void LaplaceProblem<Vector,Matrix,Sparsity>::make_grid_and_dofs ()
+template <typename VectorType, class Matrix, class Sparsity>
+void LaplaceProblem<VectorType,Matrix,Sparsity>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (3);
@@ -256,8 +256,8 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
 
 
 
-template <class Vector, class Matrix, class Sparsity>
-void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
+template <typename VectorType, class Matrix, class Sparsity>
+void LaplaceProblem<VectorType,Matrix,Sparsity>::assemble_system ()
 {
   QGauss<2>  quadrature_formula(2);
   FEValues<2> fe_values (fe, quadrature_formula,
@@ -320,12 +320,12 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
 }
 
 
-template <class Vector, class Matrix, class Sparsity>
-void LaplaceProblem<Vector,Matrix,Sparsity>::solve ()
+template <typename VectorType, class Matrix, class Sparsity>
+void LaplaceProblem<VectorType,Matrix,Sparsity>::solve ()
 {
-  SolverControl           solver_control (1000, 1e-12, false, false);
-  PrimitiveVectorMemory<Vector> vector_memory;
-  SolverCG<Vector>        cg (solver_control, vector_memory);
+  SolverControl                     solver_control (1000, 1e-12, false, false);
+  PrimitiveVectorMemory<VectorType> vector_memory;
+  SolverCG<VectorType>              cg (solver_control, vector_memory);
 
   PreconditionJacobi<Matrix> preconditioner;
   preconditioner.initialize (system_matrix, 0.8);
@@ -335,8 +335,8 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::solve ()
 }
 
 
-template <class Vector, class Matrix, class Sparsity>
-void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
+template <typename VectorType, class Matrix, class Sparsity>
+void LaplaceProblem<VectorType,Matrix,Sparsity>::run ()
 {
   make_grid_and_dofs ();
   assemble_system ();
@@ -344,7 +344,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 
   for (unsigned int i=0; i<solution.size(); ++i)
     deallog
-    //<< typeid(Vector).name ()
+    //<< typeid(VectorType).name ()
     //<< ' '
     //<< typeid(Matrix).name ()
     //<< '-'
@@ -359,7 +359,6 @@ int main ()
   deallog << std::setprecision(2);
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
 

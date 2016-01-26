@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * Building Blocks library. See
  * @ref threads
  * for more information on this.  Thread-based parallel methods need to
- * explicitly created threads and may want to use a number of threads that is
+ * explicitly create threads and may want to use a number of threads that is
  * related to the number of CPUs in your system. The recommended number of
  * threads can be queried using MultithreadInfo::n_threads(), while the number
  * of cores in the system is returned by MultithreadInfo::n_cores().
@@ -59,14 +59,9 @@ public:
   static unsigned int n_cores ();
 
   /**
-   * @deprecated Use n_cores() instead.
-   */
-  static const unsigned int n_cpus DEAL_II_DEPRECATED;
-
-  /**
    * Returns the number of threads to use. This is initially set to the number
    * of cores the system has (see n_cores()) but can be further restricted by
-   * set_thread_limit().
+   * set_thread_limit() and the environment variable DEAL_II_NUM_THREADS.
    */
   static unsigned int n_threads ();
 
@@ -104,13 +99,14 @@ public:
    */
   DeclException0(ExcProcNotPresent);
 
-  /**
-   * @deprecated All members are static, so there is no need to construct an
-   * instance.
-   */
-  MultithreadInfo () DEAL_II_DEPRECATED;
-
 private:
+
+
+  /**
+   * Constructor made private because no instance of this class needs to
+   * be constructed as all members are static.
+   */
+  MultithreadInfo ();
 
   /**
    * Private function to determine the number of CPUs. Implementation for
@@ -123,19 +119,13 @@ private:
    * Variable representing the maximum number of threads.
    */
   static unsigned int n_max_threads;
+
+  /**
+   * Variable representing the number of cores in the system. This is computed by
+   * get_n_cpus() and is returned by n_cores().
+   */
+  static const unsigned int n_cpus;
 };
-
-
-
-/**
- * Global variable of type <tt>MultithreadInfo</tt>.
- *
- * @deprecated Use the static member functions instead.
- *
- * @ingroup threads
- */
-extern MultithreadInfo multithread_info DEAL_II_DEPRECATED;
-
 
 
 

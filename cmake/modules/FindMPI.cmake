@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -64,6 +64,12 @@ ENDIF()
 # Call the system FindMPI.cmake module:
 #
 
+# in case MPIEXEC is specified first call find_program() so that in case of success 
+# its subsequent runs inside FIND_PACKAGE(MPI) do not alter the desired result.
+IF(DEFINED ENV{MPIEXEC})
+  FIND_PROGRAM(MPIEXEC $ENV{MPIEXEC})
+ENDIF()
+
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(MPI)
@@ -80,6 +86,9 @@ IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
     )
   # Clear variables so that FIND_PACKAGE runs again:
   SET(MPI_FOUND)
+  SET(MPI_CXX_COMPILER)
+  SET(MPI_C_COMPILER)
+  SET(MPI_Fortran_COMPILER)
   UNSET(MPI_CXX_COMPILER CACHE)
   UNSET(MPI_C_COMPILER CACHE)
   UNSET(MPI_Fortran_COMPILER CACHE)

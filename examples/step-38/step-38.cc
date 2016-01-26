@@ -559,8 +559,6 @@ int main ()
       using namespace dealii;
       using namespace Step38;
 
-      deallog.depth_console (0);
-
       LaplaceBeltramiProblem<3> laplace_beltrami;
       laplace_beltrami.run();
     }

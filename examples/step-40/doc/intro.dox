@@ -39,7 +39,9 @@ part to the whole. A simple way to do that was shown in step-17 and
 step-18, where we show how a program can use <a
 href="http://www.mpi-forum.org/" target="_top">MPI</a> to parallelize
 assembling the linear system, storing it, solving it, and computing
-error estimators. All of these operations scale relatively trivially,
+error estimators. All of these operations scale relatively trivially
+(for a definition of what it means for an operation to "scale", see 
+@ref GlossParallelScaling "this glossary entry),
 but there was one significant drawback: for this to be moderately
 simple to implement, each MPI processor had to keep its own copy of
 the entire Triangulation and DoFHandler objects. Consequently, while
@@ -69,7 +71,7 @@ but apart from that all of its workings are hidden under the surface
 of deal.II.
 
 In essence, what the parallel::distributed::Triangulation class and
-associated parallel::distributed::DoFHandler objects do is to split
+code inside the DoFHandler class do is to split
 the global mesh so that every processor only stores a small bit it
 "owns" along with one layer of "ghost" cells that surround the ones it
 owns. What happens in the rest of the domain on which we want to solve

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -234,7 +234,7 @@ namespace internal
  *
  * Padding the column with default elements makes sure that after the addition
  * the column has as many entries as the longest other column. In other words,
- * if we have skipped previous invokations of add_value() for a given key,
+ * if we have skipped previous invocations of add_value() for a given key,
  * then the padding will enter default values into this column.
  *
  * The algorithm as described will fail if you try to skip adding values for a
@@ -734,6 +734,11 @@ namespace internal
         char c = 's';
         ar &c & *p;
       }
+    else if (const unsigned long long int *p = boost::get<unsigned long long int>(&value))
+      {
+        char c = 'l';
+        ar &c & *p;
+      }
     else
       Assert (false, ExcInternalError());
   }
@@ -780,6 +785,14 @@ namespace internal
       case 's':
       {
         std::string val;
+        ar &val;
+        value = val;
+        break;
+      }
+
+      case 'l':
+      {
+        unsigned long long int val;
         ar &val;
         value = val;
         break;

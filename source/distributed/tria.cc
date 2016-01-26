@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1407,7 +1407,7 @@ namespace
                       quadrant_overlaps_tree (const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
                                               &p4est_cell)
                       == false))
-      return; //this quadrant and none of it's childs belongs to us.
+      return; //this quadrant and none of its children belongs to us.
 
     bool p4est_has_children = (idx == -1);
 
@@ -1505,7 +1505,7 @@ namespace
                            ptr);
           }
 
-        //mark other childs as invalid, so that unpack only happens once
+        //mark other children as invalid, so that unpack only happens once
         for (unsigned int i=1; i<GeometryInfo<dim>::max_children_per_cell; ++i)
           {
             int child_idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
@@ -1521,7 +1521,7 @@ namespace
       }
     else
       {
-        //it's children got coarsened into this cell
+        //its children got coarsened into this cell
         typename internal::p4est::types<dim>::quadrant *q;
         q = static_cast<typename internal::p4est::types<dim>::quadrant *> (
               sc_array_index (const_cast<sc_array_t *>(&tree.quadrants), idx)
@@ -1537,6 +1537,86 @@ namespace
                            parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN,
                            ptr);
           }
+      }
+  }
+
+  template <int dim, int spacedim>
+  void
+  get_cell_weights_recursively (const typename internal::p4est::types<dim>::tree &tree,
+                                const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
+                                const typename internal::p4est::types<dim>::quadrant &p4est_cell,
+                                const typename Triangulation<dim,spacedim>::Signals &signals,
+                                std::vector<unsigned int> &weight)
+  {
+    const int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
+                                     &p4est_cell,
+                                     internal::p4est::functions<dim>::quadrant_compare);
+
+    if (idx == -1 && (internal::p4est::functions<dim>::
+                      quadrant_overlaps_tree (const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
+                                              &p4est_cell)
+                      == false))
+      return; // This quadrant and none of its children belongs to us.
+
+    const bool p4est_has_children = (idx == -1);
+
+    if (p4est_has_children && dealii_cell->has_children())
+      {
+        //recurse further
+        typename internal::p4est::types<dim>::quadrant
+        p4est_child[GeometryInfo<dim>::max_children_per_cell];
+        for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          switch (dim)
+            {
+            case 2:
+              P4EST_QUADRANT_INIT(&p4est_child[c]);
+              break;
+            case 3:
+              P8EST_QUADRANT_INIT(&p4est_child[c]);
+              break;
+            default:
+              Assert (false, ExcNotImplemented());
+            }
+
+        internal::p4est::functions<dim>::
+        quadrant_childrenv (&p4est_cell, p4est_child);
+
+        for (unsigned int c=0;
+             c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          {
+            get_cell_weights_recursively<dim,spacedim> (tree,
+                                                        dealii_cell->child(c),
+                                                        p4est_child[c],
+                                                        signals,
+                                                        weight);
+          }
+      }
+    else if (!p4est_has_children && !dealii_cell->has_children())
+      {
+        // This active cell didn't change
+        weight.push_back(1000);
+        weight.back() += signals.cell_weight(dealii_cell,
+                                             parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST);
+      }
+    else if (p4est_has_children)
+      {
+        // This cell will be refined
+        unsigned int parent_weight(1000);
+        parent_weight += signals.cell_weight(dealii_cell,
+                                             parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE);
+
+        for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          {
+            // We assign the weight of the parent cell equally to all children
+            weight.push_back(parent_weight);
+          }
+      }
+    else
+      {
+        // This cell's children will be coarsened into this cell
+        weight.push_back(1000);
+        weight.back() += signals.cell_weight(dealii_cell,
+                                             parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN);
       }
   }
 
@@ -1559,7 +1639,7 @@ namespace
                       quadrant_overlaps_tree (const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
                                               &p4est_cell)
                       == false))
-      // this quadrant and none of it's children belong to us.
+      // this quadrant and none of its children belong to us.
       return;
 
 
@@ -1955,10 +2035,12 @@ namespace
   class PartitionWeights
   {
   public:
-    PartitionWeights (const parallel::distributed::Triangulation<dim,spacedim> &triangulation,
-                      const std::vector<unsigned int>   &cell_weights,
-                      const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
-                      const types::subdomain_id                   my_subdomain);
+    /**
+     * This constructor assumes the cell_weights are already sorted in the
+     * order that p4est will encounter the cells, and they do not contain
+     * ghost cells or artificial cells.
+     */
+    PartitionWeights (const std::vector<unsigned int> &cell_weights);
 
     /**
      * A callback function that we pass to the p4est data structures when a
@@ -1976,102 +2058,18 @@ namespace
   private:
     std::vector<unsigned int> cell_weights_list;
     std::vector<unsigned int>::const_iterator current_pointer;
-
-    /**
-     * Recursively go through the cells of the p4est and deal.II triangulation
-     * and collect the partitioning weights.
-     */
-    void
-    build_weight_list (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
-                       const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                       const types::subdomain_id my_subdomain,
-                       const std::vector<unsigned int> &cell_weights);
   };
 
 
   template <int dim, int spacedim>
   PartitionWeights<dim,spacedim>::
-  PartitionWeights (const parallel::distributed::Triangulation<dim,spacedim>            &triangulation,
-                    const std::vector<unsigned int>              &cell_weights,
-                    const std::vector<types::global_dof_index>   &p4est_tree_to_coarse_cell_permutation,
-                    const types::subdomain_id                    my_subdomain)
+  PartitionWeights (const std::vector<unsigned int> &cell_weights)
+    :
+    cell_weights_list(cell_weights)
   {
-    Assert (cell_weights.size() == triangulation.n_active_cells(), ExcInternalError());
-
-    // build the cell_weights_list as an array over all locally owned
-    // active cells (i.e., a subset of the weights provided by the user, which
-    // are for all active cells), in the order in which p4est will encounter them
-    cell_weights_list.reserve (triangulation.n_locally_owned_active_cells());
-    for (unsigned int c=0; c<triangulation.n_cells(0); ++c)
-      {
-        unsigned int coarse_cell_index =
-          p4est_tree_to_coarse_cell_permutation[c];
-
-        const typename Triangulation<dim,spacedim>::cell_iterator
-        cell (&triangulation, 0, coarse_cell_index);
-
-        typename internal::p4est::types<dim>::quadrant p4est_cell;
-        internal::p4est::functions<dim>::
-        quadrant_set_morton (&p4est_cell,
-                             /*level=*/0,
-                             /*index=*/0);
-        p4est_cell.p.which_tree = c;
-        build_weight_list (cell, p4est_cell, my_subdomain,
-                           cell_weights);
-      }
-
-    // ensure that we built the list right
-    Assert(cell_weights_list.size() == triangulation.n_locally_owned_active_cells(),
-           ExcInternalError());
-
     // set the current pointer to the first element of the list, given that
     // we will walk through it sequentially
     current_pointer  = cell_weights_list.begin();
-  }
-
-
-  template <int dim, int spacedim>
-  void
-  PartitionWeights<dim,spacedim>::
-  build_weight_list (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
-                     const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                     const types::subdomain_id my_subdomain,
-                     const std::vector<unsigned int> &cell_weights)
-  {
-    if (!cell->has_children())
-      {
-        if (cell->subdomain_id() == my_subdomain)
-          cell_weights_list.push_back (cell_weights[cell->active_cell_index()]);
-      }
-    else
-      {
-        typename internal::p4est::types<dim>::quadrant
-        p4est_child[GeometryInfo<dim>::max_children_per_cell];
-        for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-          switch (dim)
-            {
-            case 2:
-              P4EST_QUADRANT_INIT(&p4est_child[c]);
-              break;
-            case 3:
-              P8EST_QUADRANT_INIT(&p4est_child[c]);
-              break;
-            default:
-              Assert (false, ExcNotImplemented());
-            }
-        internal::p4est::functions<dim>::
-        quadrant_childrenv (&p4est_cell,
-                            p4est_child);
-        for (unsigned int c=0;
-             c<GeometryInfo<dim>::max_children_per_cell; ++c)
-          {
-            p4est_child[c].p.which_tree = p4est_cell.p.which_tree;
-            build_weight_list (cell->child(c),
-                               p4est_child[c],
-                               my_subdomain,
-                               cell_weights);
-          }
-      }
   }
 
 
@@ -2097,7 +2095,6 @@ namespace
     // get the weight, increment the pointer, and return the weight
     return *this_object->current_pointer++;
   }
-
 }
 
 
@@ -2761,10 +2758,7 @@ namespace parallel
         // number of CPUs and so everything works without this call, but
         // this command changes the distribution for some reason, so we
         // will leave it in here.
-        dealii::internal::p4est::functions<dim>::
-        partition (parallel_forest,
-                   /* prepare coarsening */ 1,
-                   /* weight_callback */ NULL);
+        repartition();
 
       try
         {
@@ -3406,25 +3400,37 @@ namespace parallel
           // unless the neighbor is active and coarser. It can end up on a
           // different processor. Luckily, the level_subdomain_id can be
           // figured out without communication, because the cell is active
-          // (and so level_subdomain_id=subdomain_id):
+          // (and so level_subdomain_id=subdomain_id). Finally, also consider
+          // the opposite case: if we are the coarser neighbor for another
+          // processor, also mark them.
           for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(); cell!=this->end(); ++cell)
             {
-              if (cell->level_subdomain_id()!=this->locally_owned_subdomain())
-                continue;
+              bool cell_level_mine = cell->level_subdomain_id() == this->locally_owned_subdomain();
 
               for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
                 {
-                  if (cell->face(f)->at_boundary())
+                  if (cell->face(f)->at_boundary() || cell->neighbor(f)->level() >= cell->level())
                     continue;
-                  if (cell->neighbor(f)->level() < cell->level()
-                      &&
-                      cell->neighbor(f)->level_subdomain_id()!=this->locally_owned_subdomain())
+
+                  bool neighbor_level_mine = cell->neighbor(f)->level_subdomain_id() == this->locally_owned_subdomain();
+
+                  if (cell_level_mine && !neighbor_level_mine)
                     {
+                      // set the neighbor level_id up
                       Assert(cell->neighbor(f)->active(), ExcInternalError());
                       Assert(cell->neighbor(f)->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
                       Assert(cell->neighbor(f)->level_subdomain_id() == numbers::artificial_subdomain_id
                              || cell->neighbor(f)->level_subdomain_id() == cell->neighbor(f)->subdomain_id(), ExcInternalError());
                       cell->neighbor(f)->set_level_subdomain_id(cell->neighbor(f)->subdomain_id());
+                    }
+                  else if (!cell_level_mine && neighbor_level_mine)
+                    {
+                      // set the current cell up because it is a neighbor for us
+                      Assert(cell->active(), ExcInternalError());
+                      Assert(cell->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
+                      Assert(cell->level_subdomain_id() == numbers::artificial_subdomain_id
+                             || cell->level_subdomain_id() == cell->subdomain_id(), ExcInternalError());
+                      cell->set_level_subdomain_id(cell->subdomain_id());
                     }
                 }
 
@@ -3572,21 +3578,41 @@ namespace parallel
                 balance_type(P8EST_CONNECT_FULL)),
                /*init_callback=*/NULL);
 
-
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
       attach_mesh_data();
 
-      // partition the new mesh between all processors. we cannot
-      // use weights for each cell here because the cells have changed
-      // from the time the user has called execute_c_and_r due to the
-      // mesh refinement and coarsening, and the user has not had time
-      // to attach cell weights yet
       if (!(settings & no_automatic_repartitioning))
-        dealii::internal::p4est::functions<dim>::
-        partition (parallel_forest,
-                   /* prepare coarsening */ 1,
-                   /* weight_callback */ NULL);
+        {
+          // partition the new mesh between all processors. If cell weights have
+          // not been given balance the number of cells.
+          if (this->signals.cell_weight.num_slots() == 0)
+            dealii::internal::p4est::functions<dim>::
+            partition (parallel_forest,
+                       /* prepare coarsening */ 1,
+                       /* weight_callback */ NULL);
+          else
+            {
+              // get cell weights for a weighted repartitioning.
+              const std::vector<unsigned int> cell_weights = get_cell_weights();
+
+              PartitionWeights<dim,spacedim> partition_weights (cell_weights);
+
+              // attach (temporarily) a pointer to the cell weights through p4est's
+              // user_pointer object
+              Assert (parallel_forest->user_pointer == this,
+                      ExcInternalError());
+              parallel_forest->user_pointer = &partition_weights;
+
+              dealii::internal::p4est::functions<dim>::
+              partition (parallel_forest,
+                         /* prepare coarsening */ 1,
+                         /* weight_callback */ &PartitionWeights<dim,spacedim>::cell_weight);
+
+              // reset the user pointer to its previous state
+              parallel_forest->user_pointer = this;
+            }
+        }
 
       // finally copy back from local part of tree to deal.II
       // triangulation. before doing so, make sure there are no refine or
@@ -3618,12 +3644,8 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim,spacedim>::repartition (const std::vector<unsigned int> &cell_weights)
+    Triangulation<dim,spacedim>::repartition ()
     {
-      AssertThrow(settings & no_automatic_repartitioning,
-                  ExcMessage("You need to set the 'no_automatic_repartitioning' flag in the "
-                             "constructor when creating this parallel::distributed::Triangulation "
-                             "object if you want to call repartition() manually."));
 
 #ifdef DEBUG
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
@@ -3641,7 +3663,7 @@ namespace parallel
       // (such as SolutionTransfer data) to the p4est
       attach_mesh_data();
 
-      if (cell_weights.size() == 0)
+      if (this->signals.cell_weight.num_slots() == 0)
         {
           // no cell weights given -- call p4est's 'partition' without a
           // callback for cell weights
@@ -3652,17 +3674,15 @@ namespace parallel
         }
       else
         {
-          AssertDimension (cell_weights.size(), this->n_active_cells());
+          // get cell weights for a weighted repartitioning.
+          const std::vector<unsigned int> cell_weights = get_cell_weights();
 
-          // copy the cell weights into the order in which p4est will
-          // encounter them, then attach (temporarily) a pointer to
-          // this list through p4est's user_pointer object
+          PartitionWeights<dim,spacedim> partition_weights (cell_weights);
+
+          // attach (temporarily) a pointer to the cell weights through p4est's
+          // user_pointer object
           Assert (parallel_forest->user_pointer == this,
                   ExcInternalError());
-          PartitionWeights<dim,spacedim> partition_weights (*this,
-                                                            cell_weights,
-                                                            p4est_tree_to_coarse_cell_permutation,
-                                                            this->my_subdomain);
           parallel_forest->user_pointer = &partition_weights;
 
           dealii::internal::p4est::functions<dim>::
@@ -4743,6 +4763,57 @@ namespace parallel
     }
 
     template <int dim, int spacedim>
+    std::vector<unsigned int>
+    Triangulation<dim,spacedim>::
+    get_cell_weights()
+    {
+      // Allocate the space for the weights. In fact we do not know yet, how
+      // many cells we own after the refinement (only p4est knows that
+      // at this point). We simply reserve n_active_cells space and if many
+      // more cells are refined than coarsened than additional reallocation
+      // will be done inside get_cell_weights_recursively.
+      std::vector<unsigned int> weights;
+      weights.reserve(this->n_active_cells());
+
+      // Recurse over p4est and Triangulation
+      // to find refined/coarsened/kept
+      // cells. Then append cell_weight.
+      // Note that we need to follow the p4est ordering
+      // instead of the deal.II ordering to get the cell_weights
+      // in the same order p4est will encounter them during repartitioning.
+      for (unsigned int c=0; c<this->n_cells(0); ++c)
+        {
+          // skip coarse cells, that are not ours
+          if (tree_exists_locally<dim,spacedim>(parallel_forest,c) == false)
+            continue;
+
+          const unsigned int coarse_cell_index =
+            p4est_tree_to_coarse_cell_permutation[c];
+
+          const typename Triangulation<dim,spacedim>::cell_iterator
+          dealii_coarse_cell (this, 0, coarse_cell_index);
+
+          typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+          dealii::internal::p4est::functions<dim>::
+          quadrant_set_morton (&p4est_coarse_cell,
+                               /*level=*/0,
+                               /*index=*/0);
+          p4est_coarse_cell.p.which_tree = c;
+
+          const typename dealii::internal::p4est::types<dim>::tree *tree =
+            init_tree(coarse_cell_index);
+
+          get_cell_weights_recursively<dim,spacedim>(*tree,
+                                                     dealii_coarse_cell,
+                                                     p4est_coarse_cell,
+                                                     this->signals,
+                                                     weights);
+        }
+
+      return weights;
+    }
+
+    template <int dim, int spacedim>
     typename dealii::Triangulation<dim,spacedim>::cell_iterator
     cell_from_quad
     (typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation,
@@ -4751,8 +4822,8 @@ namespace parallel
     {
       int i, l = quad.level;
       int child_id;
-      const std::vector<types::global_dof_index> perm = triangulation->get_p4est_tree_to_coarse_cell_permutation ();
-      types::global_dof_index dealii_index = perm[treeidx];
+      types::global_dof_index dealii_index =
+        triangulation->get_p4est_tree_to_coarse_cell_permutation()[treeidx];
 
       for (i = 0; i < l; i++)
         {

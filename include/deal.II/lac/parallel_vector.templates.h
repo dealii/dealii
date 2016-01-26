@@ -378,6 +378,12 @@ namespace parallel
             import_data = new Number[part.n_import_indices()];
           for (unsigned int i=0; i<n_import_targets; i++)
             {
+              AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
+                           sizeof(Number) <
+                           static_cast<size_type>(std::numeric_limits<int>::max()),
+                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                      "The number of ghost entries times the size of 'Number' "
+                                      "exceeds this value. This is not supported."));
               MPI_Recv_init (&import_data[current_index_start],
                              part.import_targets()[i].second*sizeof(Number),
                              MPI_BYTE,
@@ -394,6 +400,12 @@ namespace parallel
           current_index_start = part.local_size();
           for (unsigned int i=0; i<n_ghost_targets; i++)
             {
+              AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
+                           sizeof(Number) <
+                           static_cast<size_type>(std::numeric_limits<int>::max()),
+                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                      "The number of ghost entries times the size of 'Number' "
+                                      "exceeds this value. This is not supported."));
               MPI_Send_init (&this->val[current_index_start],
                              part.ghost_targets()[i].second*sizeof(Number),
                              MPI_BYTE,

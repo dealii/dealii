@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,9 @@
 /**
  * @defgroup Vectors Vector classes
  *
- * Here, we list all the classes that can be used as VECTOR in linear solvers
- * (see @ref Solvers) and for matrix-vector operations.
+ * Here, we list all the classes that satisfy the <code>VectorType</code>
+ * concept and may be used in linear solvers (see @ref Solvers) and for
+ * matrix-vector operations.
  *
  * @ingroup LAC
  */

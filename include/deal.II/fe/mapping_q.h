@@ -22,7 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, typename POLY> class TensorProductPolynomials;
+template <int dim, typename PolynomialType> class TensorProductPolynomials;
 
 
 /*!@addtogroup mapping */
@@ -153,45 +153,45 @@ public:
   transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                const Point<spacedim>                                     &p) const;
 
-  // for documentation, see the base classes
+  // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+  transform (const ArrayView<const Tensor<1,dim> >                  &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
-
-  // for documentation, see the base classes
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > > input,
-             const MappingType                                                        type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                  &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >                           output) const;
-
-  // for documentation, see the base classes
-  virtual
-  void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
-             const MappingType                                       type,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
+             const ArrayView<Tensor<1,spacedim> >                   &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-             const MappingType                                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const;
+  transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<2,spacedim> >                     &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+  transform (const ArrayView<const Tensor<2, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
+             const ArrayView<Tensor<2,spacedim> >                   &output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const ArrayView<const DerivativeForm<2, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<3,spacedim> >                     &output) const;
+
+  // for documentation, see the Mapping base class
+  virtual
+  void
+  transform (const ArrayView<const Tensor<3, dim> >                 &input,
+             const MappingType                                       type,
+             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+             const ArrayView<Tensor<3,spacedim> >                   &output) const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy

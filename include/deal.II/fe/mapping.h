@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/std_cxx11/array.h>
-#include <deal.II/base/vector_slice.h>
+#include <deal.II/base/array_view.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/fe/fe_update_flags.h>
 
@@ -808,7 +808,7 @@ protected:
    *   returning a less optimistic cell similarity value.
    *
    * @note FEValues ensures that this function is always called with
-   *   the same pair of @p internal_data and @output_data objects. In
+   *   the same pair of @p internal_data and @p output_data objects. In
    *   other words, if an implementation of this function knows that it
    *   has written a piece of data into the output argument in a previous
    *   call, then there is no need to copy it there again in a later
@@ -962,16 +962,15 @@ public:
    *   this object also represents with respect to which cell the transformation
    *   should be applied to.
    * @param[out] output An array (or part of an array) into which the transformed
-   *   objects should be placed.
+   *   objects should be placed. (Note that the array view is @p const, but the
+   *   tensors it points to are not.)
    */
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+  transform (const ArrayView<const Tensor<1,dim> >                  &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const = 0;
-
-
+             const ArrayView<Tensor<1,spacedim> >                   &output) const = 0;
 
   /**
    * Transform a field of differential forms from the reference cell to the
@@ -1015,15 +1014,15 @@ public:
    *   this object also represents with respect to which cell the transformation
    *   should be applied to.
    * @param[out] output An array (or part of an array) into which the transformed
-   *   objects should be placed.
+   *   objects should be placed. (Note that the array view is @p const, but the
+   *   tensors it points to are not.)
    */
   virtual
   void
-  transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
-             const MappingType                                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >                            output) const = 0;
-
+  transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<2,spacedim> >                     &output) const = 0;
 
   /**
    * Transform a tensor field from the reference cell to the physical cell.
@@ -1074,14 +1073,15 @@ public:
    *   this object also represents with respect to which cell the transformation
    *   should be applied to.
    * @param[out] output An array (or part of an array) into which the transformed
-   *   objects should be placed.
+   *   objects should be placed. (Note that the array view is @p const, but the
+   *   tensors it points to are not.)
    */
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+  transform (const ArrayView<const Tensor<2, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const = 0;
+             const ArrayView<Tensor<2,spacedim> >                   &output) const = 0;
 
   /**
    * Transform a tensor field from the reference cell to the physical cell.
@@ -1098,6 +1098,7 @@ public:
    *
    * where @f[ J^{\dagger} = J(\hat{\mathbf  x})(J(\hat{\mathbf  x})^{T} J(\hat{\mathbf  x}))^{-1}.
    * @f]
+   * </ul>
    *
    * Hessians of spacedim-vector valued differentiable functions are
    * transformed this way (After subtraction of the product of the
@@ -1118,14 +1119,15 @@ public:
    *   this object also represents with respect to which cell the transformation
    *   should be applied to.
    * @param[out] output An array (or part of an array) into which the transformed
-   *   objects should be placed.
+   *   objects should be placed. (Note that the array view is @p const, but the
+   *   tensors it points to are not.)
    */
   virtual
   void
-  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-             const MappingType                                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const = 0;
+  transform (const ArrayView<const DerivativeForm<2, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<3,spacedim> >                     &output) const = 0;
 
   /**
    * Transform a field of 3-differential forms from the reference cell to the
@@ -1176,10 +1178,10 @@ public:
    */
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+  transform (const ArrayView<const Tensor<3, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const = 0;
+             const ArrayView<Tensor<3,spacedim> >                   &output) const = 0;
 
   /**
    * @}

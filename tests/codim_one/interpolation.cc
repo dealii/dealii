@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,7 +83,6 @@ void test(std::string filename, unsigned int n)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   for (unsigned int n=1; n<8; ++n)
     {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   deallog << std::numeric_limits<double>::infinity() << std::endl;

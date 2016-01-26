@@ -133,7 +133,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_tria(),
+      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
                                               additional_data.mpi_communicator);
       size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
@@ -213,7 +213,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
   // general case?
   if (additional_data.initialize_mapping == true)
     {
-      mapping_info.initialize (dof_handler[0]->get_tria(), cell_level_index,
+      mapping_info.initialize (dof_handler[0]->get_triangulation(), cell_level_index,
                                dof_info[0].cell_active_fe_index, mapping, quad,
                                additional_data.mapping_update_flags);
 
@@ -263,7 +263,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_tria(),
+      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
                                               additional_data.mpi_communicator);
       size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
@@ -341,7 +341,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
   // determined in @p extract_local_to_global_indices.
   if (additional_data.initialize_mapping == true)
     {
-      mapping_info.initialize (dof_handler[0]->get_tria(), cell_level_index,
+      mapping_info.initialize (dof_handler[0]->get_triangulation(), cell_level_index,
                                dof_info[0].cell_active_fe_index, mapping, quad,
                                additional_data.mapping_update_flags);
 
@@ -396,7 +396,7 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
   const unsigned int n_mpi_procs = size_info.n_procs;
   const unsigned int my_pid = size_info.my_pid;
 
-  const Triangulation<dim> &tria = dof_handlers.dof_handler[0]->get_tria();
+  const Triangulation<dim> &tria = dof_handlers.dof_handler[0]->get_triangulation();
   if (level == numbers::invalid_unsigned_int)
     {
       if (n_mpi_procs == 1)
@@ -445,7 +445,7 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
 
   // if we have no level given, use the same as for the standard DoFHandler,
   // otherwise we must loop through the respective level
-  const Triangulation<dim> &tria = dof_handler[0]->get_tria();
+  const Triangulation<dim> &tria = dof_handler[0]->get_triangulation();
 
   if (n_mpi_procs == 1)
     {
@@ -565,7 +565,7 @@ void MatrixFree<dim,Number>::initialize_indices
             {
               const DoFHandler<dim> *dofh = &*dof_handlers.dof_handler[no];
               typename DoFHandler<dim>::active_cell_iterator
-              cell_it (&dofh->get_tria(),
+              cell_it (&dofh->get_triangulation(),
                        cell_level_index[counter].first,
                        cell_level_index[counter].second,
                        dofh);
@@ -582,9 +582,9 @@ void MatrixFree<dim,Number>::initialize_indices
                    dof_handlers.level != numbers::invalid_unsigned_int)
             {
               const DoFHandler<dim> *dofh = dof_handlers.dof_handler[no];
-              AssertIndexRange (dof_handlers.level, dofh->get_tria().n_levels());
+              AssertIndexRange (dof_handlers.level, dofh->get_triangulation().n_levels());
               typename DoFHandler<dim>::cell_iterator
-              cell_it (&dofh->get_tria(),
+              cell_it (&dofh->get_triangulation(),
                        cell_level_index[counter].first,
                        cell_level_index[counter].second,
                        dofh);
@@ -601,7 +601,7 @@ void MatrixFree<dim,Number>::initialize_indices
               const hp::DoFHandler<dim> *dofh =
                 dof_handlers.hp_dof_handler[no];
               typename hp::DoFHandler<dim>::active_cell_iterator
-              cell_it (&dofh->get_tria(),
+              cell_it (&dofh->get_triangulation(),
                        cell_level_index[counter].first,
                        cell_level_index[counter].second,
                        dofh);
@@ -772,8 +772,8 @@ std::size_t MatrixFree<dim,Number>::memory_consumption () const
 
 
 template <int dim, typename Number>
-template <typename STREAM>
-void MatrixFree<dim,Number>::print_memory_consumption (STREAM &out) const
+template <typename StreamType>
+void MatrixFree<dim,Number>::print_memory_consumption (StreamType &out) const
 {
   out << "  Memory cell FE operator total: --> ";
   size_info.print_memory_statistics (out, memory_consumption());
@@ -890,8 +890,8 @@ namespace internal
 
 
 
-    template <typename STREAM>
-    void SizeInfo::print_memory_statistics (STREAM     &out,
+    template <typename StreamType>
+    void SizeInfo::print_memory_statistics (StreamType &out,
                                             std::size_t data_length) const
     {
       Utilities::MPI::MinMaxAvg memory_c

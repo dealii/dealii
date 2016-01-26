@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015 by the deal.II Authors
+## Copyright (C) 2015 - 2016 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,11 +44,98 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
        "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
   STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
-  # Now set up targets for each of the code gallery programs
+  FOREACH(_step ${_code_gallery_names})
+    GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+    LIST(APPEND _code_gallery_names_sans_dir "${_step}")
+  ENDFOREACH()
 
-  # ...TODO...
+  # Describe how to build code-gallery.h:
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    COMMAND ${PERL_EXECUTABLE}
+    ARGS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
+      ${DEAL_II_CODE_GALLERY_DIRECTORY}
+      ${_code_gallery_names_sans_dir}
+      > ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    DEPENDS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
+      ${_code_gallery_names}
+    )
+  ADD_CUSTOM_TARGET(build_code-gallery_h
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
+  ADD_DEPENDENCIES(code-gallery build_code-gallery_h)
+
+
+  # Now set up targets for each of the code gallery programs
+  FOREACH(_step ${_code_gallery_names})
+    GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+    MESSAGE(STATUS "  Setting up ${_step}")
+
+    # Get all source files so we can let the perl script work on
+    # them and so we properly describe the dependencies. exclude
+    # meta-files necessary to describe each code gallery project
+    FILE(GLOB_RECURSE _src_files
+         ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/*)
+    STRING(REPLACE "${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/" "" _relative_src_files
+           "${_src_files}")
+    LIST(REMOVE_ITEM _relative_src_files doc/author)
+    LIST(REMOVE_ITEM _relative_src_files doc/tooltip)
+    LIST(REMOVE_ITEM _relative_src_files doc/dependencies)
+    LIST(REMOVE_ITEM _relative_src_files doc/builds-on)
+
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      COMMAND ${PERL_EXECUTABLE}
+      ARGS
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${CMAKE_SOURCE_DIR} 
+        ${_step} 
+        ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
+        ${_relative_src_files} 
+        > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      WORKING_DIRECTORY
+        ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+        ${_src_files}
+      )
+
+    # Copy files of interest (non-metadata) to the build directory
+    # so we can link to them, and schedule them for installation
+    FILE(COPY ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
+         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+         PATTERN REGEX "doc/tooltip|doc/dependencies|doc/builds-on" EXCLUDE)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_step}
+            DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/code-gallery
+            COMPONENT documentation
+           )
+
+    # Create a target for this program and add it to the top-level
+    # target of this directory
+    ADD_CUSTOM_TARGET(code-gallery_${_step}
+      DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      )
+    ADD_DEPENDENCIES(code-gallery code-gallery_${_step})
+
+
+  ENDFOREACH()
 
 ELSE()
-  MESSAGE(STATUS "Generating the code-gallery documentation is only possible if the code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
+
+  # no copy of the code gallery is available. say so. but also
+  # install a file that creates a doxygen page we can link to
+  # nonetheless, so we don't get bad doxygen references
+  MESSAGE(STATUS "Setting up code gallery documentation.")
+  MESSAGE(STATUS "  Skipping as no code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
+
+  FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/no-code-gallery.h
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  FILE(RENAME ${CMAKE_CURRENT_BINARY_DIR}/no-code-gallery.h
+       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
 ENDIF()
 

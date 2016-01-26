@@ -20,14 +20,16 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 
+
 DEAL_II_NAMESPACE_OPEN
+
+class IndexSet;
 
 namespace LinearAlgebra
 {
   template <typename Number>
   class ReadWriteVector;
 
-  class IndexSet;
 
   /*! @addtogroup Vectors
    *@{
@@ -48,6 +50,7 @@ namespace LinearAlgebra
     typedef Number                                            value_type;
     typedef types::global_dof_index                           size_type;
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
 
     /**
      * Multiply the entire vector by a fixed factor.
@@ -75,6 +78,11 @@ namespace LinearAlgebra
     virtual Number operator* (const VectorSpaceVector<Number> &V) = 0;
 
     /**
+     * Add @p a to all components. Note that @p a is a scalar not a vector.
+     */
+    virtual void add(const Number a) = 0;
+
+    /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     virtual void add(const Number a, const VectorSpaceVector<Number> &V) = 0;
@@ -86,12 +94,7 @@ namespace LinearAlgebra
                      const Number b, const VectorSpaceVector<Number> &W) = 0;
 
     /**
-     * Scaling and simple vector addition, i.e. <tt>*this = s*(*this)+V</tt>.
-     */
-    virtual void sadd(const Number s, const VectorSpaceVector<Number> &V) = 0;
-
-    /**
-     * Scaling and simple additiion of a multiple of a vector, i.e. <tt>*this =
+     * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
      * s*(*this)+a*V</tt>.
      */
     virtual void sadd(const Number s, const Number a,
@@ -110,25 +113,25 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) = 0;
 
     /**
-     * Returns the l<sub>1</sub> norm of the vector (i.e., the sum of the
+     * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries among all processors).
      */
     virtual real_type l1_norm() = 0;
 
     /**
-     * Returns the l<sub>2</sub> norm of the vector (i.e., the square root of
+     * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
      * the sum of the square of all entries among all processors).
      */
     virtual real_type l2_norm() = 0;
 
     /**
-     * Returns the maximum norm of the vector (i.e., the maximum absolute value
+     * Return the maximum norm of the vector (i.e., the maximum absolute value
      * among all entries and among all processors).
      */
     virtual real_type linfty_norm() = 0;
 
     /**
-     * Performs a combined operation of a vector addition and a subsequent
+     * Perform a combined operation of a vector addition and a subsequent
      * inner product, returning the value of the inner product. In other
      * words, the result of this function is the same as if the user called
      * @code
@@ -148,7 +151,7 @@ namespace LinearAlgebra
                                const VectorSpaceVector<Number> &W) = 0;
 
     /**
-     * Returns the global size of the vector, equal to the sum of the number of
+     * Return the global size of the vector, equal to the sum of the number of
      * locally owned indices among all processors.
      */
     virtual size_type size() const = 0;
@@ -163,10 +166,10 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    virtual IndexSet locally_owned_elements() const = 0;
+    virtual const dealii::IndexSet &locally_owned_elements() const = 0;
 
     /**
-     * Prints the vector to the output stream @p out.
+     * Print the vector to the output stream @p out.
      */
     virtual void print(std::ostream &out,
                        const unsigned int precision=3,
@@ -174,11 +177,10 @@ namespace LinearAlgebra
                        const bool across=true) const = 0;
 
     /**
-     * Returns the memory consumption of this class in bytes.
+     * Return the memory consumption of this class in bytes.
      */
     virtual std::size_t memory_consumption() const = 0;
   };
-
   /*@}*/
 }
 

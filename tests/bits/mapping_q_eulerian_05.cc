@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,6 @@ void test(unsigned int degree)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test<1,1>(1);
   test<2,2>(1);

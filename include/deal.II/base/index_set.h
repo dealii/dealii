@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <boost/serialization/vector.hpp>
 #include <vector>
 #include <algorithm>
 
@@ -295,15 +296,15 @@ public:
    * Vector, BlockVector, but also std::vector@<bool@>, std::vector@<int@>,
    * and std::vector@<double@>.
    */
-  template <typename Vector>
-  void fill_binary_vector (Vector &vector) const;
+  template <typename VectorType>
+  void fill_binary_vector (VectorType &vector) const;
 
   /**
    * Outputs a text representation of this IndexSet to the given stream. Used
    * for testing.
    */
-  template <class STREAM>
-  void print(STREAM &out) const;
+  template <class StreamType>
+  void print(StreamType &out) const;
 
   /**
    * Writes the IndexSet into a text based file format, that can be read in
@@ -1563,10 +1564,10 @@ IndexSet::fill_binary_vector (Vector &vector) const
 
 
 
-template <class STREAM>
+template <class StreamType>
 inline
 void
-IndexSet::print (STREAM &out) const
+IndexSet::print (StreamType &out) const
 {
   compress();
   out << "{";

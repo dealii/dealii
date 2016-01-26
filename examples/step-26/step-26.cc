@@ -217,19 +217,11 @@ namespace Step26
   // to their correct sizes. We also compute the mass and Laplace
   // matrix here by simply calling two functions in the library.
   //
-  // Note that we compute these matrices taking into account already the
-  // constraints due to hanging nodes. These are all homogenous, i.e.,
-  // they only consist of constraints of the form $U_i = \alpha_{ij} U_j
-  // + \alpha_{ik} U_k$ (whereas inhomogenous constraints would also
-  // have a term not proportional to $U$, i.e., $U_i = \alpha_{ij} U_j
-  // + \alpha_{ik} U_k + c_i$). For this kind of constraint, we can
-  // eliminate hanging nodes independently in the matrix and the
-  // right hand side vectors, but this is not the case for inhomogenous
-  // constraints for which we can eliminate constrained degrees of freedom
-  // only by looking at both the system matrix and corresponding right
-  // right hand side at the same time. This may become a problem when
-  // dealing with non-zero Dirichlet boundary conditions, though we
-  // do not do this here in the current program.
+  // Note that we do not take the hanging node constraints into account when
+  // assembling the matrices (both functions have a ConstraintMatrix argument
+  // that defaults to an empty object). This is because we are going to
+  // condense the constraints in run() after combining the matrices for the
+  // current time-step.
   template<int dim>
   void HeatEquation<dim>::setup_system()
   {
@@ -262,14 +254,10 @@ namespace Step26
 
     MatrixCreator::create_mass_matrix(dof_handler,
                                       QGauss<dim>(fe.degree+1),
-                                      mass_matrix,
-                                      (const Function<dim> *)0,
-                                      constraints);
+                                      mass_matrix);
     MatrixCreator::create_laplace_matrix(dof_handler,
                                          QGauss<dim>(fe.degree+1),
-                                         laplace_matrix,
-                                         (const Function<dim> *)0,
-                                         constraints);
+                                         laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     old_solution.reinit(dof_handler.n_dofs());
@@ -671,8 +659,6 @@ int main()
     {
       using namespace dealii;
       using namespace Step26;
-
-      deallog.depth_console(0);
 
       HeatEquation<2> heat_equation_solver;
       heat_equation_solver.run();

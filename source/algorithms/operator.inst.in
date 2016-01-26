@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,6 @@
 
 for (VEC : SERIAL_VECTORS)
 {  
-  template class Operator<VEC>;
   template class OutputOperator<VEC>;
   template class Newton<VEC>;
   template class ThetaTimestepping<VEC>;

@@ -345,13 +345,14 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 }
 
 
+
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+transform (const ArrayView<const Tensor<1,dim> >                  &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const
+           const ArrayView<Tensor<1,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
@@ -372,10 +373,10 @@ transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
-           const MappingType                                                          mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
-           VectorSlice<std::vector<Tensor<2,spacedim> > >                             output) const
+transform (const ArrayView<const DerivativeForm<1, dim ,spacedim> >  &input,
+           const MappingType                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+           const ArrayView<Tensor<2,spacedim> >                      &output) const
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
@@ -390,14 +391,63 @@ transform (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> 
     // otherwise use the full mapping
     qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
 }
+
+
+
+template<int dim, int spacedim>
+void
+MappingQ<dim,spacedim>::
+transform (const ArrayView<const Tensor<2, dim> >                 &input,
+           const MappingType                                       mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+           const ArrayView<Tensor<2,spacedim> >                   &output) const
+{
+  AssertDimension (input.size(), output.size());
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
+
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+}
+
+
+
+template<int dim, int spacedim>
+void
+MappingQ<dim,spacedim>::
+transform (const ArrayView<const DerivativeForm<2, dim ,spacedim> >  &input,
+           const MappingType                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+           const ArrayView<Tensor<3,spacedim> >                      &output) const
+{
+  AssertDimension (input.size(), output.size());
+  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
+           != 0),
+          ExcInternalError());
+  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
+
+  // check whether we should in fact work on the Q1 portion of it
+  if (data->use_mapping_q1_on_current_cell)
+    q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
+  else
+    // otherwise use the full mapping
+    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+}
+
 
 
 template<int dim, int spacedim>
 void MappingQ<dim,spacedim>::
-transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+transform (const ArrayView<const Tensor<3, dim> >                 &input,
            const MappingType                                       mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const
+           const ArrayView<Tensor<3,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
   Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
@@ -413,51 +463,6 @@ transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
     qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
 }
 
-
-
-template<int dim, int spacedim>
-void
-MappingQ<dim,spacedim>::
-transform (const VectorSlice<const std::vector<DerivativeForm<2, dim ,spacedim>  > >  input,
-           const MappingType                                                          mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase                    &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >                             output) const
-{
-  AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
-           != 0),
-          ExcInternalError());
-  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
-
-  // check whether we should in fact work on the Q1 portion of it
-  if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-  else
-    // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
-}
-
-
-template<int dim, int spacedim>
-void MappingQ<dim,spacedim>::
-transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
-           const MappingType                                       mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-           VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const
-{
-  AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
-           != 0),
-          ExcInternalError());
-  const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
-
-  // check whether we should in fact work on the Q1 portion of it
-  if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform (input, mapping_type, *data->mapping_q1_data, output);
-  else
-    // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
-}
 
 
 template<int dim, int spacedim>

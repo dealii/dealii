@@ -205,9 +205,6 @@ MultithreadInfo::memory_consumption ()
 const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
 unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
-// definition of the variable which is declared `extern' in the .h file
-MultithreadInfo multithread_info;
-
 namespace
 {
 // Force the first call to set_thread_limit happen before any tasks in TBB are

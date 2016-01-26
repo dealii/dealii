@@ -35,6 +35,24 @@
 
 #include <fstream>
 
+unsigned int current_cell_weight;
+
+template <int dim>
+unsigned int
+cell_weight_1(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+              const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+{
+  return current_cell_weight++;
+}
+
+template <int dim>
+unsigned int
+cell_weight_2(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+              const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+{
+  return 1;
+}
+
 
 template<int dim>
 void test()
@@ -49,20 +67,21 @@ void test()
   GridGenerator::subdivided_hyper_cube(tr, 16);
   tr.refine_global(1);
 
+  current_cell_weight = 1;
+
   // repartition the mesh as described above, first in some arbitrary
   // way, and then with all equal weights
-  {
-    std::vector<unsigned int> weights (tr.n_active_cells());
-    for (unsigned int i=0; i<weights.size(); ++i)
-      weights[i] = i+1;
-    tr.repartition (weights);
-  }
-  {
-    std::vector<unsigned int> weights (tr.n_active_cells());
-    for (unsigned int i=0; i<weights.size(); ++i)
-      weights[i] = 1;
-    tr.repartition (weights);
-  }
+  tr.signals.cell_weight.connect(std_cxx11::bind(&cell_weight_1<dim>,
+                                                 std_cxx11::_1,
+                                                 std_cxx11::_2));
+  tr.repartition();
+
+  tr.signals.cell_weight.disconnect_all_slots();
+
+  tr.signals.cell_weight.connect(std_cxx11::bind(&cell_weight_2<dim>,
+                                                 std_cxx11::_1,
+                                                 std_cxx11::_2));
+  tr.repartition();
 
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -85,7 +104,6 @@ int main(int argc, char *argv[])
     {
       std::ofstream logfile("output");
       deallog.attach(logfile);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");

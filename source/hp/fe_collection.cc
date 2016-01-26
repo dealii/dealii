@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,6 +96,71 @@ namespace hp
   FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe)
   {
     push_back (fe);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2)
+  {
+    push_back(fe1);
+    push_back(fe2);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3,
+                                            const FiniteElement<dim,spacedim> &fe4)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+    push_back(fe4);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            const FiniteElement<dim,spacedim> &fe3,
+                                            const FiniteElement<dim,spacedim> &fe4,
+                                            const FiniteElement<dim,spacedim> &fe5)
+  {
+    push_back(fe1);
+    push_back(fe2);
+    push_back(fe3);
+    push_back(fe4);
+    push_back(fe5);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::
+  FECollection (const std::vector<const FiniteElement<dim,spacedim>*>  &fes)
+  {
+    Assert (fes.size() > 0,
+            ExcMessage ("Need to pass at least one finite element."));
+
+    for (unsigned int i = 0; i < fes.size(); ++i)
+      push_back(*fes[i]);
   }
 
 

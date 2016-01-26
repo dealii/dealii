@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,8 +27,19 @@
 
 #  include <petscksp.h>
 
+#ifdef DEAL_II_WITH_SLEPC
+#include <deal.II/lac/slepc_spectral_transformation.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_SLEPC
+namespace SLEPcWrappers
+{
+  // forward declarations
+  class TransformationBase;
+}
+#endif
 
 namespace PETScWrappers
 {
@@ -146,6 +157,12 @@ namespace PETScWrappers
     SolverControl &control() const;
 
     /**
+     * initialize the solver with the preconditioner.
+     * This function is intended for use with SLEPc spectral transformation class.
+     */
+    void initialize(const PreconditionerBase &preconditioner);
+
+    /**
      * Exception
      */
     DeclException1 (ExcPETScError,
@@ -221,10 +238,9 @@ namespace PETScWrappers
       ~SolverData ();
 
       /**
-       * Objects for Krylov subspace solvers and preconditioners.
+       * Object for Krylov subspace solvers.
        */
       KSP  ksp;
-      PC   pc;
     };
 
     /**
@@ -232,6 +248,13 @@ namespace PETScWrappers
      * in the main solver routine if necessary.
      */
     std_cxx11::shared_ptr<SolverData> solver_data;
+
+#ifdef DEAL_II_WITH_SLEPC
+    /**
+     * Make the transformation class a friend, since it needs to set the KSP solver.
+     */
+    friend class SLEPcWrappers::TransformationBase;
+#endif
   };
 
 
@@ -452,6 +475,7 @@ namespace PETScWrappers
   /**
    * An implementation of the solver interface using the PETSc GMRES solver.
    *
+   * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, 2004
    */
   class SolverGMRES : public SolverBase

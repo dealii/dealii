@@ -51,40 +51,12 @@ template <int,int> class FiniteElement;
  * You can select more than one flag by concatenation using the bitwise or
  * operator|(UpdateFlags,UpdateFlags).
  *
- * <h3>Generating the actual flags</h3>
+ * <h3>Use of these flags flags</h3>
  *
- * When given a set of UpdateFlags @p flags, the FEValues object must
- * determine, which values will have to be computed once only for the
- * reference cell and which values will have to be updated for each cell.
- * Here, it is important to note that in many cases, the FiniteElement will
- * require additional updates from the Mapping. To this end, several auxiliary
- * functions have been implemented:
- *
- * FiniteElement::update_once(flags) and FiniteElement::update_each(flags)
- * determine the values required by the FiniteElement once or on each cell.
- * The same functions exist in Mapping.
- *
- * Since the FiniteElement does not know if a value required from Mapping
- * should be computed once or for each cell,
- * FEValuesBase::compute_update_flags() is used to compute the union of all
- * values to be computed ever. It does this by first adding to the flags set
- * by the user all flags (once and each) added by the FiniteElement. This new
- * set of flags is then given to the Mapping and all flags required there are
- * added, again once and each.
- *
- * This union of all flags is given to Mapping::fill_fe_values() and
- * FiniteElement::fill_fe_values, where it is split again into the information
- * generated only once and the information that must be updated on each cell.
- *
- * The flags finally stored in FEValues then are the union of all the flags
- * required by the user, by FiniteElement and by Mapping, for computation once
- * or on each cell. Subsequent calls to the functions @p update_once and @p
- * update_each should just select among these flags, but should not add new
- * flags.
- *
- * The mechanism by which all this is accomplished is also discussed on the
- * page on
- * @ref UpdateFlags.
+ * More information on the use of this type both in user code as
+ * well as internally can be found in the documentation modules on
+ * @ref UpdateFlags "The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues"
+ * and @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
  */
 enum UpdateFlags
 {
@@ -243,9 +215,9 @@ enum UpdateFlags
  *
  * @ref UpdateFlags
  */
-template <class STREAM>
+template <class StreamType>
 inline
-STREAM &operator << (STREAM &s, UpdateFlags u)
+StreamType &operator << (StreamType &s, UpdateFlags u)
 {
   s << " UpdateFlags|";
   if (u & update_values)                                  s << "values|";
@@ -528,17 +500,17 @@ namespace internal
        * Storage type for gradients. The layout of data is the same as for the
        * #ShapeVector data type.
        */
-      typedef std::vector<std::vector<Tensor<1,spacedim> > > GradientVector;
+      typedef dealii::Table<2,Tensor<1,spacedim> > GradientVector;
 
       /**
        * Likewise for second order derivatives.
        */
-      typedef std::vector<std::vector<Tensor<2,spacedim> > > HessianVector;
+      typedef dealii::Table<2,Tensor<2,spacedim> > HessianVector;
 
       /**
        * And the same also applies to the third order derivatives.
        */
-      typedef std::vector<std::vector<Tensor<3,spacedim> > > ThirdDerivativeVector;
+      typedef dealii::Table<2,Tensor<3,spacedim> > ThirdDerivativeVector;
 
       /**
        * Store the values of the shape functions at the quadrature points. See the

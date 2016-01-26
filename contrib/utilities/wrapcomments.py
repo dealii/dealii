@@ -116,6 +116,13 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
+        elif starts_with_one(["* - ", "*   - "],lines[idx].strip()):
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = lines[idx].strip()[2:]
+            out.append(start + thisline)
+            
         elif "@page" in lines[idx]:
             # do not break @page
             if curlines!=[]:
@@ -422,6 +429,19 @@ lineO = [" /**", \
          "  * $" + longtext + "$", \
          "  */"]
 assert(format_block(lineI)==lineO)
+
+# nested lists
+lineI = [" /**", \
+         "  * Hello:", \
+         "  * - A", \
+         "  * - B", \
+         "  *   - C", \
+         "  *   - D", \
+         "  * - E", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
 
 
 

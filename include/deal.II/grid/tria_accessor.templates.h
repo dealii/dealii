@@ -2193,9 +2193,12 @@ TriaAccessor<0, dim, spacedim>::copy_from (const TriaAccessor &t)
 template <int dim, int spacedim>
 inline
 IteratorState::IteratorStates
-TriaAccessor<0, dim, spacedim>::state ()
+TriaAccessor<0, dim, spacedim>::state () const
 {
-  return IteratorState::valid;
+  if (global_vertex_index != numbers::invalid_unsigned_int)
+    return IteratorState::valid;
+  else
+    return IteratorState::past_the_end;
 }
 
 
@@ -2223,9 +2226,11 @@ TriaAccessor<0, dim, spacedim>::index () const
 template <int dim, int spacedim>
 inline
 void
-TriaAccessor<0, dim, spacedim>::operator ++ () const
+TriaAccessor<0, dim, spacedim>::operator ++ ()
 {
-  Assert (false, ExcNotImplemented());
+  ++global_vertex_index;
+  if (global_vertex_index >= tria->n_vertices())
+    global_vertex_index = numbers::invalid_unsigned_int;
 }
 
 
@@ -2233,9 +2238,15 @@ TriaAccessor<0, dim, spacedim>::operator ++ () const
 template <int dim, int spacedim>
 inline
 void
-TriaAccessor<0, dim, spacedim>::operator -- () const
+TriaAccessor<0, dim, spacedim>::operator -- ()
 {
-  Assert (false, ExcNotImplemented());
+  if (global_vertex_index != numbers::invalid_unsigned_int)
+    {
+      if (global_vertex_index != 0)
+        --global_vertex_index;
+      else
+        global_vertex_index = numbers::invalid_unsigned_int;
+    }
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,9 +33,9 @@
 using namespace Polynomials;
 
 
-template<int dim, class POLY>
-void check_poly(const Point<dim> &x,
-                const POLY &p)
+template<int dim, class PolynomialType>
+void check_poly(const Point<dim>     &x,
+                const PolynomialType &p)
 {
   const unsigned int n = p.n();
   const double eps = 5.0e-15;
@@ -173,7 +173,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   deallog.push("Lagrange");

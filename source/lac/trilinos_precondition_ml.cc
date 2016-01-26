@@ -150,6 +150,12 @@ namespace TrilinosWrappers
     parameter_list.set("smoother: type", additional_data.smoother_type);
     parameter_list.set("coarse: type", additional_data.coarse_type);
 
+    // Force re-initialization of the random seed to make ML deterministic
+    // (only supported in trilinos >12.2):
+#if DEAL_II_TRILINOS_VERSION_GTE(12,4,0)
+    parameter_list.set("initialize random seed", true);
+#endif
+
     parameter_list.set("smoother: sweeps",
                        static_cast<int>(additional_data.smoother_sweeps));
     parameter_list.set("cycle applications",
@@ -183,6 +189,7 @@ namespace TrilinosWrappers
     if (constant_modes_dimension > 0)
       {
         const size_type global_size = n_global_rows(matrix);
+        (void)global_length; // work around compiler warning about unused function in release mode
         Assert (global_size ==
                 static_cast<size_type>(global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(global_size,

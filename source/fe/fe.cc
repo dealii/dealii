@@ -36,10 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
-  update_flags(update_default),
-  update_once(update_default),
-  update_each(update_default),
-  first_cell(true)
+  update_each(update_default)
 {}
 
 
@@ -56,32 +53,6 @@ FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption () const
 {
   return sizeof(*this);
 }
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FiniteElement<dim,spacedim>::InternalDataBase::current_update_flags () const
-{
-  if (first_cell)
-    {
-      Assert (update_flags==(update_once|update_each),
-              ExcInternalError());
-      return update_flags;
-    }
-  else
-    return update_each;
-}
-
-
-
-template <int dim, int spacedim>
-void
-FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ()
-{
-  first_cell = false;
-}
-
 
 
 
@@ -1236,10 +1207,12 @@ template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
                                             const Mapping<dim,spacedim>      &mapping,
-                                            const Quadrature<dim-1> &quadrature) const
+                                            const Quadrature<dim-1> &quadrature,
+                                            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   return get_data (flags, mapping,
-                   QProjector<dim>::project_to_all_faces(quadrature));
+                   QProjector<dim>::project_to_all_faces(quadrature),
+                   output_data);
 }
 
 
@@ -1248,10 +1221,12 @@ template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
                                                const Mapping<dim,spacedim>      &mapping,
-                                               const Quadrature<dim-1> &quadrature) const
+                                               const Quadrature<dim-1> &quadrature,
+                                               dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   return get_data (flags, mapping,
-                   QProjector<dim>::project_to_all_subfaces(quadrature));
+                   QProjector<dim>::project_to_all_subfaces(quadrature),
+                   output_data);
 }
 
 

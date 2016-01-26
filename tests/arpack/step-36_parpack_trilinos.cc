@@ -38,9 +38,9 @@ using namespace dealii;
 
 const double eps = 1e-10;
 
-template <class DH>
+template <typename DoFHandlerType>
 std::vector<IndexSet>
-locally_owned_dofs_per_subdomain (const DH  &dof_handler)
+locally_owned_dofs_per_subdomain (const DoFHandlerType  &dof_handler)
 {
   std::vector< types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
   DoFTools::get_subdomain_association (dof_handler, subdomain_association);
@@ -249,7 +249,7 @@ void test ()
     std::vector<std::complex<double> > lambda(eigenfunctions.size());
 
     for (unsigned int i=0; i < eigenvalues.size(); i++)
-      eigenfunctions[i] = PetscScalar();
+      eigenfunctions[i] = 0.;
 
     SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
     SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
@@ -339,7 +339,6 @@ int main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile,/*do not print job id*/false);
-  deallog.depth_console(0);
   deallog.threshold_double(eps);
 
   try

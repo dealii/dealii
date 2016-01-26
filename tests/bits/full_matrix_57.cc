@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@ check ()
 {
   deallog << std::fixed;
   deallog << std::setprecision(1);
-  deallog.depth_console(0);
 
   Vector<double> First4(4), Second4(4), First9(9);
   FullMatrix<double>F4(4,4),  F9(9,9);

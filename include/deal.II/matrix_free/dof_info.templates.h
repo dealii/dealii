@@ -1933,9 +1933,9 @@ not_connect:
 
 
 
-    template <typename STREAM>
+    template <typename StreamType>
     void
-    DoFInfo::print_memory_consumption (STREAM         &out,
+    DoFInfo::print_memory_consumption (StreamType     &out,
                                        const SizeInfo &size_info) const
     {
       out << "       Memory row starts indices:    ";

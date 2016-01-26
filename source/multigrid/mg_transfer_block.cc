@@ -63,7 +63,7 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index> >
-        new_dofs(mg_dof.get_tria().n_levels(),
+        new_dofs(mg_dof.get_triangulation().n_levels(),
                  std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
         MGTools::count_dofs_per_block (mg_dof, ndofs);
@@ -109,7 +109,7 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index> >
-        new_dofs(mg_dof.get_tria().n_levels(),
+        new_dofs(mg_dof.get_triangulation().n_levels(),
                  std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
         MGTools::count_dofs_per_block (mg_dof, ndofs);
@@ -138,7 +138,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // first, since only one block is
   // selected.
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
@@ -165,7 +165,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // multilevel block is always the
   // first, since only one block is selected.
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
@@ -189,7 +189,7 @@ MGTransferBlock<number>::copy_to_mg (
 {
   reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (unsigned int block=0; block<selected.size(); ++block)
@@ -213,7 +213,7 @@ void MGTransferBlockBase::build_matrices (
   const FiniteElement<dim> &fe = mg_dof.get_fe();
   const unsigned int n_blocks  = fe.n_blocks();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
+  const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
 
   Assert (selected.size() == n_blocks,
           ExcDimensionMismatch(selected.size(), n_blocks));
@@ -410,52 +410,51 @@ void MGTransferBlockBase::build_matrices (
   // impose boundary conditions
   // but only in the column of
   // the prolongation matrix
-  if (mg_constrained_dofs != 0)
-    if (mg_constrained_dofs->set_boundary_values())
-      {
-        std::vector<types::global_dof_index> constrain_indices;
-        std::vector<std::vector<bool> > constraints_per_block (n_blocks);
-        for (int level=n_levels-2; level>=0; --level)
-          {
-            if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
-              continue;
+  if (mg_constrained_dofs != 0 && mg_constrained_dofs->have_boundary_indices())
+    {
+      std::vector<types::global_dof_index> constrain_indices;
+      std::vector<std::vector<bool> > constraints_per_block (n_blocks);
+      for (int level=n_levels-2; level>=0; --level)
+        {
+          if (mg_constrained_dofs->get_boundary_indices(level).n_elements() == 0)
+            continue;
 
-            // need to delete all the columns in the
-            // matrix that are on the boundary. to achieve
-            // this, create an array as long as there are
-            // matrix columns, and find which columns we
-            // need to filter away.
-            constrain_indices.resize (0);
-            constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-            std::set<types::global_dof_index>::const_iterator dof
-            = mg_constrained_dofs->get_boundary_indices()[level].begin(),
-            endd = mg_constrained_dofs->get_boundary_indices()[level].end();
-            for (; dof != endd; ++dof)
-              constrain_indices[*dof] = 1;
+          // need to delete all the columns in the
+          // matrix that are on the boundary. to achieve
+          // this, create an array as long as there are
+          // matrix columns, and find which columns we
+          // need to filter away.
+          constrain_indices.resize (0);
+          constrain_indices.resize (prolongation_matrices[level]->n(), 0);
+          IndexSet::ElementIterator dof
+          = mg_constrained_dofs->get_boundary_indices(level).begin(),
+          endd = mg_constrained_dofs->get_boundary_indices(level).end();
+          for (; dof != endd; ++dof)
+            constrain_indices[*dof] = 1;
 
-            unsigned int index = 0;
-            for (unsigned int block=0; block<n_blocks; ++block)
-              {
-                const types::global_dof_index n_dofs = prolongation_matrices[level]->block(block, block).m();
-                constraints_per_block[block].resize(0);
-                constraints_per_block[block].resize(n_dofs, 0);
-                for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
-                  constraints_per_block[block][i] = (constrain_indices[index] == 1);
+          unsigned int index = 0;
+          for (unsigned int block=0; block<n_blocks; ++block)
+            {
+              const types::global_dof_index n_dofs = prolongation_matrices[level]->block(block, block).m();
+              constraints_per_block[block].resize(0);
+              constraints_per_block[block].resize(n_dofs, 0);
+              for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
+                constraints_per_block[block][i] = (constrain_indices[index] == 1);
 
-                for (types::global_dof_index i=0; i<n_dofs; ++i)
-                  {
-                    SparseMatrix<double>::iterator
-                    start_row = prolongation_matrices[level]->block(block, block).begin(i),
-                    end_row   = prolongation_matrices[level]->block(block, block).end(i);
-                    for (; start_row != end_row; ++start_row)
-                      {
-                        if (constraints_per_block[block][start_row->column()])
-                          start_row->value() = 0.;
-                      }
-                  }
-              }
-          }
-      }
+              for (types::global_dof_index i=0; i<n_dofs; ++i)
+                {
+                  SparseMatrix<double>::iterator
+                  start_row = prolongation_matrices[level]->block(block, block).begin(i),
+                  end_row   = prolongation_matrices[level]->block(block, block).end(i);
+                  for (; start_row != end_row; ++start_row)
+                    {
+                      if (constraints_per_block[block][start_row->column()])
+                        start_row->value() = 0.;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -480,7 +479,7 @@ void MGTransferBlockSelect<number>::build_matrices (
   std::vector<types::global_dof_index> global_dof_indices (fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (fe.dofs_per_cell);
 
-  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+  for (int level=dof.get_triangulation().n_levels()-1; level>=0; --level)
     {
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
@@ -567,7 +566,7 @@ void MGTransferBlock<number>::build_matrices (
   std::vector<std::vector<types::global_dof_index> > temp_copy_indices (n_blocks);
   std::vector<types::global_dof_index> global_dof_indices (fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (fe.dofs_per_cell);
-  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+  for (int level=dof.get_triangulation().n_levels()-1; level>=0; --level)
     {
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);

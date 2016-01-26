@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,9 +26,9 @@
 
 #include <fstream>
 
-template <class MATRIX, class VECTOR>
+template <typename MatrixType, typename VectorType>
 void
-check(const MATRIX &A, const VECTOR &f)
+check (const MatrixType &A, const VectorType &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -38,11 +38,11 @@ check(const MATRIX &A, const VECTOR &f)
 
   ReductionControl cont1(100, 0., 1.e-4);
   SolverControl cont2(100, 1.e-7);
-  SolverSelector<VECTOR> solver;
+  SolverSelector<VectorType> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
 
-  VECTOR u;
+  VectorType u;
   u.reinit(f);
 
   std::vector<std::string>::const_iterator name;
@@ -72,7 +72,6 @@ int main()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   unsigned int size=37;

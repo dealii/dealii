@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@ double log_integral(const unsigned int N, const double point, const double alpha
 int main()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog<<std::fixed;
   deallog<<std::setprecision(10);
 

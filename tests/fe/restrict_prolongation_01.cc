@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2013, 2015 by the deal.II authors
+ * Copyright (C) 1999 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *

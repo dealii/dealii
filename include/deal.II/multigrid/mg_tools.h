@@ -81,11 +81,11 @@ namespace MGTools
    * There is no need to consider hanging nodes here, since only one level is
    * considered.
    */
-  template <class DH, class SparsityPattern>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_sparsity_pattern (const DH &dof_handler,
-                         SparsityPattern         &sparsity,
-                         const unsigned int       level);
+  make_sparsity_pattern (const DoFHandlerType &dof_handler,
+                         SparsityPatternType  &sparsity,
+                         const unsigned int    level);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
@@ -95,11 +95,11 @@ namespace MGTools
    * and
    * @ref DoFTools
    */
-  template <int dim, class SparsityPattern, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof_handler,
-                              SparsityPattern         &sparsity,
-                              const unsigned int       level);
+                              SparsityPatternType            &sparsity,
+                              const unsigned int              level);
 
   /**
    * Create sparsity pattern for the fluxes at refinement edges. The matrix
@@ -107,11 +107,11 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, class SparsityPattern, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
   make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof_handler,
-                                   SparsityPattern         &sparsity,
-                                   const unsigned int       level);
+                                   SparsityPatternType            &sparsity,
+                                   const unsigned int              level);
   /**
    * This function does the same as the other with the same name, but it gets
    * two additional coefficient matrices. A matrix entry will only be
@@ -121,11 +121,11 @@ namespace MGTools
    * There is one matrix for couplings in a cell and one for the couplings
    * occurring in fluxes.
    */
-  template <int dim, class SparsityPattern, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
-  make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof,
-                              SparsityPattern       &sparsity,
-                              const unsigned int level,
+  make_flux_sparsity_pattern (const DoFHandler<dim,spacedim>    &dof,
+                              SparsityPatternType               &sparsity,
+                              const unsigned int                 level,
                               const Table<2,DoFTools::Coupling> &int_mask,
                               const Table<2,DoFTools::Coupling> &flux_mask);
 
@@ -137,11 +137,11 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, class SparsityPattern, int spacedim>
+  template <int dim, typename SparsityPatternType, int spacedim>
   void
-  make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof_handler,
-                                   SparsityPattern         &sparsity,
-                                   const unsigned int       level,
+  make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim>    &dof_handler,
+                                   SparsityPatternType               &sparsity,
+                                   const unsigned int                 level,
                                    const Table<2,DoFTools::Coupling> &flux_mask);
 
   /**
@@ -150,11 +150,11 @@ namespace MGTools
    * Result is a vector containing for each level a vector containing the
    * number of dofs for each block (access is <tt>result[level][block]</tt>).
    */
-  template <class DH>
+  template <typename DoFHandlerType>
   void
-  count_dofs_per_block (const DH     &dof_handler,
+  count_dofs_per_block (const DoFHandlerType                               &dof_handler,
                         std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
-                        std::vector<unsigned int>  target_block = std::vector<unsigned int>());
+                        std::vector<unsigned int> target_block = std::vector<unsigned int>());
 
   /**
    * Count the dofs component-wise on each level.

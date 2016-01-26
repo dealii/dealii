@@ -66,10 +66,10 @@ void test_mpi()
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
 
-  SparsityTools::distribute_sparsity_pattern<>(csp,
-                                               locally_owned_dofs_per_cpu,
-                                               MPI_COMM_WORLD,
-                                               locally_rel);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             locally_owned_dofs_per_cpu,
+                                             MPI_COMM_WORLD,
+                                             locally_rel);
   /*  {
       std::ofstream f((std::string("after")+Utilities::int_to_string(myid)).c_str());
       csp.print(f);
@@ -115,10 +115,10 @@ void test_mpi()
     locally_owned_dofs_per_cpu2[i].add_range((i)*num_local, (i+1)*num_local);
 
 
-  SparsityTools::distribute_sparsity_pattern<>(csp,
-                                               locally_owned_dofs_per_cpu2,
-                                               MPI_COMM_WORLD,
-                                               locally_rel);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             locally_owned_dofs_per_cpu2,
+                                             MPI_COMM_WORLD,
+                                             locally_rel);
 
   if (myid==0)
     {
@@ -167,7 +167,6 @@ int main(int argc, char *argv[])
     {
       std::ofstream logfile("output");
       deallog.attach(logfile);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("mpi");

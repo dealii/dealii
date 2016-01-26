@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tensor_product_polynomials_bubbles_h
-#define __deal2__tensor_product_polynomials_bubbles_h
+#ifndef dealii__tensor_product_polynomials_bubbles_h
+#define dealii__tensor_product_polynomials_bubbles_h
 
 
 #include <deal.II/base/config.h>

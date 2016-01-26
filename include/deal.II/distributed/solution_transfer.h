@@ -48,11 +48,11 @@ namespace parallel
      * interpolate() or deserialize() you need to supply distributed vectors
      * without ghost elements.
      *
-     * <h3>Transferring a solution</h3> Here VECTOR is your favorite vector
+     * <h3>Transferring a solution</h3> Here VectorType is your favorite vector
      * type, e.g. PETScWrappers::MPI::Vector, TrilinosWrappers::MPI::Vector,
      * or corresponding blockvectors.
      * @code
-     * SolutionTransfer<dim, VECTOR> soltrans(dof_handler);
+     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
      *                                   // flag some cells for refinement
      *                                   // and coarsening, e.g.
      * GridRefinement::refine_and_coarsen_fixed_fraction(
@@ -69,8 +69,8 @@ namespace parallel
      *                                   // redistribute dofs,
      * dof_handler.distribute_dofs (fe);
      *                                   // and interpolate the solution
-     * VECTOR interpolated_solution;
-     * //create VECTOR in the right size here
+     * VectorType interpolated_solution;
+     * //create VectorType in the right size here
      * soltrans.interpolate(interpolated_solution);
      * @endcode
      *
@@ -85,7 +85,7 @@ namespace parallel
      * follows:
      * *@code
      *
-     * parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim,VectorType> sol_trans(dof_handler);
      * sol_trans.prepare_serialization (vector);
      *
      * triangulation.save(filename);
@@ -96,7 +96,7 @@ namespace parallel
      * //[create coarse mesh...]
      * triangulation.load(filename);
      *
-     * parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim,VectorType> sol_trans(dof_handler);
      * sol_trans.deserialize (distributed_vector);
      * @endcode
      *
@@ -112,14 +112,14 @@ namespace parallel
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
-    template<int dim, typename VECTOR, class DH=DoFHandler<dim> >
+    template<int dim, typename VectorType, typename DoFHandlerType=DoFHandler<dim> >
     class SolutionTransfer
     {
     public:
       /**
        * Constructor, takes the current DoFHandler as argument.
        */
-      SolutionTransfer(const DH &dof);
+      SolutionTransfer(const DoFHandlerType &dof);
       /**
        * Destructor.
        */
@@ -132,13 +132,13 @@ namespace parallel
        * includes all vectors that are to be interpolated onto the new
        * (refined and/or coarsened) grid.
        */
-      void prepare_for_coarsening_and_refinement (const std::vector<const VECTOR *> &all_in);
+      void prepare_for_coarsening_and_refinement (const std::vector<const VectorType *> &all_in);
 
       /**
        * Same as previous function but for only one discrete function to be
        * interpolated.
        */
-      void prepare_for_coarsening_and_refinement (const VECTOR &in);
+      void prepare_for_coarsening_and_refinement (const VectorType &in);
 
       /**
        * Interpolate the data previously stored in this object before the mesh
@@ -147,7 +147,7 @@ namespace parallel
        * prepare_for_coarsening_and_refinement() and write the result into the
        * given set of vectors.
        */
-      void interpolate (std::vector<VECTOR *> &all_out);
+      void interpolate (std::vector<VectorType *> &all_out);
 
       /**
        * Same as the previous function. It interpolates only one function. It
@@ -158,7 +158,7 @@ namespace parallel
        * several functions can be performed in one step by using
        * <tt>interpolate (all_in, all_out)</tt>
        */
-      void interpolate (VECTOR &out);
+      void interpolate (VectorType &out);
 
 
       /**
@@ -173,13 +173,13 @@ namespace parallel
        * on the locally active DoFs (it must be ghosted). See documentation of
        * this class for more information.
        */
-      void prepare_serialization(const VECTOR &in);
+      void prepare_serialization(const VectorType &in);
 
 
       /**
        * Same as the function above, only for a list of vectors.
        */
-      void prepare_serialization(const std::vector<const VECTOR *> &all_in);
+      void prepare_serialization(const std::vector<const VectorType *> &all_in);
 
 
       /**
@@ -188,25 +188,25 @@ namespace parallel
        * fully distributed vector without ghost elements. See documentation of
        * this class for more information.
        */
-      void deserialize(VECTOR &in);
+      void deserialize(VectorType &in);
 
 
       /**
        * Same as the function above, only for a list of vectors.
        */
-      void deserialize(std::vector<VECTOR *> &all_in);
+      void deserialize(std::vector<VectorType *> &all_in);
 
     private:
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const DH,SolutionTransfer<dim,VECTOR,DH> > dof_handler;
+      SmartPointer<const DoFHandlerType,SolutionTransfer<dim,VectorType,DoFHandlerType> > dof_handler;
 
       /**
        * A vector that stores pointers to all the vectors we are supposed to
        * copy over from the old to the new mesh.
        */
-      std::vector<const VECTOR *> input_vectors;
+      std::vector<const VectorType *> input_vectors;
 
       /**
        * The offset that the Triangulation has assigned to this object
@@ -219,8 +219,8 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                         const typename Triangulation<dim,dim>::CellStatus status,
+      void pack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                         const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
                          void *data);
 
       /**
@@ -228,10 +228,10 @@ namespace parallel
        * has been packed up previously on the mesh before refinement,
        * coarsening and repartitioning.
        */
-      void unpack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                           const typename Triangulation<dim,dim>::CellStatus status,
+      void unpack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                           const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
                            const void *data,
-                           std::vector<VECTOR *> &all_out);
+                           std::vector<VectorType *> &all_out);
 
 
       /**

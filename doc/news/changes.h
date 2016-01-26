@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2015 by the deal.II authors
+// Copyright (C) 2014 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,11 +38,59 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The constructor of FiniteElementData had a last argument
+  <code>n_blocks</code> that was not actually used by the class to
+  initialize anything. It has been removed. In addition, the default
+  constructor of FiniteElementData has also been removed given that it
+  only creates a dysfunctional element.
+  <br>
+  (Wolfgang Bangerth, 2016/01/23).
+  </li>
+
+  <li> Rework: SLEPcWrappers were reworked to allow usage of PETSc solvers
+  and preconditioners inside SLEPc's eigensolvers. To that end extra methods
+  were introduced to PETSc wrappers. Moreover, initialization of the
+  underlying SLEPc objects is now done inside constructors of the wrapper
+  classes. As a result, one has to provide an MPI communicator to the constructors of
+  spectral transformation classes.
+  <br>
+  (Denis Davydov, 2015/12/29).
+  </li>
+
+  <li> Removed: The deprecated Operator class in the Algorithms namespace has been
+  removed.
+  <br>
+  (Timo Heister, 2015/12/21)
+  </li>
+
+  <li> Changed: deallog console depth is now 0 by default, causing no
+  output to the screen from solvers and other places in the library.
+  <br>
+  (Timo Heister, 2015/12/06)
+  </li>
+
+  <li> Changed: The function Utilities::trim() now removes general
+  white space characters, such as '<tt>\\r</tt>' and '<tt>\\n</tt>', as well as
+  space characters.
+  <br>
+  (David Wells, 2015/12/05)
+  </li>
+
+  <li> Removed: The previously deprecated global instance
+  <code>multithread_info</code> of
+  MultithreadInfo has been removed (all members of this class are static
+  so there is no reason to use/create an instance). The deprecated
+  MultithreadInfo::n_cpus member also got removed in favor of
+  MultithreadInfo::n_cores().
+  <br>
+  (Timo Heister, 2015/11/19)
+  </li>
+
   <li> Removed: The <code>UpdateFlags</code> flags
   <code>update_support_points</code>, <code>update_support_jacobians</code>,
   and <code>update_support_inverse_jacobians</code> have been removed.
   <code>update_support_points</code> was deprecated in 2013 and has not done
-  anything in a long time (see the commit message for more information). The
+  anything in a long time. The
   other two appeared in 2007 and were never implemented.
   <br>
   (David Wells, 2015/09/16)
@@ -78,9 +126,9 @@ inconvenience this causes.
   (Matthias Maier, 2015/09/14 - 2015/09/17)
   </li>
 
-  <li> Removed: Tensor<rank,dim,Number> as well as Point<dim,Number> no
+  <li> Removed: The Tensor and Point classes no
   longer have a constructor taking a boolean argument. Those were replaced
-  by a default constructor will always initialize underlying values with
+  by a default constructor that will always initialize underlying values with
   zero.
   <br>
   (Matthias Maier, 2015/09/07)
@@ -107,8 +155,8 @@ inconvenience this causes.
   now returns a Tensor, rather than a Point.
   <br>
   In a similar spirit, the FEValues::get_normal_vectors() function that
-  still returns a vector of Points has been deprecated and a new function,
-  FEValues::get_all_normal_vectors(), that returns a vector of tensors,
+  still returns a vector of Points has been deprecated, and a new function,
+  FEValues::get_all_normal_vectors() that returns a vector of tensors,
   has been added. This was necessary since there is no way to change the
   return type of the existing function in a backward compatible way. The
   old function will be removed in the next version, and the new function
@@ -129,7 +177,11 @@ inconvenience this causes.
   functions has been changed, in an effort to clarify which of these contain
   input information and which contain output information for these functions.
   The same has been done for the corresponding functions in the Mapping
-  class hierarchy. As part of a general overhaul, the FEValuesData class
+  class hierarchy.
+  <br>
+  Likewise the signature of FiniteElement::get_data() has been changed.
+  <br>
+  As part of a general overhaul, the FEValuesData class
   has also been removed.
   <br>
   (Wolfgang Bangerth, 2015/07/20-2015/08/13)
@@ -137,12 +189,14 @@ inconvenience this causes.
 
   <li> Changed: The functions update_once() and update_each() in the
   Mapping classes computed information that was, in essence, only of use
-  internally. No external piece of code actually needed to know which
+  internally. No external code actually needed to know which
   pieces of information a mapping could compute once and which they needed
   to compute on every cell. Consequently, these two functions have been
   removed and have been replaced by Mapping::requires_update_flags().
   <br>
-  (Wolfgang Bangerth, 2015/07/20-2015/08/13)
+  A similar change has been applied to the FiniteElement class.
+  <br>
+  (Wolfgang Bangerth, 2015/07/20-2015/12/01)
   </li>
 
   <li> Changed: The function DoFRenumbering::random() now produces different
@@ -159,10 +213,85 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
-
-  <li> New: 2nd derivatives are implemented for polynomials_BDM in 3D.
+  <li> New: The documentation of step-17 has been completely rewritten,
+  and many aspects of how one has to think when writing parallel programs
+  have been much better documented now.
   <br>
-  (Alistair Bentley, 2015/10/27)
+  (Wolfgang Bangerth, 2016/01/07)
+  </li>
+
+  <li> New: deal.II now provides a string <code>DEAL_II_ALWAYS_INLINE</code>
+  that, when supported by the compiler, can be used to annotate functions
+  to ensure that the compiler always inlines them.
+  <br>
+  (Matthias Maier, Wolfgang Bangerth, 2016/01/07)
+  </li>
+
+  <li> New: There is a new documentation module, @ref Concepts, which describes the meaning
+  behind template parameter type names.
+  <br>
+  (David Wells, 2015/12/09)
+  </li>
+
+  <li> Changed: The template type name arguments of some classes no longer
+  shadow class names. Additionally, template type names are now much more
+  consistent across deal.II.
+  <br>
+  (David Wells, 2015/10/18 - 2016/01/23)
+  </li>
+
+  <li> New: The WorkStream class's design and implementation are now much
+  better documented in the form of a @ref workstream_paper "preprint".
+  <br>
+  (Wolfgang Bangerth, 2015/11/29)
+  </li>
+
+  <li> New: There is now much more documentation for the FiniteElement class,
+  in particular detailing what one needs to implement when writing finite
+  element descriptions in derived classes.
+  <br>
+  (Wolfgang Bangerth, 2015/11/29)
+  </li>
+
+  <li> New: There is now a function template numbers::signaling_nan() that
+  is used to create invalid floating point objects. These objects can either
+  be scalars, or of type Tensor, SymmetricTensor, or DerivativeForm. The
+  content of these objects is a "signaling NaN" ("NaN" stands for "not a
+  number", and "signaling" implies that at least on platforms where this
+  is supported, any arithmetic operation using them terminates the program).
+  The purpose of this is to use them as markers for uninitialized objects
+  and arrays that are required to be filled in other places, and to trigger
+  an error when this later initialization does not happen before the first
+  use.
+  <br>
+  (Wolfgang Bangerth, Timo Heister, 2015/11/24)
+  </li>
+
+  <li> Changed: The function FE_DGPNonparametric::shape_value() and similar
+  functions in the same class returned values and derivatives of shape
+  functions on the reference cell. However, this element is not defined
+  through mapping of shape functions from the reference cell, and consequently
+  it makes no sense to ask for this information. These functions have therefore
+  been changed to throw an exception instead, as documented in
+  FiniteElement::shape_value().
+  <br>
+  (Wolfgang Bangerth, 2015/11/20)
+  </li>
+
+  <li> Changed: The functionality to distribute cells across processes
+  according to a vector of cell weights that was passed in a call to
+  parallel::distributed::Triangulation::repartition()
+  was replaced by a cell-wise signal. This signal is called during
+  parallel::distributed::Triangulation::execute_coarsening_and_refinement() and
+  parallel::distributed::Triangulation::repartition()
+  if any function is connected to it. It allows to connect a function that
+  takes the current cell iterator and a status argument that indicates whether
+  this cell will be refined, coarsened or remains unchanged and returns a
+  cell weight, which will be used to distribute cells across processes in a
+  way that keeps the sum of weights across each individual process
+  approximately equal.
+  <br>
+  (Rene Gassmoeller, 2015/11/02)
   </li>
 
   <li> New: Preliminary support for parallel, adaptive, geometric multigrid is
@@ -179,20 +308,17 @@ inconvenience this causes.
   (Lei Qiao, 2015/10/22)
   </li>
 
-  <li> New: Triangulation::ghost_owners() returns the set of MPI ranks of the
-  ghost cells. Similarly ::level_ghost_owners() for level ghosts.
+  <li> New: parallel::distributed::Triangulation::ghost_owners()
+  returns the set of MPI ranks of the ghost cells. Similarly
+  parallel::distributed::Triangulation::level_ghost_owners() for level
+  ghosts.
   <br>
   (Timo Heister, 2015/09/30)
   </li>
 
-  <li> New: FunctionParser now supports pow(a,b).
-  <br>
-  (Timo Heister, 2015/09/30)
-  </li>
-
-  <li> Improved: The interface to all deal.II type solvers and
+  <li> Improved: The interfaces to all deal.II type solvers and
   preconditioners have been updated such that they function as expected
-  with the LinearOperator class and its associated functions (i.e.
+  with the LinearOperator class and its associated functions (i.e.,
   linear_operator(), transpose_operator() and inverse_operator()).
   These preconditioners can now be wrapped as a LinearOperator,
   facilitating the construction of approximate matrix inverses such as in
@@ -249,22 +375,11 @@ inconvenience this causes.
   (Wolfgang Bangerth, Matthias Maier, 2015/09/06)
   </li>
 
-  <li> Improved: Allow continuation lines in ParameterHandler.
-  <br>
-  (Alberto Sartori, 2015/09/04)
-  </li>
-
   <li> Cleanup: The interface of Tensor<rank,dim,Number> has been cleaned
   up (a lot of unnecessary partial template specializations have been
   removed). The specialization Tensor<1,dim,Number> has been removed.
   <br>
   (Matthias Maier, 2015/09/02)
-  </li>
-
-  <li> Fixed: VectorTools::integrate_difference for VectorTools::Hdiv_seminorm
-  was computed incorrectly.
-  <br>
-  (Timo Heister, 2015/08/31)
   </li>
 
   <li> Improved: The testsuite now supports multiple comparison files.
@@ -290,7 +405,6 @@ inconvenience this causes.
   - FunctionTime
   - Function
   - TensorFunction
-
   <br>
   <em>Classes with fixed interface that now fully support complex number
   types (pure template classes without explicit instantiations in the
@@ -299,7 +413,7 @@ inconvenience this causes.
   - PackagedOperation
   - Tensor
   <br>
-  (Matthias Maier, 2015/08/25 - XXX)
+  (Matthias Maier, 2015/08/25)
   </li>
 
   <li> Fixed: The testsuite now properly supports version constraints for
@@ -307,18 +421,6 @@ inconvenience this causes.
   <code>.with_FEATURE(&lt;=|&gt;=|=|&lt;|&gt;)VERSION.</code>.
   <br>
   (Matthias Maier, 2015/08/25)
-  </li>
-
-  <li> Fixed: The GridIn class was not instantiated for the
-  <code>dim==1,spacedim==3</code> case. This is now fixed.
-  <br>
-  (Wolfgang Bangerth, 2015/08/25)
-  </li>
-
-  <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
-  associated with vertices. This is now fixed.
-  <br>
-  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
   </li>
 
   <li> Improved: The interface and documentation for periodic boundary
@@ -336,8 +438,8 @@ inconvenience this causes.
 
   <li> New: parallel::shared::Triangulation class which extends
   Triangulation class to automatically partition triangulation when run
-  with MPI. Identical functionality between parallel::shared::Triangulation and
-  parallel::distributed::Triangulation is grouped in the parent class
+  with MPI. Common functionality between parallel::shared::Triangulation and
+  parallel::distributed::Triangulation is implemented in the parent class
   parallel::Triangulation.
   <br>
   (Denis Davydov, 2015/08/14)
@@ -349,12 +451,6 @@ inconvenience this causes.
   function.
   <br>
   (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
-  </li>
-
-  <li> New: implemented the gradient method for
-  InterpolatedTensorProductGridData
-  <br>
-  (Daniel Shapero, 2015/08/12)
   </li>
 
   <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
@@ -398,10 +494,270 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: A bug in the Neumann boundary handling of KellyErrorEstimator
+  in 1d has been fixed and KellyErrorEstimator now correctly handles
+  codimension one problems by using the correct normals from the manifold
+  inside the gradient jump computation.
+  <br>
+  (Andrea Bonito, Timo Heister, 2016/01/21)
+  </li>
+
+  <li> New: The new class MGTransferMatrixFree implements multigrid level
+  transfer using local polynomial embedding and restriction with tensor
+  product evaluation techniques. This is a faster and less memory-demanding
+  alternative to MGTransferPrebuilt.
+  <br>
+  (Martin Kronbichler, 2016/01/20)
+  </li>
+
+  <li> New: hp::FECollection now has constructors which take
+  multiple finite elements as arguments.
+  <br>
+  (Angel Rodriguez, 2016/01/18)
+  </li>
+
+  <li> New: The glossary now contains a long entry describing what
+  the term "scalability" means in the context of finite element codes.
+  See @ref GlossParallelScaling.
+  <br>
+  (Wolfgang Bangerth, 2016/01/11)
+  </li>
+
+  <li> Fixed: Tensor::operator[] that takes TableIndices as a parameter no
+  longer returns by value, but rather by reference. Tensor::operator<< for
+  dim==0 now accesses values by reference instead of making a copy. This is
+  useful when non-trivial number types are stored.
+  <br>
+  (Jean-Paul Pelteret, 2016/01/08)
+  </li>
+
+  <li> New: constrained_linear_operator() and constrained_right_hand_side()
+  provide a generic mechanism of applying constraints to a LinearOperator.
+  A detailed explanation with example code is given in the @ref constraints
+  module.
+  <br>
+  (Mauro Bardelloni, Matthias Maier, 2015/10/25 - 2015/12/27)
+  </li>
+
+  <li> New: OpenCASCADE::read_IGES() and OpenCASCADE::read_STEP() have
+  been unified in behaviour, and now they allow to extract *all* elements of
+  the IGES and STEP files instead of only the faces. This allows the
+  use of iges files describing edges only to be used as input for some of
+  the OpenCASCADE Manifold wrappers.
+  <br>
+  (Luca Heltai, 2015/12/13)
+  </li>
+
+  <li> New: A new linear operator representing the Schur complement,
+  namely schur_complement(), has been implemented. Some auxiliary functions
+  that are often used in conjunction with the Schur complement
+  (condense_schur_rhs() and postprocess_schur_solution()) are also provided
+  as a PackagedOperation.
+  An example of this functionality can be found in
+  <code>tests/lac/schur_complement_01.cc</code>.
+  The solution of a multi-component problem (namely step-22) using the
+  schur_complement can be found in
+  <code>tests/lac/schur_complement_03.cc</code> .
+  <br>
+  (Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015/12/07)
+  </li>
+
+  <li> New: There is now a function Utilities::to_string that works like
+  int_to_string, but is more safe for long integers, negative integers, and
+  also handles floating point numbers. The implementation of int_to_string
+  was changed to simply call to_string. int_to_string is kept for
+  compatibility, but should only be used for unsigned integers.
+  <br>
+  (Rene Gassmoeller, 2015/12/09)
+  </li>
+
+  <li> Fixed: GridOut::write_msh() and GridOut::write_ucd() used the same
+  geometric element numbers for lines and faces. This caused visualization
+  programs to ignore parts with repeated geometric element numbers. This is now
+  fixed.
+  <br>
+  (David Wells, 2016/01/16)
+  </li>
+
+  <li> New: DoFTools::extract_dofs() are now instantiated also for
+  codimension different from zero.
+  <br>
+  (Alberto Sartori, 2016/01/13)
+  </li>
+
+  <li> Fixed: The DataOutFaces class should now also work with triangulations
+  of type parallel::distributed::Triangulation.
+  <br>
+  (Heikki Virtanen, Wolfgang Bangerth, 2016/01/11)
+  </li>
+
+  <li> Fixed: AlignedVector<T>::fill() (and thus, Table<N,T>::reinit) did not
+  correctly call the destructor of T() and could leak memory for complicated
+  class types that depend on their constructor to free memory.
+  <br>
+  (Martin Kronbichler, 2016/01/08)
+  </li>
+
+  <li> Fixed: inverse_operator() now populates <code>Tvmult</code> and
+  <code>Tvmult_add</code> correctly.
+  <br>
+  (Jean-Paul Pelteret, David Wells, Matthias Maier, 2015/12/30)
+  </li>
+
+  <li> New: MGTransferPrebuilt with parallel adaptive refinement has been
+  finalized for parallel::distributed::Vector.
+  <br>
+  (Martin Kronbichler, 2015/12/23)
+  </li>
+
+  <li> Fixed: Now all members in the class SparseMatrixEZ are initialized
+  correctly in the constructor. This was causing random crashes before.
+  <br>
+  (Timo Heister, 2015/12/21)
+  </li>
+
+  <li> New: There is now a new class ArrayView that presents a chunk of
+  memory as if it was an array of fixed size. This is eventually going
+  to replace the VectorSlice class which suffers from the defect that
+  its template argument does not encode the type of objects it points
+  to, but instead the type of the underlying container; consequently,
+  where the VectorSlice class is used as a function argument, it
+  automatically ties the type of object the function can be called
+  with (i.e., the underlying container) even if the called function
+  has no actual use for this kind of information.
+  <br>
+  (Wolfgang Bangerth, 2015/12/20)
+  </li>
+
+  <li> Fixed: Handling of constraints in step-26 was incorrect (hanging nodes
+  were condensed twice) leading to garbage solutions. This is now fixed.
+  <br>
+  (Timo Heister, 2015/12/20)
+  </li>
+
+  <li> Fixed: The implementation of ShiftedMatrixGeneralized contained several
+  errors that prevented it from being compiled. These have now been fixed.
+  <br>
+  (David Wells, 2015/12/18)
+  </li>
+
+  <li> New: There is now a function Triangulation::get_triangulation() that
+  allows writing code to get at the underlying triangulation for
+  everything that looks like a container, i.e., both Triangulation
+  or DoFHandler objects.
+  <br>
+  (Wolfgang Bangerth, 2015/12/10)
+  </li>
+
+  <li> Deprecated: The functions DoFHandler::get_tria() and
+  hp::DoFHandler::get_tria() were deprecated. UseDoFHandler::get_triangulation() and
+  hp::DoFHandler::get_triangulation() instead.
+  <br>
+  (Wolfgang Bangerth, 2015/12/10)
+  </li>
+
+  <li> New: parallel::distributed::Vector has now a method to return a shared
+  pointer to the underlying partitioner object.
+  <br>
+  (Martin Kronbichler, 2015/12/07)
+  </li>
+
+  <li> Improved: Many more functions in namespace GridTools and class
+  InterGridMap are now consistely instantiated also for types
+  parallel::distributed::Triangulation and parallel::shared::Triangulation.
+  <br>
+  (Gennadiy Rishin, Wolfgang Bangerth, 2015/12/07)
+  </li>
+
+  <li> Improved: Both versions of SparsityTools::distribute_sparsity_pattern()
+  are now plain, not
+  template, functions. This is not a breaking change because each function was
+  instantiated for exactly one template argument.
+  <br>
+  (David Wells, 2015/12/06)
+  </li>
+
+  <li> Improved: The method
+  parallel::distributed::Triangulation::fill_vertices_with_ghost_neighbors()
+  that is used for distributing DoFs on parallel triangulations previously
+  exhibited quadratic complexity in the number of coarse grid cells. This has
+  been changed into linear complexity calls (apart from a few issues
+  inside p4est).
+  <br>
+  (Martin Kronbichler, 2015/12/05)
+  </li>
+
+  <li> Fixed: The GridTools::copy_boundary_to_manifold_id() function
+  only copied boundary indicators from faces, but in 3d forgot about
+  edges. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/11/30)
+  </li>
+
+  <li> Fixed: The constructor of SymmetricTensor that takes an array
+  of initializing elements led to a compiler error. This is now
+  fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/11/28)
+  </li>
+
+  <li> Fixed: parallel::distributed::Vector now detects if the size of MPI
+  messages exceeds 2GB or if the local range exceeds the size of 32-bit
+  integers and throws an exception informing about the unsupported sizes.
+  <br>
+  (Martin Kronbichler, 2015/11/26)
+  </li>
+
+  <li> New: In 3d, GridGenerator::extract_boundary_mesh() now copies the
+  manifold ids of edges of the volume mesh to the manifold ids of the edges
+  of the extracted surface mesh.
+  <br>
+  (Wolfgang Bangerth, 2015/11/25)
+  </li>
+
+  <li> New: Triangulation::create_triangulation() now accepts subcell-data
+  objects that may include information about interior edges and faces, to
+  facilitate setting manifold indicators on interior edges and faces.
+  <br>
+  (Wolfgang Bangerth, 2015/11/25)
+  </li>
+
+  <li> Fixed: GridGenerator::extract_boundary_mesh() in 3d could generate
+  surface cells that did not uniformly had a right- or left-handed coordinate
+  system associated with them when viewed from one side of the surface. This
+  has been fixed: they now all have a right-handed coordinate system when seen
+  from one side of the surface, and a left-handed one when viewed from the
+  other side.
+  <br>
+  (Daniel Weygand, Wolfgang Bangerth, 2015/11/22)
+  </li>
+
+  <li> Fixed: Trilinos ML preconditioner is now deterministic when using
+  version 12.4 or newer.
+  <br>
+  (Timo Heister, 2015/11/16)
+  </li>
+
+  <li> New: Extra parameters to GD and Lanczos SLEPc solvers. Also added unit tests.
+  <br>
+  (Denis Davydov, 2015/11/09)
+  </li>
+
+  <li> Fixed: FETools::project_dg was adding the vector projection to
+  the output vector. Now is the output vector initialized to zero.
+  <br>
+  (Adam Kosik, 2015/11/09)
+  </li>
+
   <li> Fixed: A compilation issue with DEAL_II_INCLUDE_DIRS not used for
   compiling bundled boost.
   <br>
   (Lukas Korous, 2015/11/01)
+  </li>
+
+  <li> New: 2nd derivatives are implemented for PolynomialsBDM in 3D.
+  <br>
+  (Alistair Bentley, 2015/10/27)
   </li>
 
   <li> Fixed: PolynomialsBDM::degree() now returns the correct value.
@@ -445,6 +801,11 @@ inconvenience this causes.
   are used in typical meshes.
   <br>
   (Aslan Kosakian, 2015/10/06)
+  </li>
+
+  <li> New: FunctionParser now supports <code>pow(a,b)</code>.
+  <br>
+  (Timo Heister, 2015/09/30)
   </li>
 
   <li> New: DoFTools::locally_relevant_dofs_per_subdomain() can be used
@@ -524,6 +885,11 @@ inconvenience this causes.
   (Timo Heister, 2015/09/05)
   </li>
 
+  <li> Improved: Allow continuation lines in ParameterHandler.
+  <br>
+  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18)
+  </li>
+
   <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
   in a .svg file which can be opened in a web browser.
   <br>
@@ -574,10 +940,28 @@ inconvenience this causes.
   (Denis Davydov, 2015/08/31)
   </li>
 
+  <li> Fixed: VectorTools::integrate_difference() for VectorTools::Hdiv_seminorm
+  was computed incorrectly.
+  <br>
+  (Timo Heister, 2015/08/31)
+  </li>
+
   <li> New: Jacobian second and third derivatives are now computed by the mapping classes and can be
   accessed through FEValues in much the same way as the Jacobian and Jacobian gradient.
   <br>
   (Maien Hamed, 2015/08/28-2015/08/31)
+  </li>
+
+  <li> Fixed: The GridIn class was not instantiated for the
+  <code>dim==1,spacedim==3</code> case. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/08/25)
+  </li>
+
+  <li> Fixed: In 1d, GridIn::read_msh() ignored boundary indicators
+  associated with vertices. This is now fixed.
+  <br>
+  (Jan Stebel, Wolfgang Bangerth, 2015/08/25)
   </li>
 
   <li> New: There are now a collection of functions named GridTools::compute_active_cell_halo_layer()
@@ -609,10 +993,8 @@ inconvenience this causes.
   (Maien Hamed, 2015/08/01-2015/08/09)
   </li>
 
-  <li> Changed: The function Vector::add() that adds a scalar number to all
-  elements of a vector has been deprecated. The same is true for the
-  Vector::ratio() function, and for the corresponding functions in other
-  vector classes.
+  <li> Changed: The function Vector::ratio() and the corresponding
+  functions in other vector classes have been deprecated.
   <br>
   (Wolfgang Bangerth, Bruno Turcksin, 2015/08/13)
   </li>
@@ -627,6 +1009,12 @@ inconvenience this causes.
   by finite differencing.
   <br>
   (Maien Hamed, 2015/08/01-2015/08/09)
+  </li>
+
+  <li> New: The InterpolatedTensorProductGridData::gradient() function
+  is now implemented.
+  <br>
+  (Daniel Shapero, 2015/08/12)
   </li>
 
   <li> New: There is now a function Mapping::project_real_point_to_unit_point_on_face()

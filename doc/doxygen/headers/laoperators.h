@@ -26,9 +26,11 @@
  * linear operator is available. (For questions about C++11, see
  * @ref CPP11 .)
  *
- * This is done with a LinearOperator class that, similarly to the abstract
- * MATRIX interface, defines a minimal interface for <i>applying</i> a
- * linear operation on a vector.
+ * This is done with a LinearOperator class that, like
+ * @ref ConceptMatrixType "the MatrixType concept",
+ * defines a minimal interface for <i>applying</i> a linear operation on a
+ * vector.
+ *
  * @code
  *   std::function<void(Range &, const Domain &)> vmult;
  *   std::function<void(Range &, const Domain &)> vmult_add;

@@ -140,6 +140,30 @@ namespace parallel
      * multiple threads. This may or may not be desired when working also with
      * MPI.
      *
+     * <h4>Limitations regarding the vector size</h4>
+     *
+     * This vector class is based on two different number types for indexing.
+     * The so-called global index type encodes the overall size of the vector.
+     * Its type is types::global_dof_index. The largest possible value is
+     * <code>2^32-1</code> or approximately 4 billion in case 64 bit integers
+     * are disabled at configuration of deal.II (default case) or
+     * <code>2^64-1</code> or approximately <code>10^19</code> if 64 bit
+     * integers are enabled (see the glossary entry on @ref GlobalDoFIndex for
+     * further information).
+     *
+     * The second relevant index type is the local index used within one MPI
+     * rank. As opposed to the global index, the implementation assumes 32-bit
+     * unsigned integers unconditionally. In other words, to actually use a
+     * vector with more than four billion entries, you need to use MPI with
+     * more than one rank (which in general is a safe assumption since four
+     * billion entries consume at least 16 GB of memory for floats or 32 GB of
+     * memory for doubles) and enable 64-bit indices. If more than 4 billion
+     * local elements are present, the implementation tries to detect that,
+     * which triggers an exception and aborts the code. Note, however, that
+     * the detection of overflow is tricky and the detection mechanism might
+     * fail in some circumstances. Therefore, it is strongly recommended to
+     * not rely on this class to automatically detect the unsupported case.
+     *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
     template <typename Number>
@@ -821,7 +845,7 @@ namespace parallel
        * Addition of @p s to all components. Note that @p s is a scalar and
        * not a vector.
        */
-      void add (const Number s) DEAL_II_DEPRECATED;
+      void add (const Number s);
 
       /**
        * Simple vector addition, equal to the <tt>operator +=</tt>.
@@ -960,13 +984,23 @@ namespace parallel
       const MPI_Comm &get_mpi_communicator () const;
 
       /**
+       * Return the MPI partitioner that describes the parallel layout of the
+       * vector. This object can be used to initialize another vector with the
+       * respective reinit() call, for additional queries regarding the
+       * parallel communication, or the compatibility of partitioners.
+       */
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+      get_partitioner () const;
+
+      /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
        * they have the same local size and the same ghost indices. They do not
-       * necessarily need to be the same data field. This is a local operation
-       * only, i.e., if only some processors decide that the partitioning is
-       * not compatible, only these processors will return @p false, whereas
-       * the other processors will return @p true.
+       * necessarily need to be the same data field of the shared
+       * pointer. This is a local operation only, i.e., if only some
+       * processors decide that the partitioning is not compatible, only these
+       * processors will return @p false, whereas the other processors will
+       * return @p true.
        */
       bool
       partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
@@ -2361,6 +2395,16 @@ namespace parallel
     Vector<Number>::get_mpi_communicator() const
     {
       return partitioner->get_communicator();
+    }
+
+
+
+    template <typename Number>
+    inline
+    std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+    Vector<Number>::get_partitioner () const
+    {
+      return partitioner;
     }
 
 #endif  // ifndef DOXYGEN

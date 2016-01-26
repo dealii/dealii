@@ -58,7 +58,7 @@ reinit_vector_by_blocks (
   if (ndofs.size() == 0)
     {
       std::vector<std::vector<types::global_dof_index> >
-      new_dofs(mg_dof.get_tria().n_levels(),
+      new_dofs(mg_dof.get_triangulation().n_levels(),
                std::vector<types::global_dof_index>(selected.size()));
       std::swap(ndofs, new_dofs);
       MGTools::count_dofs_per_block (mg_dof, ndofs);
@@ -105,7 +105,7 @@ void check_block(const FiniteElement<dim> &fe,
 
   for (unsigned int l=0; l<tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l);
-  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_tria().n_levels(),
+  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_triangulation().n_levels(),
                                                               std::vector<types::global_dof_index>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
@@ -201,7 +201,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   std::vector<double> factors;

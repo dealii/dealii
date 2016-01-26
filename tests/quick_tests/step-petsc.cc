@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2014 by the deal.II authors
+ * Copyright (C) 2013 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -183,7 +183,6 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        deallog.depth_console (0);
         LaplaceProblem problem;
         problem.run ();
         deallog << "OK" << std::endl;

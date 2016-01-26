@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ template <typename> class MGLevelObject;
  *
  * @author Guido Kanschat, 2002
  */
-template <class VECTOR>
+template <typename VectorType>
 class MGMatrixBase : public Subscriptor
 {
 public:
@@ -58,29 +58,29 @@ public:
    * Matrix-vector-multiplication on a certain level.
    */
   virtual void vmult (const unsigned int level,
-                      VECTOR &dst,
-                      const VECTOR &src) const = 0;
+                      VectorType         &dst,
+                      const VectorType   &src) const = 0;
 
   /**
    * Adding matrix-vector-multiplication on a certain level.
    */
   virtual void vmult_add (const unsigned int level,
-                          VECTOR &dst,
-                          const VECTOR &src) const = 0;
+                          VectorType         &dst,
+                          const VectorType   &src) const = 0;
 
   /**
    * Transpose matrix-vector-multiplication on a certain level.
    */
   virtual void Tvmult (const unsigned int level,
-                       VECTOR &dst,
-                       const VECTOR &src) const = 0;
+                       VectorType         &dst,
+                       const VectorType   &src) const = 0;
 
   /**
    * Adding transpose matrix-vector-multiplication on a certain level.
    */
   virtual void Tvmult_add (const unsigned int level,
-                           VECTOR &dst,
-                           const VECTOR &src) const = 0;
+                           VectorType         &dst,
+                           const VectorType   &src) const = 0;
 };
 
 
@@ -91,7 +91,7 @@ public:
  *
  * @author Guido Kanschat, 2002
  */
-template <class VECTOR>
+template <typename VectorType>
 class MGCoarseGridBase : public Subscriptor
 {
 public:
@@ -103,9 +103,9 @@ public:
   /**
    * Solution operator.
    */
-  virtual void operator() (const unsigned int   level,
-                           VECTOR       &dst,
-                           const VECTOR &src) const = 0;
+  virtual void operator() (const unsigned int level,
+                           VectorType         &dst,
+                           const VectorType   &src) const = 0;
 };
 
 
@@ -119,7 +119,7 @@ public:
  * and numbering of the fine-grid discretization and of the multi-level
  * implementation are independent.
  *
- * If you use multigrid for a single PDF or for your complete system of
+ * If you use multigrid for a single PDE or for your complete system of
  * equations, you will use MGTransferPrebuilt together with Multigrid. The
  * vector types used on the fine grid as well as for the multilevel operations
  * may be Vector or BlockVector. In both cases, MGTransferPrebuilt will
@@ -156,7 +156,7 @@ public:
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
-template <class VECTOR>
+template <typename VectorType>
 class MGTransferBase : public Subscriptor
 {
 public:
@@ -176,8 +176,8 @@ public:
    * finer level.
    */
   virtual void prolongate (const unsigned int to_level,
-                           VECTOR            &dst,
-                           const VECTOR      &src) const = 0;
+                           VectorType         &dst,
+                           const VectorType   &src) const = 0;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -195,8 +195,8 @@ public:
    *
    */
   virtual void restrict_and_add (const unsigned int from_level,
-                                 VECTOR            &dst,
-                                 const VECTOR      &src) const = 0;
+                                 VectorType         &dst,
+                                 const VectorType   &src) const = 0;
 };
 
 
@@ -207,7 +207,7 @@ public:
  *
  * @author Guido Kanschat, 2002
  */
-template <class VECTOR>
+template <typename VectorType>
 class MGSmootherBase : public Subscriptor
 {
 public:
@@ -224,8 +224,8 @@ public:
    * Smoothing function. This is the function used in multigrid methods.
    */
   virtual void smooth (const unsigned int level,
-                       VECTOR            &u,
-                       const VECTOR      &rhs) const = 0;
+                       VectorType         &u,
+                       const VectorType   &rhs) const = 0;
 };
 
 /*@}*/

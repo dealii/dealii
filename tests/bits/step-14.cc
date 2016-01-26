@@ -265,7 +265,7 @@ namespace Evaluation
              << ".eps"
              << std::ends;
 
-    GridOut().write_eps (dof_handler.get_tria(),
+    GridOut().write_eps (dof_handler.get_triangulation(),
                          deallog.get_file_stream());
   }
 }
@@ -1682,7 +1682,7 @@ namespace LaplaceSolver
         face_integrals[cell->face(face_no)] = -1e20;
 
     error_indicators.reinit (dual_solver.dof_handler
-                             .get_tria().n_active_cells());
+                             .get_triangulation().n_active_cells());
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     for (unsigned int i=0; i<n_threads; ++i)
@@ -2115,14 +2115,12 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 
 int main ()
 {
-  deallog.depth_console (0);
   try
     {
       deallog << std::setprecision(2);
       logfile << std::setprecision(2);
 
       deallog.attach(logfile);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       const unsigned int dim = 2;

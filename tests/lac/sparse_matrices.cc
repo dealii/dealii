@@ -41,11 +41,11 @@
   deallog.pop(); \
   residuals.push_back(control.last_value())
 
-template<class MATRIX>
+template<typename MatrixType>
 void
-check_vmult_quadratic(std::vector<double> &residuals,
-                      const MATRIX &A,
-                      const char *prefix)
+check_vmult_quadratic (std::vector<double> &residuals,
+                       const MatrixType    &A,
+                       const char          *prefix)
 {
   deallog.push(prefix);
 
@@ -60,7 +60,7 @@ check_vmult_quadratic(std::vector<double> &residuals,
   const types::global_dof_index block_size = (types::global_dof_index) std::sqrt(A.n()+.3);
   const unsigned int n_blocks = A.n()/block_size;
 
-  typename PreconditionBlock<MATRIX, float>::AdditionalData
+  typename PreconditionBlock<MatrixType, float>::AdditionalData
   data(block_size, 1.2);
   std::vector<types::global_dof_index> perm(A.n());
   std::vector<types::global_dof_index> iperm(A.n());
@@ -72,22 +72,22 @@ check_vmult_quadratic(std::vector<double> &residuals,
       }
 
   PreconditionIdentity identity;
-  PreconditionJacobi<MATRIX> jacobi;
+  PreconditionJacobi<MatrixType> jacobi;
   jacobi.initialize(A, .5);
-  PreconditionSOR<MATRIX> sor;
+  PreconditionSOR<MatrixType> sor;
   sor.initialize(A, 1.2);
-//   PreconditionPSOR<MATRIX> psor;
+//   PreconditionPSOR<MatrixType> psor;
 //   psor.initialize(A, perm, iperm, 1.2);
-  PreconditionSSOR<MATRIX> ssor;
+  PreconditionSSOR<MatrixType> ssor;
   ssor.initialize(A, 1.2);
 
-  PreconditionBlockJacobi<MATRIX, float> block_jacobi;
+  PreconditionBlockJacobi<MatrixType, float> block_jacobi;
   block_jacobi.initialize(A, data);
-  PreconditionBlockSSOR<MATRIX, float> block_ssor;
+  PreconditionBlockSSOR<MatrixType, float> block_ssor;
   block_ssor.initialize(A, data);
-  PreconditionBlockSOR<MATRIX, float> block_sor;
+  PreconditionBlockSOR<MatrixType, float> block_sor;
   block_sor.initialize(A, data);
-  PreconditionBlockSOR<MATRIX, float> block_psor;
+  PreconditionBlockSOR<MatrixType, float> block_psor;
   block_psor.set_permutation(perm, iperm);
   block_psor.initialize(A, data);
 
@@ -160,18 +160,18 @@ check_vmult_quadratic(std::vector<double> &residuals,
 }
 
 
-template <class MATRIX>
+template <typename MatrixType>
 void
-check_iterator (const MATRIX &A)
+check_iterator (const MatrixType &A)
 {
 //  deallog.push("it");
 
-  typename MATRIX::const_iterator E = A.end();
+  typename MatrixType::const_iterator E = A.end();
 
   if (A.m() < 10)
     for (unsigned int r=0; r<A.m(); ++r)
       {
-        typename MATRIX::const_iterator b = A.begin(r);
+        typename MatrixType::const_iterator b = A.begin(r);
         if (b == E)
           deallog << "Final" << std::endl;
         else
@@ -180,7 +180,7 @@ check_iterator (const MATRIX &A)
                   << '\t' << b->column()
                   << '\t' << b->value()
                   << std::endl;
-        typename MATRIX::const_iterator e = A.end(r);
+        typename MatrixType::const_iterator e = A.end(r);
         if (e == E)
           deallog << "Final" << std::endl;
         else
@@ -188,17 +188,17 @@ check_iterator (const MATRIX &A)
                   << std::endl;
         deallog << "cols:";
 
-        for (typename MATRIX::const_iterator i=b; i!=e; ++i)
+        for (typename MatrixType::const_iterator i=b; i!=e; ++i)
           deallog << '\t' << ',' << i->column();
         deallog << std::endl;
       }
-  for (typename MATRIX::const_iterator i = A.begin(); i!= A.end(); ++i)
+  for (typename MatrixType::const_iterator i = A.begin(); i!= A.end(); ++i)
     deallog << '\t' << i->row()
             << '\t' << i->column()
             << '\t' << i->value()
             << std::endl;
   deallog << "Repeat row 2" << std::endl;
-  for (typename MATRIX::const_iterator i = A.begin(2); i!= A.end(2); ++i)
+  for (typename MatrixType::const_iterator i = A.begin(2); i!= A.end(2); ++i)
     deallog << '\t' << i->row()
             << '\t' << i->column()
             << '\t' << i->value()
@@ -278,12 +278,10 @@ int main()
   logfile << std::setprecision(3);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   // Switch between regression test
   // and benchmark
 //#ifdef DEBUG
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   const unsigned int size = 5;
   const unsigned int row_length = 3;

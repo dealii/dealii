@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ check_renumbering(DoFHandler<dim> &dof)
   deallog << element.get_name() << std::endl;
 
   DoFRenumbering::boost::Cuthill_McKee(dof);
-  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<dof.get_triangulation().n_levels(); ++level)
     DoFRenumbering::Cuthill_McKee(dof, level);
   print_dofs (dof);
 }
@@ -122,7 +122,6 @@ int main ()
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   deallog.push ("1d");
   check<1> ();

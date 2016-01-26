@@ -1,0 +1,86 @@
+
+DEAL::Preconditioners
+DEAL:Preconditioners::PreconditionChebyshev
+DEAL:Preconditioners:cg::Starting value 0.9486832981
+DEAL:Preconditioners:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 2.601335705e-15
+DEAL:Preconditioners::PreconditionIdentity
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 3.903187958e-15
+DEAL:Preconditioners::PreconditionJacobi
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::PreconditionPSOR
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::PreconditionRichardson
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::PreconditionSelector
+DEAL:Preconditioners:cg::Starting value 16.88194302
+DEAL:Preconditioners:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::PreconditionSOR
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::PreconditionSSOR
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::SparseILU
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::SparseMIC
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL:Preconditioners::SparseVanka
+DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
+DEAL::
+DEAL::Solvers
+DEAL:Solvers::SolverBicgstab
+DEAL:Solvers:Standard solver:Bicgstab::Starting value 16.88194302
+DEAL:Solvers:Standard solver:Bicgstab::Convergence step 1 value 0.000000000
+DEAL:Solvers:Linear operator:Bicgstab::Starting value 16.88194302
+DEAL:Solvers:Linear operator:Bicgstab::Convergence step 1 value 0.000000000
+DEAL:Solvers::SolverCG
+DEAL:Solvers:Standard solver:cg::Starting value 16.88194302
+DEAL:Solvers:Standard solver:cg::Convergence step 1 value 0.000000000
+DEAL:Solvers:Linear operator:cg::Starting value 16.88194302
+DEAL:Solvers:Linear operator:cg::Convergence step 1 value 0.000000000
+DEAL:Solvers::SolverFGMRES
+DEAL:Solvers:Standard solver:FGMRES::Starting value 16.88194302
+DEAL:Solvers:Standard solver:FGMRES::Convergence step 1 value 2.744725072e-15
+DEAL:Solvers:Linear operator:FGMRES::Starting value 16.88194302
+DEAL:Solvers:Linear operator:FGMRES::Convergence step 1 value 2.744725072e-15
+DEAL:Solvers::SolverGMRES
+DEAL:Solvers:Standard solver:GMRES::Starting value 8.440971508
+DEAL:Solvers:Standard solver:GMRES::Convergence step 1 value 1.372362536e-15
+DEAL:Solvers:Linear operator:GMRES::Starting value 8.440971508
+DEAL:Solvers:Linear operator:GMRES::Convergence step 1 value 1.372362536e-15
+DEAL:Solvers::SolverMinRes
+DEAL:Solvers:Standard solver:minres::Starting value 11.93733639
+DEAL:Solvers:Standard solver:minres::Convergence step 1 value 2.059168646e-15
+DEAL:Solvers:Linear operator:minres::Starting value 11.93733639
+DEAL:Solvers:Linear operator:minres::Convergence step 1 value 2.059168646e-15
+DEAL:Solvers::SolverQMRS
+DEAL:Solvers:Standard solver:QMRS::Starting value 16.88194302
+DEAL:Solvers:Standard solver:QMRS::Convergence step 1 value 0.000000000
+DEAL:Solvers:Linear operator:QMRS::Starting value 16.88194302
+DEAL:Solvers:Linear operator:QMRS::Convergence step 1 value 0.000000000
+DEAL:Solvers::SolverRelaxation
+DEAL:Solvers:Standard solver:Relaxation::Starting value 16.88194302
+DEAL:Solvers:Standard solver:Relaxation::Convergence step 1 value 0.000000000
+DEAL:Solvers:Linear operator:Relaxation::Starting value 16.88194302
+DEAL:Solvers:Linear operator:Relaxation::Convergence step 1 value 0.000000000
+DEAL:Solvers::SolverRichardson
+DEAL:Solvers:Standard solver:Richardson::Starting value 16.88194302
+DEAL:Solvers:Standard solver:Richardson::Convergence step 1 value 0.000000000
+DEAL:Solvers:Linear operator:Richardson::Starting value 16.88194302
+DEAL:Solvers:Linear operator:Richardson::Convergence step 1 value 0.000000000
+DEAL:Solvers::SolverSelector
+DEAL:Solvers:cg::Convergence step 0 value 0.000000000
+DEAL::SparseMatrix OK
+DEAL::PreconditionBlockIdentity
+DEAL:cg::Starting value 49.69909456
+DEAL:cg::Convergence step 1 value 0.000000000
+DEAL::BlockSparseMatrix OK

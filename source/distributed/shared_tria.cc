@@ -58,10 +58,15 @@ namespace parallel
     {
       dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
 
+      true_subdomain_ids_of_cells.resize(this->n_active_cells());
+
+      // loop over all cells and mark artificial:
+      typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+      cell = this->begin_active(),
+      endc = this->end();
+
       if (allow_artificial_cells)
         {
-          true_subdomain_ids_of_cells.resize(this->n_active_cells());
-
           // get halo layer of (ghost) cells
           // parallel::shared::Triangulation<dim>::
           std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
@@ -72,10 +77,6 @@ namespace parallel
           std::set<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>
           active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
 
-          // loop over all cells and mark artificial:
-          typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-          cell = this->begin_active(),
-          endc = this->end();
           for (unsigned int index=0; cell != endc; cell++, index++)
             {
               // store original/true subdomain ids:
@@ -85,6 +86,13 @@ namespace parallel
                   active_halo_layer.find(cell) == active_halo_layer.end())
                 cell->set_subdomain_id(numbers::artificial_subdomain_id);
             }
+        }
+      else
+        {
+          // just store true subdomain ids
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            true_subdomain_ids_of_cells[index] = cell->subdomain_id();
+
         }
     }
 

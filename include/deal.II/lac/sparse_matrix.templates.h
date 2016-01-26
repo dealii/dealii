@@ -1341,7 +1341,7 @@ namespace
              ExcMessage("There is a zero on the diagonal of this matrix "
                         "in row "
                         +
-                        Utilities::int_to_string(row)
+                        Utilities::to_string(row)
                         +
                         ". The preconditioner you selected cannot work if that "
                         "is the case because one of its steps requires "

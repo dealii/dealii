@@ -101,13 +101,14 @@ public:
                         const BlockVector<number2> &src) const;
 
   /**
-   * A wrapper to least_squares(), implementing the standard MATRIX interface.
+   * A wrapper to least_squares(), implementing the standard MatrixType
+   * interface.
    */
-  template<class VECTOR>
-  void vmult (VECTOR &dst, const VECTOR &src) const;
+  template<class VectorType>
+  void vmult (VectorType &dst, const VectorType &src) const;
 
-  template<class VECTOR>
-  void Tvmult (VECTOR &dst, const VECTOR &src) const;
+  template<class VectorType>
+  void Tvmult (VectorType &dst, const VectorType &src) const;
 
 
 private:
@@ -295,18 +296,18 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
 
 
 template <typename number>
-template <class VECTOR>
+template <class VectorType>
 void
-Householder<number>::vmult (VECTOR &dst, const VECTOR &src) const
+Householder<number>::vmult (VectorType &dst, const VectorType &src) const
 {
   least_squares (dst, src);
 }
 
 
 template <typename number>
-template <class VECTOR>
+template <class VectorType>
 void
-Householder<number>::Tvmult (VECTOR &, const VECTOR &) const
+Householder<number>::Tvmult (VectorType &, const VectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -318,4 +319,3 @@ Householder<number>::Tvmult (VECTOR &, const VECTOR &) const
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

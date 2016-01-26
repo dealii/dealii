@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -172,15 +172,14 @@ public:
    * Leave it at its default zero, which will be reset to the size of
    * <code>eigenvalues</code> internally.
    */
-  template <typename VECTOR, typename MATRIX1,
-            typename MATRIX2, typename INVERSE>
-  void solve(
-    const MATRIX1 &A,
-    const MATRIX2 &B,
-    const INVERSE &inverse,
-    std::vector<std::complex<double> > &eigenvalues,
-    std::vector<VECTOR> &eigenvectors,
-    const unsigned int n_eigenvalues = 0);
+  template <typename VectorType, typename MatrixType1,
+            typename MatrixType2, typename INVERSE>
+  void solve (const MatrixType1                  &A,
+              const MatrixType2                  &B,
+              const INVERSE                      &inverse,
+              std::vector<std::complex<double> > &eigenvalues,
+              std::vector<VectorType>            &eigenvectors,
+              const unsigned int                  n_eigenvalues = 0);
 
 protected:
 
@@ -231,10 +230,10 @@ private:
                   << "Maximum number " << arg1
                   << " of iterations reached.");
 
-  DeclException1 (ExcArpackNoShifts, int,
-                  << "No shifts could be applied during implicit"
-                  << " Arnoldi update, try increasing the number of"
-                  << " Arnoldi vectors.");
+  DeclExceptionMsg (ExcArpackNoShifts,
+                    "No shifts could be applied during implicit"
+                    " Arnoldi update, try increasing the number of"
+                    " Arnoldi vectors.");
 };
 
 
@@ -258,16 +257,15 @@ ArpackSolver::ArpackSolver (SolverControl &control,
 {}
 
 
-template <typename VECTOR, typename MATRIX1,
-          typename MATRIX2, typename INVERSE>
+template <typename VectorType, typename MatrixType1,
+          typename MatrixType2, typename INVERSE>
 inline
-void ArpackSolver::solve (
-  const MATRIX1 &system_matrix,
-  const MATRIX2 &mass_matrix,
-  const INVERSE &inverse,
-  std::vector<std::complex<double> > &eigenvalues,
-  std::vector<VECTOR> &eigenvectors,
-  const unsigned int n_eigenvalues)
+void ArpackSolver::solve (const MatrixType1                  &system_matrix,
+                          const MatrixType2                  &mass_matrix,
+                          const INVERSE                      &inverse,
+                          std::vector<std::complex<double> > &eigenvalues,
+                          std::vector<VectorType>            &eigenvectors,
+                          const unsigned int                  n_eigenvalues)
 {
   //inside the routines of ARPACK the
   //values change magically, so store
@@ -403,7 +401,7 @@ void ArpackSolver::solve (
             case -1:
             {
 
-              VECTOR src,dst,tmp;
+              VectorType src,dst,tmp;
               src.reinit(eigenvectors[0]);
               dst.reinit(src);
               tmp.reinit(src);
@@ -425,7 +423,7 @@ void ArpackSolver::solve (
             case  1:
             {
 
-              VECTOR src,dst,tmp, tmp2;
+              VectorType src,dst,tmp, tmp2;
               src.reinit(eigenvectors[0]);
               dst.reinit(src);
               tmp.reinit(src);
@@ -447,7 +445,7 @@ void ArpackSolver::solve (
             case  2:
             {
 
-              VECTOR src,dst;
+              VectorType src,dst;
               src.reinit(eigenvectors[0]);
               dst.reinit(src);
 
@@ -517,7 +515,7 @@ void ArpackSolver::solve (
         }
       else if (info == 3)
         {
-          Assert (false, ExcArpackNoShifts(1));
+          Assert (false, ExcArpackNoShifts());
         }
       else if (info!=0)
         {

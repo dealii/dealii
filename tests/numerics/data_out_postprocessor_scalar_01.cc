@@ -185,7 +185,6 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  deallog.depth_console (0);
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 

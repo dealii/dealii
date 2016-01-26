@@ -3174,8 +3174,6 @@ int main ()
 
   try
     {
-      deallog.depth_console(0);
-
       Solid<3> solid_3d("parameters.prm");
       solid_3d.run();
     }

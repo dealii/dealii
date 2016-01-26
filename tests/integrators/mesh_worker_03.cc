@@ -237,7 +237,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   MGLevelObject<SparseMatrix<double> > mg_matrix_dg_up;
   MGLevelObject<SparseMatrix<double> > mg_matrix_dg_down;
 
-  const unsigned int n_levels = mgdofs.get_tria().n_levels();
+  const unsigned int n_levels = mgdofs.get_triangulation().n_levels();
 
   mg_sparsity.resize(0, n_levels-1);
   mg_sparsity_dg_interface.resize(0, n_levels-1);
@@ -309,7 +309,6 @@ int main ()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   FE_DGP<2> dgp0(0);
   FE_DGP<2> dgp1(1);

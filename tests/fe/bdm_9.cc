@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,22 +68,22 @@ test (const unsigned int degree)
 
   MatrixTools::create_mass_matrix (dof, q, mass_matrix);
 
-  mass_matrix.print_formatted (logfile, 3, false, 0, " ", 1);
+  mass_matrix.print_formatted (logfile, 3, false, 0, "0", 1);
 
   SolverControl           solver_control (3*dofs_per_cell,
                                           1e-8);
   PrimitiveVectorMemory<> vector_memory;
-  SolverCG<>              cg (solver_control, vector_memory);
+  SolverCG<>              solver (solver_control, vector_memory);
 
   Vector<double> tmp1(dofs_per_cell), tmp2(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     tmp1(i) = 1.*Testing::rand()/RAND_MAX;
-  cg.solve (mass_matrix, tmp2, tmp1, PreconditionIdentity());
 
-  deallog << "Degree=" << degree
-          << ": " << solver_control.last_step()
-          << " iterations to obtain convergence."
-          << std::endl;
+  deallog << "solving degree = " << degree << std::endl;
+  check_solver_within_range(
+    solver.solve (mass_matrix, tmp2, tmp1,
+                  PreconditionIdentity()),
+    solver_control.last_step(), 3, 45);
 }
 
 
@@ -93,7 +93,6 @@ main()
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   for (unsigned int i=1; i<4; ++i)

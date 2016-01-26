@@ -34,6 +34,13 @@
 
 #include <fstream>
 
+template <int dim>
+unsigned int
+cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+            const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+{
+  return 100;
+}
 
 template<int dim>
 void test()
@@ -42,15 +49,14 @@ void test()
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               dealii::Triangulation<dim>::none,
-                                               parallel::distributed::Triangulation<dim>::no_automatic_repartitioning);
+                                               dealii::Triangulation<dim>::none);
 
   GridGenerator::subdivided_hyper_cube(tr, 16);
-  tr.refine_global(1);
 
-  // repartition the mesh; attach equal weights to all cells
-  const std::vector<unsigned int> weights (tr.n_active_cells(), 100U);
-  tr.repartition (weights);
+  tr.signals.cell_weight.connect(std_cxx11::bind(&cell_weight<dim>,
+                                                 std_cxx11::_1,
+                                                 std_cxx11::_2));
+  tr.refine_global(1);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
@@ -72,7 +78,6 @@ int main(int argc, char *argv[])
     {
       std::ofstream logfile("output");
       deallog.attach(logfile);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");

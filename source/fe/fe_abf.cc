@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   FE_PolyTensor<PolynomialsABF<dim>, dim> (
     deg,
     FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
+                           dim, deg+1, FiniteElementData<dim>::Hdiv),
     std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
     std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
                                std::vector<bool>(dim,true))),

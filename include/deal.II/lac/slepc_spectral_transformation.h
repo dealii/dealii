@@ -24,12 +24,18 @@
 
 #  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_solver.h>
 
 #  include <petscksp.h>
 #  include <slepceps.h>
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace PETScWrappers
+{
+  // forward declarations
+  class SolverBase;
+}
 
 namespace SLEPcWrappers
 {
@@ -45,7 +51,7 @@ namespace SLEPcWrappers
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
    *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
-   *  SLEPcWrappers::TransformationShift shift (additional_data);
+   *  SLEPcWrappers::TransformationShift shift (mpi_communicator,additional_data);
    *  eigensolver.set_transformation (shift);
    * @endcode
    * and later calling the <code>solve()</code> function as usual:
@@ -58,26 +64,22 @@ namespace SLEPcWrappers
    * @note These options can also be set at the command line.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009, 2013
+   * @author Toby D. Young 2009, 2013; and Denis Davydov 2015.
    */
   class TransformationBase
   {
-  public:
+  protected:
 
     /**
      * Constructor.
      */
-    TransformationBase ();
+    TransformationBase (const MPI_Comm &mpi_communicator);
 
+  public:
     /**
      * Destructor.
      */
     virtual ~TransformationBase ();
-
-    /**
-     * Record the EPS object that is associated to the spectral transformation
-     */
-    void set_context (EPS &eps);
 
     /**
      * Set a flag to indicate how the transformed matrices are being stored in
@@ -89,36 +91,25 @@ namespace SLEPcWrappers
      */
     void set_matrix_mode(const STMatMode mode);
 
+    /**
+     * Set solver to be used when solving a system of
+     * linear algebraic equations inside the eigensolver.
+     */
+    void
+    set_solver(const PETScWrappers::SolverBase &solver);
+
   protected:
-
-    virtual void set_transformation_type (ST &st) const = 0;
-
-  private:
+    /**
+     * SLEPc spectral transformation object.
+     */
+    ST st;
 
     /**
-     * Objects of this type are explicitly created, but are destroyed when the
-     * surrounding solver object goes out of scope, or when we assign a new
-     * value to the pointer to this object. The respective Destroy functions
-     * are therefore written into the destructor of this object, even though
-     * the object does not have a constructor.
+     * Make the solver class a friend, since it needs to set spectral
+     * transformation object.
      */
-    struct TransformationData
-    {
+    friend class SolverBase;
 
-      /**
-       * Destructor.
-       */
-      ~TransformationData ();
-
-      /**
-       * Objects for Eigenvalue Problem Solver.
-       */
-      ST st;
-    };
-
-    std_cxx11::shared_ptr<TransformationData> transformation_data;
-
-    std_cxx11::shared_ptr<STMatMode> mat_mode;
   };
 
   /**
@@ -152,7 +143,8 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShift (const AdditionalData &data = AdditionalData());
+    TransformationShift (const MPI_Comm &mpi_communicator,
+                         const AdditionalData &data = AdditionalData());
 
 
   protected:
@@ -161,12 +153,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformation that is appropriate for this class.
-     */
-    virtual void set_transformation_type (ST &st) const;
   };
 
   /**
@@ -200,7 +186,8 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShiftInvert (const AdditionalData &data = AdditionalData());
+    TransformationShiftInvert (const MPI_Comm &mpi_communicator,
+                               const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -208,12 +195,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformation that is appropriate for this class.
-     */
-    virtual void set_transformation_type (ST &st) const;
   };
 
   /**
@@ -248,7 +229,8 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationSpectrumFolding (const AdditionalData &data = AdditionalData());
+    TransformationSpectrumFolding (const MPI_Comm &mpi_communicator,
+                                   const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -256,12 +238,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformation that is appropriate for this class.
-     */
-    virtual void set_transformation_type (ST &st) const;
   };
 
   /**
@@ -286,9 +262,13 @@ namespace SLEPcWrappers
                       const double antishift_parameter = 0);
 
       /**
-       * Shift and antishift parameter.
+       * Shift parameter.
        */
       const double shift_parameter;
+
+      /**
+       * Antishift parameter.
+       */
       const double antishift_parameter;
     };
 
@@ -296,8 +276,8 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationCayley (const double shift,
-                          const double antishift);
+    TransformationCayley (const MPI_Comm &mpi_communicator,
+                          const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -305,12 +285,6 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
-    /**
-     * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformation that is appropriate for this class.
-     */
-    virtual void set_transformation_type (ST &st) const;
   };
 
 }

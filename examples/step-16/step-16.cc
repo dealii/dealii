@@ -659,6 +659,8 @@ int main ()
     {
       using namespace Step16;
 
+      deallog.depth_console(2);
+
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
     }

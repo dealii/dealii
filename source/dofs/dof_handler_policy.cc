@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -231,7 +231,7 @@ namespace internal
                          DoFHandler<dim,spacedim> &dof_handler)
         {
           const dealii::Triangulation<dim,spacedim> &tria
-            = dof_handler.get_tria();
+            = dof_handler.get_triangulation();
           Assert (tria.n_levels() > 0, ExcMessage("Empty triangulation"));
 
           // Clear user flags because we will need them. But first we save
@@ -468,7 +468,7 @@ namespace internal
                                   const unsigned int level)
         {
           const dealii::Triangulation<dim,spacedim> &tria
-            = dof_handler.get_tria();
+            = dof_handler.get_triangulation();
           Assert (tria.n_levels() > 0, ExcMessage("Empty triangulation"));
           if (level>=tria.n_levels())
             return 0; //this is allowed for multigrid
@@ -558,7 +558,7 @@ namespace internal
               // invalid_dof_index:
               // check if this one
               // really is unused
-              Assert (dof_handler.get_tria()
+              Assert (dof_handler.get_triangulation()
                       .vertex_used((i-dof_handler.vertex_dofs.begin()) /
                                    dof_handler.selected_fe->dofs_per_vertex)
                       == false,
@@ -656,7 +656,7 @@ namespace internal
               // if index is invalid_dof_index:
               // check if this one really is
               // unused
-              Assert (dof_handler.get_tria()
+              Assert (dof_handler.get_triangulation()
                       .vertex_used((i-dof_handler.vertex_dofs.begin()) /
                                    dof_handler.selected_fe->dofs_per_vertex)
                       == false,
@@ -699,7 +699,7 @@ namespace internal
                           const unsigned int level,
                           const bool check_validity)
         {
-          if (level>=dof_handler.get_tria().n_levels())
+          if (level>=dof_handler.get_triangulation().n_levels())
             return;
           for (typename std::vector<typename DoFHandler<2,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
@@ -724,8 +724,8 @@ namespace internal
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
-              dof_handler.get_tria().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<2,spacedim> &>(dof_handler.get_tria()).clear_user_flags ();
+              dof_handler.get_triangulation().save_user_flags(user_flags);
+              const_cast<dealii::Triangulation<2,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags ();
 
               // flag all lines adjacent to cells of the current
               // level, as those lines logically belong to the same
@@ -754,7 +754,7 @@ namespace internal
                       cell->line(l)->clear_user_flag();
                     }
               // finally, restore user flags
-              const_cast<dealii::Triangulation<2,spacedim> &>(dof_handler.get_tria()).load_user_flags (user_flags);
+              const_cast<dealii::Triangulation<2,spacedim> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
             }
 
           for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
@@ -801,7 +801,7 @@ namespace internal
               // if index is invalid_dof_index:
               // check if this one really is
               // unused
-              Assert (dof_handler.get_tria()
+              Assert (dof_handler.get_triangulation()
                       .vertex_used((i-dof_handler.vertex_dofs.begin()) /
                                    dof_handler.selected_fe->dofs_per_vertex)
                       == false,
@@ -851,7 +851,7 @@ namespace internal
                           const unsigned int level,
                           const bool check_validity)
         {
-          if (level>=dof_handler.get_tria().n_levels())
+          if (level>=dof_handler.get_triangulation().n_levels())
             return;
           for (typename std::vector<typename DoFHandler<3,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
@@ -877,8 +877,8 @@ namespace internal
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
-              dof_handler.get_tria().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).clear_user_flags ();
+              dof_handler.get_triangulation().save_user_flags(user_flags);
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags ();
 
               // flag all lines adjacent to cells of the current level, as
               // those lines logically belong to the same level as the cell,
@@ -933,7 +933,7 @@ namespace internal
                     }
 
               // finally, restore user flags
-              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_tria()).load_user_flags (user_flags);
+              const_cast<dealii::Triangulation<3,spacedim> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
             }
 
           for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
@@ -1006,10 +1006,10 @@ namespace internal
       {
         std::vector<bool> user_flags;
 
-        dof_handler.get_tria().save_user_flags (user_flags);
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_tria()).clear_user_flags ();
+        dof_handler.get_triangulation().save_user_flags (user_flags);
+        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_triangulation()).clear_user_flags ();
 
-        for (unsigned int level = 0; level < dof_handler.get_tria().n_levels(); ++level)
+        for (unsigned int level = 0; level < dof_handler.get_triangulation().n_levels(); ++level)
           {
             types::global_dof_index next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
 
@@ -1021,7 +1021,7 @@ namespace internal
             number_caches[level].n_locally_owned_dofs_per_processor.resize(1);
             number_caches[level].n_locally_owned_dofs_per_processor[0] = next_free_dof;
           }
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_tria()).load_user_flags (user_flags);
+        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_triangulation()).load_user_flags (user_flags);
       }
 
       template <int dim, int spacedim>
@@ -1073,11 +1073,11 @@ namespace internal
         // Namely, we first restore original partition (without artificial cells)
         // and then turn artificial cells on at the end of this function.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
         Assert(tr != 0, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.get_tria().begin_active(),
-        endc = dof_handler.get_tria().end();
+        cell = dof_handler.get_triangulation().begin_active(),
+        endc = dof_handler.get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1096,11 +1096,11 @@ namespace internal
             cell->set_subdomain_id(true_subdomain_ids[index]);
 
         number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
-        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
+        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain()];
         number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
         for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria().locally_owned_subdomain()];
+        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain()];
 
         // restore current subdomain ids
         cell = tr->begin_active();
@@ -1139,11 +1139,11 @@ namespace internal
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_tria ()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
         Assert(tr != 0, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.get_tria().begin_active(),
-        endc = dof_handler.get_tria().end();
+        cell = dof_handler.get_triangulation().begin_active(),
+        endc = dof_handler.get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1168,7 +1168,7 @@ namespace internal
             const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
             std::vector<types::global_dof_index> gathered_new_numbers (dof_handler.n_dofs (), 0);
             Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
-                   dof_handler.get_tria ().locally_owned_subdomain (),
+                   dof_handler.get_triangulation().locally_owned_subdomain (),
                    ExcInternalError())
 
             //gather new numbers among processors into one vector
@@ -1243,7 +1243,7 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor =
           DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
         number_cache.locally_owned_dofs =
-          number_cache.locally_owned_dofs_per_processor[dof_handler.get_tria ().locally_owned_subdomain ()];
+          number_cache.locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain ()];
         // sequential renumbering returns a vector of size 1 here,
         // correct this:
         number_cache.n_locally_owned_dofs_per_processor.resize(number_cache.locally_owned_dofs_per_processor.size());
@@ -1252,7 +1252,7 @@ namespace internal
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements ();
 
         number_cache.n_locally_owned_dofs =
-          number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_tria ().locally_owned_subdomain ()];
+          number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain ()];
 
         // restore artificial cells
         cell = tr->begin_active();
@@ -1533,6 +1533,26 @@ namespace internal
 
                 }
 
+              // Finally, if we are neighboring a coarser cell, add them to
+              // the destination list
+              if (dealii_cell->active())
+                {
+                  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+                    {
+                      if (dealii_cell->at_boundary(f))
+                        continue;
+                      typename DoFHandler<dim,spacedim>::level_cell_iterator neighbor = dealii_cell->neighbor(f);
+                      if (neighbor->level()>=dealii_cell->level())
+                        continue;
+
+                      dealii::types::subdomain_id dest = neighbor->level_subdomain_id();
+                      Assert(dest != dealii::numbers::artificial_subdomain_id, ExcInternalError());
+                      if (dest != tria.locally_owned_subdomain())
+                        send_to.insert(dest);
+
+                    }
+                }
+
 
               // send if we have something to send
               if (send_to.size() > 0)
@@ -1739,7 +1759,7 @@ namespace internal
 
           const parallel::distributed::Triangulation< dim, spacedim > *tr
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-               (&dof_handler.get_tria()));
+               (&dof_handler.get_triangulation()));
           Assert (tr != 0, ExcInternalError());
 
           // now collect cells and their
@@ -1866,7 +1886,7 @@ namespace internal
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
-                  cell (&dof_handler.get_tria(),
+                  cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[treeindex[c]],
                         &dof_handler);
@@ -1970,7 +1990,7 @@ namespace internal
 
           const parallel::distributed::Triangulation< dim, spacedim > *tr
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-               (&dof_handler.get_tria()));
+               (&dof_handler.get_triangulation()));
           Assert (tr != 0, ExcInternalError());
 
           // now collect cells and their
@@ -1981,24 +2001,23 @@ namespace internal
           cellmap_t;
           cellmap_t needs_to_get_cells;
 
-          if (level < tr->n_levels())
-            for (typename DoFHandler<dim,spacedim>::level_cell_iterator
-                 cell = dof_handler.begin(0);
-                 cell != dof_handler.end(0);
-                 ++cell)
-              {
-                typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-                internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          for (typename DoFHandler<dim,spacedim>::level_cell_iterator
+               cell = dof_handler.begin(0);
+               cell != dof_handler.end(0);
+               ++cell)
+            {
+              typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+              internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
-                fill_mg_dofindices_recursively<dim,spacedim>
-                (*tr,
-                 coarse_cell_to_p4est_tree_permutation[cell->index()],
-                 cell,
-                 p4est_coarse_cell,
-                 vertices_with_ghost_neighbors,
-                 needs_to_get_cells,
-                 level);
-              }
+              fill_mg_dofindices_recursively<dim,spacedim>
+              (*tr,
+               coarse_cell_to_p4est_tree_permutation[cell->index()],
+               cell,
+               p4est_coarse_cell,
+               vertices_with_ghost_neighbors,
+               needs_to_get_cells,
+               level);
+            }
 
 
           //sending
@@ -2032,44 +2051,42 @@ namespace internal
             }
 
 
-          // mark all own cells, that miss some
-          // dof_data and collect the neighbors
-          // that are going to send stuff to us
+          // mark all own cells, that miss some dof_data and collect the
+          // neighbors that are going to send stuff to us
           std::set<dealii::types::subdomain_id> senders;
-          if (level < tr->n_levels())
-            {
-              std::vector<dealii::types::global_dof_index> local_dof_indices;
-              typename DoFHandler<dim,spacedim>::level_cell_iterator
-              cell, endc = dof_handler.end(level);
+          {
+            std::vector<dealii::types::global_dof_index> local_dof_indices;
+            typename DoFHandler<dim,spacedim>::level_cell_iterator
+            cell, endc = dof_handler.end(level);
 
-              for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                {
-                  if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
-                    {
-                      //artificial
-                    }
-                  else if (cell->level_subdomain_id()==dof_handler.get_tria().locally_owned_subdomain())
-                    {
-                      //own
-                      local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-                      cell->get_mg_dof_indices (local_dof_indices);
-                      if (local_dof_indices.end() !=
-                          std::find (local_dof_indices.begin(),
-                                     local_dof_indices.end(),
-                                     DoFHandler<dim,spacedim>::invalid_dof_index))
-                        cell->set_user_flag();
-                      else
-                        cell->clear_user_flag();
-                    }
-                  else
-                    {
-                      //ghost
-                      if (cell->user_flag_set())
-                        senders.insert(cell->level_subdomain_id());
-                    }
-                }
+            for (cell = dof_handler.begin(level); cell != endc; ++cell)
+              {
+                if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
+                  {
+                    //artificial
+                  }
+                else if (cell->level_subdomain_id()==dof_handler.get_triangulation().locally_owned_subdomain())
+                  {
+                    //own
+                    local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+                    cell->get_mg_dof_indices (local_dof_indices);
+                    if (local_dof_indices.end() !=
+                        std::find (local_dof_indices.begin(),
+                                   local_dof_indices.end(),
+                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                      cell->set_user_flag();
+                    else
+                      cell->clear_user_flag();
+                  }
+                else
+                  {
+                    //ghost
+                    if (cell->user_flag_set())
+                      senders.insert(cell->level_subdomain_id());
+                  }
+              }
 
-            }
+          }
 
 
           //* 5. receive ghostcelldata
@@ -2109,7 +2126,7 @@ namespace internal
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
-                  cell (&dof_handler.get_tria(),
+                  cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[treeindex[c]],
                         &dof_handler);
@@ -2194,7 +2211,7 @@ namespace internal
         parallel::distributed::Triangulation< dim, spacedim > *tr
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
-              (&dof_handler.get_tria())));
+              (&dof_handler.get_triangulation())));
         Assert (tr != 0, ExcInternalError());
 
         const unsigned int
@@ -2416,7 +2433,7 @@ namespace internal
         parallel::distributed::Triangulation< dim, spacedim > *tr
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
-              (&dof_handler.get_tria())));
+              (&dof_handler.get_triangulation())));
         Assert (tr != 0, ExcInternalError());
 
         AssertThrow(
@@ -2427,7 +2444,7 @@ namespace internal
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-        unsigned int n_levels = Utilities::MPI::max(dof_handler.get_tria().n_levels(), tr->get_communicator());
+        unsigned int n_levels = Utilities::MPI::max(dof_handler.get_triangulation().n_levels(), tr->get_communicator());
 
         for (unsigned int level = 0; level < n_levels; ++level)
           {
@@ -2783,7 +2800,7 @@ namespace internal
           parallel::distributed::Triangulation< dim, spacedim > *tr
             = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
                (const_cast<dealii::Triangulation< dim, spacedim >*>
-                (&dof_handler.get_tria())));
+                (&dof_handler.get_triangulation())));
           Assert (tr != 0, ExcInternalError());
 
           std::vector<bool> user_flags;

@@ -1,0 +1,21 @@
+
+DEAL::Size 46 Unknowns 2025
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers17SolverKrylovSchurE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers13SolverArnoldiE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers13SolverLanczosE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::
+DEAL::Solver type: N6dealii13SLEPcWrappers20SolverJacobiDavidsonE
+DEAL::Eigenvalues: 29.73524, 29.67536, 29.58873, 29.46785
+DEAL::

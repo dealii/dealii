@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,7 +109,6 @@ void check ()
 int main()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
   check();
   return 0;
 }

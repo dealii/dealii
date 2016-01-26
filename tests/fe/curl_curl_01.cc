@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -403,7 +403,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   MaxwellProblem<2> maxwell(4);
   maxwell.run ();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 {
   std::vector<bool> dofs(dof_handler.n_dofs());
 
-  for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<dof_handler.get_triangulation().n_levels(); ++level)
     {
       DoFTools::extract_subdomain_dofs (dof_handler,
                                         level,

@@ -73,13 +73,13 @@ namespace MatrixCreator
      * but is templatized on the
      * dof handler that should be used.
      */
-    template <typename DH>
+    template <typename DoFHandlerType>
     struct IteratorRange
     {
       /**
        * Typedef for the iterator type.
        */
-      typedef typename DH::active_cell_iterator active_cell_iterator;
+      typedef typename DoFHandlerType::active_cell_iterator active_cell_iterator;
 
       /**
        * Abbreviation for a pair of
@@ -112,9 +112,9 @@ namespace MatrixCreator
 
 
 
-    template <typename DH>
+    template <typename DoFHandlerType>
     inline
-    IteratorRange<DH>::
+    IteratorRange<DoFHandlerType>::
     IteratorRange (const active_cell_iterator &first,
                    const active_cell_iterator &second)
       :
@@ -124,9 +124,9 @@ namespace MatrixCreator
 
 
 
-    template <typename DH>
+    template <typename DoFHandlerType>
     inline
-    IteratorRange<DH>::IteratorRange (const iterator_pair &ip)
+    IteratorRange<DoFHandlerType>::IteratorRange (const iterator_pair &ip)
       :
       first (ip.first),
       second (ip.second)
@@ -614,7 +614,7 @@ namespace MatrixCreator
         Scratch() {}
       };
 
-      template <typename DH>
+      template <typename DoFHandlerType>
       struct CopyData
       {
         CopyData() {};
@@ -624,13 +624,13 @@ namespace MatrixCreator
         unsigned int dofs_per_cell;
         std::vector<types::global_dof_index> dofs;
         std::vector<std::vector<bool> > dof_is_on_face;
-        typename DH::active_cell_iterator cell;
+        typename DoFHandlerType::active_cell_iterator cell;
         std::vector<FullMatrix<double> > cell_matrix;
         std::vector<Vector<double> > cell_vector;
       };
 
-      template <typename DH>
-      CopyData<DH>::CopyData(CopyData const &data) :
+      template <typename DoFHandlerType>
+      CopyData<DoFHandlerType>::CopyData(CopyData const &data) :
         dofs_per_cell(data.dofs_per_cell),
         dofs(data.dofs),
         dof_is_on_face(data.dof_is_on_face),
@@ -1707,9 +1707,10 @@ namespace MatrixCreator
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
-    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
+    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping,
+                          dof, q, matrix, coefficient, constraints);
   }
 
 
@@ -1766,10 +1767,10 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
-                          matrix, rhs, rhs_vector, coefficient);
+                          matrix, rhs, rhs_vector, coefficient, constraints);
   }
 
 
@@ -1819,9 +1820,10 @@ namespace MatrixCreator
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
-    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
+    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
+                          matrix, coefficient, constraints);
   }
 
 
@@ -1875,10 +1877,10 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix &)
+                              const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-                          matrix, rhs, rhs_vector, coefficient);
+                          matrix, rhs, rhs_vector, coefficient, constraints);
   }
 
 }  // namespace MatrixCreator

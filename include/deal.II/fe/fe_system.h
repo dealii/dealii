@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -430,6 +430,11 @@ public:
    */
   virtual std::string get_name () const;
 
+  // for documentation, see the FiniteElement base class
+  virtual
+  UpdateFlags
+  requires_update_flags (const UpdateFlags update_flags) const;
+
   /**
    * Return the value of the @p ith shape function at the point @p p.  @p p is
    * a point on the reference element. Since this finite element is always
@@ -624,8 +629,9 @@ public:
    * respectively, consistent with the definition of the associated operator.
    *
    * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcProjectionVoid. You can check whether
-   * this is the case by calling the restriction_is_implemented() or the
+   * class, this function aborts with an exception of type
+   * FiniteElement::ExcProjectionVoid. You can check whether
+   * this would happen by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -653,9 +659,10 @@ public:
    * cells using this matrix array, zero elements in the prolongation matrix
    * are discarded and will not fill up the transfer matrix.
    *
-   * If projection matrices are not implemented in the derived finite element
-   * class, this function aborts with ExcEmbeddingVoid. You can check whether
-   * this is the case by calling the prolongation_is_implemented() or the
+   * If prolongation matrices are not implemented in one of the base finite element
+   * classes, this function aborts with an exception of type
+   * FiniteElement::ExcEmbeddingVoid. You can check whether
+   * this would happen by first calling the prolongation_is_implemented() or the
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -839,15 +846,6 @@ public:
   virtual std::size_t memory_consumption () const;
 
 protected:
-  /**
-   * Compute flags for initial update only.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const;
-
-  /**
-   * Compute flags for update on each cell.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
   /**
    * @p clone function instead of a copy constructor.
@@ -856,54 +854,60 @@ protected:
    */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_data (const UpdateFlags      update_flags,
-            const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const;
 
   virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_face_data (const UpdateFlags      update_flags,
-                 const Mapping<dim,spacedim>    &mapping,
-                 const Quadrature<dim-1> &quadrature) const;
+  get_data (const UpdateFlags                                                    update_flags,
+            const Mapping<dim,spacedim>                                         &mapping,
+            const Quadrature<dim>                                               &quadrature,
+            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
-  get_subface_data (const UpdateFlags      update_flags,
-                    const Mapping<dim,spacedim>    &mapping,
-                    const Quadrature<dim-1> &quadrature) const;
+  virtual
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags                                                    update_flags,
+                 const Mapping<dim,spacedim>                                         &mapping,
+                 const Quadrature<dim-1>                                             &quadrature,
+                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  virtual
+  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags                                                    update_flags,
+                    const Mapping<dim,spacedim>                                         &mapping,
+                    const Quadrature<dim-1>                                             &quadrature,
+                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
-                  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                  const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                  const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data,
-                  const CellSimilarity::Similarity                           cell_similarity) const;
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                                     cell_similarity,
+                  const Quadrature<dim>                                               &quadrature,
+                  const Mapping<dim,spacedim>                                         &mapping,
+                  const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_face_values (const Mapping<dim,spacedim>                               &mapping,
-                       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                         face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                       const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                       const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                       const unsigned int                                                   face_no,
+                       const Quadrature<dim-1>                                             &quadrature,
+                       const Mapping<dim,spacedim>                                         &mapping,
+                       const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim,spacedim>                               &mapping,
-                          const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                                         face_no,
-                          const unsigned int                                         sub_no,
-                          const Quadrature<dim-1>                                   &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_internal,
-                          const typename FiniteElement<dim,spacedim>::InternalDataBase    &fe_internal,
-                          const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
+                          const unsigned int                                                   face_no,
+                          const unsigned int                                                   sub_no,
+                          const Quadrature<dim-1>                                             &quadrature,
+                          const Mapping<dim,spacedim>                                         &mapping,
+                          const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
+                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Do the work for the three <tt>fill_fe*_values</tt> functions.
@@ -970,88 +974,6 @@ private:
    * of the FiniteElement class. Called from the constructor.
    */
   void initialize_quad_dof_index_permutation ();
-
-  /**
-   * Helper function used in the constructor: take a @p FiniteElementData
-   * object and return an object of the same type with the number of degrees
-   * of freedom per vertex, line, etc.  multiplied by @p n. Don't touch the
-   * number of functions for the transformation from unit to real cell.
-   */
-  static FiniteElementData<dim>
-  multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
-                        const unsigned int            N1,
-                        const FiniteElement<dim,spacedim> *fe2=NULL,
-                        const unsigned int            N2=0,
-                        const FiniteElement<dim,spacedim> *fe3=NULL,
-                        const unsigned int            N3=0,
-                        const FiniteElement<dim,spacedim> *fe4=NULL,
-                        const unsigned int            N4=0,
-                        const FiniteElement<dim,spacedim> *fe5=NULL,
-                        const unsigned int            N5=0);
-
-  /**
-   * Same as above but for any number of sub-elements.
-   */
-  static FiniteElementData<dim>
-  multiply_dof_numbers (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                        const std::vector<unsigned int>                       &multiplicities);
-
-
-
-  /**
-   * Helper function used in the constructor: takes a @p FiniteElement object
-   * and returns an boolean vector including the @p
-   * restriction_is_additive_flags of the mixed element consisting of @p N
-   * elements of the sub-element @p fe.
-   */
-  static std::vector<bool>
-  compute_restriction_is_additive_flags (
-    const FiniteElement<dim,spacedim> *fe1,
-    const unsigned int        N1,
-    const FiniteElement<dim,spacedim> *fe2=NULL,
-    const unsigned int        N2=0,
-    const FiniteElement<dim,spacedim> *fe3=NULL,
-    const unsigned int        N3=0,
-    const FiniteElement<dim,spacedim> *fe4=NULL,
-    const unsigned int        N4=0,
-    const FiniteElement<dim,spacedim> *fe5=NULL,
-    const unsigned int        N5=0);
-
-  /**
-   * Compute the named flags for a list of finite elements with multiplicities
-   * given in the second argument. This function is called from all the above
-   * functions.
-   */
-  static std::vector<bool>
-  compute_restriction_is_additive_flags (
-    const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-    const std::vector<unsigned int>              &multiplicities);
-
-
-  /**
-   * Compute the non-zero vector components of a composed finite element.
-   */
-  static std::vector<ComponentMask>
-  compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
-                              const unsigned int        N1,
-                              const FiniteElement<dim,spacedim> *fe2=NULL,
-                              const unsigned int        N2=0,
-                              const FiniteElement<dim,spacedim> *fe3=NULL,
-                              const unsigned int        N3=0,
-                              const FiniteElement<dim,spacedim> *fe4=NULL,
-                              const unsigned int        N4=0,
-                              const FiniteElement<dim,spacedim> *fe5=NULL,
-                              const unsigned int        N5=0);
-
-  /**
-   * Compute the nonzero components of a list of finite elements with
-   * multiplicities given in the second argument. This function is called from
-   * all the above functions.
-   */
-  static std::vector<ComponentMask>
-  compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                              const std::vector<unsigned int>              &multiplicities);
-
   /**
    * This function is simply singled out of the constructors since there are
    * several of them. It sets up the index table for the system as well as @p
@@ -1083,24 +1005,6 @@ private:
   template <int structdim>
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-
-  /**
-   * Compute the equivalent of compute_fill(), but only for the base element
-   * specified by the second-to-last argument. Some elements are grouped
-   * together to stay within the limit of 8 function arguments of boost.
-   */
-  template <int dim_1>
-  void
-  compute_fill_one_base (const Mapping<dim,spacedim>                      &mapping,
-                         const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-                         CellSimilarity::Similarity>       cell_and_similarity,
-                         const std::pair<unsigned int,unsigned int>        face_sub_no,
-                         const Quadrature<dim_1>                          &quadrature,
-                         const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
-                         const typename FiniteElement<dim,spacedim>::InternalDataBase *> mapping_and_fe_internal,
-                         const unsigned int                                base_element,
-                         const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                         internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
   /**
    * Usually: Fields of cell-independent data.
@@ -1144,15 +1048,6 @@ private:
      */
     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
     get_fe_output_object (const unsigned int base_no) const;
-
-    /**
-     * Set the @p first_cell flag to @p false. Used by the @p FEValues class
-     * to indicate that we have already done the work on the first cell.
-     *
-     * In addition to calling the respective function of the base class, this
-     * function also calls the functions of the sub-data objects.
-     */
-    virtual void clear_first_cell ();
 
   private:
 

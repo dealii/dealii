@@ -57,10 +57,10 @@ namespace PETScWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   SparseMatrix::
-  SparseMatrix (const SparsityType &sparsity_pattern,
-                const bool          preset_nonzero_locations)
+  SparseMatrix (const SparsityPatternType &sparsity_pattern,
+                const bool                 preset_nonzero_locations)
   {
     do_reinit (sparsity_pattern, preset_nonzero_locations);
   }
@@ -116,11 +116,11 @@ namespace PETScWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
   SparseMatrix::
-  reinit (const SparsityType &sparsity_pattern,
-          const bool          preset_nonzero_locations)
+  reinit (const SparsityPatternType &sparsity_pattern,
+          const bool                 preset_nonzero_locations)
   {
     // get rid of old matrix and generate a
     // new one
@@ -219,10 +219,10 @@ namespace PETScWrappers
 
 
 
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
-  SparseMatrix::do_reinit (const SparsityType &sparsity_pattern,
-                           const bool          preset_nonzero_locations)
+  SparseMatrix::do_reinit (const SparsityPatternType &sparsity_pattern,
+                           const bool                 preset_nonzero_locations)
   {
     std::vector<size_type> row_lengths (sparsity_pattern.n_rows());
     for (size_type i=0; i<sparsity_pattern.n_rows(); ++i)

@@ -302,7 +302,6 @@ int main()
   deallog.log_execution_time(false);
   if (!debugging)
     {
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
     }
 

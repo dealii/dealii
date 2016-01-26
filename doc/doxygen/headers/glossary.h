@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -575,6 +575,14 @@
  * @ref GlossGhostedVector "vectors with ghost elements".
  *
  *
+ * <dt class="glossary">@anchor GlossConcept <b>Concepts in deal.II</b></dt>
+ *
+ * <dd> There are several places in deal.II where we require that a type in a
+ * template match a certain interface or behave in a certain way: such
+ * constraints are called <em>concepts</em> in C++. See the discussion in
+ * @ref Concepts for more information and a list of concepts in deal.II.
+ * </dd>
+ *
  * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
  *
  * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly
@@ -784,7 +792,7 @@
  * namespace and the techniques used in step-40.
  *
  * The full reference for the paper is as follows:
- * @code
+ * @code{.bib}
 @Article{BBHK11,
   author =       {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
@@ -973,7 +981,7 @@
  * elements.
  *
  * The full reference for this paper is as follows:
- * @code
+ * @code{.bib}
 @Article{BK07,
   author =       {Wolfgang Bangerth and Oliver Kayser-Herold},
   title =        {Data Structures and Requirements for hp Finite Element
@@ -1123,33 +1131,81 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossMeshAsAContainer <b>Meshes as containers</b></dt>
+ * <dt class="glossary">@anchor GlossMPICommunicator <b>MPI Communicator</b></dt>
  * <dd>
- * Meshes can be thought of as arrays of vertices and connectivities, but a
- * more fruitful view is to consider them as <i>collections of cells</i>. In C++,
- * collections are often called <i>containers</i> (typical containers are std::vector,
- * std::list, etc.) and they are characterized by the ability iterate over the
- * elements of the collection.
+ * In the language of the Message Passing Interface (MPI), a communicator
+ * can be thought of as a mail system that allows sending messages to
+ * other members of the mail system. Within each communicator, each
+ * @ref GlossMPIProcess "process" has a
+ * @ref GlossMPIRank "rank" (the equivalent of a house number) that
+ * allows to identify senders and receivers of messages. It is not
+ * possible to send messages via a communicator to receivers that are
+ * not part of this communicator/mail service.
  *
- * Triangulations and objects of type DoFHandler or hp::DoFHandler can all be
- * considered as containers of cells. In fact, the most important parts of the
- * public interface of these classes consists simply of the ability to get
- * iterators to their elements, using functions such as Triangulation::begin_active(),
- * Triangulation::end() and their counterparts in DoFHandler and hp::DoFHandler. Since
- * these parts of the interface are generic, i.e., the functions have the same name
- * in all classes, it is possible to write operations that do not actually care whether
- * they work on a triangulation or a DoF handler object. Examples about, for example,
- * in the GridTools namespace, underlining the power of the abstraction that meshes
- * and DoF handlers can all be considered simply as collections (containers) of cells.
- *
- * On the other hand, meshes are non-standard containers unlike std::vector or std::list
- * in that they can be sliced several ways. For example, one can iterate over the
- * subset of active cells or over all cells; likewise, cells are organized into levels
- * and one can get iterator ranges for only the cells on one level. Generally, however,
- * all classes that implement the containers-of-cells concept use the same function
- * names to provide the same functionality.
+ * When starting a parallel program via a command line call such as
+ * @code
+ *  mpirun -np 32 ./step-17
+ * @endcode
+ * (or the equivalent used in the batch submission system used on your
+ * cluster) the MPI system starts 32 copies of the step-17 executable.
+ * Each of these has access to the <code>MPI_COMM_WORLD</code> communicator
+ * that then consists of all 32 processors, each with its own rank. A subset
+ * of processes within this MPI universe can later agree to create other
+ * communicators that allow communication between only a subset of
+ * processes.
  * </dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossMPIProcess <b>MPI Process</b></dt>
+ * <dd>
+ * When running parallel jobs on distributed memory machines, one
+ * almost always uses MPI. There, a command line call such as
+ * @code
+ *  mpirun -np 32 ./step-17
+ * @endcode
+ * (or the equivalent used in the batch submission system used on your
+ * cluster) starts 32 copies of the step-17 executable. Some of these may actually
+ * run on the same machine, but in general they will be running on different
+ * machines that do not have direct access to each other's memory space.
+ *
+ * In the language of the Message Passing Interface (MPI), each of these
+ * copies of the same executable running on (possibly different) machines
+ * are called <i>processes</i>. The collection of all processes running in
+ * parallel is called the "MPI Universe" and is identified by the
+ * @ref GlossMPICommunicator "MPI communicator" <code>MPI_COMM_WORLD</code>.
+ *
+ * Each process has immediate access only to the objects in its own
+ * memory space. A process can not read from or write into the memory
+ * of other processes. As a consequence, the only way by which
+ * processes can communicate is by sending each other messages. That
+ * said (and as explained in the introduction to step-17), one
+ * typically calls higher level MPI functions in which all processes
+ * that are part of a communicator participate. An example would
+ * be computing the sum over a set of integers where each process
+ * provides one term of the sum.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossMPIRank <b>MPI Rank</b></dt>
+ * <dd>
+ * In the language of the Message Passing Interface (MPI), the <i>rank</i>
+ * of an @ref GlossMPIProcess "MPI process" is the number this process
+ * carries within the set <code>MPI_COMM_WORLD</code> of all processes
+ * currently running as one parallel job. More correctly, it is the
+ * number within an @ref GlossMPICommunicator "MPI communicator" that
+ * groups together a subset of all processes with one parallel job
+ * (where <code>MPI_COMM_WORLD</code> simply denotes the <i>complete</i>
+ * set of processes).
+ *
+ * Within each communicator, each process has a unique rank, distinct from the
+ * all other processes' ranks, that allows
+ * identifying one recipient or sender in MPI communication calls. Each
+ * process, running on one processor, can inquire about its own rank
+ * within a communicator by calling Utilities::MPI::this_mpi_process().
+ * The total number of processes participating in a communicator (i.e.,
+ * the <i>size</i> of the communicator) can be obtained by calling
+ * Utilities::MPI::n_mpi_processes().
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
@@ -1161,15 +1217,15 @@
  * methods.
  *
  * The full reference for this paper is as follows:
- * @code
+ * @code{.bib}
 @article{janssen2011adaptive,
-  title={Adaptive Multilevel Methods with Local Smoothing for H\^{}1-and H\^{}curl-Conforming High Order Finite Element Methods},
-  author={Janssen, B{\"a}rbel and Kanschat, Guido},
-  journal={SIAM Journal on Scientific Computing},
-  volume={33},
-  number={4},
-  pages={2095--2114},
-  year={2011},
+  title=    {Adaptive Multilevel Methods with Local Smoothing for H^1- and H^{curl}-Conforming High Order Finite Element Methods},
+  author=   {Janssen, B{\"a}rbel and Kanschat, Guido},
+  journal=  {SIAM Journal on Scientific Computing},
+  volume=   {33},
+  number=   {4},
+  pages=    {2095--2114},
+  year=     {2011},
   publisher={SIAM}}
  * @endcode
  * See 
@@ -1215,6 +1271,157 @@
  *     <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
+ *
+ * <dt class="glossary">@anchor GlossParallelScaling <b>Parallel scaling</b></dt>
+ * <dd>When we say that a parallel program "scales", what we mean is that the
+ * program does not become unduly slow (or takes unduly much memory) if we
+ * make the problem it solves larger, and that run time and memory consumption
+ * decrease proportionally if we keep the problem size the same but increase
+ * the number of processors (or cores) that work on it.
+ *
+ * More specifically, think of a problem whose size is given by a number $N$
+ * (which could be the number of cells, the number of unknowns, or some other
+ * indicative quantity such as the number of CPU cycles necessary to solve
+ * it) and for which you have $P$ processors available for solution. In an
+ * ideal world, the program would then require a run time of ${\cal O}(N/P)$,
+ * and this would imply that we could reduce the run time to any desired
+ * value by just providing more processors. Likewise, for a program to be
+ * scalable, its overall memory consumption needs to be ${\cal O}(N)$ and on
+ * each involved process needs to be ${\cal O}(N/P)$, again
+ * implying that we can fit any problem into the fixed amount of memory
+ * computers attach to each processor, by just providing
+ * sufficiently many processors.
+ *
+ * For practical assessments of scalability, we often distinguish between
+ * "strong" and "weak" scalability. These assess asymptotic statements
+ * such as ${\cal O}(N/P)$ run time in the limits $N\rightarrow \infty$
+ * and/or $P\rightarrow \infty$. Specifically, when we say that a program
+ * is "strongly scalable", we mean that if we have a problem of fixed
+ * size $N$, then we can reduce the run time and memory consumption (on
+ * every processor) inversely proportional to $P$ by just throwing more
+ * processors at the problem. In particular, strong scalability implies
+ * that if we provide twice as many processors, then run time and memory
+ * consumption on every process will be reduced by a factor of two. In
+ * other words, we can solve the <i>same problem</i> faster and faster
+ * by providing more and more processors.
+ *
+ * Conversely, "weak scalability" means that if we increase the problem
+ * size $N$ by a fixed factor, and increase the number of processors
+ * $P$ available to solve the problem by the same factor, then the
+ * overall run time (and the memory consumption on every processor)
+ * remains the same. In other words, we can solve <i>larger and larger
+ * problems</i> within the same amount of wallclock time by providing
+ * more and more processors.
+ *
+ * No program is truly scalable in this theoretical sense. Rather, all programs
+ * cease to scale once either $N$ or $P$ grows larger than certain limits.
+ * We therefore often say things such as "the program scales up to
+ * 4,000 cores", or "the program scales up to $10^{8}$ unknowns". There are
+ * a number of reasons why programs cannot scale without limit; these can
+ * all be illustrated by just looking at the (relatively simple) step-17
+ * tutorial program:
+ * - Sequential sections: Many programs have sections of code that
+ *   either cannot or are not parallelized, i.e., where one processor has to do
+ *   a certain, fixed amount of work that does not decrease just because
+ *   there are a total of $P$ processors around. In step-17, this is
+ *   the case when generating graphical output: one processor creates
+ *   the graphical output for the entire problem, i.e., it needs to do
+ *   ${\cal O}(N)$ work. That means that this function has a run time
+ *   of ${\cal O}(N)$, regardless of $P$, and consequently the overall
+ *   program will not be able to achieve ${\cal O}(N/P)$ run time but
+ *   have a run time that can be described as $c_1N/P + c_2N$ where
+ *   the first term comes from scalable operations such as assembling
+ *   the linear system, and the latter from generating graphical
+ *   output on process 0. If $c_2$ is sufficiently small, then the
+ *   program might look like it scales strongly for small numbers of
+ *   processors, but eventually strong scalability will cease. In
+ *   addition, the program can not scale weakly either because
+ *   increasing the size $N$ of the problem while increasing the
+ *   number of processors $P$ at the same rate does not keep the
+ *   run time of this one function constant.
+ * - Duplicated data structures: In step-17, each processor stores the entire
+ *   mesh. That is, each processor has to store a data structure of size
+ *   ${\cal O}(N)$, regardless of $P$. Eventually, if we make the problem
+ *   size large enough, this will overflow each processor's memory space
+ *   even if we increase the number of processors. It is thus clear that such
+ *   a replicated data structure prevents a program from scaling weakly.
+ *   But it also prevents it from scaling strongly because in order to
+ *   create an object of size ${\cal O}(N)$, one has to at the very
+ *   least write into ${\cal O}(N)$ memory locations, costing
+ *   ${\cal O}(N)$ in CPU time. Consequently, there is a component of the
+ *   overall algorithm that does not behave as ${\cal O}(N/P)$ if we
+ *   provide more and more processors.
+ * - Communication: If, to pick just one example, you want to compute
+ *   the $l_2$ norm of a vector of which all MPI processes store a few
+ *   entries, then every process needs to compute the sum of squares of
+ *   its own entries (which will require ${\cal O}(N/P)$ time, and
+ *   consequently scale perfectly), but then every process needs to
+ *   send their partial sum to one process that adds them all up and takes
+ *   the square root. In the very best case, sending a message that
+ *   contains a single number takes a constant amount of time,
+ *   regardless of the overall number of processes. Thus, again, every
+ *   program that does communication cannot scale strongly because
+ *   there are parts of the program whose CPU time requirements do
+ *   not decrease with the number of processors $P$ you allocate for
+ *   a fixed size $N$. In reality, the situation is actually even
+ *   worse: the more processes are participating in a communication
+ *   step, the longer it will generally take, for example because
+ *   the one process that has to add everyone's contributions has
+ *   to add everything up, requiring ${\cal O}(P)$ time. In other words,
+ *   CPU time <i>increases</i> with the number of processes, therefore
+ *   not only preventing a program from scaling strongly, but also from
+ *   scaling weakly. (In reality, MPI libraries do not implement $l_2$
+ *   norms by sending every message to one process that then adds everything
+ *   up; rather, they do pairwise reductions on a tree that doesn't
+ *   grow the run time as ${\cal O}(P)$ but as ${\cal O}(\log_2 P)$,
+ *   at the expense of more messages sent around. Be that as it may,
+ *   the fundamental point is that as you add more processors, the
+ *   run time will grow with $P$ regardless of the way the operation
+ *   is actually implemented, and it can therefore not scale.)
+ *
+ * These, and other reasons that prevent programs from scaling perfectly can
+ * be summarized in <a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">
+ * <i>Amdahl's law</i></a> that states that if a fraction $\alpha$
+ * of a program's overall work $W$ can be parallelized, i.e., it can be
+ * run in ${\cal O}(\alpha W/P)$ time, and a fraction $1-\alpha$ of the
+ * program's work can not be parallelized (i.e., it consists either of
+ * work that only one process can do, such as generating graphical output
+ * in step-17; or that every process has to execute in a replicated way,
+ * such as sending a message with a local contribution to a dedicated
+ * process for accumulation), then the overall run time of the program
+ * will be
+ * @f{align*}
+ *   T = {\cal O}\left(\alpha \frac WP + (1-\alpha)W \right).
+ * @f}
+ * Consequently, the "speedup" you get, i.e., the factor by which your
+ * programs run faster on $P$ processors compared to running the program
+ * on a single process (assuming this is possible) would be
+ * @f{align*}
+ *   S = \frac{W}{\alpha \frac WP + (1-\alpha)W}
+ *     = \frac{P}{\alpha + (1-\alpha)P}.
+ * @f}
+ * If $\alpha<1$, which it is for all practically existing programs,
+ * then $S\rightarrow \frac{1}{1-\alpha}$ as $P\rightarrow \infty$, implying
+ * that there is a point where it does not pay off in any significant way
+ * any more to throw more processors at the problem.
+ *
+ * In practice, what matters is <i>up to which problem size</i> or
+ * <i>up to which number of processes</i> or <i>down to which size
+ * of local problems ${\cal}(N/P)$</i> a program scales. For deal.II,
+ * experience shows that on most clusters with a reasonable fast
+ * network, one can solve problems up to a few billion unknowns,
+ * up to a few thousand processors, and down to somewhere between
+ * 40,000 and 100,000 unknowns per process. The last number is the
+ * most relevant: if you have a problem with, say, $10^8$ unknowns,
+ * then it makes sense to solve it on 1000-2500 processors since the
+ * number of degrees of freedom each process handles remains at more
+ * than 40,000. Consequently, there is enough work every process
+ * has to do so that the ${\cal O}(1)$ time for communication does
+ * not dominate. But it doesn't make sense to solve such a problem with
+ * 10,000 or 100,000 processors, since each of these processor's local
+ * problem becomes so small that they spend most of their time waiting
+ * for communication, rather than doing work on their part of the work.
+ * </dd>
  *
  * <dt class="glossary">@anchor GlossPeriodicConstraints <b>Periodic boundary
  * conditions</b></dt>
@@ -1291,25 +1498,25 @@
  * While in principle this property
  * can be used in any way application programs deem useful (it is simply an
  * integer associated with each cell that can indicate whatever you want), at
- * least for programs that run in %parallel it usually denotes the processor a
- * cell is associated with.
+ * least for programs that run in %parallel it usually denotes the
+ * @ref GlossMPIRank "MPI rank" of the processor that "owns" this cell.
  *
  * For programs that are parallelized based on MPI but where each processor
- * stores the entire triangulation (as in, for example, step-18, but not in
- * step-32), subdomain ids are assigned to cells by
+ * stores the entire triangulation (as in, for example, step-17 and step-18,
+ * but not in step-40), subdomain ids are assigned to cells by
  * partitioning a mesh, and each MPI process then only works on those cells it
- * "owns", i.e. that belong to a subdomain that the processor is associated with
+ * "owns", i.e., that belong to a subdomain the processor owns
  * (traditionally, this is the case for the subdomain id whose numerical value
  * coincides with the rank of the MPI process within the MPI
  * communicator). Partitioning is typically done using the
  * GridTools::partition() function, but any other method can also be used to
- * do this.
+ * do this. (Alternatively, the parallel::shared::Triangulation class can
+ * partition the mesh automatically using a similar approach.)
  *
  * On the other hand, for programs that are parallelized using MPI but
  * where meshes are held distributed across several processors using
- * the parallel::distributed::Triangulation and
- * parallel::distributed::DoFHandler classes, the subdomain id of
- * cells are tied to the processor that owns the cell. In other words,
+ * the parallel::distributed::Triangulation class, the subdomain id of
+ * cells is tied to the processor that owns the cell. In other words,
  * querying the subdomain id of a cell tells you if the cell is owned
  * by the current processor (i.e. if <code>cell-@>subdomain_id() ==
  * triangulation.parallel::distributed::Triangulation::locally_owned_subdomain()</code>)
@@ -1485,7 +1692,16 @@
  *   paper lays out the motivation for this pattern and then proposes different ways
  *   of implementing it. It also compares the performance of different implementations.
  *
- *   The paper is currently in preparation.
+ * The full reference for this paper is as follows:
+ * @code{.bib}
+@Article{TKB16,
+  author =       {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
+  title =        {\textit{WorkStream} -- a design pattern for multicore-enabled finite element computations},
+  journal =      {accepted for publication in the ACM Trans. Math. Softw.},
+  year =         2015
+}
+ * @endcode
+ * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  * </dd>
  *
  * </dl>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,6 @@ int main ()
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   FE_Q<2> linear_interpolator(1);
 

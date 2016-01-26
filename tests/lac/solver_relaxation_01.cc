@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,13 @@
 #include <deal.II/lac/solver_relaxation.h>
 #include <deal.II/lac/precondition.h>
 
-template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 double
-check_solve( SOLVER &solver, const MATRIX &A,
-             VECTOR &u, VECTOR &f, const PRECONDITION &P)
+check_solve (SolverType         &solver,
+             const MatrixType   &A,
+             VectorType         &u,
+             VectorType         &f,
+             const PRECONDITION &P)
 {
   double result = 0.;
   u = 0.;
@@ -57,7 +60,6 @@ int main()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   SolverControl control(10, 1.e-3);
@@ -176,4 +178,3 @@ int main()
       check_solve(rich,A,u,f,prec_psor);
     }
 }
-

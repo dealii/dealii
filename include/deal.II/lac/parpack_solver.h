@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__parpack_solver_h
-#define __deal2__parpack_solver_h
+#ifndef dealii__parpack_solver_h
+#define dealii__parpack_solver_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
@@ -127,7 +127,7 @@ extern "C" {
  *
  * @author Denis Davydov, 2015.
  */
-template <typename VECTOR>
+template <typename VectorType>
 class PArpackSolver : public Subscriptor
 {
 public:
@@ -159,7 +159,7 @@ public:
   /**
    * Auxiliary class to represent <code>A-sigma*B</code> operator.
    */
-  template <typename MATRIX>
+  template <typename MatrixType>
   class Shift : public dealii::Subscriptor
   {
   public:
@@ -167,9 +167,9 @@ public:
     /**
      * Constructor.
      */
-    Shift (const MATRIX &A,
-           const MATRIX &B,
-           const double sigma)
+    Shift (const MatrixType &A,
+           const MatrixType &B,
+           const double      sigma)
       :
       A(A),
       B(B),
@@ -179,7 +179,7 @@ public:
     /**
      * Apply <code>A-sigma * B</code>
      */
-    void vmult (VECTOR &dst, const VECTOR &src) const
+    void vmult (VectorType &dst, const VectorType &src) const
     {
       B.vmult(dst,src);
       dst *= (-sigma);
@@ -189,7 +189,7 @@ public:
     /**
      * Apply <code>A^T-sigma * B^T</code>
      */
-    void Tvmult (VECTOR &dst, const VECTOR &src) const
+    void Tvmult (VectorType &dst, const VectorType &src) const
     {
       B.Tvmult(dst,src);
       dst *= (-sigma);
@@ -197,8 +197,8 @@ public:
     }
 
   private:
-    const MATRIX &A;
-    const MATRIX &B;
+    const MatrixType &A;
+    const MatrixType &B;
     const double sigma;
   };
 
@@ -244,15 +244,15 @@ public:
    * calling the <code>pd(n/s)eupd</code> and <code>pd(n/s)aupd</code>
    * functions of PARPACK.
    */
-  template <typename MATRIX1,
-            typename MATRIX2, typename INVERSE>
-  void solve(
-    const MATRIX1 &A,
-    const MATRIX2 &B,
-    const INVERSE &inverse,
-    std::vector<std::complex<double> > &eigenvalues,
-    std::vector<VECTOR> &eigenvectors,
-    const unsigned int n_eigenvalues);
+  template <typename MatrixType1,
+            typename MatrixType2, typename INVERSE>
+  void solve
+  (const MatrixType1                  &A,
+   const MatrixType2                  &B,
+   const INVERSE                      &inverse,
+   std::vector<std::complex<double> > &eigenvalues,
+   std::vector<VectorType>            &eigenvectors,
+   const unsigned int                  n_eigenvalues);
 
   std::size_t memory_consumption() const;
 
@@ -356,7 +356,7 @@ protected:
   /**
    * Temporary vectors used between Arpack and deal.II
    */
-  VECTOR src,dst,tmp;
+  VectorType src,dst,tmp;
 
   /**
    * Indices of local degrees of freedom.
@@ -422,9 +422,9 @@ private:
                   << " Arnoldi vectors.");
 };
 
-template <typename VECTOR>
+template <typename VectorType>
 std::size_t
-PArpackSolver<VECTOR>::memory_consumption() const
+PArpackSolver<VectorType>::memory_consumption() const
 {
   return  MemoryConsumption::memory_consumption (double()) *
           (workl.size()  +
@@ -439,21 +439,21 @@ PArpackSolver<VECTOR>::memory_consumption() const
           MemoryConsumption::memory_consumption (types::global_dof_index()) * local_indices.size();
 }
 
-template <typename VECTOR>
-PArpackSolver<VECTOR>::AdditionalData::
-AdditionalData (const unsigned int number_of_arnoldi_vectors,
+template <typename VectorType>
+PArpackSolver<VectorType>::AdditionalData::
+AdditionalData (const unsigned int     number_of_arnoldi_vectors,
                 const WhichEigenvalues eigenvalue_of_interest,
-                const bool symmetric)
+                const bool             symmetric)
   :
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
   eigenvalue_of_interest(eigenvalue_of_interest),
   symmetric(symmetric)
 {}
 
-template <typename VECTOR>
-PArpackSolver<VECTOR>::PArpackSolver (SolverControl &control,
-                                      const MPI_Comm &mpi_communicator,
-                                      const AdditionalData &data)
+template <typename VectorType>
+PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
+                                          const MPI_Comm       &mpi_communicator,
+                                          const AdditionalData &data)
   :
   solver_control (control),
   additional_data (data),
@@ -463,14 +463,14 @@ PArpackSolver<VECTOR>::PArpackSolver (SolverControl &control,
 
 {}
 
-template <typename VECTOR>
-void PArpackSolver<VECTOR>::set_shift(const double s )
+template <typename VectorType>
+void PArpackSolver<VectorType>::set_shift(const double s )
 {
   shift_value = s;
 }
 
-template <typename VECTOR>
-void PArpackSolver<VECTOR>::reinit(const dealii::IndexSet &locally_owned_dofs)
+template <typename VectorType>
+void PArpackSolver<VectorType>::reinit(const dealii::IndexSet &locally_owned_dofs)
 {
   // store local indices to write to vectors
   locally_owned_dofs.fill_index_vector(local_indices);
@@ -516,15 +516,15 @@ void PArpackSolver<VECTOR>::reinit(const dealii::IndexSet &locally_owned_dofs)
 
 }
 
-template <typename VECTOR>
-template <typename MATRIX1,typename MATRIX2, typename INVERSE>
-void PArpackSolver<VECTOR>::solve (
-  const MATRIX1 &/*system_matrix*/,
-  const MATRIX2 &mass_matrix,
-  const INVERSE &inverse,
-  std::vector<std::complex<double> > &eigenvalues,
-  std::vector<VECTOR> &eigenvectors,
-  const unsigned int n_eigenvalues)
+template <typename VectorType>
+template <typename MatrixType1,typename MatrixType2, typename INVERSE>
+void PArpackSolver<VectorType>::solve
+(const MatrixType1                  &/*system_matrix*/,
+ const MatrixType2                  &mass_matrix,
+ const INVERSE                      &inverse,
+ std::vector<std::complex<double> > &eigenvalues,
+ std::vector<VectorType>            &eigenvectors,
+ const unsigned int                  n_eigenvalues)
 {
 
   Assert (n_eigenvalues <= eigenvectors.size(),
@@ -863,8 +863,8 @@ void PArpackSolver<VECTOR>::solve (
 
 }
 
-template <typename VECTOR>
-SolverControl &PArpackSolver<VECTOR>::control () const
+template <typename VectorType>
+SolverControl &PArpackSolver<VectorType>::control () const
 {
   return solver_control;
 }

@@ -51,14 +51,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace FETools
 {
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate(const DH1<dim, spacedim> &dof1,
-              const InVector           &u1,
-              const DH2<dim, spacedim> &dof2,
-              OutVector                &u2)
+  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
+              const InVector                       &u1,
+              const DoFHandlerType2<dim, spacedim> &dof2,
+              OutVector                            &u2)
   {
     ConstraintMatrix dummy;
     dummy.close();
@@ -68,17 +68,17 @@ namespace FETools
 
 
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate (const DH1<dim, spacedim> &dof1,
-               const InVector           &u1,
-               const DH2<dim, spacedim> &dof2,
-               const ConstraintMatrix   &constraints,
-               OutVector                &u2)
+  interpolate (const DoFHandlerType1<dim, spacedim> &dof1,
+               const InVector                       &u1,
+               const DoFHandlerType2<dim, spacedim> &dof2,
+               const ConstraintMatrix               &constraints,
+               OutVector                            &u2)
   {
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
 
     Assert(u1.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -119,10 +119,10 @@ namespace FETools
         std_cxx11::shared_ptr<FullMatrix<double> > > >
         interpolation_matrices;
 
-    typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
-                                                     endc1 = dof1.end();
-    typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
-                                                     endc2 = dof2.end();
+    typename DoFHandlerType1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
+                                                                 endc1 = dof1.end();
+    typename DoFHandlerType2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
+                                                                 endc2 = dof2.end();
     (void)endc2;
 
     std::vector<types::global_dof_index> dofs;
@@ -137,7 +137,7 @@ namespace FETools
     // a cell, which this processor owns,
     // so we have to know the subdomain_id
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     for (; cell1!=endc1; ++cell1, ++cell2)
       if ((cell1->subdomain_id() == subdomain_id)
@@ -283,7 +283,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
                                                             endc = dof1.end();
@@ -315,13 +315,13 @@ namespace FETools
 
 
   template <int dim,
-            template <int> class DH,
+            template <int> class DoFHandlerType,
             class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DH<dim>            &dof1,
-                   const InVector           &u1,
+  back_interpolate(const DoFHandlerType<dim>         &dof1,
+                   const InVector                    &u1,
                    const FiniteElement<dim,spacedim> &fe2,
-                   OutVector                &u1_interpolated)
+                   OutVector                         &u1_interpolated)
   {
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -351,10 +351,10 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
-    typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
-                                           endc = dof1.end();
+    typename DoFHandlerType<dim>::active_cell_iterator cell = dof1.begin_active(),
+                                                       endc = dof1.end();
 
     // map from possible fe objects in
     // dof1 to the back_interpolation
@@ -595,7 +595,7 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
 
     const types::subdomain_id subdomain_id =
-      dof1.get_tria().locally_owned_subdomain();
+      dof1.get_triangulation().locally_owned_subdomain();
 
     FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
     get_interpolation_difference_matrix(dof1.get_fe(), fe2,
@@ -701,7 +701,7 @@ namespace FETools
                   const DoFHandler<dim,spacedim> &dof2,
                   OutVector &u2)
   {
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
@@ -721,6 +721,7 @@ namespace FETools
     FullMatrix<double> matrix(n2,n1);
     get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);
 
+    u2 = 0;
     while (cell2 != end)
       {
         cell1->get_dof_values(u1, u1_local);
@@ -759,7 +760,7 @@ namespace FETools
   {
     Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
@@ -783,7 +784,7 @@ namespace FETools
     }
 
     // then traverse grid bottom up
-    for (unsigned int level=0; level<dof1.get_tria().n_levels()-1; ++level)
+    for (unsigned int level=0; level<dof1.get_triangulation().n_levels()-1; ++level)
       {
         typename DoFHandler<dim,spacedim>::cell_iterator cell=dof2.begin(level),
                                                          endc=dof2.end(level);

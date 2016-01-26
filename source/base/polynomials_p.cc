@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,17 +44,18 @@ void PolynomialsP<1>::create_polynomial_ordering(
 }
 
 
-
-const unsigned int imap2[6][21]=
+namespace
 {
-  {0},
-  {0,1,2},
-  {0,1,3,4,2,5},
-  {0,1,4,5,2,7,6,8,3,9},
-  {0,1,5,6,2,9,7,10,3,12,11,8,13,4,14},
-  {0,1,6,7,2,11,8,12,3,15,13,9,16,4,18,14,17,10,19,5,20}
-};
-
+  const unsigned int imap2[6][21]=
+  {
+    {0},
+    {0,1,2},
+    {0,1,3,4,2,5},
+    {0,1,4,5,2,7,6,8,3,9},
+    {0,1,5,6,2,9,7,10,3,12,11,8,13,4,14},
+    {0,1,6,7,2,11,8,12,3,15,13,9,16,4,18,14,17,10,19,5,20}
+  };
+}
 
 template <>
 void PolynomialsP<2>::create_polynomial_ordering(
@@ -75,13 +76,16 @@ void PolynomialsP<2>::create_polynomial_ordering(
 }
 
 
-const unsigned int imap3[4][20]=
+namespace
 {
-  {0},
-  {0,1,2,3},
-  {0,1,3,6,4,7,8,2,5,9},
-  {0,1,4,10,5,11,13,2,7,16,14,6,12,8,15,17,18,3,9,19}
-};
+  const unsigned int imap3[4][20]=
+  {
+    {0},
+    {0,1,2,3},
+    {0,1,3,6,4,7,8,2,5,9},
+    {0,1,4,10,5,11,13,2,7,16,14,6,12,8,15,17,18,3,9,19}
+  };
+}
 
 template <>
 void PolynomialsP<3>::create_polynomial_ordering(

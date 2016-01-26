@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,6 @@ int main ()
   const int spacedim = 3;
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   TorusBoundary<dim, spacedim> boundary (1.5, .5);
   Triangulation<dim, spacedim> tria;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -856,9 +856,9 @@ namespace internal
 
 
     template <int dim, typename Number>
-    template <typename STREAM>
+    template <typename StreamType>
     void MappingInfo<dim,Number>::MappingInfoDependent::print_memory_consumption
-    (STREAM         &out,
+    (StreamType     &out,
      const SizeInfo &size_info) const
     {
       // print_memory_statistics involves global communication, so we can
@@ -901,8 +901,8 @@ namespace internal
 
 
     template <int dim, typename Number>
-    template <typename STREAM>
-    void MappingInfo<dim,Number>::print_memory_consumption(STREAM &out,
+    template <typename StreamType>
+    void MappingInfo<dim,Number>::print_memory_consumption(StreamType     &out,
                                                            const SizeInfo &size_info) const
     {
       out << "    Cell types:                      ";

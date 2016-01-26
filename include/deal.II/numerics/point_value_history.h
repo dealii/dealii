@@ -282,7 +282,7 @@ public:
 
 
   /**
-   * Put another mnemonic string (and hence @p VECTOR) into the class. This
+   * Put another mnemonic string (and hence @p VectorType) into the class. This
    * method adds storage space for variables equal to the number of true
    * values in component_mask. This also adds extra entries for points that
    * are already in the class, so @p add_field_name and @p add_points can be
@@ -292,7 +292,7 @@ public:
                       const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Put another mnemonic string (and hence @p VECTOR) into the class. This
+   * Put another mnemonic string (and hence @p VectorType) into the class. This
    * method adds storage space for n_components variables. This also adds
    * extra entries for points that are already in the class, so @p
    * add_field_name and @p add_points can be called in any order. This method
@@ -318,20 +318,20 @@ public:
 
 
   /**
-   * Extract values at the stored points from the VECTOR supplied and add them
-   * to the new dataset in vector_name. The component mask supplied when the
-   * field was added is used to select components to extract. If a @p
+   * Extract values at the stored points from the VectorType supplied and add
+   * them to the new dataset in vector_name. The component mask supplied when
+   * the field was added is used to select components to extract. If a @p
    * DoFHandler is used, one (and only one) evaluate_field method must be
    * called for each dataset (time step, iteration, etc) for each vector_name,
    * otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VECTOR>
+  template <class VectorType>
   void evaluate_field(const std::string &name,
-                      const VECTOR &solution);
+                      const VectorType  &solution);
 
 
   /**
-   * Compute values using a @p DataPostprocessor object with the @p VECTOR
+   * Compute values using a @p DataPostprocessor object with the @p VectorType
    * supplied and add them to the new dataset in vector_name. The
    * component_mask supplied when the field was added is used to select
    * components to extract from the @p DataPostprocessor return vector. This
@@ -347,26 +347,26 @@ public:
    * method must be called for each dataset (time step, iteration, etc) for
    * each vector_name, otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VECTOR>
+  template <class VectorType>
   void evaluate_field(const std::vector <std::string> &names,
-                      const VECTOR &solution,
-                      const DataPostprocessor<dim> &data_postprocessor,
-                      const Quadrature<dim> &quadrature);
+                      const VectorType                &solution,
+                      const DataPostprocessor<dim>    &data_postprocessor,
+                      const Quadrature<dim>           &quadrature);
 
   /**
    * Construct a std::vector <std::string> containing only vector_name and
    * call the above function. The above function is more efficient if multiple
    * fields use the same @p DataPostprocessor object.
    */
-  template <class VECTOR>
-  void evaluate_field(const std::string &name,
-                      const VECTOR &solution,
+  template <class VectorType>
+  void evaluate_field(const std::string            &name,
+                      const VectorType             &solution,
                       const DataPostprocessor<dim> &data_postprocessor,
-                      const Quadrature<dim> &quadrature);
+                      const Quadrature<dim>        &quadrature);
 
 
   /**
-   * Extract values at the points actually requested from the VECTOR supplied
+   * Extract values at the points actually requested from the VectorType supplied
    * and add them to the new dataset in vector_name. Unlike the other
    * evaluate_field methods this method does not care if the dof_handler has
    * been modified because it uses calls to @p VectorTools::point_value to
@@ -377,9 +377,9 @@ public:
    * called for each dataset (time step, iteration, etc) for each vector_name,
    * otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VECTOR>
+  template <class VectorType>
   void evaluate_field_at_requested_location(const std::string &name,
-                                            const VECTOR &solution);
+                                            const VectorType  &solution);
 
 
   /**

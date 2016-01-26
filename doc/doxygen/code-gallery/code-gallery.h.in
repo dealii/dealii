@@ -1,0 +1,40 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+/**
+ * @page CodeGallery The deal.II code gallery
+ *
+ * The deal.II code gallery contains a collection of programs based on deal.II
+ * that were contributed by others to serve as starting points for more complex
+ * applications. The code gallery is an extension of the @ref Tutorial "tutorial"
+ * in that the programs are intended to show how applications can be
+ * implemented with deal.II, but without the requirement to have these code
+ * documented at the same, extensive level as used in the tutorial.
+ * Instructions for obtaining the code gallery programs can be found at
+ * http://dealii.org/code-gallery.html .
+ *
+ * @warning The programs that form part of the code gallery are contributed by
+ *   others and are not part of deal.II itself. The deal.II authors make
+ *   no assurances that these programs are documented in any reasonable way,
+ *   nor that the programs are in fact correct. Please contact the authors
+ *   of the code gallery programs if you have questions.
+ *
+ * The code gallery currently consists of the following programs (with
+ * connections to other programs shown in the graph on the
+ * @ref TutorialConnectionGraph "tutorial page"):
+ *
+@@GALLERY_LIST@@
+ */

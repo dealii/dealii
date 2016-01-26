@@ -989,8 +989,13 @@ template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_independent_components])
   :
-  data (array)
-{}
+  data (*reinterpret_cast<const typename base_tensor_type::array_type *>(array))
+{
+  // ensure that the reinterpret_cast above actually works
+  Assert (sizeof(typename base_tensor_type::array_type)
+          == sizeof(array),
+          ExcInternalError());
+}
 
 
 
@@ -1208,7 +1213,7 @@ namespace internal
     Number tmp [data_dim];
     for (unsigned int i=0; i<data_dim; ++i)
       tmp[i] = perform_double_contraction<dim,Number>(data[i], sdata);
-    return SymmetricTensor<2,dim,Number>(tmp);
+    return dealii::SymmetricTensor<2,dim,Number>(tmp);
   }
 
 

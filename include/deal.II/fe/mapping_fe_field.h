@@ -69,13 +69,13 @@ DEAL_II_NAMESPACE_OPEN
  * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
 template <int dim, int spacedim=dim,
-          class VECTOR=Vector<double>,
-          class DH=DoFHandler<dim,spacedim> >
+          typename VectorType=Vector<double>,
+          typename DoFHandlerType=DoFHandler<dim,spacedim> >
 class MappingFEField : public Mapping<dim,spacedim>
 {
 public:
   /**
-   * Constructor. The first argument is a VECTOR that specifies the
+   * Constructor. The first argument is a VectorType that specifies the
    * transformation of the domain from the reference to the current
    * configuration.
    *
@@ -106,14 +106,14 @@ public:
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
-  MappingFEField (const DH      &euler_dof_handler,
-                  const VECTOR  &euler_vector,
-                  const ComponentMask mask=ComponentMask());
+  MappingFEField (const DoFHandlerType &euler_dof_handler,
+                  const VectorType     &euler_vector,
+                  const ComponentMask   mask = ComponentMask());
 
   /**
    * Copy constructor.
    */
-  MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
+  MappingFEField (const MappingFEField<dim,spacedim,VectorType,DoFHandlerType> &mapping);
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -160,42 +160,42 @@ public:
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<1,dim> > >   input,
+  transform (const ArrayView<const Tensor<1,dim> >                  &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<1,spacedim> > >          output) const;
+             const ArrayView<Tensor<1,spacedim> >                   &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > > input,
-             const MappingType                                                        type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                  &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >                           output) const;
+  transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<2,spacedim> >                     &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >  input,
+  transform (const ArrayView<const Tensor<2, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<2,spacedim> > >          output) const;
+             const ArrayView<Tensor<2,spacedim> >                   &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector< DerivativeForm<2, dim, spacedim> > > input,
-             const MappingType                                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase                   &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >                            output) const;
+  transform (const ArrayView<const DerivativeForm<2, dim, spacedim> > &input,
+             const MappingType                                         type,
+             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
+             const ArrayView<Tensor<3,spacedim> >                     &output) const;
 
   // for documentation, see the Mapping base class
   virtual
   void
-  transform (const VectorSlice<const std::vector<Tensor<3, dim> > >  input,
+  transform (const ArrayView<const Tensor<3, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             VectorSlice<std::vector<Tensor<3,spacedim> > >          output) const;
+             const ArrayView<Tensor<3,spacedim> >                   &output) const;
 
   /**
    * @}
@@ -489,7 +489,7 @@ private:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,VECTOR,DH> > euler_vector;
+  SmartPointer<const VectorType, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_vector;
 
   /**
    * A FiniteElement object which is only needed in 3D, since it knows how to
@@ -498,13 +498,13 @@ private:
    * prevent construction in 1D and 2D, but since memory and time requirements
    * are not particularly high this seems unnecessary at the moment.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VECTOR,DH> > fe;
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > fe;
 
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DH,MappingFEField<dim,spacedim,VECTOR,DH> > euler_dof_handler;
+  SmartPointer<const DoFHandlerType,MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_dof_handler;
 
 private:
   /**

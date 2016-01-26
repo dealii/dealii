@@ -35,14 +35,14 @@ DEAL_II_NAMESPACE_OPEN
  * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
  * Martin Kronbichler, 2008, 2013
  */
-template <class POLY, int dim=POLY::dimension, int spacedim=dim>
-class FE_Q_Base : public FE_Poly<POLY,dim,spacedim>
+template <class PolynomialType, int dim=PolynomialType::dimension, int spacedim=dim>
+class FE_Q_Base : public FE_Poly<PolynomialType,dim,spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Q_Base (const POLY &poly_space,
+  FE_Q_Base (const PolynomialType &poly_space,
              const FiniteElementData<dim> &fe_data,
              const std::vector<bool> &restriction_is_additive_flags);
 
@@ -317,7 +317,7 @@ protected:
   /*
    * Declare implementation friend.
    */
-  friend struct FE_Q_Base<POLY,dim,spacedim>::Implementation;
+  friend struct FE_Q_Base<PolynomialType,dim,spacedim>::Implementation;
 
 private:
   /*

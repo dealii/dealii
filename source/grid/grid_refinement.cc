@@ -118,30 +118,30 @@ namespace
   } /* namespace internal */
 
 
-  template <typename Vector>
-  typename constraint_and_return_value<!IsBlockVector<Vector>::value,
-           typename Vector::value_type>::type
-           min_element (const Vector &criteria)
+  template <typename VectorType>
+  typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+           typename VectorType::value_type>::type
+           min_element (const VectorType &criteria)
   {
     return internal::min_element (criteria);
   }
 
 
-  template <typename Vector>
-  typename constraint_and_return_value<!IsBlockVector<Vector>::value,
-           typename Vector::value_type>::type
-           max_element (const Vector &criteria)
+  template <typename VectorType>
+  typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+           typename VectorType::value_type>::type
+           max_element (const VectorType &criteria)
   {
     return internal::max_element (criteria);
   }
 
 
-  template <typename Vector>
-  typename constraint_and_return_value<IsBlockVector<Vector>::value,
-           typename Vector::value_type>::type
-           min_element (const Vector &criteria)
+  template <typename VectorType>
+  typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+           typename VectorType::value_type>::type
+           min_element (const VectorType &criteria)
   {
-    typename Vector::value_type t = internal::min_element(criteria.block(0));
+    typename VectorType::value_type t = internal::min_element(criteria.block(0));
     for (unsigned int b=1; b<criteria.n_blocks(); ++b)
       t = std::min (t, internal::min_element(criteria.block(b)));
 
@@ -149,12 +149,12 @@ namespace
   }
 
 
-  template <typename Vector>
-  typename constraint_and_return_value<IsBlockVector<Vector>::value,
-           typename Vector::value_type>::type
-           max_element (const Vector &criteria)
+  template <typename VectorType>
+  typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+           typename VectorType::value_type>::type
+           max_element (const VectorType &criteria)
   {
-    typename Vector::value_type t = internal::max_element(criteria.block(0));
+    typename VectorType::value_type t = internal::max_element(criteria.block(0));
     for (unsigned int b=1; b<criteria.n_blocks(); ++b)
       t = std::max (t, internal::max_element(criteria.block(b)));
 
@@ -172,14 +172,14 @@ namespace
    * library version and is needed in @p refine_and_coarsen_optimize.
    */
 
-  template <class Vector>
-  void qsort_index (const Vector              &a,
+  template <class VectorType>
+  void qsort_index (const VectorType          &a,
                     std::vector<unsigned int> &ind,
                     int                        l,
                     int                        r)
   {
     int i,j;
-    typename Vector::value_type v;
+    typename VectorType::value_type v;
 
     if (r<=l)
       return;
@@ -214,9 +214,9 @@ namespace
 
 
 
-template <int dim, class Vector, int spacedim>
+template <int dim, class VectorType, int spacedim>
 void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
-                             const Vector       &criteria,
+                             const VectorType   &criteria,
                              const double        threshold,
                              const unsigned int max_to_mark)
 {
@@ -261,10 +261,10 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
 
 
 
-template <int dim, class Vector, int spacedim>
+template <int dim, class VectorType, int spacedim>
 void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
-                              const Vector       &criteria,
-                              const double        threshold)
+                              const VectorType            &criteria,
+                              const double                 threshold)
 {
   Assert (criteria.size() == tria.n_active_cells(),
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -359,13 +359,13 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction (const unsigned int  c
   return (adjusted_fractions);
 }
 
-template <int dim, class Vector, int spacedim>
+template <int dim, class VectorType, int spacedim>
 void
 GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tria,
-                                                 const Vector       &criteria,
-                                                 const double        top_fraction,
-                                                 const double        bottom_fraction,
-                                                 const unsigned int  max_n_cells)
+                                                 const VectorType            &criteria,
+                                                 const double                 top_fraction,
+                                                 const double                 bottom_fraction,
+                                                 const unsigned int           max_n_cells)
 {
   // correct number of cells is
   // checked in @p{refine}
@@ -385,7 +385,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
 
   if (refine_cells || coarsen_cells)
     {
-      dealii::Vector<typename Vector::value_type> tmp (criteria);
+      Vector<typename VectorType::value_type> tmp (criteria);
       if (refine_cells)
         {
           std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
@@ -407,10 +407,10 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
 
 
 
-template <int dim, class Vector, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 void
 GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &tria,
-                                                   const Vector       &criteria,
+                                                   const VectorType   &criteria,
                                                    const double        top_fraction,
                                                    const double        bottom_fraction,
                                                    const unsigned int  max_n_cells)
@@ -426,7 +426,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   // error, which is what we have to sum
   // up and compare with
   // @p{fraction_of_error*total_error}.
-  dealii::Vector<typename Vector::value_type> tmp;
+  Vector<typename VectorType::value_type> tmp;
   tmp = criteria;
   const double total_error = tmp.l1_norm();
 
@@ -435,7 +435,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   std::sort (tmp.begin(), tmp.end(), std::greater<double>());
 
   // compute thresholds
-  typename dealii::Vector<typename Vector::value_type>::const_iterator
+  typename Vector<typename VectorType::value_type>::const_iterator
   pp=tmp.begin();
   for (double sum=0;
        (sum<top_fraction*total_error) && (pp!=(tmp.end()-1));
@@ -444,7 +444,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   double top_threshold = ( pp != tmp.begin () ?
                            (*pp+*(pp-1))/2 :
                            *pp );
-  typename dealii::Vector<typename Vector::value_type>::const_iterator
+  typename Vector<typename VectorType::value_type>::const_iterator
   qq=(tmp.end()-1);
   for (double sum=0;
        (sum<bottom_fraction*total_error) && (qq!=tmp.begin());
@@ -537,11 +537,11 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
 
 
 
-template <int dim, class Vector, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 void
 GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
-                                             const Vector       &criteria,
-                                             const unsigned int  order)
+                                             const VectorType            &criteria,
+                                             const unsigned int           order)
 {
   Assert (criteria.size() == tria.n_active_cells(),
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -586,4 +586,3 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 #include "grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

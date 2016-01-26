@@ -489,19 +489,19 @@ SparseDirectUMFPACK::n () const
 
 
 // explicit instantiations for SparseMatrixUMFPACK
-#define InstantiateUMFPACK(MATRIX)                        \
-  template                                                \
-  void SparseDirectUMFPACK::factorize (const MATRIX &);   \
-  template                                                \
-  void SparseDirectUMFPACK::solve (const MATRIX   &,      \
-                                   Vector<double> &,      \
-                                   bool);                 \
-  template                                                \
-  void SparseDirectUMFPACK::solve (const MATRIX   &,      \
-                                   BlockVector<double> &, \
-                                   bool);                 \
-  template                                                \
-  void SparseDirectUMFPACK::initialize (const MATRIX &,   \
+#define InstantiateUMFPACK(MatrixType)                      \
+  template                                                  \
+  void SparseDirectUMFPACK::factorize (const MatrixType &); \
+  template                                                  \
+  void SparseDirectUMFPACK::solve (const MatrixType &,      \
+                                   Vector<double> &,        \
+                                   bool);                   \
+  template                                                  \
+  void SparseDirectUMFPACK::solve (const MatrixType &,      \
+                                   BlockVector<double> &,   \
+                                   bool);                   \
+  template                                                  \
+  void SparseDirectUMFPACK::initialize (const MatrixType &, \
                                         const AdditionalData);
 
 InstantiateUMFPACK(SparseMatrix<double>)

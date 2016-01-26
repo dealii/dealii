@@ -47,7 +47,6 @@ main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   // These names are all correct.
   test_fe<1>("FE_Q(1)");

@@ -241,8 +241,8 @@ public:
    * existing row lengths and allocated row lengths. Otherwise, just the
    * relation of allocated and used entries is shown.
    */
-  template <class STREAM>
-  void print_statistics (STREAM &s, bool full = false);
+  template <class StreamType>
+  void print_statistics (StreamType &s, bool full = false);
 
 private:
   /**
@@ -478,10 +478,10 @@ Tvmult_add (BlockVector<somenumber>       &dst,
 
 
 template <typename number>
-template <class STREAM>
+template <class StreamType>
 inline
 void
-BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
+BlockSparseMatrixEZ<number>::print_statistics (StreamType &out, bool full)
 {
   size_type used_total = 0;
   size_type allocated_total = 0;

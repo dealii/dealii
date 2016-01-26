@@ -198,7 +198,6 @@ int main ()
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   deallog.push ("1d");
   check<1> ();

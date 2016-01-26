@@ -40,6 +40,28 @@
 
 #include <fstream>
 
+unsigned int n_global_active_cells;
+
+template <int dim>
+unsigned int
+cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+            const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+{
+  return (
+           // bottom left corner
+           (cell->center()[0] < 1)
+           &&
+           (cell->center()[1] < 1)
+           &&
+           (dim == 3 ?
+            (cell->center()[2] < 1) :
+            true)
+           ?
+           // one cell has more weight than all others together
+           n_global_active_cells * 1000
+           :
+           0);
+}
 
 template<int dim>
 void test()
@@ -56,25 +78,11 @@ void test()
   tr.refine_global (1);
 
   // repartition the mesh; attach different weights to all cells
-  std::vector<unsigned int> weights (tr.n_active_cells());
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tr.begin_active(); cell != tr.end(); ++cell)
-    weights[cell->active_cell_index()]
-      = (
-          // bottom left corner
-          (cell->center()[0] < 1)
-          &&
-          (cell->center()[1] < 1)
-          &&
-          (dim == 3 ?
-           (cell->center()[2] < 1) :
-           true)
-          ?
-          // one cell has more weight than all others together
-          tr.n_global_active_cells()
-          :
-          1);
-  tr.repartition (weights);
+  n_global_active_cells = tr.n_global_active_cells();
+  tr.signals.cell_weight.connect(std_cxx11::bind(&cell_weight<dim>,
+                                                 std_cxx11::_1,
+                                                 std_cxx11::_2));
+  tr.repartition ();
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
@@ -90,19 +98,7 @@ void test()
        cell = tr.begin_active(); cell != tr.end(); ++cell)
     if (cell->is_locally_owned())
       integrated_weights[myid]
-      += (
-           // bottom left corner
-           (cell->center()[0] < 1)
-           &&
-           (cell->center()[1] < 1)
-           &&
-           (dim == 3 ?
-            (cell->center()[2] < 1) :
-            true)
-           ?
-           tr.n_global_active_cells()
-           :
-           1);
+      += 1000 + cell_weight<dim>(cell,parallel::distributed::Triangulation<dim>::CELL_PERSIST);
   Utilities::MPI::sum (integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int p=0; p<numproc; ++p)
@@ -124,7 +120,6 @@ int main(int argc, char *argv[])
     {
       std::ofstream logfile("output");
       deallog.attach(logfile);
-      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");

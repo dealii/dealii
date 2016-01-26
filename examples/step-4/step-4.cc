@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2015 by the deal.II authors
+ * Copyright (C) 1999 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -179,7 +179,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 }
 
 
-// As boundary values, we choose x*x+y*y in 2D, and x*x+y*y+z*z in 3D. This
+// As boundary values, we choose $x^2+y^2$ in 2D, and $x^2+y^2+z^2$ in 3D. This
 // happens to be equal to the square of the vector from the origin to the
 // point at which we would like to evaluate the function, irrespective of the
 // dimension. So that is what we return:
@@ -523,24 +523,6 @@ void Step4<dim>::run ()
 // variable would only be destroyed at the end of the function, i.e. after
 // running the 3d problem, and would needlessly hog memory while the 3d run
 // could actually use it.
-//
-// Finally, the first line of the function is used to suppress some output.
-// Remember that in the previous example, we had the output from the linear
-// solvers about the starting residual and the number of the iteration where
-// convergence was detected. This can be suppressed through the
-// <code>deallog.depth_console(0)</code> call.
-//
-// The rationale here is the following: the deallog (i.e. deal-log, not
-// de-allog) variable represents a stream to which some parts of the library
-// write output. It redirects this output to the console and if required to a
-// file. The output is nested in a way so that each function can use a prefix
-// string (separated by colons) for each line of output; if it calls another
-// function, that may also use its prefix which is then printed after the one
-// of the calling function. Since output from functions which are nested deep
-// below is usually not as important as top-level output, you can give the
-// deallog variable a maximal depth of nested output for output to console and
-// file. The depth zero which we gave here means that no output is written. By
-// changing it you can get more information about the innards of the library.
 int main ()
 {
   deallog.depth_console (0);

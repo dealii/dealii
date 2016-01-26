@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@ int main()
   std::ofstream logfile(logname.c_str());
   logfile.precision(1);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   FullMatrix<double> A(4,4,left),
              B(4,4,right);

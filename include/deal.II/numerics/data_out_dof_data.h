@@ -161,7 +161,7 @@ namespace internal
      *
      * @author Wolfgang Bangerth, 2004
      */
-    template <class DH>
+    template <typename DoFHandlerType>
     class DataEntryBase
     {
     public:
@@ -170,7 +170,7 @@ namespace internal
        * the vector and their interpretation as scalar or vector data. This
        * constructor assumes that no postprocessor is going to be used.
        */
-      DataEntryBase (const DH                       *dofs,
+      DataEntryBase (const DoFHandlerType           *dofs,
                      const std::vector<std::string> &names,
                      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
 
@@ -179,8 +179,8 @@ namespace internal
        * case, the names and vector declarations are going to be acquired from
        * the postprocessor.
        */
-      DataEntryBase (const DH                       *dofs,
-                     const DataPostprocessor<DH::space_dimension> *data_postprocessor);
+      DataEntryBase (const DoFHandlerType *dofs,
+                     const DataPostprocessor<DoFHandlerType::space_dimension> *data_postprocessor);
 
       /**
        * Destructor made virtual.
@@ -201,8 +201,9 @@ namespace internal
        */
       virtual
       void
-      get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<double>             &patch_values) const = 0;
+      get_function_values
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<double> &patch_values) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -211,8 +212,9 @@ namespace internal
        */
       virtual
       void
-      get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<dealii::Vector<double> >    &patch_values_system) const = 0;
+      get_function_values
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<dealii::Vector<double> > &patch_values_system) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -220,8 +222,9 @@ namespace internal
        */
       virtual
       void
-      get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const = 0;
+      get_function_gradients
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<Tensor<1,DoFHandlerType::space_dimension> > &patch_gradients) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -230,8 +233,9 @@ namespace internal
        */
       virtual
       void
-      get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const = 0;
+      get_function_gradients
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -239,8 +243,9 @@ namespace internal
        */
       virtual
       void
-      get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const = 0;
+      get_function_hessians
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<Tensor<2,DoFHandlerType::space_dimension> > &patch_hessians) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -249,8 +254,9 @@ namespace internal
        */
       virtual
       void
-      get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const = 0;
+      get_function_hessians
+      (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const = 0;
 
       /**
        * Clear all references to the vectors.
@@ -266,7 +272,7 @@ namespace internal
       /**
        * Pointer to the DoFHandler object that the vector is based on.
        */
-      SmartPointer<const DH> dof_handler;
+      SmartPointer<const DoFHandlerType> dof_handler;
 
       /**
        * Names of the components of this data vector.
@@ -285,7 +291,7 @@ namespace internal
        * Pointer to a DataPostprocessing object which shall be applied to this
        * data vector.
        */
-      SmartPointer<const dealii::DataPostprocessor<DH::space_dimension> > postprocessor;
+      SmartPointer<const dealii::DataPostprocessor<DoFHandlerType::space_dimension> > postprocessor;
 
       /**
        * Number of output variables this dataset provides (either number of
@@ -326,8 +332,8 @@ namespace internal
 
       ParallelDataBase (const ParallelDataBase &data);
 
-      template <typename DH>
-      void reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DH> > > &dof_data,
+      template <typename DoFHandlerType>
+      void reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
                                 const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face = numbers::invalid_unsigned_int);
 
@@ -501,7 +507,7 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <class DH, int patch_dim, int patch_space_dim=patch_dim>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim=patch_dim>
 class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
 public:
@@ -510,8 +516,8 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename Triangulation<DH::dimension,DH::space_dimension>::cell_iterator cell_iterator;
-  typedef typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator active_cell_iterator;
+  typedef typename Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::cell_iterator cell_iterator;
+  typedef typename Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::active_cell_iterator active_cell_iterator;
 
 public:
 
@@ -559,7 +565,7 @@ public:
    * This call is optional: If you add data vectors with specified DoFHandler
    * object, then that contains all information needed to generate the output.
    */
-  void attach_dof_handler (const DH &);
+  void attach_dof_handler (const DoFHandlerType &);
 
   /**
    * Designate a triangulation to be used to extract geometry data and the
@@ -570,8 +576,8 @@ public:
    * This call is useful when you only output cell vectors and no DoFHandler
    * at all, in which case it provides the geometry.
    */
-  void attach_triangulation (const Triangulation<DH::dimension,
-                             DH::space_dimension> &);
+  void attach_triangulation (const Triangulation<DoFHandlerType::dimension,
+                             DoFHandlerType::space_dimension> &);
 
   /**
    * Add a data vector together with its name.
@@ -638,10 +644,10 @@ public:
    * includes all of the usual vector types, but also IndexSet (see step-41
    * for a use of this).
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR                   &data,
+  template <class VectorType>
+  void add_data_vector (const VectorType               &data,
                         const std::vector<std::string> &names,
-                        const DataVectorType            type = type_automatic,
+                        const DataVectorType           type = type_automatic,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -661,10 +667,10 @@ public:
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR         &data,
+  template <class VectorType>
+  void add_data_vector (const VectorType     &data,
                         const std::string    &name,
-                        const DataVectorType  type = type_automatic,
+                        const DataVectorType type = type_automatic,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -682,9 +688,9 @@ public:
    * represents dof data, the data vector type argument present in the other
    * methods above is skipped.
    */
-  template <class VECTOR>
-  void add_data_vector (const DH                       &dof_handler,
-                        const VECTOR                   &data,
+  template <class VectorType>
+  void add_data_vector (const DoFHandlerType           &dof_handler,
+                        const VectorType               &data,
                         const std::vector<std::string> &names,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
@@ -694,10 +700,10 @@ public:
    * This function is an abbreviation of the function above with only a scalar
    * @p dof_handler given and a single data name.
    */
-  template <class VECTOR>
-  void add_data_vector (const DH                       &dof_handler,
-                        const VECTOR                   &data,
-                        const std::string              &name,
+  template <class VectorType>
+  void add_data_vector (const DoFHandlerType          &dof_handler,
+                        const VectorType  &data,
+                        const std::string &name,
                         const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
                         = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
@@ -729,9 +735,9 @@ public:
    * error by declaring the data postprocessor variable before the DataOut
    * variable as objects are destroyed in reverse order of declaration.
    */
-  template <class VECTOR>
-  void add_data_vector (const VECTOR                           &data,
-                        const DataPostprocessor<DH::space_dimension> &data_postprocessor);
+  template <class VectorType>
+  void add_data_vector (const VectorType                             &data,
+                        const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
 
   /**
    * Same function as above, but with a DoFHandler object that does not need
@@ -739,10 +745,10 @@ public:
    * postprocessor can only read data from the given DoFHandler and solution
    * vector, not other solution vectors or DoFHandlers.
    */
-  template <class VECTOR>
-  void add_data_vector (const DH                               &dof_handler,
-                        const VECTOR                           &data,
-                        const DataPostprocessor<DH::space_dimension> &data_postprocessor);
+  template <class VectorType>
+  void add_data_vector (const DoFHandlerType                         &dof_handler,
+                        const VectorType                             &data,
+                        const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
 
   /**
    * Release the pointers to the data vectors. This allows output of a new set
@@ -787,8 +793,8 @@ public:
    * This function will fail if either this or the other object did not yet
    * set up any patches.
    */
-  template <class DH2>
-  void merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
+  template <typename DoFHandlerType2>
+  void merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> &source,
                       const Point<patch_space_dim> &shift = Point<patch_space_dim>());
 
   /**
@@ -814,22 +820,22 @@ protected:
   /**
    * Pointer to the triangulation object.
    */
-  SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> > triangulation;
+  SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> > triangulation;
 
   /**
    * Pointer to the optional handler object.
    */
-  SmartPointer<const DH> dofs;
+  SmartPointer<const DoFHandlerType> dofs;
 
   /**
    * List of data elements with vectors of values for each degree of freedom.
    */
-  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> > >  dof_data;
+  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  dof_data;
 
   /**
    * List of data elements with vectors of values for each cell.
    */
-  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DH> > >  cell_data;
+  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  cell_data;
 
   /**
    * This is a list of patches that is created each time build_patches() is
@@ -856,7 +862,7 @@ protected:
    * Extracts the finite elements stored in the dof_data object, including a
    * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
    */
-  std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DH::dimension,DH::space_dimension> > >
+  std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> > >
   get_finite_elements() const;
 
   /**
@@ -880,11 +886,11 @@ protected:
 // -------------------- template and inline functions ------------------------
 
 
-template <class DH, int patch_dim, int patch_space_dim>
-template <class DH2>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType2>
 void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> &source,
                const Point<patch_space_dim> &shift)
 {
   const std::vector<Patch> source_patches = source.get_patches ();

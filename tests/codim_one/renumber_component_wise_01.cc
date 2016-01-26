@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,6 @@ void test(std::string filename)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   test<2,3>(SOURCE_DIR "/grids/square.inp");
   test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");

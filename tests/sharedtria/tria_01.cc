@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: 3d_refinement_01.cc 31349 2013-10-20 19:07:06Z maier $
 //
-// Copyright (C) 2008 - 2013, 2015 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,6 +59,15 @@ void test()
 {
   parallel::shared::Triangulation<dim> tr(MPI_COMM_WORLD);
 
+  AssertThrow( tr.with_artificial_cells() == false,
+               ExcInternalError());
+
+  const std::vector<unsigned int> &
+  true_subdomain_ids_of_cells = tr.get_true_subdomain_ids_of_cells();
+
+  AssertThrow (true_subdomain_ids_of_cells.size() == tr.n_active_cells(),
+               ExcInternalError());
+
 
   GridGenerator::hyper_cube(tr);
   tr.begin_active()->set_refine_flag();
@@ -81,11 +90,15 @@ void test()
     deallog << v[i] << " ";
     deallog << std::endl;*/
 
-  deallog << "subdomains: ";
+  // untill parmetis is stable, do not output partitioning
+  //deallog << "subdomains: ";
   typename  parallel::shared::Triangulation<dim>::active_cell_iterator it=tr.begin_active();
-  for (; it!=tr.end(); ++it)
+  for (unsigned int index=0; it!=tr.end(); ++it,++index)
     {
-      deallog << it->subdomain_id() << " ";
+      // check that true subdomain_ids are the same as those, stored in cell->subdomain_id()
+      AssertThrow(true_subdomain_ids_of_cells[index] == it->subdomain_id(),
+                  ExcInternalError());
+      //deallog << it->subdomain_id() << " ";
     }
   deallog << std::endl;
 

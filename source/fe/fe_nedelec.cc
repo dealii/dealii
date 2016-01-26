@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
   FE_PolyTensor<PolynomialsNedelec<dim>, dim>
   (p,
    FiniteElementData<dim> (get_dpo_vector (p), dim, p + 1,
-                           FiniteElementData<dim>::Hcurl, 1),
+                           FiniteElementData<dim>::Hcurl),
    std::vector<bool> (PolynomialsNedelec<dim>::compute_n_pols (p), true),
    std::vector<ComponentMask>
    (PolynomialsNedelec<dim>::compute_n_pols (p),

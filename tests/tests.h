@@ -43,6 +43,20 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
+#ifdef DEAL_II_MSVC
+// Under windows tests will hang and show a debugging dialog box from the
+// debug CRT if an exception is encountered. Disable this:
+#include <stdlib.h>
+
+struct DisableWindowsDebugRuntimeDialog
+{
+  DisableWindowsDebugRuntimeDialog ()
+  {
+    _set_abort_behavior( 0, _WRITE_ABORT_MSG);
+  }
+} deal_II_windows_crt_dialog;
+#endif
+
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
 using namespace dealii;
@@ -162,16 +176,16 @@ std::string unify_pretty_function (const std::string &text)
 /*
  * Test that a solver converged within a certain range of iteration steps.
  *
- * SOLVER_COMMAND is the command to issue, CONTROL_COMMAND a function call
+ * SolverType_COMMAND is the command to issue, CONTROL_COMMAND a function call
  * that returns the number of iterations (castable to unsigned int), and
  * MIN_ALLOWED, MAX_ALLOWED is the inclusive range of allowed iteration
  * steps.
  */
 
-#define check_solver_within_range(SOLVER_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
+#define check_solver_within_range(SolverType_COMMAND, CONTROL_COMMAND, MIN_ALLOWED, MAX_ALLOWED) \
   {                                                                              \
     const unsigned int previous_depth = deallog.depth_file(0);                   \
-    SOLVER_COMMAND;                                                              \
+    SolverType_COMMAND;                                                              \
     deallog.depth_file(previous_depth);                                          \
     const unsigned int steps = CONTROL_COMMAND;                                  \
     if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                            \

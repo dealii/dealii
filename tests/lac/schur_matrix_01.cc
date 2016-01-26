@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@ main()
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   std::vector < types::global_dof_index > ivector(1);

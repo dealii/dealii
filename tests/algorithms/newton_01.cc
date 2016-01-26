@@ -33,7 +33,7 @@ public:
 };
 
 class SquareRootResidual : public
-  Algorithms::Operator<Vector<double> >
+  Algorithms::OperatorBase
 {
   SmartPointer<SquareRoot, SquareRootResidual>
   discretization;
@@ -50,7 +50,7 @@ public:
 };
 
 class SquareRootSolver : public
-  Algorithms::Operator<Vector<double> >
+  Algorithms::OperatorBase
 {
   SmartPointer<SquareRoot, SquareRootSolver>
   solver;
@@ -122,7 +122,6 @@ int main()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test ();

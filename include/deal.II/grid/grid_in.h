@@ -215,6 +215,8 @@ struct SubCellData;
  *  - information which is currently not easily obtained through
  * Cubit's python interface.
  *
+ * </ul>
+ *
  * <h3>Structure of input grid data. The GridReordering class</h3>
  *
  * It is your duty to use a correct numbering of vertices in the cell list,

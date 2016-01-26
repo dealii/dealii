@@ -30,8 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Store any amount of any type of data accessible by an identifier string.
  *
- * @todo Deprecate access by index after NamedData has been deprecated for
- * long enough, then change to a map.
+ * @todo GK: Deprecate access to AnyData by index and change to a map.
  */
 class AnyData :
   public Subscriptor
@@ -167,8 +166,8 @@ public:
   bool is_type(const unsigned int i) const;
 
   /// List the contents to a stream
-  template <class STREAM>
-  void list (STREAM &os) const;
+  template <class StreamType>
+  void list (StreamType &os) const;
 
   /// An entry with this name does not exist in the AnyData object.
   DeclException1(ExcNameNotFound, std::string,
@@ -183,7 +182,7 @@ public:
 
   /**
    * Exception indicating that a function expected a vector to have a certain
-   * name, but NamedData had a different name in that position.
+   * name, but we store a different name in that position.
    */
   DeclException2(ExcNameMismatch, int, std::string,
                  << "Name at position " << arg1 << " is not equal to " << arg2);
@@ -448,9 +447,9 @@ AnyData::merge(const AnyData &other)
 }
 
 
-template <class STREAM>
+template <class StreamType>
 inline
-void AnyData::list(STREAM &os) const
+void AnyData::list(StreamType &os) const
 {
   for (unsigned int i=0; i<names.size(); ++i)
     {

@@ -52,8 +52,8 @@ SET(_release_steps
   step-6  step-7  step-8  step-9  step-10
   step-11 step-12 step-13 step-14 step-16
   step-20 step-23 step-25 step-26 step-27
-  step-30 step-38 step-39 step-44 step-45
-  step-47 step-48 step-49
+  step-30 step-38 step-39 step-44 step-47
+  step-48 step-49
   )
 
 #
@@ -117,7 +117,7 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
         COMMAND rm -f ${_step_dir}/failing_configure_output
         COMMAND ${CMAKE_COMMAND}
-          -DDEAL_II_DIR=${DEAL_II_DIR} -DCMAKE_BUILD_TYPE=${_build} .
+          -DDEAL_II_DIR=${DEAL_II_DIR} -DCMAKE_BUILD_TYPE=${_build} -G ${CMAKE_GENERATOR} .
           > ${_step_dir}/configure_output 2>&1
           || (mv ${_step_dir}/configure_output
                  ${_step_dir}/failing_configure_output
@@ -128,11 +128,21 @@ FOREACH(_step_full ${_steps})
           ${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PACKAGE_NAME}Config.cmake
         )
 
+
+      # MSVC needs to know if we are compiling the debug or release configuration right now:
+      IF(MSVC AND ("${_build}" STREQUAL "RELEASE"))
+        SET(_magic1 "--config")
+        SET(_magic2 "Release")
+      ELSE()
+        SET(_magic1 "")
+        SET(_magic2 "")
+      ENDIF()
+
       # And a rule on how to build the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/build_output
         COMMAND test ! -f ${_step_dir}/configure_output
           || (rm -f ${_step_dir}/failing_build_output
-              && ${CMAKE_COMMAND} --build ${_step_dir} --target all
+              && ${CMAKE_COMMAND} --build . ${_magic1} ${_magic2}
               > ${_step_dir}/build_output 2>&1)
           || (mv ${_step_dir}/build_output
                  ${_step_dir}/failing_build_output
@@ -152,7 +162,7 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/run_output
         COMMAND test ! -f ${_step_dir}/build_output
           || (rm -f ${_step_dir}/failing_run_output
-             && ${CMAKE_COMMAND} --build ${_step_dir} --target run
+             && ${CMAKE_COMMAND} --build .  --target run ${_magic1} ${_magic2}
              > ${_step_dir}/run_output 2>&1)
           || (mv ${_step_dir}/run_output
                  ${_step_dir}/failing_run_output

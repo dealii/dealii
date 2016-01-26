@@ -41,7 +41,6 @@ int main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   const unsigned int dim=3;
   Triangulation<dim> tria;

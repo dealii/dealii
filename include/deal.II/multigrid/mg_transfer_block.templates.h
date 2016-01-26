@@ -44,7 +44,7 @@ MGTransferBlockSelect<number>::copy_from_mg (
   BlockVector<number2>                 &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end(); ++i)
       dst.block(selected_block)(i->first) = src[level](i->second);
@@ -60,7 +60,7 @@ MGTransferBlockSelect<number>::copy_from_mg (
   Vector<number2>                      &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end(); ++i)
       dst(i->first) = src[level](i->second);
@@ -76,7 +76,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
   BlockVector<number2>                 &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end(); ++i)
       dst.block(selected_block)(i->first) += src[level](i->second);
@@ -92,7 +92,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
   Vector<number2>                      &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
     for (IT i= copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end(); ++i)
       dst(i->first) += src[level](i->second);
@@ -122,7 +122,7 @@ MGTransferBlock<number>::copy_from_mg (
 {
   for (unsigned int block=0; block<selected.size(); ++block)
     if (selected[block])
-      for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+      for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
         for (IT i= copy_indices[block][level].begin();
              i != copy_indices[block][level].end(); ++i)
           dst.block(block)(i->first) = src[level].block(mg_block[block])(i->second);
@@ -140,7 +140,7 @@ MGTransferBlock<number>::copy_from_mg_add (
 {
   for (unsigned int block=0; block<selected.size(); ++block)
     if (selected[block])
-      for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+      for (unsigned int level=0; level<mg_dof_handler.get_triangulation().n_levels(); ++level)
         for (IT i= copy_indices[block][level].begin();
              i != copy_indices[block][level].end(); ++i)
           dst.block(block)(i->first) += src[level].block(mg_block[block])(i->second);

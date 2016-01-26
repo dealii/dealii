@@ -562,14 +562,14 @@ namespace FETools
    * @p distribute function of your hanging node constraints object.
    */
   template <int dim, int spacedim,
-            template <int,int> class DH1,
-            template <int,int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
   void
-  interpolate (const DH1<dim,spacedim> &dof1,
-               const InVector          &u1,
-               const DH2<dim,spacedim> &dof2,
-               OutVector               &u2);
+  interpolate (const DoFHandlerType1<dim,spacedim> &dof1,
+               const InVector                      &u1,
+               const DoFHandlerType2<dim,spacedim> &dof2,
+               OutVector                           &u2);
 
   /**
    * Gives the interpolation of a the @p dof1-function @p u1 to a @p
@@ -588,14 +588,14 @@ namespace FETools
    * at the discontinuities.
    */
   template <int dim, int spacedim,
-            template <int, int> class DH1,
-            template <int, int> class DH2,
+            template <int, int> class DoFHandlerType1,
+            template <int, int> class DoFHandlerType2,
             class InVector, class OutVector>
-  void interpolate (const DH1<dim,spacedim>  &dof1,
-                    const InVector           &u1,
-                    const DH2<dim,spacedim>  &dof2,
-                    const ConstraintMatrix   &constraints,
-                    OutVector                &u2);
+  void interpolate (const DoFHandlerType1<dim,spacedim> &dof1,
+                    const InVector                      &u1,
+                    const DoFHandlerType2<dim,spacedim> &dof2,
+                    const ConstraintMatrix              &constraints,
+                    OutVector                           &u2);
 
   /**
    * Gives the interpolation of the @p fe1-function @p u1 to a @p
@@ -612,21 +612,21 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void back_interpolate (const DoFHandler<dim,spacedim>    &dof1,
-                         const InVector           &u1,
+                         const InVector                    &u1,
                          const FiniteElement<dim,spacedim> &fe2,
-                         OutVector                &u1_interpolated);
+                         OutVector                         &u1_interpolated);
 
   /**
    * Same as last function, except that the dof handler objects might be of
    * type @p hp::DoFHandler.
    */
   template <int dim,
-            template <int> class DH,
+            template <int> class DoFHandlerType,
             class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DH<dim>            &dof1,
-                         const InVector           &u1,
+  void back_interpolate (const DoFHandlerType<dim>         &dof1,
+                         const InVector                    &u1,
                          const FiniteElement<dim,spacedim> &fe2,
-                         OutVector                &u1_interpolated);
+                         OutVector                         &u1_interpolated);
 
   /**
    * Gives the interpolation of the @p dof1-function @p u1 to a @p
@@ -641,12 +641,12 @@ namespace FETools
    * corresponding to @p dof2, this function is simply an identity mapping.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DoFHandler<dim,spacedim>  &dof1,
-                         const ConstraintMatrix &constraints1,
-                         const InVector         &u1,
-                         const DoFHandler<dim,spacedim>  &dof2,
-                         const ConstraintMatrix &constraints2,
-                         OutVector              &u1_interpolated);
+  void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
+                         const ConstraintMatrix         &constraints1,
+                         const InVector                 &u1,
+                         const DoFHandler<dim,spacedim> &dof2,
+                         const ConstraintMatrix         &constraints2,
+                         OutVector                      &u1_interpolated);
 
   /**
    * Gives $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
@@ -658,10 +658,10 @@ namespace FETools
    * that takes an additional @p ConstraintMatrix object.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
-                                const InVector &z1,
+  void interpolation_difference(const DoFHandler<dim,spacedim>    &dof1,
+                                const InVector                    &z1,
                                 const FiniteElement<dim,spacedim> &fe2,
-                                OutVector &z1_difference);
+                                OutVector                         &z1_difference);
 
   /**
    * Gives $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
@@ -676,12 +676,12 @@ namespace FETools
    * and @p z1_difference without ghost elements.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void interpolation_difference(const DoFHandler<dim,spacedim>  &dof1,
-                                const ConstraintMatrix &constraints1,
-                                const InVector         &z1,
-                                const DoFHandler<dim,spacedim>  &dof2,
-                                const ConstraintMatrix &constraints2,
-                                OutVector              &z1_difference);
+  void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
+                                const ConstraintMatrix         &constraints1,
+                                const InVector                 &z1,
+                                const DoFHandler<dim,spacedim> &dof2,
+                                const ConstraintMatrix         &constraints2,
+                                OutVector                      &z1_difference);
 
 
 
@@ -695,9 +695,9 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void project_dg (const DoFHandler<dim,spacedim> &dof1,
-                   const InVector        &u1,
+                   const InVector                 &u1,
                    const DoFHandler<dim,spacedim> &dof2,
-                   OutVector             &u2);
+                   OutVector                      &u2);
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
@@ -759,9 +759,9 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void extrapolate (const DoFHandler<dim,spacedim> &dof1,
-                    const InVector        &z1,
+                    const InVector                 &z1,
                     const DoFHandler<dim,spacedim> &dof2,
-                    OutVector             &z2);
+                    OutVector                      &z2);
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
@@ -776,11 +776,11 @@ namespace FETools
    * description of its operation).
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void extrapolate (const DoFHandler<dim,spacedim>  &dof1,
-                    const InVector         &z1,
-                    const DoFHandler<dim,spacedim>  &dof2,
-                    const ConstraintMatrix &constraints,
-                    OutVector              &z2);
+  void extrapolate (const DoFHandler<dim,spacedim> &dof1,
+                    const InVector                 &z1,
+                    const DoFHandler<dim,spacedim> &dof2,
+                    const ConstraintMatrix         &constraints,
+                    OutVector                      &z2);
   //@}
   /**
    * The numbering of the degrees of freedom in continuous finite elements is

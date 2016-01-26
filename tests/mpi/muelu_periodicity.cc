@@ -770,13 +770,11 @@ int main (int argc, char *argv[])
       using namespace Step22;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-      deallog.depth_console (0);
 
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)==0)
         {
           std::ofstream logfile("output");
           deallog.attach(logfile, false);
-          deallog.depth_console(0);
           deallog.threshold_double(1.e-10);
           {
             StokesProblem<2> flow_problem(1);

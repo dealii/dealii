@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,8 +109,8 @@ public:
    * also read from vectors (but less efficient than with data coming from
    * MatrixFree).
    */
-  template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell);
+  template <typename DoFHandlerType, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell);
 
   /**
    * Initialize the data to the current cell using a TriaIterator object as
@@ -1132,7 +1132,7 @@ public:
    * Returns the curl of the vector field, $nabla \times v$ after a call to @p
    * evaluate(...,true,...).
    */
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> >
+  Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
   get_curl (const unsigned int q_point) const;
 
   /**
@@ -1990,11 +1990,11 @@ FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_in)
 
 
 template <int dim, int n_components_, typename Number>
-template <typename DH, bool level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell)
+::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
 {
   Assert(matrix_info == 0,
          ExcMessage("Cannot use initialization from cell iterator if "
@@ -4098,13 +4098,13 @@ FEEvaluationAccess<dim,dim,Number>
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim==2?1:dim,VectorizedArray<Number> >
+Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number>
 ::get_curl (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
-  Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl;
+  Tensor<1,(dim==2?1:dim),VectorizedArray<Number> > curl;
   switch (dim)
     {
     case 1:
@@ -6020,9 +6020,11 @@ namespace internal
                 if (integrate_grad == true)
                   eval.template gradients<0,false,true> (gradients_quad[c][0], temp1);
                 eval.template values<1,false,false>(temp1, temp2);
-                eval.template values<0,false,false> (gradients_quad[c][d1], temp1);
                 if (integrate_grad == true)
-                  eval.template gradients<1,false,true>(temp1, temp2);
+                  {
+                    eval.template values<0,false,false> (gradients_quad[c][d1], temp1);
+                    eval.template gradients<1,false,true>(temp1, temp2);
+                  }
                 eval.template values<2,false,false> (temp2, values_dofs[c]);
               }
             else if (integrate_grad == true)

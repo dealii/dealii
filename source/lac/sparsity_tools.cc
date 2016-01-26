@@ -522,29 +522,31 @@ namespace SparsityTools
 
 
 #ifdef DEAL_II_WITH_MPI
-  template <class DSP_t>
-  void distribute_sparsity_pattern(DSP_t &dsp,
-                                   const std::vector<typename DSP_t::size_type> &rows_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange)
+  void distribute_sparsity_pattern
+  (DynamicSparsityPattern                               &dsp,
+   const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
+   const MPI_Comm                                       &mpi_comm,
+   const IndexSet                                       &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
-    std::vector<typename DSP_t::size_type> start_index(rows_per_cpu.size()+1);
+    std::vector<DynamicSparsityPattern::size_type> start_index(rows_per_cpu.size()+1);
     start_index[0]=0;
-    for (typename DSP_t::size_type i=0; i<rows_per_cpu.size(); ++i)
+    for (DynamicSparsityPattern::size_type i=0; i<rows_per_cpu.size(); ++i)
       start_index[i+1]=start_index[i]+rows_per_cpu[i];
 
-    typedef std::map<typename DSP_t::size_type, std::vector<typename DSP_t::size_type> > map_vec_t;
+    typedef std::map<DynamicSparsityPattern::size_type,
+            std::vector<DynamicSparsityPattern::size_type> >
+            map_vec_t;
 
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      typename DSP_t::size_type n_local_rel_rows = myrange.n_elements();
-      for (typename DSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      DynamicSparsityPattern::size_type n_local_rel_rows = myrange.n_elements();
+      for (DynamicSparsityPattern::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          typename DSP_t::size_type row=myrange.nth_index_in_set(row_idx);
+          DynamicSparsityPattern::size_type row=myrange.nth_index_in_set(row_idx);
 
           //calculate destination CPU
           while (row>=start_index[dest_cpu+1])
@@ -557,21 +559,21 @@ namespace SparsityTools
               continue;
             }
 
-          typename DSP_t::size_type rlen = dsp.row_length(row);
+          DynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<typename DSP_t::size_type> &dst = send_data[dest_cpu];
+          std::vector<DynamicSparsityPattern::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (typename DSP_t::size_type c=0; c<rlen; ++c)
+          for (DynamicSparsityPattern::size_type c=0; c<rlen; ++c)
             {
               //columns
-              typename DSP_t::size_type column = dsp.column_number(row, c);
+              DynamicSparsityPattern::size_type column = dsp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -582,7 +584,7 @@ namespace SparsityTools
     {
       std::vector<unsigned int> send_to;
       send_to.reserve(send_data.size());
-      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
         send_to.push_back(it->first);
 
       num_receive =
@@ -596,7 +598,7 @@ namespace SparsityTools
     // send data
     {
       unsigned int idx=0;
-      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
                   DEAL_II_DOF_INDEX_MPI_TYPE,
@@ -608,7 +610,7 @@ namespace SparsityTools
 
     {
       //receive
-      std::vector<typename DSP_t::size_type> recv_buf;
+      std::vector<DynamicSparsityPattern::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -621,13 +623,13 @@ namespace SparsityTools
           MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
-          typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
+          std::vector<DynamicSparsityPattern::size_type>::const_iterator ptr = recv_buf.begin();
+          std::vector<DynamicSparsityPattern::size_type>::const_iterator end = recv_buf.end();
           while (ptr!=end)
             {
-              typename DSP_t::size_type num=*(ptr++);
+              DynamicSparsityPattern::size_type num=*(ptr++);
               Assert(ptr!=end, ExcInternalError());
-              typename DSP_t::size_type row=*(ptr++);
+              DynamicSparsityPattern::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
                   Assert(ptr!=end, ExcInternalError());
@@ -645,24 +647,25 @@ namespace SparsityTools
 
   }
 
-  template <class DSP_t>
-  void distribute_sparsity_pattern(DSP_t &dsp,
+  void distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                                    const std::vector<IndexSet> &owned_set_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange)
+                                   const MPI_Comm              &mpi_comm,
+                                   const IndexSet              &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
 
-    typedef std::map<typename DSP_t::size_type, std::vector<typename DSP_t::size_type> > map_vec_t;
+    typedef std::map<BlockDynamicSparsityPattern::size_type,
+            std::vector<BlockDynamicSparsityPattern::size_type> >
+            map_vec_t;
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      typename DSP_t::size_type n_local_rel_rows = myrange.n_elements();
-      for (typename DSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      BlockDynamicSparsityPattern::size_type n_local_rel_rows = myrange.n_elements();
+      for (BlockDynamicSparsityPattern::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          typename DSP_t::size_type row=myrange.nth_index_in_set(row_idx);
+          BlockDynamicSparsityPattern::size_type row=myrange.nth_index_in_set(row_idx);
 
           // calculate destination CPU, note that we start the search
           // at last destination cpu, because even if the owned ranges
@@ -678,21 +681,21 @@ namespace SparsityTools
           if (dest_cpu==myid)
             continue;
 
-          typename DSP_t::size_type rlen = dsp.row_length(row);
+          BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<typename DSP_t::size_type> &dst = send_data[dest_cpu];
+          std::vector<BlockDynamicSparsityPattern::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (typename DSP_t::size_type c=0; c<rlen; ++c)
+          for (BlockDynamicSparsityPattern::size_type c=0; c<rlen; ++c)
             {
               //columns
-              typename DSP_t::size_type column = dsp.column_number(row, c);
+              BlockDynamicSparsityPattern::size_type column = dsp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -703,7 +706,7 @@ namespace SparsityTools
     {
       std::vector<unsigned int> send_to;
       send_to.reserve(send_data.size());
-      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
         send_to.push_back(it->first);
 
       num_receive =
@@ -717,7 +720,7 @@ namespace SparsityTools
     // send data
     {
       unsigned int idx=0;
-      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
                   DEAL_II_DOF_INDEX_MPI_TYPE,
@@ -729,7 +732,7 @@ namespace SparsityTools
 
     {
       //receive
-      std::vector<typename DSP_t::size_type> recv_buf;
+      std::vector<BlockDynamicSparsityPattern::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -742,13 +745,13 @@ namespace SparsityTools
           MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
-          typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
+          std::vector<BlockDynamicSparsityPattern::size_type>::const_iterator ptr = recv_buf.begin();
+          std::vector<BlockDynamicSparsityPattern::size_type>::const_iterator end = recv_buf.end();
           while (ptr!=end)
             {
-              typename DSP_t::size_type num=*(ptr++);
+              BlockDynamicSparsityPattern::size_type num=*(ptr++);
               Assert(ptr!=end, ExcInternalError());
-              typename DSP_t::size_type row=*(ptr++);
+              BlockDynamicSparsityPattern::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
                   Assert(ptr!=end, ExcInternalError());
@@ -764,32 +767,7 @@ namespace SparsityTools
     if (requests.size())
       MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
   }
-
-
 #endif
 }
-
-
-//explicit instantiations
-
-#define SPARSITY_FUNCTIONS(SparsityType) \
-  template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & dsp, \
-      const std::vector<SparsityType::size_type> & rows_per_cpu,\
-      const MPI_Comm & mpi_comm,\
-      const IndexSet & myrange)
-
-#ifdef DEAL_II_WITH_MPI
-SPARSITY_FUNCTIONS(DynamicSparsityPattern);
-
-template void SparsityTools::distribute_sparsity_pattern
-<BlockDynamicSparsityPattern>
-(BlockDynamicSparsityPattern &dsp,
- const std::vector<IndexSet> &owned_set_per_cpu,
- const MPI_Comm &mpi_comm,
- const IndexSet &myrange);
-
-#endif
-
-#undef SPARSITY_FUNCTIONS
 
 DEAL_II_NAMESPACE_CLOSE

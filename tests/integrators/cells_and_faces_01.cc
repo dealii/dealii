@@ -93,8 +93,8 @@ test_mesh(DoFHandler<dim> &mgdofs)
   BlockVector<double> faces(n_functionals);
   for (unsigned int i=0; i<n_functionals; ++i)
     {
-      cells.block(i).reinit(dofs.get_tria().n_cells());
-      faces.block(i).reinit(dofs.get_tria().n_faces());
+      cells.block(i).reinit(dofs.get_triangulation().n_cells());
+      faces.block(i).reinit(dofs.get_triangulation().n_faces());
     }
   cells.collect_sizes();
   faces.collect_sizes();
@@ -191,7 +191,6 @@ int main ()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console (0);
 
   FE_DGP<2> el2(0);
   FE_DGP<3> el3(0);

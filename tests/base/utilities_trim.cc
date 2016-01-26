@@ -14,35 +14,36 @@
 // ---------------------------------------------------------------------
 
 
-// test Utilities::trim
+// test Utilities::trim. Note that deallog does not like being given '\n's in
+// the middle of strings, so the output file is almost empty.
 
-#include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
-
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
+#include <fstream>
+
+using namespace dealii;
 
 void check(const std::string &input, const std::string &expected)
 {
-  deallog << "trim(\"" << input << "\") = \"" << Utilities::trim(input) << "\"" << std::endl;
-  Assert(Utilities::trim(input) == expected, ExcInternalError());
+  AssertThrow(Utilities::trim(input) == expected, ExcInternalError());
 }
 
 
 
 void test ()
 {
-  check("Hello World", "Hello World");
+  check("\r\nHello World\r\n\r", "Hello World");
   check("", "");
   check(" ", "");
   check("    ", "");
-  check("  middle   ", "middle");
-  check("left   ", "left");
-  check("  right", "right");
-  check("  multiple  words with spaces  ", "multiple  words with spaces");
+  check("  \r\n\v\t\r\n\f  ", "");
+  check("  \rmiddle\r\n   ", "middle");
+  check("left\v\t\r\n   ", "left");
+  check("  \n\v\f\r\nright", "right");
+  check(" \t\v\f\t\r\n\r multiple  words with spaces  \v\f\n", "multiple  words with spaces");
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -50,7 +51,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test ();

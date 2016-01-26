@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2015 by the deal.II authors
+// Copyright (C) 2014 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,10 +47,10 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain> linear_operator (const Matrix &);
 
-template <typename Domain = Vector<double>,
-          typename Range = Domain>
-LinearOperator<Domain, Range>
-null_operator(const LinearOperator<Domain, Range> &);
+template <typename Range = Vector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+null_operator(const LinearOperator<Range, Domain> &);
 
 
 /**
@@ -100,7 +100,7 @@ null_operator(const LinearOperator<Domain, Range> &);
  * @endcode
  *
  * @note This class makes heavy use of <code>std::function</code> objects
- * and lambda functions. This flexibiliy comes with a run-time penalty.
+ * and lambda functions. This flexibility comes with a run-time penalty.
  * Only use this object to encapsulate matrix object of medium to large
  * size (as a rule of thumb, sparse matrices with a size $1000\times1000$,
  * or larger).
@@ -664,7 +664,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     solver.solve(transpose_operator(op), v, u, preconditioner);
   };
 
-  return_op.Tvmult =
+  return_op.Tvmult_add =
     [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
     static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
@@ -1027,12 +1027,12 @@ namespace
  *   // with appropriate size and internal layout
  *
  *   // Application of matrix to vector src, writes the result into dst.
- *   vmult(VECTOR &dst, const VECTOR &src);
+ *   vmult(Range &dst, const Domain &src);
  *
  *   // Application of the transpose of matrix to vector src, writes the
  *   // result into dst. (Depending on the usage of the linear operator
  *   // class this can be a dummy implementation throwing an error.)
- *   Tvmult(VECTOR &dst, const VECTOR &src);
+ *   Tvmult(Range &dst, const Domain &src);
  * };
  * @endcode
  *
@@ -1043,11 +1043,11 @@ namespace
  * {
  * public:
  *   // Application of matrix to vector src, adds the result to dst.
- *   vmult_add(VECTOR &dst, const VECTOR &src);
+ *   vmult_add(Range &dst, const Domain &src);
  *
  *   // Application of the transpose of matrix to vector src, adds the
  *   // result to dst.
- *   Tvmult_add(VECTOR &dst, const VECTOR &src);
+ *   Tvmult_add(Range &dst, const Domain &src);
  * };
  * @endcode
  *

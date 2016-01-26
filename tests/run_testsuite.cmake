@@ -480,10 +480,13 @@ IF("${_res}" STREQUAL "0")
 
     MESSAGE("-- Running setup_tests")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-      --build ${CTEST_BINARY_DIRECTORY} --target setup_tests
+      --build . --target setup_tests
       -- ${MAKEOPTS}
-      OUTPUT_QUIET RESULT_VARIABLE _res
+      WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
+      OUTPUT_QUIET 
+      RESULT_VARIABLE _res
       )
+
     IF(NOT "${_res}" STREQUAL "0")
       MESSAGE(FATAL_ERROR "
 \"setup_tests\" target exited with an error. Bailing out.
@@ -492,6 +495,9 @@ IF("${_res}" STREQUAL "0")
     ENDIF()
 
     MESSAGE("-- Running CTEST_TESTS()")
+    IF(DEAL_II_MSVC)
+      SET(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
+    ENDIF()
     CTEST_TEST()
 
     IF(COVERAGE)

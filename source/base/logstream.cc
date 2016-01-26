@@ -49,7 +49,7 @@ LogStream::LogStream()
   :
   std_out(&std::cerr),
   file(0),
-  std_depth(10000),
+  std_depth(0),
   file_depth(10000),
   print_utime(false),
   diff_utime(false),
@@ -445,37 +445,6 @@ LogStream::print_line_head()
   double utime = 0.;
 #endif
 
-  /*
-   * The following lines were used for debugging a memory leak.
-   * They work on Linux, not on Solaris, since the /proc filesystem
-   * on Solaris is quite cryptic. For other systems, we don't know.
-   *
-   * Unfortunately, the information in /proc/pid/stat is updated slowly,
-   * therefore, the information is quite unreliable.
-   *
-   * Furthermore, the constructor of ifstream caused another memory leak.
-   *
-   * Still, this code might be useful sometimes, so I kept it here.
-   * When we have more information about the kernel, this should be
-   * incorporated properly. Suggestions are welcome!
-   */
-
-#ifdef DEALII_MEMORY_DEBUG
-  static const pid_t id = getpid();
-
-  std::ostringstream statname;
-  statname << "/proc/" << id << "/stat";
-
-  static long size;
-  static string dummy;
-  ifstream stat(statname.str());
-  // ignore 22 values
-  stat >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-       dummy >> dummy >> dummy >> dummy >> dummy >>
-       dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-       dummy >> dummy >> dummy >> dummy >> dummy >> size;
-#endif
-
   const std::string &head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
 
@@ -485,9 +454,6 @@ LogStream::print_line_head()
         {
           int p = std_out->width(5);
           *std_out << utime << ':';
-#ifdef DEALII_MEMORY_DEBUG
-          *std_out << size << ':';
-#endif
           std_out->width(p);
         }
       if (print_thread_id)
@@ -503,9 +469,6 @@ LogStream::print_line_head()
         {
           int p = file->width(6);
           *file << utime << ':';
-#ifdef DEALII_MEMORY_DEBUG
-          *file << size << ':';
-#endif
           file->width(p);
         }
       if (print_thread_id)

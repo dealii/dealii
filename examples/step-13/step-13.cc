@@ -1521,8 +1521,6 @@ int main ()
 {
   try
     {
-      dealii::deallog.depth_console (0);
-
       Step13::solve_problem<2> ("global");
       Step13::solve_problem<2> ("kelly");
     }

@@ -31,9 +31,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, int spacedim, class DH>
+template <int dim, int spacedim, typename DoFHandlerType>
 std::size_t
-DataOutStack<dim,spacedim,DH>::DataVector::memory_consumption () const
+DataOutStack<dim,spacedim,DoFHandlerType>::DataVector::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (data) +
           MemoryConsumption::memory_consumption (names));
@@ -41,14 +41,14 @@ DataOutStack<dim,spacedim,DH>::DataVector::memory_consumption () const
 
 
 
-template <int dim, int spacedim, class DH>
-DataOutStack<dim,spacedim,DH>::~DataOutStack ()
+template <int dim, int spacedim, typename DoFHandlerType>
+DataOutStack<dim,spacedim,DoFHandlerType>::~DataOutStack ()
 {}
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::new_parameter_value (const double p,
-                                                         const double dp)
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::new_parameter_value (const double p,
+    const double dp)
 {
   parameter      = p;
   parameter_step = dp;
@@ -69,20 +69,20 @@ void DataOutStack<dim,spacedim,DH>::new_parameter_value (const double p,
 }
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::attach_dof_handler (const DH &dof)
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::attach_dof_handler (const DoFHandlerType &dof)
 {
   // Check consistency of redundant
   // template parameter
-  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  Assert (dim==DoFHandlerType::dimension, ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
   dof_handler = &dof;
 }
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::declare_data_vector (const std::string &name,
-                                                         const VectorType   vector_type)
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::string &name,
+    const VectorType   vector_type)
 {
   std::vector<std::string> names;
   names.push_back (name);
@@ -90,9 +90,9 @@ void DataOutStack<dim,spacedim,DH>::declare_data_vector (const std::string &name
 }
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::declare_data_vector (const std::vector<std::string> &names,
-                                                         const VectorType    vector_type)
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::vector<std::string> &names,
+    const VectorType    vector_type)
 {
   // make sure this function is
   // not called after some parameter
@@ -130,10 +130,10 @@ void DataOutStack<dim,spacedim,DH>::declare_data_vector (const std::vector<std::
 }
 
 
-template <int dim, int spacedim, class DH>
+template <int dim, int spacedim, typename DoFHandlerType>
 template <typename number>
-void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
-                                                     const std::string    &name)
+void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
+    const std::string    &name)
 {
   const unsigned int n_components = dof_handler->get_fe().n_components ();
 
@@ -142,7 +142,7 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
   // is cell vector: we only need one
   // name
   if ((n_components == 1) ||
-      (vec.size() == dof_handler->get_tria().n_active_cells()))
+      (vec.size() == dof_handler->get_triangulation().n_active_cells()))
     {
       names.resize (1, name);
     }
@@ -163,16 +163,16 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim, int spacedim, class DH>
+template <int dim, int spacedim, typename DoFHandlerType>
 template <typename number>
-void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
-                                                     const std::vector<std::string> &names)
+void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
+    const std::vector<std::string> &names)
 {
   Assert (dof_handler != 0,
           Exceptions::DataOut::ExcNoDoFHandlerSelected ());
   // either cell data and one name,
   // or dof data and n_components names
-  Assert (((vec.size() == dof_handler->get_tria().n_active_cells()) &&
+  Assert (((vec.size() == dof_handler->get_triangulation().n_active_cells()) &&
            (names.size() == 1))
           ||
           ((vec.size() == dof_handler->n_dofs()) &&
@@ -205,13 +205,13 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
       // n_dofs==n_cells, so only
       // bomb out if the next if
       // statement will not be run
-      if (dof_handler->n_dofs() != dof_handler->get_tria().n_active_cells())
+      if (dof_handler->n_dofs() != dof_handler->get_triangulation().n_active_cells())
         Assert (false, ExcVectorNotDeclared (names[0]));
     }
 
   // search cell data
   if ((vec.size() != dof_handler->n_dofs()) ||
-      (dof_handler->n_dofs() == dof_handler->get_tria().n_active_cells()))
+      (dof_handler->n_dofs() == dof_handler->get_triangulation().n_active_cells()))
     {
       typename std::vector<DataVector>::iterator data_vector=cell_data.begin();
       for (; data_vector!=cell_data.end(); ++data_vector)
@@ -232,8 +232,8 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdivisions)
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned int nnnn_subdivisions)
 {
   // this is mostly copied from the
   // DataOut class
@@ -254,7 +254,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
   // create patches of and make sure
   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (typename DH::active_cell_iterator
+  for (typename DoFHandlerType::active_cell_iterator
        cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     ++n_patches;
@@ -302,7 +302,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
   typename std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> >::iterator
   patch = patches.begin() + (patches.size()-n_patches);
   unsigned int cell_number = 0;
-  for (typename DH::active_cell_iterator cell=dof_handler->begin_active();
+  for (typename DoFHandlerType::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
       Assert (cell->is_locally_owned(),
@@ -415,8 +415,8 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 }
 
 
-template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::finish_parameter_value ()
+template <int dim, int spacedim, typename DoFHandlerType>
+void DataOutStack<dim,spacedim,DoFHandlerType>::finish_parameter_value ()
 {
   // release lock on dof handler
   dof_handler = 0;
@@ -431,9 +431,9 @@ void DataOutStack<dim,spacedim,DH>::finish_parameter_value ()
 
 
 
-template <int dim, int spacedim, class DH>
+template <int dim, int spacedim, typename DoFHandlerType>
 std::size_t
-DataOutStack<dim,spacedim,DH>::memory_consumption () const
+DataOutStack<dim,spacedim,DoFHandlerType>::memory_consumption () const
 {
   return (DataOutInterface<dim+1>::memory_consumption () +
           MemoryConsumption::memory_consumption (parameter) +
@@ -446,17 +446,17 @@ DataOutStack<dim,spacedim,DH>::memory_consumption () const
 
 
 
-template <int dim, int spacedim, class DH>
+template <int dim, int spacedim, typename DoFHandlerType>
 const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > &
-DataOutStack<dim,spacedim,DH>::get_patches () const
+DataOutStack<dim,spacedim,DoFHandlerType>::get_patches () const
 {
   return patches;
 }
 
 
 
-template <int dim, int spacedim, class DH>
-std::vector<std::string> DataOutStack<dim,spacedim,DH>::get_dataset_names () const
+template <int dim, int spacedim, typename DoFHandlerType>
+std::vector<std::string> DataOutStack<dim,spacedim,DoFHandlerType>::get_dataset_names () const
 {
   std::vector<std::string> names;
   for (typename std::vector<DataVector>::const_iterator dataset=dof_data.begin();

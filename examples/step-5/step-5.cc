@@ -630,8 +630,6 @@ void Step5<dim>::run ()
 // won't comment on it further:
 int main ()
 {
-  deallog.depth_console (0);
-
   Step5<2> laplace_problem_2d;
   laplace_problem_2d.run ();
 

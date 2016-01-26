@@ -100,7 +100,6 @@ int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
-  deallog.depth_console(0);
 
   test();
 

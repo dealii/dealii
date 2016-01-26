@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -401,10 +401,7 @@ int main ()
       using namespace dealii;
       using namespace Step54;
 
-
-      deallog.depth_console (3);
-
-      const std::string in_mesh_filename = "initial_mesh_3d.vtk";
+      const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
       const std::string cad_file_name = "DTMB-5415_bulbous_bow.iges";
 
       cout << "----------------------------------------------------------" << endl;
@@ -473,4 +470,3 @@ int main ()
 
   return 0;
 }
-

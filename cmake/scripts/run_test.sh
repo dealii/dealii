@@ -87,7 +87,7 @@ diff() {
     # is found (including the main comparison file).
     #
     case ${NUMDIFF_EXECUTABLE} in
-      *numdiff)
+      *numdiff*)
         ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
                               "${file}" output > diff${variant}
         ;;

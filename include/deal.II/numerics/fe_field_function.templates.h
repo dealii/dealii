@@ -31,10 +31,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
 
-  template <int dim, typename DH, typename VECTOR>
-  FEFieldFunction<dim, DH, VECTOR>::FEFieldFunction (const DH &mydh,
-                                                     const VECTOR &myv,
-                                                     const Mapping<dim> &mymapping)
+  template <int dim, typename DoFHandlerType, typename VectorType>
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::FEFieldFunction
+  (const DoFHandlerType &mydh,
+   const VectorType     &myv,
+   const Mapping<dim>   &mymapping)
     :
     Function<dim>(mydh.get_fe().n_components()),
     dh(&mydh, "FEFieldFunction"),
@@ -47,23 +48,23 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
-  set_active_cell(const typename DH::active_cell_iterator &newcell)
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  set_active_cell(const typename DoFHandlerType::active_cell_iterator &newcell)
   {
     cell_hint.get() = newcell;
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  void FEFieldFunction<dim, DH, VECTOR>::vector_value (const Point<dim> &p,
-                                                       Vector<double>   &values) const
+  template <int dim, typename DoFHandlerType, typename VectorType>
+  void FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_value (const Point<dim> &p,
+      Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
-    typename DH::active_cell_iterator cell = cell_hint.get();
+    typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
 
@@ -71,7 +72,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
@@ -87,18 +88,18 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> >
-    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    std::vector< Vector<typename VectorType::value_type> >
+    vvalues (1, Vector<typename VectorType::value_type>(values.size()));
     fe_v.get_function_values(data_vector, vvalues);
     values = vvalues[0];
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   double
-  FEFieldFunction<dim, DH, VECTOR>::value (const Point<dim>   &p,
-                                           const unsigned int comp) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::value (const Point<dim>   &p,
+                                                           const unsigned int comp) const
   {
     Vector<double> values(n_components);
     vector_value(p, values);
@@ -107,15 +108,15 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_gradient (const Point<dim>            &p,
                    std::vector<Tensor<1,dim> > &gradients) const
   {
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
-    typename DH::active_cell_iterator cell = cell_hint.get();
+    typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
 
@@ -123,7 +124,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
@@ -143,17 +144,17 @@ namespace Functions
     // FIXME: we need a temp argument because get_function_values wants to put
     // its data into an object storing the correct scalar type, but this
     // function wants to return everything in a vector<double>
-    std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > > vgrads
-    (1,  std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components) );
+    std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > > vgrads
+    (1,  std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components) );
     fe_v.get_function_gradients(data_vector, vgrads);
     gradients = std::vector<Tensor<1,dim> >(vgrads[0].begin(), vgrads[0].end());
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   Tensor<1,dim>
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
   gradient (const Point<dim>   &p,
             const unsigned int comp) const
   {
@@ -164,15 +165,15 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_laplacian (const Point<dim> &p,
                     Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
-    typename DH::active_cell_iterator cell = cell_hint.get();
+    typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
 
@@ -180,7 +181,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
@@ -196,17 +197,18 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> >
-    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    std::vector< Vector<typename VectorType::value_type> >
+    vvalues (1, Vector<typename VectorType::value_type>(values.size()));
     fe_v.get_function_laplacians(data_vector, vvalues);
     values = vvalues[0];
   }
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  double FEFieldFunction<dim, DH, VECTOR>::laplacian
-  (const Point<dim>   &p, const unsigned int  comp) const
+  template <int dim, typename DoFHandlerType, typename VectorType>
+  double FEFieldFunction<dim, DoFHandlerType, VectorType>::laplacian
+  (const Point<dim>   &p,
+   const unsigned int  comp) const
   {
     Vector<double> lap(n_components);
     vector_laplacian(p, lap);
@@ -217,16 +219,16 @@ namespace Functions
   // Now the list versions
   // ==============================
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
-  vector_value_list (const std::vector<Point< dim > >     &points,
-                     std::vector< Vector<double> > &values) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  vector_value_list (const std::vector<Point< dim > > &points,
+                     std::vector< Vector<double> >    &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
-    std::vector<typename DH::active_cell_iterator > cells;
+    std::vector<typename DoFHandlerType::active_cell_iterator > cells;
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
@@ -252,7 +254,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_values(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
@@ -261,12 +263,12 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
   value_list (const std::vector<Point< dim > > &points,
-              std::vector< double > &values,
-              const unsigned int  component) const
+              std::vector< double >            &values,
+              const unsigned int                component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -278,17 +280,16 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
-  vector_gradient_list (const std::vector<Point< dim > >     &points,
-                        std::vector<
-                        std::vector< Tensor<1,dim> > > &values) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  vector_gradient_list (const std::vector<Point< dim > >           &points,
+                        std::vector<std::vector< Tensor<1,dim> > > &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
-    std::vector<typename DH::active_cell_iterator > cells;
+    std::vector<typename DoFHandlerType::active_cell_iterator > cells;
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
@@ -314,8 +315,8 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > >
-        vgrads (nq, std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components));
+        std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > >
+        vgrads (nq, std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components));
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
@@ -327,12 +328,12 @@ namespace Functions
       }
   }
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
   gradient_list (const std::vector<Point< dim > > &points,
-                 std::vector< Tensor<1,dim> > &values,
-                 const unsigned int  component) const
+                 std::vector< Tensor<1,dim> >     &values,
+                 const unsigned int                component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -344,16 +345,16 @@ namespace Functions
   }
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
-  vector_laplacian_list (const std::vector<Point< dim > >     &points,
-                         std::vector< Vector<double> > &values) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  vector_laplacian_list (const std::vector<Point< dim > > &points,
+                         std::vector< Vector<double> >    &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
 
-    std::vector<typename DH::active_cell_iterator > cells;
+    std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
@@ -379,19 +380,19 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_laplacians(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
   }
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   void
-  FEFieldFunction<dim, DH, VECTOR>::
-  laplacian_list (const std::vector<Point< dim > > &points,
-                  std::vector< double > &values,
-                  const unsigned int  component) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  laplacian_list (const std::vector<Point<dim> > &points,
+                  std::vector<double>            &values,
+                  const unsigned int              component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -403,12 +404,13 @@ namespace Functions
 
 
 
-  template <int dim, typename DH, typename VECTOR>
-  unsigned int FEFieldFunction<dim, DH, VECTOR>::
-  compute_point_locations(const std::vector<Point<dim> > &points,
-                          std::vector<typename DH::active_cell_iterator > &cells,
-                          std::vector<std::vector<Point<dim> > > &qpoints,
-                          std::vector<std::vector<unsigned int> > &maps) const
+  template <int dim, typename DoFHandlerType, typename VectorType>
+  unsigned int FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  compute_point_locations
+  (const std::vector<Point<dim> >                              &points,
+   std::vector<typename DoFHandlerType::active_cell_iterator > &cells,
+   std::vector<std::vector<Point<dim> > >                      &qpoints,
+   std::vector<std::vector<unsigned int> >                     &maps) const
   {
     // How many points are here?
     const unsigned int np = points.size();
@@ -430,7 +432,7 @@ namespace Functions
     bool left_over = true;
 
     // Current quadrature point
-    typename DH::active_cell_iterator cell = cell_hint.get();
+    typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
 
@@ -453,7 +455,7 @@ namespace Functions
       qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
         {
-          const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> >
+          const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> >
           my_pair  = GridTools::find_active_cell_around_point
                      (mapping, *dh, points[0]);
           AssertThrow (my_pair.first->is_locally_owned(),
@@ -518,7 +520,7 @@ namespace Functions
         // the next cell
         if (left_over == true)
           {
-            const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
+            const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
               = GridTools::find_active_cell_around_point (mapping, *dh, points[first_outside]);
             AssertThrow (my_pair.first->is_locally_owned(),
                          VectorTools::ExcPointNotAvailableHere());
@@ -565,11 +567,11 @@ namespace Functions
   }
 
 
-  template <int dim, typename DH, typename VECTOR>
+  template <int dim, typename DoFHandlerType, typename VectorType>
   boost::optional<Point<dim> >
-  FEFieldFunction<dim, DH, VECTOR>::
-  get_reference_coordinates (const typename DH::active_cell_iterator &cell,
-                             const Point<dim>                        &point) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  get_reference_coordinates (const typename DoFHandlerType::active_cell_iterator &cell,
+                             const Point<dim>                                    &point) const
   {
     try
       {

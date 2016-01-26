@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,7 +107,7 @@ void do_test (const DoFHandler<dim> &dof,
               const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
+  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
   //          << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
@@ -176,7 +176,6 @@ void test ()
 int main ()
 {
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   deallog << std::setprecision (3);
   {

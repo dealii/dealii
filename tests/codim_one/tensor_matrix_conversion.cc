@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,6 @@ int main ()
 {
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   FullMatrix<double> A1(10,10);
   Tensor<2,3> T1;

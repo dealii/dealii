@@ -76,17 +76,17 @@ output_matrix (const FullMatrix<double> &m)
 
 
 // output some indicators for a given vector
-template <class VECTOR>
+template <typename VectorType>
 void
-output_vector (const VECTOR &v)
+output_vector (const VectorType &v)
 {
   deallog << v.l1_norm() << ' ' << v.l2_norm() << ' ' << v.linfty_norm()
           << std::endl;
 
   // write out at most 20 equispaced
   // elements of the vector
-  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<typename VECTOR::size_type>(1),
-                                                 static_cast<typename VECTOR::size_type>(v.size()/20)))
+  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<typename VectorType::size_type>(1),
+                                                 static_cast<typename VectorType::size_type>(v.size()/20)))
     deallog << v(i) << ' ';
   deallog << std::endl;
 }

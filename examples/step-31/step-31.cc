@@ -2208,8 +2208,6 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step31;
 
-      deallog.depth_console (0);
-
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
 

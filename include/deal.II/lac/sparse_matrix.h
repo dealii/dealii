@@ -431,18 +431,16 @@ namespace SparseMatrixIterators
 //TODO: Add multithreading to the other vmult functions.
 
 /**
- * Sparse matrix. This class implements the function to store values in the
- * locations of a sparse matrix denoted by a SparsityPattern. The separation
- * of sparsity pattern and values is done since one can store data elements of
- * different type in these locations without the SparsityPattern having to
- * know this, and more importantly one can associate more than one matrix with
- * the same sparsity pattern.
+ * Sparse matrix. This class implements the functionality to store
+ * matrix entry values in the locations denoted by a
+ * SparsityPattern. See @ref Sparsity for a discussion about the
+ * separation between sparsity patterns and matrices.
  *
  * The elements of a SparseMatrix are stored in the same order in which the
  * SparsityPattern class stores its entries. Within each row, elements are
  * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (n_rows() ==
- * n_columns()), then the diagonal entry is stored as the first element in
+ * exception to this rule is that if the matrix is square (m() ==
+ * n()), then the diagonal entry is stored as the first element in
  * each row to make operations like applying a Jacobi or SSOR preconditioner
  * faster. As a consequence, if you traverse the elements of a row of a
  * SparseMatrix with the help of iterators into this object (using
@@ -1428,10 +1426,10 @@ public:
    * internal storage scheme. If it is false, the elements in a row are
    * written in ascending column order.
    */
-  template <class STREAM>
-  void print (STREAM &out,
-              const bool across = false,
-              const bool diagonal_first = true) const;
+  template <class StreamType>
+  void print (StreamType &out,
+              const bool  across = false,
+              const bool  diagonal_first = true) const;
 
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
@@ -1510,7 +1508,7 @@ public:
                   int, int,
                   << "You are trying to access the matrix entry with index <"
                   << arg1 << ',' << arg2
-                  << ">, but this entry does not exist in the sparsity pattern"
+                  << ">, but this entry does not exist in the sparsity pattern "
                   "of this matrix."
                   "\n\n"
                   "The most common cause for this problem is that you used "
@@ -1604,7 +1602,12 @@ private:
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
 
+#ifndef DEAL_II_MSVC
+  // Visual studio is choking on the following friend declaration, probably
+  // because Reference is only defined in a specialization. It looks like
+  // the library is compiling without this line, though.
   template <typename number2> friend class SparseMatrixIterators::Accessor<number2, false>::Reference;
+#endif
 };
 
 #ifndef DOXYGEN
@@ -2340,11 +2343,11 @@ SparseMatrix<number>::end (const size_type r)
 
 
 template <typename number>
-template <class STREAM>
+template <class StreamType>
 inline
-void SparseMatrix<number>::print (STREAM &out,
-                                  const bool across,
-                                  const bool diagonal_first) const
+void SparseMatrix<number>::print (StreamType &out,
+                                  const bool  across,
+                                  const bool  diagonal_first) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());

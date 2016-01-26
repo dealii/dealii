@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,43 +22,15 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
-{
-// helper function to acquire the number of levels within a grid
-  template <class GridClass>
-  unsigned int
-  get_n_levels (const GridClass &grid)
-  {
-    // all objects we deal with are able
-    // to deliver a pointer to the
-    // underlying triangulation.
-    //
-    // for the triangulation as GridClass
-    // of this object, there is a
-    // specialization of this function
-    return grid.get_tria().n_levels();
-  }
-
-
-// specialization for grid==tria
-  template <int dim, int spacedim>
-  unsigned int
-  get_n_levels (const Triangulation<dim, spacedim> &grid)
-  {
-    // if GridClass==Triangulation, then
-    // we can ask directly.
-    return grid.n_levels();
-  }
-}
-
-
-template <class GridClass>
-InterGridMap<GridClass>::InterGridMap ()
+template <class MeshType>
+InterGridMap<MeshType>::InterGridMap ()
   :
   source_grid(0, typeid(*this).name()),
   destination_grid(0, typeid(*this).name())
@@ -67,9 +39,9 @@ InterGridMap<GridClass>::InterGridMap ()
 
 
 
-template <class GridClass>
-void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
-                                            const GridClass &destination_grid)
+template <class MeshType>
+void InterGridMap<MeshType>::make_mapping (const MeshType &source_grid,
+                                           const MeshType &destination_grid)
 {
   // first delete all contents
   clear ();
@@ -78,9 +50,9 @@ void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
   this->source_grid      = &source_grid;
   this->destination_grid = &destination_grid;
 
-  // then set up the containers from
+  // then set up the meshes from
   // scratch and fill them with end-iterators
-  const unsigned int n_levels = get_n_levels(source_grid);
+  const unsigned int n_levels = source_grid.get_triangulation().n_levels();
   mapping.resize (n_levels);
   for (unsigned int level=0; level<n_levels; ++level)
     {
@@ -124,10 +96,10 @@ void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
 
 
 
-template <class GridClass>
+template <class MeshType>
 void
-InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
-                                      const cell_iterator &dst_cell)
+InterGridMap<MeshType>::set_mapping (const cell_iterator &src_cell,
+                                     const cell_iterator &dst_cell)
 {
   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -137,14 +109,14 @@ InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
   if (src_cell->has_children() && dst_cell->has_children())
     {
       Assert(src_cell->n_children()==
-             GeometryInfo<GridClass::dimension>::max_children_per_cell,
+             GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
       Assert(dst_cell->n_children()==
-             GeometryInfo<GridClass::dimension>::max_children_per_cell,
+             GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
       Assert(src_cell->refinement_case()==dst_cell->refinement_case(),
              ExcNotImplemented());
-      for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::max_children_per_cell; ++c)
+      for (unsigned int c=0; c<GeometryInfo<MeshType::dimension>::max_children_per_cell; ++c)
         set_mapping (src_cell->child(c),
                      dst_cell->child(c));
     }
@@ -164,10 +136,10 @@ InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
 
 
 
-template <class GridClass>
+template <class MeshType>
 void
-InterGridMap<GridClass>::set_entries_to_cell (const cell_iterator &src_cell,
-                                              const cell_iterator &dst_cell)
+InterGridMap<MeshType>::set_entries_to_cell (const cell_iterator &src_cell,
+                                             const cell_iterator &dst_cell)
 {
   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -181,9 +153,9 @@ InterGridMap<GridClass>::set_entries_to_cell (const cell_iterator &src_cell,
 }
 
 
-template <class GridClass>
-typename InterGridMap<GridClass>::cell_iterator
-InterGridMap<GridClass>::operator [] (const cell_iterator &source_cell) const
+template <class MeshType>
+typename InterGridMap<MeshType>::cell_iterator
+InterGridMap<MeshType>::operator [] (const cell_iterator &source_cell) const
 {
   Assert (source_cell.state() == IteratorState::valid,
           ExcInvalidKey (source_cell));
@@ -197,8 +169,8 @@ InterGridMap<GridClass>::operator [] (const cell_iterator &source_cell) const
 
 
 
-template <class GridClass>
-void InterGridMap<GridClass>::clear ()
+template <class MeshType>
+void InterGridMap<MeshType>::clear ()
 {
   mapping.clear ();
   source_grid      = 0;
@@ -207,27 +179,27 @@ void InterGridMap<GridClass>::clear ()
 
 
 
-template <class GridClass>
-const GridClass &
-InterGridMap<GridClass>::get_source_grid () const
+template <class MeshType>
+const MeshType &
+InterGridMap<MeshType>::get_source_grid () const
 {
   return *source_grid;
 }
 
 
 
-template <class GridClass>
-const GridClass &
-InterGridMap<GridClass>::get_destination_grid () const
+template <class MeshType>
+const MeshType &
+InterGridMap<MeshType>::get_destination_grid () const
 {
   return *destination_grid;
 }
 
 
 
-template <class GridClass>
+template <class MeshType>
 std::size_t
-InterGridMap<GridClass>::memory_consumption () const
+InterGridMap<MeshType>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (mapping) +
           MemoryConsumption::memory_consumption (source_grid) +

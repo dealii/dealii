@@ -147,13 +147,11 @@ main()
   deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   check<FE_Q> (1,4);
   check1<FE_Q_Hierarchical> (1,4);
   check<FE_DGQ> (0,4);
   check<FE_DGP> (0,4);
-  check<FE_DGPNonparametric> (0,4);
   check1<FE_DGPMonomial> (0,3);
 
   check1<FE_Nedelec> (0,1);

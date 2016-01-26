@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_console(0);
 
   //      subtract two equal polynomials up to order p_dim
   //      the result evaluated at an arbitrary point

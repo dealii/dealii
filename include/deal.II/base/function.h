@@ -524,15 +524,15 @@ public:
 
 
   /**
-   * Substitute function value with value of a <tt>ConstantFunction<dim, Number> <\tt>
+   * Substitute function value with value of a <tt>ConstantFunction@<dim, Number@></tt>
    * object and keep the current selection pattern.
    *
    * This is useful if you want to have different values in different components since the
-   * provided constructors of <tt>ComponentSelectFunction<dim, Number> <\tt>
+   * provided constructors of <tt>ComponentSelectFunction@<dim, Number@></tt>
    * class can only have same value for all components.
    *
-   * @note: we copy the underlying component value data from @para f from its beginning.
-   * So the number of components of @para f cannot be less than the calling object.
+   * @note: we copy the underlying component value data from @p f from its beginning.
+   * So the number of components of @p f cannot be less than the calling object.
    */
   virtual void substitute_function_value_with (const ConstantFunction<dim, Number> &f);
 

@@ -35,9 +35,9 @@ class BlockLinearOperator;
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_operator(const BlockMatrix &matrix);
+block_operator(const BlockMatrixType &matrix);
 
 template <size_t m, size_t n,
           typename Range = BlockVector<double>,
@@ -66,9 +66,9 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_diagonal_operator(const BlockMatrix &block_matrix);
+block_diagonal_operator(const BlockMatrixType &block_matrix);
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range>
@@ -388,9 +388,9 @@ namespace internal
  */
 template <typename Range,
           typename Domain,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_operator(const BlockMatrix &block_matrix)
+block_operator(const BlockMatrixType &block_matrix)
 {
   typedef typename BlockLinearOperator<Range, Domain>::BlockType BlockType;
 
@@ -502,9 +502,9 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
  */
 template <typename Range,
           typename Domain,
-          typename BlockMatrix>
+          typename BlockMatrixType>
 BlockLinearOperator<Range, Domain>
-block_diagonal_operator(const BlockMatrix &block_matrix)
+block_diagonal_operator(const BlockMatrixType &block_matrix)
 {
   typedef typename BlockLinearOperator<Range, Domain>::BlockType BlockType;
 
@@ -588,7 +588,7 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
           new_ops[i][j].reinit_domain_vector = ops[j].reinit_domain_vector;
         }
 
-  return block_operator(new_ops);
+  return block_operator<m,m,Range,Domain>(new_ops);
 }
 
 
@@ -793,7 +793,7 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &block_operator
         auto &dst = v.block(i);
         dst = u.block(i);
         dst *= -1.;
-        for (int j = i + 1; j < m; ++j)
+        for (unsigned int j = i + 1; j < m; ++j)
           block_operator.block(i, j).vmult_add(dst, v.block(j));
         dst *= -1.;
         diagonal_inverse.block(i, i).vmult(dst, dst); // uses intermediate storage
@@ -824,7 +824,7 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &block_operator
         diagonal_inverse.block(i, i).reinit_range_vector(*tmp, /*bool omit_zeroing_entries=*/ true);
         *tmp = u.block(i);
         *tmp *= -1.;
-        for (int j = i + 1; j < m; ++j)
+        for (unsigned int j = i + 1; j < m; ++j)
           block_operator.block(i, j).vmult_add(*tmp,v.block(j));
         *tmp *= -1.;
         diagonal_inverse.block(i, i).vmult_add(v.block(i),*tmp);

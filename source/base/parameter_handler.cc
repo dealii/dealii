@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1337,14 +1337,45 @@ bool ParameterHandler::read_input (std::istream &input,
   // store subsections we are currently in
   std::vector<std::string> saved_path = subsection_path;
 
-  std::string line;
-  int lineno=0;
+  std::string input_line;
+  std::string fully_concatenated_line;
+  bool is_concatenated = false;
+  unsigned int current_line_n = 0;
   bool status = true;
 
-  while (getline (input, line))
+  while (std::getline (input, input_line))
     {
-      ++lineno;
-      status &= scan_line (line, filename, lineno);
+      ++current_line_n;
+
+      // check whether or not the current line should be joined with the next
+      // line before calling scan_line.
+      if (input_line.length() != 0 &&
+          input_line.find_last_of('\\') == input_line.length() - 1)
+        {
+          input_line.erase(input_line.length() - 1); // remove the last '\'
+          is_concatenated = true;
+
+          fully_concatenated_line += input_line;
+        }
+      // If the previous line ended in a '\' but the current did not, then we
+      // should proceed to scan_line.
+      else if (is_concatenated)
+        {
+          fully_concatenated_line += input_line;
+          is_concatenated = false;
+        }
+      // finally, if neither the previous nor current lines are continuations,
+      // then the current input line is entirely concatenated.
+      else
+        {
+          fully_concatenated_line = input_line;
+        }
+
+      if (!is_concatenated)
+        {
+          status &= scan_line (fully_concatenated_line, filename, current_line_n);
+          fully_concatenated_line.clear();
+        }
     }
 
   if (status && (saved_path != subsection_path))
@@ -1382,19 +1413,10 @@ bool ParameterHandler::read_input (const std::string &filename,
   try
     {
       std::string openname = search.find(filename);
-      std::ifstream file (openname.c_str());
-      AssertThrow(file, ExcIO());
+      std::ifstream file_stream (openname.c_str());
+      AssertThrow(file_stream, ExcIO());
 
-      std::string str;
-      std::string file_contents;
-
-      while (std::getline(file, str))
-        {
-          file_contents += str;
-          file_contents.push_back('\n');
-        }
-
-      return ParameterHandler::read_input_from_string (file_contents.c_str());
+      return read_input (file_stream, filename);
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1416,43 +1438,8 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 bool ParameterHandler::read_input_from_string (const char *s)
 {
-  // create an istringstream representation and pass it off
-  // to the other functions doing this work
-
-  // concatenate the lines ending with "\"
-
-  std::istringstream file(s);
-  std::string str;
-  std::string file_contents;
-  bool is_concatenated(false);
-  while (std::getline(file, str))
-    {
-      // if this str must be concatenated with the previous one
-      // we strip the whitespaces
-      if (is_concatenated)
-        {
-          const std::size_t str_begin = str.find_first_not_of(" \t");
-          if (str_begin == std::string::npos)
-            str = ""; // no content
-          else
-            str.erase(0,str_begin); // trim whitespaces from left
-        }
-
-      if ((std::find(str.begin(),str.end(),'\\') != str.end()) && str.find_last_of('\\') == str.length()-1)
-        {
-          str.erase(str.length()-1); // remove '\'
-          file_contents += str;
-          is_concatenated = true; // next line must be concatenated = true
-        }
-      else
-        {
-          is_concatenated = false; // next line must be concatenated = false
-          file_contents += str;
-          file_contents.push_back('\n');
-        }
-    }
-  std::istringstream in (file_contents);
-  return read_input (in, "input string");
+  std::istringstream input_stream (s);
+  return read_input (input_stream, "input string");
 }
 
 
@@ -2559,7 +2546,7 @@ ParameterHandler::log_parameters_section (LogStream &out)
 bool
 ParameterHandler::scan_line (std::string         line,
                              const std::string  &input_filename,
-                             const unsigned int  lineno)
+                             const unsigned int  current_line_n)
 {
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
@@ -2588,7 +2575,7 @@ ParameterHandler::scan_line (std::string         line,
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: There is no such subsection to be entered: "
                     << demangle(get_current_full_path(subsection)) << std::endl;
@@ -2615,7 +2602,7 @@ ParameterHandler::scan_line (std::string         line,
 
       if (line.size()>0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: invalid content after 'end'!" << std::endl;
           return false;
@@ -2623,7 +2610,7 @@ ParameterHandler::scan_line (std::string         line,
 
       if (subsection_path.size() == 0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: There is no subsection to leave here!" << std::endl;
           return false;
@@ -2646,7 +2633,7 @@ ParameterHandler::scan_line (std::string         line,
       std::string::size_type pos = line.find("=");
       if (pos == std::string::npos)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: invalid format of set expression!" << std::endl;
           return false;
@@ -2663,7 +2650,7 @@ ParameterHandler::scan_line (std::string         line,
         {
           if (entries->get<std::string>(path + path_separator + "deprecation_status") == "true")
             {
-              std::cerr << "Warning in line <" << lineno
+              std::cerr << "Warning in line <" << current_line_n
                         << "> of file <" << input_filename
                         << ">: You are using the deprecated spelling <"
                         << entry_name
@@ -2689,7 +2676,7 @@ ParameterHandler::scan_line (std::string         line,
                 = entries->get<unsigned int> (path + path_separator + "pattern");
               if (!patterns[pattern_index]->match(entry_value))
                 {
-                  std::cerr << "Line <" << lineno
+                  std::cerr << "Line <" << current_line_n
                             << "> of file <" << input_filename
                             << ">:" << std::endl
                             << "    The entry value" << std::endl
@@ -2709,7 +2696,7 @@ ParameterHandler::scan_line (std::string         line,
         }
       else
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << ">: No such entry was declared:" << std::endl
                     << "    " << entry_name << std::endl
@@ -2735,7 +2722,7 @@ ParameterHandler::scan_line (std::string         line,
       // the remainder must then be a filename
       if (line.size() == 0)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << "> is an include statement but does not name a file!"
                     << std::endl;
@@ -2746,7 +2733,7 @@ ParameterHandler::scan_line (std::string         line,
       std::ifstream input (line.c_str());
       if (!input)
         {
-          std::cerr << "Line <" << lineno
+          std::cerr << "Line <" << current_line_n
                     << "> of file <" << input_filename
                     << "> is an include statement but the file <"
                     << line << "> could not be opened!"
@@ -2759,7 +2746,7 @@ ParameterHandler::scan_line (std::string         line,
     }
 
   // this line matched nothing known
-  std::cerr << "Line <" << lineno
+  std::cerr << "Line <" << current_line_n
             << "> of file <" << input_filename
             << ">: This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
             << "    " << line << std::endl;
@@ -2828,28 +2815,6 @@ bool MultipleParameterLoop::read_input (std::istream &input,
   bool x = ParameterHandler::read_input (input, filename);
   if (x)
     init_branches ();
-  return x;
-}
-
-
-
-bool MultipleParameterLoop::read_input (const std::string &filename,
-                                        bool optional,
-                                        bool write_compact)
-{
-  return ParameterHandler::read_input (filename, optional, write_compact);
-  // don't call init_branches, since this read_input
-  // function calls
-  // MultipleParameterLoop::Readinput(std::istream &, std::ostream &)
-  // which itself calls init_branches.
-}
-
-
-
-bool MultipleParameterLoop::read_input_from_string (const char *s)
-{
-  bool x = ParameterHandler::read_input (s);
-  init_branches ();
   return x;
 }
 

@@ -74,7 +74,8 @@ public:
   /**
    * Specialized constructor for a structure with blocks of equal size.
    */
-  explicit BlockIndices(const unsigned int n_blocks, const size_type block_size = 0);
+  explicit BlockIndices(const unsigned int n_blocks,
+                        const size_type block_size = 0);
 
   /**
    * Reinitialize the number of blocks and assign each block the same number
@@ -259,9 +260,8 @@ BlockIndices::BlockIndices ()
 
 
 inline
-BlockIndices::BlockIndices (
-  const unsigned int n_blocks,
-  const size_type block_size)
+BlockIndices::BlockIndices (const unsigned int n_blocks,
+                            const size_type block_size)
   :
   n_blocks(n_blocks),
   start_indices(n_blocks+1)
@@ -359,9 +359,9 @@ BlockIndices::to_string () const
     {
       if (i>0)
         result += ',';
-      result += Utilities::int_to_string(block_size(i));
+      result += Utilities::to_string(block_size(i));
     }
-  result += "|" + Utilities::int_to_string(total_size()) + ']';
+  result += "|" + Utilities::to_string(total_size()) + ']';
   return result;
 }
 

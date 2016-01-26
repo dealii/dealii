@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -381,12 +381,10 @@ int main ()
   deallog << std::setprecision(2);
 
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   try
     {
-      deallog.depth_console (0);
 
       LaplaceProblem<2> laplace_problem_2d;
       laplace_problem_2d.run ();

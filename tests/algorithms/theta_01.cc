@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ using namespace Algorithms;
 
 
 class Explicit
-  : public Operator<Vector<double> >
+  : public OperatorBase
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
@@ -42,7 +42,7 @@ private:
 
 
 class Implicit
-  : public Operator<Vector<double> >
+  : public OperatorBase
 {
 public:
   Implicit(const FullMatrix<double> &matrix);
@@ -59,7 +59,6 @@ int main()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   FullMatrix<double> matrix(2);

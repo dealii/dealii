@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,10 +56,13 @@ SolverControl::State monitor_mean (const unsigned int    iteration,
 
 
 
-template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
+template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve( SOLVER &solver, const MATRIX &A,
-             VECTOR &u, VECTOR &f, const PRECONDITION &P)
+check_solve (SolverType         &solver,
+             const MatrixType   &A,
+             VectorType         &u,
+             VectorType         &f,
+             const PRECONDITION &P)
 {
   u = 0.;
   f = 1.;
@@ -79,7 +82,6 @@ int main()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   GrowingVectorMemory<> mem;
@@ -140,4 +142,3 @@ int main()
         }
     }
 }
-

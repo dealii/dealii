@@ -46,7 +46,7 @@ template <int dim>
 void
 write_vtk (const hp::DoFHandler<dim> &dof_handler, const std::string filename)
 {
-  Vector<double> active_fe_index (dof_handler.get_tria().n_active_cells());
+  Vector<double> active_fe_index (dof_handler.get_triangulation().n_active_cells());
   int count = 0;
   typename hp::DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
@@ -148,7 +148,6 @@ void test ()
 int main ()
 {
   initlog();
-  deallog.depth_console(0);
 
   test<2> ();
   test<3> ();

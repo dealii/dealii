@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2015 by the deal.II authors
+ * Copyright (C) 2000 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1029,7 +1029,7 @@ namespace Step18
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           cell_matrix = 0;
           cell_rhs = 0;
@@ -1301,8 +1301,8 @@ namespace Step18
       typename Triangulation<dim>::active_cell_iterator
       cell = triangulation.begin_active(),
       endc = triangulation.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-        if (cell->is_locally_owned() )
+      for (; cell!=endc; ++cell)
+        if (cell->is_locally_owned())
           {
             // On these cells, add up the stresses over all quadrature
             // points...
@@ -1315,7 +1315,7 @@ namespace Step18
                 .old_stress;
 
             // ...then write the norm of the average to their destination:
-            norm_of_stress(index)
+            norm_of_stress(cell->active_cell_index())
               = (accumulated_stress /
                  quadrature_formula.size()).norm();
           }
@@ -1326,7 +1326,7 @@ namespace Step18
       // elements would not appear in the output file, that we would find out
       // by looking at the graphical output:
         else
-          norm_of_stress(index) = -1e+20;
+          norm_of_stress(cell->active_cell_index()) = -1e+20;
     }
     // Finally attach this vector as well to be treated for output:
     data_out.add_data_vector (norm_of_stress, "norm_of_stress");
@@ -1702,7 +1702,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         ++our_cells;
 
     triangulation.clear_user_data();
@@ -1735,7 +1735,7 @@ namespace Step18
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           cell->set_user_pointer (&quadrature_point_history[history_index]);
           history_index += quadrature_formula.size();
@@ -1820,7 +1820,7 @@ namespace Step18
     for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
-      if (cell->is_locally_owned() )
+      if (cell->is_locally_owned())
         {
           // Next, get a pointer to the quadrature point history data local to
           // the present cell, and, as a defensive measure, make sure that
@@ -1906,12 +1906,9 @@ int main (int argc, char **argv)
       using namespace Step18;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      {
-        deallog.depth_console (0);
 
-        TopLevel<3> elastic_problem;
-        elastic_problem.run ();
-      }
+      TopLevel<3> elastic_problem;
+      elastic_problem.run ();
     }
   catch (std::exception &exc)
     {

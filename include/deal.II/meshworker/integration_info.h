@@ -36,7 +36,7 @@ namespace MeshWorker
    * Objects of this class contain one or more objects of type FEValues,
    * FEFaceValues or FESubfaceValues to be used in local integration. They are
    * stored in an array of pointers to the base classes FEValuesBase. The
-   * template parameter VECTOR allows the use of different data types for the
+   * template parameter VectorType allows the use of different data types for the
    * global system.
    *
    * Additionally, this function contains space to store the values of finite
@@ -310,12 +310,12 @@ namespace MeshWorker
      * and also set uninitialized quadrature rules to Gauss formulas, which
      * integrate polynomial bilinear forms exactly.
      */
-    template <typename VECTOR>
+    template <typename VectorType>
     void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim> &mapping,
-                    const AnyData &data,
-                    const VECTOR &dummy,
-                    const BlockInfo *block_info = 0);
+                    const Mapping<dim, spacedim>       &mapping,
+                    const AnyData                      &data,
+                    const VectorType                   &dummy,
+                    const BlockInfo                    *block_info = 0);
     /**
      * Initialize the IntegrationInfo objects contained.
      *
@@ -323,12 +323,12 @@ namespace MeshWorker
      * and also set uninitialized quadrature rules to Gauss formulas, which
      * integrate polynomial bilinear forms exactly.
      */
-    template <typename VECTOR>
+    template <typename VectorType>
     void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim> &mapping,
-                    const AnyData &data,
-                    const MGLevelObject<VECTOR> &dummy,
-                    const BlockInfo *block_info = 0);
+                    const Mapping<dim, spacedim>       &mapping,
+                    const AnyData                      &data,
+                    const MGLevelObject<VectorType>    &dummy,
+                    const BlockInfo                    *block_info = 0);
     /**
      * @name FEValues setup
      */
@@ -773,20 +773,20 @@ namespace MeshWorker
 
 
   template <int dim, int sdim>
-  template <typename VECTOR>
+  template <typename VectorType>
   void
-  IntegrationInfoBox<dim,sdim>::initialize(
-    const FiniteElement<dim,sdim> &el,
-    const Mapping<dim,sdim> &mapping,
-    const AnyData &data,
-    const VECTOR &,
-    const BlockInfo *block_info)
+  IntegrationInfoBox<dim,sdim>::initialize
+  (const FiniteElement<dim,sdim> &el,
+   const Mapping<dim,sdim>       &mapping,
+   const AnyData                 &data,
+   const VectorType &,
+   const BlockInfo               *block_info)
   {
     initialize(el, mapping, block_info);
-    std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
+    std_cxx11::shared_ptr<VectorData<VectorType, dim, sdim> > p;
     VectorDataBase<dim,sdim> *pp;
 
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (cell_selector));
+    p = std_cxx11::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (cell_selector));
     // Public member function of parent class was not found without
     // explicit cast
     pp = &*p;
@@ -794,13 +794,13 @@ namespace MeshWorker
     cell_data = p;
     cell.initialize_data(p);
 
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (boundary_selector));
+    p = std_cxx11::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (boundary_selector));
     pp = &*p;
     pp->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (face_selector));
+    p = std_cxx11::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (face_selector));
     pp = &*p;
     pp->initialize(data);
     face_data = p;
@@ -810,20 +810,20 @@ namespace MeshWorker
   }
 
   template <int dim, int sdim>
-  template <typename VECTOR>
+  template <typename VectorType>
   void
-  IntegrationInfoBox<dim,sdim>::initialize(
-    const FiniteElement<dim,sdim> &el,
-    const Mapping<dim,sdim> &mapping,
-    const AnyData &data,
-    const MGLevelObject<VECTOR> &,
-    const BlockInfo *block_info)
+  IntegrationInfoBox<dim,sdim>::initialize
+  (const FiniteElement<dim,sdim>   &el,
+   const Mapping<dim,sdim>         &mapping,
+   const AnyData                   &data,
+   const MGLevelObject<VectorType> &,
+   const BlockInfo                 *block_info)
   {
     initialize(el, mapping, block_info);
-    std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
+    std_cxx11::shared_ptr<MGVectorData<VectorType, dim, sdim> > p;
     VectorDataBase<dim,sdim> *pp;
 
-    p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (cell_selector));
+    p = std_cxx11::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (cell_selector));
     // Public member function of parent class was not found without
     // explicit cast
     pp = &*p;
@@ -831,13 +831,13 @@ namespace MeshWorker
     cell_data = p;
     cell.initialize_data(p);
 
-    p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (boundary_selector));
+    p = std_cxx11::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (boundary_selector));
     pp = &*p;
     pp->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (face_selector));
+    p = std_cxx11::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (face_selector));
     pp = &*p;
     pp->initialize(data);
     face_data = p;

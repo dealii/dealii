@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
   FE_PolyTensor<PolynomialsBDM<dim>, dim> (
     deg,
     FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
+                           dim, deg+1, FiniteElementData<dim>::Hdiv),
     get_ria_vector (deg),
     std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
                                std::vector<bool>(dim,true)))

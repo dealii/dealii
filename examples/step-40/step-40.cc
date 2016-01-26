@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2015 by the deal.II authors
+ * Copyright (C) 2009 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -30,14 +30,22 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-#define USE_PETSC_LA
+// uncomment the following #define if you have PETSc and Trilinos installed
+// and you prefer using Trilinos in this example:
+// #define FORCE_USE_OF_TRILINOS
 
+// This will either import PETSc or TrilinosWrappers into the namespace
+// LA. Note that we are defining the macro USE_PETSC_LA so that we can detect
+// if we are using PETSc (see solve() for an example where this is necessary)
 namespace LA
 {
-#ifdef USE_PETSC_LA
+#if defined(DEAL_II_WITH_PETSC) && !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
-#else
+#  define USE_PETSC_LA
+#elif defined(DEAL_II_WITH_TRILINOS)
   using namespace dealii::LinearAlgebraTrilinos;
+#else
+#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
 #endif
 }
 
@@ -702,12 +710,9 @@ int main(int argc, char *argv[])
       using namespace Step40;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      deallog.depth_console (0);
 
-      {
-        LaplaceProblem<2> laplace_problem_2d;
-        laplace_problem_2d.run ();
-      }
+      LaplaceProblem<2> laplace_problem_2d;
+      laplace_problem_2d.run ();
     }
   catch (std::exception &exc)
     {

@@ -175,9 +175,18 @@ public:
   /**
    * Constructor. The supplied IndexSet defines which indices might be
    * constrained inside this ConstraintMatrix. In a calculation with a
-   * parallel::distributed::DoFHandler one should use locally_relevant_dofs.
-   * The IndexSet allows the ConstraintMatrix to save memory. Otherwise
-   * internal data structures for all possible indices will be created.
+   * DoFHandler object based on parallel::distributed::Triangulation
+   * or parallel::shared::Triangulation, one should use the set of locally
+   * relevant dofs (see @ref GlossLocallyRelevenDof).
+   *
+   * The given IndexSet allows the ConstraintMatrix to save memory by just not
+   * caring about degrees of freedom that are not of importance to the
+   * current processor. Alternatively, if no such IndexSet is provided,
+   * internal data structures for <i>all</i> possible indices will be created,
+   * leading to memory consumption on every processor that is proportional to
+   * the <i>overall</i> size of the problem, not just proportional to the
+   * size of the portion of the overall problem that is handled by the current
+   * processor.
    */
   explicit ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
@@ -940,23 +949,23 @@ public:
    * caller's site. There is no locking mechanism inside this method to
    * prevent data races.
    */
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
   add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                               SparsityType                 &sparsity_pattern,
+                               SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries = true,
-                               const Table<2,bool>          &dof_mask = default_empty_table) const;
+                               const Table<2,bool>          &dof_mask                 = default_empty_table) const;
 
   /**
    * Similar to the other function, but for non-quadratic sparsity patterns.
    */
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
   add_entries_local_to_global (const std::vector<size_type> &row_indices,
                                const std::vector<size_type> &col_indices,
-                               SparsityType                 &sparsity_pattern,
+                               SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries = true,
-                               const Table<2,bool>          &dof_mask = default_empty_table) const;
+                               const Table<2,bool>          &dof_mask                 = default_empty_table) const;
 
   /**
    * This function imports values from a global vector (@p global_vector) by
@@ -1000,7 +1009,7 @@ public:
    * the constraint $x_3=\frac 12 x_1 + \frac 12 x_2$, then this function will
    * read the values of $x_1$ and $x_1$ from the given vector and set the
    * element $x_3$ according to this constraints. Similarly, if the current
-   * object stores the constraint $x_42=208$, then this function will set the
+   * object stores the constraint $x_{42}=208$, then this function will set the
    * 42nd element of the given vector to 208.
    *
    * @note If this function is called with a parallel vector @p vec, then the
@@ -1283,10 +1292,10 @@ private:
    * This function actually implements the local_to_global function for
    * standard (non-block) sparsity types.
    */
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
   add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                               SparsityType                 &sparsity_pattern,
+                               SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries,
                                const Table<2,bool>          &dof_mask,
                                internal::bool2type<false>) const;
@@ -1295,10 +1304,10 @@ private:
    * This function actually implements the local_to_global function for block
    * sparsity types.
    */
-  template <typename SparsityType>
+  template <typename SparsityPatternType>
   void
   add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                               SparsityType                 &sparsity_pattern,
+                               SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries,
                                const Table<2,bool>          &dof_mask,
                                internal::bool2type<true>) const;
@@ -1311,8 +1320,8 @@ private:
    * the global row indices.
    */
   void
-  make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
-                        internals::GlobalRowsFromLocal  &global_rows) const;
+  make_sorted_row_list (const std::vector<size_type>   &local_dof_indices,
+                        internals::GlobalRowsFromLocal &global_rows) const;
 
   /**
    * Internal helper function for add_entries_local_to_global function.
@@ -1656,7 +1665,7 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
 
 
 template <typename MatrixType> class BlockMatrixBase;
-template <typename SparsityType> class BlockSparsityPatternBase;
+template <typename SparsityPatternType> class BlockSparsityPatternBase;
 template <typename number>     class BlockSparseMatrixEZ;
 
 /**
@@ -1776,12 +1785,12 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>   
 
 
 
-template <typename SparsityType>
+template <typename SparsityPatternType>
 inline
 void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
-                             SparsityType                 &sparsity_pattern,
+                             SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask) const
 {
@@ -1789,7 +1798,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   // the actual implementation follows in the cm.templates.h file.
   add_entries_local_to_global (local_dof_indices, sparsity_pattern,
                                keep_constrained_entries, dof_mask,
-                               internal::bool2type<IsBlockMatrix<SparsityType>::value>());
+                               internal::bool2type<IsBlockMatrix<SparsityPatternType>::value>());
 }
 
 

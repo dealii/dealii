@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: tria.h 32739 2014-04-08 16:39:47Z denis.davydov $
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__distributed__shared_tria_h
-#define __deal2__distributed__shared_tria_h
+#ifndef dealii__distributed__shared_tria_h
+#define dealii__distributed__shared_tria_h
 
 
 #include <deal.II/base/config.h>

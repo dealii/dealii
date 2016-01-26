@@ -1018,9 +1018,9 @@ namespace Step9
                                 const Vector<double>  &solution,
                                 Vector<float>         &error_per_cell)
   {
-    Assert (error_per_cell.size() == dof_handler.get_tria().n_active_cells(),
+    Assert (error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
             ExcInvalidVectorLength (error_per_cell.size(),
-                                    dof_handler.get_tria().n_active_cells()));
+                                    dof_handler.get_triangulation().n_active_cells()));
 
     typedef std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
     IteratorTuple;
@@ -1297,8 +1297,7 @@ namespace Step9
     // using this quantity and the right powers of the mesh width:
     const Tensor<2,dim> Y_inverse = invert(Y);
 
-    Tensor<1,dim> gradient;
-    contract (gradient, Y_inverse, projected_gradient);
+    Tensor<1,dim> gradient = Y_inverse * projected_gradient;
 
     // The last part of this function is the one where we
     // write into the element of the output vector what
@@ -1331,8 +1330,6 @@ int main ()
 {
   try
     {
-      dealii::deallog.depth_console (0);
-
       dealii::MultithreadInfo::set_thread_limit();
 
       Step9::AdvectionProblem<2> advection_problem_2d;

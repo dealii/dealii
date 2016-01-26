@@ -485,9 +485,9 @@ public:
    * of this object is lost, and the sparsity pattern is in compressed mode
    * afterwards.
    */
-  template <typename SparsityType>
-  void copy_from (const SparsityType &dsp,
-                  const size_type     chunk_size);
+  template <typename SparsityPatternType>
+  void copy_from (const SparsityPatternType &dsp,
+                  const size_type            chunk_size);
 
   /**
    * Take a full matrix and use its nonzero entries to generate a sparse
