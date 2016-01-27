@@ -17,7 +17,8 @@
 // conditions. we used to forget to enforce the 2:1 level balance over
 // periodic boundaries in artificial cells, which lead to the case where the
 // coarser MG level did not provide the correct ghost layer. This test
-// explicitly looks into the ghost layer on an adaptive case for processor 0
+// explicitly lists all cells on all processors (processor 1 used to miss a
+// few cells in the implementation before January 2016).
 
 #include "../tests.h"
 
@@ -34,10 +35,6 @@
 
 #include <deal.II/distributed/tria.h>
 
-// This is C++:
-#include <fstream>
-#include <sstream>
-
 
 
 template <int dim>
@@ -49,7 +46,8 @@ void test()
   tria(MPI_COMM_WORLD, dealii::Triangulation<dim>::limit_level_difference_at_vertices,
        parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::subdivided_hyper_cube (tria, 3);
-  // set periodic boundary conditions in x and z directions
+
+  // set periodic boundary conditions in all directions
   for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -60,9 +58,8 @@ void test()
   GridTools::collect_periodic_faces(tria, 0+10, 1+10, 0, periodic_faces);
   GridTools::collect_periodic_faces(tria, 2+10, 3+10, 1, periodic_faces);
   tria.add_periodicity(periodic_faces);
-  //tria.refine_global(3);
 
-  // adaptively refine into the corner on proc 0
+  // adaptively refine into the lower left corner
   for (unsigned int i=0; i<2; ++i)
     {
       for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
@@ -75,7 +72,8 @@ void test()
   for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
        cell != tria.end(); ++cell)
     deallog << cell->id().to_string() << " " << cell->level_subdomain_id() << std::endl;
-  if (1)
+
+  if (0)
     {
       std::ofstream grid_output (("out"+Utilities::to_string(myid)+".svg").c_str());
       GridOut grid_out;

@@ -38,10 +38,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/distributed/tria.h>
 
-// This is C++:
-#include <fstream>
-#include <sstream>
-
 
 
 template <int dim>

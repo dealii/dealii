@@ -3177,11 +3177,6 @@ namespace parallel
                periodic.orientation[2] == false,
                ExcNotImplemented());
 
-        // TODO: might need to fix the case with corners where several PBC
-        // meet (in most cases it will get fixed eventually because we visit
-        // corner dofs more than once, and each time we pass around we connect
-        // two more vertices; in the worst case of 3 periodicity connects in
-        // 3D, we are safe after three levels)
         for (unsigned int v=0; v<GeometryInfo<ITERATOR::AccessorType::dimension-1>::vertices_per_cell; ++v)
           {
             const unsigned int vi0 = topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)];
