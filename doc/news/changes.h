@@ -500,7 +500,15 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Fixed: SparseVanka now really uses second-order couplings for the 
+  <li> Fixed: parallel::distributed::Triangulation with periodic boundary
+  conditions did not respect 2:1 balance over vertices on periodic
+  boundaries. This lead to incomplete ghost layers on multigrid levels. This
+  has been fixed.
+  <br>
+  (Martin Kronbichler, Timo Heister, 2016/01/27)
+  </li>
+
+  <li> Fixed: SparseVanka now really uses second-order couplings for the
   right-hand side of the local problems.
   <br>
   (Florian Sonner, 2016/01/27)
