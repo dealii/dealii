@@ -16,9 +16,8 @@
 // this tests distribute_mg_dofs on a mesh with periodic boundary
 // conditions. we used to forget to enforce the 2:1 level balance over
 // periodic boundaries in artificial cells, which lead to the case where the
-// coarser MG level did not provide the correct ghost layer (leading to a
-// deadlock in the distribute_dofs function for 6 procs in 2D and 28 procs in
-// 3D)
+// coarser MG level did not provide the correct ghost layer. This test
+// explicitly looks into the ghost layer on an adaptive case for processor 0
 
 #include "../tests.h"
 
@@ -31,11 +30,8 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_out.h>
 
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/distributed/tria.h>
 
 // This is C++:
@@ -47,36 +43,50 @@
 template <int dim>
 void test()
 {
+  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
   parallel::distributed::Triangulation<dim>
   tria(MPI_COMM_WORLD, dealii::Triangulation<dim>::limit_level_difference_at_vertices,
        parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::subdivided_hyper_cube (tria, 1);
+  GridGenerator::subdivided_hyper_cube (tria, 3);
   // set periodic boundary conditions in x and z directions
   for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (f / 2 != 1 && cell->at_boundary(f))
+      if (cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f+10);
 
   std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> > periodic_faces;
   GridTools::collect_periodic_faces(tria, 0+10, 1+10, 0, periodic_faces);
-  if (dim == 3)
-    GridTools::collect_periodic_faces(tria, 4+10, 5+10, 2, periodic_faces);
+  GridTools::collect_periodic_faces(tria, 2+10, 3+10, 1, periodic_faces);
   tria.add_periodicity(periodic_faces);
-  tria.refine_global(5);
+  //tria.refine_global(3);
 
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs(fe);
-  deallog << "Number of cells: " << tria.n_global_active_cells()
-          << std::endl
-          << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
+  // adaptively refine into the corner on proc 0
+  for (unsigned int i=0; i<2; ++i)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+           cell != tria.end(); ++cell)
+        if (cell->at_boundary(0) && cell->at_boundary(2) && cell->is_locally_owned())
+          cell->set_refine_flag();
+      tria.execute_coarsening_and_refinement();
+    }
 
-  dof_handler.distribute_mg_dofs(fe);
-  deallog << "Number of DoFs per level: ";
-  for (unsigned int level=0; level<tria.n_global_levels(); ++level)
-    deallog << dof_handler.n_dofs(level) << " ";
-  deallog << std::endl;
+  for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
+       cell != tria.end(); ++cell)
+    deallog << cell->id().to_string() << " " << cell->level_subdomain_id() << std::endl;
+  if (1)
+    {
+      std::ofstream grid_output (("out"+Utilities::to_string(myid)+".svg").c_str());
+      GridOut grid_out;
+      GridOutFlags::Svg flags;
+      flags.label_level_subdomain_id = true;
+      flags.coloring = GridOutFlags::Svg::level_subdomain_id;
+      flags.convert_level_number_to_height = true;
+      grid_out.set_flags(flags);
+
+      grid_out.write_svg (tria, grid_output);
+    }
 }
 
 
@@ -84,10 +94,9 @@ void test()
 int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  mpi_initlog();
+  MPILogInitAll log;
 
   test<2>();
-  test<3>();
 
   return 0;
 }

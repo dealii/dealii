@@ -3187,7 +3187,7 @@ namespace parallel
             const unsigned int vi0 = topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)];
             const unsigned int vi1 = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)];
             const unsigned int min_index = std::min(vi0, vi1);
-            topological_vertex_numbering[vi0] = topological_vertex_numbering[vi1] = min_index;
+            topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)] = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)] = min_index;
           }
       }
 
@@ -3203,9 +3203,10 @@ namespace parallel
         for (unsigned int i=0; i<topological_vertex_numbering.size(); ++i)
           topological_vertex_numbering[i] = i;
         for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
+          {
           identify_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
                                                  topological_vertex_numbering);
-
+          }
         // this code is replicated from grid/tria.cc but using an indirection
         // for periodic boundary conditions
         bool continue_iterating = true;
