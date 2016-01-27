@@ -3192,21 +3192,26 @@ namespace parallel
       }
 
       template <int dim, int spacedim>
-      void enforce_mesh_balance_over_periodic_boundaries
+      bool enforce_mesh_balance_over_periodic_boundaries
       (Triangulation<dim,spacedim> &tria,
        std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > periodic_face_pairs_level_0)
       {
         if (periodic_face_pairs_level_0.empty())
-          return;
+          return false;
+
+        std::vector<bool> flags_before[2];
+        tria.save_coarsen_flags (flags_before[0]);
+        tria.save_refine_flags (flags_before[1]);
 
         std::vector<unsigned int> topological_vertex_numbering(tria.n_vertices());
         for (unsigned int i=0; i<topological_vertex_numbering.size(); ++i)
           topological_vertex_numbering[i] = i;
         for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
           {
-          identify_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
-                                                 topological_vertex_numbering);
+            identify_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
+                                                   topological_vertex_numbering);
           }
+
         // this code is replicated from grid/tria.cc but using an indirection
         // for periodic boundary conditions
         bool continue_iterating = true;
@@ -3316,7 +3321,39 @@ namespace parallel
                       cell->child(child)->clear_coarsen_flag();
               }
           }
+        std::vector<bool> flags_after[2];
+        tria.save_coarsen_flags (flags_after[0]);
+        tria.save_refine_flags (flags_after[1]);
+        return ((flags_before[0] != flags_after[0]) ||
+                (flags_before[1] != flags_after[1]));
       }
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim,spacedim>::prepare_coarsening_and_refinement()
+    {
+      std::vector<bool> flags_before[2];
+      this->save_coarsen_flags (flags_before[0]);
+      this->save_refine_flags (flags_before[1]);
+
+      do
+        {
+          this->dealii::Triangulation<dim,spacedim>::prepare_coarsening_and_refinement();
+        }
+      // enforce 2:1 mesh balance over periodic boundaries
+      while ((this->smooth_grid & dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
+             &&
+             enforce_mesh_balance_over_periodic_boundaries(*this,
+                                                           periodic_face_pairs_level_0));
+
+      std::vector<bool> flags_after[2];
+      this->save_coarsen_flags (flags_after[0]);
+      this->save_refine_flags (flags_after[1]);
+      return ((flags_before[0] != flags_after[0]) ||
+              (flags_before[1] != flags_after[1]));
     }
 
 
@@ -3470,11 +3507,6 @@ namespace parallel
 
           // fix all the flags to make sure we have a consistent mesh
           this->prepare_coarsening_and_refinement ();
-
-          // enforce 2:1 mesh balance over periodic boundaries
-          if (this->smooth_grid & dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
-            enforce_mesh_balance_over_periodic_boundaries(*this,
-                                                          periodic_face_pairs_level_0);
 
           // see if any flags are still set
           mesh_changed = false;
