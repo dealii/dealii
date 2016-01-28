@@ -1381,6 +1381,13 @@ bool ParameterHandler::read_input (std::istream &input,
         }
     }
 
+  // While it does not make much sense for anyone to actually do this, allow
+  // the last line to end in a backslash.
+  if (is_concatenated)
+    {
+      status &= scan_line (fully_concatenated_line, filename, current_line_n);
+    }
+
   if (status && (saved_path != subsection_path))
     {
       std::cerr << "Unbalanced 'subsection'/'end' in file <" << filename
