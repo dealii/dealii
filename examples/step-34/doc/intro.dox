@@ -273,7 +273,7 @@ The reason why this is possible can be understood if we consider the
 fact that the solution of a pure Neumann problem is known up to an
 arbitrary constant $c$, which means that, if we set the Neumann data
 to be zero, then any constant $\phi = \phi_\infty$ will be a solution.
-Inserting constant solution and the Neumann boundary condition in the 
+Inserting the constant solution and the Neumann boundary condition in the 
 boundary integral equation, we have
 @f{align*}
 \alpha\left(\mathbf{x}\right)\phi\left(\mathbf{x}\right)
@@ -285,7 +285,7 @@ boundary integral equation, we have
 +\int_{\Gamma}\frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y
 \right]
 @f}
-The integral on $\Gamma_\infty$ is unity, see above, division by the constant $\phi_\infty$ gives us the explicit 
+The integral on $\Gamma_\infty$ is unity, see above, so division by the constant $\phi_\infty$ gives us the explicit 
 expression above for $\alpha(\mathbf{x})$.
 
 While this example program is really only focused on the solution of the
