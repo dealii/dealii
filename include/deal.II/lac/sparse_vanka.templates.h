@@ -335,8 +335,8 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
             // couples with
             // number of DoFs coupling to
             // irow (including irow itself)
-            for (typename SparseMatrix<number>::const_iterator p=matrix->begin(row);
-                 p != matrix->end(row); ++p)
+            for (typename SparseMatrix<number>::const_iterator p=matrix->begin(irow);
+                 p != matrix->end(irow); ++p)
               {
                 // find out whether this DoF
                 // (that couples with @p irow,

@@ -500,6 +500,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: SparseVanka now really uses second-order couplings for the 
+  right-hand side of the local problems.
+  <br>
+  (Florian Sonner, 2016/01/27)
+  </li>
+
   <li> Fixed: A bug in the Neumann boundary handling of KellyErrorEstimator
   in 1d has been fixed and KellyErrorEstimator now correctly handles
   codimension one problems by using the correct normals from the manifold
