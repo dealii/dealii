@@ -36,7 +36,7 @@ std::vector<unsigned int>
 FE_P1NCParametric::get_dpo_vector ()
 {
   std::vector<unsigned int> dpo(3);
-  dpo[0] = 1; //dofs per object: vertex
+  dpo[0] = 1; // dofs per object: vertex
   dpo[1] = 0; // line
   dpo[2] = 0; // quad
   return dpo;
@@ -45,30 +45,29 @@ FE_P1NCParametric::get_dpo_vector ()
 
 FiniteElement<2,2>::InternalDataBase *
 FE_P1NCParametric::get_data (const UpdateFlags update_flags,
-                             const Mapping<2,2> &mapping,
-                             const Quadrature<2> &quadrature) const
+                             const Mapping<2,2> &,
+                             const Quadrature<2> &quadrature,
+                             dealii::internal::FEValues::FiniteElementRelatedData<2,2> &) const
 {
 
   InternalData *data = new InternalData;
 
 
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
+  data->update_each = requires_update_flags(update_flags);
 
-  const UpdateFlags flags(data->update_flags);
+  const UpdateFlags flags(data->update_each);
   const unsigned int n_q_points = quadrature.size();
 
 
   // initialize shape value
   if (flags & update_values)
-    data->shape_values.resize (this->dofs_per_cell,
-                               std::vector<double> (n_q_points));
+    data->shape_values.reinit (this->dofs_per_cell,
+                               n_q_points);
 
   // initialize shape gradient
   if (flags & update_gradients)
-    data->shape_gradients.resize (this->dofs_per_cell,
-                                  std::vector<Tensor<1,2> > (n_q_points));
+    data->shape_gradients.reinit (this->dofs_per_cell,
+                                  n_q_points);
 
 
   // update
@@ -94,25 +93,27 @@ FE_P1NCParametric::get_data (const UpdateFlags update_flags,
 }
 
 
-// get fe value in real cell from fedata in reference cell
 void
-FE_P1NCParametric::fill_fe_values (const Mapping<2,2>                                &mapping,
-                                   const Triangulation<2,2>::cell_iterator           &cell,
+FE_P1NCParametric::fill_fe_values (const Triangulation<2,2>::cell_iterator           &,
+                                   const CellSimilarity::Similarity                   cell_similarity,
                                    const Quadrature<2>                               &quadrature,
+                                   const Mapping<2,2>                                &mapping,
                                    const Mapping<2,2>::InternalDataBase              &mapping_internal,
+                                   const internal::FEValues::MappingRelatedData<2,2> &,
                                    const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                   internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
-                                   const CellSimilarity::Similarity                   cell_similarity) const
+                                   internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {
 
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
-  const UpdateFlags flags(fe_data.current_update_flags());
+  const UpdateFlags flags(fe_data.update_each);
 
-  // gets shape function values from its input argument fedata
+  //   std::cout<<" ? Flag ? "
+  //           << (flags)
+  //           <<std::endl;
+
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       // shape value
@@ -123,10 +124,10 @@ FE_P1NCParametric::fill_fe_values (const Mapping<2,2>                           
 
       // shape gradient
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
-        mapping.transform(fe_data.shape_gradients[k],
+        mapping.transform(make_array_view(fe_data.shape_gradients, k),
                           mapping_covariant,
                           mapping_internal,
-                          output_data.shape_gradients[k]);
+                          make_array_view(output_data.shape_gradients, k));
 
     }
 
@@ -134,14 +135,14 @@ FE_P1NCParametric::fill_fe_values (const Mapping<2,2>                           
 
 
 void
-FE_P1NCParametric::fill_fe_face_values (const Mapping<2,2>                                &mapping,
-                                        const Triangulation<2,2>::cell_iterator           &cell,
-                                        const unsigned int                                 face_no,
-                                        const Quadrature<1>                               &quadrature,
+FE_P1NCParametric::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
+                                        const unsigned int                                                   face_no,
+                                        const Quadrature<1>                                             &quadrature,
+                                        const Mapping<2,2>                                         &mapping,
                                         const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                        const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                                        const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                        internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                                        const dealii::internal::FEValues::MappingRelatedData<2,2> &,
+                                        const InternalDataBase                                              &fe_internal,
+                                        dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 
 {
@@ -157,7 +158,7 @@ FE_P1NCParametric::fill_fe_face_values (const Mapping<2,2>                      
                                               cell->face_rotation(face_no),
                                               quadrature.size());
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  const UpdateFlags flags(fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -166,10 +167,18 @@ FE_P1NCParametric::fill_fe_face_values (const Mapping<2,2>                      
           output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+      {
+          const ArrayView<Tensor<1,2> > transformed_shape_gradients
+                  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
+
+        mapping.transform(make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                           mapping_covariant,
                           mapping_internal,
-                          output_data.shape_gradients[k]);
+                          transformed_shape_gradients);
+
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+            output_data.shape_gradients(k,i) = transformed_shape_gradients[i] ;
+      }
     }
 
 
@@ -181,15 +190,15 @@ FE_P1NCParametric::fill_fe_face_values (const Mapping<2,2>                      
 
 
 void
-FE_P1NCParametric::fill_fe_subface_values (const Mapping<2,2>                                &mapping,
-                                           const Triangulation<2,2>::cell_iterator           &cell,
-                                           const unsigned int                                 face_no,
-                                           const unsigned int                                 sub_no,
-                                           const Quadrature<1>                               &quadrature,
+FE_P1NCParametric::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
+                                           const unsigned int                                                   face_no,
+                                           const unsigned int                                                   sub_no,
+                                           const Quadrature<1>                                             &quadrature,
+                                           const Mapping<2,2>                                         &mapping,
                                            const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                           const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                                           const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                           internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                                           const dealii::internal::FEValues::MappingRelatedData<2,2> &,
+                                           const InternalDataBase                                              &fe_internal,
+                                           dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {
 
@@ -206,7 +215,7 @@ FE_P1NCParametric::fill_fe_subface_values (const Mapping<2,2>                   
                                                  quadrature.size(),
                                                  cell->subface_case(face_no));
 
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
+  const UpdateFlags flags(fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
@@ -215,14 +224,22 @@ FE_P1NCParametric::fill_fe_subface_values (const Mapping<2,2>                   
           output_data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
 
       if (flags & update_gradients)
-        mapping.transform(make_slice(fe_data.shape_gradients[k], offset, quadrature.size()),
+      {
+          const ArrayView<Tensor<1,2> > transformed_shape_gradients
+                  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
+
+        mapping.transform(make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                           mapping_covariant,
                           mapping_internal,
-                          output_data.shape_gradients[k]);
+                          transformed_shape_gradients);
+
+        for (unsigned int i=0; i<quadrature.size(); ++i)
+            output_data.shape_gradients(k,i) = transformed_shape_gradients[i] ;
+      }
+
     }
 
 }
-
 
 
 FE_P1NCParametric::FE_P1NCParametric()
@@ -230,8 +247,7 @@ FE_P1NCParametric::FE_P1NCParametric()
   FiniteElement<2,2>(FiniteElementData<2>(get_dpo_vector(),
                                           1,
                                           1,
-                                          FiniteElementData<2>::L2,
-                                          numbers::invalid_unsigned_int),
+                                          FiniteElementData<2>::L2),
                      std::vector<bool> (1, false),
                      get_nonzero_component())
 {
@@ -253,7 +269,7 @@ FE_P1NCParametric::FE_P1NCParametric()
   unit_face_support_points[1][0] = 1.0 ;
 
 
-  // CONSTRAINTS MATRIX INITIALIZATION
+  // constraints matrix initialization
   initialize_constraints () ;
 }
 
@@ -266,15 +282,12 @@ std::string FE_P1NCParametric::get_name () const
 
 
 
-UpdateFlags     FE_P1NCParametric::update_once (const UpdateFlags flags) const
-{
-  return (update_default | (flags & update_values));
-}
-
-UpdateFlags     FE_P1NCParametric::update_each (const UpdateFlags flags) const
+UpdateFlags     FE_P1NCParametric::requires_update_flags (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
+  if (flags & update_values)
+    out |= update_values;
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_cell_normal_vectors)
@@ -348,7 +361,7 @@ double FE_P1NCParametric::shape_value (const unsigned int i,
 
   double value = 0.0 ;
 
-  // P1NC with HALF COEFFICIENT
+  // P1NC with a half value
   switch (i)
     {
     case 0:
@@ -369,23 +382,6 @@ double FE_P1NCParametric::shape_value (const unsigned int i,
 
   return value*0.5 ;
 
-
-  // // Q1 for test
-  // switch (i)
-  //  {
-  //  case 0:
-  //    return  (1.0-p[0])*(1.0-p[1]) ;
-  //  case 1:
-  //    return  p[0]*(1.0-p[1]) ;
-  //  case 2:
-  //    return  (1.0-p[0])*p[1] ;
-  //  case 3:
-  //    return  p[0]*p[1] ;
-  //  default:
-  //    return 0 ;
-  //  };
-
-
 }
 
 
@@ -397,7 +393,7 @@ Tensor<1,2> FE_P1NCParametric::shape_grad (const unsigned int i,
   Tensor<1,2> grad ;
 
 
-  // P1NC with HALF COEFFICIENT
+  // P1NC with a half value
   switch (i)
     {
     case 0:
@@ -422,36 +418,8 @@ Tensor<1,2> FE_P1NCParametric::shape_grad (const unsigned int i,
 
   return grad*0.5 ;
 
-
-  // // Q1 for test
-  // switch (i)
-  //  {
-  //  case 0:
-  //    grad[0] = p[1]-1.0 ;
-  //    grad[1] = p[0]-1.0 ;
-  //    return grad ;
-  //  case 1:
-  //    grad[0] = 1.0-p[1] ;
-  //    grad[1] = -p[0] ;
-  //    return grad ;
-  //  case 2:
-  //    grad[0] = -p[1] ;
-  //    grad[1] = 1.0-p[0] ;
-  //    return grad ;
-  //  case 3:
-  //    grad[0] =  p[1] ;
-  //    grad[1] =  p[0] ;
-  //    return grad ;
-  //  default:
-  //    return grad ;
-  //  };
-
-
 }
 
-
-// 2015 05 13 CONSTRAINTS MATRIX FOR HANGING NODE
-// BASED ON 'fe_q_base.cc'
 
 void FE_P1NCParametric::initialize_constraints ()
 {
@@ -459,9 +427,6 @@ void FE_P1NCParametric::initialize_constraints ()
   std::vector<Point<1> > constraint_points;
   // Add midpoint
   constraint_points.push_back (Point<1> (0.5));
-
-  // Now construct relation between destination (child) and source (mother)
-  // dofs.
 
   interface_constraints
   .TableBase<2,double>::reinit (interface_constraints_size());
@@ -510,9 +475,7 @@ FE_P1NCNonparametric::get_data (const UpdateFlags update_flags,
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
+  data->update_each = requires_update_flags(update_flags);
 
   return data;
 
@@ -524,17 +487,16 @@ FE_P1NCNonparametric::get_data (const UpdateFlags update_flags,
 
 
 void
-FE_P1NCNonparametric::fill_fe_values (const Mapping<2,2>                                &mapping,
-                                      const Triangulation<2,2>::cell_iterator           &cell,
+FE_P1NCNonparametric::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
+                                      const CellSimilarity::Similarity                   ,
                                       const Quadrature<2>                               &quadrature,
-                                      const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                      const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                                      const Mapping<2,2>                                &mapping,
+                                      const Mapping<2,2>::InternalDataBase              &,
                                       const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                      internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
-                                      const CellSimilarity::Similarity                   cell_similarity) const
-
+                                      const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                                      internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
-  const UpdateFlags flags(fe_internal.current_update_flags()) ;
+  const UpdateFlags flags(fe_internal.update_each) ;
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -631,15 +593,14 @@ FE_P1NCNonparametric::fill_fe_values (const Mapping<2,2>                        
 
 
 void
-FE_P1NCNonparametric::fill_fe_face_values (const Mapping<2,2>                                &mapping,
-                                           const Triangulation<2,2>::cell_iterator           &cell,
+FE_P1NCNonparametric::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
                                            const unsigned int                                 face_no,
-                                           const Quadrature<1>                               &quadrature,
+                                           const Quadrature<1>                                             &quadrature,
+                                           const Mapping<2,2>                                         &mapping,
                                            const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                           const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                                           const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                           internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
-
+                                           const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                                           const InternalDataBase                                              &fe_internal,
+                                           dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {}
 
@@ -649,15 +610,15 @@ FE_P1NCNonparametric::fill_fe_face_values (const Mapping<2,2>                   
 
 
 void
-FE_P1NCNonparametric::fill_fe_subface_values (const Mapping<2,2>                                &mapping,
-                                              const Triangulation<2,2>::cell_iterator           &cell,
-                                              const unsigned int                                 face_no,
-                                              const unsigned int                                 sub_no,
-                                              const Quadrature<1>                               &quadrature,
+FE_P1NCNonparametric::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
+                                              const unsigned int                                                  face_no,
+                                              const unsigned int                                                   sub_no,
+                                              const Quadrature<1>                                             &quadrature,
+                                              const Mapping<2,2>                                         &mapping,
                                               const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                              const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                                              const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                              internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                                              const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                                              const InternalDataBase                                              &fe_internal,
+                                              dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {}
 
@@ -668,8 +629,7 @@ FE_P1NCNonparametric::FE_P1NCNonparametric()
   FiniteElement<2,2>(FiniteElementData<2>(get_dpo_vector(),
                                           1,
                                           1,
-                                          FiniteElementData<2>::L2,
-                                          numbers::invalid_unsigned_int),
+                                          FiniteElementData<2>::L2),
                      std::vector<bool> (1, false),
                      get_nonzero_component())
 {
@@ -692,21 +652,16 @@ std::string FE_P1NCNonparametric::get_name () const
 }
 
 
-
-UpdateFlags     FE_P1NCNonparametric::update_once (const UpdateFlags flags) const
+UpdateFlags     FE_P1NCNonparametric::requires_update_flags (const UpdateFlags flags) const
 {
-  return (update_default );
+    UpdateFlags out = update_default;
 
-}
-
-UpdateFlags     FE_P1NCNonparametric::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = (update_default | (flags & update_values) | (flags & update_quadrature_points)) ;
-
-  if (flags & update_gradients)
-    out |= update_gradients | update_covariant_transformation | update_JxW_values;
-  if (flags & update_cell_normal_vectors)
-    out |= update_cell_normal_vectors | update_JxW_values;
+    if (flags & update_values)
+      out |= update_values | update_quadrature_points ;
+    if (flags & update_gradients)
+      out |= update_gradients ;
+    if (flags & update_cell_normal_vectors)
+      out |= update_cell_normal_vectors | update_JxW_values;
 
   return out;
 }

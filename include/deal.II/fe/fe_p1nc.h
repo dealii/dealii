@@ -49,58 +49,60 @@ private:
   {
   public:
 
-    std::vector<std::vector<double> > shape_values;
-    std::vector<std::vector<Tensor<1,2> > > shape_gradients;
+    Table<2,double > shape_values;
+    Table<2,Tensor<1,2> > shape_gradients;
+    mutable std::vector<Tensor<1,2> > transformed_shape_gradients ;
   };
 
 
-  virtual FiniteElement<2,2>::InternalDataBase *
+virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
-            const Mapping<2,2> &mapping,
-            const Quadrature<2> &quadrature) const ;
+            const Mapping<2,2> &,
+            const Quadrature<2> &,
+            dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const ;
 
 
 
 
   virtual
   void
-  fill_fe_values (const Mapping<2,2>                                &mapping,
-                  const Triangulation<2,2>::cell_iterator           &cell,
+  fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                   ,
                   const Quadrature<2>                               &quadrature,
-                  const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                  const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                  const Mapping<2,2>                                &mapping,
+                  const Mapping<2,2>::InternalDataBase              &,
                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
-                  const CellSimilarity::Similarity                   cell_similarity) const;
+                  const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                  internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
 
   virtual
   void
-  fill_fe_face_values (const Mapping<2,2>                                &mapping,
-                       const Triangulation<2,2>::cell_iterator           &cell,
-                       const unsigned int                                 face_no,
-                       const Quadrature<1>                               &quadrature,
+  fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
+                       const unsigned int                                                   face_no,
+                       const Quadrature<1>                                             &quadrature,
+                       const Mapping<2,2>                                         &mapping,
                        const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                       const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                       const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                       const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                       const InternalDataBase                                              &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<2,2>                                &mapping,
-                          const Triangulation<2,2>::cell_iterator           &cell,
-                          const unsigned int                                 face_no,
-                          const unsigned int                                 sub_no,
-                          const Quadrature<1>                               &quadrature,
+  fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
+                          const unsigned int                                                   face_no,
+                          const unsigned int                                                   sub_no,
+                          const Quadrature<1>                                             &quadrature,
+                          const Mapping<2,2>                                         &mapping,
                           const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                          const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                          const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                          const InternalDataBase                                              &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
@@ -111,11 +113,7 @@ public:
 
   virtual std::string get_name () const ;
 
-
-
-  virtual UpdateFlags     update_once (const UpdateFlags flags) const ;
-
-  virtual UpdateFlags     update_each (const UpdateFlags flags) const ;
+  virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
 
   const std::vector<Point<1> > &get_unit_face_support_points () const ;
 
@@ -174,50 +172,51 @@ private:
   virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
-            const Quadrature<2> &) const ;
+            const Quadrature<2> &,
+            dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const ;
 
 
 
 
-  virtual
+   virtual
   void
-  fill_fe_values (const Mapping<2,2>                                &mapping,
-                  const Triangulation<2,2>::cell_iterator           &cell,
+  fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
+                  const CellSimilarity::Similarity                   ,
                   const Quadrature<2>                               &quadrature,
-                  const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                  const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                  const Mapping<2,2>                                &mapping,
+                  const Mapping<2,2>::InternalDataBase              &,
                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                  internal::FEValues::FiniteElementRelatedData<2,2> &output_data,
-                  const CellSimilarity::Similarity                   cell_similarity) const;
+                  const FiniteElement<2,2>::InternalDataBase        &fe_internal,
+                  internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
 
   virtual
   void
-  fill_fe_face_values (const Mapping<2,2>                                &mapping,
-                       const Triangulation<2,2>::cell_iterator           &cell,
-                       const unsigned int                                 face_no,
-                       const Quadrature<1>                               &quadrature,
+  fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
+                       const unsigned int                                                   face_no,
+                       const Quadrature<1>                                             &quadrature,
+                       const Mapping<2,2>                                         &mapping,
                        const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                       const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                       const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                       internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                       const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                       const InternalDataBase                                              &fe_internal,
+                       dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
 
   virtual
   void
-  fill_fe_subface_values (const Mapping<2,2>                                &mapping,
-                          const Triangulation<2,2>::cell_iterator           &cell,
-                          const unsigned int                                 face_no,
-                          const unsigned int                                 sub_no,
-                          const Quadrature<1>                               &quadrature,
+  fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
+                          const unsigned int                                                   face_no,
+                          const unsigned int                                                   sub_no,
+                          const Quadrature<1>                                             &quadrature,
+                          const Mapping<2,2>                                         &mapping,
                           const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                          const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                          const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                          const InternalDataBase                                              &fe_internal,
+                          dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
 
@@ -226,9 +225,7 @@ public:
 
   virtual std::string get_name () const ;
 
-  virtual UpdateFlags     update_once (const UpdateFlags flags) const ;
-
-  virtual UpdateFlags     update_each (const UpdateFlags flags) const ;
+  virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
 
   virtual FiniteElement<2,2> *clone () const ;
 
