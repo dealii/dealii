@@ -572,6 +572,23 @@ FE_P1NCNonparametric::fill_fe_values (const Triangulation<2,2>::cell_iterator   
 
       }
 
+      // hessian
+      std::vector<Tensor<2,2> > hessians(flags & update_hessians ? this->dofs_per_cell : 0);
+      if (flags & update_hessians)
+      {
+        for (unsigned int i=0; i<n_q_points; ++i)
+        {
+            for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            {
+                hessians[k][0][0] = 0.0 ;
+                hessians[k][0][1] = 0.0 ;
+                hessians[k][1][0] = 0.0 ;
+                hessians[k][1][1] = 0.0 ;
+                output_data.shape_hessians[k][i] = hessians[k];
+            }
+        }
+      }
+
   // When this function is called for the graphic out,
   // MappingRelatedData does not work properly.
   // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
@@ -874,7 +891,9 @@ UpdateFlags     FE_P1NCNonparametric::requires_update_flags (const UpdateFlags f
       out |= update_gradients ;
     if (flags & update_cell_normal_vectors)
       out |= update_cell_normal_vectors | update_JxW_values;
-
+    if (flags & update_hessians)
+      out |= update_hessians;
+ 
   return out;
 }
 
