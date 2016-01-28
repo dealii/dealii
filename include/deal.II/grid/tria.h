@@ -1897,7 +1897,7 @@ public:
    * This function uses the user flags, so store them if you still need them
    * afterwards.
    */
-  bool prepare_coarsening_and_refinement ();
+  virtual bool prepare_coarsening_and_refinement ();
 
   /*
    * @}
