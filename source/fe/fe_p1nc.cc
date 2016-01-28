@@ -602,7 +602,113 @@ FE_P1NCNonparametric::fill_fe_face_values (const Triangulation<2,2>::cell_iterat
                                            const InternalDataBase                                              &fe_internal,
                                            dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
-{}
+{
+  const UpdateFlags flags(fe_internal.update_each) ;
+
+  const unsigned int n_q_points = mapping_data.quadrature_points.size();
+
+  std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
+
+
+
+  // edge midpoints
+  std::vector<Point<2> > mpt(4) ;
+
+  mpt[0](0) = (cell->vertex(0)(0) + cell->vertex(2)(0))/2.0 ;
+  mpt[0](1) = (cell->vertex(0)(1) + cell->vertex(2)(1))/2.0 ;
+
+  mpt[1](0) = (cell->vertex(1)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[1](1) = (cell->vertex(1)(1) + cell->vertex(3)(1))/2.0 ;
+
+  mpt[2](0) = (cell->vertex(0)(0) + cell->vertex(1)(0))/2.0 ;
+  mpt[2](1) = (cell->vertex(0)(1) + cell->vertex(1)(1))/2.0 ;
+
+  mpt[3](0) = (cell->vertex(2)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))/2.0 ;
+
+  // center point
+  Point<2> cpt ;
+  cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))/4.0 ;
+  cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))/4.0 ;
+
+
+  // basis functions with a half value: phi(x,y) = ax + by + c
+  std::vector<double> a(4), b(4), c(4) ;
+  double det ;
+
+  det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1)) ;
+
+  a[0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[1] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[2] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+  a[3] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+
+  b[0] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[2] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+  b[3] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+
+  c[0] = 0.25 - cpt(0)*a[0] - cpt(1)*b[0] ;
+  c[1] = 0.25 - cpt(0)*a[1] - cpt(1)*b[1] ;
+  c[2] = 0.25 - cpt(0)*a[2] - cpt(1)*b[2] ;
+  c[3] = 0.25 - cpt(0)*a[3] - cpt(1)*b[3] ;
+
+
+
+  // compute basis functions
+  if (flags & (update_values | update_gradients))
+    for (unsigned int i=0; i<n_q_points; ++i)
+      {
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              {
+                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                output_data.shape_values[k][i] = values[k];
+              }
+
+            if (flags & update_gradients)
+              {
+                grads[k][0] = a[k] ;
+                grads[k][1] = b[k] ;
+                output_data.shape_gradients[k][i] = grads[k];
+              }
+          }
+
+      }
+
+  // When this function is called for computation of facial jump residual,
+  // MappingRelatedData does not work properly.
+  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
+  // This is a temporary solution. It needs to be fixed fundamentally.
+  if (n_q_points==0)
+    {
+      Quadrature<2> cellquadrature = QProjector<2>::project_to_face(quadrature, face_no) ;
+      for(unsigned int i=0;i<cellquadrature.size();++i)
+               for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+               {
+                   if (flags & update_values)
+                   {
+                   Point<2> realquadrature ;
+
+                   realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
+                   values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+                   output_data.shape_values[k][i] = values[k];
+                   }
+
+                   if (flags & update_gradients)
+                   {
+                   grads[k][0] = a[k] ;
+                   grads[k][1] = b[k] ;
+                   output_data.shape_gradients[k][i] = grads[k];
+                   }
+
+               }
+
+    }
+
+}
 
 
 
@@ -620,7 +726,112 @@ FE_P1NCNonparametric::fill_fe_subface_values (const Triangulation<2,2>::cell_ite
                                               const InternalDataBase                                              &fe_internal,
                                               dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
-{}
+{
+  const UpdateFlags flags(fe_internal.update_each) ;
+
+  const unsigned int n_q_points = mapping_data.quadrature_points.size();
+
+  std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
+
+
+
+  // edge midpoints
+  std::vector<Point<2> > mpt(4) ;
+
+  mpt[0](0) = (cell->vertex(0)(0) + cell->vertex(2)(0))/2.0 ;
+  mpt[0](1) = (cell->vertex(0)(1) + cell->vertex(2)(1))/2.0 ;
+
+  mpt[1](0) = (cell->vertex(1)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[1](1) = (cell->vertex(1)(1) + cell->vertex(3)(1))/2.0 ;
+
+  mpt[2](0) = (cell->vertex(0)(0) + cell->vertex(1)(0))/2.0 ;
+  mpt[2](1) = (cell->vertex(0)(1) + cell->vertex(1)(1))/2.0 ;
+
+  mpt[3](0) = (cell->vertex(2)(0) + cell->vertex(3)(0))/2.0 ;
+  mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))/2.0 ;
+
+  // center point
+  Point<2> cpt ;
+  cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))/4.0 ;
+  cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))/4.0 ;
+
+
+  // basis functions with a half value: phi(x,y) = ax + by + c
+  std::vector<double> a(4), b(4), c(4) ;
+  double det ;
+
+  det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1)) ;
+
+  a[0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[1] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
+  a[2] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+  a[3] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+
+  b[0] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
+  b[2] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+  b[3] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+
+  c[0] = 0.25 - cpt(0)*a[0] - cpt(1)*b[0] ;
+  c[1] = 0.25 - cpt(0)*a[1] - cpt(1)*b[1] ;
+  c[2] = 0.25 - cpt(0)*a[2] - cpt(1)*b[2] ;
+  c[3] = 0.25 - cpt(0)*a[3] - cpt(1)*b[3] ;
+
+
+
+  // compute basis functions
+  if (flags & (update_values | update_gradients))
+    for (unsigned int i=0; i<n_q_points; ++i)
+      {
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+          {
+            if (flags & update_values)
+              {
+                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                output_data.shape_values[k][i] = values[k];
+              }
+
+            if (flags & update_gradients)
+              {
+                grads[k][0] = a[k] ;
+                grads[k][1] = b[k] ;
+                output_data.shape_gradients[k][i] = grads[k];
+              }
+          }
+
+      }
+
+  // When this function is called for computation of facial jump residual,
+  // MappingRelatedData does not work properly.
+  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
+  // This is a temporary solution. It needs to be fixed fundamentally.
+  if (n_q_points==0)
+    {
+      Quadrature<2> cellquadrature = QProjector<2>::project_to_subface(quadrature, face_no, sub_no) ;
+      for(unsigned int i=0;i<cellquadrature.size();++i)
+               for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+               {
+                   if (flags & update_values)
+                   {
+                   Point<2> realquadrature ;
+
+                   realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
+                   values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+                   output_data.shape_values[k][i] = values[k];
+                   }
+
+                   if (flags & update_gradients)
+                   {
+                   grads[k][0] = a[k] ;
+                   grads[k][1] = b[k] ;
+                   output_data.shape_gradients[k][i] = grads[k];
+                   }
+
+               }
+
+    }
+}
 
 
 
