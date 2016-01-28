@@ -3124,11 +3124,29 @@ namespace parallel
 
     namespace
     {
+      // this function combines vertices that have different locations (and
+      // thus, different vertex_index) but represent the same topological
+      // entity over periodic boundaries. The vector
+      // topological_vertex_numbering contains a linear map from 0 to
+      // n_vertices at input and at output relates periodic vertices with only
+      // one vertex index. The output is used to always identify the same
+      // vertex according to the periodicity, e.g. when finding the maximum
+      // cell level around a vertex.
+      //
+      // Example: On a 3D cell with vertices numbered from 0 to 7 and periodic
+      // boundary conditions in x direction, the vector
+      // topological_vertex_numbering will contain the numbers
+      // {0,0,2,2,4,4,6,6} (because the vertex pairs {0,1}, {2,3}, {4,5},
+      // {6,7} belong together, respectively). If periodicity is set in x and
+      // z direction, the output is {0,0,2,2,0,0,2,2}, and if periodicity is
+      // in all directions, the output is simply {0,0,0,0,0,0,0,0}.
       template <typename ITERATOR>
       void
       identify_periodic_vertices_recursively(const GridTools::PeriodicFacePair<ITERATOR> &periodic,
                                              std::vector<unsigned int> &topological_vertex_numbering)
       {
+        const unsigned int dim = ITERATOR::AccessorType::dimension;
+
         // for hanging nodes we will consider all necessary coupling already
         // on the parent level, so we just need to consider neighbors of the
         // same level
@@ -3141,28 +3159,22 @@ namespace parallel
             // find appropriate pairs of child elements
             for (unsigned int cf=0; cf<periodic.cell[0]->face(periodic.face_idx[0])->n_children(); ++cf)
               {
-                unsigned int c=0;
-                for (; c<periodic.cell[0]->n_children(); ++c)
-                  {
-                    if (periodic.cell[0]->child(c)->face(periodic.face_idx[0]) ==
-                        periodic.cell[0]->face(periodic.face_idx[0])->child(cf))
-                      break;
-                  }
-                Assert(c < periodic.cell[0]->n_children(),
-                       ExcMessage("Face child not found"));
-                periodic_child.cell[0] = periodic.cell[0]->child(c);
+                const unsigned int child_index_0 =
+                  GeometryInfo<dim>::child_cell_on_face(periodic.cell[0]->refinement_case(),
+                                                        periodic.face_idx[0], cf,
+                                                        periodic.orientation[0],
+                                                        periodic.orientation[1],
+                                                        periodic.orientation[2]);
+                periodic_child.cell[0] = periodic.cell[0]->child(child_index_0);
                 periodic_child.face_idx[0] = periodic.face_idx[0];
 
-                c=0;
-                for (; c<periodic.cell[1]->n_children(); ++c)
-                  {
-                    if (periodic.cell[1]->child(c)->face(periodic.face_idx[1]) ==
-                        periodic.cell[1]->face(periodic.face_idx[1])->child(cf))
-                      break;
-                  }
-                Assert(c < periodic.cell[1]->n_children(),
-                       ExcMessage("Face child not found"));
-                periodic_child.cell[1] = periodic.cell[1]->child(c);
+                // the second face is in standard orientation in terms of the
+                // periodic face pair
+                const unsigned int child_index_1 =
+                  GeometryInfo<dim>::child_cell_on_face(periodic.cell[1]->refinement_case(),
+                                                        periodic.face_idx[1], cf);
+
+                periodic_child.cell[1] = periodic.cell[1]->child(child_index_1);
                 periodic_child.face_idx[1] = periodic.face_idx[1];
 
                 // recursive call into children
@@ -3171,25 +3183,31 @@ namespace parallel
               }
           }
 
-        // TODO: fix non-standard orientation
-        Assert(periodic.orientation[0] == true &&
-               periodic.orientation[1] == false &&
-               periodic.orientation[2] == false,
-               ExcNotImplemented());
-
-        for (unsigned int v=0; v<GeometryInfo<ITERATOR::AccessorType::dimension-1>::vertices_per_cell; ++v)
+        for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
           {
-            const unsigned int vi0 = topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)];
+            // take possible non-standard orientation of face on cell[0] into
+            // account
+            const unsigned int vface0 =
+              GeometryInfo<dim>::standard_to_real_face_vertex(v,periodic.orientation[0],
+                                                              periodic.orientation[1],
+                                                              periodic.orientation[2]);
+            const unsigned int vi0 = topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)];
             const unsigned int vi1 = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)];
             const unsigned int min_index = std::min(vi0, vi1);
-            topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)] = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)] = min_index;
+            topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)]
+              = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)]
+                = min_index;
           }
       }
 
+
+
+      // ensures the 2:1 mesh balance for periodic boundary conditions in the
+      // artificial cell layer (the active cells are taken care of by p4est)
       template <int dim, int spacedim>
       bool enforce_mesh_balance_over_periodic_boundaries
       (Triangulation<dim,spacedim> &tria,
-       std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > periodic_face_pairs_level_0)
+       const std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > periodic_face_pairs_level_0)
       {
         if (periodic_face_pairs_level_0.empty())
           return false;
@@ -3334,16 +3352,21 @@ namespace parallel
       this->save_coarsen_flags (flags_before[0]);
       this->save_refine_flags (flags_before[1]);
 
+      bool mesh_changed = false;
       do
         {
           this->dealii::Triangulation<dim,spacedim>::prepare_coarsening_and_refinement();
-        }
-      // enforce 2:1 mesh balance over periodic boundaries
-      while ((this->smooth_grid & dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
-             &&
-             enforce_mesh_balance_over_periodic_boundaries(*this,
-                                                           periodic_face_pairs_level_0));
 
+          // enforce 2:1 mesh balance over periodic boundaries
+          if (this->smooth_grid &
+              dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
+            mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this,
+                           periodic_face_pairs_level_0);
+        }
+      while (mesh_changed);
+
+      // check if any of the refinement flags were changed during this
+      // function and return that value
       std::vector<bool> flags_after[2];
       this->save_coarsen_flags (flags_after[0]);
       this->save_refine_flags (flags_after[1]);
@@ -4453,6 +4476,7 @@ namespace parallel
         if (periodic.cell[0]->level() > target_level)
           return;
 
+        const unsigned int dim = ITERATOR::AccessorType::dimension;
         // for hanging nodes there is nothing to do since we are interested in
         // the connections on the same level...
         if (periodic.cell[0]->level() < target_level &&
@@ -4465,28 +4489,22 @@ namespace parallel
             // find appropriate pairs of child elements
             for (unsigned int cf=0; cf<periodic.cell[0]->face(periodic.face_idx[0])->n_children(); ++cf)
               {
-                unsigned int c=0;
-                for (; c<periodic.cell[0]->n_children(); ++c)
-                  {
-                    if (periodic.cell[0]->child(c)->face(periodic.face_idx[0]) ==
-                        periodic.cell[0]->face(periodic.face_idx[0])->child(cf))
-                      break;
-                  }
-                Assert(c < periodic.cell[0]->n_children(),
-                       ExcMessage("Face child not found"));
-                periodic_child.cell[0] = periodic.cell[0]->child(c);
+                const unsigned int child_index_0 =
+                  GeometryInfo<dim>::child_cell_on_face(periodic.cell[0]->refinement_case(),
+                                                        periodic.face_idx[0], cf,
+                                                        periodic.orientation[0],
+                                                        periodic.orientation[1],
+                                                        periodic.orientation[2]);
+                periodic_child.cell[0] = periodic.cell[0]->child(child_index_0);
                 periodic_child.face_idx[0] = periodic.face_idx[0];
 
-                c=0;
-                for (; c<periodic.cell[1]->n_children(); ++c)
-                  {
-                    if (periodic.cell[1]->child(c)->face(periodic.face_idx[1]) ==
-                        periodic.cell[1]->face(periodic.face_idx[1])->child(cf))
-                      break;
-                  }
-                Assert(c < periodic.cell[1]->n_children(),
-                       ExcMessage("Face child not found"));
-                periodic_child.cell[1] = periodic.cell[1]->child(c);
+                // the second face is in standard orientation in terms of the
+                // periodic face pair
+                const unsigned int child_index_1 =
+                  GeometryInfo<dim>::child_cell_on_face(periodic.cell[1]->refinement_case(),
+                                                        periodic.face_idx[1], cf);
+
+                periodic_child.cell[1] = periodic.cell[1]->child(child_index_1);
                 periodic_child.face_idx[1] = periodic.face_idx[1];
 
                 // recursive call into children
@@ -4499,18 +4517,20 @@ namespace parallel
         if (periodic.cell[0]->level() != target_level)
           return;
 
-        // TODO: fix non-standard orientation
-        Assert(periodic.orientation[0] == true &&
-               periodic.orientation[1] == false &&
-               periodic.orientation[2] == false,
-               ExcNotImplemented());
-
-        for (unsigned int v=0; v<GeometryInfo<ITERATOR::AccessorType::dimension-1>::vertices_per_cell; ++v)
-          if (active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)] ||
-              active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)])
-            active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(v)]
-              = active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)]
-                = true;
+        for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+          {
+            // take possible non-standard orientation of face on cell[0] into
+            // account
+            const unsigned int vface0 =
+              GeometryInfo<dim>::standard_to_real_face_vertex(v,periodic.orientation[0],
+                                                              periodic.orientation[1],
+                                                              periodic.orientation[2]);
+            if (active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)] ||
+                active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)])
+              active_vertices_on_level[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)]
+                = active_vertices_on_level[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)]
+                  = true;
+          }
       }
 
 
