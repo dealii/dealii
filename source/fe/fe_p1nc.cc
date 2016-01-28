@@ -471,7 +471,8 @@ FE_P1NCNonparametric::get_dpo_vector ()
 FiniteElement<2,2>::InternalDataBase *
 FE_P1NCNonparametric::get_data (const UpdateFlags update_flags,
                                 const Mapping<2,2> &,
-                                const Quadrature<2> &) const
+                                const Quadrature<2> &,
+				dealii::internal::FEValues::FiniteElementRelatedData<2,2> &) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
