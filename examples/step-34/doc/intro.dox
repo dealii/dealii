@@ -138,13 +138,13 @@ the second Green %identity:
 
 \f[\label{green}
   \int_{\omega}
-  (-\Delta u)v\,dx + \int_{\partial\omega} \frac{\partial u}{\partial \mathbf{n} }v \,ds
+  (-\Delta u)v\,dx + \int_{\partial\omega} \frac{\partial u}{\partial \tilde{\mathbf{n}} }v \,ds
   =
   \int_{\omega}
-  (-\Delta v)u\,dx + \int_{\partial\omega} u\frac{\partial v}{\partial \mathbf{n}} \,ds,
+  (-\Delta v)u\,dx + \int_{\partial\omega} u\frac{\partial v}{\partial \tilde{\mathbf{n}}} \,ds,
 \f]
 
-where $\mathbf{n}$ is the normal to the surface of $\omega$ pointing
+where $\tilde{\mathbf{n}}$ is the normal to the surface of $\omega$ pointing
 outwards from the domain of integration $\omega$.
 
 In our case the domain of integration is the domain
@@ -158,7 +158,8 @@ $\mathbb{R}^n\backslash\Omega$, whose boundary is $ \Gamma_\infty \cup
 In our program the normals are defined as <i>outer</i> to the domain
 $\Omega$, that is, they are in fact <i>inner</i> to the integration
 domain, and some care is required in defining the various integrals
-with the correct signs for the normals.
+with the correct signs for the normals, i.e. replacing $\tilde{\mathbf{n}}$
+by $-\mathbf{n}$.
 
 If we substitute $u$ and $v$ in the Green %identity with the solution
 $\phi$ and with the fundamental solution of the Laplace equation
@@ -271,8 +272,21 @@ $\Omega$ can be defined using the double layer potential itself:
 The reason why this is possible can be understood if we consider the
 fact that the solution of a pure Neumann problem is known up to an
 arbitrary constant $c$, which means that, if we set the Neumann data
-to be zero, then any constant $\phi = \phi_\infty$ will be a solution,
-giving us an the explicit expression above for $\alpha(\mathbf{x})$.
+to be zero, then any constant $\phi = \phi_\infty$ will be a solution.
+Inserting the constant solution and the Neumann boundary condition in the 
+boundary integral equation, we have
+@f{align*}
+\alpha\left(\mathbf{x}\right)\phi\left(\mathbf{x}\right)
+&=\int_{\Omega}\phi\left(\mathbf{y}\right)\delta\left(\mathbf{y}-\mathbf{x}\right)\, dy\\
+\Rightarrow
+\alpha\left(\mathbf{x}\right)\phi_\infty
+&=\phi_\infty\int_{\Gamma\cup\Gamma_\infty}\frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y
+=\phi_\infty\left[\int_{\Gamma_\infty}\frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y
++\int_{\Gamma}\frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y
+\right]
+@f}
+The integral on $\Gamma_\infty$ is unity, see above, so division by the constant $\phi_\infty$ gives us the explicit 
+expression above for $\alpha(\mathbf{x})$.
 
 While this example program is really only focused on the solution of the
 boundary integral equation, in a realistic setup one would still need to solve
