@@ -905,9 +905,11 @@ inconvenience this causes.
   (Timo Heister, 2015/09/05)
   </li>
 
-  <li> Improved: Allow continuation lines in ParameterHandler.
+  <li> Improved: Allow continuation lines in ParameterHandler. Any line in a
+  parameter file ending with a <tt>\\</tt> will now be combined with the next
+  line; see ParameterHandler's documentation for more information.
   <br>
-  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18)
+  (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18-2016/01/28)
   </li>
 
   <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix

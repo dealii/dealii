@@ -19,6 +19,18 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * Test that ParameterHandler can read parameters of the form
+ *
+ *     set Function = a,\
+ *                    \
+ *                    b,\
+ *     \
+ *                    c
+ *
+ * correctly. This tests how ParameterHandler handles lines that are blank
+ * aside from whitespace and a continuation ('\') character.
+ */
 
 int main ()
 {

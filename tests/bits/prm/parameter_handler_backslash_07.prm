@@ -1,0 +1,7 @@
+# whitespace at the beginning of a line is always ignored.
+#---------------------------------------------------------
+subsection Testing
+  set value = val\
+              u\
+              e
+end

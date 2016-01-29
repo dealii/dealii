@@ -19,6 +19,14 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * Test that ParameterHandler does not join lines for things like
+ *
+ *     set Function = a,\ # first term
+ *                    b
+ *
+ * since there are non-whitespace characters after the '\'.
+ */
 
 int main ()
 {

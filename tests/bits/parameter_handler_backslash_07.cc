@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2016 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,16 +20,17 @@
 #include <fstream>
 
 /*
- * Test that ParameterHandler will stop a line continuation if a completely
- * blank line follows one with a '\', such as
+ * If a parameter file line ends in a '\', then the whitespace at at the
+ * beginning of the next line is ignored when joining the lines. For example,
+ * the input
  *
- *     set Function_1 = a, \
+ *      set value = val\
+ *                  u\
+ *                  e
  *
- *                      b, \
- *                      c
- *
- * This should *not* be parsed as 'Function_1 = a, b, c'.
+ * is parsed as 'set value = value'.
  */
+
 
 int main ()
 {
@@ -41,36 +42,27 @@ int main ()
     {
       ParameterHandler prm;
       prm.enter_subsection ("Testing");
-      prm.declare_entry ("Function_1",
-                         "a",
-                         Patterns::List(Patterns::Selection("a|b|c")));
-      prm.declare_entry ("Function_2",
-                         "d",
-                         Patterns::List(Patterns::Selection("d|e|f")));
+      prm.declare_entry ("value", "value", Patterns::Anything());
       prm.leave_subsection ();
-
 
       // test both relevant read_input functions
       if (i == 0)
         {
-          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
         }
       else
         {
           std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+          (SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
           prm.read_input(input_stream);
         }
 
-      std::string list_1;
-      std::string list_2;
+      std::string list;
       prm.enter_subsection ("Testing");
-      list_1 = prm.get ("Function_1");
-      list_2 = prm.get ("Function_2");
+      list = prm.get ("value");
       prm.leave_subsection ();
 
-      deallog << list_1 << std::endl;
-      deallog << list_2 << std::endl;
+      deallog << list << std::endl;
     }
 
   return 0;

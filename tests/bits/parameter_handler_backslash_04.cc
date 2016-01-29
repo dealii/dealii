@@ -19,6 +19,12 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+/*
+ * Test that ParameterHandler does *not* join lines for things like
+ *
+ *      set Function = a,\ b,
+ *                     c
+ */
 
 int main ()
 {
