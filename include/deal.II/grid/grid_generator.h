@@ -1021,7 +1021,7 @@ namespace GridGenerator
   std::map<typename MeshType<dim-1,spacedim>::cell_iterator,
       typename MeshType<dim,spacedim>::face_iterator>
 #else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+  typename ExtractBoundaryMesh<MeshType,dim,spacedim>::return_type
 #endif
       extract_boundary_mesh (const MeshType<dim,spacedim>       &volume_mesh,
                              MeshType<dim-1,spacedim>           &surface_mesh,
