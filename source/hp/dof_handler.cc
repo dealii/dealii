@@ -2321,15 +2321,10 @@ namespace hp
 
                           if (i == (*finite_elements)[fe_index_1].dofs_per_line)
                             {
-                              // the dofs of these two finite elements are
-                              // identical. as a safety check, ensure that none
-                              // of the two FEs is trying to dominate the other,
-                              // which wouldn't make any sense in this case
-                              Assert ((*finite_elements)[fe_index_1].compare_for_face_domination
-                                      ((*finite_elements)[fe_index_2])
-                                      ==
-                                      FiniteElementDomination::either_element_can_dominate,
-                                      ExcInternalError());
+                              // The line dofs (i.e., the ones interior to a line) of these two finite elements are identical.
+                              // Note that there could be situations when one element still dominates another, e.g.:
+                              // FE_Q(2) x FE_Nothing(dominate) vs
+                              // FE_Q(2) x FE_Q(1)
 
                               --unique_sets_of_dofs;
 
