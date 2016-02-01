@@ -260,7 +260,7 @@ ArpackSolver::ArpackSolver (SolverControl &control,
 template <typename VectorType, typename MatrixType1,
           typename MatrixType2, typename INVERSE>
 inline
-void ArpackSolver::solve (const MatrixType1                  &system_matrix,
+void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
                           const MatrixType2                  &mass_matrix,
                           const INVERSE                      &inverse,
                           std::vector<std::complex<double> > &eigenvalues,
