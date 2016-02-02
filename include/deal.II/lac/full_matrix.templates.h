@@ -809,7 +809,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B A)^T, which is A^T B^T.
 
-        const int m = src.n();
+        const int m = src.m();
         const int n = this->n();
         const int k = this->m();
         const char *trans = "t";
