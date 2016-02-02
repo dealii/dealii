@@ -500,6 +500,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: FullMatrix::TmTmult for matrix multiplication used to compute
+  wrong results for larger matrix sizes where external BLAS is called. This
+  has been fixed.
+  <br>
+  (Martin Kronbichler, 2016/02/02)
+  </li>
+
   <li> Fixed: parallel::distributed::Triangulation with periodic boundary
   conditions did not respect 2:1 balance over vertices on periodic
   boundaries. This lead to incomplete ghost layers on multigrid levels. This
