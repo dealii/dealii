@@ -52,6 +52,7 @@ private:
     Table<2,double > shape_values;
     Table<2,Tensor<1,2> > shape_gradients;
     mutable std::vector<Tensor<1,2> > transformed_shape_gradients ;
+    Table<2,Tensor<2,2> > shape_hessians;
   };
 
 
@@ -135,6 +136,8 @@ public:
   virtual Tensor<1,2> shape_grad (const unsigned int i,
                                   const Point<2>    &p) const ;
 
+  virtual Tensor<2,2> shape_grad_grad (const unsigned int i,
+				       const Point<2>    &p) const ;
 
 
 protected:

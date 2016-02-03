@@ -66,8 +66,11 @@ FE_P1NCParametric::get_data (const UpdateFlags update_flags,
 
   // initialize shape gradient
   if (flags & update_gradients)
-    data->shape_gradients.reinit (this->dofs_per_cell,
-                                  n_q_points);
+    {
+      data->shape_gradients.reinit (this->dofs_per_cell,
+				    n_q_points);
+      data->transformed_shape_gradients.resize (n_q_points);
+    }
 
 
   // update
@@ -88,6 +91,23 @@ FE_P1NCParametric::get_data (const UpdateFlags update_flags,
             }
 
       }
+
+
+  // initialize shape hessian
+  if (flags & update_hessians)
+    data->shape_hessians.reinit (this->dofs_per_cell,
+                                  n_q_points);
+  // update
+  if (flags & update_hessians)
+    for (unsigned int i=0; i<n_q_points; ++i)
+      {
+          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+            {
+              data->shape_hessians[k][i] = shape_grad_grad(k,quadrature.point(i));
+            }
+      }
+
+
   return data;
 
 }
@@ -99,7 +119,7 @@ FE_P1NCParametric::fill_fe_values (const Triangulation<2,2>::cell_iterator      
                                    const Quadrature<2>                               &quadrature,
                                    const Mapping<2,2>                                &mapping,
                                    const Mapping<2,2>::InternalDataBase              &mapping_internal,
-                                   const internal::FEValues::MappingRelatedData<2,2> &,
+                                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                                    const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                                    internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
@@ -129,6 +149,24 @@ FE_P1NCParametric::fill_fe_values (const Triangulation<2,2>::cell_iterator      
                           mapping_internal,
                           make_array_view(output_data.shape_gradients, k));
 
+    }
+
+
+  // shape hessian
+  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	mapping.transform (make_array_view(fe_data.shape_hessians, k),
+			   mapping_covariant_gradient,
+			   mapping_internal,
+			   make_array_view(output_data.shape_hessians, k));
+
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	for (unsigned int i=0; i<quadrature.size(); ++i)
+	  for (unsigned int j=0; j<2; ++j)
+	    output_data.shape_hessians[k][i] -=
+	      mapping_data.jacobian_pushed_forward_grads[i][j]
+	      * output_data.shape_gradients[k][i][j];
     }
 
 }
@@ -168,8 +206,8 @@ FE_P1NCParametric::fill_fe_face_values (const Triangulation<2,2>::cell_iterator 
 
       if (flags & update_gradients)
       {
-          const ArrayView<Tensor<1,2> > transformed_shape_gradients
-                  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
+	const ArrayView<Tensor<1,2> > transformed_shape_gradients
+	  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
 
         mapping.transform(make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                           mapping_covariant,
@@ -225,8 +263,8 @@ FE_P1NCParametric::fill_fe_subface_values (const Triangulation<2,2>::cell_iterat
 
       if (flags & update_gradients)
       {
-          const ArrayView<Tensor<1,2> > transformed_shape_gradients
-                  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
+	const ArrayView<Tensor<1,2> > transformed_shape_gradients
+	  = make_array_view(fe_data.transformed_shape_gradients, offset, quadrature.size());
 
         mapping.transform(make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
                           mapping_covariant,
@@ -292,6 +330,8 @@ UpdateFlags     FE_P1NCParametric::requires_update_flags (const UpdateFlags flag
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
+  if (flags & update_hessians)
+    out |= update_hessians | update_gradients | update_covariant_transformation | update_jacobian_pushed_forward_grads;
 
   return out;
 }
@@ -417,6 +457,45 @@ Tensor<1,2> FE_P1NCParametric::shape_grad (const unsigned int i,
     };
 
   return grad*0.5 ;
+
+}
+
+
+Tensor<2,2> FE_P1NCParametric::shape_grad_grad (const unsigned int i,
+						const Point<2>    &p) const
+{
+  Tensor<2,2> grad_grad ;
+
+
+     switch (i)
+       {
+       case 0:
+         grad_grad[0][0] = 0.0 ;
+         grad_grad[0][1] = 0.0 ;
+         grad_grad[1][0] = 0.0 ;
+         grad_grad[1][1] = 0.0 ;
+         return grad_grad ;
+       case 1:
+	 grad_grad[0][0] = 0.0 ;
+         grad_grad[0][1] = 0.0 ;
+         grad_grad[1][0] = 0.0 ;
+         grad_grad[1][1] = 0.0 ;
+         return grad_grad ;
+       case 2:
+         grad_grad[0][0] = 0.0 ;
+         grad_grad[0][1] = 0.0 ;
+         grad_grad[1][0] = 0.0 ;
+         grad_grad[1][1] = 0.0 ;
+         return grad_grad ;
+       case 3:
+         grad_grad[0][0] = 0.0 ;
+         grad_grad[0][1] = 0.0 ;
+         grad_grad[1][0] = 0.0 ;
+         grad_grad[1][1] = 0.0 ;
+         return grad_grad ;
+       default:
+         return grad_grad ;
+       };
 
 }
 
@@ -891,6 +970,8 @@ UpdateFlags     FE_P1NCNonparametric::requires_update_flags (const UpdateFlags f
       out |= update_gradients ;
     if (flags & update_cell_normal_vectors)
       out |= update_cell_normal_vectors | update_JxW_values;
+    if (flags & update_hessians)
+      out |= update_hessians;
     if (flags & update_hessians)
       out |= update_hessians;
  
