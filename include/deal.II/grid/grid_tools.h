@@ -974,6 +974,41 @@ namespace GridTools
   get_patch_around_cell(const typename MeshType::active_cell_iterator &cell);
 
 
+  /**
+   * This function runs through the degrees of freedom defined by the
+   * Container and for each dof constructs a vector of active_cell_iterators
+   * representing the cells of support of the nodal basis element
+   * at that degree of freedom. This function was designed for the
+   * implementation of local projections, for instance the Clement interpolant,
+   * in conjunction with other local patch functions like
+   * GridTools::build_triangulation_from_patch.
+   *
+   * Containers built on top of Triangulation<dim> or
+   * parallel:distributed::Triangulation<dim> are supported and handled
+   * appropriately.
+   *
+   * It is necessary that the finite element underlying the Container used has
+   * degrees of freedom on faces (2d or 3d) and lines (in 3d).  This unfortunately
+   * precludes the FE_DGQ<dim> finite element.  Likewise, the finite element
+   * must have nodal basis elements for this implementation to make sense.
+   *
+   * @tparam Container The Container could be a DoFHandler<dim> or hp::DoFHandler<dim>.
+   * @param[in] dof_handler The Container which could be built on a Triangulation<dim>
+   * or a parallel:distributed::Triangulation<dim> and should be using a nodal
+   * finite element with degrees of freedom defined on faces (2d or 3d) and
+   * lines (3d).
+   * @param[out] dof_to_support_patch_map A map from the global_dof_index of dofs on locally relevant cells
+   * to vectors containing Container::active_cell_iterators of
+   * cells in support of basis function at that degree of freedom.
+   *
+   *  @author Spencer Patty, 2016
+   *
+   */
+  template <class Container>
+  std::map< types::global_dof_index,std::vector<typename Container::active_cell_iterator> >
+  get_dof_to_support_patch_map(Container& dof_handler);
+
+
   /*@}*/
   /**
    * @name Lower-dimensional meshes for parts of higher-dimensional meshes

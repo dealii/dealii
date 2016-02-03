@@ -224,7 +224,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   }
 
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Container : DOFHANDLER_TEMPLATES)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
 
+      template
+      std::map< types::global_dof_index,std::vector<typename Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> >
+      get_dof_to_support_patch_map<Container<deal_II_dimension,deal_II_space_dimension> >
+      (Container<deal_II_dimension,deal_II_space_dimension> &dof_handler);
+      
+      
+    \}
+#endif
+  }
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Container : TRIANGULATION_AND_DOFHANDLER_TEMPLATES)
