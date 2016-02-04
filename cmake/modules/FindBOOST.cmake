@@ -58,6 +58,21 @@ IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 ENDIF()
 
+
+#
+# Blacklist version 1.58 because we get serialization errors with it. At least
+# version 1.56 and 1.59 are known to work.
+#
+IF(Boost_FOUND)
+  IF("${Boost_MAJOR_VERSION}" STREQUAL "1" AND "${Boost_MINOR_VERSION}" STREQUAL "58")
+    MESSAGE("-- Boost version 1.58 is not compatible with deal.II!")
+    UNSET(Boost_FOUND)
+    UNSET(Boost_INCLUDE_DIRS)
+    UNSET(Boost_LIBRARIES)
+  ENDIF()
+ENDIF()
+
+
 IF(Boost_FOUND)
   #
   # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
