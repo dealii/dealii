@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
@@ -48,8 +49,8 @@ namespace GridGenerator
 {
   /**
    * @name Creating meshes for basic geometries
-   * @{
    */
+  ///@{
 
   /**
    * Initialize the given triangulation with a hypercube (line in 1D, square
@@ -64,6 +65,11 @@ namespace GridGenerator
    *
    * @image html hyper_cubes.png
    *
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object
+   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example,
+   * a <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
+   *
    * See also subdivided_hyper_cube() for a coarse mesh consisting of several
    * cells. See hyper_rectangle(), if different lengths in different ordinate
    * directions are required.
@@ -77,8 +83,7 @@ namespace GridGenerator
                    const bool                    colorize= false);
 
   /**
-   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells,
-   * resp.
+   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells.
    *
    * The @p vertices argument contains a vector with all d+1 vertices of the
    * simplex. They must be given in an order such that the vectors from the
@@ -89,6 +94,13 @@ namespace GridGenerator
    *
    * @image html simplex_2d.png
    * @image html simplex_3d.png
+   *
+   * @param tria The Triangulation to create. It needs to be empty upon calling this
+   * function.
+   *
+   * @param vertices The dim+1 corners of the simplex.
+   *
+   * @note Implemented for <tt>Triangulation@<2,2@></tt>, <tt>Triangulation@<3,3@></tt>.
    *
    * @author Guido Kanschat
    * @date 2015
@@ -103,10 +115,10 @@ namespace GridGenerator
    * cells. Thus, the number of cells filling the given volume is
    * <tt>repetitions<sup>dim</sup></tt>.
    *
-   * If spacedim=dim+1 the same mesh as in the case spacedim=dim is created,
-   * but the vertices have an additional coordinate =0. So, if dim=1 one
-   * obtains line along the x axis in the xy plane, and if dim=3 one obtains a
-   * square in lying in the xy plane in 3d space.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object
+   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example,
+   * a <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -129,23 +141,23 @@ namespace GridGenerator
    * 2<sup>i</sup>. For instance, the center point (1,-1,1) yields a material
    * id 5.
    *
-   * @note If spacedim>dim the same mesh as in the case spacedim=dim is
-   * created, but the vertices have all additional coordinates equal to the
-   * coordinates of p1, i.e., we generate a hyper_rectangle parallel to the
-   * x-axis (1d), or to the xy-axis passing through p1. The additional
-   * coordinates of the point p2 are ignored by this class in this case.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object
+   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example,
+   * a <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with z=0,
+   * defined by the two opposing corners @p p1 and @p p2.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim, int spacedim>
   void hyper_rectangle (Triangulation<dim,spacedim> &tria,
-                        const Point<spacedim>       &p1,
-                        const Point<spacedim>       &p2,
+                        const Point<dim>            &p1,
+                        const Point<dim>            &p2,
                         const bool                  colorize = false);
 
   /**
    * Create a coordinate-parallel parallelepiped from the two diagonally
-   * opposite corner points @p p1 and @p p2. In dimension @p i,
+   * opposite corner points @p p1 and @p p2. In direction @p i,
    * <tt>repetitions[i]</tt> cells are generated.
    *
    * To get cells with an aspect ratio different from that of the domain, use
@@ -169,17 +181,34 @@ namespace GridGenerator
    * be true. That means the boundary indicator is 0 on the left and 1 on the
    * right.  See step-15 for details.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object
+   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example,
+   * a <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with z=0,
+   * defined by the two opposing corners @p p1 and @p p2.
    *
    * @note For an example of the use of this function see the step-28 tutorial
    * program.
+   *
+   * @param tria The Triangulation to create. It needs to be empty upon calling this
+   * function.
+   *
+   * @param repetitions A vector of dim positive values denoting the number of cells
+   * to generate in that direction.
+   *
+   * @param p1 First corner point.
+   *
+   * @param p2 Second corner opposite to @p p1.
+   *
+   * @param colorize Assign different boundary ids if set to true.
+   *
    */
   template <int dim, int spacedim>
   void
   subdivided_hyper_rectangle (Triangulation<dim,spacedim>     &tria,
                               const std::vector<unsigned int> &repetitions,
-                              const Point<spacedim>           &p1,
-                              const Point<spacedim>           &p2,
+                              const Point<dim>                &p1,
+                              const Point<dim>                &p2,
                               const bool                      colorize=false);
 
   /**
@@ -238,6 +267,15 @@ namespace GridGenerator
    *
    * @image html cheese_2d.png
    *
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object
+   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero.
+   *
+   * @param tria The Triangulation to create. It needs to be empty upon calling this
+   * function.
+   *
+   * @param holes Positive number of holes in each of the dim directions.
+
    * @author Guido Kanschat
    * @date 2015
    */
@@ -317,6 +355,32 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize = false);
 
+  /**
+   * A subdivided parallelepiped.
+   *
+   * @param tria The Triangulation to create. It needs to be empty upon calling this
+   * function.
+   *
+   * @param origin First corner of the parallelepiped.
+   *
+   * @param edges An array of @p dim tensors describing the length and direction of the edges
+   * from @p origin.
+   *
+   * @param subdivisions Number of subdivisions in each of the dim directions. Each
+   * entry must be positive. An empty vector is equivalent to one subdivision in
+   * each direction.
+   *
+   * @param colorize Assign different boundary ids if set to true.
+   *
+   * @note Implemented for all combinations of @p dim and @p spacedim.
+   */
+  template <int dim, int spacedim>
+  void
+  subdivided_parallelepiped (Triangulation<dim, spacedim>  &tria,
+                             const Point<spacedim> &origin,
+                             const std_cxx11::array<Tensor<1,spacedim>,dim> &edges,
+                             const std::vector<unsigned int> &subdivisions = std::vector<unsigned int>(),
+                             const bool colorize = false);
 
   /**
    * Hypercube with a layer of hypercubes around it. The first two parameters
@@ -351,6 +415,10 @@ namespace GridGenerator
    * This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
+   * You should attach a SphericalManifold to the cells and faces for correct
+   * placement of vertices upon refinement and to be able to use higher order
+   * mappings.
+   *
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
@@ -359,9 +427,14 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-    * Creates an hyper sphere.
-    * This function is declared to exist for dim=1, spacedim =2, and
-    * dim=2, spacedim =3.
+    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
+    * dimensions.
+    * This function only exists for dim+1=spacedim in 2 and 3 space
+    * dimensions.
+    *
+    * You should attach a SphericalManifold to the cells and faces for correct
+    * placement of vertices upon refinement and to be able to use higher order
+    * mappings.
     *
     * The following pictures are generated with:
     * @code
@@ -376,8 +449,8 @@ namespace GridGenerator
     * triangulation.refine_global(3);
     * @endcode
     *
-    * See the @ref manifold "documentation module on manifolds", for
-    * more detail.
+    * See the @ref manifold "documentation module on manifolds" for
+    * more details.
     *
     * @image html sphere.png
     * @image html sphere_section.png
@@ -753,14 +826,12 @@ namespace GridGenerator
                 const double        R,
                 const double        r);
 
-  /*
-   * @}
-   */
+  ///@}
 
   /**
    * @name Creating meshes from other meshes
-   * @{
    */
+  ///@{
 
   /**
    * Given the two triangulations specified as the first two arguments, create
@@ -918,16 +989,12 @@ namespace GridGenerator
   void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
                              Triangulation<dim,spacedim2> &out_tria);
 
-  /*
-   * @}
-   */
+  ///@}
 
   /**
-   * @name Creating lower-dimensional meshes from parts of higher-dimensional
-   * meshes
-   * @{
+   * @name Creating lower-dimensional meshes from parts of higher-dimensional meshes
    */
-
+  ///@{
 
 #ifdef _MSC_VER
   // Microsoft's VC++ has a bug where it doesn't want to recognize that
@@ -1028,14 +1095,14 @@ namespace GridGenerator
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
 
-  /*
-   * @}
-   */
+  ///@}
+
 
   /**
    * @name Exceptions
-   * @{
    */
+  ///@{
+
 
   /**
    * Exception
@@ -1056,9 +1123,7 @@ namespace GridGenerator
                   << "The vector of repetitions  must have "
                   << arg1 <<" elements.");
 
-  /*
-   * @}
-   */
+  ///@}
 }
 
 

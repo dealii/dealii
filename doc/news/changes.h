@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: GridGenerator::hyper_rectangle and
+  GridGenerator::subdivided_hyper_rectangle now take points with @p dim
+  components to correctly handle meshes embedded in higher dimensional spaces.
+  <br>
+  (Timo Heister, 2016/02/04)
+  </li>
+
   <li> Changed: The constructor of FiniteElementData had a last argument
   <code>n_blocks</code> that was not actually used by the class to
   initialize anything. It has been removed. In addition, the default
@@ -213,6 +220,12 @@ inconvenience this causes.
 <a name="general"></a>
 <h3>General</h3>
 <ol>
+  <li> New: A variant for GridGenerator::subdivided_parallelepiped() was added
+  that supports meshes embedded in higher dimesional spaces.
+  <br>
+  (Timo Heister, 2016/02/04)
+  </li>
+
   <li> Fixed: Partitioning using METIS now works correctly with more
   domains than cells.
   <br>

@@ -22,7 +22,7 @@ namespace GridGenerator
     template void
       hyper_rectangle<deal_II_dimension, deal_II_space_dimension> (
 	Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-	const Point<deal_II_space_dimension>&, const Point<deal_II_space_dimension>&,
+  const Point<deal_II_dimension>&, const Point<deal_II_dimension>&,
 	const bool);
     
     template void
@@ -39,9 +39,17 @@ namespace GridGenerator
     subdivided_hyper_rectangle<deal_II_dimension, deal_II_space_dimension>
     (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
      const std::vector<unsigned int>&,
-     const Point<deal_II_space_dimension>&,
-     const Point<deal_II_space_dimension>&,
+     const Point<deal_II_dimension>&,
+     const Point<deal_II_dimension>&,
      const bool);
+
+      template void
+      subdivided_parallelepiped<deal_II_dimension, deal_II_space_dimension>
+      (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+          const Point<deal_II_space_dimension> &,
+          const std_cxx11::array<Tensor<1,deal_II_space_dimension>,deal_II_dimension> &,
+                                 const std::vector<unsigned int> &,
+                                 const bool colorize);
 
   template void
     hyper_cross<deal_II_dimension, deal_II_space_dimension>
@@ -147,6 +155,7 @@ namespace GridGenerator \{
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
 	const bool);
   #endif
+
   
 \}  
  }

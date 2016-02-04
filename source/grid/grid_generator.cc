@@ -337,18 +337,19 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   hyper_rectangle (Triangulation<dim,spacedim> &tria,
-                   const Point<spacedim>   &p_1,
-                   const Point<spacedim>   &p_2,
+                   const Point<dim>   &p_1,
+                   const Point<dim>   &p_2,
                    const bool          colorize)
   {
-    // First, normalize input such that
-    // p1 is lower in all coordinate directions.
-    Point<spacedim> p1(p_1);
-    Point<spacedim> p2(p_2);
-
-    for (unsigned int i=0; i<spacedim; ++i)
-      if (p1(i) > p2(i))
-        std::swap (p1(i), p2(i));
+    // First, extend dimensions from dim to spacedim and
+    // normalize such that p1 is lower in all coordinate
+    // directions. Additional entries will be 0.
+    Point<spacedim> p1, p2;
+    for (unsigned int i=0; i<dim; ++i)
+      {
+        p1(i) = std::min(p_1(i), p_2(i));
+        p2(i) = std::max(p_1(i), p_2(i));
+      }
 
     std::vector<Point<spacedim> > vertices (GeometryInfo<dim>::vertices_per_cell);
     switch (dim)
@@ -406,12 +407,7 @@ namespace GridGenerator
     Assert (left < right,
             ExcMessage ("Invalid left-to-right bounds of hypercube"));
 
-    Point<spacedim> p1;
-    Point<spacedim> p2;
-
-    p1(spacedim-1) = 0;
-    p2(spacedim-1) = 0;
-
+    Point<dim> p1, p2;
     for (unsigned int i=0; i<dim; ++i)
       {
         p1(i) = left;
@@ -746,22 +742,12 @@ namespace GridGenerator
                  const Point<2> (&corners)[2],
                  const bool         colorize)
   {
-    std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
-
-    vertices[1] = corners[0];
-    vertices[2] = corners[1];
-    vertices[3] = vertices[1] + vertices[2];
-    // Prepare cell data
-    std::vector<CellData<2> > cells (1);
-    for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
-      cells[0].vertices[i] = i;
-    cells[0].material_id = 0;
-
-    tria.create_triangulation (vertices, cells, SubCellData());
-
-    // Assign boundary indicators
-    if (colorize)
-      colorize_hyper_rectangle (tria);
+    Point<2> origin;
+    std_cxx11::array<Tensor<1,2>,2> edges;
+    edges[0] = corners[0];
+    edges[1] = corners[1];
+    std::vector<unsigned int> subdivisions;
+    subdivided_parallelepiped(tria, origin, edges, subdivisions, colorize);
   }
 
 
@@ -801,14 +787,6 @@ namespace GridGenerator
                                colorize);
   }
 
-  // Parallelepiped implementation in 1d, 2d, and 3d. @note The
-  // implementation in 1d is similar to hyper_rectangle(), and in 2d is
-  // similar to parallelogram().
-  //
-  // The GridReordering::reorder_grid is made use of towards the end of
-  // this function. Thus the triangulation is explicitly constructed for
-  // all dim here since it is slightly different in that respect
-  // (cf. hyper_rectangle(), parallelogram()).
   template<int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
@@ -820,41 +798,83 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
-    // Zero n_subdivisions is the origin only, which makes no sense
+    Point<dim> origin;
+    std::vector<unsigned int> subdivisions;
+    std_cxx11::array<Tensor<1,dim>,dim> edges;
     for (unsigned int i=0; i<dim; ++i)
-      Assert (n_subdivisions[i]>0, ExcInvalidRepetitions(n_subdivisions[i]));
+      {
+        subdivisions.push_back(n_subdivisions[i]);
+        edges[i] = corners[i];
+      }
+
+    subdivided_parallelepiped (tria, origin, edges, subdivisions, colorize);
+  }
+
+  // Parallelepiped implementation in 1d, 2d, and 3d. @note The
+  // implementation in 1d is similar to hyper_rectangle(), and in 2d is
+  // similar to parallelogram().
+  //
+  // The GridReordering::reorder_grid is made use of towards the end of
+  // this function. Thus the triangulation is explicitly constructed for
+  // all dim here since it is slightly different in that respect
+  // (cf. hyper_rectangle(), parallelogram()).
+  template <int dim, int spacedim>
+  void
+  subdivided_parallelepiped (Triangulation<dim, spacedim>  &tria,
+                             const Point<spacedim> &origin,
+                             const std_cxx11::array<Tensor<1,spacedim>,dim> &edges,
+                             const std::vector<unsigned int> &subdivisions,
+                             const bool colorize)
+  {
+    if (subdivisions.size()==0)
+      {
+        std::vector<unsigned int> new_subdivisions(dim, 1);
+        subdivided_parallelepiped(tria, origin, edges, new_subdivisions, colorize);
+        return;
+      }
+
+    Assert(subdivisions.size()==dim, ExcMessage(""));
+
+    // check subdivisions
+    for (unsigned int i=0; i<dim; ++i)
+      {
+        Assert (subdivisions[i]>0, ExcInvalidRepetitions(subdivisions[i]));
+        Assert (edges[i].norm()>0, ExcMessage("Edges in subdivided_parallelepiped() must not be degenerate."));
+      }
 
     // Check corners do not overlap (unique)
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=i+1; j<dim; ++j)
-        Assert ((corners[i]!=corners[j]),
-                ExcMessage ("Invalid distance between corner points of parallelepiped."));
+        Assert ((edges[i]!=edges[j]),
+                ExcMessage ("Degenerate edges of subdivided_parallelepiped encountered."));
 
     // Create a list of points
-    Point<dim> delta[dim];
-
-    for (unsigned int i=0; i<dim; ++i)
-      delta[i] = corners[i]/n_subdivisions[i];
-    std::vector<Point<dim> > points;
+    std::vector<Point<spacedim> > points;
 
     switch (dim)
       {
       case 1:
-        for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-          points.push_back (double(x)*delta[0]);
+        for (unsigned int x=0; x<=subdivisions[0]; ++x)
+          points.push_back (origin + edges[0]/subdivisions[0]*x);
         break;
 
       case 2:
-        for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
-          for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-            points.push_back (double(x)*delta[0] + double(y)*delta[1]);
+        for (unsigned int y=0; y<=subdivisions[1]; ++y)
+          for (unsigned int x=0; x<=subdivisions[0]; ++x)
+            points.push_back (origin
+                              + edges[0]/subdivisions[0]*x
+                              + edges[1]/subdivisions[1]*y);
         break;
 
       case 3:
-        for (unsigned int z=0; z<=n_subdivisions[2]; ++z)
-          for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
-            for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-              points.push_back (double(x)*delta[0] + double(y)*delta[1] + double(z)*delta[2]);
+        for (unsigned int z=0; z<=subdivisions[2]; ++z)
+          for (unsigned int y=0; y<=subdivisions[1]; ++y)
+            for (unsigned int x=0; x<=subdivisions[0]; ++x)
+              points.push_back (
+                origin
+                + edges[0]/subdivisions[0]*x
+                + edges[1]/subdivisions[1]*y
+                + edges[2]/subdivisions[2]*z);
         break;
 
       default:
@@ -864,14 +884,14 @@ namespace GridGenerator
     // Prepare cell data
     unsigned int n_cells = 1;
     for (unsigned int i=0; i<dim; ++i)
-      n_cells *= n_subdivisions[i];
+      n_cells *= subdivisions[i];
     std::vector<CellData<dim> > cells (n_cells);
 
     // Create fixed ordering of
     switch (dim)
       {
       case 1:
-        for (unsigned int x=0; x<n_subdivisions[0]; ++x)
+        for (unsigned int x=0; x<subdivisions[0]; ++x)
           {
             cells[x].vertices[0] = x;
             cells[x].vertices[1] = x+1;
@@ -884,13 +904,13 @@ namespace GridGenerator
       case 2:
       {
         // Shorthand
-        const unsigned int n_dy = n_subdivisions[1];
-        const unsigned int n_dx = n_subdivisions[0];
+        const unsigned int n_dy = subdivisions[1];
+        const unsigned int n_dx = subdivisions[0];
 
         for (unsigned int y=0; y<n_dy; ++y)
           for (unsigned int x=0; x<n_dx; ++x)
             {
-              const unsigned int    c = y*n_dx         + x;
+              const unsigned int c = y*n_dx         + x;
               cells[c].vertices[0] = y*(n_dx+1)     + x;
               cells[c].vertices[1] = y*(n_dx+1)     + x+1;
               cells[c].vertices[2] = (y+1)*(n_dx+1) + x;
@@ -905,15 +925,15 @@ namespace GridGenerator
       case 3:
       {
         // Shorthand
-        const unsigned int n_dz = n_subdivisions[2];
-        const unsigned int n_dy = n_subdivisions[1];
-        const unsigned int n_dx = n_subdivisions[0];
+        const unsigned int n_dz = subdivisions[2];
+        const unsigned int n_dy = subdivisions[1];
+        const unsigned int n_dx = subdivisions[0];
 
         for (unsigned int z=0; z<n_dz; ++z)
           for (unsigned int y=0; y<n_dy; ++y)
             for (unsigned int x=0; x<n_dx; ++x)
               {
-                const unsigned int    c = z*n_dy*n_dx             + y*n_dx         + x;
+                const unsigned int c = z*n_dy*n_dx             + y*n_dx         + x;
 
                 cells[c].vertices[0] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x;
                 cells[c].vertices[1] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x+1;
@@ -969,7 +989,7 @@ namespace GridGenerator
     Assert (left < right,
             ExcMessage ("Invalid left-to-right bounds of hypercube"));
 
-    Point<spacedim> p0,p1;
+    Point<dim> p0, p1;
     for (unsigned int i=0; i<dim; ++i)
       {
         p0[i] = left;
@@ -987,39 +1007,35 @@ namespace GridGenerator
   subdivided_hyper_rectangle (
     Triangulation<dim, spacedim>              &tria,
     const std::vector<unsigned int> &repetitions,
-    const Point<spacedim>                &p_1,
-    const Point<spacedim>                &p_2,
+    const Point<dim>                &p_1,
+    const Point<dim>                &p_2,
     const bool                       colorize)
   {
-    // contributed by Joerg R. Weimar
-    // (j.weimar@jweimar.de) 2003
     Assert(repetitions.size() == dim,
            ExcInvalidRepetitionsDimension(dim));
-    // First, normalize input such that
-    // p1 is lower in all coordinate
-    // directions.
-    Point<spacedim> p1(p_1);
-    Point<spacedim> p2(p_2);
 
+    // First, extend dimensions from dim to spacedim and
+    // normalize such that p1 is lower in all coordinate
+    // directions. Additional entries will be 0.
+    Point<spacedim> p1, p2;
     for (unsigned int i=0; i<dim; ++i)
-      if (p1(i) > p2(i))
-        std::swap (p1(i), p2(i));
+      {
+        p1(i) = std::min(p_1(i), p_2(i));
+        p2(i) = std::max(p_1(i), p_2(i));
+      }
 
-    // then check that all repetitions
-    // are >= 1, and calculate deltas
-    // convert repetitions from double
-    // to int by taking the ceiling.
+    // calculate deltas and validate input
     std::vector<Point<spacedim> > delta(dim);
-
     for (unsigned int i=0; i<dim; ++i)
       {
         Assert (repetitions[i] >= 1, ExcInvalidRepetitions(repetitions[i]));
 
         delta[i][i] = (p2[i]-p1[i])/repetitions[i];
+        Assert(delta[i][i]>0.0,
+               ExcMessage("The first dim entries of coordinates of p1 and p2 need to be different."));
       }
 
-    // then generate the necessary
-    // points
+    // then generate the points
     std::vector<Point<spacedim> > points;
     switch (dim)
       {
@@ -1048,7 +1064,6 @@ namespace GridGenerator
       }
 
     // next create the cells
-    // Prepare cell data
     std::vector<CellData<dim> > cells;
     switch (dim)
       {
@@ -1145,18 +1160,12 @@ namespace GridGenerator
     const Point<dim>                &p_2,
     const bool                       colorize)
   {
-    // contributed by Joerg R. Weimar
-    // (j.weimar@jweimar.de) 2003
-    // modified by Yaqi Wang 2006
     Assert(step_sz.size() == dim,
            ExcInvalidRepetitionsDimension(dim));
 
-
     // First, normalize input such that
     // p1 is lower in all coordinate
-    // directions.
-
-    // and check the consistency of
+    // directions and check the consistency of
     // step sizes, i.e. that they all
     // add up to the sizes specified by
     // p_1 and p_2
@@ -1367,7 +1376,6 @@ namespace GridGenerator
     const Table<1,types::material_id>                 &material_id,
     const bool                                    colorize)
   {
-    // contributed by Yaqi Wang 2006
     Assert(spacing.size() == 1,
            ExcInvalidRepetitionsDimension(1));
 
@@ -1428,7 +1436,6 @@ namespace GridGenerator
     const Table<2,types::material_id>          &material_id,
     const bool                                    colorize)
   {
-    // contributed by Yaqi Wang 2006
     Assert(spacing.size() == 2,
            ExcInvalidRepetitionsDimension(2));
 
@@ -1526,7 +1533,6 @@ namespace GridGenerator
     const Table<3,types::material_id>               &material_id,
     const bool                                    colorize)
   {
-    // contributed by Yaqi Wang 2006
     const unsigned int dim = 3;
 
     Assert(spacing.size() == dim,
