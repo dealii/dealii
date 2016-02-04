@@ -2872,6 +2872,181 @@ next_cell:
 
 
 
+  template <class Container>
+  std::vector<typename Container::cell_iterator>
+  get_cells_at_coarsest_common_level (
+    const std::vector<typename Container::active_cell_iterator> &patch)
+  {
+    Assert (patch.size() > 0, ExcMessage("Vector containing patch cells should not be an empty vector!"));
+    // In order to extract the set of cells with the coarsest common level from the give vector of cells:
+    // First it finds the number associated with the minimum level of refinmenet, namely "min_level"
+    int min_level = patch[0]->level();
+
+    for (unsigned int i=0; i<patch.size(); ++i)
+      min_level = std::min (min_level, patch[i]->level() );
+    std::set<typename Container::cell_iterator>  uniform_cells;
+    typename std::vector<typename Container::active_cell_iterator>::const_iterator  patch_cell;
+    // it loops through all cells of the input vector
+    for (patch_cell=patch.begin(); patch_cell!=patch.end () ; ++patch_cell)
+      {
+        // If the refinement level of each cell i the loop be equal to the min_level, so that
+        // that cell inserted into the set of uniform_cells, as the set of cells with the coarsest common refinement level
+        if ((*patch_cell)->level() == min_level)
+          uniform_cells.insert (*patch_cell);
+        else
+          // If not, it asks for the parent of the cell, until it finds the parent cell
+          // with the refinement level equal to the min_level and inserts that parent cell into the
+          // the set of uniform_cells, as the set of cells with the coarsest common refinement level.
+          {
+            typename Container::cell_iterator parent = *patch_cell;
+
+            while (parent->level() > min_level)
+              parent = parent-> parent();
+            uniform_cells.insert (parent);
+          }
+      }
+
+    return std::vector<typename Container::cell_iterator> (uniform_cells.begin(),
+                                                           uniform_cells.end());
+  }
+
+
+
+  template <class Container>
+  void build_triangulation_from_patch(const std::vector<typename Container::active_cell_iterator> &patch,
+                                      Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
+                                      std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
+                                      typename Container::active_cell_iterator> &patch_to_global_tria_map)
+
+  {
+    const std::vector<typename Container::cell_iterator> uniform_cells =
+      get_cells_at_coarsest_common_level <Container> (patch);
+    // First it creates triangulation from the vector of "uniform_cells"
+    local_triangulation.clear();
+    std::vector<Point<Container::space_dimension> > vertices;
+    const unsigned int n_uniform_cells=uniform_cells.size();
+    std::vector<CellData<Container::dimension> > cells(n_uniform_cells);
+    unsigned int k=0;// for enumerating cells
+    unsigned int i=0;// for enumerating vertices
+    typename std::vector<typename Container::cell_iterator>::const_iterator uniform_cell;
+    for (uniform_cell=uniform_cells.begin(); uniform_cell!=uniform_cells.end(); ++uniform_cell)
+      {
+        bool repeat_vertex;
+        for (unsigned int j=0;  j< GeometryInfo<Container::dimension>::vertices_per_cell; ++j)
+          {
+            Point<Container::space_dimension> position=(*uniform_cell)->vertex (j);
+            repeat_vertex=false;
+
+            for (unsigned int m=0; m<i; ++m)
+              {
+                if (position == vertices[m])
+                  {
+                    repeat_vertex=true;
+                    cells[k].vertices[j]=m;
+                    break;
+                  }
+              }
+            if (repeat_vertex==false)
+              {
+                vertices.push_back(position);
+                cells[k].vertices[j]=i;
+                i=i+1;
+              }
+
+          }//for vertices_per_cell
+        k=k+1;
+      }
+    local_triangulation.create_triangulation(vertices,cells,SubCellData());
+    Assert (local_triangulation.n_active_cells() == uniform_cells.size(), ExcInternalError());
+    local_triangulation.clear_user_flags ();
+    unsigned int index=0;
+    // Create a map between cells of class DofHandler into class Triangulation
+    std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
+        typename Container::cell_iterator> patch_to_global_tria_map_tmp;
+    for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator coarse_cell = local_triangulation.begin();
+         coarse_cell != local_triangulation.end(); ++coarse_cell, ++index)
+      {
+        patch_to_global_tria_map_tmp.insert (std::make_pair(coarse_cell, uniform_cells[index]));
+        // To ensure that the cells with the same coordinates (here, we compare their centers) are mapped into each other.
+
+        Assert(coarse_cell->center().distance( uniform_cells[index]->center())<=1e-15*coarse_cell->diameter(),
+               ExcInternalError());
+      }
+    bool refinement_necessary;
+    // In this loop we start to do refinement on the above coarse triangulation to reach
+    // to the same level of refinement as the patch cells are really on
+    do
+      {
+        refinement_necessary = false;
+        for (typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator
+             active_tria_cell = local_triangulation.begin_active();
+             active_tria_cell != local_triangulation.end(); ++active_tria_cell)
+          {
+            if (patch_to_global_tria_map_tmp[active_tria_cell]->has_children())
+              {
+                active_tria_cell -> set_refine_flag();
+                refinement_necessary = true;
+              }
+            else for (unsigned int i=0; i<patch.size(); ++i)
+                {
+                  if (patch_to_global_tria_map_tmp[active_tria_cell]==patch[i])
+                    {
+                      active_tria_cell->set_user_flag();
+                      break;
+                    }
+                }
+          }
+
+        if (refinement_necessary)
+          {
+            local_triangulation.execute_coarsening_and_refinement ();
+
+            for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator
+                 cell = local_triangulation.begin();
+                 cell != local_triangulation.end(); ++cell)
+              {
+
+                if (patch_to_global_tria_map_tmp.find(cell)!=patch_to_global_tria_map_tmp.end())
+                  {
+                    if (cell-> has_children())
+                      {
+                        // Note: Since the cell got children, then it should not be in the map anymore
+                        // children may be added into the map, instead
+
+                        // these children may not yet be in the map
+                        for (unsigned int c=0; c< cell ->n_children(); ++c)
+                          {
+                            if (patch_to_global_tria_map_tmp.find(cell->child(c)) ==
+                                patch_to_global_tria_map_tmp.end())
+                              {
+                                patch_to_global_tria_map_tmp.insert (std::make_pair(cell ->child(c),
+                                                                                    patch_to_global_tria_map_tmp[cell]->child(c)));
+
+                                Assert(cell->child(c)->center().distance( patch_to_global_tria_map_tmp[cell]->child(c)->center())
+                                       <=1e-15*cell->child(c)->diameter(),
+                                       ExcInternalError());
+                              }
+                          }
+                        // The parent cell whose children were added
+                        // into the map should be deleted from the map
+                        patch_to_global_tria_map_tmp.erase(cell);
+                      }
+                  }
+              }
+          }
+
+      }
+    while (refinement_necessary);
+    typename std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
+             typename Container::cell_iterator>::iterator map_tmp_it =
+               patch_to_global_tria_map_tmp.begin(),map_tmp_end = patch_to_global_tria_map_tmp.end();
+    // Now we just need to take the temporary map of pairs of type cell_iterator "patch_to_global_tria_map_tmp"
+    // making pair of active_cell_iterators so that filling out the final map "patch_to_global_tria_map"
+    for (; map_tmp_it!=map_tmp_end; ++map_tmp_it)
+      patch_to_global_tria_map[map_tmp_it->first] = map_tmp_it->second;
+  }
+
+
 
   /*
    * Internally used in orthogonal_equality

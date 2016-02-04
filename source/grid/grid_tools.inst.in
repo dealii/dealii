@@ -225,8 +225,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   }
 
 
-
-
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Container : TRIANGULATION_AND_DOFHANDLER_TEMPLATES)
   {
 #if deal_II_dimension <= deal_II_space_dimension
@@ -236,6 +234,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
       get_patch_around_cell<Container<deal_II_dimension,deal_II_space_dimension> >
       (const Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &cell);
+      
+      template
+      std::vector< Container<deal_II_dimension,deal_II_space_dimension>::cell_iterator> 
+      get_cells_at_coarsest_common_level <Container<deal_II_dimension,deal_II_space_dimension> > (
+      const std::vector< Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> & patch_cells);
+      
+      template
+      void build_triangulation_from_patch <Container<deal_II_dimension,deal_II_space_dimension> > (
+      const std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>  &patch,
+      Triangulation<Container<deal_II_dimension,deal_II_space_dimension>::dimension,Container<deal_II_dimension,deal_II_space_dimension>::space_dimension> &local_triangulation,
+      std::map<Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator,
+      Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator > &patch_to_global_tria_map);
+      
     \}
 #endif
   }
