@@ -64,11 +64,11 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
 # (Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED)
 #
 
-STRING(REGEX MATCH "${TEST}: CONFIGURE failed\\." _configure_regex ${_output})
-STRING(REGEX MATCH "${TEST}: BUILD failed\\." _build_regex ${_output})
-STRING(REGEX MATCH "${TEST}: RUN failed\\." _run_regex ${_output})
-STRING(REGEX MATCH "${TEST}: DIFF failed\\." _diff_regex ${_output})
-STRING(REGEX MATCH "${TEST}: PASSED\\." _passed_regex ${_output})
+STRING(REGEX MATCH "${TEST}: CONFIGURE failed\\." _configure_regex "${_output}")
+STRING(REGEX MATCH "${TEST}: BUILD failed\\." _build_regex "${_output}")
+STRING(REGEX MATCH "${TEST}: RUN failed\\." _run_regex "${_output}")
+STRING(REGEX MATCH "${TEST}: DIFF failed\\." _diff_regex "${_output}")
+STRING(REGEX MATCH "${TEST}: PASSED\\." _passed_regex "${_output}")
 
 IF(NOT "${_passed_regex}" STREQUAL "")
   SET(_stage PASSED)
@@ -115,7 +115,7 @@ ELSE()
     # Some special output in case the BUILD stage failed in a regression test:
     MESSAGE("${TEST}: BUILD failed. Output:")
   ENDIF()
-  MESSAGE(${_output})
+  MESSAGE("${_output}")
   MESSAGE("")
   MESSAGE("${TEST}: ******    ${_stage} failed    *******")
   MESSAGE("")
