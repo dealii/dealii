@@ -47,6 +47,22 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
   ENDIF()
 ENDMACRO()
 
+MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
+  FIND_PACKAGE(BOOST)
+
+  IF(BOOST_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # Blacklist version 1.58 because we get serialization errors with it. At
+    # least version 1.56 and 1.59 are known to work.
+    #
+    IF("${Boost_MAJOR_VERSION}" STREQUAL "1" AND "${Boost_MINOR_VERSION}" STREQUAL "58")
+      MESSAGE(STATUS "Boost version 1.58 is not compatible with deal.II!")
+      SET(${var} FALSE)
+    ENDIF()
+  ENDIF()
+ENDMACRO()
 
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
   ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
