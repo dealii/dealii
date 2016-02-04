@@ -1,0 +1,88 @@
+
+DEAL:1d::coarse_ cells 2.0: 2.0 2.1 
+DEAL:1d::coarse_ cells 2.1: 2.0 2.1 2.2 
+DEAL:1d::coarse_ cells 2.2: 2.1 2.2 2.3 
+DEAL:1d::coarse_ cells 2.3: 2.2 2.3 
+DEAL:1d::OKay
+DEAL:2d::coarse_ cells 2.0: 2.0 2.1 2.2 
+DEAL:2d::coarse_ cells 2.1: 2.0 2.1 2.3 2.4 
+DEAL:2d::coarse_ cells 2.2: 2.0 2.2 2.3 2.8 
+DEAL:2d::coarse_ cells 2.3: 2.1 2.2 2.3 2.6 2.9 
+DEAL:2d::coarse_ cells 2.4: 2.1 2.4 2.5 2.6 
+DEAL:2d::coarse_ cells 2.5: 2.4 2.5 2.7 
+DEAL:2d::coarse_ cells 2.6: 2.3 2.4 2.6 2.7 2.12 
+DEAL:2d::coarse_ cells 2.7: 2.5 2.6 2.7 2.13 
+DEAL:2d::coarse_ cells 2.8: 2.2 2.8 2.9 2.10 
+DEAL:2d::coarse_ cells 2.9: 2.3 2.8 2.9 2.11 2.12 
+DEAL:2d::coarse_ cells 2.10: 2.8 2.10 2.11 
+DEAL:2d::coarse_ cells 2.11: 2.9 2.10 2.11 2.14 
+DEAL:2d::coarse_ cells 2.12: 2.6 2.9 2.12 2.13 2.14 
+DEAL:2d::coarse_ cells 2.13: 2.7 2.12 2.13 2.15 
+DEAL:2d::coarse_ cells 2.14: 2.11 2.12 2.14 2.15 
+DEAL:2d::coarse_ cells 2.15: 2.13 2.14 2.15 
+DEAL:2d::OKay
+DEAL:3d::coarse_ cells 2.0: 2.0 2.1 2.2 2.4 
+DEAL:3d::coarse_ cells 2.1: 2.0 2.1 2.3 2.5 2.8 
+DEAL:3d::coarse_ cells 2.2: 2.0 2.2 2.3 2.6 2.16 
+DEAL:3d::coarse_ cells 2.3: 2.1 2.2 2.3 2.7 2.10 2.17 
+DEAL:3d::coarse_ cells 2.4: 2.0 2.4 2.5 2.6 2.32 
+DEAL:3d::coarse_ cells 2.5: 2.1 2.4 2.5 2.7 2.12 2.33 
+DEAL:3d::coarse_ cells 2.6: 2.2 2.4 2.6 2.7 2.20 2.34 
+DEAL:3d::coarse_ cells 2.7: 2.3 2.5 2.6 2.7 2.14 2.21 2.35 
+DEAL:3d::coarse_ cells 2.8: 2.1 2.8 2.9 2.10 2.12 
+DEAL:3d::coarse_ cells 2.9: 2.8 2.9 2.11 2.13 
+DEAL:3d::coarse_ cells 2.10: 2.3 2.8 2.10 2.11 2.14 2.24 
+DEAL:3d::coarse_ cells 2.11: 2.9 2.10 2.11 2.15 2.25 
+DEAL:3d::coarse_ cells 2.12: 2.5 2.8 2.12 2.13 2.14 2.40 
+DEAL:3d::coarse_ cells 2.13: 2.9 2.12 2.13 2.15 2.41 
+DEAL:3d::coarse_ cells 2.14: 2.7 2.10 2.12 2.14 2.15 2.28 2.42 
+DEAL:3d::coarse_ cells 2.15: 2.11 2.13 2.14 2.15 2.29 2.43 
+DEAL:3d::coarse_ cells 2.16: 2.2 2.16 2.17 2.18 2.20 
+DEAL:3d::coarse_ cells 2.17: 2.3 2.16 2.17 2.19 2.21 2.24 
+DEAL:3d::coarse_ cells 2.18: 2.16 2.18 2.19 2.22 
+DEAL:3d::coarse_ cells 2.19: 2.17 2.18 2.19 2.23 2.26 
+DEAL:3d::coarse_ cells 2.20: 2.6 2.16 2.20 2.21 2.22 2.48 
+DEAL:3d::coarse_ cells 2.21: 2.7 2.17 2.20 2.21 2.23 2.28 2.49 
+DEAL:3d::coarse_ cells 2.22: 2.18 2.20 2.22 2.23 2.50 
+DEAL:3d::coarse_ cells 2.23: 2.19 2.21 2.22 2.23 2.30 2.51 
+DEAL:3d::coarse_ cells 2.24: 2.10 2.17 2.24 2.25 2.26 2.28 
+DEAL:3d::coarse_ cells 2.25: 2.11 2.24 2.25 2.27 2.29 
+DEAL:3d::coarse_ cells 2.26: 2.19 2.24 2.26 2.27 2.30 
+DEAL:3d::coarse_ cells 2.27: 2.25 2.26 2.27 2.31 
+DEAL:3d::coarse_ cells 2.28: 2.14 2.21 2.24 2.28 2.29 2.30 2.56 
+DEAL:3d::coarse_ cells 2.29: 2.15 2.25 2.28 2.29 2.31 2.57 
+DEAL:3d::coarse_ cells 2.30: 2.23 2.26 2.28 2.30 2.31 2.58 
+DEAL:3d::coarse_ cells 2.31: 2.27 2.29 2.30 2.31 2.59 
+DEAL:3d::coarse_ cells 2.32: 2.4 2.32 2.33 2.34 2.36 
+DEAL:3d::coarse_ cells 2.33: 2.5 2.32 2.33 2.35 2.37 2.40 
+DEAL:3d::coarse_ cells 2.34: 2.6 2.32 2.34 2.35 2.38 2.48 
+DEAL:3d::coarse_ cells 2.35: 2.7 2.33 2.34 2.35 2.39 2.42 2.49 
+DEAL:3d::coarse_ cells 2.36: 2.32 2.36 2.37 2.38 
+DEAL:3d::coarse_ cells 2.37: 2.33 2.36 2.37 2.39 2.44 
+DEAL:3d::coarse_ cells 2.38: 2.34 2.36 2.38 2.39 2.52 
+DEAL:3d::coarse_ cells 2.39: 2.35 2.37 2.38 2.39 2.46 2.53 
+DEAL:3d::coarse_ cells 2.40: 2.12 2.33 2.40 2.41 2.42 2.44 
+DEAL:3d::coarse_ cells 2.41: 2.13 2.40 2.41 2.43 2.45 
+DEAL:3d::coarse_ cells 2.42: 2.14 2.35 2.40 2.42 2.43 2.46 2.56 
+DEAL:3d::coarse_ cells 2.43: 2.15 2.41 2.42 2.43 2.47 2.57 
+DEAL:3d::coarse_ cells 2.44: 2.37 2.40 2.44 2.45 2.46 
+DEAL:3d::coarse_ cells 2.45: 2.41 2.44 2.45 2.47 
+DEAL:3d::coarse_ cells 2.46: 2.39 2.42 2.44 2.46 2.47 2.60 
+DEAL:3d::coarse_ cells 2.47: 2.43 2.45 2.46 2.47 2.61 
+DEAL:3d::coarse_ cells 2.48: 2.20 2.34 2.48 2.49 2.50 2.52 
+DEAL:3d::coarse_ cells 2.49: 2.21 2.35 2.48 2.49 2.51 2.53 2.56 
+DEAL:3d::coarse_ cells 2.50: 2.22 2.48 2.50 2.51 2.54 
+DEAL:3d::coarse_ cells 2.51: 2.23 2.49 2.50 2.51 2.55 2.58 
+DEAL:3d::coarse_ cells 2.52: 2.38 2.48 2.52 2.53 2.54 
+DEAL:3d::coarse_ cells 2.53: 2.39 2.49 2.52 2.53 2.55 2.60 
+DEAL:3d::coarse_ cells 2.54: 2.50 2.52 2.54 2.55 
+DEAL:3d::coarse_ cells 2.55: 2.51 2.53 2.54 2.55 2.62 
+DEAL:3d::coarse_ cells 2.56: 2.28 2.42 2.49 2.56 2.57 2.58 2.60 
+DEAL:3d::coarse_ cells 2.57: 2.29 2.43 2.56 2.57 2.59 2.61 
+DEAL:3d::coarse_ cells 2.58: 2.30 2.51 2.56 2.58 2.59 2.62 
+DEAL:3d::coarse_ cells 2.59: 2.31 2.57 2.58 2.59 2.63 
+DEAL:3d::coarse_ cells 2.60: 2.46 2.53 2.56 2.60 2.61 2.62 
+DEAL:3d::coarse_ cells 2.61: 2.47 2.57 2.60 2.61 2.63 
+DEAL:3d::coarse_ cells 2.62: 2.55 2.58 2.60 2.62 2.63 
+DEAL:3d::coarse_ cells 2.63: 2.59 2.61 2.62 2.63 
+DEAL:3d::OKay

@@ -923,9 +923,13 @@ namespace GridTools
   fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
                                 Triangulation<dim,spacedim> &triangulation);
 
+
+
+
   /*@}*/
   /**
-   * @name Extracting and creating patches of cells surrounding a single cell
+   * @name Extracting and creating patches of cells surrounding a single cell,
+   *  and creating triangulation out of them
    */
   /*@{*/
 
@@ -973,6 +977,107 @@ namespace GridTools
   std::vector<typename MeshType::active_cell_iterator>
   get_patch_around_cell(const typename MeshType::active_cell_iterator &cell);
 
+
+  /**
+   * This function takes a vector of active cells (hereafter named @p
+   * patch_cells) as input argument, and returns a vector of their
+   * parent cells with the coarsest common level of refinement. In
+   * other words, find that set of cells living at the same refinement
+   * level so that all cells in the input vector are children of the
+   * cells in the set, or are in the set itself.
+   *
+   * @tparam Container In C++, the compiler can not determine the type
+   * of <code>Container</code> from the function call. You need to
+   * specify it as an explicit template argument following the
+   * function name. This type has to satisfy the requirements of a
+   * mesh container (see @ref GlossMeshAsAContainer).
+   *
+   * @param[in] patch_cells A vector of active cells for which
+   *   this function finds the parents at the coarsest common
+   *   level. This vector of cells typically results from
+   *   calling the function GridTools::get_patch_around_cell().
+   * @return A list of cells with the coarsest common level of
+   *   refinement of the input cells.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  std::vector<typename Container::cell_iterator>
+  get_cells_at_coarsest_common_level(const std::vector<typename Container::active_cell_iterator> &patch_cells);
+
+  /**
+   * This function constructs a Triangulation (named @p
+   * local_triangulation) from a given vector of active cells. This
+   * vector (which we think of the cells corresponding to a "patch")
+   * contains active cells that are part of an existing global
+   * Triangulation. The goal of this function is to build a local
+   * Triangulation that contains only the active cells given in
+   * @p patch (and potentially a minimum number of additional cells
+   * required to form a valid Triangulation).
+   * The function also returns a map that allows to identify the cells in
+   * the output Triangulation and corresponding cells in the input
+   * list.
+   *
+   * The operation implemented by this function is frequently used in
+   * the definition of error estimators that need to solve "local"
+   * problems on each cell and its neighbors. A similar construction is
+   * necessary in the definition of the Clement interpolation operator
+   * in which one needs to solve a local problem on all cells within
+   * the support of a shape function. This function then builds a
+   * complete Triangulation from a list of cells that make up such a
+   * patch; one can then later attach a DoFHandler to such a
+   * Triangulation.
+   *
+   * If the list of input cells contains only cells at the same
+   * refinement level, then the output Triangulation simply consists
+   * of a Triangulation containing only exactly these patch cells. On
+   * the other hand, if the input cells live on different refinement
+   * levels, i.e., the Triangulation of which they are part is
+   * adaptively refined, then the construction of the output
+   * Triangulation is not so simple because the coarsest level of a
+   * Triangulation can not contain hanging nodes. Rather, we first
+   * have to find the common refinement level of all input cells,
+   * along with their common parents (see
+   * GridTools::get_cells_at_coarsest_common_level()), build a
+   * Triangulation from those, and then adaptively refine it so that
+   * the input cells all also exist in the output Triangulation.
+   *
+   * A consequence of this procedure is that that output Triangulation
+   * may contain more active cells than the ones that exist in the
+   * input vector.  On the other hand, one typically wants to solve
+   * the local problem not on the entire output Triangulation, but
+   * only on those cells of it that correspond to cells in the input
+   * list.  In this case, a user typically wants to assign degrees of
+   * freedom only on cells that are part of the "patch", and somehow
+   * ignore those excessive cells. The current function supports this
+   * common requirement by setting the user flag for the cells in the
+   * output Triangulation that match with cells in the input
+   * list. Cells which are not part of the original patch will not
+   * have their @p user_flag set; we can then avoid assigning degrees of
+   * freedom using the FE_Nothing<dim> element.
+   *
+   * @tparam Container In C++, the compiler can not determine the type
+   * of <code>Container</code> from the function call. You need to
+   * specify it as an explicit template argument following the
+   * function name. This type that satisfies the requirements of a
+   * mesh container (see @ref GlossMeshAsAContainer).
+   *
+   * @param[in] patch A vector of active cells from a common triangulation.
+   *  These cells may or may not all be at the same refinement level.
+   * @param[out] local_triangulation A triangulation whose active cells
+   *  correspond to the given vector of active cells in @p patch.
+   * @param[out] patch_to_global_tria_map A map between the local triangulation
+   * which is built as explained above, and the cell iterators in the input list.
+   *
+   *  @author Arezou Ghesmati, Wolfgang Bangerth, 2015
+   */
+  template <class Container>
+  void
+  build_triangulation_from_patch (
+    const std::vector<typename Container::active_cell_iterator>  &patch,
+    Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
+    std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
+    typename Container::active_cell_iterator> &patch_to_global_tria_map);
 
   /**
    * This function runs through the degrees of freedom defined by the
