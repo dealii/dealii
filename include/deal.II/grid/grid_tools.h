@@ -1062,7 +1062,7 @@ namespace GridTools
    * common requirement by setting the user flag for the cells in the
    * output Triangulation that match with cells in the input
    * list. Cells which are not part of the original patch will not
-   * have their user_flag set; we can then avoid assigning degrees of
+   * have their @p user_flag set; we can then avoid assigning degrees of
    * freedom using the FE_Nothing<dim> element.
    *
    * @tparam Container In C++, the compiler can not determine the type

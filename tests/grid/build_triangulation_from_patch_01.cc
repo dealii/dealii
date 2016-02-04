@@ -61,12 +61,23 @@ void test()
         deallog << patch_cells[i] << ' ';
       deallog << std::endl;
 
-      deallog << "local_triangulation " << cell << ": ";
+      deallog << "local_triangulation " << cell << ":\n";
       for (typename Triangulation<dim>::active_cell_iterator
            tria_cell = local_triangulation.begin_active();
            tria_cell != local_triangulation.end(); ++tria_cell)
-        deallog << tria_cell << ' ';
-      deallog << std::endl;
+        {
+          deallog << "   "
+                  << tria_cell
+                  << " user flag check:  "
+                  << (tria_cell->user_flag_set() ? " (+) " : " (-) ")
+                  << std::endl;
+          for (unsigned int v=0;  v< GeometryInfo<dim>::vertices_per_cell; ++v)
+            {
+              deallog << "  vertices for cell  "
+                      << tria_cell << " : "
+                      << tria_cell->vertex(v) << std::endl;
+            }
+        }
 
     }
 
