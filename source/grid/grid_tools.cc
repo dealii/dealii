@@ -3070,6 +3070,11 @@ next_cell:
     std::vector<types::global_dof_index> local_face_dof_indices;
     std::vector<types::global_dof_index> local_line_dof_indices;
 
+    // a place to save the dof_handler user flags and restore them later
+    // to maintain const of dof_handler.
+    std::vector<bool> user_flags;
+
+
     // in 3d, we need pointers from active lines to the
     // active parent lines, so we construct it as needed.
     std::map<typename MeshType::active_line_iterator, typename MeshType::line_iterator > lines_to_parent_lines_map;
@@ -3077,7 +3082,6 @@ next_cell:
       {
 
         // save user flags as they will be modified and then later restored
-        std::vector<bool> user_flags;
         dof_handler.get_triangulation().save_user_flags(user_flags);
         const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
 
