@@ -3049,12 +3049,10 @@ next_cell:
 
 
 
-  template <class Container>
-  std::map< types::global_dof_index,std::vector<typename Container::active_cell_iterator> >
-  get_dof_to_support_patch_map(Container &dof_handler)
+  template <class MeshType>
+  std::map< types::global_dof_index,std::vector<typename MeshType::active_cell_iterator> >
+  get_dof_to_support_patch_map(MeshType &dof_handler)
   {
-
-    //  TODO: Add Assert( fe is not dg)
 
     // This is the map from global_dof_index to
     // a set of cells on patch.  We first map into
@@ -3066,18 +3064,18 @@ next_cell:
     // constructed, we will copy to a map of vectors
     // since that is the prefered output for other
     // functions.
-    std::map< types::global_dof_index,std::set<typename Container::active_cell_iterator> > dof_to_set_of_cells_map;
+    std::map< types::global_dof_index,std::set<typename MeshType::active_cell_iterator> > dof_to_set_of_cells_map;
 
-    std::vector<types::global_dof_index> local_dof_index;
-    std::vector<types::global_dof_index> local_face_dof_index;
-    std::vector<types::global_dof_index> local_line_dof_index;
+    std::vector<types::global_dof_index> local_dof_indices;
+    std::vector<types::global_dof_index> local_face_dof_indices;
+    std::vector<types::global_dof_index> local_line_dof_indices;
 
     // in 3d, we need pointers from active lines to the
     // active parent lines, so we construct it as needed.
-    std::map<typename Container::active_line_iterator, typename Container::line_iterator > lines_to_parent_lines_map;
-    if (Container::dimension == 3)
+    std::map<typename MeshType::active_line_iterator, typename MeshType::line_iterator > lines_to_parent_lines_map;
+    if (MeshType::dimension == 3)
       {
-        typename Container::active_cell_iterator cell = dof_handler.begin_active(),
+        typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
         for (; cell!=endc; ++cell)
           {
@@ -3087,7 +3085,7 @@ next_cell:
             // few and we don't have to use them.
             if (cell->is_artificial() == false)
               {
-                for (unsigned int l=0; l<GeometryInfo<Container::dimension>::lines_per_cell; ++l)
+                for (unsigned int l=0; l<GeometryInfo<MeshType::dimension>::lines_per_cell; ++l)
                   if (cell->line(l)->has_children())
                     for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
                       {
@@ -3107,7 +3105,7 @@ next_cell:
     // which it is a part, mainly the ones that must
     // be added on account of adaptivity hanging node
     // constraints.
-    typename Container::active_cell_iterator cell = dof_handler.begin_active(),
+    typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
                                              endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
@@ -3117,13 +3115,13 @@ next_cell:
         if (cell->is_artificial() == false)
           {
             const unsigned int n_dofs_per_cell = cell->get_fe().dofs_per_cell;
-            local_dof_index.resize(n_dofs_per_cell);
+            local_dof_indices.resize(n_dofs_per_cell);
 
             // Take care of adding cell pointer to each
             // dofs that exists on cell.
-            cell->get_dof_indices(local_dof_index);
+            cell->get_dof_indices(local_dof_indices);
             for (unsigned int i=0; i< n_dofs_per_cell; ++i )
-              dof_to_set_of_cells_map[local_dof_index[i]].insert(cell);
+              dof_to_set_of_cells_map[local_dof_indices[i]].insert(cell);
 
             // In the case of the adjacent cell (over
             // faces or edges) being more refined, we
@@ -3133,7 +3131,7 @@ next_cell:
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (unsigned int f=0; f<GeometryInfo<Container::dimension>::faces_per_cell; ++f)
+            for (unsigned int f=0; f<GeometryInfo<MeshType::dimension>::faces_per_cell; ++f)
               {
                 if (cell->face(f)->has_children())
                   {
@@ -3154,11 +3152,11 @@ next_cell:
                         Assert (cell->face(f)->child(c)->has_children() == false, ExcInternalError());
 
                         const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
-                        local_face_dof_index.resize(n_dofs_per_face);
+                        local_face_dof_indices.resize(n_dofs_per_face);
 
-                        cell->face(f)->child(c)->get_dof_indices(local_face_dof_index);
+                        cell->face(f)->child(c)->get_dof_indices(local_face_dof_indices);
                         for (unsigned int i=0; i< n_dofs_per_face; ++i )
-                          dof_to_set_of_cells_map[local_face_dof_index[i]].insert(cell);
+                          dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
                       }
                   }
                 else if ((cell->face(f)->at_boundary() == false) && (cell->neighbor_is_coarser(f)))
@@ -3184,11 +3182,11 @@ next_cell:
                     unsigned int subface = neighbor_face_no_subface_no.second;
 
                     const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
-                    local_face_dof_index.resize(n_dofs_per_face);
+                    local_face_dof_indices.resize(n_dofs_per_face);
 
-                    cell->neighbor(f)->face(face_no)->get_dof_indices(local_face_dof_index);
+                    cell->neighbor(f)->face(face_no)->get_dof_indices(local_face_dof_indices);
                     for (unsigned int i=0; i< n_dofs_per_face; ++i )
-                      dof_to_set_of_cells_map[local_face_dof_index[i]].insert(cell);
+                      dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
 
                     // Add cell to all dofs of children of
                     // parent face
@@ -3197,12 +3195,12 @@ next_cell:
                         if (c != subface) // don't repeat work on dofs of original cell
                           {
                             const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
-                            local_face_dof_index.resize(n_dofs_per_face);
+                            local_face_dof_indices.resize(n_dofs_per_face);
 
                             Assert (cell->neighbor(f)->face(face_no)->child(c)->has_children() == false, ExcInternalError());
-                            cell->neighbor(f)->face(face_no)->child(c)->get_dof_indices(local_face_dof_index);
+                            cell->neighbor(f)->face(face_no)->child(c)->get_dof_indices(local_face_dof_indices);
                             for (unsigned int i=0; i<n_dofs_per_face; ++i )
-                              dof_to_set_of_cells_map[local_face_dof_index[i]].insert(cell);
+                              dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
                           }
                       }
                   }
@@ -3216,9 +3214,9 @@ next_cell:
             // if cell's line has an active parent, then
             // distribute cell to dofs on parent line
             // and dofs on all children of parent line.
-            if (Container::dimension == 3)
+            if (MeshType::dimension == 3)
               {
-                for (unsigned int l=0; l<GeometryInfo<Container::dimension>::lines_per_cell; ++l)
+                for (unsigned int l=0; l<GeometryInfo<MeshType::dimension>::lines_per_cell; ++l)
                   {
                     if (cell->line(l)->has_children())
                       {
@@ -3230,11 +3228,11 @@ next_cell:
                             // on line not including the vertices of the line.
                             const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
                                                                  + cell->get_fe().dofs_per_line;
-                            local_line_dof_index.resize(n_dofs_per_line);
+                            local_line_dof_indices.resize(n_dofs_per_line);
 
-                            cell->line(l)->child(c)->get_dof_indices(local_line_dof_index);
+                            cell->line(l)->child(c)->get_dof_indices(local_line_dof_indices);
                             for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                              dof_to_set_of_cells_map[local_line_dof_index[i]].insert(cell);
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
                           }
                       }
                     // user flag was set above to denote that
@@ -3243,18 +3241,18 @@ next_cell:
                     // children
                     else if (cell->line(l)->user_flag_set() == true)
                       {
-                        typename Container::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
+                        typename MeshType::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
                         Assert (parent_line->has_children(), ExcInternalError() );
 
                         // dofs_per_line returns number of dofs
                         // on line not including the vertices of the line.
                         const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
                                                              + cell->get_fe().dofs_per_line;
-                        local_line_dof_index.resize(n_dofs_per_line);
+                        local_line_dof_indices.resize(n_dofs_per_line);
 
-                        parent_line->get_dof_indices(local_line_dof_index);
+                        parent_line->get_dof_indices(local_line_dof_indices);
                         for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                          dof_to_set_of_cells_map[local_line_dof_index[i]].insert(cell);
+                          dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
 
                         for (unsigned int c=0; c<parent_line->n_children(); ++c)
                           {
@@ -3262,11 +3260,11 @@ next_cell:
 
                             const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
                                                                  + cell->get_fe().dofs_per_line;
-                            local_line_dof_index.resize(n_dofs_per_line);
+                            local_line_dof_indices.resize(n_dofs_per_line);
 
-                            parent_line->child(c)->get_dof_indices(local_line_dof_index);
+                            parent_line->child(c)->get_dof_indices(local_line_dof_indices);
                             for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                              dof_to_set_of_cells_map[local_line_dof_index[i]].insert(cell);
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
                           }
 
                         // clear up user flags set from earlier
@@ -3277,16 +3275,16 @@ next_cell:
                         cell->line(l)->clear_user_flag();
                       }
                   } // for lines l
-              }// if Container::dimension == 3
+              }// if MeshType::dimension == 3
           }// if cell->is_locally_owned()
       }// for cells
 
 
     // Finally, we copy map of sets to
     // map of vectors using assign()
-    std::map< types::global_dof_index, std::vector<typename Container::active_cell_iterator> > dof_to_cell_patches;
+    std::map< types::global_dof_index, std::vector<typename MeshType::active_cell_iterator> > dof_to_cell_patches;
 
-    typename std::map<types::global_dof_index, std::set< typename Container::active_cell_iterator> >::iterator
+    typename std::map<types::global_dof_index, std::set< typename MeshType::active_cell_iterator> >::iterator
     it = dof_to_set_of_cells_map.begin(),
     it_end = dof_to_set_of_cells_map.end();
     for ( ; it!=it_end; ++it)

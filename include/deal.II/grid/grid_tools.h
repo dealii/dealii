@@ -1092,26 +1092,33 @@ namespace GridTools
    * parallel:distributed::Triangulation<dim> are supported and handled
    * appropriately.
    *
-   * It is necessary that the finite element underlying the Container used has
-   * degrees of freedom on faces (2d or 3d) and lines (in 3d).  This unfortunately
-   * precludes the FE_DGQ<dim> finite element.  Likewise, the finite element
-   * must have nodal basis elements for this implementation to make sense.
+   * It is necessary that the finite element underlying the MeshType used has
+   * degrees of freedom that are logically associated to a vertex, line, quad, 
+   * or hex.  This includes both nodal degrees of freedom and other modal types
+   * of dofs that are associated to an edge, etc.  The result is the patch of 
+   * cells representing the support of the basis element associated to the 
+   * degree of freedom.  For instance using an FE_Q finite element, we obtain
+   * the standard patch of cells touching the degree of freedom and then others 
+   * that take care of possible hanging node constraints.  Using a FE_DGQ finite
+   * element, the degrees of freedom are logically considered to be "interior" to
+   * the cells so the patch would be the cell on which the degree of freedom is 
+   * located.
    *
-   * @tparam Container The Container could be a DoFHandler<dim> or hp::DoFHandler<dim>.
-   * @param[in] dof_handler The Container which could be built on a Triangulation<dim>
-   * or a parallel:distributed::Triangulation<dim> and should be using a nodal
-   * finite element with degrees of freedom defined on faces (2d or 3d) and
-   * lines (3d).
-   * @param[out] dof_to_support_patch_map A map from the global_dof_index of dofs on locally relevant cells
-   * to vectors containing Container::active_cell_iterators of
+   * @tparam MeshType The MeshType should be a DoFHandler<dim> or hp::DoFHandler<dim>.
+   * @param[in] dof_handler The MeshType which could be built on a Triangulation<dim>
+   * or a parallel::distributed::Triangulation<dim> and should be using a finite
+   * element that has degrees of freedom that are logically associated to a vertex,
+   * line, quad, or hex.
+   * @param[out] dof_to_support_patch_map A map from the global_dof_index of DoFs
+   * on locally relevant cells to vectors containing MeshType::active_cell_iterators of
    * cells in support of basis function at that degree of freedom.
    *
    *  @author Spencer Patty, 2016
    *
    */
-  template <class Container>
-  std::map< types::global_dof_index,std::vector<typename Container::active_cell_iterator> >
-  get_dof_to_support_patch_map(Container &dof_handler);
+  template <class MeshType>
+  std::map< types::global_dof_index,std::vector<typename MeshType::active_cell_iterator> >
+  get_dof_to_support_patch_map(MeshType &dof_handler);
 
 
   /*@}*/
