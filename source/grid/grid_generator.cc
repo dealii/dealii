@@ -747,7 +747,7 @@ namespace GridGenerator
     edges[0] = corners[0];
     edges[1] = corners[1];
     std::vector<unsigned int> subdivisions;
-    subdivided_parallelepiped(tria, origin, edges, subdivisions, colorize);
+    subdivided_parallelepiped<2,2>(tria, origin, edges, subdivisions, colorize);
   }
 
 
@@ -807,7 +807,7 @@ namespace GridGenerator
         edges[i] = corners[i];
       }
 
-    subdivided_parallelepiped (tria, origin, edges, subdivisions, colorize);
+    subdivided_parallelepiped<dim,dim> (tria, origin, edges, subdivisions, colorize);
   }
 
   // Parallelepiped implementation in 1d, 2d, and 3d. @note The
@@ -829,7 +829,7 @@ namespace GridGenerator
     if (subdivisions.size()==0)
       {
         std::vector<unsigned int> new_subdivisions(dim, 1);
-        subdivided_parallelepiped(tria, origin, edges, new_subdivisions, colorize);
+        subdivided_parallelepiped<dim,spacedim>(tria, origin, edges, new_subdivisions, colorize);
         return;
       }
 
