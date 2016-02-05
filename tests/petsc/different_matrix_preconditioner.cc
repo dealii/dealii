@@ -74,10 +74,8 @@ int main(int argc, char **argv)
   SparseMatrix<double>::iterator it = A_tmp.begin(), endit = A_tmp.end();
   for (; it!=endit; ++it)
     {
-      const auto row = it->row();
-      const auto column = it->column();
-      A.set(row, column, it->value());
-      A2.set(row, column, 1000. * it->value()); // scale A2 by 1000.
+      A.set(it->row(), it->column(), it->value());
+      A2.set(it->row(), it->column(), 1000. * it->value()); // scale A2 by 1000.
     }
   A.compress(VectorOperation::insert);
   A2.compress(VectorOperation::insert);

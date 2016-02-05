@@ -80,7 +80,7 @@ using namespace dealii;
 template <int dim>
 struct less_than_key
 {
-  inline bool operator() (const std::pair<Point<dim>,Vector<double>> &pair1, const std::pair<Point<dim>,Vector<double>> &pair2)
+  inline bool operator() (const std::pair<Point<dim>,Vector<double> > &pair1, const std::pair<Point<dim>,Vector<double> > &pair2)
   {
     const double precision = 1e-3;
     const Point<dim> &p1 = pair1.first;
@@ -169,7 +169,7 @@ void test2cells(const FiniteElement<dim> &fe_0,
 #ifdef DEBUG_OUTPUT_VTK
   // output to check if all is good:
   counter++;
-  std::vector<Vector<double>> shape_functions;
+  std::vector<Vector<double> > shape_functions;
   std::vector<std::string> names;
   for (unsigned int s=0; s < dof_handler.n_dofs(); s++)
     {
@@ -193,7 +193,7 @@ void test2cells(const FiniteElement<dim> &fe_0,
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim,hp::DoFHandler<dim>> data_out;
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
 
   // get material ids:
@@ -234,7 +234,7 @@ void test2cells(const FiniteElement<dim> &fe_0,
   std::vector<unsigned int> local_face_dof_indices;
   std::vector<Vector<double> > values;
 
-  std::vector<std::pair<Point<dim>,Vector<double>> > pairs_point_value;
+  std::vector<std::pair<Point<dim>,Vector<double> > > pairs_point_value;
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
        cell = dof_handler.begin_active();
