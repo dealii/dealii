@@ -522,9 +522,6 @@ namespace TrilinosWrappers
                                                        solver_control.last_value()));
   }
 
-
-
-
   void
   SolverDirect::do_solve()
   {

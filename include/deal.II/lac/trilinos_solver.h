@@ -576,16 +576,14 @@ namespace TrilinosWrappers
      void
      initialize (const SparseMatrix    &A);
 
-
     /*
      * Preforms the solve on the linear system <tt>Ax=b</tt> based of the 
      * package set in itialize(). Note the matrix is not refactorized during
      * this solve.
      */
      void
-     solve(VectorBase          &x,
-	   onst VectorBase     &b);
-
+     solve(VectorBase           &x,
+	   const VectorBase     &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
