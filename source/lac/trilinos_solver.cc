@@ -441,17 +441,17 @@ namespace TrilinosWrappers
   }
 
 
-	void 
+  void 
   SolverDirect::initialize (const SparseMatrix     &A)
-	{
-		// We need an Epetra_LinearProblem object to let the Amesos solver know
-		// about the matrix and vectors.
-		linear_problem.reset(new Epetra_LinearProblem());
+  {
+    // We need an Epetra_LinearProblem object to let the Amesos solver know
+    // about the matrix and vectors.
+    linear_problem.reset(new Epetra_LinearProblem());
 
-		// Assign the matrix operator to the Epetra_LinearProblem object
-		linear_problem->SetOperator(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()));
+    // Assign the matrix operator to the Epetra_LinearProblem object
+    linear_problem->SetOperator(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()));
        
-	  // Fetch return value of Amesos Solver functions
+    // Fetch return value of Amesos Solver functions
     int ierr;
 
     // First set whether we want to print the solver information to screen or
@@ -486,23 +486,23 @@ namespace TrilinosWrappers
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-	}
+  }
 
 
-	void
-	SolverDirect::solve(VectorBase							&x,
-											const VectorBase				&b)
-	{
-		// Assign the empty LHS vector to the Epetra_LinearProblem object
-		linear_problem->SetLHS(&x.trilinos_vector());
+  void
+  SolverDirect::solve(VectorBase          &x,
+                      const VectorBase    &b)
+  {
+    // Assign the empty LHS vector to the Epetra_LinearProblem object
+    linear_problem->SetLHS(&x.trilinos_vector());
 
-		// Assign the RHS vector to the Epetra_LinearProblem object
-		linear_problem->SetRHS(const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
+    // Assign the RHS vector to the Epetra_LinearProblem object
+    linear_problem->SetRHS(const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
 
-	  // Fetch return value of Amesos Solver functions
+    // Fetch return value of Amesos Solver functions
     int ierr;
 
-		// First set whether we want to print the solver information to screen or
+    // First set whether we want to print the solver information to screen or
     // not.
     ConditionalOStream  verbose_cout (std::cout,
                                       additional_data.output_solver_details);
@@ -520,7 +520,7 @@ namespace TrilinosWrappers
     if (solver_control.last_check() != SolverControl::success)
       AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
                                                        solver_control.last_value()));
-	}
+  }
 
 
 
