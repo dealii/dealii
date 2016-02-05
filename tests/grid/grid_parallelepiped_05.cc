@@ -89,8 +89,11 @@ void check (bool subdivide)
   bool colorize = false;
 
   Triangulation<dim,spacedim> triangulation;
-  GridGenerator::subdivided_parallelepiped (triangulation, origin, edges,
-                                            subdivisions, colorize);
+  GridGenerator::subdivided_parallelepiped<dim,spacedim> (triangulation,
+                                                          origin,
+                                                          edges,
+                                                          subdivisions,
+                                                          colorize);
 
   GridOut grid_out;
 
