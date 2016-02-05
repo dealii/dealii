@@ -75,7 +75,7 @@ int main ()
 
   // gen.generate("FE_Q_Hierarchical(1)");
   // gen.generate("FE_DGPNonparametric(1)");
-  gen.generate("FE_DGQ(1)");
+  gen.generate("FE_DGQ     (1)");
   gen.generate("FE_Q(1)");
 
   // gen.generate("FE_Q_Hierarchical(2)");
@@ -95,7 +95,7 @@ int main ()
 
   // gen.generate("FESystem[FE_Q_Hierarchical(1)^2-FE_DGQ(1)]");
   // gen.generate("FESystem[FE_DGPNonparametric(1)^2-FE_DGQ(1)]");
-  gen.generate("FESystem[FE_DGQ(1)^2-FE_DGQ(1)]");
+  gen.generate("      FESystem[FE_DGQ(1)^2     -FE_DGQ(1)]");
   gen.generate("FESystem[FE_Q(1)^2-FE_DGQ(1)]");
 
 

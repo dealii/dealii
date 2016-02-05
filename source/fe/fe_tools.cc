@@ -50,6 +50,7 @@
 
 #include <deal.II/base/index_set.h>
 
+#include <cctype>
 #include <iostream>
 
 
@@ -1547,10 +1548,27 @@ namespace FETools
   FiniteElement<dim, spacedim> *
   get_fe_by_name (const std::string &parameter_name)
   {
+    std::string name = Utilities::trim(parameter_name);
+    std::size_t index = 1;
+    // remove spaces that are not between two word (things that match the
+    // regular expression [A-Za-z0-9_]) characters.
+    while (2 < name.size() && index < name.size() - 1)
+      {
+        if (name[index] == ' ' &&
+            (!(std::isalnum(name[index - 1]) || name[index - 1] == '_') ||
+             !(std::isalnum(name[index + 1]) || name[index + 1] == '_')))
+          {
+            name.erase(index, 1);
+          }
+        else
+          {
+            ++index;
+          }
+      }
+
     // Create a version of the name
     // string where all template
     // parameters are eliminated.
-    std::string name = parameter_name;
     for (unsigned int pos1 = name.find('<');
          pos1 < name.size();
          pos1 = name.find('<'))

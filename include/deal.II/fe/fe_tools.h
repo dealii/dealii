@@ -845,7 +845,8 @@ namespace FETools
 
   /**
    * Parse the name of a finite element and generate a finite element object
-   * accordingly.
+   * accordingly. The parser ignores space characters between words (things
+   * matching the regular expression [A-Za-z0-9_]).
    *
    * The name must be in the form which is returned by the
    * FiniteElement::get_name function, where dimension template parameters
