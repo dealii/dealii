@@ -3075,8 +3075,15 @@ next_cell:
     std::map<typename MeshType::active_line_iterator, typename MeshType::line_iterator > lines_to_parent_lines_map;
     if (MeshType::dimension == 3)
       {
+
+        // save user flags as they will be modified and then later restored
+        std::vector<bool> user_flags;
+        dof_handler.get_triangulation().save_user_flags(user_flags);
+        const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
+
+
         typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
-                                                 endc = dof_handler.end();
+                                                endc = dof_handler.end();
         for (; cell!=endc; ++cell)
           {
             // We only want lines that are locally_relevant
@@ -3267,18 +3274,21 @@ next_cell:
                               dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
                           }
 
-                        // clear up user flags set from earlier
-                        // denoting that a 3d line has an active
-                        // parent and so an entry exists in the
-                        // lines_to_parent_lines_map map for that
-                        // line pointing to it's parent.
-                        cell->line(l)->clear_user_flag();
+
                       }
                   } // for lines l
               }// if MeshType::dimension == 3
           }// if cell->is_locally_owned()
       }// for cells
 
+
+    if (MeshType::dimension == 3)
+    {
+      // finally, restore user flags that were changed above
+      // to when we constructed the pointers to parent of lines
+      // Since dof_handler is const, we must leave it unchanged.
+      const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+    }
 
     // Finally, we copy map of sets to
     // map of vectors using assign()
