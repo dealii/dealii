@@ -32,12 +32,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <AztecOO.h>
 #  include <Epetra_Operator.h>
 #  include <Amesos.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-
-DEAL_II_NAMESPACE_OPEN
-
-namespace TrilinosWrappers
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+  DEAL_II_NAMESPACE_OPEN namespace TrilinosWrappers
 {
   // forward declarations
   class SparseMatrix;
@@ -74,7 +70,8 @@ namespace TrilinosWrappers
      * one of the specialized derived classes when the solver should be set at
      * runtime. Currently enabled options are:
      */
-    enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
+    enum SolverName
+    { cg, cgs, gmres, bicgstab, tfqmr } solver_name;
 
     /**
      * Standardized data struct to pipe additional data to the solver.
@@ -91,8 +88,8 @@ namespace TrilinosWrappers
        * base class for all solvers.
        */
       explicit
-      AdditionalData (const bool         output_solver_details   = false,
-                      const unsigned int gmres_restart_parameter = 30);
+	AdditionalData (const bool output_solver_details = false,
+			const unsigned int gmres_restart_parameter = 30);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -109,19 +106,18 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverBase (SolverControl  &cn);
+      SolverBase (SolverControl & cn);
 
     /**
      * Second constructor. This constructor takes an enum object that
      * specifies the solver name and sets the appropriate Krylov method.
      */
-    SolverBase (const enum SolverName  solver_name,
-                SolverControl         &cn);
+      SolverBase (const enum SolverName solver_name, SolverControl & cn);
 
     /**
      * Destructor.
      */
-    virtual ~SolverBase ();
+      virtual ~ SolverBase ();
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -129,10 +125,9 @@ namespace TrilinosWrappers
      * one of the linear solvers and preconditioners of Trilinos is chosen.
      */
     void
-    solve (const SparseMatrix     &A,
-           VectorBase             &x,
-           const VectorBase       &b,
-           const PreconditionBase &preconditioner);
+      solve (const SparseMatrix & A,
+	     VectorBase & x,
+	     const VectorBase & b, const PreconditionBase & preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
@@ -142,10 +137,9 @@ namespace TrilinosWrappers
      * Trilinos is chosen.
      */
     void
-    solve (Epetra_Operator        &A,
-           VectorBase             &x,
-           const VectorBase       &b,
-           const PreconditionBase &preconditioner);
+      solve (Epetra_Operator & A,
+	     VectorBase & x,
+	     const VectorBase & b, const PreconditionBase & preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -158,10 +152,10 @@ namespace TrilinosWrappers
      * will be thrown.
      */
     void
-    solve (const SparseMatrix           &A,
-           dealii::Vector<double>       &x,
-           const dealii::Vector<double> &b,
-           const PreconditionBase       &preconditioner);
+      solve (const SparseMatrix & A,
+	     dealii::Vector < double >&x,
+	     const dealii::Vector < double >&b,
+	     const PreconditionBase & preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
@@ -175,10 +169,10 @@ namespace TrilinosWrappers
      * exception will be thrown.
      */
     void
-    solve (Epetra_Operator              &A,
-           dealii::Vector<double>       &x,
-           const dealii::Vector<double> &b,
-           const PreconditionBase       &preconditioner);
+      solve (Epetra_Operator & A,
+	     dealii::Vector < double >&x,
+	     const dealii::Vector < double >&b,
+	     const PreconditionBase & preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> for deal.II's parallel
@@ -187,10 +181,10 @@ namespace TrilinosWrappers
      * solvers and preconditioners of Trilinos is chosen.
      */
     void
-    solve (const SparseMatrix                                  &A,
-           dealii::parallel::distributed::Vector<double>       &x,
-           const dealii::parallel::distributed::Vector<double> &b,
-           const PreconditionBase                              &preconditioner);
+      solve (const SparseMatrix & A,
+	     dealii::parallel::distributed::Vector < double >&x,
+	     const dealii::parallel::distributed::Vector < double >&b,
+	     const PreconditionBase & preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
@@ -200,24 +194,24 @@ namespace TrilinosWrappers
      * Trilinos is chosen.
      */
     void
-    solve (Epetra_Operator                                     &A,
-           dealii::parallel::distributed::Vector<double>       &x,
-           const dealii::parallel::distributed::Vector<double> &b,
-           const PreconditionBase                              &preconditioner);
+      solve (Epetra_Operator & A,
+	     dealii::parallel::distributed::Vector < double >&x,
+	     const dealii::parallel::distributed::Vector < double >&b,
+	     const PreconditionBase & preconditioner);
 
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+      SolverControl & control () const;
 
     /**
      * Exception
      */
-    DeclException1 (ExcTrilinosError,
-                    int,
-                    << "An error with error number " << arg1
-                    << " occurred while calling a Trilinos function");
+      DeclException1 (ExcTrilinosError,
+		      int,
+		      <<"An error with error number " << arg1
+		      << " occurred while calling a Trilinos function");
 
   protected:
 
@@ -227,7 +221,7 @@ namespace TrilinosWrappers
      * but we copy the data from this object before starting the solution
      * process, and copy the data back into it afterwards.
      */
-    SolverControl &solver_control;
+      SolverControl & solver_control;
 
   private:
 
@@ -235,14 +229,14 @@ namespace TrilinosWrappers
      * The solve function is used to set properly the Epetra_LinearProblem,
      * once it is done this function solves the linear problem.
      */
-    void do_solve(const PreconditionBase &preconditioner);
+    void do_solve (const PreconditionBase & preconditioner);
 
     /**
      * A structure that collects the Trilinos sparse matrix, the right hand
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std_cxx11::shared_ptr<Epetra_LinearProblem> linear_problem;
+      std_cxx11::shared_ptr < Epetra_LinearProblem > linear_problem;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
@@ -265,7 +259,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
    */
-  class SolverCG : public SolverBase
+  class SolverCG:public SolverBase
   {
   public:
     /**
@@ -277,8 +271,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
+      explicit AdditionalData (const bool output_solver_details = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -294,8 +287,8 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverCG (SolverControl        &cn,
-              const AdditionalData &data = AdditionalData());
+      SolverCG (SolverControl & cn,
+		const AdditionalData & data = AdditionalData ());
 
   protected:
     /**
@@ -312,7 +305,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
    */
-  class SolverCGS : public SolverBase
+  class SolverCGS:public SolverBase
   {
   public:
     /**
@@ -323,8 +316,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
+      explicit AdditionalData (const bool output_solver_details = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -340,8 +332,8 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverCGS (SolverControl        &cn,
-               const AdditionalData &data = AdditionalData());
+      SolverCGS (SolverControl & cn,
+		 const AdditionalData & data = AdditionalData ());
 
   protected:
     /**
@@ -358,7 +350,7 @@ namespace TrilinosWrappers
    *
    * @author Martin Kronbichler, 2008
    */
-  class SolverGMRES : public SolverBase
+  class SolverGMRES:public SolverBase
   {
   public:
     /**
@@ -371,8 +363,8 @@ namespace TrilinosWrappers
        * i.e. do a restart every 30 iterations.
        */
       explicit
-      AdditionalData (const bool         output_solver_details = false,
-                      const unsigned int restart_parameter = 30);
+	AdditionalData (const bool output_solver_details = false,
+			const unsigned int restart_parameter = 30);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -393,8 +385,8 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverGMRES (SolverControl        &cn,
-                 const AdditionalData &data = AdditionalData());
+      SolverGMRES (SolverControl & cn,
+		   const AdditionalData & data = AdditionalData ());
 
   protected:
     /**
@@ -412,7 +404,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
    */
-  class SolverBicgstab : public SolverBase
+  class SolverBicgstab:public SolverBase
   {
   public:
     /**
@@ -423,8 +415,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
+      explicit AdditionalData (const bool output_solver_details = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -440,8 +431,8 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverBicgstab (SolverControl        &cn,
-                    const AdditionalData &data = AdditionalData());
+      SolverBicgstab (SolverControl & cn,
+		      const AdditionalData & data = AdditionalData ());
 
   protected:
     /**
@@ -459,7 +450,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
    */
-  class SolverTFQMR : public SolverBase
+  class SolverTFQMR:public SolverBase
   {
   public:
     /**
@@ -470,8 +461,7 @@ namespace TrilinosWrappers
       /**
        * Sets the additional data field to the desired output format.
        */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
+      explicit AdditionalData (const bool output_solver_details = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -487,8 +477,8 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverTFQMR (SolverControl        &cn,
-                 const AdditionalData &data = AdditionalData());
+      SolverTFQMR (SolverControl & cn,
+		   const AdditionalData & data = AdditionalData ());
 
   protected:
     /**
@@ -526,8 +516,8 @@ namespace TrilinosWrappers
        * Sets the additional data field to the desired output format.
        */
       explicit
-      AdditionalData (const bool output_solver_details = false,
-                      const std::string &solver_type = "Amesos_Klu");
+	AdditionalData (const bool output_solver_details = false,
+			const std::string & solver_type = "Amesos_Klu");
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -553,19 +543,19 @@ namespace TrilinosWrappers
        * Note that the availability of these solvers in deal.II depends on
        * which solvers were set when configuring Trilinos.
        */
-      std::string solver_type;
+        std::string solver_type;
     };
 
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverDirect (SolverControl  &cn,
-                  const AdditionalData &data = AdditionalData());
+      SolverDirect (SolverControl & cn,
+		    const AdditionalData & data = AdditionalData ());
 
     /**
      * Destructor.
      */
-    virtual ~SolverDirect ();
+      virtual ~ SolverDirect ();
 
     /**
      * Initializes the direct solver for the matrix <tt>A</tt> and creates a
@@ -573,17 +563,14 @@ namespace TrilinosWrappers
      * data structure. Note that there is no need for a preconditioner
      * here and there is no solve preformred.
      */
-     void
-     initialize (const SparseMatrix    &A);
+    void initialize (const SparseMatrix & A);
 
     /*
-     * Preforms the solve on the linear system <tt>Ax=b</tt> based of the 
-     * package set in itialize(). Note the matrix is not refactorized during
+     * Performs the solve on the linear system <tt>Ax=b</tt> based of the 
+     * package set in intialize(). Note the matrix is not refactorized during
      * this solve.
      */
-     void
-     solve(VectorBase           &x,
-	   const VectorBase     &b);
+    void solve (VectorBase & x, const VectorBase & b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
@@ -591,10 +578,7 @@ namespace TrilinosWrappers
      * performs the solve. Note that there is no need for a preconditioner
      * here.
      */
-    void
-    solve (const SparseMatrix     &A,
-           VectorBase             &x,
-           const VectorBase       &b);
+    void solve (const SparseMatrix & A, VectorBase & x, const VectorBase & b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. This class works with Trilinos
@@ -604,9 +588,8 @@ namespace TrilinosWrappers
      * exception will be thrown.
      */
     void
-    solve (const SparseMatrix           &A,
-           dealii::Vector<double>       &x,
-           const dealii::Vector<double> &b);
+      solve (const SparseMatrix & A,
+	     dealii::Vector < double >&x, const dealii::Vector < double >&b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> for deal.II's own parallel
@@ -615,29 +598,29 @@ namespace TrilinosWrappers
      * there is no need for a preconditioner here.
      */
     void
-    solve (const SparseMatrix                                  &A,
-           dealii::parallel::distributed::Vector<double>       &x,
-           const dealii::parallel::distributed::Vector<double> &b);
+      solve (const SparseMatrix & A,
+	     dealii::parallel::distributed::Vector < double >&x,
+	     const dealii::parallel::distributed::Vector < double >&b);
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+      SolverControl & control () const;
 
     /**
      * Exception
      */
-    DeclException1 (ExcTrilinosError,
-                    int,
-                    << "An error with error number " << arg1
-                    << " occurred while calling a Trilinos function");
+      DeclException1 (ExcTrilinosError,
+		      int,
+		      <<"An error with error number " << arg1
+		      << " occurred while calling a Trilinos function");
 
   private:
     /**
      * Actually performs the operations for solving the linear system,
      * including the factorization and forward and backward substitution.
      */
-    void do_solve();
+    void do_solve ();
 
     /**
      * Reference to the object that controls convergence of the iterative
@@ -645,20 +628,20 @@ namespace TrilinosWrappers
      * but we copy the data from this object before starting the solution
      * process, and copy the data back into it afterwards.
      */
-    SolverControl &solver_control;
+      SolverControl & solver_control;
 
     /**
      * A structure that collects the Trilinos sparse matrix, the right hand
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std_cxx11::shared_ptr<Epetra_LinearProblem> linear_problem;
+      std_cxx11::shared_ptr < Epetra_LinearProblem > linear_problem;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
      * objects.
      */
-    std_cxx11::shared_ptr<Amesos_BaseSolver> solver;
+      std_cxx11::shared_ptr < Amesos_BaseSolver > solver;
 
     /**
      * Store a copy of the flags for this particular solver.
@@ -669,10 +652,7 @@ namespace TrilinosWrappers
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_TRILINOS
-
 /*----------------------------   trilinos_solver.h     ---------------------------*/
-
 #endif
 /*----------------------------   trilinos_solver.h     ---------------------------*/
