@@ -3113,7 +3113,7 @@ next_cell:
     // be added on account of adaptivity hanging node
     // constraints.
     typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
-                                             endc = dof_handler.end();
+                                            endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         // Need to loop through all cells that could
@@ -3283,12 +3283,12 @@ next_cell:
 
 
     if (MeshType::dimension == 3)
-    {
-      // finally, restore user flags that were changed above
-      // to when we constructed the pointers to parent of lines
-      // Since dof_handler is const, we must leave it unchanged.
-      const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
-    }
+      {
+        // finally, restore user flags that were changed above
+        // to when we constructed the pointers to parent of lines
+        // Since dof_handler is const, we must leave it unchanged.
+        const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+      }
 
     // Finally, we copy map of sets to
     // map of vectors using assign()

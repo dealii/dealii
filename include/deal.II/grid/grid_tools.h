@@ -1093,15 +1093,15 @@ namespace GridTools
    * appropriately.
    *
    * It is necessary that the finite element underlying the MeshType used has
-   * degrees of freedom that are logically associated to a vertex, line, quad, 
+   * degrees of freedom that are logically associated to a vertex, line, quad,
    * or hex.  This includes both nodal degrees of freedom and other modal types
-   * of dofs that are associated to an edge, etc.  The result is the patch of 
-   * cells representing the support of the basis element associated to the 
+   * of dofs that are associated to an edge, etc.  The result is the patch of
+   * cells representing the support of the basis element associated to the
    * degree of freedom.  For instance using an FE_Q finite element, we obtain
-   * the standard patch of cells touching the degree of freedom and then others 
+   * the standard patch of cells touching the degree of freedom and then others
    * that take care of possible hanging node constraints.  Using a FE_DGQ finite
    * element, the degrees of freedom are logically considered to be "interior" to
-   * the cells so the patch would be the cell on which the degree of freedom is 
+   * the cells so the patch would be the cell on which the degree of freedom is
    * located.
    *
    * @tparam MeshType The MeshType should be a DoFHandler<dim> or hp::DoFHandler<dim>.
