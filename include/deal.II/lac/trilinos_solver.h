@@ -568,6 +568,24 @@ namespace TrilinosWrappers
     virtual ~SolverDirect ();
 
     /**
+     * Initializes the direct solver for the matrix <tt>A</tt> and creates a
+     * factorization for it with the package chosen from the additional
+     * data structure. Note that there is no need for a preconditioner
+     * here and there is no solve preformred.
+     */
+    void
+    initialize (const SparseMatrix    &A);
+
+    /*
+     * Preforms the solve on the linear system <tt>Ax=b</tt> based of the
+     * package set in itialize(). Note the matrix is not refactorized during
+     * this solve.
+     */
+    void
+    solve(VectorBase           &x,
+          const VectorBase     &b);
+
+    /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
      * matrix with the package chosen from the additional data structure and
      * performs the solve. Note that there is no need for a preconditioner
