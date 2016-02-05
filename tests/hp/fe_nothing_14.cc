@@ -74,7 +74,9 @@ void test ()
   std::vector<unsigned int> sub(dim, 1);
   sub[dim-1] = 2;
 
-  GridGenerator::subdivided_hyper_rectangle (triangulation, sub, Point<dim>(), Point<dim>());
+  Point<2> p1;
+  Point<2> p2(1.0, 2.0);
+  GridGenerator::subdivided_hyper_rectangle (triangulation, sub, p1, p2);
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 

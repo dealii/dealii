@@ -70,12 +70,14 @@ int main(int argc, char **argv)
   PETScWrappers::SparseMatrix A2;
   A.reinit(sparsity_pattern);
   A2.reinit(sparsity_pattern);
-  for (auto it : A_tmp)
+
+  SparseMatrix<double>::iterator it = A_tmp.begin(), endit = A_tmp.end();
+  for (; it!=endit; ++it)
     {
-      const auto row = it.row();
-      const auto column = it.column();
-      A.set(row, column, it.value());
-      A2.set(row, column, 1000. * it.value()); // scale A2 by 1000.
+      const auto row = it->row();
+      const auto column = it->column();
+      A.set(row, column, it->value());
+      A2.set(row, column, 1000. * it->value()); // scale A2 by 1000.
     }
   A.compress(VectorOperation::insert);
   A2.compress(VectorOperation::insert);
