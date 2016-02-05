@@ -57,7 +57,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
     # Blacklist version 1.58 because we get serialization errors with it. At
     # least version 1.56 and 1.59 are known to work.
     #
-    IF("${Boost_MAJOR_VERSION}" STREQUAL "1" AND "${Boost_MINOR_VERSION}" STREQUAL "58")
+    IF("${BOOST_VERSION_MAJOR}" STREQUAL "1" AND "${BOOST_VERSION_MINOR}" STREQUAL "58")
       MESSAGE(STATUS "Boost version 1.58 is not compatible with deal.II!")
       SET(${var} FALSE)
     ENDIF()
