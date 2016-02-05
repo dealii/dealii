@@ -1111,7 +1111,7 @@ namespace GridTools
    */
   template <class Container>
   std::map< types::global_dof_index,std::vector<typename Container::active_cell_iterator> >
-  get_dof_to_support_patch_map(Container& dof_handler);
+  get_dof_to_support_patch_map(Container &dof_handler);
 
 
   /*@}*/
