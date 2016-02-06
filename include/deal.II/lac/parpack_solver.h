@@ -554,24 +554,21 @@ void PArpackSolver<VectorType>::solve
   // must be zero on the first call to pdnaupd
   int ido = 0;
 
-  /**
-   * 'G' generalized eigenvalue problem
-   * 'I' standard eigenvalue problem
-   */
+  // 'G' generalized eigenvalue problem
+  // 'I' standard eigenvalue problem
   char bmat[2] = "G";
 
-  /** Specify the eigenvalues of interest,
-   *  possible parameters
-   *  "LA" algebraically largest
-   *  "SA" algebraically smallest
-   *  "LM" largest magnitude
-   *  "SM" smallest magnitude
-   *  "LR" largest real part
-   *  "SR" smallest real part
-   *  "LI" largest imaginary part
-   *  "SI" smallest imaginary part
-   *  "BE" both ends of spectrum simultaneous
-   */
+  // Specify the eigenvalues of interest, possible parameters:
+  // "LA" algebraically largest
+  // "SA" algebraically smallest
+  // "LM" largest magnitude
+  // "SM" smallest magnitude
+  // "LR" largest real part
+  // "SR" smallest real part
+  // "LI" largest imaginary part
+  // "SI" smallest imaginary part
+  // "BE" both ends of spectrum simultaneous
+  
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
     {
@@ -619,13 +616,12 @@ void PArpackSolver<VectorType>::solve
   // Parpack currently works only for NB = 1
   iparam[3] = 1;
 
-  /** Sets the mode of dsaupd.
-   *  1 is exact shifting,
-   *  2 is user-supplied shifts,
-   *  3 is shift-invert mode,
-   *  4 is buckling mode,
-   *  5 is Cayley mode.
-   */
+  // Sets the mode of dsaupd:
+  // 1 is exact shifting,
+  // 2 is user-supplied shifts,
+  // 3 is shift-invert mode,
+  // 4 is buckling mode,
+  // 5 is Cayley mode.
 
   iparam[6] = mode;
   std::vector<int> ipntr (14, 0);
@@ -787,9 +783,8 @@ void PArpackSolver<VectorType>::solve
     }
   else
     {
-      /** 1 - compute eigenvectors,
-       *  0 - only eigenvalues
-       */
+      // 1 - compute eigenvectors,
+      // 0 - only eigenvalues
       int rvec = 1;
 
       // which eigenvectors

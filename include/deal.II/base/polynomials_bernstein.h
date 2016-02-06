@@ -26,7 +26,7 @@ public:
   /**
    * Construct the @p index -th Bernstein Polynomial of degree @p degree.
    *
-   * @f{aligned*}{
+   * @f{align*}{
    * B_{\text{index}, \text{degree}} (t)
    *   &= \text{binom}(\text{degree}, \text{index})
    *      \cdot t^{\text{index}}
