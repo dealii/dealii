@@ -84,26 +84,26 @@ extern "C" {
  *
  * The ArpackSolver can be used in application codes in the
  * following way:
- @code
-  SolverControl solver_control (1000, 1e-9);
-  const unsigned int num_arnoldi_vectors = 2*size_of_spectrum + 2;
-  PArpackSolver<V>::AdditionalData
-    additional_data(num_arnoldi_vectors,
-                    dealii::PArpackSolver<V>::largest_magnitude,
-                    true);
-
-   PArpackSolver<V> eigensolver (solver_control,
-                                 mpi_communicator,
-                                 additional_data);
-   eigensolver.set_shift(sigma);
-   eigensolver.reinit(locally_owned_dofs);
-   eigensolver.solve (A,
-                      B,
-                      OP,
-                      lambda,
-                      x,
-                      size_of_spectrum);
- @endcode
+ * @code
+ *   SolverControl solver_control (1000, 1e-9);
+ *   const unsigned int num_arnoldi_vectors = 2*size_of_spectrum + 2;
+ *   PArpackSolver<V>::AdditionalData
+ *     additional_data(num_arnoldi_vectors,
+ *                     dealii::PArpackSolver<V>::largest_magnitude,
+ *                     true);
+ * 
+ *    PArpackSolver<V> eigensolver (solver_control,
+ *                                  mpi_communicator,
+ *                                  additional_data);
+ *    eigensolver.set_shift(sigma);
+ *    eigensolver.reinit(locally_owned_dofs);
+ *    eigensolver.solve (A,
+ *                       B,
+ *                       OP,
+ *                       lambda,
+ *                       x,
+ *                       size_of_spectrum);
+ * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>size_of_spectrum</code> tells PARPACK the number of
  * eigenvector/eigenvalue pairs to solve for. Here,

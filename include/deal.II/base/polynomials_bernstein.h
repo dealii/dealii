@@ -11,7 +11,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class implements Bernstein basis polynomials of desire degree as described in
  * http://www.idav.ucdavis.edu/education/CAGDNotes/Bernstein-Polynomials.pdf
- * Paragraph: Converting from the Bernstein Basis to the Power Basis
+ * in the paragraph "Converting from the Bernstein Basis to the Power Basis".
  *
  * They are used to create the Bernstein finite element FE_Bernstein.
  *
@@ -24,11 +24,19 @@ class PolynomialsBernstein : public Polynomials::Polynomial<number>
 {
 public:
   /**
-   * Construct the #index -th Bernstein Polynomial of degree #degree.
+   * Construct the @p index -th Bernstein Polynomial of degree @p degree.
    *
-   * B_{index, degree} (t) = binom(degree, index) * t^index * (1 - t)^{degree - index} =
-   *                       = sum_{i = index}^degree (-1)^{i - index} *
-   *                         binom(degree, i) * binom(i, index) * t^i
+   * @f{aligned*}{
+   * B_{\text{index}, \text{degree}} (t)
+   *   &= \text{binom}(\text{degree}, \text{index})
+   *      \cdot t^{\text{index}}
+   *      \cdot (1 - t)^{\text{degree} - \text{index}} \\
+   *   &= \sum_{i = \text{index}}^\text{degree}
+   *      \cdot (-1)^{i - \text{index}}
+   *      \cdot \text{binom}(\text{degree}, i)
+   *      \cdot \text{binom}(i, \text{index})
+   *      \cdot t^i
+   * @f}
    *
    * @param index
    * @param degree

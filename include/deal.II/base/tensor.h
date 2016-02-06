@@ -52,7 +52,7 @@ class Tensor<-1, dim, Number>
 /**
  * This class is a specialized version of the
  * <tt>Tensor<rank,dim,Number></tt> class. It handles tensors of rank zero,
- * i.e. scalars. The second template argument @param dim is ignored.
+ * i.e. scalars. The second template argument @p dim is ignored.
  *
  * This class exists because in some cases we want to construct objects of
  * type Tensor@<spacedim-dim,dim,Number@>, which should expand to scalars,

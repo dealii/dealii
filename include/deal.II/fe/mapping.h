@@ -590,7 +590,9 @@ protected:
    * this does not take away from the instructiveness of the example.)
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation
    * module.
    *
    * @see UpdateFlags
@@ -622,7 +624,9 @@ protected:
    * this function. Ownership will therefore rest with the caller.
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation
    * module.
    *
    * @param update_flags A set of flags that define what is expected of
@@ -759,7 +763,9 @@ protected:
    * passed to this function.
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation
    * module.
    *
    * @param[in] cell The cell of the triangulation for which this function

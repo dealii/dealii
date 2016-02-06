@@ -148,7 +148,9 @@ namespace parallel
      * <code>2^32-1</code> or approximately 4 billion in case 64 bit integers
      * are disabled at configuration of deal.II (default case) or
      * <code>2^64-1</code> or approximately <code>10^19</code> if 64 bit
-     * integers are enabled (see the glossary entry on @ref GlobalDoFIndex for
+     * integers are enabled (see the glossary entry on
+     * @ref GlobalDoFIndex
+     * for
      * further information).
      *
      * The second relevant index type is the local index used within one MPI

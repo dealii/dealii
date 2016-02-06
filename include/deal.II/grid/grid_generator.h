@@ -38,8 +38,8 @@ template <typename number> class SparseMatrix;
  * triangulations for some basic geometries.
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
- * of the boundary receive different boundary indicators
- * (@ref GlossBoundaryIndicator),
+ * of the boundary receive different 
+ * @ref GlossBoundaryIndicator "boundary indicators"),
  * allowing them to be distinguished for the purpose of attaching geometry
  * objects and evaluating different boundary conditions.
  *
@@ -452,11 +452,13 @@ namespace GridGenerator
     * triangulation.refine_global(3);
     * @endcode
     *
-    * See the @ref manifold "documentation module on manifolds" for
+    * See the
+    * @ref manifold "documentation module on manifolds"
+    * for
     * more details.
     *
-    * @image html sphere.png
-    * @image html sphere_section.png
+   * @image html sphere.png
+   * @image html sphere_section.png
     *
     * @note The triangulation needs to be void upon calling this function.
     */
@@ -562,8 +564,8 @@ namespace GridGenerator
    *
    * Examples in two and three dimensions are
    *
-  * @image html hyper_cross_2d.png
-  * @image html hyper_cross_3d.png
+   * @image html hyper_cross_2d.png
+   * @image html hyper_cross_3d.png
    *
    * @author Guido Kanschat
    * @date 2015
@@ -642,7 +644,8 @@ namespace GridGenerator
    * below).
    *
    * While the SphericalManifold, that is demonstrated in the documentation of the
-   * @ref manifold "documentation module on manifolds", creates reasonable meshes
+   * @ref manifold "documentation module on manifolds",
+   * creates reasonable meshes
    * for any number of @p n_cells if attached to all cells and boundaries, the
    * situation is less than ideal when only attaching a HyperShellBoundary. Then,
    * only vertices on the boundaries are placed at the correct distance from the
@@ -1041,7 +1044,8 @@ namespace GridGenerator
    * vertices.
    *
    * @tparam MeshType A type that satisfies the requirements of the
-   * @ref ConceptMeshType "MeshType concept". The map that is returned will be
+   * @ref ConceptMeshType "MeshType concept".
+   * The map that is returned will be
    * between cell iterators pointing into the container describing the surface
    * mesh and face iterators of the volume mesh container. If MeshType is
    * DoFHandler or hp::DoFHandler, then the function will re-build the

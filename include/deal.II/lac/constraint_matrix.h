@@ -177,7 +177,8 @@ public:
    * constrained inside this ConstraintMatrix. In a calculation with a
    * DoFHandler object based on parallel::distributed::Triangulation
    * or parallel::shared::Triangulation, one should use the set of locally
-   * relevant dofs (see @ref GlossLocallyRelevenDof).
+   * relevant dofs (see
+   * @ref GlossLocallyRelevantDof).
    *
    * The given IndexSet allows the ConstraintMatrix to save memory by just not
    * caring about degrees of freedom that are not of importance to the

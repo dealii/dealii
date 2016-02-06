@@ -343,7 +343,8 @@ namespace GridTools
    * located closest to a given point.
    *
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref ConceptMeshType "MeshType concept".
+   * the
+   * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the closest vertex.
    * @return The index of the closest vertex found.
    *
@@ -363,7 +364,8 @@ namespace GridTools
    * vertex of a cell or be a hanging node located on a face or an edge of it.
    *
    * @param container A variable of a type that satisfies the requirements of
-   * the @ref ConceptMeshType "MeshType concept".
+   * the
+   * @ref ConceptMeshType "MeshType concept".
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells.
    * @return A vector of cells that lie adjacent to the given vertex.
@@ -400,7 +402,8 @@ namespace GridTools
    * additional computational cost.
    *
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref ConceptMeshType "MeshType concept".
+   * the
+   * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An iterator into the mesh that points to the surrounding cell.
    *
@@ -448,7 +451,8 @@ namespace GridTools
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
    * @param mesh A variable of a type that satisfies the requirements of
-   * the @ref ConceptMeshType "MeshType concept".
+   * the
+   * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
@@ -990,7 +994,8 @@ namespace GridTools
    * of <code>Container</code> from the function call. You need to
    * specify it as an explicit template argument following the
    * function name. This type has to satisfy the requirements of a
-   * mesh container (see @ref ConceptMeshType).
+   * mesh container (see
+   * @ref ConceptMeshType).
    *
    * @param[in] patch_cells A vector of active cells for which
    *   this function finds the parents at the coarsest common
@@ -1060,7 +1065,8 @@ namespace GridTools
    * of <code>Container</code> from the function call. You need to
    * specify it as an explicit template argument following the
    * function name. This type that satisfies the requirements of a
-   * mesh container (see @ref ConceptMeshType).
+   * mesh container (see
+   * @ref ConceptMeshType).
    *
    * @param[in] patch A vector of active cells from a common triangulation.
    *  These cells may or may not all be at the same refinement level.
