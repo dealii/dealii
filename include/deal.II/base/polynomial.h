@@ -560,9 +560,15 @@ namespace Polynomials
    * degree four with vanishing values and derivatives at <i>x</i>=0 and
    * <i>x</i>=1, then by the product of this fourth order polynomial with
    * Legendre polynomials of increasing order. The implementation is
-   * @f{align*}{ p_0(x) &= 2x^3-3x^2+1 \\ p_1(x) &= -2x^2+3x^2 \\ p_2(x) &=
-   * x^3-2x^2+x  \\ p_3(x) &= x^3-x^2 \\ p_4(x) &= 16x^2(x-1)^2 \\ \ldots &
-   * \ldots \\ p_k(x) &= x^2(x-1)^2 L_{k-4}(x) @f}
+   * @f{align*}{
+   * p_0(x) &= 2x^3-3x^2+1 \\
+   * p_1(x) &= -2x^2+3x^2 \\
+   * p_2(x) &= x^3-2x^2+x  \\
+   * p_3(x) &= x^3-x^2 \\
+   * p_4(x) &= 16x^2(x-1)^2 \\
+   * \ldots & \ldots \\
+   * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
+   * @f}
    *
    * @author Guido Kanschat
    * @date 2012

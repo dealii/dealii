@@ -490,7 +490,9 @@ namespace DoFTools
    *
    * For example, if you wanted to solve the Stokes equations,
    *
-   * @f{align*} -\Delta \mathbf u + \nabla p &= 0,\\ \text{div}\ u &= 0 @f}
+   * @f{align*}{
+   * -\Delta \mathbf u + \nabla p &= 0,\\ \text{div}\ u &= 0
+   * @f}
    *
    * in two space dimensions, using stable Q2/Q1 mixed elements (using
    * the FESystem class), then you don't want all degrees of freedom

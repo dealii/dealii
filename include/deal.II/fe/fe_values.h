@@ -630,11 +630,15 @@ namespace FEValuesViews
      * for the shape function and quadrature point selected by the arguments.
      * For 1d this function does not make any sense. Thus it is not
      * implemented for <code>spacedim=1</code>.  In 2d the curl is defined as
-     * @f{equation*} \operatorname{curl}(u):=\frac{du_2}{dx} -\frac{du_1}{dy},
-     * @f} whereas in 3d it is given by @f{equation*}
+     * @f{equation*}{
+     * \operatorname{curl}(u):=\frac{du_2}{dx} -\frac{du_1}{dy},
+     * @f}
+     * whereas in 3d it is given by
+     * @f{equation*}{
      * \operatorname{curl}(u):=\left( \begin{array}{c}
      * \frac{du_3}{dy}-\frac{du_2}{dz}\\ \frac{du_1}{dz}-\frac{du_3}{dx}\\
-     * \frac{du_2}{dx}-\frac{du_1}{dy} \end{array} \right).  @f}
+     * \frac{du_2}{dx}-\frac{du_1}{dy} \end{array} \right).
+     * @f}
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.

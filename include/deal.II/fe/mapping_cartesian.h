@@ -36,11 +36,17 @@ DEAL_II_NAMESPACE_OPEN
  * In other words, the mapping is meant for cells for which the mapping from
  * the reference to the real cell is a scaling along the coordinate
  * directions: The transformation from reference coordinates $\hat {\mathbf
- * x}$ to real coordinates $\mathbf x$ on each cell is of the form @f{align*}
+ * x}$ to real coordinates $\mathbf x$ on each cell is of the form
+ * @f{align*}{
  * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 \\ 0 & h_y
- * \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0 @f} in 2d, and @f{align*}
+ * \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ * @f}
+ * in 2d, and
+ * @f{align*}{
  * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 & 0 \\ 0 & h_y & 0
- * \\ 0 & 0 & h_z \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0 @f} in 3d,
+ * \\ 0 & 0 & h_z \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ * @f}
+ * in 3d,
  * where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$ are the
  * extents of the cell along the axes.
  *
