@@ -36,6 +36,10 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/NOMINMAX")
 LIST(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
 LIST(APPEND DEAL_II_USER_DEFINITIONS "NOMINMAX")
 
+# fix "fatal error C1128: number of sections exceeded object file format limit"
+# happening in debug mode with visual studio 2015
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/bigobj")
+
 ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
 
 #
