@@ -1668,7 +1668,7 @@ namespace DoFTools
    * processor. Note that this includes the ones that this subdomain "owns"
    * (i.e. the ones for which get_subdomain_association() returns a value
    * equal to the subdomain given here and that are selected by the
-   * extract_locally_owned() function) but also all of those that sit on the
+   * extract_locally_owned_dofs() function) but also all of those that sit on the
    * boundary between the given subdomain and other subdomain. In essence,
    * degrees of freedom that sit on boundaries between subdomain will be in
    * the index sets returned by this function for more than one subdomain.

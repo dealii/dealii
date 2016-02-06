@@ -940,8 +940,9 @@ inconvenience this causes.
   (Alberto Sartori, 2015/09/04, David Wells, 2016/01/18-2016/01/28)
   </li>
 
-  <li> New: There is now a function SparsityPattern::print_svg() which prints the sparsity of the matrix
-  in a .svg file which can be opened in a web browser.
+  <li> New: There is now a function SparsityPattern::print_svg() which prints
+  the sparsity of the matrix in a .svg file which can be opened in a web
+  browser.
   <br>
   (Conrad Clevenger, 2015/09/03)
   </li>
@@ -967,9 +968,9 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/09/02)
   </li>
 
-  <li> New: introduced hp::FECollection::find_least_face_dominating_fe(const std::set<unsigned int> &fes)
-  which aims to find the least dominating finite element w.r.t. those provided
-  as fe_indices in @p fes.
+  <li> New: introduced hp::FECollection::find_least_face_dominating_fe(const
+  std::set<unsigned int> &fes) which aims to find the least dominating finite
+  element w.r.t. those provided as fe_indices in @p fes.
   <br>
   (Denis Davydov, Wolfgang Bangerth, 2015/08/31)
   </li>

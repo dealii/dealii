@@ -373,6 +373,9 @@ namespace GridGenerator
    * @param colorize Assign different boundary ids if set to true.
    *
    * @note Implemented for all combinations of @p dim and @p spacedim.
+   *
+   * @note You likely need to help the compiler by explicitly specifying the
+   * two template parameters when calling this function.
    */
   template <int dim, int spacedim>
   void

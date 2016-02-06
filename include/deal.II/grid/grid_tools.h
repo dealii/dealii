@@ -362,7 +362,7 @@ namespace GridTools
    * adjacent cells that are returned. However, it will always be either a
    * vertex of a cell or be a hanging node located on a face or an edge of it.
    *
-   * @param mesh A variable of a type that satisfies the requirements of
+   * @param container A variable of a type that satisfies the requirements of
    * the @ref ConceptMeshType "MeshType concept".
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells.
@@ -990,7 +990,7 @@ namespace GridTools
    * of <code>Container</code> from the function call. You need to
    * specify it as an explicit template argument following the
    * function name. This type has to satisfy the requirements of a
-   * mesh container (see @ref GlossMeshAsAContainer).
+   * mesh container (see @ref ConceptMeshType).
    *
    * @param[in] patch_cells A vector of active cells for which
    *   this function finds the parents at the coarsest common
@@ -1060,7 +1060,7 @@ namespace GridTools
    * of <code>Container</code> from the function call. You need to
    * specify it as an explicit template argument following the
    * function name. This type that satisfies the requirements of a
-   * mesh container (see @ref GlossMeshAsAContainer).
+   * mesh container (see @ref ConceptMeshType).
    *
    * @param[in] patch A vector of active cells from a common triangulation.
    *  These cells may or may not all be at the same refinement level.
