@@ -265,8 +265,6 @@ public:
    * representing the $(i,j)$-th block of the BlockLinearOperator.
    */
   std::function<BlockType(unsigned int, unsigned int)> block;
-
-  //@}
 };
 
 

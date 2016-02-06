@@ -2108,7 +2108,6 @@ public:
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<std::vector<typename InputVector::value_type> > &laplacians,
     bool quadrature_points_fastest = false) const;
-  //@}
 
   //@}
   /// @name Access to third derivatives of global finite element fields
