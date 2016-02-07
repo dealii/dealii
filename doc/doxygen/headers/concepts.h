@@ -117,8 +117,8 @@
  * DoFHandler::begin_active()) and <tt>typedefs</tt> (such as
  * DoFHandler::active_cell_iterator) for managing collections of cells.
  *
- * Triangulation, DoFHandler, and hp::DoFHandler may
- * all be considered as a container of cells. In fact, the most important parts
+ * Instances of Triangulation, DoFHandler, and hp::DoFHandler may
+ * all be considered as containers of cells. In fact, the most important parts
  * of the public interface of these classes consists simply of the ability to
  * get iterators to their elements. Since these parts of the interface are
  * generic, i.e., the functions have the same name in all classes, it is
