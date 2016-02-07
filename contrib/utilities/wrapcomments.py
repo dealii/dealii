@@ -8,7 +8,7 @@
 
 from __future__ import print_function
 import textwrap
-import sys
+import sys, re
 wrapper = textwrap.TextWrapper()
 
 # take an array of lines and wrap them to 78 columns and let each line start
@@ -116,7 +116,15 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
-        elif starts_with_one(["* - ", "*   - "],lines[idx].strip()):
+        elif re.match(r'\*\s+- ',lines[idx].strip()):
+            # bullet ('-') list
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = lines[idx].strip()[2:]
+            out.append(start + thisline)
+        elif lines[idx].strip().startswith("* ") and re.match(r'\s*\d+.',lines[idx][3:]):
+            # numbered list
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
                 curlines=[]
@@ -441,6 +449,7 @@ lineI = [" /**", \
          "  *   - C", \
          "  *   - D", \
          "  * - E", \
+         "  *         - very indented", \
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
@@ -472,8 +481,34 @@ lineI = [" /**", \
          "  * bla", \
          "  */"]
 lineO = lineI
-#print (lineI, "\n",format_block(lineI))
 assert(format_block(lineI)==lineO)
+
+# lists
+lineI = [" /**", \
+         "  * Hello:", \
+         "  *  - a", \
+         "  *  - b", \
+         "  * the end.", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+# numbered lists
+lineI = [" /**", \
+         "  * Hello:", \
+         "  * 1. a", \
+         "  * 2. b", \
+         "  * the end.", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+
+
+#print (lineI)
+#print (format_block(lineI))
+
+
 
 
 # now open the file and do the work
