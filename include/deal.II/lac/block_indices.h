@@ -119,9 +119,9 @@ public:
   size_type block_size (const unsigned int i) const;
 
   /**
-   * String representation of the block sizes. The output is of the
-   * form `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s`
-   * is total_size() and `b1` etc. are the values of block_size().
+   * String representation of the block sizes. The output is of the form
+   * `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s` is total_size() and
+   * `b1` etc. are the values of block_size().
    */
   std::string to_string () const;
 

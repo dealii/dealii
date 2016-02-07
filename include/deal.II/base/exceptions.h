@@ -1008,8 +1008,8 @@ namespace StandardExceptions
                     "information.");
 
   /**
-   * Some of our numerical classes allow for setting all entries to zero
-   * using the assignment operator <tt>=</tt>.
+   * Some of our numerical classes allow for setting all entries to zero using
+   * the assignment operator <tt>=</tt>.
    *
    * In many cases, this assignment operator makes sense <b>only</b> for the
    * argument zero. In other cases, this exception is thrown.

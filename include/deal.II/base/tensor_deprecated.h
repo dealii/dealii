@@ -45,7 +45,7 @@ DeclException1 (ExcInvalidTensorContractionIndex,
  * product <tt>sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
  *
  * @deprecated Use the double_contract() function that takes indices as
- *   template arguments and returns its result instead.
+ * template arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -60,7 +60,7 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
  * analog operation between tensors of rank 4 and rank 2.
  *
  * @deprecated Use the double_contract() function that takes indices as
- *   template arguments and returns its result instead.
+ * template arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -72,11 +72,11 @@ void double_contract (Tensor<2,dim,Number>       &dest,
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The contraction is
  * performed over index <tt>index1</tt> of the first tensor, and
- * <tt>index2</tt> of the second tensor. Note that the number of the index
- * is counted from 1 on, not from zero as usual.
+ * <tt>index2</tt> of the second tensor. Note that the number of the index is
+ * counted from 1 on, not from zero as usual.
  *
  * @deprecated Use the contract() function that takes indices as template
- *   arguments and returns its result instead.
+ * arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -93,7 +93,7 @@ void contract (Tensor<2,dim,Number>       &dest,
  * number of the index is counted from 1 on, not from zero as usual.
  *
  * @deprecated Use the contract() function that takes indices as template
- *   arguments and returns its result instead.
+ * arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -106,11 +106,11 @@ void contract (Tensor<2,dim,Number>       &dest,
 /**
  * Contract a tensor of rank 3 with a tensor of rank 2. The contraction is
  * performed over index <tt>index1</tt> of the first tensor, and
- * <tt>index2</tt> of the second tensor. Note that the number of the index
- * is counted from 1 on, not from zero as usual.
+ * <tt>index2</tt> of the second tensor. Note that the number of the index is
+ * counted from 1 on, not from zero as usual.
  *
  * @deprecated Use the contract() function that takes indices as template
- *   arguments and returns its result instead.
+ * arguments and returns its result instead.
  * @relates Tensor
  */
 template <int dim, typename Number>
@@ -122,9 +122,9 @@ void contract (Tensor<3,dim,Number>       &dest,
                const unsigned int          index2) DEAL_II_DEPRECATED;
 
 /**
- * Single contraction for tensors: contract the last index of a tensor @p
- * src1 of rank @p rank_1 with the first index of a tensor @p src2 of rank
- * @p rank_2.
+ * Single contraction for tensors: contract the last index of a tensor @p src1
+ * of rank @p rank_1 with the first index of a tensor @p src2 of rank @p
+ * rank_2.
  *
  * @deprecated Use operator* instead. It denotes a single contraction.
  * @relates Tensor
@@ -136,8 +136,7 @@ void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
                const Tensor<rank_2 ,dim, Number>        &src2) DEAL_II_DEPRECATED;
 
 /**
- * Contract a tensor of rank 1 with a tensor of rank 1 and return the
- * result.
+ * Contract a tensor of rank 1 with a tensor of rank 1 and return the result.
  *
  * @deprecated Use operator* instead. It denotes a single contraction.
  * @relates Tensor

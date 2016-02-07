@@ -198,7 +198,8 @@ namespace TrilinosWrappers
      * on the same Epetra_map is intended. In that case, the same communicator
      * is used for data exchange.
      *
-     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+     * zeros.
      */
     void reinit (const std::vector<Epetra_Map> &partitioning,
                  const bool                     omit_zeroing_entries = false);
@@ -211,7 +212,8 @@ namespace TrilinosWrappers
      * with a distributed vector based on the same initialization is intended.
      * In that case, the same communicator is used for data exchange.
      *
-     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+     * zeros.
      */
     void reinit (const std::vector<IndexSet> &partitioning,
                  const MPI_Comm              &communicator = MPI_COMM_WORLD,
@@ -222,7 +224,8 @@ namespace TrilinosWrappers
      * elements in the first argument, and with the respective sizes. Since no
      * distribution map is given, all vectors are local vectors.
      *
-     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+     * zeros.
      */
     void reinit (const std::vector<size_type> &N,
                  const bool                    omit_zeroing_entries=false);

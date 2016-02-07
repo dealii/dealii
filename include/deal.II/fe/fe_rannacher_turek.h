@@ -36,17 +36,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Interpolation</h3>
  *
- * <h4>Node values</h4>
- * The
+ * <h4>Node values</h4> The
  * @ref GlossNodes "node values"
  * are moments on faces.
  *
- * <h4>Generalized support points</h4>
- * To calculate the node values, we are using a QGauss rule on each face.
- * By default, we are using a two point rule to integrate Rannacher-Turek
- * functions exactly. But in order to be able to interpolate other
- * functions with sufficient accuracy, the number of quadrature points
- * used on a face can be adjusted in the constructor.
+ * <h4>Generalized support points</h4> To calculate the node values, we are
+ * using a QGauss rule on each face. By default, we are using a two point rule
+ * to integrate Rannacher-Turek functions exactly. But in order to be able to
+ * interpolate other functions with sufficient accuracy, the number of
+ * quadrature points used on a face can be adjusted in the constructor.
  *
  * @ingroup fe
  * @author Patrick Esser
@@ -57,10 +55,9 @@ class FE_RannacherTurek : public FE_Poly<PolynomialsRannacherTurek<dim>, dim>
 {
 public:
   /**
-   * Constructor for Rannacher-Turek element of degree @p degree, using
-   * @p n_face_support_points quadrature points on each face for
-   * interpolation. Notice that the element of degree 0 contains
-   * polynomials of degree 2.
+   * Constructor for Rannacher-Turek element of degree @p degree, using @p
+   * n_face_support_points quadrature points on each face for interpolation.
+   * Notice that the element of degree 0 contains polynomials of degree 2.
    *
    * Only implemented for degree 0 in 2D.
    */
@@ -100,8 +97,8 @@ private:
    */
   void initialize_support_points();
   /**
-   * Return information about degrees of freedom per object as needed
-   * during construction.
+   * Return information about degrees of freedom per object as needed during
+   * construction.
    */
   std::vector<unsigned int> get_dpo_vector();
 };

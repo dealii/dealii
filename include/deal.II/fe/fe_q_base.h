@@ -27,9 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * This class collects the basic methods used in FE_Q, FE_Q_DG0 and FE_Q_Bubbles.
- * There is no public constructor for this class as it is not functional as a stand-
- * alone. The completion of definitions is left to the derived classes.
+ * This class collects the basic methods used in FE_Q, FE_Q_DG0 and
+ * FE_Q_Bubbles. There is no public constructor for this class as it is not
+ * functional as a stand- alone. The completion of definitions is left to the
+ * derived classes.
  *
  * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
  * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;

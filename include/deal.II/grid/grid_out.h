@@ -318,14 +318,13 @@ namespace GridOutFlags
     bool color_lines_on_user_flag;
 
     /**
-     * The number of points on a boundary face that are plotted
-     * in addition to the vertices of the face.
+     * The number of points on a boundary face that are plotted in addition to
+     * the vertices of the face.
      *
-     * This number is only used if the mapping used is not simply
-     * the standard $Q_1$ mapping (i.e., an object of kind
-     * MappingQGeneric(1)) that may describe edges of cells as
-     * curved and that will then be approximated using line
-     * segments with a number of intermediate points as described
+     * This number is only used if the mapping used is not simply the standard
+     * $Q_1$ mapping (i.e., an object of kind MappingQGeneric(1)) that may
+     * describe edges of cells as curved and that will then be approximated
+     * using line segments with a number of intermediate points as described
      * by the current variable.
      */
     unsigned int n_boundary_face_points;

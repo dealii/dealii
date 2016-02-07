@@ -1130,7 +1130,8 @@ public:
   /**
    * Access the value of the user pointer. It is in the responsibility of the
    * user to make sure that the pointer points to something useful. You should
-   * use the new style cast operator to maintain a minimum of type safety, e.g.
+   * use the new style cast operator to maintain a minimum of type safety,
+   * e.g.
    *
    * @note User pointers and user indices are mutually exclusive. Therefore,
    * you can only use one of them, unless you call
@@ -1475,14 +1476,14 @@ private:
 
 
 /**
- * Specialization of <code>TriaAccessor<structdim, dim, spacedim></code>.
- * This class represent vertices in a triangulation of dimensionality
- * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a triangulation
- * of quads, and 3 for a triangulation of hexes) that is embedded in a space of
- * dimensionality <code>spacedim</code> (for <code>spacedim==dim</code> the
- * triangulation represents a domain in ${\mathbb R}^\text{dim}$, for
- * <code>spacedim@>dim</code> the triangulation is of a manifold embedded in
- * a higher dimensional space).
+ * Specialization of <code>TriaAccessor<structdim, dim, spacedim></code>. This
+ * class represent vertices in a triangulation of dimensionality
+ * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a
+ * triangulation of quads, and 3 for a triangulation of hexes) that is
+ * embedded in a space of dimensionality <code>spacedim</code> (for
+ * <code>spacedim==dim</code> the triangulation represents a domain in
+ * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dim</code> the triangulation
+ * is of a manifold embedded in a higher dimensional space).
  *
  * @ingroup Accessors
  * @author Bruno Turcksin, 2015
@@ -1518,15 +1519,16 @@ public:
   typedef void AccessorData;
 
   /**
-   * Constructor. The second argument is the global index of the vertex we point to.
+   * Constructor. The second argument is the global index of the vertex we
+   * point to.
    */
   TriaAccessor (const Triangulation<dim,spacedim> *tria,
                 const unsigned int    vertex_index);
 
   /**
    * Constructor. This constructor exists in order to maintain interface
-   * compatibility with the other accessor classes. @p index can be used to set
-   * the global index of the vertex we point to.
+   * compatibility with the other accessor classes. @p index can be used to
+   * set the global index of the vertex we point to.
    */
   TriaAccessor (const Triangulation<dim,spacedim> *tria  = NULL,
                 const int                          level = 0,
@@ -1675,9 +1677,9 @@ public:
 
   /**
    * Return the center of this object, which of course coincides with the
-   * location of the vertex this object refers to. The parameters
-   * @p respect_manifold and @p use_laplace_transformation are not used. They
-   * are there to provide the same interface as
+   * location of the vertex this object refers to. The parameters @p
+   * respect_manifold and @p use_laplace_transformation are not used. They are
+   * there to provide the same interface as
    * <code>TriaAccessor<structdim,dim,spacedim></code>.
    */
   Point<spacedim> center (const bool respect_manifold=false,
@@ -2806,11 +2808,11 @@ public:
    * @ref GlossArtificialCell).
    * This function counts over all of them, including ghost and artificial
    * active cells. This implies that the index returned by this function
-   * uniquely identifies a cell within the triangulation on a single processor,
-   * but does not uniquely identify the cell among the (parts of the)
-   * triangulation that is shared among processors. If you would like to identify
-   * active cells across processors, you need to consider the CellId of a cell
-   * returned by CellAccessor::id().
+   * uniquely identifies a cell within the triangulation on a single
+   * processor, but does not uniquely identify the cell among the (parts of
+   * the) triangulation that is shared among processors. If you would like to
+   * identify active cells across processors, you need to consider the CellId
+   * of a cell returned by CellAccessor::id().
    */
   unsigned int active_cell_index () const;
 

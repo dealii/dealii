@@ -194,8 +194,8 @@ public:
   /**
    * Set several elements in the specified row of the matrix with column
    * indices as given by <tt>col_indices</tt> to the respective value. This is
-   * the function doing the actual work for the ones adding full matrices.
-   * The global locations <tt>row_index</tt> and <tt>col_indices</tt> are
+   * the function doing the actual work for the ones adding full matrices. The
+   * global locations <tt>row_index</tt> and <tt>col_indices</tt> are
    * translated into locations in this block and ExcBlockIndexMismatch is
    * thrown, if the global index does not point into the block referred to by
    * #row and #column.
@@ -231,33 +231,33 @@ public:
             const bool       col_indices_are_sorted = false);
 
   /**
-   * Matrix-vector-multiplication, forwarding to the same function in MatrixType.
-   * No index computations are done, thus, the vectors need to have sizes
-   * matching #matrix.
+   * Matrix-vector-multiplication, forwarding to the same function in
+   * MatrixType. No index computations are done, thus, the vectors need to
+   * have sizes matching #matrix.
    */
   template<class VectorType>
   void vmult (VectorType &w, const VectorType &v) const;
 
   /**
-   * Matrix-vector-multiplication, forwarding to the same function in MatrixType.
-   * No index computations are done, thus, the vectors need to have sizes
-   * matching #matrix.
+   * Matrix-vector-multiplication, forwarding to the same function in
+   * MatrixType. No index computations are done, thus, the vectors need to
+   * have sizes matching #matrix.
    */
   template<class VectorType>
   void vmult_add (VectorType &w, const VectorType &v) const;
 
   /**
-   * Matrix-vector-multiplication, forwarding to the same function in MatrixType.
-   * No index computations are done, thus, the vectors need to have sizes
-   * matching #matrix.
+   * Matrix-vector-multiplication, forwarding to the same function in
+   * MatrixType. No index computations are done, thus, the vectors need to
+   * have sizes matching #matrix.
    */
   template<class VectorType>
   void Tvmult (VectorType &w, const VectorType &v) const;
 
   /**
-   * Matrix-vector-multiplication, forwarding to the same function in MatrixType.
-   * No index computations are done, thus, the vectors need to have sizes
-   * matching #matrix.
+   * Matrix-vector-multiplication, forwarding to the same function in
+   * MatrixType. No index computations are done, thus, the vectors need to
+   * have sizes matching #matrix.
    */
   template<class VectorType>
   void Tvmult_add (VectorType &w, const VectorType &v) const;

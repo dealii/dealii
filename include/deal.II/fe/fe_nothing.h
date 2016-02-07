@@ -85,12 +85,12 @@ public:
    * Constructor. First argument denotes the number of components to give this
    * finite element (default = 1).
    *
-   * Second argument decides whether FE_Nothing
-   * will dominate any other FE in compare_for_face_domination() (default = false).
-   * Therefore at interfaces where, for example, a Q1 meets an FE_Nothing,
-   * we will force the traces of the two functions to be the same. Because the
-   * FE_Nothing encodes a space that is zero everywhere, this means that the Q1
-   * field will be forced to become zero at this interface.
+   * Second argument decides whether FE_Nothing will dominate any other FE in
+   * compare_for_face_domination() (default = false). Therefore at interfaces
+   * where, for example, a Q1 meets an FE_Nothing, we will force the traces of
+   * the two functions to be the same. Because the FE_Nothing encodes a space
+   * that is zero everywhere, this means that the Q1 field will be forced to
+   * become zero at this interface.
    */
   FE_Nothing (const unsigned int n_components = 1,
               const bool dominate = false);
@@ -189,9 +189,9 @@ public:
    * @ref hp_paper "hp paper".
    *
    * In the current case, this element is assumed to dominate if the second
-   * argument in the constructor @p dominate is true. When this argument is false
-   * and @p fe_other is also of type FE_Nothing(), either element can dominate.
-   * Otherwise there are no_requirements.
+   * argument in the constructor @p dominate is true. When this argument is
+   * false and @p fe_other is also of type FE_Nothing(), either element can
+   * dominate. Otherwise there are no_requirements.
    */
   virtual
   FiniteElementDomination::Domination
@@ -253,7 +253,8 @@ public:
 private:
 
   /**
-   * If true, this element will dominate any other apart from itself in compare_for_face_domination();
+   * If true, this element will dominate any other apart from itself in
+   * compare_for_face_domination();
    */
   const bool dominate;
 };

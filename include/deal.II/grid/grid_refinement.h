@@ -67,7 +67,8 @@ namespace GridRefinement
    * default value of this argument is to impose no limit on the number of
    * cells.
    *
-   * @param[in] top_fraction_of_cells The requested fraction of cells to be refined.
+   * @param[in] top_fraction_of_cells The requested fraction of cells to be
+   * refined.
    *
    * @param[in] bottom_fraction_of_cells The requested fraction of cells to be
    * coarsened.
@@ -128,11 +129,11 @@ namespace GridRefinement
    * mesh is not changed until you call
    * Triangulation::execute_coarsening_and_refinement().
    *
-   * @param[in,out] triangulation The triangulation whose cells this function is
-   * supposed to mark for coarsening and refinement.
+   * @param[in,out] triangulation The triangulation whose cells this function
+   * is supposed to mark for coarsening and refinement.
    *
-   * @param[in] criteria The refinement criterion for each mesh cell.
-   * Entries may not be negative.
+   * @param[in] criteria The refinement criterion for each mesh cell. Entries
+   * may not be negative.
    *
    * @param[in] top_fraction_of_cells The fraction of cells to be refined. If
    * this number is zero, no cells will be refined. If it equals one, the
@@ -141,13 +142,13 @@ namespace GridRefinement
    * @param[in] bottom_fraction_of_cells The fraction of cells to be
    * coarsened. If this number is zero, no cells will be coarsened.
    *
-   * @param[in] max_n_cells This argument can be used to specify a maximal number of cells. If
-   * this number is going to be exceeded upon refinement, then refinement and
-   * coarsening fractions are going to be adjusted in an attempt to reach the
-   * maximum number of cells. Be aware though that through proliferation of
-   * refinement due to Triangulation::MeshSmoothing, this number is only an
-   * indicator. The default value of this argument is to impose no limit on
-   * the number of cells.
+   * @param[in] max_n_cells This argument can be used to specify a maximal
+   * number of cells. If this number is going to be exceeded upon refinement,
+   * then refinement and coarsening fractions are going to be adjusted in an
+   * attempt to reach the maximum number of cells. Be aware though that
+   * through proliferation of refinement due to Triangulation::MeshSmoothing,
+   * this number is only an indicator. The default value of this argument is
+   * to impose no limit on the number of cells.
    */
   template <int dim, class VectorType, int spacedim>
   void
@@ -205,13 +206,13 @@ namespace GridRefinement
    * @param[in] bottom_fraction The fraction of the estimate coarsened. If
    * this number is zero, no cells will be coarsened.
    *
-   * @param[in] max_n_cells This argument can be used to specify a maximal number of cells. If
-   * this number is going to be exceeded upon refinement, then refinement and
-   * coarsening fractions are going to be adjusted in an attempt to reach the
-   * maximum number of cells. Be aware though that through proliferation of
-   * refinement due to Triangulation::MeshSmoothing, this number is only an
-   * indicator. The default value of this argument is to impose no limit on
-   * the number of cells.
+   * @param[in] max_n_cells This argument can be used to specify a maximal
+   * number of cells. If this number is going to be exceeded upon refinement,
+   * then refinement and coarsening fractions are going to be adjusted in an
+   * attempt to reach the maximum number of cells. Be aware though that
+   * through proliferation of refinement due to Triangulation::MeshSmoothing,
+   * this number is only an indicator. The default value of this argument is
+   * to impose no limit on the number of cells.
    */
   template <int dim, class VectorType, int spacedim>
   void

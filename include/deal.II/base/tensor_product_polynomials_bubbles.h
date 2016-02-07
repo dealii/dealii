@@ -38,10 +38,9 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Tensor product of given polynomials and bubble functions of form
- * $(2*x_j-1)^{degree-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. This class inherits most of its
- * functionality from TensorProductPolynomials. The bubble enrichments
- * are added for the last indices.
- * index.
+ * $(2*x_j-1)^{degree-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. This class inherits
+ * most of its functionality from TensorProductPolynomials. The bubble
+ * enrichments are added for the last indices. index.
  *
  * @author Daniel Arndt, 2015
  */
@@ -50,10 +49,8 @@ class TensorProductPolynomialsBubbles : public TensorProductPolynomials<dim>
 {
 public:
   /**
-   * Access to the dimension of
-   * this object, for checking and
-   * automatic setting of dimension
-   * in other classes.
+   * Access to the dimension of this object, for checking and automatic
+   * setting of dimension in other classes.
    */
   static const unsigned int dimension = dim;
 
@@ -100,16 +97,16 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @p order derivative of the <tt>i</tt>th tensor
-   * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
-   * tensor product numbering.
+   * Computes the order @p order derivative of the <tt>i</tt>th tensor product
+   * polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor
+   * product numbering.
    *
    * Note, that using this function within a loop over all tensor product
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
-   * several times.  Instead use the compute() function, see above, with
-   * the size of the appropriate parameter set to n() to get the point value
-   * of all tensor polynomials all at once and in a much more efficient way.
+   * several times.  Instead use the compute() function, see above, with the
+   * size of the appropriate parameter set to n() to get the point value of
+   * all tensor polynomials all at once and in a much more efficient way.
    */
   template <int order>
   Tensor<order,dim> compute_derivative (const unsigned int i,
@@ -146,9 +143,10 @@ public:
                                    const Point<dim> &p) const;
 
   /**
-   * Returns the number of tensor product polynomials plus the bubble enrichments.
-   * For <i>n</i> 1d polynomials this is <i>n<sup>dim</sup>+1</i> if the maximum
-   * degree of the polynomials is one and <i>n<sup>dim</sup>+dim</i> otherwise.
+   * Returns the number of tensor product polynomials plus the bubble
+   * enrichments. For <i>n</i> 1d polynomials this is <i>n<sup>dim</sup>+1</i>
+   * if the maximum degree of the polynomials is one and
+   * <i>n<sup>dim</sup>+dim</i> otherwise.
    */
   unsigned int n () const;
 };

@@ -157,8 +157,8 @@ namespace PETScWrappers
     SolverControl &control() const;
 
     /**
-     * initialize the solver with the preconditioner.
-     * This function is intended for use with SLEPc spectral transformation class.
+     * initialize the solver with the preconditioner. This function is
+     * intended for use with SLEPc spectral transformation class.
      */
     void initialize(const PreconditionerBase &preconditioner);
 
@@ -251,7 +251,8 @@ namespace PETScWrappers
 
 #ifdef DEAL_II_WITH_SLEPC
     /**
-     * Make the transformation class a friend, since it needs to set the KSP solver.
+     * Make the transformation class a friend, since it needs to set the KSP
+     * solver.
      */
     friend class SLEPcWrappers::TransformationBase;
 #endif

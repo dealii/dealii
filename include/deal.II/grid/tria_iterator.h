@@ -79,9 +79,9 @@ template <typename> class TriaActiveIterator;
  * The objects pointed to are accessors, derived from TriaAccessorBase. Which
  * kind of accessor is determined by the template argument <em>Accessor</em>.
  * These accessors are not so much data structures as they are a collection of
- * functions providing access to the data stored in Triangulation or DoFHandler
- * objects. Using these accessors, the structure of these classes is hidden
- * from the application program.
+ * functions providing access to the data stored in Triangulation or
+ * DoFHandler objects. Using these accessors, the structure of these classes
+ * is hidden from the application program.
  *
  * <h3>Which iterator to use when</h3>
  *

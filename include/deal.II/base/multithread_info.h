@@ -103,8 +103,8 @@ private:
 
 
   /**
-   * Constructor made private because no instance of this class needs to
-   * be constructed as all members are static.
+   * Constructor made private because no instance of this class needs to be
+   * constructed as all members are static.
    */
   MultithreadInfo ();
 
@@ -121,8 +121,8 @@ private:
   static unsigned int n_max_threads;
 
   /**
-   * Variable representing the number of cores in the system. This is computed by
-   * get_n_cpus() and is returned by n_cores().
+   * Variable representing the number of cores in the system. This is computed
+   * by get_n_cpus() and is returned by n_cores().
    */
   static const unsigned int n_cpus;
 };

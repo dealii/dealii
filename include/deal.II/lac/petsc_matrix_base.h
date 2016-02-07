@@ -851,10 +851,11 @@ namespace PETScWrappers
     is_hermitian (const double tolerance = 1.e-12);
 
     /**
-     * Print the PETSc matrix object values using PETSc internal matrix
-     * viewer function <tt>MatView</tt>. The default format prints the non-
-     * zero matrix elements. For other valid view formats, consult
-     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MatView.html
+     * Print the PETSc matrix object values using PETSc internal matrix viewer
+     * function <tt>MatView</tt>. The default format prints the non- zero
+     * matrix elements. For other valid view formats, consult
+     * http://www.mcs.anl.gov/petsc/petsc-
+     * current/docs/manualpages/Mat/MatView.html
      */
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT);
 
@@ -862,8 +863,8 @@ namespace PETScWrappers
      * Print the elements of a matrix to the given output stream.
      *
      * @param[in,out] out The output stream to which to write.
-     * @param[in] alternative_output This argument is ignored. It exists
-     *   for compatibility with similar functions in other matrix classes.
+     * @param[in] alternative_output This argument is ignored. It exists for
+     * compatibility with similar functions in other matrix classes.
      */
     void print (std::ostream &out,
                 const bool    alternative_output = false) const;

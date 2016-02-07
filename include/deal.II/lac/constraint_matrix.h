@@ -175,18 +175,18 @@ public:
   /**
    * Constructor. The supplied IndexSet defines which indices might be
    * constrained inside this ConstraintMatrix. In a calculation with a
-   * DoFHandler object based on parallel::distributed::Triangulation
-   * or parallel::shared::Triangulation, one should use the set of locally
+   * DoFHandler object based on parallel::distributed::Triangulation or
+   * parallel::shared::Triangulation, one should use the set of locally
    * relevant dofs (see
    * @ref GlossLocallyRelevantDof).
    *
    * The given IndexSet allows the ConstraintMatrix to save memory by just not
-   * caring about degrees of freedom that are not of importance to the
-   * current processor. Alternatively, if no such IndexSet is provided,
-   * internal data structures for <i>all</i> possible indices will be created,
-   * leading to memory consumption on every processor that is proportional to
-   * the <i>overall</i> size of the problem, not just proportional to the
-   * size of the portion of the overall problem that is handled by the current
+   * caring about degrees of freedom that are not of importance to the current
+   * processor. Alternatively, if no such IndexSet is provided, internal data
+   * structures for <i>all</i> possible indices will be created, leading to
+   * memory consumption on every processor that is proportional to the
+   * <i>overall</i> size of the problem, not just proportional to the size of
+   * the portion of the overall problem that is handled by the current
    * processor.
    */
   explicit ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
@@ -330,8 +330,8 @@ public:
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
    * are usually filled in an arbitrary order and since we do not want to use
-   * associative constrainers to store the lines, we need to sort the lines and
-   * within the lines the columns before usage of the matrix. This is done
+   * associative constrainers to store the lines, we need to sort the lines
+   * and within the lines the columns before usage of the matrix. This is done
    * through this function.
    *
    * Also, zero entries are discarded, since they are not needed.
@@ -680,9 +680,9 @@ public:
    *
    * @param[in] local_vector Vector of local contributions.
    * @param[in] local_dof_indices Local degrees of freedom indices
-   *   corresponding to the vector of local contributions.
+   * corresponding to the vector of local contributions.
    * @param[out]  global_vector The global vector to which all local
-   *   contributions will be added.
+   * contributions will be added.
    */
   template <class InVector, class OutVector>
   void
@@ -1010,8 +1010,8 @@ public:
    * the constraint $x_3=\frac 12 x_1 + \frac 12 x_2$, then this function will
    * read the values of $x_1$ and $x_1$ from the given vector and set the
    * element $x_3$ according to this constraints. Similarly, if the current
-   * object stores the constraint $x_{42}=208$, then this function will set the
-   * 42nd element of the given vector to 208.
+   * object stores the constraint $x_{42}=208$, then this function will set
+   * the 42nd element of the given vector to 208.
    *
    * @note If this function is called with a parallel vector @p vec, then the
    * vector must not contain ghost elements.

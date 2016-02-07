@@ -171,10 +171,9 @@ public:
    * have of the original object. Notice that it is your own responsibility to
    * ensure that the memory you are pointing to is big enough.
    *
-   * Similarly to what happens in the base class, if
-   * 'omit_zeroing_entries' is false, then the entire content of the
-   * vector is set to 0, otherwise the content of the memory is left
-   * unchanged.
+   * Similarly to what happens in the base class, if 'omit_zeroing_entries' is
+   * false, then the entire content of the vector is set to 0, otherwise the
+   * content of the memory is left unchanged.
    *
    * Notice that the following snippet of code may not produce what you
    * expect:

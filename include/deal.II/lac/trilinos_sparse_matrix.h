@@ -1119,14 +1119,14 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data
-     * structure: If the same matrix entry is inserted more than once, the
-     * matrix entries will be added upon calling compress() (since Epetra does
-     * not track values to the same entry before the final compress() is
-     * called), even if VectorOperation::insert is specified as argument to
-     * compress(). In the case you cannot make sure that matrix entries are
-     * only set once, initialize the matrix with a sparsity pattern to fix the
-     * matrix structure before inserting elements.
+     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * If the same matrix entry is inserted more than once, the matrix entries
+     * will be added upon calling compress() (since Epetra does not track
+     * values to the same entry before the final compress() is called), even
+     * if VectorOperation::insert is specified as argument to compress(). In
+     * the case you cannot make sure that matrix entries are only set once,
+     * initialize the matrix with a sparsity pattern to fix the matrix
+     * structure before inserting elements.
      */
     void set (const size_type i,
               const size_type j,
@@ -1155,14 +1155,14 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data
-     * structure: If the same matrix entry is inserted more than once, the
-     * matrix entries will be added upon calling compress() (since Epetra does
-     * not track values to the same entry before the final compress() is
-     * called), even if VectorOperation::insert is specified as argument to
-     * compress(). In the case you cannot make sure that matrix entries are
-     * only set once, initialize the matrix with a sparsity pattern to fix the
-     * matrix structure before inserting elements.
+     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * If the same matrix entry is inserted more than once, the matrix entries
+     * will be added upon calling compress() (since Epetra does not track
+     * values to the same entry before the final compress() is called), even
+     * if VectorOperation::insert is specified as argument to compress(). In
+     * the case you cannot make sure that matrix entries are only set once,
+     * initialize the matrix with a sparsity pattern to fix the matrix
+     * structure before inserting elements.
      */
     void set (const std::vector<size_type>     &indices,
               const FullMatrix<TrilinosScalar> &full_matrix,
@@ -1196,14 +1196,14 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data
-     * structure: If the same matrix entry is inserted more than once, the
-     * matrix entries will be added upon calling compress() (since Epetra does
-     * not track values to the same entry before the final compress() is
-     * called), even if VectorOperation::insert is specified as argument to
-     * compress(). In the case you cannot make sure that matrix entries are
-     * only set once, initialize the matrix with a sparsity pattern to fix the
-     * matrix structure before inserting elements.
+     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * If the same matrix entry is inserted more than once, the matrix entries
+     * will be added upon calling compress() (since Epetra does not track
+     * values to the same entry before the final compress() is called), even
+     * if VectorOperation::insert is specified as argument to compress(). In
+     * the case you cannot make sure that matrix entries are only set once,
+     * initialize the matrix with a sparsity pattern to fix the matrix
+     * structure before inserting elements.
      */
     void set (const size_type                    row,
               const std::vector<size_type>      &col_indices,
@@ -1228,14 +1228,14 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data
-     * structure: If the same matrix entry is inserted more than once, the
-     * matrix entries will be added upon calling compress() (since Epetra does
-     * not track values to the same entry before the final compress() is
-     * called), even if VectorOperation::insert is specified as argument to
-     * compress(). In the case you cannot make sure that matrix entries are
-     * only set once, initialize the matrix with a sparsity pattern to fix the
-     * matrix structure before inserting elements.
+     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * If the same matrix entry is inserted more than once, the matrix entries
+     * will be added upon calling compress() (since Epetra does not track
+     * values to the same entry before the final compress() is called), even
+     * if VectorOperation::insert is specified as argument to compress(). In
+     * the case you cannot make sure that matrix entries are only set once,
+     * initialize the matrix with a sparsity pattern to fix the matrix
+     * structure before inserting elements.
      */
     void set (const size_type       row,
               const size_type       n_cols,

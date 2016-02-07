@@ -48,12 +48,12 @@ public:
   TableIndices();
 
   /**
-   * Convenience constructor that takes up to 9 arguments. It can be used
-   * to populate a TableIndices object upon creation, either completely, or
+   * Convenience constructor that takes up to 9 arguments. It can be used to
+   * populate a TableIndices object upon creation, either completely, or
    * partially.
    *
-   * Index entries that are not set by these arguments (either because
-   * they are omitted, or because $N > 9$) are set to
+   * Index entries that are not set by these arguments (either because they
+   * are omitted, or because $N > 9$) are set to
    * numbers::invalid_unsigned_int.
    *
    * Note that only the first <tt>N</tt> arguments are actually used.
@@ -253,8 +253,8 @@ TableIndices<N>::serialize (Archive &ar, const unsigned int)
 
 
 /**
- * Output operator for TableIndices objects; reports them in a list like
- * this: <code>[i1,i2,...]</code>.
+ * Output operator for TableIndices objects; reports them in a list like this:
+ * <code>[i1,i2,...]</code>.
  *
  * @relates TableIndices
  */

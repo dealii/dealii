@@ -229,8 +229,8 @@ public:
   }
 
   /**
-   * Subtract a constant @p offset (of the @p Range space) from the result of a
-   * PackagedOperation.
+   * Subtract a constant @p offset (of the @p Range space) from the result of
+   * a PackagedOperation.
    */
   PackagedOperation<Range> &operator-=(const Range &offset)
   {

@@ -478,26 +478,25 @@ namespace parallel
        * this-@>locally_owned_subdomain()</code>), refinement and coarsening
        * flags are only respected for those locally owned cells. Flags may be
        * set on other cells as well (and may often, in fact, if you call
-       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will be
-       * largely ignored: the decision to refine the global mesh will only be
-       * affected by flags set on locally owned cells.
+       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will
+       * be largely ignored: the decision to refine the global mesh will only
+       * be affected by flags set on locally owned cells.
        *
-       * @note This function by default partitions the mesh in such a way
-       *   that the number of cells on all processors is roughly equal.
-       *   If you want to set weights for partitioning, e.g. because some cells
-       *   are more expensive to compute than others, you can use the signal
-       *   cell_weight as documented in the dealii::Triangulation class. This
-       *   function will check whether a function is connected to the signal
-       *   and if so use it. If you prefer to repartition the mesh yourself at
-       *   user-defined intervals only, you can create your triangulation
-       *   object by passing the
-       *   parallel::distributed::Triangulation::no_automatic_repartitioning
-       *   flag to the constructor, which ensures that calling the current
-       *   function only refines and coarsens the triangulation, but doesn't
-       *   partition it. You can then call the repartition() function manually.
-       *   The usage of the cell_weights signal is identical in both cases,
-       *   if a function is connected to the signal it will be used to balance
-       *   the calculated weights, otherwise the number of cells is balanced.
+       * @note This function by default partitions the mesh in such a way that
+       * the number of cells on all processors is roughly equal. If you want
+       * to set weights for partitioning, e.g. because some cells are more
+       * expensive to compute than others, you can use the signal cell_weight
+       * as documented in the dealii::Triangulation class. This function will
+       * check whether a function is connected to the signal and if so use it.
+       * If you prefer to repartition the mesh yourself at user-defined
+       * intervals only, you can create your triangulation object by passing
+       * the parallel::distributed::Triangulation::no_automatic_repartitioning
+       * flag to the constructor, which ensures that calling the current
+       * function only refines and coarsens the triangulation, but doesn't
+       * partition it. You can then call the repartition() function manually.
+       * The usage of the cell_weights signal is identical in both cases, if a
+       * function is connected to the signal it will be used to balance the
+       * calculated weights, otherwise the number of cells is balanced.
        */
       virtual void execute_coarsening_and_refinement ();
 
@@ -528,27 +527,26 @@ namespace parallel
        * dealing with data movement (SolutionTransfer, etc.).
        *
        * @note If no function is connected to the cell_weight signal described
-       *   in the dealii::Triangulation class, this function will balance the
-       *   number of cells on each processor. If one or more functions are
-       *   connected, it will calculate the sum of the weights and balance the
-       *   weights across processors. The only requirement on the weights is
-       *   that every cell's weight is positive and that the sum over all
-       *   weights on all processors can be formed using a 64-bit integer.
-       *   Beyond that, it is your choice how you want to interpret the weights.
-       *   A common approach is to consider the weights proportional to
-       *   the cost of doing computations on a cell, e.g., by summing
-       *   the time for assembly and solving. In practice, determining
-       *   this cost is of course not trivial since we don't solve on
-       *   isolated cells, but on the entire mesh. In such cases, one
-       *   could, for example, choose the weight equal to the number
-       *   of unknowns per cell (in the context of hp finite element
-       *   methods), or using a heuristic that estimates the cost on
-       *   each cell depending on whether, for example, one has to
-       *   run some expensive algorithm on some cells but not others
-       *   (such as forming boundary integrals during the assembly
-       *   only on cells that are actually at the boundary, or computing
-       *   expensive nonlinear terms only on some cells but not others,
-       *   e.g., in the elasto-plastic problem in step-42).
+       * in the dealii::Triangulation class, this function will balance the
+       * number of cells on each processor. If one or more functions are
+       * connected, it will calculate the sum of the weights and balance the
+       * weights across processors. The only requirement on the weights is
+       * that every cell's weight is positive and that the sum over all
+       * weights on all processors can be formed using a 64-bit integer.
+       * Beyond that, it is your choice how you want to interpret the weights.
+       * A common approach is to consider the weights proportional to the cost
+       * of doing computations on a cell, e.g., by summing the time for
+       * assembly and solving. In practice, determining this cost is of course
+       * not trivial since we don't solve on isolated cells, but on the entire
+       * mesh. In such cases, one could, for example, choose the weight equal
+       * to the number of unknowns per cell (in the context of hp finite
+       * element methods), or using a heuristic that estimates the cost on
+       * each cell depending on whether, for example, one has to run some
+       * expensive algorithm on some cells but not others (such as forming
+       * boundary integrals during the assembly only on cells that are
+       * actually at the boundary, or computing expensive nonlinear terms only
+       * on some cells but not others, e.g., in the elasto-plastic problem in
+       * step-42).
        */
       void repartition ();
 
@@ -769,8 +767,8 @@ namespace parallel
        * GridTools::collect_periodic_faces.
        *
        * For more information on periodic boundary conditions see
-       * GridTools::collect_periodic_faces, DoFTools::make_periodicity_constraints
-       * and step-45.
+       * GridTools::collect_periodic_faces,
+       * DoFTools::make_periodicity_constraints and step-45.
        *
        * @note Before this function can be used the Triangulation has to be
        * initialized and must not be refined. Calling this function more than
@@ -785,8 +783,8 @@ namespace parallel
     private:
 
       /**
-       * Override the function to update the number cache so we can fill
-       * data like @p level_ghost_owners.
+       * Override the function to update the number cache so we can fill data
+       * like @p level_ghost_owners.
        *
        */
       virtual void update_number_cache ();
@@ -933,7 +931,8 @@ namespace parallel
        * repartition cycle. Note that the number of entries does not need to
        * be equal to either n_active_cells or n_locally_owned_active_cells,
        * because the triangulation is not updated yet. The weights are sorted
-       * in the order that p4est will encounter them while iterating over them.
+       * in the order that p4est will encounter them while iterating over
+       * them.
        */
       std::vector<unsigned int>
       get_cell_weights();

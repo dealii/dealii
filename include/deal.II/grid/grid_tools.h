@@ -342,8 +342,7 @@ namespace GridTools
    * Find and return the number of the used vertex in a given mesh that is
    * located closest to a given point.
    *
-   * @param mesh A variable of a type that satisfies the requirements of
-   * the
+   * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the closest vertex.
    * @return The index of the closest vertex found.
@@ -401,8 +400,7 @@ namespace GridTools
    * simultaneously delivers the local coordinate of the given point without
    * additional computational cost.
    *
-   * @param mesh A variable of a type that satisfies the requirements of
-   * the
+   * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An iterator into the mesh that points to the surrounding cell.
@@ -450,8 +448,7 @@ namespace GridTools
    *
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
-   * @param mesh A variable of a type that satisfies the requirements of
-   * the
+   * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
    * @return An pair of an iterators into the mesh that points to the
@@ -528,9 +525,9 @@ namespace GridTools
    * @param cell An iterator pointing to a cell of the mesh.
    * @return A list of active descendants of the given cell
    *
-   * @note Since in C++ the MeshType template argument can not be
-   * deduced from a function call, you will have to specify it after the
-   * function name, as for example in
+   * @note Since in C++ the MeshType template argument can not be deduced from
+   * a function call, you will have to specify it after the function name, as
+   * for example in
    * @code
    *   GridTools::get_active_child_cells<DoFHandler<dim> > (cell)
    * @endcode
@@ -555,13 +552,14 @@ namespace GridTools
                         std::vector<typename MeshType::active_cell_iterator> &active_neighbors);
 
   /**
-   * Extract and return the active cell layer around a subdomain (set of active
-   * cells) in the @p mesh (i.e. those that share a common set of vertices
-   * with the subdomain but are not a part of it).
-   * Here, the "subdomain" consists of exactly all of those cells for which the
-   * @p predicate returns @p true.
+   * Extract and return the active cell layer around a subdomain (set of
+   * active cells) in the @p mesh (i.e. those that share a common set of
+   * vertices with the subdomain but are not a part of it). Here, the
+   * "subdomain" consists of exactly all of those cells for which the @p
+   * predicate returns @p true.
    *
-   * An example of a custom predicate is one that checks for a given material id
+   * An example of a custom predicate is one that checks for a given material
+   * id
    * @code
    * template<int dim>
    * bool
@@ -576,8 +574,9 @@ namespace GridTools
    * GridTools::compute_active_cell_halo_layer(tria, pred_mat_id<dim>);
    * @endcode
    *
-   * Predicates that are frequently useful can be found in namespace IteratorFilters.
-   * For example, it is possible to extracting a layer based on material id
+   * Predicates that are frequently useful can be found in namespace
+   * IteratorFilters. For example, it is possible to extracting a layer based
+   * on material id
    * @code
    * GridTools::compute_active_cell_halo_layer(tria,
    *                                           IteratorFilters::MaterialIdEqualTo(1, true));
@@ -593,13 +592,13 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param[in] mesh A mesh (i.e. objects of type Triangulation,
-   * DoFHandler, or hp::DoFHandler).
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
+   * or hp::DoFHandler).
    * @param[in] predicate A function  (or object of a type with an operator())
    * defining the subdomain around which the halo layer is to be extracted. It
    * is a function that takes in an active cell and returns a boolean.
-   * @return A list of active cells sharing at least one common vertex with the
-   * predicated subdomain.
+   * @return A list of active cells sharing at least one common vertex with
+   * the predicated subdomain.
    *
    * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
    */
@@ -610,16 +609,16 @@ namespace GridTools
    const std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> &predicate);
 
   /**
-   * Extract and return ghost cells which are the active cell layer
-   * around all locally owned cells. This is most relevant for
+   * Extract and return ghost cells which are the active cell layer around all
+   * locally owned cells. This is most relevant for
    * parallel::shared::Triangulation where it will return a subset of all
    * ghost cells on a processor, but for parallel::distributed::Triangulation
    * this will return all the ghost cells.
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * @param[in] mesh A mesh (i.e. objects of type Triangulation,
-   * DoFHandler, or hp::DoFHandler).
+   * @param[in] mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
+   * or hp::DoFHandler).
    * @return A list of ghost cells
    *
    * @author Jean-Paul Pelteret, Denis Davydov, Wolfgang Bangerth, 2015
@@ -633,8 +632,8 @@ namespace GridTools
    * Return the adjacent cells of all the vertices. If a vertex is also a
    * hanging node, the associated coarse cell is also returned. The vertices
    * are ordered by the vertex index. This is the number returned by the
-   * function <code>cell-@>vertex_index()</code>. Notice that only the
-   * indices marked in the array returned by
+   * function <code>cell-@>vertex_index()</code>. Notice that only the indices
+   * marked in the array returned by
    * Triangulation<dim,spacedim>::get_used_vertices() are used.
    */
   template <int dim, int spacedim>
@@ -642,11 +641,11 @@ namespace GridTools
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
   /**
-   * Compute a globally unique index for each vertex and hanging node associated
-   * with a locally owned active cell. The vertices of a ghost cell that are
-   * hanging nodes of a locally owned cells have a global index. However, the
-   * other vertices of the cells that do not <i>touch</i> an active cell do not
-   * have a global index on this processor.
+   * Compute a globally unique index for each vertex and hanging node
+   * associated with a locally owned active cell. The vertices of a ghost cell
+   * that are hanging nodes of a locally owned cells have a global index.
+   * However, the other vertices of the cells that do not <i>touch</i> an
+   * active cell do not have a global index on this processor.
    *
    * The key of the map is the local index of the vertex and the value is the
    * global index. The indices need to be recomputed after refinement or
@@ -840,12 +839,12 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Given two meshes (i.e. objects of type Triangulation,
-   * DoFHandler, or hp::DoFHandler) that are based on the same coarse mesh,
-   * this function figures out a set of cells that are matched between the two
-   * meshes and where at most one of the meshes is more refined on this cell.
-   * In other words, it finds the smallest cells that are common to both
-   * meshes, and that together completely cover the domain.
+   * Given two meshes (i.e. objects of type Triangulation, DoFHandler, or
+   * hp::DoFHandler) that are based on the same coarse mesh, this function
+   * figures out a set of cells that are matched between the two meshes and
+   * where at most one of the meshes is more refined on this cell. In other
+   * words, it finds the smallest cells that are common to both meshes, and
+   * that together completely cover the domain.
    *
    * This function is useful, for example, in time-dependent or nonlinear
    * application, where one has to integrate a solution defined on one mesh
@@ -933,7 +932,7 @@ namespace GridTools
   /*@}*/
   /**
    * @name Extracting and creating patches of cells surrounding a single cell,
-   *  and creating triangulation out of them
+   * and creating triangulation out of them
    */
   /*@{*/
 
@@ -984,25 +983,24 @@ namespace GridTools
 
   /**
    * This function takes a vector of active cells (hereafter named @p
-   * patch_cells) as input argument, and returns a vector of their
-   * parent cells with the coarsest common level of refinement. In
-   * other words, find that set of cells living at the same refinement
-   * level so that all cells in the input vector are children of the
-   * cells in the set, or are in the set itself.
+   * patch_cells) as input argument, and returns a vector of their parent
+   * cells with the coarsest common level of refinement. In other words, find
+   * that set of cells living at the same refinement level so that all cells
+   * in the input vector are children of the cells in the set, or are in the
+   * set itself.
    *
-   * @tparam Container In C++, the compiler can not determine the type
-   * of <code>Container</code> from the function call. You need to
-   * specify it as an explicit template argument following the
-   * function name. This type has to satisfy the requirements of a
-   * mesh container (see
+   * @tparam Container In C++, the compiler can not determine the type of
+   * <code>Container</code> from the function call. You need to specify it as
+   * an explicit template argument following the function name. This type has
+   * to satisfy the requirements of a mesh container (see
    * @ref ConceptMeshType).
    *
-   * @param[in] patch_cells A vector of active cells for which
-   *   this function finds the parents at the coarsest common
-   *   level. This vector of cells typically results from
-   *   calling the function GridTools::get_patch_around_cell().
-   * @return A list of cells with the coarsest common level of
-   *   refinement of the input cells.
+   * @param[in] patch_cells A vector of active cells for which this function
+   * finds the parents at the coarsest common level. This vector of cells
+   * typically results from calling the function
+   * GridTools::get_patch_around_cell().
+   * @return A list of cells with the coarsest common level of refinement of
+   * the input cells.
    *
    * @author Arezou Ghesmati, Wolfgang Bangerth, 2015
    */
@@ -1011,71 +1009,65 @@ namespace GridTools
   get_cells_at_coarsest_common_level(const std::vector<typename Container::active_cell_iterator> &patch_cells);
 
   /**
-   * This function constructs a Triangulation (named @p
-   * local_triangulation) from a given vector of active cells. This
-   * vector (which we think of the cells corresponding to a "patch")
-   * contains active cells that are part of an existing global
-   * Triangulation. The goal of this function is to build a local
-   * Triangulation that contains only the active cells given in
-   * @p patch (and potentially a minimum number of additional cells
-   * required to form a valid Triangulation).
-   * The function also returns a map that allows to identify the cells in
-   * the output Triangulation and corresponding cells in the input
-   * list.
+   * This function constructs a Triangulation (named @p local_triangulation)
+   * from a given vector of active cells. This vector (which we think of the
+   * cells corresponding to a "patch") contains active cells that are part of
+   * an existing global Triangulation. The goal of this function is to build a
+   * local Triangulation that contains only the active cells given in @p patch
+   * (and potentially a minimum number of additional cells required to form a
+   * valid Triangulation). The function also returns a map that allows to
+   * identify the cells in the output Triangulation and corresponding cells in
+   * the input list.
    *
-   * The operation implemented by this function is frequently used in
-   * the definition of error estimators that need to solve "local"
-   * problems on each cell and its neighbors. A similar construction is
-   * necessary in the definition of the Clement interpolation operator
-   * in which one needs to solve a local problem on all cells within
-   * the support of a shape function. This function then builds a
-   * complete Triangulation from a list of cells that make up such a
-   * patch; one can then later attach a DoFHandler to such a
-   * Triangulation.
+   * The operation implemented by this function is frequently used in the
+   * definition of error estimators that need to solve "local" problems on
+   * each cell and its neighbors. A similar construction is necessary in the
+   * definition of the Clement interpolation operator in which one needs to
+   * solve a local problem on all cells within the support of a shape
+   * function. This function then builds a complete Triangulation from a list
+   * of cells that make up such a patch; one can then later attach a
+   * DoFHandler to such a Triangulation.
    *
-   * If the list of input cells contains only cells at the same
-   * refinement level, then the output Triangulation simply consists
-   * of a Triangulation containing only exactly these patch cells. On
-   * the other hand, if the input cells live on different refinement
-   * levels, i.e., the Triangulation of which they are part is
-   * adaptively refined, then the construction of the output
-   * Triangulation is not so simple because the coarsest level of a
-   * Triangulation can not contain hanging nodes. Rather, we first
-   * have to find the common refinement level of all input cells,
-   * along with their common parents (see
-   * GridTools::get_cells_at_coarsest_common_level()), build a
-   * Triangulation from those, and then adaptively refine it so that
+   * If the list of input cells contains only cells at the same refinement
+   * level, then the output Triangulation simply consists of a Triangulation
+   * containing only exactly these patch cells. On the other hand, if the
+   * input cells live on different refinement levels, i.e., the Triangulation
+   * of which they are part is adaptively refined, then the construction of
+   * the output Triangulation is not so simple because the coarsest level of a
+   * Triangulation can not contain hanging nodes. Rather, we first have to
+   * find the common refinement level of all input cells, along with their
+   * common parents (see GridTools::get_cells_at_coarsest_common_level()),
+   * build a Triangulation from those, and then adaptively refine it so that
    * the input cells all also exist in the output Triangulation.
    *
-   * A consequence of this procedure is that that output Triangulation
-   * may contain more active cells than the ones that exist in the
-   * input vector.  On the other hand, one typically wants to solve
-   * the local problem not on the entire output Triangulation, but
-   * only on those cells of it that correspond to cells in the input
-   * list.  In this case, a user typically wants to assign degrees of
-   * freedom only on cells that are part of the "patch", and somehow
-   * ignore those excessive cells. The current function supports this
-   * common requirement by setting the user flag for the cells in the
-   * output Triangulation that match with cells in the input
-   * list. Cells which are not part of the original patch will not
-   * have their @p user_flag set; we can then avoid assigning degrees of
-   * freedom using the FE_Nothing<dim> element.
+   * A consequence of this procedure is that that output Triangulation may
+   * contain more active cells than the ones that exist in the input vector.
+   * On the other hand, one typically wants to solve the local problem not on
+   * the entire output Triangulation, but only on those cells of it that
+   * correspond to cells in the input list.  In this case, a user typically
+   * wants to assign degrees of freedom only on cells that are part of the
+   * "patch", and somehow ignore those excessive cells. The current function
+   * supports this common requirement by setting the user flag for the cells
+   * in the output Triangulation that match with cells in the input list.
+   * Cells which are not part of the original patch will not have their @p
+   * user_flag set; we can then avoid assigning degrees of freedom using the
+   * FE_Nothing<dim> element.
    *
-   * @tparam Container In C++, the compiler can not determine the type
-   * of <code>Container</code> from the function call. You need to
-   * specify it as an explicit template argument following the
-   * function name. This type that satisfies the requirements of a
-   * mesh container (see
+   * @tparam Container In C++, the compiler can not determine the type of
+   * <code>Container</code> from the function call. You need to specify it as
+   * an explicit template argument following the function name. This type that
+   * satisfies the requirements of a mesh container (see
    * @ref ConceptMeshType).
    *
    * @param[in] patch A vector of active cells from a common triangulation.
-   *  These cells may or may not all be at the same refinement level.
+   * These cells may or may not all be at the same refinement level.
    * @param[out] local_triangulation A triangulation whose active cells
-   *  correspond to the given vector of active cells in @p patch.
-   * @param[out] patch_to_global_tria_map A map between the local triangulation
-   * which is built as explained above, and the cell iterators in the input list.
+   * correspond to the given vector of active cells in @p patch.
+   * @param[out] patch_to_global_tria_map A map between the local
+   * triangulation which is built as explained above, and the cell iterators
+   * in the input list.
    *
-   *  @author Arezou Ghesmati, Wolfgang Bangerth, 2015
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2015
    */
   template <class Container>
   void
@@ -1143,15 +1135,14 @@ namespace GridTools
 
     /**
      * A @p dim $\times$ @p dim rotation matrix that describes how vector
-     * valued DoFs of the first face should be modified prior to
-     * constraining to the DoFs of the second face.
+     * valued DoFs of the first face should be modified prior to constraining
+     * to the DoFs of the second face.
      *
-     * The rotation matrix is used in
-     * DoFTools::make_periodicity_constriants() by applying the rotation to
-     * all vector valued blocks listed in the parameter
-     * @p first_vector_components of the finite element space.
-     * For more details see DoFTools::make_periodicity_constraints() and
-     * the glossary
+     * The rotation matrix is used in DoFTools::make_periodicity_constriants()
+     * by applying the rotation to all vector valued blocks listed in the
+     * parameter @p first_vector_components of the finite element space. For
+     * more details see DoFTools::make_periodicity_constraints() and the
+     * glossary
      * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
@@ -1164,11 +1155,11 @@ namespace GridTools
    * @p face1 and @p face2 are considered equal, if a one to one matching
    * between its vertices can be achieved via an orthogonal equality relation.
    *
-   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
-   * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
+   * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal, if
+   * $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
    * direction @p direction. If the parameter @p matrix is a reference to a
-   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is
-   * the identity matrix.
+   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
+   * identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1
    * with respect to @p face2 is returned in the bitset @p orientation, where
@@ -1248,10 +1239,9 @@ namespace GridTools
 
 
   /**
-   * This function will collect periodic face pairs on the coarsest mesh
-   * level of the given @p mesh (a Triangulation or DoFHandler) and
-   * add them to the vector @p matched_pairs leaving the original contents
-   * intact.
+   * This function will collect periodic face pairs on the coarsest mesh level
+   * of the given @p mesh (a Triangulation or DoFHandler) and add them to the
+   * vector @p matched_pairs leaving the original contents intact.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id @p
    * b_id1 and a 'second' boundary consisting of all faces belonging to @p
@@ -1262,31 +1252,28 @@ namespace GridTools
    * orthogonal_equality().
    *
    * The bitset that is returned inside of PeriodicFacePair encodes the
-   * _relative_ orientation of the first face with respect to the second
-   * face, see the documentation of orthogonal_equality() for further
-   * details.
+   * _relative_ orientation of the first face with respect to the second face,
+   * see the documentation of orthogonal_equality() for further details.
    *
    * The @p direction refers to the space direction in which periodicity is
    * enforced. When maching periodic faces this vector component is ignored.
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary. This can
-   * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
+   * them to the corresponding vertices of the 'second' boundary. This can be
+   * used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
    * Optionally, a $dim\times dim$ rotation @p matrix can be specified that
    * describes how vector valued DoFs of the first face should be modified
-   * prior to constraining to the DoFs of the second face.
-   * The @p matrix is used in two places. First, @p matrix will be supplied
-   * to orthogonal_equality() and used for matching faces: Two vertices
-   * $v_1$ and $v_2$ match if
-   * $\text{matrix}\cdot v_1 + \text{offset} - v_2$
-   * is parallel to the unit vector in unit direction @p direction.
-   * (For more details see DoFTools::make_periodicity_constraints(), the
-   * glossary
+   * prior to constraining to the DoFs of the second face. The @p matrix is
+   * used in two places. First, @p matrix will be supplied to
+   * orthogonal_equality() and used for matching faces: Two vertices $v_1$ and
+   * $v_2$ match if $\text{matrix}\cdot v_1 + \text{offset} - v_2$ is parallel
+   * to the unit vector in unit direction @p direction. (For more details see
+   * DoFTools::make_periodicity_constraints(), the glossary
    * @ref GlossPeriodicConstraints "glossary entry on periodic conditions"
-   * and step-45). Second, @p matrix will be stored in the
-   * PeriodicFacePair collection @p matched_pairs for further use.
+   * and step-45). Second, @p matrix will be stored in the PeriodicFacePair
+   * collection @p matched_pairs for further use.
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
@@ -1297,9 +1284,9 @@ namespace GridTools
    * periodicity algebraically.
    *
    * @note Because elements will be added to @p matched_pairs (and existing
-   * entries will be preserved), it is possible to call this function
-   * several times with different boundary ids to generate a vector with
-   * all periodic pairs.
+   * entries will be preserved), it is possible to call this function several
+   * times with different boundary ids to generate a vector with all periodic
+   * pairs.
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
@@ -1354,11 +1341,11 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Copy boundary ids to manifold ids on faces and edges at the boundary.
-   * The default manifold_id for new Triangulation objects is
+   * Copy boundary ids to manifold ids on faces and edges at the boundary. The
+   * default manifold_id for new Triangulation objects is
    * numbers::invalid_manifold_id. This function copies the boundary_ids of
-   * the boundary faces and edges to the manifold_ids of the same faces
-   * and edges, allowing the user to change the boundary_ids and use them for
+   * the boundary faces and edges to the manifold_ids of the same faces and
+   * edges, allowing the user to change the boundary_ids and use them for
    * boundary conditions regardless of the geometry, which will use
    * manifold_ids to create new points. Only active cells will be iterated
    * over. This is a function you'd typically call when there is only one

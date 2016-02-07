@@ -24,33 +24,33 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This namespace is a collection of algorithms working on generic
- * tensorial objects (of arbitrary rank).
+ * This namespace is a collection of algorithms working on generic tensorial
+ * objects (of arbitrary rank).
  *
  * The rationale to implement such functionality in a generic fashion in a
  * separate namespace is
  *  - to easy code reusability and therefore avoid code duplication.
  *  - to have a well-defined interface that allows to exchange the low
- *    level implementation.
+ * level implementation.
  *
  *
  * A tensorial object has the notion of a rank and allows a rank-times
- * recursive application of the index operator, e.g., if <code>t</code> is
- * a tensorial object of rank 4, the following access is valid:
+ * recursive application of the index operator, e.g., if <code>t</code> is a
+ * tensorial object of rank 4, the following access is valid:
  * @code
  *   t[1][2][1][4]
  * @endcode
  *
  * deal.II has its own implementation for tensorial objects such as
- * dealii::Tensor<rank, dim, Number> and
- * dealii::SymmetricTensor<rank, dim, Number>
+ * dealii::Tensor<rank, dim, Number> and dealii::SymmetricTensor<rank, dim,
+ * Number>
  *
  * The methods and algorithms implemented in this namespace, however, are
- * fully generic. More precisely, it can operate on nested c-style arrays,
- * or on class types <code>T</code> with a minimal interface that provides
- * a local typedef <code>value_type</code> and an index operator
- * <code>operator[](unsigned int)</code> that returns a (const or
- * non-const) reference of <code>value_type</code>:
+ * fully generic. More precisely, it can operate on nested c-style arrays, or
+ * on class types <code>T</code> with a minimal interface that provides a
+ * local typedef <code>value_type</code> and an index operator
+ * <code>operator[](unsigned int)</code> that returns a (const or non-const)
+ * reference of <code>value_type</code>:
  * @code
  *   template<...>
  *   class T
@@ -81,20 +81,20 @@ namespace TensorAccessors
 
 
   /**
-   * This class provides a local typedef @p value_type denoting the
-   * resulting type of an access with operator[](unsigned int). More
-   * precisely, @p value_type will be
+   * This class provides a local typedef @p value_type denoting the resulting
+   * type of an access with operator[](unsigned int). More precisely, @p
+   * value_type will be
    *  - <code>T::value_type</code> if T is a tensorial class providing a
-   *    typedef <code>value_type</code> and does not have a const qualifier.
+   * typedef <code>value_type</code> and does not have a const qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   *    providing a typedef <code>value_type</code> and does have a const
-   *    qualifier.
+   * providing a typedef <code>value_type</code> and does have a const
+   * qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   *    providing a typedef <code>value_type</code> and does have a const
-   *    qualifier.
+   * providing a typedef <code>value_type</code> and does have a const
+   * qualifier.
    *  - <code>A</code> if T is of array type <code>A[...]</code>
    *  - <code>const A</code> if T is of array type <code>A[...]</code> and
-   *    does have a const qualifier.
+   * does have a const qualifier.
    */
   template <typename T>
   struct ValueType
@@ -122,12 +122,11 @@ namespace TensorAccessors
 
 
   /**
-   * This class provides a local typedef @p value_type that is equal to
-   * the typedef <code>value_type</code> after @p deref_steps
-   * recursive dereferences via ```operator[](unsigned int)```.
-   * Further, constness is preserved via the ValueType
-   * type trait, i.e., if T is const, ReturnType<rank, T>::value_type
-   * will also be const.
+   * This class provides a local typedef @p value_type that is equal to the
+   * typedef <code>value_type</code> after @p deref_steps recursive
+   * dereferences via ```operator[](unsigned int)```. Further, constness is
+   * preserved via the ValueType type trait, i.e., if T is const,
+   * ReturnType<rank, T>::value_type will also be const.
    */
   template <int deref_steps, typename T>
   struct ReturnType
@@ -143,17 +142,16 @@ namespace TensorAccessors
 
 
   /**
-   * Provide a "tensorial view" to a reference @p t of a tensor object of
-   * rank @p rank in which the index @p index is shifted to the
-   * end. As an example consider a tensor of 5th order in dim=5 space
-   * dimensions that can be accessed through 5 recursive
-   * <code>operator[]()</code> invocations:
+   * Provide a "tensorial view" to a reference @p t of a tensor object of rank
+   * @p rank in which the index @p index is shifted to the end. As an example
+   * consider a tensor of 5th order in dim=5 space dimensions that can be
+   * accessed through 5 recursive <code>operator[]()</code> invocations:
    * @code
    *   Tensor<5, dim> tensor;
    *   tensor[0][1][2][3][4] = 42.;
    * @endcode
-   * Index 1 (the 2nd index, count starts at 0) can now be shifted to the
-   * end via
+   * Index 1 (the 2nd index, count starts at 0) can now be shifted to the end
+   * via
    * @code
    *   auto tensor_view = reordered_index_view<1, 5>(tensor);
    *   tensor_view[0][2][3][4][1] == 42.; // is true
@@ -162,11 +160,11 @@ namespace TensorAccessors
    * example. The mechanism implemented by this function is available for
    * fairly general tensorial types @p T.
    *
-   * The purpose of this reordering facility is to be able to contract over
-   * an arbitrary index of two (or more) tensors:
+   * The purpose of this reordering facility is to be able to contract over an
+   * arbitrary index of two (or more) tensors:
    *  - reorder the indices in mind to the end of the tensors
    *  - use the contract function below that contracts the _last_ elements of
-   *    tensors.
+   * tensors.
    *
    * @note This function returns an internal class object consisting of an
    * array subscript operator <code>operator[](unsigned int)</code> and a
@@ -175,10 +173,10 @@ namespace TensorAccessors
    * @tparam index The index to be shifted to the end. Indices are counted
    * from 0, thus the valid range is $0\le\text{index}<\text{rank}$.
    * @tparam rank Rank of the tensorial object @p t
-   * @tparam T A tensorial object of rank @p rank. @p T must
-   * provide a local typedef <code>value_type</code> and an index operator
-   * <code>operator[]()</code> that returns a (const or non-const)
-   * reference of <code>value_type</code>.
+   * @tparam T A tensorial object of rank @p rank. @p T must provide a local
+   * typedef <code>value_type</code> and an index operator
+   * <code>operator[]()</code> that returns a (const or non-const) reference
+   * of <code>value_type</code>.
    *
    * @author Matthias Maier, 2015
    */
@@ -206,11 +204,11 @@ namespace TensorAccessors
    * @endcode
    * This is equivalent to <code>tensor[0][1][2][3][4] = 42.</code>.
    *
-   * @tparam T A tensorial object of rank @p rank. @p T must provide a
-   * local typedef <code>value_type</code> and an index operator
-   * <code>operator[]()</code> that returns a (const or non-const)
-   * reference of <code>value_type</code>. Further, its tensorial rank must
-   * be equal or greater than @p rank.
+   * @tparam T A tensorial object of rank @p rank. @p T must provide a local
+   * typedef <code>value_type</code> and an index operator
+   * <code>operator[]()</code> that returns a (const or non-const) reference
+   * of <code>value_type</code>. Further, its tensorial rank must be equal or
+   * greater than @p rank.
    *
    * @tparam ArrayType An array like object, such as std::array, or
    * dealii::TableIndices  that stores at least @p rank indices that can be
@@ -228,8 +226,8 @@ namespace TensorAccessors
 
   /**
    * This function contracts two tensorial objects @p left and @p right and
-   * stores the result in @p result. The contraction is done over the
-   * _last_ @p no_contr indices of both tensorial objects:
+   * stores the result in @p result. The contraction is done over the _last_
+   * @p no_contr indices of both tensorial objects:
    *
    * @f[
    *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
@@ -255,12 +253,12 @@ namespace TensorAccessors
    *                       result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
    *               }
    * @endcode
-   * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 = rank_1,
-   * and c = no_contr.
+   * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 =
+   * rank_1, and c = no_contr.
    *
-   * @note The Types @p T1, @p T2, and @p T3 must have rank
-   * rank_1 + rank_2 - 2 * no_contr, rank_1, or rank_2, respectively.
-   * Obviously, no_contr must be less or equal than rank_1 and rank_2.
+   * @note The Types @p T1, @p T2, and @p T3 must have rank rank_1 + rank_2 -
+   * 2 * no_contr, rank_1, or rank_2, respectively. Obviously, no_contr must
+   * be less or equal than rank_1 and rank_2.
    *
    * @author Matthias Maier, 2015
    */
@@ -305,9 +303,8 @@ namespace TensorAccessors
    *               result += left[i_0]..[i_] * middle[i_0]..[i_][j_0]..[j_] * right[j_0]..[j_];
    * @endcode
    *
-   * @note The Types @p T2, @p T3, and @p T4 must have
-   * rank rank_1, rank_1 + rank_2, and rank_3, respectively. @p T1
-   * must be a scalar type.
+   * @note The Types @p T2, @p T3, and @p T4 must have rank rank_1, rank_1 +
+   * rank_2, and rank_3, respectively. @p T1 must be a scalar type.
    *
    * @author Matthias Maier, 2015
    */
@@ -334,9 +331,9 @@ namespace TensorAccessors
      * function reordered_index_view(T &t).
      *
      * The problem is that when working with the actual tensorial types, we
-     * have to return subtensors by reference - but sometimes, especially
-     * for StoreIndex and ReorderedIndexView that return rvalues, we have
-     * to return by value.
+     * have to return subtensors by reference - but sometimes, especially for
+     * StoreIndex and ReorderedIndexView that return rvalues, we have to
+     * return by value.
      */
     template<typename T>
     struct ReferenceType

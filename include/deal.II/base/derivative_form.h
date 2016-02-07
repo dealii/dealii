@@ -26,29 +26,28 @@ DEAL_II_NAMESPACE_OPEN
  * functions are always used to map the reference dim-dimensional cell into
  * spacedim-dimensional space. For such objects, the first derivative of the
  * function is a linear map from ${\mathbb R}^{\text{dim}}$ to ${\mathbb
- * R}^{\text{spacedim}}$, i.e., it can be represented as a matrix
- * in ${\mathbb R}^{\text{spacedim}\times \text{dim}}$. This makes sense
- * since one would represent the first derivative, $\nabla f(\mathbf x)$
- * with $\mathbf x\in {\mathbb R}^{\text{dim}}$, in such a way that the
- * directional derivative in direction $\mathbf d\in {\mathbb R}^{\text{dim}}$
- * so that
+ * R}^{\text{spacedim}}$, i.e., it can be represented as a matrix in ${\mathbb
+ * R}^{\text{spacedim}\times \text{dim}}$. This makes sense since one would
+ * represent the first derivative, $\nabla f(\mathbf x)$ with $\mathbf x\in
+ * {\mathbb R}^{\text{dim}}$, in such a way that the directional derivative in
+ * direction $\mathbf d\in {\mathbb R}^{\text{dim}}$ so that
  * @f{align*}{
  *   \nabla f(\mathbf x) \mathbf d
  *   = \lim_{\varepsilon\rightarrow 0}
  *     \frac{f(\mathbf x + \varepsilon \mathbf d) - f(\mathbf x)}{\varepsilon},
  * @f}
  * i.e., one needs to be able to multiply the matrix $\nabla f(\mathbf x)$ by
- * a vector in ${\mathbb R}^{\text{dim}}$, and the result is a difference
- * of function values, which are in ${\mathbb R}^{\text{spacedim}}$. Consequently,
- * the matrix must be of size $\text{spacedim}\times\text{dim}$.
+ * a vector in ${\mathbb R}^{\text{dim}}$, and the result is a difference of
+ * function values, which are in ${\mathbb R}^{\text{spacedim}}$.
+ * Consequently, the matrix must be of size $\text{spacedim}\times\text{dim}$.
  *
  * Similarly, the second derivative is a bilinear map from  ${\mathbb
  * R}^{\text{dim}} \times  {\mathbb R}^{\text{dim}}$ to ${\mathbb
  * R}^{\text{spacedim}}$, which one can think of a rank-3 object of size
  * $\text{spacedim}\times\text{dim}\times\text{dim}$.
  *
- * In deal.II we represent these derivatives
- * using objects of type DerivativeForm@<1,dim,spacedim,Number@>,
+ * In deal.II we represent these derivatives using objects of type
+ * DerivativeForm@<1,dim,spacedim,Number@>,
  * DerivativeForm@<2,dim,spacedim,Number@> and so on.
  *
  * @author Sebastian Pauletti, 2011, Luca Heltai, 2015

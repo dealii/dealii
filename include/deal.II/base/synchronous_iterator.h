@@ -39,8 +39,8 @@ DEAL_II_NAMESPACE_OPEN
  * <code>std_cxx11::tuple</code> with arguments equal to the iterator types.
  *
  * The individual iterators can be accessed using
- * <code>std_cxx11::get<X>(synchronous_iterator.iterators)</code> where X is the
- * number corresponding to the desired iterator.
+ * <code>std_cxx11::get<X>(synchronous_iterator.iterators)</code> where X is
+ * the number corresponding to the desired iterator.
  *
  * This type, and the helper functions associated with it, are used as the
  * Value concept for the blocked_range type of the Threading Building Blocks.

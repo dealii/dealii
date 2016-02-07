@@ -72,9 +72,9 @@ namespace internal
   {
     /**
      * All small temporary data objects that are needed once per thread by the
-     * several functions of the error estimator are gathered in this
-     * struct. The reason for this structure is mainly that we have a number
-     * of functions that operate on cells or faces and need a number of small
+     * several functions of the error estimator are gathered in this struct.
+     * The reason for this structure is mainly that we have a number of
+     * functions that operate on cells or faces and need a number of small
      * temporary data objects. Since these functions may run in parallel, we
      * cannot make these objects member variables of the enclosing class. On
      * the other hand, declaring them locally in each of these functions would
@@ -123,11 +123,11 @@ namespace internal
 
       /**
        * A vector to store the jump of the normal vectors in the quadrature
-       * points for each of the solution vectors (i.e. a temporary
-       * value). This vector is not allocated inside the functions that use
-       * it, but rather globally, since memory allocation is slow, in
-       * particular in presence of multiple threads where synchronisation
-       * makes things even slower.
+       * points for each of the solution vectors (i.e. a temporary value).
+       * This vector is not allocated inside the functions that use it, but
+       * rather globally, since memory allocation is slow, in particular in
+       * presence of multiple threads where synchronisation makes things even
+       * slower.
        */
       std::vector<std::vector<std::vector<number> > > phi;
 
@@ -152,8 +152,8 @@ namespace internal
       std::vector<Tensor<1,spacedim> > normal_vectors;
 
       /**
-      * Normal vectors of the opposing face.
-      */
+       * Normal vectors of the opposing face.
+       */
       std::vector<Tensor<1,spacedim> > neighbor_normal_vectors;
 
       /**
@@ -483,8 +483,8 @@ namespace internal
     }
 
     /**
-     * A factor to scale the integral for the face at the boundary.
-     * Used for Neumann BC.
+     * A factor to scale the integral for the face at the boundary. Used for
+     * Neumann BC.
      */
     template <typename DoFHandlerType>
     double boundary_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
@@ -513,7 +513,7 @@ namespace internal
 
 
     /**
-     *  A factor to scale the integral for the regular face.
+     * A factor to scale the integral for the regular face.
      */
     template <typename DoFHandlerType>
     double regular_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
@@ -575,8 +575,8 @@ namespace internal
     }
 
     /**
-     * A factor used when summing up all the contribution
-     * from different faces of each cell.
+     * A factor used when summing up all the contribution from different faces
+     * of each cell.
      */
     template <typename DoFHandlerType>
     double cell_factor(const typename DoFHandlerType::active_cell_iterator &cell,
@@ -698,14 +698,9 @@ namespace internal
 
 
     /**
-     * The same applies as for the
-     * function above, except that
-     * integration is over face
-     * @p face_no of @p cell, where
-     * the respective neighbor is
-     * refined, so that the
-     * integration is a bit more
-     * complex.
+     * The same applies as for the function above, except that integration is
+     * over face @p face_no of @p cell, where the respective neighbor is
+     * refined, so that the integration is a bit more complex.
      */
     template <typename InputVector, typename DoFHandlerType>
     void

@@ -34,9 +34,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Base namespace for solver classes using the SLEPc solvers which are selected
- * based on flags passed to the eigenvalue problem solver context. Derived
- * classes set the right flags to set the right solver.
+ * Base namespace for solver classes using the SLEPc solvers which are
+ * selected based on flags passed to the eigenvalue problem solver context.
+ * Derived classes set the right flags to set the right solver.
  *
  * The SLEPc solvers are intended to be used for solving the generalized
  * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
@@ -71,8 +71,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For cases when spectral transformations are used in conjunction with
  * Krylov-type solvers or Davidson-type eigensolvers are employed one can
- * additionally specify which linear solver and preconditioner to use.
- * This can be achieved as follows
+ * additionally specify which linear solver and preconditioner to use. This
+ * can be achieved as follows
  * @code
  *   PETScWrappers::PreconditionBoomerAMG::AdditionalData data;
  *   data.symmetric_operator = true;
@@ -88,12 +88,12 @@ DEAL_II_NAMESPACE_OPEN
  *   eigensolver.solve (stiffness_matrix,mass_matrix,eigenvalues,eigenfunctions,eigenfunctions.size());
  * @endcode
  *
- * In order to support this usage case, different from PETSc wrappers, the classes
- * in this namespace are written in such a way that the underlying SLEPc objects
- * are initialized in constructors. By doing so one also avoid caching of different
- * settings (such as target eigenvalue or type of the problem); instead those are
- * applied straight away when the corresponding functions of the wrapper classes
- * are called.
+ * In order to support this usage case, different from PETSc wrappers, the
+ * classes in this namespace are written in such a way that the underlying
+ * SLEPc objects are initialized in constructors. By doing so one also avoid
+ * caching of different settings (such as target eigenvalue or type of the
+ * problem); instead those are applied straight away when the corresponding
+ * functions of the wrapper classes are called.
  *
  * An alternative implementation to the one above is to use the API internals
  * directly within the application code. In this way the calling sequence
@@ -159,8 +159,9 @@ namespace SLEPcWrappers
      * specific vector class used (i.e. local_dofs for MPI vectors). However,
      * while copying eigenvectors, at least twice the memory size of
      * <tt>eigenvectors</tt> is being used (and can be more). To avoid doing
-     * this, the fairly standard calling sequence executed here is used:
-     * Set up matrices for solving; Actually solve the system; Gather the solution(s).
+     * this, the fairly standard calling sequence executed here is used: Set
+     * up matrices for solving; Actually solve the system; Gather the
+     * solution(s).
      *
      * @note Note that the number of converged eigenvectors can be larger than
      * the number of eigenvectors requested; this is due to a round off error
@@ -214,7 +215,8 @@ namespace SLEPcWrappers
     /**
      * Set the initial vector space for the solver.
      *
-     * By default, SLEPc initializes the starting vector or the initial subspace randomly.
+     * By default, SLEPc initializes the starting vector or the initial
+     * subspace randomly.
      */
     template <typename Vector>
     void
@@ -483,7 +485,8 @@ namespace SLEPcWrappers
       EPSLanczosReorthogType reorthog;
 
       /**
-       * Constructor. By default sets the type of reorthogonalization used during the Lanczos iteration to full.
+       * Constructor. By default sets the type of reorthogonalization used
+       * during the Lanczos iteration to full.
        */
       AdditionalData(const EPSLanczosReorthogType r  = EPS_LANCZOS_REORTHOG_FULL);
     };
@@ -558,8 +561,8 @@ namespace SLEPcWrappers
     struct AdditionalData
     {
       /**
-        * Use double expansion in search subspace.
-        */
+       * Use double expansion in search subspace.
+       */
       bool double_expansion;
 
       /**

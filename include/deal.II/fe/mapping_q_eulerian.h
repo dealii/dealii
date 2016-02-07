@@ -101,8 +101,8 @@ public:
    * relative to the original positions of the cells of the triangulation.
    * @param[in] euler_vector A finite element function in the space defined by
    * the second argument. The first dim components of this function will be
-   * interpreted as the displacement we use in defining the mapping,
-   * relative to the location of cells of the underlying triangulation.
+   * interpreted as the displacement we use in defining the mapping, relative
+   * to the location of cells of the underlying triangulation.
    */
   MappingQEulerian (const unsigned int             degree,
                     const DoFHandler<dim,spacedim> &euler_dof_handler,
@@ -117,10 +117,10 @@ public:
                     const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
 
   /**
-   * Return the mapped vertices of the cell. For the current class, this function does
-   * not use the support points from the geometry of the current cell but
-   * instead evaluates an externally given displacement field in addition to
-   * the geometry of the cell.
+   * Return the mapped vertices of the cell. For the current class, this
+   * function does not use the support points from the geometry of the current
+   * cell but instead evaluates an externally given displacement field in
+   * addition to the geometry of the cell.
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
@@ -147,12 +147,12 @@ public:
 
 protected:
   /**
-   * Compute mapping-related information for a cell.
-   * See the documentation of Mapping::fill_fe_values() for
-   * a discussion of purpose, arguments, and return value of this function.
+   * Compute mapping-related information for a cell. See the documentation of
+   * Mapping::fill_fe_values() for a discussion of purpose, arguments, and
+   * return value of this function.
    *
-   * This function overrides the function in
-   * the base class since we cannot use any cell similarity for this class.
+   * This function overrides the function in the base class since we cannot
+   * use any cell similarity for this class.
    */
   virtual
   CellSimilarity::Similarity
@@ -176,9 +176,9 @@ protected:
 private:
 
   /**
-   * A class derived from MappingQGeneric that provides the generic
-   * mapping with support points on boundary objects so that the
-   * corresponding Q3 mapping ends up being C1.
+   * A class derived from MappingQGeneric that provides the generic mapping
+   * with support points on boundary objects so that the corresponding Q3
+   * mapping ends up being C1.
    */
   class MappingQEulerianGeneric : public MappingQGeneric<dim,spacedim>
   {
@@ -191,19 +191,19 @@ private:
                              const MappingQEulerian<dim,VectorType,spacedim> &mapping_q_eulerian);
 
     /**
-     * Return the mapped vertices of the cell. For the current class, this function does
-     * not use the support points from the geometry of the current cell but
-     * instead evaluates an externally given displacement field in addition to
-     * the geometry of the cell.
+     * Return the mapped vertices of the cell. For the current class, this
+     * function does not use the support points from the geometry of the
+     * current cell but instead evaluates an externally given displacement
+     * field in addition to the geometry of the cell.
      */
     virtual
     std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
     get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
     /**
-     * Compute the positions of the support points in the current configuration.
-     * See the documentation of MappingQGeneric::compute_mapping_support_points()
-     * for more information.
+     * Compute the positions of the support points in the current
+     * configuration. See the documentation of
+     * MappingQGeneric::compute_mapping_support_points() for more information.
      */
     virtual
     std::vector<Point<spacedim> >
@@ -241,8 +241,9 @@ private:
      * FEValues object used to query the the given finite element field at the
      * support points in the reference configuration.
      *
-     * The variable is marked as mutable since we have to call FEValues::reinit
-     * from compute_mapping_support_points, a function that is 'const'.
+     * The variable is marked as mutable since we have to call
+     * FEValues::reinit from compute_mapping_support_points, a function that
+     * is 'const'.
      */
     mutable FEValues<dim,spacedim> fe_values;
 

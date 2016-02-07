@@ -94,7 +94,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note The matrix #inverse_node_matrix should have dimensions zero before
  * this piece of code is executed. Only then, shape_value_component() will
- * return the raw polynomial <i>j</i> as defined in the polynomial space PolynomialType.
+ * return the raw polynomial <i>j</i> as defined in the polynomial space
+ * PolynomialType.
  *
  * <h4>Setting the transformation</h4>
  *
@@ -132,11 +133,10 @@ public:
   requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
-   * Compute the (scalar) value of shape function @p i at
-   * the given quadrature point @p p.
-   * Since the elements represented by this class are vector
-   * valued, there is no such scalar value and the function therefore
-   * throws an exception.
+   * Compute the (scalar) value of shape function @p i at the given quadrature
+   * point @p p. Since the elements represented by this class are vector
+   * valued, there is no such scalar value and the function therefore throws
+   * an exception.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
@@ -147,10 +147,9 @@ public:
                                         const unsigned int component) const;
 
   /**
-   * Compute the gradient of (scalar) shape function @p i at
-   * the given quadrature point @p p.
-   * Since the elements represented by this class are vector
-   * valued, there is no such scalar value and the function therefore
+   * Compute the gradient of (scalar) shape function @p i at the given
+   * quadrature point @p p. Since the elements represented by this class are
+   * vector valued, there is no such scalar value and the function therefore
    * throws an exception.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
@@ -162,10 +161,9 @@ public:
                                               const unsigned int component) const;
 
   /**
-   * Compute the Hessian of (scalar) shape function @p i at
-   * the given quadrature point @p p.
-   * Since the elements represented by this class are vector
-   * valued, there is no such scalar value and the function therefore
+   * Compute the Hessian of (scalar) shape function @p i at the given
+   * quadrature point @p p. Since the elements represented by this class are
+   * vector valued, there is no such scalar value and the function therefore
    * throws an exception.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
@@ -370,10 +368,10 @@ protected:
     Table<2,DerivativeForm<1, dim, spacedim> > shape_grads;
 
     /**
-        * Array with shape function hessians in quadrature points. There is one
-        * row for each shape function, containing values for each quadrature
-        * point.
-        */
+     * Array with shape function hessians in quadrature points. There is one
+     * row for each shape function, containing values for each quadrature
+     * point.
+     */
     Table<2,DerivativeForm<2, dim, spacedim> > shape_grad_grads;
 
     /**
@@ -392,7 +390,8 @@ protected:
 
 
   /**
-   * The polynomial space. Its type is given by the template parameter PolynomialType.
+   * The polynomial space. Its type is given by the template parameter
+   * PolynomialType.
    */
   PolynomialType poly_space;
 

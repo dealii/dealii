@@ -76,11 +76,11 @@ class PreconditionIdentity;
  * @see Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.3
  * for details.
  *
- * The coefficients, eigenvalues and condition number (computed as the ratio of
- * the largest over smallest eigenvalue) can be obtained by connecting a
- * function as a slot to the solver using one of the functions
- * @p connect_coefficients_slot, @p connect_eigenvalues_slot and
- * @p connect_condition_number_slot. These slots will then be called from the
+ * The coefficients, eigenvalues and condition number (computed as the ratio
+ * of the largest over smallest eigenvalue) can be obtained by connecting a
+ * function as a slot to the solver using one of the functions @p
+ * connect_coefficients_slot, @p connect_eigenvalues_slot and @p
+ * connect_condition_number_slot. These slots will then be called from the
  * solver with the estimates as argument.
  *
  * @deprecated Alternatively these estimates can be written to deallog by
@@ -185,29 +185,28 @@ public:
   /**
    * Connect a slot to retrieve the CG coefficients. The slot will be called
    * with alpha as the first argument and with beta as the second argument,
-   * where alpha and beta follow the notation in
-   * Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.
-   * Called once per iteration
+   * where alpha and beta follow the notation in Y. Saad: "Iterative methods
+   * for Sparse Linear Systems", section 6.7. Called once per iteration
    */
   boost::signals2::connection
   connect_coefficients_slot(
     const std_cxx11::function<void (double,double)> &slot);
 
   /**
-   * Connect a slot to retrieve the estimated condition number.
-   * Called on each iteration if every_iteration=true, otherwise called once
-   * when iterations are ended (i.e., either because convergence has been
-   * achieved, or because divergence has been detected).
+   * Connect a slot to retrieve the estimated condition number. Called on each
+   * iteration if every_iteration=true, otherwise called once when iterations
+   * are ended (i.e., either because convergence has been achieved, or because
+   * divergence has been detected).
    */
   boost::signals2::connection
   connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
                                 const bool every_iteration=false);
 
   /**
-   * Connect a slot to retrieve the estimated eigenvalues.
-   * Called on each iteration if every_iteration=true, otherwise called once
-   * when iterations are ended (i.e., either because convergence has been
-   * achieved, or because divergence has been detected).
+   * Connect a slot to retrieve the estimated eigenvalues. Called on each
+   * iteration if every_iteration=true, otherwise called once when iterations
+   * are ended (i.e., either because convergence has been achieved, or because
+   * divergence has been detected).
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
@@ -232,8 +231,8 @@ protected:
                              const VectorType   &d) const;
 
   /**
-   * Estimates the eigenvalues from diagonal and offdiagonal. Uses
-   * these estimate to compute the condition number. Calls the signals
+   * Estimates the eigenvalues from diagonal and offdiagonal. Uses these
+   * estimate to compute the condition number. Calls the signals
    * eigenvalues_signal and cond_signal with these estimates as arguments.
    * Outputs the eigenvalues/condition-number to deallog if
    * log_eigenvalues/log_cond is true.
@@ -269,32 +268,31 @@ protected:
   AdditionalData additional_data;
 
   /**
-   * Signal used to retrieve the CG coefficients.
-   * Called on each iteration.
+   * Signal used to retrieve the CG coefficients. Called on each iteration.
    */
   boost::signals2::signal<void (double,double)> coefficients_signal;
 
   /**
-   * Signal used to retrieve the estimated condition number.
-   * Called once when all iterations are ended.
+   * Signal used to retrieve the estimated condition number. Called once when
+   * all iterations are ended.
    */
   boost::signals2::signal<void (double)> condition_number_signal;
 
   /**
-   * Signal used to retrieve the estimated condition numbers.
-   * Called on each iteration.
+   * Signal used to retrieve the estimated condition numbers. Called on each
+   * iteration.
    */
   boost::signals2::signal<void (double)> all_condition_numbers_signal;
 
   /**
-   * Signal used to retrieve the estimated eigenvalues.
-   * Called once when all iterations are ended.
+   * Signal used to retrieve the estimated eigenvalues. Called once when all
+   * iterations are ended.
    */
   boost::signals2::signal<void (const std::vector<double> &)> eigenvalues_signal;
 
   /**
-   * Signal used to retrieve the estimated eigenvalues.
-   * Called on each iteration.
+   * Signal used to retrieve the estimated eigenvalues. Called on each
+   * iteration.
    */
   boost::signals2::signal<void (const std::vector<double> &)> all_eigenvalues_signal;
 

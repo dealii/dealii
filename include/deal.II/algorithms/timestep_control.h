@@ -141,7 +141,7 @@ namespace Algorithms
      * stepping strategy.
      *
      * @param[in] step The size of the first step, which may be overwritten by
-     *   the time stepping strategy.
+     * the time stepping strategy.
      */
     void start_step (const double step);
 

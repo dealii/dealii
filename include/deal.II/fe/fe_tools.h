@@ -297,8 +297,8 @@ namespace FETools
    * @param isotropic_only Set to <code>true</code> if you only want to
    * compute matrices for isotropic refinement.
    *
-   * @param threshold is the gap allowed in the least squares
-   * algorithm computing the embedding.
+   * @param threshold is the gap allowed in the least squares algorithm
+   * computing the embedding.
    */
   template <int dim, typename number, int spacedim>
   void compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
@@ -321,8 +321,8 @@ namespace FETools
    * @param face_fine The number of the face on the refined side of the face
    * for which this is computed.
    *
-   * @param threshold is the gap allowed in the least squares
-   * algorithm computing the embedding.
+   * @param threshold is the gap allowed in the least squares algorithm
+   * computing the embedding.
    *
    * @warning This function will be used in computing constraint matrices. It
    * is not sufficiently tested yet.

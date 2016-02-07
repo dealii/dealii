@@ -112,19 +112,17 @@ public:
    *
    * The number of points requested is given by the size of the vector @p
    * points. It is the task of derived classes to arrange the points in
-   * approximately equal distances along the length of the line
-   * segment on the boundary bounded by the vertices of the first
-   * argument.
+   * approximately equal distances along the length of the line segment on the
+   * boundary bounded by the vertices of the first argument.
    *
-   * Among other places in the library, this function is called by
-   * the Mapping classes, for example the @p MappingQGeneric class. On
-   * the other hand, not all mapping classes actually require intermediate
-   * points on lines (for example, $Q_1$ mappings do not). Consequently
-   * this function is not made pure virtual, to allow users to define
-   * their own boundary classes without having to overload this function.
-   * However, the default implementation throws an error in any case and
-   * can, consequently, not be used if you use a mapping that does need
-   * the information provided by this function.
+   * Among other places in the library, this function is called by the Mapping
+   * classes, for example the @p MappingQGeneric class. On the other hand, not
+   * all mapping classes actually require intermediate points on lines (for
+   * example, $Q_1$ mappings do not). Consequently this function is not made
+   * pure virtual, to allow users to define their own boundary classes without
+   * having to overload this function. However, the default implementation
+   * throws an error in any case and can, consequently, not be used if you use
+   * a mapping that does need the information provided by this function.
    */
   virtual
   void
@@ -142,15 +140,14 @@ public:
    * to arrange the points such they split the quad into <tt>(m+1)(m+1)</tt>
    * approximately equal-sized subquads.
    *
-   * Among other places in the library, this function is called by
-   * the Mapping classes, for example the @p MappingQGeneric class. On
-   * the other hand, not all mapping classes actually require intermediate
-   * points on quads (for example, $Q_1$ mappings do not). Consequently
-   * this function is not made pure virtual, to allow users to define
-   * their own boundary classes without having to overload this function.
-   * However, the default implementation throws an error in any case and
-   * can, consequently, not be used if you use a mapping that does need
-   * the information provided by this function.
+   * Among other places in the library, this function is called by the Mapping
+   * classes, for example the @p MappingQGeneric class. On the other hand, not
+   * all mapping classes actually require intermediate points on quads (for
+   * example, $Q_1$ mappings do not). Consequently this function is not made
+   * pure virtual, to allow users to define their own boundary classes without
+   * having to overload this function. However, the default implementation
+   * throws an error in any case and can, consequently, not be used if you use
+   * a mapping that does need the information provided by this function.
    */
   virtual
   void

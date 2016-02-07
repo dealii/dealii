@@ -101,10 +101,10 @@ public:
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**
-   * Return the mapped vertices of the cell. For the current class, this function does
-   * not use the support points from the geometry of the current cell but
-   * instead evaluates an externally given displacement field in addition to
-   * the geometry of the cell.
+   * Return the mapped vertices of the cell. For the current class, this
+   * function does not use the support points from the geometry of the current
+   * cell but instead evaluates an externally given displacement field in
+   * addition to the geometry of the cell.
    */
   virtual
   std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
@@ -133,12 +133,12 @@ public:
 
 protected:
   /**
-   * Compute mapping-related information for a cell.
-   * See the documentation of Mapping::fill_fe_values() for
-   * a discussion of purpose, arguments, and return value of this function.
+   * Compute mapping-related information for a cell. See the documentation of
+   * Mapping::fill_fe_values() for a discussion of purpose, arguments, and
+   * return value of this function.
    *
-   * This function overrides the function in
-   * the base class since we cannot use any cell similarity for this class.
+   * This function overrides the function in the base class since we cannot
+   * use any cell similarity for this class.
    */
   virtual
   CellSimilarity::Similarity
@@ -149,10 +149,10 @@ protected:
                   internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
 
   /**
-   * Compute the support points of the mapping. For the current class, these are
-   * the vertices, as obtained by calling Mapping::get_vertices().
-   * See the documentation of MappingQGeneric::compute_mapping_support_points()
-   * for more information.
+   * Compute the support points of the mapping. For the current class, these
+   * are the vertices, as obtained by calling Mapping::get_vertices(). See the
+   * documentation of MappingQGeneric::compute_mapping_support_points() for
+   * more information.
    */
   virtual
   std::vector<Point<spacedim> >

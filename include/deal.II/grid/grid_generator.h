@@ -65,10 +65,10 @@ namespace GridGenerator
    *
    * @image html hyper_cubes.png
    *
-   * If @p dim < @p spacedim, this will create a @p dim dimensional object
-   * in the first @p dim coordinate directions embedded into the @p spacedim
-   * dimensional space with the remaining entries set to zero. For example,
-   * a <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object in
+   * the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example, a
+   * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
    * See also subdivided_hyper_cube() for a coarse mesh consisting of several
    * cells. See hyper_rectangle(), if different lengths in different ordinate
@@ -95,12 +95,13 @@ namespace GridGenerator
    * @image html simplex_2d.png
    * @image html simplex_3d.png
    *
-   * @param tria The Triangulation to create. It needs to be empty upon calling this
-   * function.
+   * @param tria The Triangulation to create. It needs to be empty upon
+   * calling this function.
    *
    * @param vertices The dim+1 corners of the simplex.
    *
-   * @note Implemented for <tt>Triangulation@<2,2@></tt>, <tt>Triangulation@<3,3@></tt>.
+   * @note Implemented for <tt>Triangulation@<2,2@></tt>,
+   * <tt>Triangulation@<3,3@></tt>.
    *
    * @author Guido Kanschat
    * @date 2015
@@ -115,10 +116,10 @@ namespace GridGenerator
    * cells. Thus, the number of cells filling the given volume is
    * <tt>repetitions<sup>dim</sup></tt>.
    *
-   * If @p dim < @p spacedim, this will create a @p dim dimensional object
-   * in the first @p dim coordinate directions embedded into the @p spacedim
-   * dimensional space with the remaining entries set to zero. For example,
-   * a <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object in
+   * the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example, a
+   * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -141,11 +142,11 @@ namespace GridGenerator
    * 2<sup>i</sup>. For instance, the center point (1,-1,1) yields a material
    * id 5.
    *
-   * If @p dim < @p spacedim, this will create a @p dim dimensional object
-   * in the first @p dim coordinate directions embedded into the @p spacedim
-   * dimensional space with the remaining entries set to zero. For example,
-   * a <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with z=0,
-   * defined by the two opposing corners @p p1 and @p p2.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object in
+   * the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example, a
+   * <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with
+   * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -181,20 +182,20 @@ namespace GridGenerator
    * be true. That means the boundary indicator is 0 on the left and 1 on the
    * right.  See step-15 for details.
    *
-   * If @p dim < @p spacedim, this will create a @p dim dimensional object
-   * in the first @p dim coordinate directions embedded into the @p spacedim
-   * dimensional space with the remaining entries set to zero. For example,
-   * a <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with z=0,
-   * defined by the two opposing corners @p p1 and @p p2.
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object in
+   * the first @p dim coordinate directions embedded into the @p spacedim
+   * dimensional space with the remaining entries set to zero. For example, a
+   * <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with
+   * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
    * @note For an example of the use of this function see the step-28 tutorial
    * program.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon calling this
-   * function.
+   * @param tria The Triangulation to create. It needs to be empty upon
+   * calling this function.
    *
-   * @param repetitions A vector of dim positive values denoting the number of cells
-   * to generate in that direction.
+   * @param repetitions A vector of dim positive values denoting the number of
+   * cells to generate in that direction.
    *
    * @param p1 First corner point.
    *
@@ -267,15 +268,14 @@ namespace GridGenerator
    *
    * @image html cheese_2d.png
    *
-   * If @p dim < @p spacedim, this will create a @p dim dimensional object
-   * in the first @p dim coordinate directions embedded into the @p spacedim
+   * If @p dim < @p spacedim, this will create a @p dim dimensional object in
+   * the first @p dim coordinate directions embedded into the @p spacedim
    * dimensional space with the remaining entries set to zero.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon calling this
-   * function.
+   * @param tria The Triangulation to create. It needs to be empty upon
+   * calling this function.
    *
    * @param holes Positive number of holes in each of the dim directions.
-
    * @author Guido Kanschat
    * @date 2015
    */
@@ -358,17 +358,17 @@ namespace GridGenerator
   /**
    * A subdivided parallelepiped.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon calling this
-   * function.
+   * @param tria The Triangulation to create. It needs to be empty upon
+   * calling this function.
    *
    * @param origin First corner of the parallelepiped.
    *
-   * @param edges An array of @p dim tensors describing the length and direction of the edges
-   * from @p origin.
+   * @param edges An array of @p dim tensors describing the length and
+   * direction of the edges from @p origin.
    *
-   * @param subdivisions Number of subdivisions in each of the dim directions. Each
-   * entry must be positive. An empty vector is equivalent to one subdivision in
-   * each direction.
+   * @param subdivisions Number of subdivisions in each of the dim directions.
+   * Each entry must be positive. An empty vector is equivalent to one
+   * subdivision in each direction.
    *
    * @param colorize Assign different boundary ids if set to true.
    *
@@ -430,38 +430,36 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
-    * dimensions.
-    * This function only exists for dim+1=spacedim in 2 and 3 space
-    * dimensions.
-    *
-    * You should attach a SphericalManifold to the cells and faces for correct
-    * placement of vertices upon refinement and to be able to use higher order
-    * mappings.
-    *
-    * The following pictures are generated with:
-    * @code
-    * Triangulation<2,3>   triangulation;
-    *
-    * static SphericalManifold<2,3> surface_description;
-    *
-    * GridGenerator::hyper_sphere(triangulation);
-    *
-    * triangulation.set_all_manifold_ids(0);
-    * triangulation.set_manifold (0, surface_description);
-    * triangulation.refine_global(3);
-    * @endcode
-    *
-    * See the
-    * @ref manifold "documentation module on manifolds"
-    * for
-    * more details.
-    *
+   * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
+   * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
+   * dimensions.
+   *
+   * You should attach a SphericalManifold to the cells and faces for correct
+   * placement of vertices upon refinement and to be able to use higher order
+   * mappings.
+   *
+   * The following pictures are generated with:
+   * @code
+   * Triangulation<2,3>   triangulation;
+   *
+   * static SphericalManifold<2,3> surface_description;
+   *
+   * GridGenerator::hyper_sphere(triangulation);
+   *
+   * triangulation.set_all_manifold_ids(0);
+   * triangulation.set_manifold (0, surface_description);
+   * triangulation.refine_global(3);
+   * @endcode
+   *
+   * See the
+   * @ref manifold "documentation module on manifolds"
+   * for more details.
+   *
    * @image html sphere.png
    * @image html sphere_section.png
-    *
-    * @note The triangulation needs to be void upon calling this function.
-    */
+   *
+   * @note The triangulation needs to be void upon calling this function.
+   */
 
   template <int dim, int spacedim>
   void hyper_sphere (Triangulation<dim,spacedim> &tria,
@@ -629,28 +627,28 @@ namespace GridGenerator
    *
    * You should attach a SphericalManifold to the cells and faces for correct
    * placement of vertices upon refinement and to be able to use higher order
-   * mappings. Alternatively, it is also possible to attach a HyperShellBoundary
-   * to the inner and outer boundary. This will create inferior meshes as
-   * described below.
+   * mappings. Alternatively, it is also possible to attach a
+   * HyperShellBoundary to the inner and outer boundary. This will create
+   * inferior meshes as described below.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only certain numbers are allowed, 6 (or the default 0) for a surface based on a
-   * hexahedron (i.e. 6 panels on the inner sphere extruded in radial
-   * direction to form 6 cells), 12 for the rhombic dodecahedron, and 96 (see
-   * below).
+   * In 3d, only certain numbers are allowed, 6 (or the default 0) for a
+   * surface based on a hexahedron (i.e. 6 panels on the inner sphere extruded
+   * in radial direction to form 6 cells), 12 for the rhombic dodecahedron,
+   * and 96 (see below).
    *
-   * While the SphericalManifold, that is demonstrated in the documentation of the
+   * While the SphericalManifold, that is demonstrated in the documentation of
+   * the
    * @ref manifold "documentation module on manifolds",
-   * creates reasonable meshes
-   * for any number of @p n_cells if attached to all cells and boundaries, the
-   * situation is less than ideal when only attaching a HyperShellBoundary. Then,
-   * only vertices on the boundaries are placed at the correct distance from the
-   * center. As an example, the 3d meshes give rise to the following meshes
-   * upon one refinement:
+   * creates reasonable meshes for any number of @p n_cells if attached to all
+   * cells and boundaries, the situation is less than ideal when only
+   * attaching a HyperShellBoundary. Then, only vertices on the boundaries are
+   * placed at the correct distance from the center. As an example, the 3d
+   * meshes give rise to the following meshes upon one refinement:
    *
    * @image html hypershell3d-6.png
    * @image html hypershell3d-12.png
@@ -956,8 +954,8 @@ namespace GridGenerator
    * the corresponding side walls in z direction. The bottom and top get the
    * next two free boundary indicators.
    *
-   * @note The 2d input triangulation @p input must be a coarse mesh that
-   * has no refined cells.
+   * @note The 2d input triangulation @p input must be a coarse mesh that has
+   * no refined cells.
    */
   void
   extrude_triangulation (const Triangulation<2, 2> &input,
@@ -998,7 +996,8 @@ namespace GridGenerator
   ///@}
 
   /**
-   * @name Creating lower-dimensional meshes from parts of higher-dimensional meshes
+   * @name Creating lower-dimensional meshes from parts of higher-dimensional
+   * meshes
    */
   ///@{
 
@@ -1045,41 +1044,40 @@ namespace GridGenerator
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
-   * The map that is returned will be
-   * between cell iterators pointing into the container describing the surface
-   * mesh and face iterators of the volume mesh container. If MeshType is
-   * DoFHandler or hp::DoFHandler, then the function will re-build the
-   * triangulation underlying the second argument and return a map between
-   * appropriate iterators into the MeshType arguments. However, the function
-   * will not actually distribute degrees of freedom on this newly created
-   * surface mesh.
+   * The map that is returned will be between cell iterators pointing into the
+   * container describing the surface mesh and face iterators of the volume
+   * mesh container. If MeshType is DoFHandler or hp::DoFHandler, then the
+   * function will re-build the triangulation underlying the second argument
+   * and return a map between appropriate iterators into the MeshType
+   * arguments. However, the function will not actually distribute degrees of
+   * freedom on this newly created surface mesh.
    *
-   * @tparam dim The dimension of the cells of the volume mesh. For example, if
-   *   dim==2, then the cells are quadrilaterals that either live in the
-   *   plane, or form a surface in a higher-dimensional space. The dimension
-   *   of the cells of the surface mesh is consequently dim-1.
+   * @tparam dim The dimension of the cells of the volume mesh. For example,
+   * if dim==2, then the cells are quadrilaterals that either live in the
+   * plane, or form a surface in a higher-dimensional space. The dimension of
+   * the cells of the surface mesh is consequently dim-1.
    * @tparam spacedim The dimension of the space in which both the volume and
-   *   the surface mesh live.
+   * the surface mesh live.
    *
    * @param[in] volume_mesh A container of cells that define the volume mesh.
-   * @param[out] surface_mesh A container whose associated triangulation
-   *   will be built to consist of the cells that correspond to the (selected
-   *   portion of) the boundary of the volume mesh.
-   * @param[in] boundary_ids A list of boundary indicators denoting that subset
-   *   of faces of volume cells for which this function should extract
-   *   the surface mesh. If left at its default, i.e., if the set is empty,
-   *   then the function operates on <i>all</i> boundary faces.
+   * @param[out] surface_mesh A container whose associated triangulation will
+   * be built to consist of the cells that correspond to the (selected portion
+   * of) the boundary of the volume mesh.
+   * @param[in] boundary_ids A list of boundary indicators denoting that
+   * subset of faces of volume cells for which this function should extract
+   * the surface mesh. If left at its default, i.e., if the set is empty, then
+   * the function operates on <i>all</i> boundary faces.
    *
    * @return A map that for each cell of the surface mesh (key) returns an
-   *   iterator to the corresponding face of a cell of the volume mesh (value).
-   *   The keys include both active and non-active cells of the surface mesh.
-   *   For dim=2 (i.e., where volume cells are quadrilaterals and surface
-   *   cells are lines), the order of vertices of surface cells and the
-   *   corresponding volume faces match. For dim=3 (i.e., where volume cells
-   *   are hexahedra and surface cells are quadrilaterals), the order of
-   *   vertices may not match in order to ensure that each surface cell
-   *   has a right-handed coordinate system when viewed from one of the
-   *   two sides of the surface connecting the cells of the surface mesh.
+   * iterator to the corresponding face of a cell of the volume mesh (value).
+   * The keys include both active and non-active cells of the surface mesh.
+   * For dim=2 (i.e., where volume cells are quadrilaterals and surface cells
+   * are lines), the order of vertices of surface cells and the corresponding
+   * volume faces match. For dim=3 (i.e., where volume cells are hexahedra and
+   * surface cells are quadrilaterals), the order of vertices may not match in
+   * order to ensure that each surface cell has a right-handed coordinate
+   * system when viewed from one of the two sides of the surface connecting
+   * the cells of the surface mesh.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as

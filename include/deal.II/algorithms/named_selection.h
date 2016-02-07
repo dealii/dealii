@@ -58,9 +58,8 @@ public:
 
 
   /**
-   * Return the corresponding index in the AnyData object supplied to the
-   * last initialize(). It is an error if initialize() has not been called
-   * before.
+   * Return the corresponding index in the AnyData object supplied to the last
+   * initialize(). It is an error if initialize() has not been called before.
    *
    * Indices are in the same order as the calls to add().
    */

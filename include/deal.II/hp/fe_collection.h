@@ -68,23 +68,23 @@ namespace hp
     explicit FECollection (const FiniteElement<dim,spacedim> &fe);
 
     /**
-     * Constructor. This constructor creates a FECollection from two
-     * finite elements.
+     * Constructor. This constructor creates a FECollection from two finite
+     * elements.
      */
     FECollection (const FiniteElement<dim,spacedim> &fe1,
                   const FiniteElement<dim,spacedim> &fe2);
 
     /**
-     * Constructor. This constructor creates a FECollection from three
-     * finite elements.
+     * Constructor. This constructor creates a FECollection from three finite
+     * elements.
      */
     FECollection (const FiniteElement<dim,spacedim> &fe1,
                   const FiniteElement<dim,spacedim> &fe2,
                   const FiniteElement<dim,spacedim> &fe3);
 
     /**
-     * Constructor. This constructor creates a FECollection from four
-     * finite elements.
+     * Constructor. This constructor creates a FECollection from four finite
+     * elements.
      */
     FECollection (const FiniteElement<dim,spacedim> &fe1,
                   const FiniteElement<dim,spacedim> &fe2,
@@ -92,8 +92,8 @@ namespace hp
                   const FiniteElement<dim,spacedim> &fe4);
 
     /**
-     * Constructor. This constructor creates a FECollection from five
-     * finite elements.
+     * Constructor. This constructor creates a FECollection from five finite
+     * elements.
      */
     FECollection (const FiniteElement<dim,spacedim> &fe1,
                   const FiniteElement<dim,spacedim> &fe2,
@@ -102,12 +102,11 @@ namespace hp
                   const FiniteElement<dim,spacedim> &fe5);
 
     /**
-     * Constructor. Same as above but for any number of elements. Pointers
-     * to the elements are passed in a vector to this constructor.
-     * As above, the finite element objects pointed to by the argument are
-     * not actually used other than to create copies internally. Consequently,
-     * you can delete these pointers immediately again after calling this
-     * constructor.
+     * Constructor. Same as above but for any number of elements. Pointers to
+     * the elements are passed in a vector to this constructor. As above, the
+     * finite element objects pointed to by the argument are not actually used
+     * other than to create copies internally. Consequently, you can delete
+     * these pointers immediately again after calling this constructor.
      */
     FECollection (const std::vector<const FiniteElement<dim,spacedim>*> &fes);
 
@@ -233,25 +232,25 @@ namespace hp
 
     /**
      * Try to find a least dominant finite element inside this FECollection
-     * which dominates other finite elements provided as fe_indices in @p fes .
-     * For example, if FECollection consists of {Q1,Q2,Q3,Q4} and we are looking
-     * for the least dominant FE for Q3 and Q4 (@p fes is {2,3}), then the
-     * answer is Q3 and therefore this function will return its index in
+     * which dominates other finite elements provided as fe_indices in @p fes
+     * . For example, if FECollection consists of {Q1,Q2,Q3,Q4} and we are
+     * looking for the least dominant FE for Q3 and Q4 (@p fes is {2,3}), then
+     * the answer is Q3 and therefore this function will return its index in
      * FECollection, namely 2.
      *
      * For the purpose of this function by domination we consider either
      * this_element_dominate or either_element_can_dominate ; therefore the
-     * element can dominate itself. Thus if FECollection contains {Q1,Q2,Q4,Q3}
-     * and @p fes = {3}, the function returns 3.
+     * element can dominate itself. Thus if FECollection contains
+     * {Q1,Q2,Q4,Q3} and @p fes = {3}, the function returns 3.
      *
      * If we were not able to find a finite element, the function returns
      * numbers::invalid_unsigned_int .
      *
-     * Note that for the cases like when FECollection consists of
-     * {FE_Nothing x FE_Nothing, Q1xQ2, Q2xQ1} with @p fes = {1}, the function
-     * will not find the most dominating element as the default behavior of
-     * FE_Nothing is to return FiniteElementDomination::no_requirements when
-     * comparing for face domination. This, therefore, can't be considered as a
+     * Note that for the cases like when FECollection consists of {FE_Nothing
+     * x FE_Nothing, Q1xQ2, Q2xQ1} with @p fes = {1}, the function will not
+     * find the most dominating element as the default behavior of FE_Nothing
+     * is to return FiniteElementDomination::no_requirements when comparing
+     * for face domination. This, therefore, can't be considered as a
      * dominating element in the sense described above .
      */
     unsigned int

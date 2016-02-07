@@ -39,53 +39,47 @@ template <int,int> class MappingQ;
 
 
 /**
- * This class implements the functionality for polynomial mappings
- * $Q_p$ of polynomial degree $p$ that will be used on all cells of
- * the mesh. The MappingQ1 and MappingQ classes specialize this
- * behavior slightly.
+ * This class implements the functionality for polynomial mappings $Q_p$ of
+ * polynomial degree $p$ that will be used on all cells of the mesh. The
+ * MappingQ1 and MappingQ classes specialize this behavior slightly.
  *
- * The class is poorly named. It should really have been called
- * MappingQ because it consistently uses $Q_p$ mappings on all cells
- * of a triangulation. However, the name MappingQ was already taken
- * when we rewrote the entire class hierarchy for mappings. One might
- * argue that one should always use MappingQGeneric over the existing
- * class MappingQ (which, unless explicitly specified during the
- * construction of the object, only uses mappings of degree $p$ <i>on
- * cells at the boundary of the domain</i>). On the other hand, there
- * are good reasons to use MappingQ in many situations: in many
- * situations, curved domains are only provided with information about
- * how exactly edges at the boundary are shaped, but we do not know
- * anything about internal edges. Thus, in the absence of other
- * information, we can only assume that internal edges are straight
- * lines, and in that case internal cells may as well be treated is
- * bilinear quadrilaterals or trilinear hexahedra. (An example of how
- * such meshes look is shown in step-1 already, but it is also
- * discussed in the "Results" section of step-6.)  Because
- * bi-/trilinear mappings are significantly cheaper to compute than
- * higher order mappings, it is advantageous in such situations to use
- * the higher order mapping only on cells at the boundary of the
- * domain -- i.e., the behavior of MappingQ. Of course,
- * MappingQGeneric also uses bilinear mappings for interior cells as
- * long as it has no knowledge about curvature of interior edges, but
- * it implements this the expensive way: as a general $Q_p$ mapping
- * where the mapping support points just <i>happen</i> to be arranged
- * along linear or bilinear edges or faces.
+ * The class is poorly named. It should really have been called MappingQ
+ * because it consistently uses $Q_p$ mappings on all cells of a
+ * triangulation. However, the name MappingQ was already taken when we rewrote
+ * the entire class hierarchy for mappings. One might argue that one should
+ * always use MappingQGeneric over the existing class MappingQ (which, unless
+ * explicitly specified during the construction of the object, only uses
+ * mappings of degree $p$ <i>on cells at the boundary of the domain</i>). On
+ * the other hand, there are good reasons to use MappingQ in many situations:
+ * in many situations, curved domains are only provided with information about
+ * how exactly edges at the boundary are shaped, but we do not know anything
+ * about internal edges. Thus, in the absence of other information, we can
+ * only assume that internal edges are straight lines, and in that case
+ * internal cells may as well be treated is bilinear quadrilaterals or
+ * trilinear hexahedra. (An example of how such meshes look is shown in step-1
+ * already, but it is also discussed in the "Results" section of step-6.)
+ * Because bi-/trilinear mappings are significantly cheaper to compute than
+ * higher order mappings, it is advantageous in such situations to use the
+ * higher order mapping only on cells at the boundary of the domain -- i.e.,
+ * the behavior of MappingQ. Of course, MappingQGeneric also uses bilinear
+ * mappings for interior cells as long as it has no knowledge about curvature
+ * of interior edges, but it implements this the expensive way: as a general
+ * $Q_p$ mapping where the mapping support points just <i>happen</i> to be
+ * arranged along linear or bilinear edges or faces.
  *
  * There are a number of special cases worth considering:
  * - If you really want to use a higher order mapping for all cells,
- *   you can do this using the current class, but this only makes
- *   sense if you can actually provide information about how interior
- *   edges and faces of the mesh should be curved. This is typically
- *   done by associating a Manifold with interior cells and
- *   edges. A simple example of this is discussed in the "Results"
- *   section of step-6; a full discussion of manifolds is provided in
- *   step-53.
+ * you can do this using the current class, but this only makes sense if you
+ * can actually provide information about how interior edges and faces of the
+ * mesh should be curved. This is typically done by associating a Manifold
+ * with interior cells and edges. A simple example of this is discussed in the
+ * "Results" section of step-6; a full discussion of manifolds is provided in
+ * step-53.
  * - If you are working on meshes that describe a (curved) manifold
- *   embedded in higher space dimensions, i.e., if dim!=spacedim, then
- *   every cell is at the boundary of the domain you will likely
- *   already have attached a manifold object to all cells that can
- *   then also be used by the mapping classes for higher order
- *   mappings.
+ * embedded in higher space dimensions, i.e., if dim!=spacedim, then every
+ * cell is at the boundary of the domain you will likely already have attached
+ * a manifold object to all cells that can then also be used by the mapping
+ * classes for higher order mappings.
  *
  *
  * @author Wolfgang Bangerth, 2015
@@ -95,9 +89,9 @@ class MappingQGeneric : public Mapping<dim,spacedim>
 {
 public:
   /**
-   * Constructor.  @p polynomial_degree denotes the polynomial degree
-   * of the polynomials that are used to map cells from the reference
-   * to the real cell.
+   * Constructor.  @p polynomial_degree denotes the polynomial degree of the
+   * polynomials that are used to map cells from the reference to the real
+   * cell.
    */
   MappingQGeneric (const unsigned int polynomial_degree);
 
@@ -117,8 +111,8 @@ public:
   unsigned int get_degree () const;
 
   /**
-   * Always returns @p true because the default implementation of
-   * functions in this class preserves vertex locations.
+   * Always returns @p true because the default implementation of functions in
+   * this class preserves vertex locations.
    */
   virtual
   bool preserves_vertex_locations () const;
@@ -203,30 +197,29 @@ public:
    * Storage for internal data of polynomial mappings. See
    * Mapping::InternalDataBase for an extensive description.
    *
-   * For the current class, the InternalData class stores
-   * data that is computed once when the object is created
-   * (in get_data()) as well as data the class wants to store from between
-   * the call to fill_fe_values(), fill_fe_face_values(), or
-   * fill_fe_subface_values() until possible later calls from the finite
-   * element to functions such as transform(). The latter class of
-   * member variables are marked as 'mutable'.
+   * For the current class, the InternalData class stores data that is
+   * computed once when the object is created (in get_data()) as well as data
+   * the class wants to store from between the call to fill_fe_values(),
+   * fill_fe_face_values(), or fill_fe_subface_values() until possible later
+   * calls from the finite element to functions such as transform(). The
+   * latter class of member variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
   public:
     /**
-     * Constructor. The argument denotes the polynomial degree of
-     * the mapping to which this object will correspond.
+     * Constructor. The argument denotes the polynomial degree of the mapping
+     * to which this object will correspond.
      */
     InternalData(const unsigned int polynomial_degree);
 
     /**
-     * Initialize the object's member variables related to cell data
-     * based on the given arguments.
+     * Initialize the object's member variables related to cell data based on
+     * the given arguments.
      *
-     * The function also calls compute_shape_function_values() to
-     * actually set the member variables related to the values and
-     * derivatives of the mapping shape functions.
+     * The function also calls compute_shape_function_values() to actually set
+     * the member variables related to the values and derivatives of the
+     * mapping shape functions.
      */
     void
     initialize (const UpdateFlags      update_flags,
@@ -234,9 +227,9 @@ public:
                 const unsigned int     n_original_q_points);
 
     /**
-     * Initialize the object's member variables related to cell and
-     * face data based on the given arguments. In order to initialize
-     * cell data, this function calls initialize().
+     * Initialize the object's member variables related to cell and face data
+     * based on the given arguments. In order to initialize cell data, this
+     * function calls initialize().
      */
     void
     initialize_face (const UpdateFlags      update_flags,
@@ -244,20 +237,19 @@ public:
                      const unsigned int     n_original_q_points);
 
     /**
-     * Compute the values and/or derivatives of the shape functions
-     * used for the mapping.
+     * Compute the values and/or derivatives of the shape functions used for
+     * the mapping.
      *
-     * Which values, derivatives, or higher order derivatives are
-     * computed is determined by which of the member arrays have
-     * nonzero sizes. They are typically set to their appropriate
-     * sizes by the initialize() and initialize_face() functions,
-     * which indeed call this function internally. However, it is
-     * possible (and at times useful) to do the resizing by hand and
-     * then call this function directly. An example is in a Newton
-     * iteration where we update the location of a quadrature point
-     * (e.g., in MappingQ::transform_real_to_uni_cell()) and need to
-     * re-compute the mapping and its derivatives at this location,
-     * but have already sized all internal arrays correctly.
+     * Which values, derivatives, or higher order derivatives are computed is
+     * determined by which of the member arrays have nonzero sizes. They are
+     * typically set to their appropriate sizes by the initialize() and
+     * initialize_face() functions, which indeed call this function
+     * internally. However, it is possible (and at times useful) to do the
+     * resizing by hand and then call this function directly. An example is in
+     * a Newton iteration where we update the location of a quadrature point
+     * (e.g., in MappingQ::transform_real_to_uni_cell()) and need to re-
+     * compute the mapping and its derivatives at this location, but have
+     * already sized all internal arrays correctly.
      */
     void compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
 
@@ -382,9 +374,8 @@ public:
     std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
     /**
-     * The polynomial degree of the mapping. Since the objects here
-     * are also used (with minor adjustments) by MappingQ, we need to
-     * store this.
+     * The polynomial degree of the mapping. Since the objects here are also
+     * used (with minor adjustments) by MappingQ, we need to store this.
      */
     unsigned int polynomial_degree;
 
@@ -394,8 +385,8 @@ public:
      * use this class (e.g. the Mapping_Q() class), the number of shape
      * functions may also be different.
      *
-     * In general, it is $(p+1)^\text{dim}$, where $p$ is the
-     * polynomial degree of the mapping.
+     * In general, it is $(p+1)^\text{dim}$, where $p$ is the polynomial
+     * degree of the mapping.
      */
     const unsigned int n_shape_functions;
 
@@ -499,8 +490,8 @@ public:
 protected:
 
   /**
-   * The degree of the polynomials used as shape functions for the mapping
-   * of cells.
+   * The degree of the polynomials used as shape functions for the mapping of
+   * cells.
    */
   const unsigned int polynomial_degree;
 
@@ -523,13 +514,14 @@ protected:
   const std_cxx11::unique_ptr<FE_Q<dim> > fe_q;
 
   /**
-   * A table of weights by which we multiply the locations of the
-   * support points on the perimeter of a quad to get the location of
-   * interior support points.
+   * A table of weights by which we multiply the locations of the support
+   * points on the perimeter of a quad to get the location of interior support
+   * points.
    *
-   * Sizes: support_point_weights_on_quad.size()= number of inner unit_support_points
-   * support_point_weights_on_quad[i].size()= number of outer unit_support_points,
-   * i.e.  unit_support_points on the boundary of the quad
+   * Sizes: support_point_weights_on_quad.size()= number of inner
+   * unit_support_points support_point_weights_on_quad[i].size()= number of
+   * outer unit_support_points, i.e.  unit_support_points on the boundary of
+   * the quad
    *
    * For the definition of this vector see equation (8) of the `mapping'
    * report.
@@ -537,9 +529,9 @@ protected:
   Table<2,double> support_point_weights_on_quad;
 
   /**
-   * A table of weights by which we multiply the locations of the
-   * support points on the perimeter of a hex to get the location of
-   * interior support points.
+   * A table of weights by which we multiply the locations of the support
+   * points on the perimeter of a hex to get the location of interior support
+   * points.
    *
    * For the definition of this vector see equation (8) of the `mapping'
    * report.
@@ -547,35 +539,32 @@ protected:
   Table<2,double> support_point_weights_on_hex;
 
   /**
-   * Return the locations of support points for the mapping. For
-   * example, for $Q_1$ mappings these are the vertices, and for higher
-   * order polynomial mappings they are the vertices plus interior
-   * points on edges, faces, and the cell interior that are placed
-   * in consultation with the Manifold description of the domain and
-   * its boundary. However, other
-   * classes may override this function differently. In particular,
-   * the MappingQ1Eulerian class does exactly this by not computing
-   * the support points from the geometry of the current cell but
-   * instead evaluating an externally given displacement field in
-   * addition to the geometry of the cell.
+   * Return the locations of support points for the mapping. For example, for
+   * $Q_1$ mappings these are the vertices, and for higher order polynomial
+   * mappings they are the vertices plus interior points on edges, faces, and
+   * the cell interior that are placed in consultation with the Manifold
+   * description of the domain and its boundary. However, other classes may
+   * override this function differently. In particular, the MappingQ1Eulerian
+   * class does exactly this by not computing the support points from the
+   * geometry of the current cell but instead evaluating an externally given
+   * displacement field in addition to the geometry of the cell.
    *
-   * The default implementation of this function is appropriate for
-   * most cases. It takes the locations of support points on the
-   * boundary of the cell from the underlying manifold. Interior
-   * support points (ie. support points in quads for 2d, in hexes for
-   * 3d) are then computed using the solution of a Laplace equation
-   * with the position of the outer support points as boundary values,
-   * in order to make the transformation as smooth as possible.
+   * The default implementation of this function is appropriate for most
+   * cases. It takes the locations of support points on the boundary of the
+   * cell from the underlying manifold. Interior support points (ie. support
+   * points in quads for 2d, in hexes for 3d) are then computed using the
+   * solution of a Laplace equation with the position of the outer support
+   * points as boundary values, in order to make the transformation as smooth
+   * as possible.
    *
-   * The function works its way from the vertices (which it takes from
-   * the given cell) via the support points on the line (for which it
-   * calls the add_line_support_points() function) and the support
-   * points on the quad faces (in 3d, for which it calls the
-   * add_quad_support_points() function). It then adds interior
-   * support points that are either computed by interpolation from the
-   * surrounding points using weights computed by solving a Laplace
-   * equation, or if dim<spacedim, it asks the underlying manifold for
-   * the locations of interior points.
+   * The function works its way from the vertices (which it takes from the
+   * given cell) via the support points on the line (for which it calls the
+   * add_line_support_points() function) and the support points on the quad
+   * faces (in 3d, for which it calls the add_quad_support_points() function).
+   * It then adds interior support points that are either computed by
+   * interpolation from the surrounding points using weights computed by
+   * solving a Laplace equation, or if dim<spacedim, it asks the underlying
+   * manifold for the locations of interior points.
    */
   virtual
   std::vector<Point<spacedim> >
@@ -591,20 +580,18 @@ protected:
                                         const Point<dim> &initial_p_unit) const;
 
   /**
-   * For <tt>dim=2,3</tt>. Append the support points of all shape
-   * functions located on bounding lines of the given cell to the
-   * vector @p a. Points located on the vertices of a line are not
-   * included.
+   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
+   * located on bounding lines of the given cell to the vector @p a. Points
+   * located on the vertices of a line are not included.
    *
-   * Needed by the @p compute_support_points() function. For
-   * <tt>dim=1</tt> this function is empty. The function uses the
-   * underlying manifold object of the line (or, if none is set, of
-   * the cell) for the location of the requested points.
+   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
+   * this function is empty. The function uses the underlying manifold object
+   * of the line (or, if none is set, of the cell) for the location of the
+   * requested points.
    *
-   * This function is made virtual in order to allow derived classes
-   * to choose shape function support points differently than the
-   * present class, which chooses the points as interpolation points
-   * on the boundary.
+   * This function is made virtual in order to allow derived classes to choose
+   * shape function support points differently than the present class, which
+   * chooses the points as interpolation points on the boundary.
    */
   virtual
   void
@@ -612,21 +599,18 @@ protected:
                            std::vector<Point<spacedim> > &a) const;
 
   /**
-   * For <tt>dim=3</tt>. Append the support points of all shape
-   * functions located on bounding faces (quads in 3d) of the given
-   * cell to the vector @p a. Points located on the vertices or lines
-   * of a quad are not included.
+   * For <tt>dim=3</tt>. Append the support points of all shape functions
+   * located on bounding faces (quads in 3d) of the given cell to the vector
+   * @p a. Points located on the vertices or lines of a quad are not included.
    *
-   * Needed by the @p compute_support_points() function. For
-   * <tt>dim=1</tt> and <tt>dim=2</tt> this function is empty. The
-   * function uses the underlying manifold object of the quad (or, if
-   * none is set, of the cell) for the location of the requested
-   * points.
+   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
+   * and <tt>dim=2</tt> this function is empty. The function uses the
+   * underlying manifold object of the quad (or, if none is set, of the cell)
+   * for the location of the requested points.
    *
-   * This function is made virtual in order to allow derived classes
-   * to choose shape function support points differently than the
-   * present class, which chooses the points as interpolation points
-   * on the boundary.
+   * This function is made virtual in order to allow derived classes to choose
+   * shape function support points differently than the present class, which
+   * chooses the points as interpolation points on the boundary.
    */
   virtual
   void
@@ -634,9 +618,8 @@ protected:
                           std::vector<Point<spacedim> > &a) const;
 
   /**
-   * Make MappingQ a friend since it needs to call the
-   * fill_fe_values() functions on its MappingQGeneric(1)
-   * sub-object.
+   * Make MappingQ a friend since it needs to call the fill_fe_values()
+   * functions on its MappingQGeneric(1) sub-object.
    */
   template <int, int> friend class MappingQ;
 };

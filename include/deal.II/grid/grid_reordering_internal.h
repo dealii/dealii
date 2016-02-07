@@ -207,8 +207,8 @@ namespace internal
       void build_graph (const std::vector<CellData<2> > &inquads);
 
       /**
-       * Orient the internal data into deal.II format The orientation algorithm
-       * is as follows
+       * Orient the internal data into deal.II format The orientation
+       * algorithm is as follows
        *
        * 1) Find an unoriented quad (A)
        *
@@ -617,8 +617,8 @@ namespace internal
 
       /**
        * Return whether the cell is consistently oriented at present (i.e.
-       * only considering those edges that are already oriented. This is
-       * a sanity check that should be called from inside an assert macro.
+       * only considering those edges that are already oriented. This is a
+       * sanity check that should be called from inside an assert macro.
        */
       bool cell_is_consistent (const unsigned int cell_num) const;
 

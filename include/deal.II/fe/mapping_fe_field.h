@@ -236,12 +236,12 @@ public:
    * Storage for internal data of this mapping. See Mapping::InternalDataBase
    * for an extensive description.
    *
-   * This includes data that is computed once when the object is created
-   * (in get_data()) as well as data the class wants to store from between
-   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * This includes data that is computed once when the object is created (in
+   * get_data()) as well as data the class wants to store from between the
+   * call to fill_fe_values(), fill_fe_face_values(), or
    * fill_fe_subface_values() until possible later calls from the finite
-   * element to functions such as transform(). The latter class of
-   * member variables are marked as 'mutable', along with scratch arrays.
+   * element to functions such as transform(). The latter class of member
+   * variables are marked as 'mutable', along with scratch arrays.
    */
   class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
@@ -553,8 +553,7 @@ private:
                             const typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   /**
-   * See the documentation of the base class for
-   * detailed information.
+   * See the documentation of the base class for detailed information.
    */
   virtual void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,

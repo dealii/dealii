@@ -630,8 +630,8 @@ public:
    *
    * If projection matrices are not implemented in the derived finite element
    * class, this function aborts with an exception of type
-   * FiniteElement::ExcProjectionVoid. You can check whether
-   * this would happen by first calling the restriction_is_implemented() or the
+   * FiniteElement::ExcProjectionVoid. You can check whether this would happen
+   * by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -659,10 +659,10 @@ public:
    * cells using this matrix array, zero elements in the prolongation matrix
    * are discarded and will not fill up the transfer matrix.
    *
-   * If prolongation matrices are not implemented in one of the base finite element
-   * classes, this function aborts with an exception of type
-   * FiniteElement::ExcEmbeddingVoid. You can check whether
-   * this would happen by first calling the prolongation_is_implemented() or the
+   * If prolongation matrices are not implemented in one of the base finite
+   * element classes, this function aborts with an exception of type
+   * FiniteElement::ExcEmbeddingVoid. You can check whether this would happen
+   * by first calling the prolongation_is_implemented() or the
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
@@ -1064,9 +1064,9 @@ private:
     typename std::vector<typename FiniteElement<dim,spacedim>::InternalDataBase *> base_fe_datas;
 
     /**
-     * A collection of objects to which the base elements will write their output
-     * when we call
-     * FiniteElement::fill_fe_values() and related functions on them.
+     * A collection of objects to which the base elements will write their
+     * output when we call FiniteElement::fill_fe_values() and related
+     * functions on them.
      *
      * The size of this vector is set to @p n_base_elements by the
      * InternalData constructor.

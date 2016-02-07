@@ -42,8 +42,8 @@ namespace parallel
 {
   /**
    * This class describes the interface for all triangulation classes that
-   * work in parallel, namely parallel::distributed::Triangulation
-   * and parallel::shared::Triangulation.
+   * work in parallel, namely parallel::distributed::Triangulation and
+   * parallel::shared::Triangulation.
    */
   template <int dim, int spacedim = dim>
   class Triangulation : public dealii::Triangulation<dim,spacedim>
@@ -83,19 +83,19 @@ namespace parallel
 
 
     /**
-     * Return the number of active cells in the triangulation that are
-     * locally owned, i.e. that have a subdomain_id equal to
-     * locally_owned_subdomain(). Note that there may be more active cells
-     * in the triangulation stored on the present processor, such as for
-     * example ghost cells, or cells further away from the locally owned
-     * block of cells but that are needed to ensure that the triangulation
-     * that stores this processor's set of active cells still remains
-     * balanced with respect to the 2:1 size ratio of adjacent cells.
+     * Return the number of active cells in the triangulation that are locally
+     * owned, i.e. that have a subdomain_id equal to
+     * locally_owned_subdomain(). Note that there may be more active cells in
+     * the triangulation stored on the present processor, such as for example
+     * ghost cells, or cells further away from the locally owned block of
+     * cells but that are needed to ensure that the triangulation that stores
+     * this processor's set of active cells still remains balanced with
+     * respect to the 2:1 size ratio of adjacent cells.
      *
      * As a consequence of the remark above, the result of this function is
      * always smaller or equal to the result of the function with the same
-     * name in the ::Triangulation base class, which includes the active
-     * ghost and artificial cells (see also
+     * name in the ::Triangulation base class, which includes the active ghost
+     * and artificial cells (see also
      * @ref GlossArtificialCell
      * and
      * @ref GlossGhostCell).
@@ -103,9 +103,9 @@ namespace parallel
     unsigned int n_locally_owned_active_cells () const;
 
     /**
-     * Return the sum over all processors of the number of active cells
-     * owned by each processor. This equals the overall number of active
-     * cells in the triangulation.
+     * Return the sum over all processors of the number of active cells owned
+     * by each processor. This equals the overall number of active cells in
+     * the triangulation.
      */
     virtual types::global_dof_index n_global_active_cells () const;
 
@@ -139,7 +139,7 @@ namespace parallel
      *
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
-     **/
+     */
     const std::set<unsigned int> &ghost_owners () const;
 
     /**
@@ -150,14 +150,14 @@ namespace parallel
      *
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
-     **/
+     */
     const std::set<unsigned int> &level_ghost_owners () const;
 
   protected:
     /**
      * MPI communicator to be used for the triangulation. We create a unique
-     * communicator for this class, which is a duplicate of the one passed
-     * to the constructor.
+     * communicator for this class, which is a duplicate of the one passed to
+     * the constructor.
      */
     MPI_Comm mpi_communicator;
 
@@ -179,13 +179,13 @@ namespace parallel
     struct NumberCache
     {
       /**
-       *  This vector stores the number of locally owned active cells per MPI
-       *  rank.
+       * This vector stores the number of locally owned active cells per MPI
+       * rank.
        */
       std::vector<unsigned int> n_locally_owned_active_cells;
       /**
-       * The total number of active cells (sum of
-       * @p n_locally_owned_active_cells).
+       * The total number of active cells (sum of @p
+       * n_locally_owned_active_cells).
        */
       types::global_dof_index   n_global_active_cells;
       /**

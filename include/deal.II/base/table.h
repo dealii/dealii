@@ -481,12 +481,12 @@ public:
   void reset_values ();
 
   /**
-   * Set the dimensions of this object to the sizes given in the
-   * argument, and newly allocate the required memory. If
-   * <tt>omit_default_initialization</tt> is set to <tt>false</tt>,
-   * all elements of the table are set to a default constructed object
-   * for the element type. Otherwise the memory is left in an
-   * uninitialized or otherwise undefined state.
+   * Set the dimensions of this object to the sizes given in the argument, and
+   * newly allocate the required memory. If
+   * <tt>omit_default_initialization</tt> is set to <tt>false</tt>, all
+   * elements of the table are set to a default constructed object for the
+   * element type. Otherwise the memory is left in an uninitialized or
+   * otherwise undefined state.
    */
   void reinit (const TableIndices<N> &new_size,
                const bool             omit_default_initialization = false);

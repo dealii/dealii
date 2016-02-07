@@ -168,9 +168,9 @@ namespace PETScWrappers
     AdditionalData additional_data;
 
     /**
-     * Initializes the preconditioner object without knowing a particular matrix.
-     * This function sets up appropriate parameters to the underlying PETSc object
-     * after it has been created.
+     * Initializes the preconditioner object without knowing a particular
+     * matrix. This function sets up appropriate parameters to the underlying
+     * PETSc object after it has been created.
      */
     void initialize();
   };
@@ -242,9 +242,9 @@ namespace PETScWrappers
     AdditionalData additional_data;
 
     /**
-     * Initializes the preconditioner object without knowing a particular matrix.
-     * This function sets up appropriate parameters to the underlying PETSc object
-     * after it has been created.
+     * Initializes the preconditioner object without knowing a particular
+     * matrix. This function sets up appropriate parameters to the underlying
+     * PETSc object after it has been created.
      */
     void initialize();
 
@@ -678,8 +678,8 @@ namespace PETScWrappers
       /**
        * Set this flag to true if you have a symmetric system matrix and you
        * want to use a solver which assumes a symmetric preconditioner like
-       * CG. The relaxation is done with SSOR/Jacobi when set to true and
-       * with SOR/Jacobi otherwise.
+       * CG. The relaxation is done with SSOR/Jacobi when set to true and with
+       * SOR/Jacobi otherwise.
        */
       bool symmetric_operator;
 
@@ -754,9 +754,9 @@ namespace PETScWrappers
     AdditionalData additional_data;
 
     /**
-     * Initializes the preconditioner object without knowing a particular matrix.
-     * This function sets up appropriate parameters to the underlying PETSc object
-     * after it has been created.
+     * Initializes the preconditioner object without knowing a particular
+     * matrix. This function sets up appropriate parameters to the underlying
+     * PETSc object after it has been created.
      */
     void initialize();
 

@@ -305,10 +305,10 @@ namespace TrilinosWrappers
       /**
        * Reinit functionality. This function sets the calling vector to the
        * dimension and the parallel distribution of the input vector, but does
-       * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt> is not
-       * <tt>true</tt>, the elements in the vector are initialized with zero,
-       * otherwise the content will be left unchanged and the user has to set
-       * all elements.
+       * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt>
+       * is not <tt>true</tt>, the elements in the vector are initialized with
+       * zero, otherwise the content will be left unchanged and the user has
+       * to set all elements.
        *
        * This function has a third argument, <tt>allow_different_maps</tt>,
        * that allows for an exchange of data between two equal-sized vectors
@@ -316,10 +316,10 @@ namespace TrilinosWrappers
        * application of this function is to generate a replication of a whole
        * vector on each machine, when the calling vector is built according to
        * the localized vector class TrilinosWrappers::Vector, and <tt>v</tt>
-       * is a distributed vector. In this case, the variable <tt>omit_zeroing_entries</tt>
-       * needs to be set to <tt>false</tt>, since it does not make sense to
-       * exchange data between differently parallelized vectors without
-       * touching the elements.
+       * is a distributed vector. In this case, the variable
+       * <tt>omit_zeroing_entries</tt> needs to be set to <tt>false</tt>,
+       * since it does not make sense to exchange data between differently
+       * parallelized vectors without touching the elements.
        */
       void reinit (const VectorBase &v,
                    const bool        omit_zeroing_entries = false,
@@ -566,8 +566,8 @@ namespace TrilinosWrappers
       /**
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning.  The flag
-       * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with
-       * zero (false) or left untouched (true).
+       * <tt>omit_zeroing_entries</tt> determines whether the vector should be
+       * filled with zero (false) or left untouched (true).
        *
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
@@ -807,8 +807,8 @@ namespace TrilinosWrappers
      * is generated. This initialization function is appropriate when the data
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
-     * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with zero
-     * or left untouched.
+     * <tt>omit_zeroing_entries</tt> determines whether the vector should be
+     * filled with zero or left untouched.
      *
      * Which element of the @p input_map argument are set is in fact ignored,
      * the only thing that matters is the size of the index space described by
@@ -823,8 +823,8 @@ namespace TrilinosWrappers
      * generated. This initialization function is appropriate in case the data
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
-     * <tt>omit_zeroing_entries</tt> determines whether the vector should be filled with zero
-     * (false) or left untouched (true).
+     * <tt>omit_zeroing_entries</tt> determines whether the vector should be
+     * filled with zero (false) or left untouched (true).
      *
      * Which element of the @p input_map argument are set is in fact ignored,
      * the only thing that matters is the size of the index space described by

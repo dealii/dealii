@@ -312,16 +312,16 @@ public:
 
   /**
    * Assignment from different matrix classes. This assignment operator uses
-   * iterators of the typename MatrixType. Therefore, sparse matrices are possible
-   * sources.
+   * iterators of the typename MatrixType. Therefore, sparse matrices are
+   * possible sources.
    */
   template <typename MatrixType>
   void copy_from (const MatrixType &);
 
   /**
    * Transposing assignment from different matrix classes. This assignment
-   * operator uses iterators of the typename MatrixType. Therefore, sparse matrices
-   * are possible sources.
+   * operator uses iterators of the typename MatrixType. Therefore, sparse
+   * matrices are possible sources.
    */
   template <typename MatrixType>
   void copy_transposed (const MatrixType &);

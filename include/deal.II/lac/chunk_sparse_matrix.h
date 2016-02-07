@@ -692,10 +692,10 @@ public:
    * Copying matrices is an expensive operation that we do not want to happen
    * by accident through compiler generated code for <code>operator=</code>.
    * (This would happen, for example, if one accidentally declared a function
-   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
-   * The functionality of copying matrices is implemented in this member function
-   * instead. All copy operations of objects of this type therefore require an
-   * explicit function call.
+   * argument of the current type <i>by value</i> rather than <i>by
+   * reference</i>.) The functionality of copying matrices is implemented in
+   * this member function instead. All copy operations of objects of this type
+   * therefore require an explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.

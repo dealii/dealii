@@ -158,7 +158,8 @@ namespace PETScWrappers
      * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
      * size <tt>block_size</tt> each.
      *
-     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+     * zeros.
      */
     void reinit (const unsigned int num_blocks,
                  const size_type    block_size,
@@ -172,7 +173,8 @@ namespace PETScWrappers
      * If the number of blocks is the same as before this function was called,
      * all vectors remain the same and reinit() is called for each vector.
      *
-     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+     * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+     * zeros.
      *
      * Note that you must call this (or the other reinit() functions)
      * function, rather than calling the reinit() functions of an individual

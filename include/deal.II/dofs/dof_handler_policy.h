@@ -63,14 +63,12 @@ namespace internal
         virtual ~PolicyBase ();
 
         /**
-         * Distribute degrees of freedom on
-         * the object given as first argument.
-         * The reference to the NumberCache of the
-         * DoFHandler object has to be passed in a
-         * second argument. It could then be modified to
-         * make DoFHandler related functions work properly
-         * when called within the policies classes.
-         * The updated NumberCache is written to that argument.
+         * Distribute degrees of freedom on the object given as first
+         * argument. The reference to the NumberCache of the DoFHandler object
+         * has to be passed in a second argument. It could then be modified to
+         * make DoFHandler related functions work properly when called within
+         * the policies classes. The updated NumberCache is written to that
+         * argument.
          */
         virtual
         void
@@ -86,14 +84,12 @@ namespace internal
                             std::vector<NumberCache> &number_caches) const = 0;
 
         /**
-         * Renumber degrees of freedom as
-         * specified by the first argument.
-         * The reference to the NumberCache of the
-         * DoFHandler object has to be passed in a
-         * second argument. It could then be modified to
-         * make DoFHandler related functions work properly
-         * when called within the policies classes.
-         * The updated NumberCache is written to that argument.
+         * Renumber degrees of freedom as specified by the first argument. The
+         * reference to the NumberCache of the DoFHandler object has to be
+         * passed in a second argument. It could then be modified to make
+         * DoFHandler related functions work properly when called within the
+         * policies classes. The updated NumberCache is written to that
+         * argument.
          */
         virtual
         void
@@ -138,25 +134,22 @@ namespace internal
       };
 
       /**
-        * This class implements the
-        * policy for operations when
-        * we use a
-        * parallel::shared::Triangulation
-        * object.
-        */
+       * This class implements the policy for operations when we use a
+       * parallel::shared::Triangulation object.
+       */
       template <int dim, int spacedim>
       class ParallelShared : public Sequential<dim,spacedim>
       {
       public:
 
         /**
-          * Distribute degrees of freedom on
-          * the object given as first argument.
-          *
-          * On distribution, DoFs are renumbered subdomain-wise and
-          * number_cache.n_locally_owned_dofs_per_processor[i] and
-          * number_cache.locally_owned_dofs are updated consistently.
-          */
+         * Distribute degrees of freedom on the object given as first
+         * argument.
+         *
+         * On distribution, DoFs are renumbered subdomain-wise and
+         * number_cache.n_locally_owned_dofs_per_processor[i] and
+         * number_cache.locally_owned_dofs are updated consistently.
+         */
         virtual
         void
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
@@ -171,15 +164,14 @@ namespace internal
                             std::vector<NumberCache> &number_caches) const;
 
         /**
-          * Renumber degrees of freedom as
-          * specified by the first argument.
-          *
-          * The input argument @p new_numbers may either have as many entries
-          * as there are global degrees of freedom (i.e. dof_handler.n_dofs() )
-          * or dof_handler.locally_owned_dofs().n_elements().
-          * Therefore it can be utilised with renumbering functions
-          * implemented for the parallel::distributed case.
-          */
+         * Renumber degrees of freedom as specified by the first argument.
+         *
+         * The input argument @p new_numbers may either have as many entries
+         * as there are global degrees of freedom (i.e. dof_handler.n_dofs() )
+         * or dof_handler.locally_owned_dofs().n_elements(). Therefore it can
+         * be utilised with renumbering functions implemented for the
+         * parallel::distributed case.
+         */
         virtual
         void
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,

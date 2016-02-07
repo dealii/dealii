@@ -32,8 +32,9 @@ DEAL_II_NAMESPACE_OPEN
  * transforming a triplet of iterative solver, matrix and preconditioner into
  * a coarse grid solver.
  *
- * The type of the matrix (i.e. the template parameter @p MatrixType) should be
- * derived from @p Subscriptor to allow for the use of a smart pointer to it.
+ * The type of the matrix (i.e. the template parameter @p MatrixType) should
+ * be derived from @p Subscriptor to allow for the use of a smart pointer to
+ * it.
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */

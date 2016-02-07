@@ -142,9 +142,9 @@ public:
    * Note, that using this function within a loop over all tensor product
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
-   * several times.  Instead use the compute() function, see above, with
-   * the size of the appropriate parameter set to n() to get the point value
-   * of all tensor polynomials all at once and in a much more efficient way.
+   * several times.  Instead use the compute() function, see above, with the
+   * size of the appropriate parameter set to n() to get the point value of
+   * all tensor polynomials all at once and in a much more efficient way.
    *
    * @tparam order The derivative order.
    */
@@ -297,9 +297,9 @@ public:
    * Note, that using this function within a loop over all tensor product
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
-   * several times.  Instead use the compute() function, see above, with
-   * the size of the appropriate parameter set to n() to get the point value
-   * of all tensor polynomials all at once and in a much more efficient way.
+   * several times.  Instead use the compute() function, see above, with the
+   * size of the appropriate parameter set to n() to get the point value of
+   * all tensor polynomials all at once and in a much more efficient way.
    *
    * @tparam order The derivative order.
    */

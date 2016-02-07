@@ -106,16 +106,16 @@ block_back_substitution(const BlockLinearOperator<Range, Domain> &,
  * const auto block_op_a = block_operator(A);
  * @endcode
  *
- * A BlockLinearOperator can be sliced to a LinearOperator at any time.
- * This removes all information about the underlying block structure
- * (beacuse above <code>std::function</code> objects are no longer
- * available) - the linear operator interface, however, remains intact.
+ * A BlockLinearOperator can be sliced to a LinearOperator at any time. This
+ * removes all information about the underlying block structure (beacuse above
+ * <code>std::function</code> objects are no longer available) - the linear
+ * operator interface, however, remains intact.
  *
- * @note This class makes heavy use of <code>std::function</code> objects
- * and lambda functions. This flexibiliy comes with a run-time penalty.
- * Only use this object to encapsulate object with medium to large
- * individual block sizes, and small block structure (as a rule of thumb,
- * matrix blocks greater than $1000\times1000$).
+ * @note This class makes heavy use of <code>std::function</code> objects and
+ * lambda functions. This flexibiliy comes with a run-time penalty. Only use
+ * this object to encapsulate object with medium to large individual block
+ * sizes, and small block structure (as a rule of thumb, matrix blocks greater
+ * than $1000\times1000$).
  *
  * @note This class is only available if deal.II was configured with C++11
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
@@ -135,9 +135,9 @@ public:
   /**
    * Create an empty BlockLinearOperator object.
    *
-   * All<code>std::function</code> member objects of this class and its
-   * base class LinearOperator are initialized with default variants that
-   * throw an exception upon invocation.
+   * All<code>std::function</code> member objects of this class and its base
+   * class LinearOperator are initialized with default variants that throw an
+   * exception upon invocation.
    */
   BlockLinearOperator()
     : LinearOperator<Range, Domain>()
@@ -169,8 +169,8 @@ public:
     default;
 
   /**
-   * Templated copy constructor that creates a BlockLinearOperator object
-   * from an object @p op for which the conversion function
+   * Templated copy constructor that creates a BlockLinearOperator object from
+   * an object @p op for which the conversion function
    * <code>block_operator</code> is defined.
    */
   template<typename Op>
@@ -181,8 +181,8 @@ public:
 
   /**
    * Create a BlockLinearOperator from a two-dimensional array @p ops of
-   * LinearOperator. This constructor calls the corresponding
-   * block_operator() specialization.
+   * LinearOperator. This constructor calls the corresponding block_operator()
+   * specialization.
    */
   template<size_t m, size_t n>
   BlockLinearOperator(const std::array<std::array<BlockType, n>, m> &ops)
@@ -191,9 +191,9 @@ public:
   }
 
   /**
-   * Create a block-diagonal BlockLinearOperator from a one-dimensional
-   * array @p ops of LinearOperator. This constructor calls the
-   * corresponding block_operator() specialization.
+   * Create a block-diagonal BlockLinearOperator from a one-dimensional array
+   * @p ops of LinearOperator. This constructor calls the corresponding
+   * block_operator() specialization.
    */
   template<size_t m>
   BlockLinearOperator(const std::array<BlockType, m> &ops)
@@ -233,9 +233,8 @@ public:
 
   /**
    * Copy assignment from a one-dimensional array @p ops of LinearOperator
-   * that creates a block-diagonal BlockLinearOperator.
-   * This assignment operator calls the corresponding block_operator()
-   * specialization.
+   * that creates a block-diagonal BlockLinearOperator. This assignment
+   * operator calls the corresponding block_operator() specialization.
    */
   template <size_t m>
   BlockLinearOperator<Range, Domain> &
@@ -246,23 +245,21 @@ public:
   }
 
   /**
-   * Return the number of blocks in a column (i.e, the number of "block
-   * rows", or the number $m$, if interpreted as a $m\times n$ block
-   * system).
+   * Return the number of blocks in a column (i.e, the number of "block rows",
+   * or the number $m$, if interpreted as a $m\times n$ block system).
    */
   std::function<unsigned int()> n_block_rows;
 
   /**
-   * Return the number of blocks in a row (i.e, the number of "block
-   * columns", or the number $n$, if interpreted as a $m\times n$ block
-   * system).
+   * Return the number of blocks in a row (i.e, the number of "block columns",
+   * or the number $n$, if interpreted as a $m\times n$ block system).
    */
   std::function<unsigned int()> n_block_cols;
 
   /**
    * Access the block with the given coordinates. This
-   * <code>std::function</code> object returns a LinearOperator
-   * representing the $(i,j)$-th block of the BlockLinearOperator.
+   * <code>std::function</code> object returns a LinearOperator representing
+   * the $(i,j)$-th block of the BlockLinearOperator.
    */
   std::function<BlockType(unsigned int, unsigned int)> block;
 };
@@ -375,8 +372,7 @@ namespace internal
 /**
  * @relates BlockLinearOperator
  *
- * A function that encapsulates a @p block_matrix into a
- * BlockLinearOperator.
+ * A function that encapsulates a @p block_matrix into a BlockLinearOperator.
  *
  * All changes made on the block structure and individual blocks of @p
  * block_matrix after the creation of the BlockLinearOperator object are
@@ -425,13 +421,13 @@ block_operator(const BlockMatrixType &block_matrix)
 /**
  * @relates BlockLinearOperator
  *
- * A variant of above function that encapsulates a given collection @p ops
- * of LinearOperators into a block structure. Here, it is assumed that
- * Range and Domain are blockvectors, i.e., derived from
+ * A variant of above function that encapsulates a given collection @p ops of
+ * LinearOperators into a block structure. Here, it is assumed that Range and
+ * Domain are blockvectors, i.e., derived from
  * @ref BlockVectorBase.
- * The individual linear operators in @p ops must act on
- * the underlying vector type of the block vectors, i.e., on
- * Domain::BlockType yielding a result in Range::BlockType.
+ * The individual linear operators in @p ops must act on the underlying vector
+ * type of the block vectors, i.e., on Domain::BlockType yielding a result in
+ * Range::BlockType.
  *
  * The list @p ops is best passed as an initializer list. Consider for example
  * a linear operator block (acting on Vector<double>)
@@ -493,9 +489,9 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
  * initialized as null_operator (with correct reinit_range_vector and
  * reinit_domain_vector methods).
  *
- * All changes made on the individual diagonal blocks of @p block_matrix
- * after the creation of the BlockLinearOperator object are reflected by
- * the operator object.
+ * All changes made on the individual diagonal blocks of @p block_matrix after
+ * the creation of the BlockLinearOperator object are reflected by the
+ * operator object.
  *
  * @ingroup LAOperators
  */
@@ -629,10 +625,10 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * @relates BlockLinearOperator
  *
  * This function implements forward substitution to invert a lower block
- * triangular matrix. As arguments, it takes a BlockLinearOperator
- * @p block_operator representing a block lower triangular matrix, as well as
- * a BlockLinearOperator @p diagonal_inverse representing inverses of
- * diagonal blocks of @p block_operator.
+ * triangular matrix. As arguments, it takes a BlockLinearOperator @p
+ * block_operator representing a block lower triangular matrix, as well as a
+ * BlockLinearOperator @p diagonal_inverse representing inverses of diagonal
+ * blocks of @p block_operator.
  *
  * Let us assume we have a linear system with the following block structure:
  *
@@ -643,7 +639,8 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * A0n x0 + A1n x1 + ... + Ann xn = yn
  * @endcode
  *
- * First of all, <code>x0 = A00^-1 y0</code>. Then, we can use x0 to recover x1:
+ * First of all, <code>x0 = A00^-1 y0</code>. Then, we can use x0 to recover
+ * x1:
  * @code
  *    x1 = A11^-1 ( y1 - A01 x0 )
  * @endcode
@@ -653,8 +650,8 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * @endcode
  *
  * @note We are not using all blocks of the BlockLinearOperator arguments:
- * Just the lower triangular block matrix of @p block_operator is used as
- * well as the diagonal of @p diagonal_inverse.
+ * Just the lower triangular block matrix of @p block_operator is used as well
+ * as the diagonal of @p diagonal_inverse.
  *
  * @ingroup LAOperators
  */
@@ -740,10 +737,10 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
  * @relates BlockLinearOperator
  *
  * This function implements back substitution to invert an upper block
- * triangular matrix. As arguments, it takes a BlockLinearOperator
- * @p block_operator representing an upper block triangular matrix, as well
- * as a BlockLinearOperator @p diagonal_inverse representing inverses of
- * diagonal blocks of @p block_operator.
+ * triangular matrix. As arguments, it takes a BlockLinearOperator @p
+ * block_operator representing an upper block triangular matrix, as well as a
+ * BlockLinearOperator @p diagonal_inverse representing inverses of diagonal
+ * blocks of @p block_operator.
  *
  * Let us assume we have a linear system with the following block structure:
  *
@@ -754,7 +751,8 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
  *                         Ann xn = yn
  * @endcode
  *
- * First of all, <code>xn = Ann^-1 yn</code>. Then, we can use xn to recover x(n-1):
+ * First of all, <code>xn = Ann^-1 yn</code>. Then, we can use xn to recover
+ * x(n-1):
  * @code
  *    x(n-1) = A(n-1)(n-1)^-1 ( y(n-1) - A(n-1)n x(n-1) )
  * @endcode
@@ -764,9 +762,8 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
  * @endcode
  *
  * @note We are not using all blocks of the BlockLinearOperator arguments:
- * Just the upper triangular block matrix of @p block_operator is used as
- * well as the diagonal of @p diagonal_inverse.
-
+ * Just the upper triangular block matrix of @p block_operator is used as well
+ * as the diagonal of @p diagonal_inverse.
  *
  * @ingroup LAOperators
  */

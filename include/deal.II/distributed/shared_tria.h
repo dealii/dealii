@@ -55,14 +55,13 @@ namespace parallel
 
     /**
      * This is an extension of dealii::Triangulation class to automatically
-     * partition triangulation when run with MPI.
-     * Different from the parallel::distributed::Triangulation, the entire mesh
-     * is stored on each processor. However, cells are labeled according to
-     * the id of the processor which "owns" them. The partitioning is done
-     * automatically inside the DoFHandler by calling Metis.
-     * This enables distributing DoFs among processors and therefore splitting
-     * matrices and vectors across processors.
-     * The usage of this class is demonstrated in Step-18.
+     * partition triangulation when run with MPI. Different from the
+     * parallel::distributed::Triangulation, the entire mesh is stored on each
+     * processor. However, cells are labeled according to the id of the
+     * processor which "owns" them. The partitioning is done automatically
+     * inside the DoFHandler by calling Metis. This enables distributing DoFs
+     * among processors and therefore splitting matrices and vectors across
+     * processors. The usage of this class is demonstrated in Step-18.
      *
      * @author Denis Davydov, 2015
      * @ingroup distributed
@@ -78,9 +77,9 @@ namespace parallel
       /**
        * Constructor.
        *
-       * If @p allow_aritifical_cells is true, this class will behave
-       * similar to parallel::distributed::Triangulation in that there will be
-       * locally owned, ghost and artificial cells.
+       * If @p allow_aritifical_cells is true, this class will behave similar
+       * to parallel::distributed::Triangulation in that there will be locally
+       * owned, ghost and artificial cells.
        *
        * Otherwise all non-locally owned cells are considered ghost.
        */
@@ -95,35 +94,38 @@ namespace parallel
       virtual ~Triangulation ();
 
       /**
-       * Coarsen and refine the mesh according to refinement and
-       * coarsening flags set.
+       * Coarsen and refine the mesh according to refinement and coarsening
+       * flags set.
        *
-       * This step is equivalent to the dealii::Triangulation class
-       * with an addition of calling dealii::GridTools::partition_triangulation() at the end.
+       * This step is equivalent to the dealii::Triangulation class with an
+       * addition of calling dealii::GridTools::partition_triangulation() at
+       * the end.
        */
       virtual void execute_coarsening_and_refinement ();
 
       /**
-        * Create a triangulation.
-        *
-        * This function also partitions triangulation based on the
-        * MPI communicator provided to constructor.
-        */
+       * Create a triangulation.
+       *
+       * This function also partitions triangulation based on the MPI
+       * communicator provided to constructor.
+       */
       virtual void create_triangulation (const std::vector< Point< spacedim > > &vertices,
                                          const std::vector< CellData< dim > > &cells,
                                          const SubCellData &subcelldata);
 
       /**
        * Return a vector of length Triangulation::n_active_cells() where each
-       * element stores the subdomain id of the owner of this cell. The elements
-       * of the vector are obviously the same as the subdomain ids for locally
-       * owned and ghost cells, but are also correct for artificial cells that
-       * do not store who the owner of the cell is in their subdomain_id field.
+       * element stores the subdomain id of the owner of this cell. The
+       * elements of the vector are obviously the same as the subdomain ids
+       * for locally owned and ghost cells, but are also correct for
+       * artificial cells that do not store who the owner of the cell is in
+       * their subdomain_id field.
        */
       const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
 
       /**
-       * Return allow_artificial_cells , namely true if artificial cells are allowed.
+       * Return allow_artificial_cells , namely true if artificial cells are
+       * allowed.
        */
       bool with_artificial_cells() const;
 
@@ -141,13 +143,14 @@ namespace parallel
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
-       * using METIS. In case allow_artificial_cells is false, this vector
-       * is consistent with IDs stored in cell->subdomain_id() of the triangulation
-       * class. When allow_artificial_cells is true, cells which are artificial
-       * will have cell->subdomain_id() == numbers::artificial;
+       * using METIS. In case allow_artificial_cells is false, this vector is
+       * consistent with IDs stored in cell->subdomain_id() of the
+       * triangulation class. When allow_artificial_cells is true, cells which
+       * are artificial will have cell->subdomain_id() == numbers::artificial;
        *
        * The original parition information is stored to allow using sequential
-       * DoF distribution and partitioning functions with semi-artificial cells.
+       * DoF distribution and partitioning functions with semi-artificial
+       * cells.
        */
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
     };
@@ -158,14 +161,14 @@ namespace parallel
   {
 
     /**
-     * Dummy class the compiler chooses for parallel shared
-     * triangulations if we didn't actually configure deal.II with the
-     * MPI library. The existence of this class allows us to refer
-     * to parallel::shared::Triangulation objects throughout the
-     * library even if it is disabled.
+     * Dummy class the compiler chooses for parallel shared triangulations if
+     * we didn't actually configure deal.II with the MPI library. The
+     * existence of this class allows us to refer to
+     * parallel::shared::Triangulation objects throughout the library even if
+     * it is disabled.
      *
-     * Since the constructor of this class is private, no such objects
-     * can actually be created if MPI is not available.
+     * Since the constructor of this class is private, no such objects can
+     * actually be created if MPI is not available.
      */
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>

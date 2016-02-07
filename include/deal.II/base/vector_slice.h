@@ -65,16 +65,14 @@ public:
               unsigned int length);
 
   /**
-   * Conversion operator to an ArrayView object that represents
-   * an array of non-const elements pointing to the same location
-   * as the current object.
+   * Conversion operator to an ArrayView object that represents an array of
+   * non-const elements pointing to the same location as the current object.
    */
   operator ArrayView<typename VectorType::value_type *> ();
 
   /**
-   * Conversion operator to an ArrayView object that represents
-   * an array of const elements pointing to the same location
-   * as the current object.
+   * Conversion operator to an ArrayView object that represents an array of
+   * const elements pointing to the same location as the current object.
    */
   operator ArrayView<const typename VectorType::value_type *> () const;
 
@@ -85,14 +83,14 @@ public:
   unsigned int size() const;
 
   /**
-   * Return a reference to the $i$th element of the range
-   * represented by the current object.
+   * Return a reference to the $i$th element of the range represented by the
+   * current object.
    */
   typename VectorType::reference operator[] (unsigned int i);
 
   /**
-   * Return a @p const reference to the $i$th element of the range
-   * represented by the current object.
+   * Return a @p const reference to the $i$th element of the range represented
+   * by the current object.
    */
   typename VectorType::const_reference operator[] (unsigned int i) const;
 

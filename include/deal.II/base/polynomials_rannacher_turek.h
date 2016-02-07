@@ -28,14 +28,14 @@ DEAL_II_NAMESPACE_OPEN
  * Basis for polynomial space on the unit square used for lowest order
  * Rannacher Turek element.
  *
- * The i-th basis function is the dual basis element corresponding to
- * the dof which evaluates the function's mean value across the i-th
- * face. The numbering can be found in GeometryInfo.
+ * The i-th basis function is the dual basis element corresponding to the dof
+ * which evaluates the function's mean value across the i-th face. The
+ * numbering can be found in GeometryInfo.
  *
  * @ingroup Polynomials
  * @author Patrick Esser
  * @date 2015
- **/
+ */
 template <int dim>
 class PolynomialsRannacherTurek
 {
@@ -46,13 +46,13 @@ public:
   static const unsigned int dimension = dim;
 
   /**
-   * Constructor, checking that the basis is implemented in this
-   * dimension.
+   * Constructor, checking that the basis is implemented in this dimension.
    */
   PolynomialsRannacherTurek();
 
-  /** Value of basis function @p i at @p p.
-  */
+  /**
+   * Value of basis function @p i at @p p.
+   */
   double compute_value(const unsigned int i,
                        const Point<dim> &p) const;
 
@@ -65,23 +65,23 @@ public:
   Tensor<order,dim> compute_derivative (const unsigned int i,
                                         const Point<dim> &p) const;
 
-  /** Gradient of basis function @p i at @p p.
-  */
+  /**
+   * Gradient of basis function @p i at @p p.
+   */
   Tensor<1, dim> compute_grad(const unsigned int i,
                               const Point<dim> &p) const;
 
-  /** Gradient of gradient of basis function @p i at @p p.
-  */
+  /**
+   * Gradient of gradient of basis function @p i at @p p.
+   */
   Tensor<2, dim> compute_grad_grad(const unsigned int i,
                                    const Point<dim> &p) const;
 
   /**
-   * Compute values and derivatives of all basis functions at @p
-   * unit_point.
+   * Compute values and derivatives of all basis functions at @p unit_point.
    *
-   * Size of the vectors must be either equal to the number of
-   * polynomials or zero. A size of zero means that we are not
-   * computing the vector entries.
+   * Size of the vectors must be either equal to the number of polynomials or
+   * zero. A size of zero means that we are not computing the vector entries.
    */
   void compute(const Point<dim> &unit_point,
                std::vector<double> &values,

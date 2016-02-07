@@ -48,9 +48,9 @@ namespace parallel
      * interpolate() or deserialize() you need to supply distributed vectors
      * without ghost elements.
      *
-     * <h3>Transferring a solution</h3> Here VectorType is your favorite vector
-     * type, e.g. PETScWrappers::MPI::Vector, TrilinosWrappers::MPI::Vector,
-     * or corresponding blockvectors.
+     * <h3>Transferring a solution</h3> Here VectorType is your favorite
+     * vector type, e.g. PETScWrappers::MPI::Vector,
+     * TrilinosWrappers::MPI::Vector, or corresponding blockvectors.
      * @code
      * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
      *                                   // flag some cells for refinement
