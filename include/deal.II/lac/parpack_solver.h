@@ -91,7 +91,7 @@ extern "C" {
  *     additional_data(num_arnoldi_vectors,
  *                     dealii::PArpackSolver<V>::largest_magnitude,
  *                     true);
- * 
+ *
  *    PArpackSolver<V> eigensolver (solver_control,
  *                                  mpi_communicator,
  *                                  additional_data);
@@ -568,7 +568,7 @@ void PArpackSolver<VectorType>::solve
   // "LI" largest imaginary part
   // "SI" smallest imaginary part
   // "BE" both ends of spectrum simultaneous
-  
+
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
     {
