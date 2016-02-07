@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: tria.h 32739 2014-04-08 16:39:47Z denis.davydov $
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
