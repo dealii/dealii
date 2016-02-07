@@ -433,7 +433,9 @@ namespace SparseMatrixIterators
 /**
  * Sparse matrix. This class implements the functionality to store
  * matrix entry values in the locations denoted by a
- * SparsityPattern. See @ref Sparsity for a discussion about the
+ * SparsityPattern. See
+ * @ref Sparsity
+ * for a discussion about the
  * separation between sparsity patterns and matrices.
  *
  * The elements of a SparseMatrix are stored in the same order in which the

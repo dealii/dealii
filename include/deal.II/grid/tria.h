@@ -434,7 +434,8 @@ namespace internal
  * dependent of the dimension and there only exist specialized versions for
  * distinct dimensions.
  *
- * This class satisfies the @ref ConceptMeshType "MeshType concept"
+ * This class satisfies the
+ * @ref ConceptMeshType "MeshType concept"
  * requirements.
  *
  * <h3>Structure and iterators</h3>
@@ -1968,7 +1969,7 @@ public:
    * A structure that has boost::signal objects for a number of actions that a
    * triangulation can do to itself. Please refer to the
    * "Getting notice when a triangulation changes" section in the general
-   * documentation of the @ref Triangulation class for more information
+   * documentation of the Triangulation class for more information
    * and examples.
    *
    * For documentation on signals, see
@@ -2816,7 +2817,9 @@ public:
    *
    * This doesn't seem to be very useful but allows to write code that
    * can access the underlying triangulation for anything that satisfies
-   * the @ref ConceptMeshType "MeshType concept" (which may not only be a
+   * the
+   * @ref ConceptMeshType "MeshType concept"
+   * (which may not only be a
    * triangulation, but also a DoFHandler, for example).
    */
   Triangulation<dim,spacedim> &

@@ -100,7 +100,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @tparam order derivative of the <tt>i</tt>th tensor
+   * Computes the order @p order derivative of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *

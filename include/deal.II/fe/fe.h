@@ -58,12 +58,17 @@ namespace hp
  *   node constraints), as well as to other finite element spaces
  *   defined on the same cell (e.g., when doing $p$ refinement).
  * - %Functions that describe the properties of individual shape functions,
- *   for example which @ref GlossComponent "vector components" of a
- *   @ref vector_valued "vector-valued finite element's" shape function
- *   is nonzero, or whether an element is @ref GlossPrimitive "primitive".
+ *   for example which
+ *   @ref GlossComponent "vector components"
+ *   of a
+ *   @ref vector_valued "vector-valued finite element's"
+ *   shape function
+ *   is nonzero, or whether an element is
+ *   @ref GlossPrimitive "primitive".
  * - For elements that are interpolatory, such as the common $Q_p$
  *   Lagrange elements, data that describes where their
- *   @ref GlossSupport "support points" are located.
+ *   @ref GlossSupport "support points"
+ *   are located.
  * - %Functions that define the interface to the FEValues class that is
  *   almost always used to access finite element shape functions from
  *   user code.
@@ -105,7 +110,8 @@ namespace hp
  *   derived classes can overload that describes whether a particular
  *   feature is implemented. An example is whether an element implements
  *   the information necessary to use it in the $hp$ finite element
- *   context (see @ref hp "hp finite element support").
+ *   context (see
+ *   @ref hp "hp finite element support").
  *
  *
  * <h3>Nomenclature</h3>
@@ -116,7 +122,8 @@ namespace hp
  *
  * <h4>Components and blocks</h4>
  *
- * @ref vector_valued "Vector-valued finite element" are elements used for
+ * @ref vector_valued "Vector-valued finite element"
+ * are elements used for
  * systems of partial differential equations. Oftentimes, they are composed
  * via the FESystem class (which is itself derived from the current class),
  * but there are also non-composed elements that have multiple components
@@ -142,7 +149,8 @@ namespace hp
  * Oftentimes, one may want to split linear system into blocks so that they
  * reflect the structure of the underlying operator. This is typically not
  * done based on vector components, but based on the use of
- * @ref GlossBlock "blocks", and the result is then used to substructure
+ * @ref GlossBlock "blocks",
+ * and the result is then used to substructure
  * objects of type BlockVector, BlockSparseMatrix, BlockMatrixArray, and so on.
  * If you use non-primitive elements, you cannot determine the block number by
  * FiniteElement::system_to_component_index(). Instead, you can use
@@ -162,7 +170,8 @@ namespace hp
  * Most finite elements are defined by mapping from the reference cell to
  * a concrete cell. Consequently, the support points are then defined on
  * the reference ("unit") cell, see
- * @ref GlossSupport "this glossary entry". The support points on a concrete
+ * @ref GlossSupport "this glossary entry".
+ * The support points on a concrete
  * cell can then be computed by mapping the unit support points, using the
  * Mapping class interface and derived classes, typically via the FEValues
  * class.
@@ -214,7 +223,9 @@ namespace hp
  * of other, similar elements first. Since many of the more complicated
  * pieces of a finite element interface have to do with how they interact
  * with mappings, quadrature, and the FEValues class, you will also want
- * to read through the @ref FE_vs_Mapping_vs_FEValues documentation
+ * to read through the
+ * @ref FE_vs_Mapping_vs_FEValues
+ * documentation
  * module.
  *
  *
@@ -269,7 +280,9 @@ namespace hp
  *   relevant to the case where the same finite element space is used on
  *   neighboring (but differently refined) cells. The case that the finite
  *   element spaces on different sides of a face are different, i.e.,
- *   the $hp$ case (see @ref hp "hp finite element support") is handled
+ *   the $hp$ case (see
+ *   @ref hp "hp finite element support")
+ *   is handled
  *   by separate functions. See the FiniteElement::get_face_interpolation_matrix()
  *   and FiniteElement::get_subface_interpolation_matrix() functions.
  *
@@ -363,7 +376,8 @@ namespace hp
  * ConstraintMatrix object.) However, this is of no concern for the
  * FiniteElement and derived classes since they only act locally on one cell
  * and its immediate neighbor, and do not see the bigger picture. The
- * @ref hp_paper details how such chains are handled in practice.
+ * @ref hp_paper
+ * details how such chains are handled in practice.
  *
  *
  * <h4>Helper functions</h4>
@@ -675,7 +689,8 @@ public:
    *   components this shape function is nonzero (after mapping the shape
    *   function to the real cell). For "primitive" shape
    *   functions, this component mask will have a single entry (see
-   *   @ref GlossPrimitive for more information about primitive elements).
+   *   @ref GlossPrimitive
+   *   for more information about primitive elements).
    *   On the other hand, for elements such as the Raviart-Thomas or Nedelec
    *   elements, shape functions are nonzero in more than one vector component
    *   (after mapping to the real cell) and the given component mask will
@@ -2335,7 +2350,9 @@ protected:
    * makes the mapping class produce the inverse of the Jacobian matrix.
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation
    * module.
    *
    * @see UpdateFlags
@@ -2388,7 +2405,9 @@ protected:
    * in the object returned.
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation
    * module. See also the documentation of the InternalDataBase class.
    *
    * @param[in] update_flags A set of UpdateFlags values that describe
@@ -2555,8 +2574,9 @@ protected:
    * of these functions in derived classes).
    *
    * An extensive discussion of the interaction between this function and
-   * FEValues can be found in the @ref FE_vs_Mapping_vs_FEValues documentation
-   * module.
+   * FEValues can be found in the
+   * @ref FE_vs_Mapping_vs_FEValues
+   * documentation module.
    *
    * @param[in] cell The cell of the triangulation for which this function
    *   is to compute a mapping from the reference cell to.

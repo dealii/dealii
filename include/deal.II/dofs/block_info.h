@@ -64,7 +64,7 @@ namespace hp
  * The most common usage for this object is initializing vectors as in the
  * following code:
  *
- * <code>
+ * @code
  * DoFHandler<dim> dof_handler(triangulation);
  * dof_handler.distribute_dofs(fe_system);
  * dof_handler.distribute_mg_dofs(fe_system);
@@ -77,7 +77,7 @@ namespace hp
  *   {
  *     mg_vector[i].reinit(dof_handler.block_info().level(i));
  *   }
- * </code>
+ * @endcode
  *
  * In this
  * example, <tt>solution</tt> obtains the block structure needed to represent

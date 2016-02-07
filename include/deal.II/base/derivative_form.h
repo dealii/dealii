@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  * with $\mathbf x\in {\mathbb R}^{\text{dim}}$, in such a way that the
  * directional derivative in direction $\mathbf d\in {\mathbb R}^{\text{dim}}$
  * so that
- * @f{align*}
+ * @f{align*}{
  *   \nabla f(\mathbf x) \mathbf d
  *   = \lim_{\varepsilon\rightarrow 0}
  *     \frac{f(\mathbf x + \varepsilon \mathbf d) - f(\mathbf x)}{\varepsilon},

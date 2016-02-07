@@ -65,15 +65,18 @@ namespace Utilities
   {
     /**
      * Return the number of MPI processes there exist in the given
-     * @ref GlossMPICommunicator "communicator" object. If this is
+     * @ref GlossMPICommunicator "communicator"
+     * object. If this is
      * a sequential job, it returns 1.
      */
     unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator);
 
     /**
-     * Return the @ref GlossMPIRank "rank of the present MPI process"
+     * Return the
+     * @ref GlossMPIRank "rank of the present MPI process"
      * in the space of processes described by the given
-     * @ref GlossMPICommunicator "communicator". This will be a unique value for
+     * @ref GlossMPICommunicator "communicator".
+     * This will be a unique value for
      * each process between zero and (less than) the number of all processes
      * (given by get_n_mpi_processes()).
      */
@@ -85,7 +88,9 @@ namespace Utilities
      * processors. To do that, the other processors need to know who to expect
      * messages from. This function computes this information.
      *
-     * @param mpi_comm A @ref GlossMPICommunicator "communicator" that describes
+     * @param mpi_comm A
+     * @ref GlossMPICommunicator "communicator"
+     * that describes
      * the processors that are going to communicate with each other.
      *
      * @param destinations The list of processors the current process wants to
@@ -103,7 +108,9 @@ namespace Utilities
                                                   const std::vector<unsigned int> &destinations);
 
     /**
-     * Given a @ref GlossMPICommunicator "communicator", generate a new
+     * Given a
+     * @ref GlossMPICommunicator "communicator",
+     * generate a new
      * communicator that contains the
      * same set of processors but that has a different, unique identifier.
      *
@@ -118,7 +125,8 @@ namespace Utilities
 
     /**
      * Return the sum over all processors of the value @p t. This function is
-     * collective over all processors given in the @ref GlossMPICommunicator "communicator".
+     * collective over all processors given in the
+     * @ref GlossMPICommunicator "communicator".
      * If deal.II is
      * not configured for use of MPI, this function simply returns the value
      * of @p t. This function corresponds to the <code>MPI_Allreduce</code>
@@ -203,7 +211,8 @@ namespace Utilities
     /**
      * Return the maximum over all processors of the value @p t. This function
      * is collective over all processors given in the
-     * @ref GlossMPICommunicator "communicator". If deal.II
+     * @ref GlossMPICommunicator "communicator".
+     * If deal.II
      * is not configured for use of MPI, this function simply returns the
      * value of @p t. This function corresponds to the
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
@@ -254,7 +263,8 @@ namespace Utilities
     /**
      * Return the minimum over all processors of the value @p t. This function
      * is collective over all processors given in the
-     * @ref GlossMPICommunicator "communicator". If deal.II
+     * @ref GlossMPICommunicator "communicator".
+     * If deal.II
      * is not configured for use of MPI, this function simply returns the
      * value of @p t. This function corresponds to the
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
@@ -321,7 +331,8 @@ namespace Utilities
     /**
      * Returns sum, average, minimum, maximum, processor id of minimum and
      * maximum as a collective operation of on the given MPI
-     * @ref GlossMPICommunicator "communicator" @p mpi_communicator.
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator.
      * Each processor's value is given in @p my_value and
      * the result will be returned. The result is available on all machines.
      *

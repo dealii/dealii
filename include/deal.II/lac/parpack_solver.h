@@ -84,26 +84,26 @@ extern "C" {
  *
  * The ArpackSolver can be used in application codes in the
  * following way:
- @code
-  SolverControl solver_control (1000, 1e-9);
-  const unsigned int num_arnoldi_vectors = 2*size_of_spectrum + 2;
-  PArpackSolver<V>::AdditionalData
-    additional_data(num_arnoldi_vectors,
-                    dealii::PArpackSolver<V>::largest_magnitude,
-                    true);
-
-   PArpackSolver<V> eigensolver (solver_control,
-                                 mpi_communicator,
-                                 additional_data);
-   eigensolver.set_shift(sigma);
-   eigensolver.reinit(locally_owned_dofs);
-   eigensolver.solve (A,
-                      B,
-                      OP,
-                      lambda,
-                      x,
-                      size_of_spectrum);
- @endcode
+ * @code
+ *   SolverControl solver_control (1000, 1e-9);
+ *   const unsigned int num_arnoldi_vectors = 2*size_of_spectrum + 2;
+ *   PArpackSolver<V>::AdditionalData
+ *     additional_data(num_arnoldi_vectors,
+ *                     dealii::PArpackSolver<V>::largest_magnitude,
+ *                     true);
+ *
+ *    PArpackSolver<V> eigensolver (solver_control,
+ *                                  mpi_communicator,
+ *                                  additional_data);
+ *    eigensolver.set_shift(sigma);
+ *    eigensolver.reinit(locally_owned_dofs);
+ *    eigensolver.solve (A,
+ *                       B,
+ *                       OP,
+ *                       lambda,
+ *                       x,
+ *                       size_of_spectrum);
+ * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>size_of_spectrum</code> tells PARPACK the number of
  * eigenvector/eigenvalue pairs to solve for. Here,
@@ -554,24 +554,21 @@ void PArpackSolver<VectorType>::solve
   // must be zero on the first call to pdnaupd
   int ido = 0;
 
-  /**
-   * 'G' generalized eigenvalue problem
-   * 'I' standard eigenvalue problem
-   */
+  // 'G' generalized eigenvalue problem
+  // 'I' standard eigenvalue problem
   char bmat[2] = "G";
 
-  /** Specify the eigenvalues of interest,
-   *  possible parameters
-   *  "LA" algebraically largest
-   *  "SA" algebraically smallest
-   *  "LM" largest magnitude
-   *  "SM" smallest magnitude
-   *  "LR" largest real part
-   *  "SR" smallest real part
-   *  "LI" largest imaginary part
-   *  "SI" smallest imaginary part
-   *  "BE" both ends of spectrum simultaneous
-   */
+  // Specify the eigenvalues of interest, possible parameters:
+  // "LA" algebraically largest
+  // "SA" algebraically smallest
+  // "LM" largest magnitude
+  // "SM" smallest magnitude
+  // "LR" largest real part
+  // "SR" smallest real part
+  // "LI" largest imaginary part
+  // "SI" smallest imaginary part
+  // "BE" both ends of spectrum simultaneous
+
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
     {
@@ -619,13 +616,12 @@ void PArpackSolver<VectorType>::solve
   // Parpack currently works only for NB = 1
   iparam[3] = 1;
 
-  /** Sets the mode of dsaupd.
-   *  1 is exact shifting,
-   *  2 is user-supplied shifts,
-   *  3 is shift-invert mode,
-   *  4 is buckling mode,
-   *  5 is Cayley mode.
-   */
+  // Sets the mode of dsaupd:
+  // 1 is exact shifting,
+  // 2 is user-supplied shifts,
+  // 3 is shift-invert mode,
+  // 4 is buckling mode,
+  // 5 is Cayley mode.
 
   iparam[6] = mode;
   std::vector<int> ipntr (14, 0);
@@ -787,9 +783,8 @@ void PArpackSolver<VectorType>::solve
     }
   else
     {
-      /** 1 - compute eigenvectors,
-       *  0 - only eigenvalues
-       */
+      // 1 - compute eigenvectors,
+      // 0 - only eigenvalues
       int rvec = 1;
 
       // which eigenvectors

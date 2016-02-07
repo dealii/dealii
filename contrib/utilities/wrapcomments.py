@@ -8,7 +8,7 @@
 
 from __future__ import print_function
 import textwrap
-import sys
+import sys, re
 wrapper = textwrap.TextWrapper()
 
 # take an array of lines and wrap them to 78 columns and let each line start
@@ -92,11 +92,11 @@ def format_block(lines, infostr=""):
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@relates", "@relatesalso", "@deprecated", "@image", "@return", "@brief", "@attention", "@copydoc", "@addtogroup", "@todo", "@tparam", "@skip", "@skipline", "@until", "@line", "@dontinclude", "@include", "@see", "@note"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@relates", "@relatesalso", "@deprecated", "@image", "@return", "@brief", "@attention", "@copydoc", "@addtogroup", "@todo", "@tparam", "@see", "@note", "@skip", "@skipline", "@until", "@line", "@dontinclude", "@include"]
 
     # subset of ops_startline that does not want stuff from the next line appended
     # to this.
-    ops_also_end_paragraph = ["@image"]
+    ops_also_end_paragraph = ["@image", "@skip", "@skipline", "@until", "@line", "@dontinclude", "@include"]
 
     # stuff handled in the while loop down: @code, @verbatim, @f @ref
 
@@ -116,7 +116,15 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
-        elif starts_with_one(["* - ", "*   - "],lines[idx].strip()):
+        elif re.match(r'\*\s+- ',lines[idx].strip()):
+            # bullet ('-') list
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = lines[idx].strip()[2:]
+            out.append(start + thisline)
+        elif lines[idx].strip().startswith("* ") and re.match(r'\s*\d+.',lines[idx][3:]):
+            # numbered list
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
                 curlines=[]
@@ -186,7 +194,10 @@ def format_block(lines, infostr=""):
                 out.append(lines[idx].rstrip())
             else:
                 curlines.append(lines[idx])
-        elif one_in(["@code", "@verbatim", "@f["], lines[idx]):
+        elif one_in(["@code", "@verbatim", "@f[", "@f{"], lines[idx]):
+            if "@f{" in lines[idx]:
+                if not lines[idx].endswith("}{"):
+                    print ("%s warning malformed @f{*}{"%(infostr), file=sys.stderr)
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
                 curlines=[]
@@ -207,7 +218,7 @@ def format_block(lines, infostr=""):
                 else:
                     thisline = start + thisline.strip()[2:]
                 out.append(thisline.rstrip())
-                if one_in(["@endcode", "@endverbatim", "@f]"], lines[idx]):
+                if one_in(["@endcode", "@endverbatim", "@f]", "@f}"], lines[idx]):
                     break
                 idx += 1
         elif lines[idx].strip()=="*":
@@ -438,9 +449,64 @@ lineI = [" /**", \
          "  *   - C", \
          "  *   - D", \
          "  * - E", \
+         "  *         - very indented", \
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
+
+# @f{}
+lineI = [" /**", \
+         "  * Hello:", \
+         "  * @f{aligned*}{", \
+         "  *   A\\\\", \
+         "  *   B", \
+         "  * @f}", \
+         "  * bla", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+# @until 
+lineI = [" /**", \
+         "  * Hello:", \
+         "  * @include a", \
+         "  * bla", \
+         "  * @dontinclude a", \
+         "  * bla", \
+         "  * @line a", \
+         "  * bla", \
+         "  * @skip a", \
+         "  * bla", \
+         "  * @until a", \
+         "  * bla", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+# lists
+lineI = [" /**", \
+         "  * Hello:", \
+         "  *  - a", \
+         "  *  - b", \
+         "  * the end.", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+# numbered lists
+lineI = [" /**", \
+         "  * Hello:", \
+         "  * 1. a", \
+         "  * 2. b", \
+         "  * the end.", \
+         "  */"]
+lineO = lineI
+assert(format_block(lineI)==lineO)
+
+
+
+#print (lineI)
+#print (format_block(lineI))
 
 
 

@@ -906,9 +906,13 @@ namespace VectorTools
    * Project a function or a set of functions to the boundary of the domain.
    * In other words, compute the solution of the following problem: Find $u_h
    * \in V_h$ (where $V_h$ is the finite element space represented by the
-   * DoFHandler argument of this function) so that @f{align*} \int_{\Gamma}
-   * \varphi_i u_h = \sum_{k \in {\cal K}} \int_{\Gamma_k} \varphi_i f_k,
-   * \qquad \forall \varphi_i \in V_h @f} where $\Gamma = \bigcup_{k \in {\cal
+   * DoFHandler argument of this function) so that
+   * @f{align*}{
+   * \int_{\Gamma} \varphi_i u_h
+   * = \sum_{k \in {\cal K}} \int_{\Gamma_k} \varphi_i f_k,
+   * \qquad \forall \varphi_i \in V_h
+   * @f}
+   * where $\Gamma = \bigcup_{k \in {\cal
    * K}} \Gamma_k$, $\Gamma_k \subset \partial\Omega$, $\cal K$ is the set of
    * indices and $f_k$ the corresponding boundary functions represented in the
    * function map argument @p boundary_values to this function, and the
@@ -1812,7 +1816,11 @@ namespace VectorTools
    * function object, and a finite element function. The result of this
    * function is the vector @p difference that contains one value per active
    * cell $K$ of the triangulation. Each of the values of this vector $d$
-   * equals @f{align*} d_K = \| u-u_h \|_X @f} where $X$ denotes the norm
+   * equals
+   * @f{align*}{
+   * d_K = \| u-u_h \|_X
+   * @f}
+   * where $X$ denotes the norm
    * chosen and $u$ represents the exact solution.
    *
    * It is assumed that the number of components of the function @p
@@ -1896,8 +1904,11 @@ namespace VectorTools
    * @endcode
    * The squaring and taking the square root is necessary in order to compute
    * the sum of squares of norms over all all cells in the definition of the
-   * $L_2$ norm: @f{align*} \textrm{error} = \sqrt{\sum_K
-   * \|u-u_h\|_{L_2(K)}^2} @f} Obviously, if you are interested in computing
+   * $L_2$ norm:
+   * @f{align*}{
+   * \textrm{error} = \sqrt{\sum_K \|u-u_h\|_{L_2(K)}^2}
+   * @f}
+   * Obviously, if you are interested in computing
    * the $L_1$ norm of the error, the correct form of the last two lines would
    * have been
    * @code

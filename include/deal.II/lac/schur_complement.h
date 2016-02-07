@@ -44,50 +44,50 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Consider a general system of linear equations that can be
  * decomposed into two major sets of equations:
- * @f{eqnarray*}
-  \mathbf{K}\mathbf{d} = \mathbf{f}
-  \quad \Rightarrow\quad
-  \left(\begin{array}{cc}
-    A & B \\ C & D
-  \end{array}\right)
-  \left(\begin{array}{cc}
-    x \\ y
-  \end{array}\right)
-  =
-  \left(\begin{array}{cc}
-    f \\ g
-  \end{array}\right),
+ * @f{eqnarray*}{
+ * \mathbf{K}\mathbf{d} = \mathbf{f}
+ * \quad \Rightarrow\quad
+ * \left(\begin{array}{cc}
+ *    A & B \\ C & D
+ * \end{array}\right)
+ * \left(\begin{array}{cc}
+ *    x \\ y
+ * \end{array}\right)
+ * =
+ * \left(\begin{array}{cc}
+ *    f \\ g
+ * \end{array}\right),
  * @f}
  * where $ A,B,C,D $  represent general subblocks of the matrix
  * $ \mathbf{K} $ and, similarly, general subvectors of
  * $ \mathbf{d},\mathbf{f} $ are given by $ x,y,f,g $ .
  *
  * This is equivalent to the following two statements:
- * @f{eqnarray*}
-     (1) \quad Ax + By &=& f \\
-     (2) \quad Cx + Dy &=& g \quad .
+ * @f{eqnarray*}{
+ *   (1) \quad Ax + By &=& f \\
+ *   (2) \quad Cx + Dy &=& g \quad .
  * @f}
  *
  * Assuming that $ A,D $ are both square and invertible, we could
  * then perform one of two possible substitutions,
- * @f{eqnarray*}
-     (3) \quad x &=& A^{-1}(f - By) \quad \text{from} \quad (1) \\
-     (4) \quad y &=& D^{-1}(g - Cx) \quad \text{from} \quad (2) ,
+ * @f{eqnarray*}{
+ *   (3) \quad x &=& A^{-1}(f - By) \quad \text{from} \quad (1) \\
+ *   (4) \quad y &=& D^{-1}(g - Cx) \quad \text{from} \quad (2) ,
  * @f}
  * which amount to performing block Gaussian elimination on
  * this system of equations.
  *
  * For the purpose of the current implementation, we choose to
  * substitute (3) into (2)
- * @f{eqnarray*}
-     C \: A^{-1}(f - By) + Dy &=& g \\
-     -C \: A^{-1} \: By + Dy &=& g - C \: A^{-1} \: f \quad .
-   @f}
+ * @f{eqnarray*}{
+ *   C \: A^{-1}(f - By) + Dy &=& g \\
+ *   -C \: A^{-1} \: By + Dy &=& g - C \: A^{-1} \: f \quad .
+ * @f}
  * This leads to the result
  * @f[
-     (5) \quad (D - C\: A^{-1} \:B)y  = g - C \: A^{-1} f
-         \quad \Rightarrow \quad Sy = g'
-   @f]
+ *   (5) \quad (D - C\: A^{-1} \:B)y  = g - C \: A^{-1} f
+ *       \quad \Rightarrow \quad Sy = g'
+ * @f]
  * with $ S = (D - C\: A^{-1} \:B) $ being the Schur complement
  * and the modified right-hand side vector $ g' = g - C \: A^{-1} f $ arising from
  * the condensation step.
@@ -98,8 +98,8 @@ DEAL_II_NAMESPACE_OPEN
  * So for any arbitrary vector $ a $, the Schur complement
  * performs the following operation:
  * @f[
-     (6) \quad Sa = (D - C \: A^{-1} \: B)a
-   @f]
+ *   (6) \quad Sa = (D - C \: A^{-1} \: B)a
+ * @f]
  *
  * A typical set of steps needed the solve a linear system (1),(2)
  * would be:
@@ -119,51 +119,51 @@ DEAL_II_NAMESPACE_OPEN
  * 4. Perform pre-processing step on the RHS of (5) using
  *    condense_schur_rhs():
  *    @f[
-        g' = g - C \: A^{-1} \: f
-      @f]
+ *      g' = g - C \: A^{-1} \: f
+ *    @f]
  * 5. Solve for $ y $ in (5):
  *    @f[
-        y =  S^{-1} g'
-      @f]
+ *      y =  S^{-1} g'
+ *    @f]
  * 6. Perform the post-processing step from (3) using
  *    postprocess_schur_solution():
  *    @f[
-        x =  A^{-1} (f - By)
-      @f]
+ *      x =  A^{-1} (f - By)
+ *    @f]
  *
  * An illustration of typical usage of this operator for a fully coupled
  * system is given below.
  * @code
-    #include<deal.II/lac/schur_complement.h>
-
-    // Given BlockMatrix K and BlockVectors d,F
-
-    // Decomposition of tangent matrix
-    const auto A = linear_operator(K.block(0,0));
-    const auto B = linear_operator(K.block(0,1));
-    const auto C = linear_operator(K.block(1,0));
-    const auto D = linear_operator(K.block(1,1));
-
-    // Decomposition of solution vector
-    auto x = d.block(0);
-    auto y = d.block(1);
-
-    // Decomposition of RHS vector
-    auto f = F.block(0);
-    auto g = F.block(1);
-
-    // Construction of inverse of Schur complement
-    const auto prec_A = PreconditionSelector<...>(A);
-    const auto A_inv = inverse_operator<...>(A,prec_A);
-    const auto S = schur_complement(A_inv,B,C,D);
-    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on same space
-    const auto S_inv = inverse_operator<...>(S,...,prec_S);
-
-    // Solve reduced block system
-    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that represents the condensed form of g
-    y = S_inv * rhs; // Solve for y
-    x = postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved solution y
-   @endcode
+ *    #include<deal.II/lac/schur_complement.h>
+ *
+ *    // Given BlockMatrix K and BlockVectors d,F
+ *
+ *    // Decomposition of tangent matrix
+ *    const auto A = linear_operator(K.block(0,0));
+ *    const auto B = linear_operator(K.block(0,1));
+ *    const auto C = linear_operator(K.block(1,0));
+ *    const auto D = linear_operator(K.block(1,1));
+ *
+ *    // Decomposition of solution vector
+ *    auto x = d.block(0);
+ *    auto y = d.block(1);
+ *
+ *    // Decomposition of RHS vector
+ *    auto f = F.block(0);
+ *    auto g = F.block(1);
+ *
+ *    // Construction of inverse of Schur complement
+ *    const auto prec_A = PreconditionSelector<...>(A);
+ *    const auto A_inv = inverse_operator<...>(A,prec_A);
+ *    const auto S = schur_complement(A_inv,B,C,D);
+ *    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on same space
+ *    const auto S_inv = inverse_operator<...>(S,...,prec_S);
+ *
+ *    // Solve reduced block system
+ *    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that represents the condensed form of g
+ *    y = S_inv * rhs; // Solve for y
+ *    x = postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved solution y
+ * @endcode
  *
  * In the above example, the preconditioner for $ S $ was defined as the
  * preconditioner for $ D $, which is valid since they operate on the same
@@ -184,21 +184,21 @@ DEAL_II_NAMESPACE_OPEN
  * Thereafter we construct the approximate inverse operator $ \tilde{S}^{-1} $
  * which is then used as the preconditioner for computing $ S^{-1} $.
  * @code
-    // Construction of approximate inverse of Schur complement
-    const auto A_inv_approx = linear_operator(preconditioner_A);
-    const auto S_approx = schur_complement(A_inv_approx,B,C,D);
-    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx operate on same space
-    const auto S_inv_approx = inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically limited to few iterations using IterationNumberControl
-
-    // Construction of exact inverse of Schur complement
-    const auto S = schur_complement(A_inv,B,C,D);
-    const auto S_inv = inverse_operator(S,...,S_inv_approx); // Outer solver
-
-    // Solve reduced block system
-    auto rhs = condense_schur_rhs (A_inv,C,f,g);
-    y = S_inv * rhs; // Solve for y
-    x = postprocess_schur_solution (A_inv,B,y,f);
-   @endcode
+ *    // Construction of approximate inverse of Schur complement
+ *    const auto A_inv_approx = linear_operator(preconditioner_A);
+ *    const auto S_approx = schur_complement(A_inv_approx,B,C,D);
+ *    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx operate on same space
+ *    const auto S_inv_approx = inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically limited to few iterations using IterationNumberControl
+ *
+ *    // Construction of exact inverse of Schur complement
+ *    const auto S = schur_complement(A_inv,B,C,D);
+ *    const auto S_inv = inverse_operator(S,...,S_inv_approx); // Outer solver
+ *
+ *    // Solve reduced block system
+ *    auto rhs = condense_schur_rhs (A_inv,C,f,g);
+ *    y = S_inv * rhs; // Solve for y
+ *    x = postprocess_schur_solution (A_inv,B,y,f);
+ * @endcode
  * Note that due to the construction of @c S_inv_approx and subsequently
  * @c S_inv, there are a pair of nested iterative solvers which could
  * collectively consume a lot of resources.
@@ -353,7 +353,7 @@ schur_complement(const LinearOperator<Domain_1, Range_1> &A_inv,
  * @relates PackagedOperation
  *
  * For the system of equations
- * @f{eqnarray*}
+ * @f{eqnarray*}{
      Ax + By &=& f \\
      Cx + Dy &=& g \quad ,
  * @f}
@@ -436,7 +436,7 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1> &A_inv,
  * @relates PackagedOperation
  *
  * For the system of equations
- * @f{eqnarray*}
+ * @f{eqnarray*}{
      Ax + By &=& f \\
      Cx + Dy &=& g \quad ,
  * @f}

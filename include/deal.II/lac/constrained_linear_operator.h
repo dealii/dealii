@@ -48,7 +48,8 @@ DEAL_II_NAMESPACE_OPEN
  * The LinearOperator object created by this function is primarily used
  * internally in constrained_linear_operator() to build up a modified
  * system of linear equations. How to solve a linear system of equations
- * with this approach is explained in detail in the @ref constraints
+ * with this approach is explained in detail in the
+ * @ref constraints
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
@@ -215,7 +216,8 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * with a given (unconstrained) system matrix $A$, right hand side $b$, and
  * linear constraints $C$ with inhomogeneities $k$.
  *
- * A detailed explanation of this approach is given in the @ref constraints
+ * A detailed explanation of this approach is given in the
+ * @ref constraints
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
@@ -262,7 +264,8 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * with a given (unconstrained) system matrix $A$, right hand side $b$, and
  * linear constraints $C$ with inhomogeneities $k$.
  *
- * A detailed explanation of this approach is given in the @ref constraints
+ * A detailed explanation of this approach is given in the
+ * @ref constraints
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015

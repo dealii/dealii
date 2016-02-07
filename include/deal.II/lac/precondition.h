@@ -524,7 +524,8 @@ public:
  * The MatrixType class used is required to have functions
  * <tt>precondition_SOR(VectorType&, const VectorType&, double)</tt> and
  * <tt>precondition_TSOR(VectorType&, const VectorType&, double)</tt>. This
- * class satisfies the @ref ConceptRelaxationType "relaxation concept".
+ * class satisfies the
+ * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
  *     // Declare related objects

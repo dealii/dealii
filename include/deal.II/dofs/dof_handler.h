@@ -67,7 +67,8 @@ namespace internal
 /**
  * Manage the distribution and numbering of the degrees of freedom for non-
  * multigrid algorithms. This class satisfies the
- * @ref ConceptMeshType "MeshType concept" requirements.
+ * @ref ConceptMeshType "MeshType concept"
+ * requirements.
  *
  * It is first used in the step-2 tutorial program.
  *

@@ -298,7 +298,9 @@ namespace SparsityPatternIterators
  * A class that can store which elements of a matrix are nonzero (or,
  * in fact, <i>may</i> be nonzero) and for which we have to allocate
  * memory to store their values. This class is an example of the
- * "static" type of sparsity patters (see @ref Sparsity). It uses the
+ * "static" type of sparsity patters (see
+ * @ref Sparsity).
+ * It uses the
  * <a href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed
  * row storage (CSR)</a> format to store data, and is used as the
  * basis for the SparseMatrix class.
@@ -321,7 +323,8 @@ namespace SparsityPatternIterators
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
  * first, see for example the step-2 tutorial program as well as the
- * documentation module @ref Sparsity.
+ * documentation module
+ * @ref Sparsity.
  *
  * @author Wolfgang Bangerth, Guido Kanschat and others
  */

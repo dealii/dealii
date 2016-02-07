@@ -34,15 +34,22 @@ template <int spacedim, typename Number> class Function;
  * function that provides the boundary values on this part of the boundary.
  * This type is required in many functions in the library where, for example,
  * we need to know about the functions $h_i(\mathbf x)$ used in boundary
- * conditions @f{align*} \mathbf n \cdot \nabla u = h_i \qquad \qquad
- * \text{on}\ \Gamma_i\subset\partial\Omega. @f} An example is the function
+ * conditions
+ * @f{align*}{
+ * \mathbf n \cdot \nabla u = h_i \qquad \qquad
+ * \text{on}\ \Gamma_i\subset\partial\Omega.
+ * @f}
+ * An example is the function
  * KellyErrorEstimator::estimate() that allows us to provide a set of
  * functions $h_i$ for all those boundary indicators $i$ for which the
  * boundary condition is supposed to be of Neumann type. Of course, the same
  * kind of principle can be applied to cases where we care about Dirichlet
  * values, where one needs to provide a map from boundary indicator $i$ to
- * Dirichlet function $h_i$ if the boundary conditions are given as @f{align*}
- * u = h_i \qquad \qquad \text{on}\ \Gamma_i\subset\partial\Omega. @f} This
+ * Dirichlet function $h_i$ if the boundary conditions are given as
+ * @f{align*}{
+ * u = h_i \qquad \qquad \text{on}\ \Gamma_i\subset\partial\Omega.
+ * @f}
+ * This
  * is, for example, the case for the VectorTools::interpolate() functions.
  *
  * Tutorial programs step-6, step-7 and step-8 show examples of how to use

@@ -49,13 +49,13 @@ for i in $files ; do
   last_year=`git log -n 3 --date=short --format="format:%cd %s" $i | \
              egrep -i -v "update.*copyright|copyright.*update" | \
              head -n 1 | \
-             perl -pi -e 's/^(\d\d\d\d)-.*/\1/g;'`
+             perl -p -e 's/^(\d\d\d\d)-.*/\1/g;'`
 
   # get the first year this file was modified from the actual
   # file. this may predate the git log if the file was copied
   # from elsewhere
   first_year=`cat $i | egrep 'Copyright \(C\) [0-9]{4}' | \
-              perl -pi -e "s/.*Copyright \(C\) (\d{4}).*/\1/g;"`
+              perl -p -e "s/.*Copyright \(C\) (\d{4}).*/\1/g;"`
 
   # print a status message. we really only have to update
   # the copyright year if the first and last year are

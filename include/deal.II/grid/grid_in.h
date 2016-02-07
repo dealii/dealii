@@ -391,19 +391,19 @@ public:
    *   also generate valid input decks.
    * - Files generated using Cubit 11.x, 12.x and 13.x are valid, but only
    *   when using a specific set of export steps. These are as follows:
-   *     1. Go to "Analysis setup mode" by clicking on the disc icon in the
-   *        toolbar on the right.
-   *     2. Select "Export Mesh" under "Operation" by clicking on the
-   *        necessary icon in the toolbar on the right.
-   *     3. Select an output file. In Cubit version 11.0 and 12.0 it might be
-   *        necessary to click on the browse button and type it in the
-   *        dialogue that pops up.
-   *     4. Select the dimension to output in.
-   *     5. Tick the overwrite box.
-   *     6. If using Cubit v12.0 onwards, uncheck the box "Export using Cubit
-   *        ID's". An invalid file will encounter errors if this box is left
-   *        checked.
-   *     7. Click apply.
+   *     - Go to "Analysis setup mode" by clicking on the disc icon in the
+   *       toolbar on the right.
+   *     - Select "Export Mesh" under "Operation" by clicking on the
+   *       necessary icon in the toolbar on the right.
+   *     - Select an output file. In Cubit version 11.0 and 12.0 it might be
+   *       necessary to click on the browse button and type it in the
+   *       dialogue that pops up.
+   *     - Select the dimension to output in.
+   *     - Tick the overwrite box.
+   *     - If using Cubit v12.0 onwards, uncheck the box "Export using Cubit
+   *       ID's". An invalid file will encounter errors if this box is left
+   *       checked.
+   *     - Click apply.
    */
   void read_abaqus (std::istream &in);
 

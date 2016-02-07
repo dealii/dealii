@@ -265,8 +265,6 @@ public:
    * representing the $(i,j)$-th block of the BlockLinearOperator.
    */
   std::function<BlockType(unsigned int, unsigned int)> block;
-
-  //@}
 };
 
 
@@ -429,8 +427,9 @@ block_operator(const BlockMatrixType &block_matrix)
  *
  * A variant of above function that encapsulates a given collection @p ops
  * of LinearOperators into a block structure. Here, it is assumed that
- * Range and Domain are blockvectors, i.e., derived from @ref
- * BlockVectorBase. The individual linear operators in @p ops must act on
+ * Range and Domain are blockvectors, i.e., derived from
+ * @ref BlockVectorBase.
+ * The individual linear operators in @p ops must act on
  * the underlying vector type of the block vectors, i.e., on
  * Domain::BlockType yielding a result in Range::BlockType.
  *
@@ -637,16 +636,21 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  *
  * Let us assume we have a linear system with the following block structure:
  *
+ * @code
  * A00 x0 + ...                   = y0
  * A01 x0 + A11 x1 + ...          = y1
  * ...        ...
  * A0n x0 + A1n x1 + ... + Ann xn = yn
+ * @endcode
  *
- * First of all, x0 = A00^-1 y0
- * Then, we can use x0 to recover x1:
+ * First of all, <code>x0 = A00^-1 y0</code>. Then, we can use x0 to recover x1:
+ * @code
  *    x1 = A11^-1 ( y1 - A01 x0 )
+ * @endcode
  * and therefore:
+ * @code
  *    xn = Ann^-1 ( yn - A0n x0 - ... - A(n-1)n x(n-1) )
+ * @endcode
  *
  * @note We are not using all blocks of the BlockLinearOperator arguments:
  * Just the lower triangular block matrix of @p block_operator is used as
@@ -743,16 +747,21 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain> &block_opera
  *
  * Let us assume we have a linear system with the following block structure:
  *
+ * @code
  * A00 x0 + A01 x1 + ... + A0n xn = yn
  *          A11 x1 + ...          = y1
  *                          ...     ..
  *                         Ann xn = yn
+ * @endcode
  *
- * First of all, xn = Ann^-1 yn
- * Then, we can use xn to recover x(n-1):
+ * First of all, <code>xn = Ann^-1 yn</code>. Then, we can use xn to recover x(n-1):
+ * @code
  *    x(n-1) = A(n-1)(n-1)^-1 ( y(n-1) - A(n-1)n x(n-1) )
+ * @endcode
  * and therefore:
+ * @code
  *    x0 = A00^-1 ( y0 - A0n xn - ... - A01 x1 )
+ * @endcode
  *
  * @note We are not using all blocks of the BlockLinearOperator arguments:
  * Just the upper triangular block matrix of @p block_operator is used as

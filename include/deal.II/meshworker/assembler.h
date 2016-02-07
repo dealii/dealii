@@ -93,8 +93,8 @@ namespace MeshWorker
      * used locally.
      *
      * In the block model, each of the blocks of the local vectors corresponds
-     * to the restriction of a single block of the system to this cell
-     (* @ref GlossBlock).
+     * to the restriction of a single block of the system to this cell (see
+     * @ref GlossBlock).
      * Thus, the size of this local block is the number of degrees of freedom
      * of the corresponding base element of the FESystem.
      *
