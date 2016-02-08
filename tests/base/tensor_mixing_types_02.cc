@@ -30,9 +30,15 @@ int main ()
   double d_scalar = 10.;
   std::complex<double> c_scalar = 10.;
 
-  Tensor<1,2,float>                 f1 = { {1., 2.} };
-  Tensor<1,2,double>                d1 = { {4., 8.} };
-  Tensor<1,2,std::complex<double> > c1 = { {16., 32.} };
+  Tensor<1,2,float>                 f1;
+  f1[0] = 1.;
+  f1[1] = 2.;
+  Tensor<1,2,double>                d1;
+  d1[0] = 4.;
+  d1[1] = 8.;
+  Tensor<1,2,std::complex<double> > c1;
+  c1[0] = 16.;
+  c1[1] = 32.;
 
   deallog << f1 + d1 << std::endl;
   deallog << f1 - d1 << std::endl;
