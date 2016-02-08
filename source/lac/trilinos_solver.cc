@@ -28,24 +28,24 @@ DEAL_II_NAMESPACE_OPEN namespace TrilinosWrappers
 {
 
   SolverBase::AdditionalData::
-    AdditionalData (const bool output_solver_details,
-		    const unsigned int
-		    gmres_restart_parameter):output_solver_details
+  AdditionalData (const bool output_solver_details,
+                  const unsigned int
+                  gmres_restart_parameter):output_solver_details
     (output_solver_details), gmres_restart_parameter (gmres_restart_parameter)
   {
   }
 
 
 
-SolverBase::SolverBase (SolverControl & cn):
-  solver_name (gmres), solver_control (cn)
+  SolverBase::SolverBase (SolverControl &cn):
+    solver_name (gmres), solver_control (cn)
   {
   }
 
 
 
   SolverBase::SolverBase (const enum SolverBase::SolverName solver_name,
-			  SolverControl & cn):solver_name (solver_name),
+                          SolverControl &cn):solver_name (solver_name),
     solver_control (cn)
   {
   }
@@ -58,7 +58,7 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  SolverControl & SolverBase::control ()const
+  SolverControl &SolverBase::control ()const
   {
     return solver_control;
   }
@@ -66,22 +66,22 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (const SparseMatrix & A,
-		       VectorBase & x,
-		       const VectorBase & b,
-		       const PreconditionBase & preconditioner)
+  SolverBase::solve (const SparseMatrix &A,
+                     VectorBase &x,
+                     const VectorBase &b,
+                     const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem.reset
-      (new
-       Epetra_LinearProblem (const_cast <
-			     Epetra_CrsMatrix * >(&A.trilinos_matrix ()),
-			     &x.trilinos_vector (),
-			     const_cast <
-			     Epetra_MultiVector * >(&b.trilinos_vector ())));
+    (new
+     Epetra_LinearProblem (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()),
+                           &x.trilinos_vector (),
+                           const_cast <
+                           Epetra_MultiVector * >(&b.trilinos_vector ())));
 
     do_solve (preconditioner);
   }
@@ -89,21 +89,21 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (Epetra_Operator & A,
-		       VectorBase & x,
-		       const VectorBase & b,
-		       const PreconditionBase & preconditioner)
+  SolverBase::solve (Epetra_Operator &A,
+                     VectorBase &x,
+                     const VectorBase &b,
+                     const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem.reset
-      (new Epetra_LinearProblem (&A,
-				 &x.trilinos_vector (),
-				 const_cast <
-				 Epetra_MultiVector *
-				 >(&b.trilinos_vector ())));
+    (new Epetra_LinearProblem (&A,
+                               &x.trilinos_vector (),
+                               const_cast <
+                               Epetra_MultiVector *
+                               >(&b.trilinos_vector ())));
 
     do_solve (preconditioner);
   }
@@ -111,10 +111,10 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (const SparseMatrix & A,
-		       dealii::Vector < double >&x,
-		       const dealii::Vector < double >&b,
-		       const PreconditionBase & preconditioner)
+  SolverBase::solve (const SparseMatrix &A,
+                     dealii::Vector < double > &x,
+                     const dealii::Vector < double > &b,
+                     const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
@@ -123,21 +123,21 @@ SolverBase::SolverBase (SolverControl & cn):
     Assert (x.size () == A.n (), ExcDimensionMismatch (x.size (), A.n ()));
     Assert (b.size () == A.m (), ExcDimensionMismatch (b.size (), A.m ()));
     Assert (A.local_range ().second == A.m (),
-	    ExcMessage
-	    ("Can only work in serial when using deal.II vectors."));
+            ExcMessage
+            ("Can only work in serial when using deal.II vectors."));
     Assert (A.trilinos_matrix ().Filled (),
-	    ExcMessage ("Matrix is not compressed. Call compress() method."));
+            ExcMessage ("Matrix is not compressed. Call compress() method."));
 
     Epetra_Vector ep_x (View, A.domain_partitioner (), x.begin ());
     Epetra_Vector ep_b (View, A.range_partitioner (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem.reset (new Epetra_LinearProblem
-			  (const_cast <
-			   Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
-			   &ep_b));
+                          (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
+                           &ep_b));
 
     do_solve (preconditioner);
   }
@@ -145,16 +145,16 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (Epetra_Operator & A,
-		       dealii::Vector < double >&x,
-		       const dealii::Vector < double >&b,
-		       const PreconditionBase & preconditioner)
+  SolverBase::solve (Epetra_Operator &A,
+                     dealii::Vector < double > &x,
+                     const dealii::Vector < double > &b,
+                     const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
     Epetra_Vector ep_x (View, A.OperatorDomainMap (), x.begin ());
     Epetra_Vector ep_b (View, A.OperatorRangeMap (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -166,32 +166,32 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (const SparseMatrix & A,
-		       dealii::parallel::distributed::Vector < double >&x,
-		       const dealii::parallel::distributed::Vector <
-		       double >&b, const PreconditionBase & preconditioner)
+  SolverBase::solve (const SparseMatrix &A,
+                     dealii::parallel::distributed::Vector < double > &x,
+                     const dealii::parallel::distributed::Vector <
+                     double >&b, const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (x.local_size ()),
-		     A.domain_partitioner ().NumMyElements ());
+                     (x.local_size ()),
+                     A.domain_partitioner ().NumMyElements ());
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (b.local_size ()),
-		     A.range_partitioner ().NumMyElements ());
+                     (b.local_size ()),
+                     A.range_partitioner ().NumMyElements ());
 
     Epetra_Vector ep_x (View, A.domain_partitioner (), x.begin ());
     Epetra_Vector ep_b (View, A.range_partitioner (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem.reset (new Epetra_LinearProblem
-			  (const_cast <
-			   Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
-			   &ep_b));
+                          (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
+                           &ep_b));
 
     do_solve (preconditioner);
   }
@@ -199,23 +199,23 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverBase::solve (Epetra_Operator & A,
-		       dealii::parallel::distributed::Vector < double >&x,
-		       const dealii::parallel::distributed::Vector <
-		       double >&b, const PreconditionBase & preconditioner)
+  SolverBase::solve (Epetra_Operator &A,
+                     dealii::parallel::distributed::Vector < double > &x,
+                     const dealii::parallel::distributed::Vector <
+                     double >&b, const PreconditionBase &preconditioner)
   {
     linear_problem.reset ();
 
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (x.local_size ()),
-		     A.OperatorDomainMap ().NumMyElements ());
+                     (x.local_size ()),
+                     A.OperatorDomainMap ().NumMyElements ());
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (b.local_size ()),
-		     A.OperatorRangeMap ().NumMyElements ());
+                     (b.local_size ()),
+                     A.OperatorRangeMap ().NumMyElements ());
 
     Epetra_Vector ep_x (View, A.OperatorDomainMap (), x.begin ());
     Epetra_Vector ep_b (View, A.OperatorRangeMap (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -226,7 +226,7 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  void SolverBase::do_solve (const PreconditionBase & preconditioner)
+  void SolverBase::do_solve (const PreconditionBase &preconditioner)
   {
     int ierr;
 
@@ -237,46 +237,46 @@ SolverBase::SolverBase (SolverControl & cn):
     switch (solver_name)
       {
       case cg:
-	solver.SetAztecOption (AZ_solver, AZ_cg);
-	break;
+        solver.SetAztecOption (AZ_solver, AZ_cg);
+        break;
       case cgs:
-	solver.SetAztecOption (AZ_solver, AZ_cgs);
-	break;
+        solver.SetAztecOption (AZ_solver, AZ_cgs);
+        break;
       case gmres:
-	solver.SetAztecOption (AZ_solver, AZ_gmres);
-	solver.SetAztecOption (AZ_kspace,
-			       additional_data.gmres_restart_parameter);
-	break;
+        solver.SetAztecOption (AZ_solver, AZ_gmres);
+        solver.SetAztecOption (AZ_kspace,
+                               additional_data.gmres_restart_parameter);
+        break;
       case bicgstab:
-	solver.SetAztecOption (AZ_solver, AZ_bicgstab);
-	break;
+        solver.SetAztecOption (AZ_solver, AZ_bicgstab);
+        break;
       case tfqmr:
-	solver.SetAztecOption (AZ_solver, AZ_tfqmr);
-	break;
+        solver.SetAztecOption (AZ_solver, AZ_tfqmr);
+        break;
       default:
-	Assert (false, ExcNotImplemented ());
+        Assert (false, ExcNotImplemented ());
       }
 
     // Introduce the preconditioner, if the identity preconditioner is used,
     // the precondioner is set to none, ...
     if (preconditioner.preconditioner.use_count () != 0)
       {
-	ierr = solver.SetPrecOperator (const_cast < Epetra_Operator * >
-				       (preconditioner.preconditioner.
-					get ()));
-	AssertThrow (ierr == 0, ExcTrilinosError (ierr));
+        ierr = solver.SetPrecOperator (const_cast < Epetra_Operator * >
+                                       (preconditioner.preconditioner.
+                                        get ()));
+        AssertThrow (ierr == 0, ExcTrilinosError (ierr));
       }
     else
       solver.SetAztecOption (AZ_precond, AZ_none);
 
     // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
-			   AZ_all : AZ_none);
+                           AZ_all : AZ_none);
     solver.SetAztecOption (AZ_conv, AZ_noscaled);
 
     // ... and then solve!
     ierr = solver.Iterate (solver_control.max_steps (),
-			   solver_control.tolerance ());
+                           solver_control.tolerance ());
 
     // report errors in more detail than just by checking whether the return
     // status is zero or greater. the error strings are taken from the
@@ -284,19 +284,19 @@ SolverBase::SolverBase (SolverControl & cn):
     switch (ierr)
       {
       case -1:
-	AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -1: "
-					"option not implemented"));
+        AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -1: "
+                                        "option not implemented"));
       case -2:
-	AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -2: "
-					"numerical breakdown"));
+        AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -2: "
+                                        "numerical breakdown"));
       case -3:
-	AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -3: "
-					"loss of precision"));
+        AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -3: "
+                                        "loss of precision"));
       case -4:
-	AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -4: "
-					"GMRES Hessenberg ill-conditioned"));
+        AssertThrow (false, ExcMessage ("AztecOO::Iterate error code -4: "
+                                        "GMRES Hessenberg ill-conditioned"));
       default:
-	AssertThrow (ierr >= 0, ExcTrilinosError (ierr));
+        AssertThrow (ierr >= 0, ExcTrilinosError (ierr));
       }
 
     // Finally, let the deal.II SolverControl object know what has
@@ -306,9 +306,9 @@ SolverBase::SolverBase (SolverControl & cn):
 
     if (solver_control.last_check () != SolverControl::success)
       AssertThrow (false,
-		   SolverControl::NoConvergence (solver_control.last_step (),
-						 solver_control.
-						 last_value ()));
+                   SolverControl::NoConvergence (solver_control.last_step (),
+                                                 solver_control.
+                                                 last_value ()));
   }
 
 
@@ -318,16 +318,16 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverCG ------------------------ */
 
   SolverCG::
-    AdditionalData::AdditionalData (const bool
-				    output_solver_details):output_solver_details
+  AdditionalData::AdditionalData (const bool
+                                  output_solver_details):output_solver_details
     (output_solver_details)
   {
   }
 
 
 
-  SolverCG::SolverCG (SolverControl & cn,
-		      const AdditionalData & data):SolverBase (cn),
+  SolverCG::SolverCG (SolverControl &cn,
+                      const AdditionalData &data):SolverBase (cn),
     additional_data (data.output_solver_details)
   {
     solver_name = cg;
@@ -337,17 +337,17 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverGMRES ------------------------ */
 
   SolverGMRES::
-    AdditionalData::AdditionalData (const bool output_solver_details,
-				    const unsigned int
-				    restart_parameter):output_solver_details
+  AdditionalData::AdditionalData (const bool output_solver_details,
+                                  const unsigned int
+                                  restart_parameter):output_solver_details
     (output_solver_details), restart_parameter (restart_parameter)
   {
   }
 
 
 
-  SolverGMRES::SolverGMRES (SolverControl & cn,
-			    const AdditionalData & data):SolverBase (cn),
+  SolverGMRES::SolverGMRES (SolverControl &cn,
+                            const AdditionalData &data):SolverBase (cn),
     additional_data (data.output_solver_details, data.restart_parameter)
   {
     solver_name = gmres;
@@ -357,8 +357,8 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverBicgstab ------------------------ */
 
   SolverBicgstab::
-    AdditionalData::AdditionalData (const bool
-				    output_solver_details):output_solver_details
+  AdditionalData::AdditionalData (const bool
+                                  output_solver_details):output_solver_details
     (output_solver_details)
   {
   }
@@ -366,9 +366,9 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  SolverBicgstab::SolverBicgstab (SolverControl & cn,
-				  const AdditionalData &
-				  data):SolverBase (cn),
+  SolverBicgstab::SolverBicgstab (SolverControl &cn,
+                                  const AdditionalData &
+                                  data):SolverBase (cn),
     additional_data (data.output_solver_details)
   {
     solver_name = bicgstab;
@@ -378,8 +378,8 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverCGS ------------------------ */
 
   SolverCGS::
-    AdditionalData::AdditionalData (const bool
-				    output_solver_details):output_solver_details
+  AdditionalData::AdditionalData (const bool
+                                  output_solver_details):output_solver_details
     (output_solver_details)
   {
   }
@@ -387,8 +387,8 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  SolverCGS::SolverCGS (SolverControl & cn,
-			const AdditionalData & data):SolverBase (cn),
+  SolverCGS::SolverCGS (SolverControl &cn,
+                        const AdditionalData &data):SolverBase (cn),
     additional_data (data.output_solver_details)
   {
     solver_name = cgs;
@@ -398,16 +398,16 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverTFQMR ------------------------ */
 
   SolverTFQMR::
-    AdditionalData::AdditionalData (const bool
-				    output_solver_details):output_solver_details
+  AdditionalData::AdditionalData (const bool
+                                  output_solver_details):output_solver_details
     (output_solver_details)
   {
   }
 
 
 
-  SolverTFQMR::SolverTFQMR (SolverControl & cn,
-			    const AdditionalData & data):SolverBase (cn),
+  SolverTFQMR::SolverTFQMR (SolverControl &cn,
+                            const AdditionalData &data):SolverBase (cn),
     additional_data (data.output_solver_details)
   {
     solver_name = tfqmr;
@@ -418,10 +418,10 @@ SolverBase::SolverBase (SolverControl & cn):
   /* ---------------------- SolverDirect ------------------------ */
 
   SolverDirect::
-    AdditionalData::AdditionalData (const bool output_solver_details,
-				    const std::
-				    string &
-				    solver_type):output_solver_details
+  AdditionalData::AdditionalData (const bool output_solver_details,
+                                  const std::
+                                  string &
+                                  solver_type):output_solver_details
     (output_solver_details), solver_type (solver_type)
   {
   }
@@ -429,9 +429,9 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  SolverDirect::SolverDirect (SolverControl & cn,
-			      const AdditionalData &
-			      data):solver_control (cn),
+  SolverDirect::SolverDirect (SolverControl &cn,
+                              const AdditionalData &
+                              data):solver_control (cn),
     additional_data (data.output_solver_details, data.solver_type)
   {
   }
@@ -444,13 +444,13 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
 
-  SolverControl & SolverDirect::control ()const
+  SolverControl &SolverDirect::control ()const
   {
     return solver_control;
   }
 
 
-  void SolverDirect::initialize (const SparseMatrix & A)
+  void SolverDirect::initialize (const SparseMatrix &A)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -458,7 +458,7 @@ SolverBase::SolverBase (SolverControl & cn):
 
     // Assign the matrix operator to the Epetra_LinearProblem object
     linear_problem->SetOperator (const_cast <
-				 Epetra_CrsMatrix * >(&A.trilinos_matrix ()));
+                                 Epetra_CrsMatrix * >(&A.trilinos_matrix ()));
 
     // Fetch return value of Amesos Solver functions
     int ierr;
@@ -466,7 +466,7 @@ SolverBase::SolverBase (SolverControl & cn):
     // First set whether we want to print the solver information to screen or
     // not.
     ConditionalOStream verbose_cout (std::cout,
-				     additional_data.output_solver_details);
+                                     additional_data.output_solver_details);
 
     solver.reset ();
 
@@ -476,16 +476,16 @@ SolverBase::SolverBase (SolverControl & cn):
     Amesos Factory;
 
     AssertThrow (Factory.Query (additional_data.solver_type.c_str ()),
-		 ExcMessage (std::
-			     string ("You tried to select the solver type <")
-			     + additional_data.solver_type +
-			     "> but this solver is not supported by Trilinos either "
-			     "because it does not exist, or because Trilinos was not "
-			     "configured for its use."));
+                 ExcMessage (std::
+                             string ("You tried to select the solver type <")
+                             + additional_data.solver_type +
+                             "> but this solver is not supported by Trilinos either "
+                             "because it does not exist, or because Trilinos was not "
+                             "configured for its use."));
 
     solver.reset (Factory.
-		  Create (additional_data.solver_type.c_str (),
-			  *linear_problem));
+                  Create (additional_data.solver_type.c_str (),
+                          *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization ();
@@ -497,14 +497,14 @@ SolverBase::SolverBase (SolverControl & cn):
   }
 
 
-  void SolverDirect::solve (VectorBase & x, const VectorBase & b)
+  void SolverDirect::solve (VectorBase &x, const VectorBase &b)
   {
     // Assign the empty LHS vector to the Epetra_LinearProblem object
     linear_problem->SetLHS (&x.trilinos_vector ());
 
     // Assign the RHS vector to the Epetra_LinearProblem object
     linear_problem->SetRHS (const_cast <
-			    Epetra_MultiVector * >(&b.trilinos_vector ()));
+                            Epetra_MultiVector * >(&b.trilinos_vector ()));
 
     // Fetch return value of Amesos Solver functions
     int ierr;
@@ -512,7 +512,7 @@ SolverBase::SolverBase (SolverControl & cn):
     // First set whether we want to print the solver information to screen or
     // not.
     ConditionalOStream verbose_cout (std::cout,
-				     additional_data.output_solver_details);
+                                     additional_data.output_solver_details);
 
 
     verbose_cout << "Starting solve" << std::endl;
@@ -526,9 +526,9 @@ SolverBase::SolverBase (SolverControl & cn):
 
     if (solver_control.last_check () != SolverControl::success)
       AssertThrow (false,
-		   SolverControl::NoConvergence (solver_control.last_step (),
-						 solver_control.
-						 last_value ()));
+                   SolverControl::NoConvergence (solver_control.last_step (),
+                                                 solver_control.
+                                                 last_value ()));
   }
 
   void SolverDirect::do_solve ()
@@ -539,7 +539,7 @@ SolverBase::SolverBase (SolverControl & cn):
     // First set whether we want to print the solver information to screen or
     // not.
     ConditionalOStream verbose_cout (std::cout,
-				     additional_data.output_solver_details);
+                                     additional_data.output_solver_details);
 
     solver.reset ();
 
@@ -549,16 +549,16 @@ SolverBase::SolverBase (SolverControl & cn):
     Amesos Factory;
 
     AssertThrow (Factory.Query (additional_data.solver_type.c_str ()),
-		 ExcMessage (std::
-			     string ("You tried to select the solver type <")
-			     + additional_data.solver_type +
-			     "> but this solver is not supported by Trilinos either "
-			     "because it does not exist, or because Trilinos was not "
-			     "configured for its use."));
+                 ExcMessage (std::
+                             string ("You tried to select the solver type <")
+                             + additional_data.solver_type +
+                             "> but this solver is not supported by Trilinos either "
+                             "because it does not exist, or because Trilinos was not "
+                             "configured for its use."));
 
     solver.reset (Factory.
-		  Create (additional_data.solver_type.c_str (),
-			  *linear_problem));
+                  Create (additional_data.solver_type.c_str (),
+                          *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization ();
@@ -579,25 +579,25 @@ SolverBase::SolverBase (SolverControl & cn):
 
     if (solver_control.last_check () != SolverControl::success)
       AssertThrow (false,
-		   SolverControl::NoConvergence (solver_control.last_step (),
-						 solver_control.
-						 last_value ()));
+                   SolverControl::NoConvergence (solver_control.last_step (),
+                                                 solver_control.
+                                                 last_value ()));
   }
 
 
   void
-    SolverDirect::solve (const SparseMatrix & A,
-			 VectorBase & x, const VectorBase & b)
+  SolverDirect::solve (const SparseMatrix &A,
+                       VectorBase &x, const VectorBase &b)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
     linear_problem.reset
-      (new
-       Epetra_LinearProblem (const_cast <
-			     Epetra_CrsMatrix * >(&A.trilinos_matrix ()),
-			     &x.trilinos_vector (),
-			     const_cast <
-			     Epetra_MultiVector * >(&b.trilinos_vector ())));
+    (new
+     Epetra_LinearProblem (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()),
+                           &x.trilinos_vector (),
+                           const_cast <
+                           Epetra_MultiVector * >(&b.trilinos_vector ())));
 
     do_solve ();
   }
@@ -605,9 +605,9 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverDirect::solve (const SparseMatrix & A,
-			 dealii::Vector < double >&x,
-			 const dealii::Vector < double >&b)
+  SolverDirect::solve (const SparseMatrix &A,
+                       dealii::Vector < double > &x,
+                       const dealii::Vector < double > &b)
   {
 
     // In case we call the solver with deal.II vectors, we create views of the
@@ -615,18 +615,18 @@ SolverBase::SolverBase (SolverControl & cn):
     Assert (x.size () == A.n (), ExcDimensionMismatch (x.size (), A.n ()));
     Assert (b.size () == A.m (), ExcDimensionMismatch (b.size (), A.m ()));
     Assert (A.local_range ().second == A.m (),
-	    ExcMessage
-	    ("Can only work in serial when using deal.II vectors."));
+            ExcMessage
+            ("Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x (View, A.domain_partitioner (), x.begin ());
     Epetra_Vector ep_b (View, A.range_partitioner (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
     linear_problem.reset (new Epetra_LinearProblem
-			  (const_cast <
-			   Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
-			   &ep_b));
+                          (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
+                           &ep_b));
 
     do_solve ();
   }
@@ -634,27 +634,27 @@ SolverBase::SolverBase (SolverControl & cn):
 
 
   void
-    SolverDirect::solve (const SparseMatrix & A,
-			 dealii::parallel::distributed::Vector < double >&x,
-			 const dealii::parallel::distributed::Vector <
-			 double >&b)
+  SolverDirect::solve (const SparseMatrix &A,
+                       dealii::parallel::distributed::Vector < double > &x,
+                       const dealii::parallel::distributed::Vector <
+                       double >&b)
   {
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (x.local_size ()),
-		     A.domain_partitioner ().NumMyElements ());
+                     (x.local_size ()),
+                     A.domain_partitioner ().NumMyElements ());
     AssertDimension (static_cast < TrilinosWrappers::types::int_type >
-		     (b.local_size ()),
-		     A.range_partitioner ().NumMyElements ());
+                     (b.local_size ()),
+                     A.range_partitioner ().NumMyElements ());
     Epetra_Vector ep_x (View, A.domain_partitioner (), x.begin ());
     Epetra_Vector ep_b (View, A.range_partitioner (),
-			const_cast < double *>(b.begin ()));
+                        const_cast < double *>(b.begin ()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
     linear_problem.reset (new Epetra_LinearProblem
-			  (const_cast <
-			   Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
-			   &ep_b));
+                          (const_cast <
+                           Epetra_CrsMatrix * >(&A.trilinos_matrix ()), &ep_x,
+                           &ep_b));
 
     do_solve ();
   }
