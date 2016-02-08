@@ -7082,7 +7082,7 @@ namespace VectorTools
         double my_values[3] = { mean_double.real(), mean_double.imag(), area };
         double global_values[3];
 
-        MPI_Allreduce (&my_values, &global_values, 3, MPI_DOUBLE,
+        MPI_Allreduce (my_values, global_values, 3, MPI_DOUBLE,
                        MPI_SUM,
                        p_triangulation->get_communicator());
 

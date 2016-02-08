@@ -96,7 +96,7 @@ namespace
 
     // compute the minimum on
     // processor zero
-    MPI_Reduce (&comp, &result, 2, MPI_DOUBLE,
+    MPI_Reduce (comp, result, 2, MPI_DOUBLE,
                 MPI_MIN, 0, mpi_communicator);
 
     // make sure only processor zero
