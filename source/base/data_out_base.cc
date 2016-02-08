@@ -6173,7 +6173,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
     }
 
-  MPI_Bcast(&header_size, 1, MPI_INT, 0, comm);
+  MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
 
   MPI_File_seek_shared( fh, header_size, MPI_SEEK_SET );
   {
