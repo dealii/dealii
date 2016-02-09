@@ -288,7 +288,8 @@ struct SubCellData;
  *
  * @ingroup grid
  * @ingroup input
- * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007, Jean-Paul Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
+ * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007, Jean-Paul
+ * Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
  */
 
 template <int dim, int spacedim=dim>
@@ -368,41 +369,39 @@ public:
   void read_ucd (std::istream &in);
 
   /**
-   * Read grid data from an Abaqus file. Numerical and constitutive data
-   * is ignored.
+   * Read grid data from an Abaqus file. Numerical and constitutive data is
+   * ignored.
    *
-   * @note The current implementation of this mesh reader is suboptimal,
-   *       and may therefore be slow for large meshes.
+   * @note The current implementation of this mesh reader is suboptimal, and
+   * may therefore be slow for large meshes.
    *
    * @note Usage tips for Cubit:
    * - Multiple material-id's can be defined in the mesh.
-   *   This is done by specifying blocksets in the pre-processor.
+   * This is done by specifying blocksets in the pre-processor.
    * - Arbitrary surface boundaries can be defined in the mesh.
-   *   This is done by specifying sidesets in the pre-processor.
-   *   In particular, boundaries are not confined to just surfaces (in 3d)
-   *   individual element faces can be added to the sideset as well.
-   *   This is useful when a boundary condition is to be applied on a
-   *   complex shape boundary that is difficult to define using "surfaces"
-   *   alone. Similar can be done in 2d.
+   * This is done by specifying sidesets in the pre-processor. In particular,
+   * boundaries are not confined to just surfaces (in 3d) individual element
+   * faces can be added to the sideset as well. This is useful when a boundary
+   * condition is to be applied on a complex shape boundary that is difficult
+   * to define using "surfaces" alone. Similar can be done in 2d.
    *
    * @note Compatibility information for this file format is listed below.
    * - Files generated in Abaqus CAE 6.12 have been verified to be
-   *   correctly imported, but older (or newer) versions of Abaqus may
-   *   also generate valid input decks.
+   * correctly imported, but older (or newer) versions of Abaqus may also
+   * generate valid input decks.
    * - Files generated using Cubit 11.x, 12.x and 13.x are valid, but only
-   *   when using a specific set of export steps. These are as follows:
+   * when using a specific set of export steps. These are as follows:
    *     - Go to "Analysis setup mode" by clicking on the disc icon in the
-   *       toolbar on the right.
+   * toolbar on the right.
    *     - Select "Export Mesh" under "Operation" by clicking on the
-   *       necessary icon in the toolbar on the right.
+   * necessary icon in the toolbar on the right.
    *     - Select an output file. In Cubit version 11.0 and 12.0 it might be
-   *       necessary to click on the browse button and type it in the
-   *       dialogue that pops up.
+   * necessary to click on the browse button and type it in the dialogue that
+   * pops up.
    *     - Select the dimension to output in.
    *     - Tick the overwrite box.
    *     - If using Cubit v12.0 onwards, uncheck the box "Export using Cubit
-   *       ID's". An invalid file will encounter errors if this box is left
-   *       checked.
+   * ID's". An invalid file will encounter errors if this box is left checked.
    *     - Click apply.
    */
   void read_abaqus (std::istream &in);

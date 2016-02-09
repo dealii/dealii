@@ -339,9 +339,10 @@ private:
  * multi-level preconditioning and provide the standard interface for LAC
  * iterative methods.
  *
- * Furthermore, it needs functions <tt>void copy_to_mg(const VectorType&)</tt> to
- * store @p src in the right hand side of the multi-level method and <tt>void
- * copy_from_mg(VectorType&)</tt> to store the result of the v-cycle in @p dst.
+ * Furthermore, it needs functions <tt>void copy_to_mg(const VectorType&)</tt>
+ * to store @p src in the right hand side of the multi-level method and
+ * <tt>void copy_from_mg(VectorType&)</tt> to store the result of the v-cycle
+ * in @p dst.
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */

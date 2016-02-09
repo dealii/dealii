@@ -209,7 +209,8 @@ namespace DoFTools
   };
 
   /**
-   * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
+   * @name Functions to support code that generically uses both DoFHandler and
+   * hp::DoFHandler
    * @{
    */
   /**
@@ -341,131 +342,117 @@ namespace DoFTools
    */
 
   /**
-   * Compute which entries of a matrix built on the given
-   * @p dof_handler may possibly be nonzero, and create a sparsity
-   * pattern object that represents these nonzero locations.
+   * Compute which entries of a matrix built on the given @p dof_handler may
+   * possibly be nonzero, and create a sparsity pattern object that represents
+   * these nonzero locations.
    *
-   * This function computes the possible positions of non-zero entries
-   * in the global system matrix by <i>simulating</i> which entries
-   * one would write to during the actual assembly of a matrix. For
-   * this, the function assumes that each finite element basis
-   * function is non-zero on a cell only if its degree of freedom is
-   * associated with the interior, a face, an edge or a vertex of this
-   * cell.  As a result, a matrix entry $A_{ij}$ that is computed from
-   * two basis functions $\varphi_i$ and $\varphi_j$ with (global)
-   * indices $i$ and $j$ (for example, using a bilinear form
-   * $A_{ij}=a(\varphi_i,\varphi_j)$) can be non-zero only if these
-   * shape functions correspond to degrees of freedom that are defined
-   * on at least one common cell. Therefore, this function just loops
-   * over all cells, figures out the global indices of all degrees of
-   * freedom, and presumes that all matrix entries that couple any of
-   * these indices will result in a nonzero matrix entry. These will
-   * then be added to the sparsity pattern. As this process of
-   * generating the sparsity pattern does not take into account the
-   * equation to be solved later on, the resulting sparsity pattern is
-   * symmetric.
+   * This function computes the possible positions of non-zero entries in the
+   * global system matrix by <i>simulating</i> which entries one would write
+   * to during the actual assembly of a matrix. For this, the function assumes
+   * that each finite element basis function is non-zero on a cell only if its
+   * degree of freedom is associated with the interior, a face, an edge or a
+   * vertex of this cell.  As a result, a matrix entry $A_{ij}$ that is
+   * computed from two basis functions $\varphi_i$ and $\varphi_j$ with
+   * (global) indices $i$ and $j$ (for example, using a bilinear form
+   * $A_{ij}=a(\varphi_i,\varphi_j)$) can be non-zero only if these shape
+   * functions correspond to degrees of freedom that are defined on at least
+   * one common cell. Therefore, this function just loops over all cells,
+   * figures out the global indices of all degrees of freedom, and presumes
+   * that all matrix entries that couple any of these indices will result in a
+   * nonzero matrix entry. These will then be added to the sparsity pattern.
+   * As this process of generating the sparsity pattern does not take into
+   * account the equation to be solved later on, the resulting sparsity
+   * pattern is symmetric.
    *
-   * This algorithm makes no distinction between shape functions on
-   * each cell, i.e., it simply couples all degrees of freedom on a
-   * cell with all other degrees of freedom on a cell. This is often
-   * the case, and always a safe assumption. However, if you know
-   * something about the structure of your operator and that it does
-   * not couple certain shape functions with certain test functions,
-   * then you can get a sparser sparsity pattern by calling a variant
-   * of the current function described below that allows to specify
-   * which vector components couple with which other vector
-   * components.
+   * This algorithm makes no distinction between shape functions on each cell,
+   * i.e., it simply couples all degrees of freedom on a cell with all other
+   * degrees of freedom on a cell. This is often the case, and always a safe
+   * assumption. However, if you know something about the structure of your
+   * operator and that it does not couple certain shape functions with certain
+   * test functions, then you can get a sparser sparsity pattern by calling a
+   * variant of the current function described below that allows to specify
+   * which vector components couple with which other vector components.
    *
-   * The method described above lives on the assumption that coupling
-   * between degrees of freedom only happens if shape functions
-   * overlap on at least one cell. This is the case with most usual
-   * finite element formulations involving conforming
-   * elements. However, for formulations such as the Discontinuous
-   * Galerkin finite element method, the bilinear form contains terms
-   * on interfaces between cells that couple shape functions that live
-   * on one cell with shape functions that live on a neighboring
-   * cell. The current function would not see these couplings, and
-   * would consequently not allocate entries in the sparsity
-   * pattern. You would then get into trouble during matrix assembly
-   * because you try to write into matrix entries for which no space
-   * has been allocated in the sparsity pattern. This can be avoided
-   * by calling the DoFTools::make_flux_sparsity_pattern() function
-   * instead, which takes into account coupling between degrees of
+   * The method described above lives on the assumption that coupling between
+   * degrees of freedom only happens if shape functions overlap on at least
+   * one cell. This is the case with most usual finite element formulations
+   * involving conforming elements. However, for formulations such as the
+   * Discontinuous Galerkin finite element method, the bilinear form contains
+   * terms on interfaces between cells that couple shape functions that live
+   * on one cell with shape functions that live on a neighboring cell. The
+   * current function would not see these couplings, and would consequently
+   * not allocate entries in the sparsity pattern. You would then get into
+   * trouble during matrix assembly because you try to write into matrix
+   * entries for which no space has been allocated in the sparsity pattern.
+   * This can be avoided by calling the DoFTools::make_flux_sparsity_pattern()
+   * function instead, which takes into account coupling between degrees of
    * freedom on neighboring cells.
    *
-   * There are other situations where bilinear forms contain non-local
-   * terms, for example in treating integral equations. These require
-   * different methods for building the sparsity patterns that depend
-   * on the exact formulation of the problem. You will have to do this
-   * yourself then.
+   * There are other situations where bilinear forms contain non-local terms,
+   * for example in treating integral equations. These require different
+   * methods for building the sparsity patterns that depend on the exact
+   * formulation of the problem. You will have to do this yourself then.
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object
-   *   that describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
+   * describes which degrees of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
-   *   entries.
+   * entries.
    *
-   * @param[in] constraints The process for generating entries
-   *   described above is purely local to each cell. Consequently, the
-   *   sparsity pattern does not provide for matrix entries that will
-   *   only be written into during the elimination of hanging nodes or
-   *   other constraints. They have to be taken care of by a
-   *   subsequent call to ConstraintMatrix::condense().
-   *   Alternatively, the constraints on degrees of freedom can
-   *   already be taken into account at the time of creating the
-   *   sparsity pattern. For this, pass the ConstraintMatrix object as
-   *   the third argument to the current function. No call to
-   *   ConstraintMatrix::condense() is then necessary. This process is
-   *   explained in step-6, step-27, and other tutorial programs.
+   * @param[in] constraints The process for generating entries described above
+   * is purely local to each cell. Consequently, the sparsity pattern does not
+   * provide for matrix entries that will only be written into during the
+   * elimination of hanging nodes or other constraints. They have to be taken
+   * care of by a subsequent call to ConstraintMatrix::condense().
+   * Alternatively, the constraints on degrees of freedom can already be taken
+   * into account at the time of creating the sparsity pattern. For this, pass
+   * the ConstraintMatrix object as the third argument to the current
+   * function. No call to ConstraintMatrix::condense() is then necessary. This
+   * process is explained in step-6, step-27, and other tutorial programs.
    *
-   * @param[in] keep_constrained_dofs In case the constraints are
-   *   already taken care of in this function by passing in a
-   *   ConstraintMatrix object, it is possible to abandon some
-   *   off-diagonal entries in the sparsity pattern if these entries
-   *   will also not be written into during the actual assembly of the
-   *   matrix this sparsity pattern later serves. Specifically, when
-   *   using an assembly method that uses
-   *   ConstraintMatrix::distribute_local_to_global(), no entries will
-   *   ever be written into those matrix rows or columns that
-   *   correspond to constrained degrees of freedom. In such cases,
-   *   you can set the argument @p keep_constrained_dofs to @p false
-   *   to avoid allocating these entries in the sparsity pattern.
+   * @param[in] keep_constrained_dofs In case the constraints are already
+   * taken care of in this function by passing in a ConstraintMatrix object,
+   * it is possible to abandon some off-diagonal entries in the sparsity
+   * pattern if these entries will also not be written into during the actual
+   * assembly of the matrix this sparsity pattern later serves. Specifically,
+   * when using an assembly method that uses
+   * ConstraintMatrix::distribute_local_to_global(), no entries will ever be
+   * written into those matrix rows or columns that correspond to constrained
+   * degrees of freedom. In such cases, you can set the argument @p
+   * keep_constrained_dofs to @p false to avoid allocating these entries in
+   * the sparsity pattern.
    *
-   * @param[in] subdomain_id If specified, the sparsity pattern is
-   *   built only on cells that have a subdomain_id equal to the given
-   *   argument. This is useful in parallel contexts where the matrix
-   *   and sparsity pattern (for example a
-   *   TrilinosWrappers::SparsityPattern) may be distributed and not
-   *   every MPI process needs to build the entire sparsity pattern;
-   *   in that case, it is sufficient if every process only builds
-   *   that part of the sparsity pattern that corresponds to the
-   *   subdomain_id for which it is responsible. This feature is used
-   *   in step-32. (This argument is not usually needed for objects of
-   *   type parallel::distributed::Triangulation because the current
-   *   function only loops over locally owned cells anyway; thus, this
-   *   argument typically only makes sense if you want to use the
-   *   subdomain_id for anything other than indicating which processor
-   *   owns a cell, for example which geometric component of the
-   *   domain a cell belongs to.)
+   * @param[in] subdomain_id If specified, the sparsity pattern is built only
+   * on cells that have a subdomain_id equal to the given argument. This is
+   * useful in parallel contexts where the matrix and sparsity pattern (for
+   * example a TrilinosWrappers::SparsityPattern) may be distributed and not
+   * every MPI process needs to build the entire sparsity pattern; in that
+   * case, it is sufficient if every process only builds that part of the
+   * sparsity pattern that corresponds to the subdomain_id for which it is
+   * responsible. This feature is used in step-32. (This argument is not
+   * usually needed for objects of type parallel::distributed::Triangulation
+   * because the current function only loops over locally owned cells anyway;
+   * thus, this argument typically only makes sense if you want to use the
+   * subdomain_id for anything other than indicating which processor owns a
+   * cell, for example which geometric component of the domain a cell belongs
+   * to.)
    *
-   * @note The actual type of the sparsity pattern may be
-   *   SparsityPattern, DynamicSparsityPattern, BlockSparsityPattern,
-   *   BlockDynamicSparsityPattern, or any other class that satisfies
-   *   similar requirements. It is assumed that the size of the
-   *   sparsity pattern matches the number of degrees of freedom and
-   *   that enough unused nonzero entries are left to fill the
-   *   sparsity pattern if the sparsity pattern is of "static" kind
-   *   (see
-   *   @ref Sparsity
-   *   for more information on what this
-   *   means). The nonzero entries generated by this function are
-   *   added to possible previous content of the object, i.e.,
-   *   previously added entries are not removed.
+   * @note The actual type of the sparsity pattern may be SparsityPattern,
+   * DynamicSparsityPattern, BlockSparsityPattern,
+   * BlockDynamicSparsityPattern, or any other class that satisfies similar
+   * requirements. It is assumed that the size of the sparsity pattern matches
+   * the number of degrees of freedom and that enough unused nonzero entries
+   * are left to fill the sparsity pattern if the sparsity pattern is of
+   * "static" kind (see
+   * @ref Sparsity
+   * for more information on what this means). The nonzero entries generated
+   * by this function are added to possible previous content of the object,
+   * i.e., previously added entries are not removed.
    *
    * @note If the sparsity pattern is represented by an object of type
-   *   SparsityPattern (as opposed to, for example,
-   *   DynamicSparsityPattern), you need to remember using
-   *   SparsityPattern::compress() after generating the pattern.
+   * SparsityPattern (as opposed to, for example, DynamicSparsityPattern), you
+   * need to remember using SparsityPattern::compress() after generating the
+   * pattern.
    *
    * @ingroup constraints
    */
@@ -478,15 +465,15 @@ namespace DoFTools
                          const types::subdomain_id  subdomain_id          = numbers::invalid_subdomain_id);
 
   /**
-   * Compute which entries of a matrix built on the given
-   * @p dof_handler may possibly be nonzero, and create a sparsity
-   * pattern object that represents these nonzero locations.
+   * Compute which entries of a matrix built on the given @p dof_handler may
+   * possibly be nonzero, and create a sparsity pattern object that represents
+   * these nonzero locations.
    *
    * This function is a simple variation on the previous
-   * make_sparsity_pattern() function (see there for a description of
-   * all of the common arguments), but it provides functionality for
-   * vector finite elements that allows to be more specific about
-   * which variables couple in which equation.
+   * make_sparsity_pattern() function (see there for a description of all of
+   * the common arguments), but it provides functionality for vector finite
+   * elements that allows to be more specific about which variables couple in
+   * which equation.
    *
    * For example, if you wanted to solve the Stokes equations,
    *
@@ -494,15 +481,14 @@ namespace DoFTools
    * -\Delta \mathbf u + \nabla p &= 0,\\ \text{div}\ u &= 0
    * @f}
    *
-   * in two space dimensions, using stable Q2/Q1 mixed elements (using
-   * the FESystem class), then you don't want all degrees of freedom
-   * to couple in each equation. More specifically, in the first
-   * equation, only $u_x$ and $p$ appear; in the second equation, only
-   * $u_y$ and $p$ appear; and in the third equation, only $u_x$ and
-   * $u_y$ appear. (Note that this discussion only talks about vector
-   * components of the solution variable and the different equation,
-   * and has nothing to do with degrees of freedom, or in fact with
-   * any kind of discretization.) We can describe this by the
+   * in two space dimensions, using stable Q2/Q1 mixed elements (using the
+   * FESystem class), then you don't want all degrees of freedom to couple in
+   * each equation. More specifically, in the first equation, only $u_x$ and
+   * $p$ appear; in the second equation, only $u_y$ and $p$ appear; and in the
+   * third equation, only $u_x$ and $u_y$ appear. (Note that this discussion
+   * only talks about vector components of the solution variable and the
+   * different equation, and has nothing to do with degrees of freedom, or in
+   * fact with any kind of discretization.) We can describe this by the
    * following pattern of "couplings":
    *
    * @f[
@@ -515,18 +501,17 @@ namespace DoFTools
    * \right]
    * @f]
    *
-   * where "1" indicates that two variables (i.e., vector components
-   * of the FESystem) couple in the respective equation, and a "0"
-   * means no coupling. These zeros imply that upon discretization via
-   * a standard finite element formulation, we will not write entries
-   * into the matrix that, for example, couple pressure test functions
-   * with pressure shape functions (and similar for the other zeros
-   * above). It is then a waste to allocate memory for these entries
-   * in the matrix and the sparsity pattern, and you can avoid this by
-   * creating a mask such as the one above that describes this to the
-   * (current) function that computes the sparsity pattern. As stated
-   * above, the mask shown above refers to components of the composed
-   * FESystem, rather than to degrees of freedom or shape functions.
+   * where "1" indicates that two variables (i.e., vector components of the
+   * FESystem) couple in the respective equation, and a "0" means no coupling.
+   * These zeros imply that upon discretization via a standard finite element
+   * formulation, we will not write entries into the matrix that, for example,
+   * couple pressure test functions with pressure shape functions (and similar
+   * for the other zeros above). It is then a waste to allocate memory for
+   * these entries in the matrix and the sparsity pattern, and you can avoid
+   * this by creating a mask such as the one above that describes this to the
+   * (current) function that computes the sparsity pattern. As stated above,
+   * the mask shown above refers to components of the composed FESystem,
+   * rather than to degrees of freedom or shape functions.
    *
    * This function is designed to accept a coupling pattern, like the one
    * shown above, through the @p couplings parameter, which contains values of
@@ -539,10 +524,8 @@ namespace DoFTools
    * finite element in use are non-zero in more than one component (in deal.II
    * speak: they are
    * @ref GlossPrimitive "non-primitive finite elements").
-   * In
-   * this case, the coupling element
-   * corresponding to the first non-zero component is taken and additional
-   * ones for this component are ignored.
+   * In this case, the coupling element corresponding to the first non-zero
+   * component is taken and additional ones for this component are ignored.
    *
    * @ingroup constraints
    */
@@ -582,51 +565,47 @@ namespace DoFTools
                          SparsityPatternType  &sparsity);
 
   /**
-   * Compute which entries of a matrix built on the given @p
-   * dof_handler may possibly be nonzero, and create a sparsity
-   * pattern object that represents these nonzero locations. This
-   * function is a variation of the make_sparsity_pattern() functions
-   * above in that it assumes that the bilinear form you want to use
-   * to generate the matrix also contains terms that integrate over
-   * the <i>faces</i> between cells (i.e., it contains "fluxes"
-   * between cells, explaining the name of the function).
+   * Compute which entries of a matrix built on the given @p dof_handler may
+   * possibly be nonzero, and create a sparsity pattern object that represents
+   * these nonzero locations. This function is a variation of the
+   * make_sparsity_pattern() functions above in that it assumes that the
+   * bilinear form you want to use to generate the matrix also contains terms
+   * that integrate over the <i>faces</i> between cells (i.e., it contains
+   * "fluxes" between cells, explaining the name of the function).
    *
-   * This function is useful for Discontinuous Galerkin methods where
-   * the standard make_sparsity_pattern() function would only create
-   * nonzero entries for all degrees of freedom on one cell coupling
-   * to all other degrees of freedom on the same cell; however, in DG
-   * methods, all or some degrees of freedom on each cell also couple
-   * to the degrees of freedom on other cells connected to the current
-   * one by a common face. The current function also creates the
-   * nonzero entries in the matrix resulting from these additional
-   * couplings. In other words, this function computes a strict
-   * super-set of nonzero entries compared to the work done by
+   * This function is useful for Discontinuous Galerkin methods where the
+   * standard make_sparsity_pattern() function would only create nonzero
+   * entries for all degrees of freedom on one cell coupling to all other
+   * degrees of freedom on the same cell; however, in DG methods, all or some
+   * degrees of freedom on each cell also couple to the degrees of freedom on
+   * other cells connected to the current one by a common face. The current
+   * function also creates the nonzero entries in the matrix resulting from
+   * these additional couplings. In other words, this function computes a
+   * strict super-set of nonzero entries compared to the work done by
    * make_sparsity_pattern().
    *
-   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object
-   *   that describes which degrees of freedom live on which cells.
+   * @param[in] dof_handler The DoFHandler or hp::DoFHandler object that
+   * describes which degrees of freedom live on which cells.
    *
    * @param[out] sparsity_pattern The sparsity pattern to be filled with
-   *   entries.
+   * entries.
    *
-   * @note The actual type of the sparsity pattern may be
-   *   SparsityPattern, DynamicSparsityPattern, BlockSparsityPattern,
-   *   BlockDynamicSparsityPattern, or any other class that satisfies
-   *   similar requirements. It is assumed that the size of the
-   *   sparsity pattern matches the number of degrees of freedom and
-   *   that enough unused nonzero entries are left to fill the
-   *   sparsity pattern if the sparsity pattern is of "static" kind
-   *   (see
-   *   @ref Sparsity
-   *   for more information on what this
-   *   means). The nonzero entries generated by this function are
-   *   added to possible previous content of the object, i.e.,
-   *   previously added entries are not removed.
+   * @note The actual type of the sparsity pattern may be SparsityPattern,
+   * DynamicSparsityPattern, BlockSparsityPattern,
+   * BlockDynamicSparsityPattern, or any other class that satisfies similar
+   * requirements. It is assumed that the size of the sparsity pattern matches
+   * the number of degrees of freedom and that enough unused nonzero entries
+   * are left to fill the sparsity pattern if the sparsity pattern is of
+   * "static" kind (see
+   * @ref Sparsity
+   * for more information on what this means). The nonzero entries generated
+   * by this function are added to possible previous content of the object,
+   * i.e., previously added entries are not removed.
    *
    * @note If the sparsity pattern is represented by an object of type
-   *   SparsityPattern (as opposed to, for example,
-   *   DynamicSparsityPattern), you need to remember using
-   *   SparsityPattern::compress() after generating the pattern.
+   * SparsityPattern (as opposed to, for example, DynamicSparsityPattern), you
+   * need to remember using SparsityPattern::compress() after generating the
+   * pattern.
    *
    * @ingroup constraints
    */
@@ -637,10 +616,9 @@ namespace DoFTools
 
   /**
    * This function does essentially the same as the other
-   * make_flux_sparsity_pattern() function but allows the
-   * specification of a number of additional arguments. These carry
-   * the same meaning as discussed in the first
-   * make_sparsity_pattern() function above.
+   * make_flux_sparsity_pattern() function but allows the specification of a
+   * number of additional arguments. These carry the same meaning as discussed
+   * in the first make_sparsity_pattern() function above.
    *
    * @ingroup constraints
    */
@@ -654,20 +632,20 @@ namespace DoFTools
 
   /**
    * This function does essentially the same as the other
-   * make_flux_sparsity_pattern() function but allows the
-   * specification of coupling matrices that state which components of
-   * the solution variable couple in each of the equations you are
-   * discretizing. This works in complete analogy as discussed in the
-   * second make_sparsity_pattern() function above.
+   * make_flux_sparsity_pattern() function but allows the specification of
+   * coupling matrices that state which components of the solution variable
+   * couple in each of the equations you are discretizing. This works in
+   * complete analogy as discussed in the second make_sparsity_pattern()
+   * function above.
    *
    * In fact, this function takes two such masks, one describing which
-   * variables couple with each other in the cell integrals that make
-   * up your bilinear form, and which variables coupld with each other
-   * in the face integrals. If you passed masks consisting of only 1s
-   * to both of these, then you would get the same sparsity pattern as
-   * if you had called the first of the make_sparsity_pattern()
-   * functions above. By setting some of the entries of these masks to
-   * zeros, you can get a sparser sparsity pattern.
+   * variables couple with each other in the cell integrals that make up your
+   * bilinear form, and which variables coupld with each other in the face
+   * integrals. If you passed masks consisting of only 1s to both of these,
+   * then you would get the same sparsity pattern as if you had called the
+   * first of the make_sparsity_pattern() functions above. By setting some of
+   * the entries of these masks to zeros, you can get a sparser sparsity
+   * pattern.
    *
    * @ingroup constraints
    */
@@ -682,11 +660,10 @@ namespace DoFTools
    * Create the sparsity pattern for boundary matrices. See the general
    * documentation of this class for more information.
    *
-   * The function does essentially what the other
-   * make_sparsity_pattern() functions do, but assumes that the
-   * bilinear form that is used to build the matrix does not consist
-   * of domain integrals, but only of integrals over the boundary of
-   * the domain.
+   * The function does essentially what the other make_sparsity_pattern()
+   * functions do, but assumes that the bilinear form that is used to build
+   * the matrix does not consist of domain integrals, but only of integrals
+   * over the boundary of the domain.
    */
   template <typename DoFHandlerType, typename SparsityPatternType>
   void
@@ -696,20 +673,19 @@ namespace DoFTools
 
   /**
    * This function is a variation of the previous
-   * make_boundary_sparsity_pattern() function in which we assume that
-   * the boundary integrals that will give rise to the matrix extends
-   * only over those parts of the boundary whose boundary indicators
-   * are listed in the @p boundary_ids argument to this function.
+   * make_boundary_sparsity_pattern() function in which we assume that the
+   * boundary integrals that will give rise to the matrix extends only over
+   * those parts of the boundary whose boundary indicators are listed in the
+   * @p boundary_ids argument to this function.
    *
-   * This function could have been written by passing a @p set of
-   * boundary_id numbers. However, most of the functions throughout
-   * deal.II dealing with boundary indicators take a mapping of
-   * boundary indicators and the corresponding boundary function,
-   * i.e., a FunctionMap argument. Correspondingly, this function does
-   * the same, though the actual boundary function is ignored here.
-   * (Consequently, if you don't have any such boundary functions,
-   * just create a map with the boundary indicators you want and set
-   * the function pointers to null pointers).
+   * This function could have been written by passing a @p set of boundary_id
+   * numbers. However, most of the functions throughout deal.II dealing with
+   * boundary indicators take a mapping of boundary indicators and the
+   * corresponding boundary function, i.e., a FunctionMap argument.
+   * Correspondingly, this function does the same, though the actual boundary
+   * function is ignored here. (Consequently, if you don't have any such
+   * boundary functions, just create a map with the boundary indicators you
+   * want and set the function pointers to null pointers).
    */
   template <typename DoFHandlerType, typename SparsityPatternType>
   void
@@ -855,9 +831,10 @@ namespace DoFTools
    * elements of the other vector components of the finite element fields on
    * the fine grid are not touched.
    *
-   * Triangulation of the fine grid can be distributed. When called in parallel,
-   * each process has to have a copy of the coarse grid. In this case, function
-   * returns transfer representation for a set of locally owned cells.
+   * Triangulation of the fine grid can be distributed. When called in
+   * parallel, each process has to have a copy of the coarse grid. In this
+   * case, function returns transfer representation for a set of locally owned
+   * cells.
    *
    * The output of this function is a compressed format that can be used to
    * construct corresponding sparse transfer matrix.
@@ -1015,14 +992,14 @@ namespace DoFTools
    * and any combination of that...
    * @endcode
    *
-   * Optionally a matrix @p matrix along with an std::vector
-   * @p first_vector_components can be specified that describes how DoFs on
-   * @p face_1 should be modified prior to constraining to the DoFs of
-   * @p face_2. Here, two declarations are possible: If the std::vector
-   * @p first_vector_components is non empty the matrix is interpreted as a
-   * @p dim $\times$ @p dim rotation matrix that is applied to all vector
-   * valued blocks listed in @p first_vector_components of the FESystem. If
-   * @p first_vector_components is empty the matrix is interpreted as an
+   * Optionally a matrix @p matrix along with an std::vector @p
+   * first_vector_components can be specified that describes how DoFs on @p
+   * face_1 should be modified prior to constraining to the DoFs of @p face_2.
+   * Here, two declarations are possible: If the std::vector @p
+   * first_vector_components is non empty the matrix is interpreted as a @p
+   * dim $\times$ @p dim rotation matrix that is applied to all vector valued
+   * blocks listed in @p first_vector_components of the FESystem. If @p
+   * first_vector_components is empty the matrix is interpreted as an
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
    *
    * Detailed information can be found in the see
@@ -1192,7 +1169,8 @@ namespace DoFTools
    */
 
   /**
-   * @name Identifying subsets of degrees of freedom with particular properties
+   * @name Identifying subsets of degrees of freedom with particular
+   * properties
    * @{
    */
 
@@ -1534,15 +1512,17 @@ namespace DoFTools
 
   /**
    *
-   * For each processor, determine the set of locally owned degrees of freedom as an IndexSet.
-   * This function then returns a vector of index sets, where the vector has size equal to the
-   * number of MPI processes that participate in the DoF handler object.
+   * For each processor, determine the set of locally owned degrees of freedom
+   * as an IndexSet. This function then returns a vector of index sets, where
+   * the vector has size equal to the number of MPI processes that participate
+   * in the DoF handler object.
    *
-   * The function can be used for objects of type dealii::Triangulation or parallel::shared::Triangulation.
-   * It will not work for objects of type parallel::distributed::Triangulation since for such triangulations
-   * we do not have information about all cells of the triangulation available locally,
-   * and consequently can not say anything definitive about the degrees of freedom active on other
-   * processors' locally owned cells.
+   * The function can be used for objects of type dealii::Triangulation or
+   * parallel::shared::Triangulation. It will not work for objects of type
+   * parallel::distributed::Triangulation since for such triangulations we do
+   * not have information about all cells of the triangulation available
+   * locally, and consequently can not say anything definitive about the
+   * degrees of freedom active on other processors' locally owned cells.
    *
    * @author Denis Davydov, 2015
    */
@@ -1552,15 +1532,17 @@ namespace DoFTools
 
   /**
    *
-   * For each processor, determine the set of locally relevant degrees of freedom as an IndexSet.
-   * This function then returns a vector of index sets, where the vector has size equal to the
-   * number of MPI processes that participate in the DoF handler object.
+   * For each processor, determine the set of locally relevant degrees of
+   * freedom as an IndexSet. This function then returns a vector of index
+   * sets, where the vector has size equal to the number of MPI processes that
+   * participate in the DoF handler object.
    *
-   * The function can be used for objects of type dealii::Triangulation or parallel::shared::Triangulation.
-   * It will not work for objects of type parallel::distributed::Triangulation since for such triangulations
-   * we do not have information about all cells of the triangulation available locally,
-   * and consequently can not say anything definitive about the degrees of freedom active on other
-   * processors' locally owned cells.
+   * The function can be used for objects of type dealii::Triangulation or
+   * parallel::shared::Triangulation. It will not work for objects of type
+   * parallel::distributed::Triangulation since for such triangulations we do
+   * not have information about all cells of the triangulation available
+   * locally, and consequently can not say anything definitive about the
+   * degrees of freedom active on other processors' locally owned cells.
    *
    * @author Jean-Paul Pelteret, 2015
    */
@@ -1570,8 +1552,8 @@ namespace DoFTools
 
 
   /**
-   * Same as extract_locally_relevant_dofs() but for multigrid DoFs
-   * for the given @p level.
+   * Same as extract_locally_relevant_dofs() but for multigrid DoFs for the
+   * given @p level.
    */
   template <typename DoFHandlerType>
   void
@@ -1581,10 +1563,10 @@ namespace DoFTools
 
 
   /**
-   * For each degree of freedom, return in the output array to which
-   * subdomain (as given by the <tt>cell->subdomain_id()</tt>
-   * function) it belongs. The output array is supposed to have the
-   * right size already when calling this function.
+   * For each degree of freedom, return in the output array to which subdomain
+   * (as given by the <tt>cell->subdomain_id()</tt> function) it belongs. The
+   * output array is supposed to have the right size already when calling this
+   * function.
    *
    * Note that degrees of freedom associated with faces, edges, and vertices
    * may be associated with multiple subdomains if they are sitting on
@@ -1676,8 +1658,8 @@ namespace DoFTools
    * processor. Note that this includes the ones that this subdomain "owns"
    * (i.e. the ones for which get_subdomain_association() returns a value
    * equal to the subdomain given here and that are selected by the
-   * extract_locally_owned_dofs() function) but also all of those that sit on the
-   * boundary between the given subdomain and other subdomain. In essence,
+   * extract_locally_owned_dofs() function) but also all of those that sit on
+   * the boundary between the given subdomain and other subdomain. In essence,
    * degrees of freedom that sit on boundaries between subdomain will be in
    * the index sets returned by this function for more than one subdomain.
    *
@@ -1941,10 +1923,11 @@ namespace DoFTools
    *
    * @tparam DoFHandlerType A type that is either DoFHandler or
    * hp::DoFHandler. In C++, the compiler can not determine the type of
-   * <code>DoFHandlerType</code> from the function call. You need to specify it
-   * as an explicit template argument following the function name.
+   * <code>DoFHandlerType</code> from the function call. You need to specify
+   * it as an explicit template argument following the function name.
    *
-   * @param patch A collection of cells within an object of type DoFHandlerType
+   * @param patch A collection of cells within an object of type
+   * DoFHandlerType
    *
    * @return The number of degrees of freedom associated with the cells of
    * this patch.
@@ -1995,10 +1978,11 @@ namespace DoFTools
    *
    * @tparam DoFHandlerType A type that is either DoFHandler or
    * hp::DoFHandler. In C++, the compiler can not determine the type of
-   * <code>DoFHandlerType</code> from the function call. You need to specify it
-   * as an explicit template argument following the function name.
+   * <code>DoFHandlerType</code> from the function call. You need to specify
+   * it as an explicit template argument following the function name.
    *
-   * @param patch A collection of cells within an object of type DoFHandlerType
+   * @param patch A collection of cells within an object of type
+   * DoFHandlerType
    *
    * @return A list of those global degrees of freedom located on the patch,
    * as defined above.

@@ -43,10 +43,10 @@ template <int dim, int spacedim> class MappingQ;
  * are suitable for DG and hybrid formulations involving these function
  * spaces.
  *
- * The template argument <tt>PolynomialType</tt> refers to a vector valued polynomial
- * space like PolynomialsRaviartThomas or PolynomialsNedelec. Note that the
- * dimension of the polynomial space and the argument <tt>dim</tt> must
- * coincide.
+ * The template argument <tt>PolynomialType</tt> refers to a vector valued
+ * polynomial space like PolynomialsRaviartThomas or PolynomialsNedelec. Note
+ * that the dimension of the polynomial space and the argument <tt>dim</tt>
+ * must coincide.
  *
  * @ingroup febase
  * @author Guido Kanschat

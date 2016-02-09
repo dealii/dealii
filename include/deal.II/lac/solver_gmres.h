@@ -57,7 +57,8 @@ namespace internal
     {
     public:
       /**
-       * Constructor. Prepares an array of @p VectorType of length @p max_size.
+       * Constructor. Prepares an array of @p VectorType of length @p
+       * max_size.
        */
       TmpVectors(const unsigned int       max_size,
                  VectorMemory<VectorType> &vmem);
@@ -157,13 +158,13 @@ namespace internal
  *
  * <h3>Eigenvalue and condition number estimates</h3>
  *
- * This class can estimate eigenvalues and condition number during the solution
- * process. This is done by creating the Hessenberg matrix during the inner
- * iterations. The eigenvalues are estimated as the eigenvalues of the
+ * This class can estimate eigenvalues and condition number during the
+ * solution process. This is done by creating the Hessenberg matrix during the
+ * inner iterations. The eigenvalues are estimated as the eigenvalues of the
  * Hessenberg matrix and the condition number is estimated as the ratio of the
  * largest and smallest singular value of the Hessenberg matrix. The estimates
- * can be obtained by connecting a function as a slot using
- * @p connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
+ * can be obtained by connecting a function as a slot using @p
+ * connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
  * will then be called from the solver with the estimates as argument.
  *
  *
@@ -267,20 +268,20 @@ public:
          const PreconditionerType &precondition);
 
   /**
-   * Connect a slot to retrieve the estimated condition number.
-   * Called on each outer iteration if every_iteration=true, otherwise called
-   * once when iterations are ended (i.e., either because convergence has been
-   * achieved, or because divergence has been detected).
+   * Connect a slot to retrieve the estimated condition number. Called on each
+   * outer iteration if every_iteration=true, otherwise called once when
+   * iterations are ended (i.e., either because convergence has been achieved,
+   * or because divergence has been detected).
    */
   boost::signals2::connection
   connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
                                 const bool every_iteration=false);
 
   /**
-   * Connect a slot to retrieve the estimated eigenvalues.
-   * Called on each outer iteration if every_iteration=true, otherwise called
-   * once when iterations are ended (i.e., either because convergence has been
-   * achieved, or because divergence has been detected).
+   * Connect a slot to retrieve the estimated eigenvalues. Called on each
+   * outer iteration if every_iteration=true, otherwise called once when
+   * iterations are ended (i.e., either because convergence has been achieved,
+   * or because divergence has been detected).
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
@@ -302,26 +303,26 @@ protected:
   AdditionalData additional_data;
 
   /**
-   * Signal used to retrieve the estimated condition number.
-   * Called once when all iterations are ended.
+   * Signal used to retrieve the estimated condition number. Called once when
+   * all iterations are ended.
    */
   boost::signals2::signal<void (double)> condition_number_signal;
 
   /**
-   * Signal used to retrieve the estimated condition numbers.
-   * Called on each outer iteration.
+   * Signal used to retrieve the estimated condition numbers. Called on each
+   * outer iteration.
    */
   boost::signals2::signal<void (double)> all_condition_numbers_signal;
 
   /**
-   * Signal used to retrieve the estimated eigenvalues.
-   * Called once when all iterations are ended.
+   * Signal used to retrieve the estimated eigenvalues. Called once when all
+   * iterations are ended.
    */
   boost::signals2::signal<void (const std::vector<std::complex<double> > &)> eigenvalues_signal;
 
   /**
-   * Signal used to retrieve the estimated eigenvalues.
-   * Called on each outer iteration.
+   * Signal used to retrieve the estimated eigenvalues. Called on each outer
+   * iteration.
    */
   boost::signals2::signal<void (const std::vector<std::complex<double> > &)> all_eigenvalues_signal;
 
@@ -357,12 +358,12 @@ protected:
                          bool                                                &re_orthogonalize);
 
   /**
-    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
-    * during the inner iterations. Uses these estimate to compute the condition
-    * number. Calls the signals eigenvalues_signal and cond_signal with these
-    * estimates as arguments. Outputs the eigenvalues to deallog if
-    * log_eigenvalues is true.
-    */
+   * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
+   * during the inner iterations. Uses these estimate to compute the condition
+   * number. Calls the signals eigenvalues_signal and cond_signal with these
+   * estimates as arguments. Outputs the eigenvalues to deallog if
+   * log_eigenvalues is true.
+   */
   static void
   compute_eigs_and_cond(
     const FullMatrix<double> &H_orig ,

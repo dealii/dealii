@@ -206,7 +206,6 @@ namespace SparsityTools
    * instead.
    *
    * @param[in,out] dsp The locally built sparsity pattern to be modified.
-
    * @param owned_set_per_cpu Typically the value given by
    * DoFHandler::locally_owned_dofs_per_processor.
    *

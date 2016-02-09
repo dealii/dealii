@@ -50,8 +50,8 @@ namespace Utilities
 {
 
   /**
-   * Convert a number @p value to a string, with as many digits as given to fill
-   * with leading zeros.
+   * Convert a number @p value to a string, with as many digits as given to
+   * fill with leading zeros.
    *
    * If the second parameter is left at its default value, the number is not
    * padded with leading zeros. The result is then the same as if the standard
@@ -61,16 +61,17 @@ namespace Utilities
    * unsigned integers and long integers might experience an overflow.
    *
    * @note The use of this function is discouraged and users should use
-   * <code>Utilities::to_string()</code> instead. In its current implementation
-   * the function simply calls <code>to_string@<unsigned int@>()</code>.
+   * <code>Utilities::to_string()</code> instead. In its current
+   * implementation the function simply calls <code>to_string@<unsigned
+   * int@>()</code>.
    */
   std::string
   int_to_string (const unsigned int value,
                  const unsigned int digits = numbers::invalid_unsigned_int);
 
   /**
-   * Convert a number @p value to a string, with @p digits characters.
-   * The string is padded with leading zeros, after a possible minus sign.
+   * Convert a number @p value to a string, with @p digits characters. The
+   * string is padded with leading zeros, after a possible minus sign.
    * Therefore the total number of padding zeros is @p digits minus any signs,
    * decimal points and digits of @p value.
    *

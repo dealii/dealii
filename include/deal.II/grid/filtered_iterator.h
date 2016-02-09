@@ -228,9 +228,9 @@ namespace IteratorFilters
                        const bool only_locally_owned = false);
 
     /**
-     * Constructor. Store a collection of material ids which iterators
-     * shall have to be evaluated to true and state if the iterator must be
-     * locally owned.
+     * Constructor. Store a collection of material ids which iterators shall
+     * have to be evaluated to true and state if the iterator must be locally
+     * owned.
      */
     MaterialIdEqualTo (const std::set<types::material_id> material_ids,
                        const bool only_locally_owned = false);

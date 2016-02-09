@@ -312,7 +312,8 @@ public:
                const AdditionalData    additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but using a $Q_1$ mapping.
+   * Initializes the data structures. Same as above, but using a $Q_1$
+   * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const DoFHandlerType   &dof_handler,
@@ -367,7 +368,8 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
+   * Initializes the data structures. Same as above, but  using a $Q_1$
+   * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
@@ -390,7 +392,8 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but  using a $Q_1$ mapping.
+   * Initializes the data structures. Same as above, but  using a $Q_1$
+   * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,

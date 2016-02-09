@@ -192,8 +192,9 @@ namespace mg
      * Initialize for matrices. This function initializes the smoothing
      * operator with the same smoother for each level.
      *
-     * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
-     * handed to the initialization function of the relaxation method.
+     * @p additional_data is an object of type @p
+     * RelaxationType::AdditionalData and is handed to the initialization
+     * function of the relaxation method.
      */
     template <typename MatrixType2>
     void initialize (const MGLevelObject<MatrixType2>     &matrices,
@@ -291,8 +292,8 @@ public:
    * matrices and initializes the smoothing operator with the according
    * smoother for each level.
    *
-   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
-   * handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData
+   * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -304,8 +305,8 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the same smoother for each level.
    *
-   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
-   * handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData
+   * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -319,8 +320,8 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the according smoother for each level.
    *
-   * @p additional_data is an object of type @p RelaxationType::AdditionalData and is
-   * handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p RelaxationType::AdditionalData
+   * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -408,8 +409,9 @@ public:
    * matrices and initializes the smoothing operator with the same smoother
    * for each level.
    *
-   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
-   * and is handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p
+   * PreconditionerType::AdditionalData and is handed to the initialization
+   * function of the relaxation method.
    */
   template <typename MatrixType2>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -420,8 +422,9 @@ public:
    * matrices and initializes the smoothing operator with the according
    * smoother for each level.
    *
-   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
-   * and is handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p
+   * PreconditionerType::AdditionalData and is handed to the initialization
+   * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -433,8 +436,9 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the same smoother for each level.
    *
-   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
-   * and is handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p
+   * PreconditionerType::AdditionalData and is handed to the initialization
+   * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,
@@ -448,8 +452,9 @@ public:
    * This function stores pointers to the level matrices and initializes the
    * smoothing operator with the according smoother for each level.
    *
-   * @p additional_data is an object of type @p PreconditionerType::AdditionalData
-   * and is handed to the initialization function of the relaxation method.
+   * @p additional_data is an object of type @p
+   * PreconditionerType::AdditionalData and is handed to the initialization
+   * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
   void initialize (const MGLevelObject<MatrixType2> &matrices,

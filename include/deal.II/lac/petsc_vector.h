@@ -167,8 +167,8 @@ namespace PETScWrappers
      * reduces memory consumption, or if for efficiency the same amount of
      * memory is used for less data.
      *
-     * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
-     * elements are left an unspecified state.
+     * If @p omit_zeroing_entries is false, the vector is filled by zeros.
+     * Otherwise, the elements are left an unspecified state.
      */
     void reinit (const size_type N,
                  const bool      omit_zeroing_entries = false);

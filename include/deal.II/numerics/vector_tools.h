@@ -63,8 +63,8 @@ class ConstraintMatrix;
  * explicit Mapping argument and one that does not. The second one generally
  * calls the first with an implicit $Q_1$ argument (i.e., with an argument of
  * kind MappingQGeneric(1)). If your intend your code to use a different
- * mapping than a (bi-/tri-)linear one, then you need to call the
- * functions <b>with</b> mapping argument should be used.
+ * mapping than a (bi-/tri-)linear one, then you need to call the functions
+ * <b>with</b> mapping argument should be used.
  *
  *
  * <h3>Description of operations</h3>
@@ -392,8 +392,8 @@ namespace VectorTools
    * with the hanging nodes from space @p dof afterwards, to make the result
    * continuous again.
    *
-   * The template argument <code>DoFHandlerType</code> may either be of type DoFHandler or
-   * hp::DoFHandler.
+   * The template argument <code>DoFHandlerType</code> may either be of type
+   * DoFHandler or hp::DoFHandler.
    *
    * See the general documentation of this namespace for further information.
    *
@@ -634,8 +634,8 @@ namespace VectorTools
                 const bool                                 project_to_boundary_first = false);
 
   /**
-   * Calls the project() function above, with a collection of
-   * $Q_1$ mapping objects, i.e., with hp::StaticMappingQ1::mapping_collection.
+   * Calls the project() function above, with a collection of $Q_1$ mapping
+   * objects, i.e., with hp::StaticMappingQ1::mapping_collection.
    */
   template <int dim, typename VectorType, int spacedim>
   void project (const hp::DoFHandler<dim,spacedim> &dof,
@@ -741,9 +741,9 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * apply as for the previous function, in particular about the use of the
+   * component mask and the requires size of the function object.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -760,9 +760,9 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * apply as for the previous function, in particular about the use of the
+   * component mask and the requires size of the function object.
    */
   template <typename DoFHandlerType>
   void
@@ -866,9 +866,9 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * apply as for the previous function, in particular about the use of the
+   * component mask and the requires size of the function object.
    *
    * @ingroup constraints
    *
@@ -887,9 +887,9 @@ namespace VectorTools
 
   /**
    * Calls the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * apply as for the previous function, in particular about the use of the
+   * component mask and the requires size of the function object.
    *
    * @ingroup constraints
    */
@@ -912,24 +912,23 @@ namespace VectorTools
    * = \sum_{k \in {\cal K}} \int_{\Gamma_k} \varphi_i f_k,
    * \qquad \forall \varphi_i \in V_h
    * @f}
-   * where $\Gamma = \bigcup_{k \in {\cal
-   * K}} \Gamma_k$, $\Gamma_k \subset \partial\Omega$, $\cal K$ is the set of
-   * indices and $f_k$ the corresponding boundary functions represented in the
-   * function map argument @p boundary_values to this function, and the
-   * integrals are evaluated by quadrature. This problem has a non-unique
-   * solution in the interior, but it is well defined for the degrees of
-   * freedom on the part of the boundary, $\Gamma$, for which we do the
-   * integration. The values of $u_h|_\Gamma$, i.e., the nodal values of the
-   * degrees of freedom of this function along the boundary, are then what is
-   * computed by this function.
+   * where $\Gamma = \bigcup_{k \in {\cal K}} \Gamma_k$, $\Gamma_k \subset
+   * \partial\Omega$, $\cal K$ is the set of indices and $f_k$ the
+   * corresponding boundary functions represented in the function map argument
+   * @p boundary_values to this function, and the integrals are evaluated by
+   * quadrature. This problem has a non-unique solution in the interior, but
+   * it is well defined for the degrees of freedom on the part of the
+   * boundary, $\Gamma$, for which we do the integration. The values of
+   * $u_h|_\Gamma$, i.e., the nodal values of the degrees of freedom of this
+   * function along the boundary, are then what is computed by this function.
    *
    * @param[in] mapping The mapping that will be used in the transformations
    * necessary to integrate along the boundary.
    * @param[in] dof The DoFHandler that describes the finite element space and
    * the numbering of degrees of freedom.
-   * @param[in] boundary_functions A map from boundary indicators to pointers to
-   * functions that describe the desired values on those parts of the boundary
-   * marked with this boundary indicator (see
+   * @param[in] boundary_functions A map from boundary indicators to pointers
+   * to functions that describe the desired values on those parts of the
+   * boundary marked with this boundary indicator (see
    * @ref GlossBoundaryIndicator "Boundary indicator").
    * The projection happens on only those parts of the boundary whose
    * indicators are represented in this map.
@@ -940,8 +939,8 @@ namespace VectorTools
    * by the boundary parts in @p boundary_functions) and the computed dof
    * value for this degree of freedom. For each degree of freedom at the
    * boundary, if its index already exists in @p boundary_values then its
-   * boundary value will be overwritten, otherwise a new entry with proper index
-   * and boundary value for this degree of freedom will be inserted into
+   * boundary value will be overwritten, otherwise a new entry with proper
+   * index and boundary value for this degree of freedom will be inserted into
    * @p boundary_values.
    * @param[in] component_mapping It is sometimes convenient to project a
    * vector-valued function onto only parts of a finite element space (for
@@ -1396,18 +1395,18 @@ namespace VectorTools
    * @image html no_normal_flux_1.png
    * </p>
    *
-   * Here, we have two cells that use a bilinear mapping (i.e., MappingQGeneric(1)).
-   * Consequently, for each of the cells, the normal vector is perpendicular
-   * to the straight edge. If the two edges at the top and right are meant to
-   * approximate a curved boundary (as indicated by the dashed line), then
-   * neither of the two computed normal vectors are equal to the exact normal
-   * vector (though they approximate it as the mesh is refined further). What
-   * is worse, if we constrain $\vec u \cdot \vec n= \vec u_\Gamma \cdot \vec
-   * n$ at the common vertex with the normal vector from both cells, then we
-   * constrain the vector $\vec u$ with respect to two linearly independent
-   * vectors; consequently, the constraint would be $\vec u=\vec u_\Gamma$ at
-   * this point (i.e. <i>all</i> components of the vector), which is not what
-   * we wanted.
+   * Here, we have two cells that use a bilinear mapping (i.e.,
+   * MappingQGeneric(1)). Consequently, for each of the cells, the normal
+   * vector is perpendicular to the straight edge. If the two edges at the top
+   * and right are meant to approximate a curved boundary (as indicated by the
+   * dashed line), then neither of the two computed normal vectors are equal
+   * to the exact normal vector (though they approximate it as the mesh is
+   * refined further). What is worse, if we constrain $\vec u \cdot \vec n=
+   * \vec u_\Gamma \cdot \vec n$ at the common vertex with the normal vector
+   * from both cells, then we constrain the vector $\vec u$ with respect to
+   * two linearly independent vectors; consequently, the constraint would be
+   * $\vec u=\vec u_\Gamma$ at this point (i.e. <i>all</i> components of the
+   * vector), which is not what we wanted.
    *
    * To deal with this situation, the algorithm works in the following way: at
    * each point where we want to constrain $\vec u$, we first collect all
@@ -1820,8 +1819,7 @@ namespace VectorTools
    * @f{align*}{
    * d_K = \| u-u_h \|_X
    * @f}
-   * where $X$ denotes the norm
-   * chosen and $u$ represents the exact solution.
+   * where $X$ denotes the norm chosen and $u$ represents the exact solution.
    *
    * It is assumed that the number of components of the function @p
    * exact_solution matches that of the finite element used by @p dof.
@@ -1908,9 +1906,8 @@ namespace VectorTools
    * @f{align*}{
    * \textrm{error} = \sqrt{\sum_K \|u-u_h\|_{L_2(K)}^2}
    * @f}
-   * Obviously, if you are interested in computing
-   * the $L_1$ norm of the error, the correct form of the last two lines would
-   * have been
+   * Obviously, if you are interested in computing the $L_1$ norm of the
+   * error, the correct form of the last two lines would have been
    * @code
    *    const double total_local_error = local_errors.l1_norm();
    *    const double total_global_error
@@ -2329,10 +2326,11 @@ namespace VectorTools
    * Compute the mean value of one component of the solution.
    *
    * This function integrates the chosen component over the whole domain and
-   * returns the result, i.e. it computes $\frac{1}{|\Omega|}\int_\Omega [u_h(x)]_c \; dx$ where
-   * $c$ is the vector component and $u_h$ is the function representation of
-   * the nodal vector given as fourth argument. The integral is evaluated
-   * numerically using the quadrature formula given as third argument.
+   * returns the result, i.e. it computes $\frac{1}{|\Omega|}\int_\Omega
+   * [u_h(x)]_c \; dx$ where $c$ is the vector component and $u_h$ is the
+   * function representation of the nodal vector given as fourth argument. The
+   * integral is evaluated numerically using the quadrature formula given as
+   * third argument.
    *
    * This function is used in the "Possibilities for extensions" part of the
    * results section of
@@ -2369,15 +2367,15 @@ namespace VectorTools
    */
   //@{
   /**
-   * Given a DoFHandler containing at least a spacedim vector field,
-   * this function interpolates the Triangulation at the support
-   * points of a FE_Q() finite element of the same degree as the
-   * degree of the required components.
+   * Given a DoFHandler containing at least a spacedim vector field, this
+   * function interpolates the Triangulation at the support points of a FE_Q()
+   * finite element of the same degree as the degree of the required
+   * components.
    *
    * Curved manifold are respected, and the resulting VectorType will be
    * geometrically consistent. The resulting map is guaranteed to be
-   * interpolatory at the support points of a FE_Q() finite element of
-   * the same degree as the degree of the required components.
+   * interpolatory at the support points of a FE_Q() finite element of the
+   * same degree as the degree of the required components.
    *
    * If the underlying finite element is an FE_Q(1)^spacedim, then the
    * resulting @p VectorType is a finite element field representation of the
@@ -2389,8 +2387,8 @@ namespace VectorTools
    * the first spacedim components of the FiniteElement are assumed to
    * represent the geometry of the problem.
    *
-   * This function is only implemented for FiniteElements where the
-   * specified components are primitive.
+   * This function is only implemented for FiniteElements where the specified
+   * components are primitive.
    *
    * @author Luca Heltai, 2015
    */

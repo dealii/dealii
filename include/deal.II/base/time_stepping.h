@@ -48,7 +48,7 @@ namespace TimeStepping
    *   - HEUN_EULER (second order)
    *   - BOGACKI_SHAMPINE (third order)
    *   - DOPRI: Dormand-Prince (fifth order, method used by ode45 in
-   *     MATLAB)
+   * MATLAB)
    *   - FEHLBERG (fifth order)
    *   - CASH_KARP (firth order)
    */

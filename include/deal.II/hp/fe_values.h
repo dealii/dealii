@@ -70,8 +70,8 @@ namespace internal
                     const dealii::UpdateFlags             update_flags);
       /**
        * Constructor. This constructor is equivalent to the other one except
-       * that it makes the object use a $Q_1$ mapping (i.e., an object of
-       * type MappingQGeneric(1)) implicitly.
+       * that it makes the object use a $Q_1$ mapping (i.e., an object of type
+       * MappingQGeneric(1)) implicitly.
        */
       FEValuesBase (const dealii::hp::FECollection<dim,FEValuesType::space_dimension> &fe_collection,
                     const dealii::hp::QCollection<q_dim> &q_collection,
@@ -249,8 +249,8 @@ namespace hp
 
     /**
      * Constructor. This constructor is equivalent to the other one except
-     * that it makes the object use a $Q_1$ mapping (i.e., an object of
-     * type MappingQGeneric(1)) implicitly.
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of type
+     * MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
@@ -304,10 +304,9 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a $Q_1$ mapping
-     * for all finite elements in an hp discretization), then this single
-     * mapping is used unless a different value for this argument is
-     * specified.
+     * single element (a frequent case if one wants to use a $Q_1$ mapping for
+     * all finite elements in an hp discretization), then this single mapping
+     * is used unless a different value for this argument is specified.
      */
     template <typename DoFHandlerType, bool lda>
     void
@@ -386,8 +385,8 @@ namespace hp
 
     /**
      * Constructor. This constructor is equivalent to the other one except
-     * that it makes the object use a $Q_1$ mapping (i.e., an object of
-     * type MappingQGeneric(1)) implicitly.
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of type
+     * MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
@@ -440,10 +439,9 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a $Q_1$ mapping
-     * for all finite elements in an hp discretization), then this single
-     * mapping is used unless a different value for this argument is
-     * specified.
+     * single element (a frequent case if one wants to use a $Q_1$ mapping for
+     * all finite elements in an hp discretization), then this single mapping
+     * is used unless a different value for this argument is specified.
      */
     template <typename DoFHandlerType, bool lda>
     void
@@ -505,8 +503,8 @@ namespace hp
 
     /**
      * Constructor. This constructor is equivalent to the other one except
-     * that it makes the object use a $Q_1$ mapping (i.e., an object of
-     * type MappingQGeneric(1)) implicitly.
+     * that it makes the object use a $Q_1$ mapping (i.e., an object of type
+     * MappingQGeneric(1)) implicitly.
      *
      * The finite element collection parameter is actually ignored, but is in
      * the signature of this function to make it compatible with the signature
@@ -549,10 +547,9 @@ namespace hp
      * constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
      * the finite element. As above, if the mapping collection contains only a
-     * single element (a frequent case if one wants to use a $Q_1$ mapping
-     * for all finite elements in an hp discretization), then this single
-     * mapping is used unless a different value for this argument is
-     * specified.
+     * single element (a frequent case if one wants to use a $Q_1$ mapping for
+     * all finite elements in an hp discretization), then this single mapping
+     * is used unless a different value for this argument is specified.
      */
     template <typename DoFHandlerType, bool lda>
     void

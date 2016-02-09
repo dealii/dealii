@@ -438,11 +438,11 @@ public:
    * away and only non-zero data is added. The default value is <tt>true</tt>,
    * i.e., zero values won't be added into the matrix.
    *
-   * If anyway a new element will be inserted and it does not exist,
-   * allocates the entry.
+   * If anyway a new element will be inserted and it does not exist, allocates
+   * the entry.
    *
-   * @note You may need to insert some zero elements to keep a
-   * symmetric sparsity pattern for the matrix.
+   * @note You may need to insert some zero elements to keep a symmetric
+   * sparsity pattern for the matrix.
    */
   void set (const size_type i, const size_type j,
             const number value, const bool elide_zero_values = true);
@@ -524,10 +524,10 @@ public:
    * Copying matrices is an expensive operation that we do not want to happen
    * by accident through compiler generated code for <code>operator=</code>.
    * (This would happen, for example, if one accidentally declared a function
-   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
-   * The functionality of copying matrices is implemented in this member function
-   * instead. All copy operations of objects of this type therefore require an
-   * explicit function call.
+   * argument of the current type <i>by value</i> rather than <i>by
+   * reference</i>.) The functionality of copying matrices is implemented in
+   * this member function instead. All copy operations of objects of this type
+   * therefore require an explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.

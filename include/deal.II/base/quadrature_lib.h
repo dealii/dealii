@@ -442,21 +442,17 @@ public:
 /**
  * Telles quadrature of arbitrary order.
  *
- * The coefficients of these quadrature rules are computed using
- * a non linear change of variables starting from a Gauss-Legendre
- * quadrature formula.
- * This is done using a cubic polynomial,
- * $n = a x^3 + b x^2 + c x + d$
- * in order to integrate
- * a singular integral, with singularity at a given point x_0.
+ * The coefficients of these quadrature rules are computed using a non linear
+ * change of variables starting from a Gauss-Legendre quadrature formula. This
+ * is done using a cubic polynomial, $n = a x^3 + b x^2 + c x + d$ in order to
+ * integrate a singular integral, with singularity at a given point x_0.
  *
- * We start from a Gauss Quadrature Formula with arbitrary
- * function. Then we apply the cubic variable change.
- * In the paper, J.C.F.Telles:A Self-Adaptive Co-ordinate Transformation
- * For Efficient Numerical Evaluation of General Boundary Element Integrals.
- * International Journal for Numerical Methods in Engineering, vol 24,
- * pages 959–973. year 1987, the author applies the transformation on the
- * reference cell $[-1, 1]$ getting
+ * We start from a Gauss Quadrature Formula with arbitrary function. Then we
+ * apply the cubic variable change. In the paper, J.C.F.Telles:A Self-Adaptive
+ * Co-ordinate Transformation For Efficient Numerical Evaluation of General
+ * Boundary Element Integrals. International Journal for Numerical Methods in
+ * Engineering, vol 24, pages 959–973. year 1987, the author applies the
+ * transformation on the reference cell $[-1, 1]$ getting
  * @f{align*}{
  * n(1) &= 1, \\ n(-1) &= -1, \\ \frac{dn}{dx} &= 0 \text{ at }
  * x = x_0, \\ \frac{d^2n}{dx^2} &= 0 \text{ at  } x = x_0
@@ -477,22 +473,22 @@ public:
  * q &= (\Gamma-\bar{\Gamma})^3 + \bar{\Gamma}
  *      \frac{\bar{\Gamma}^2+3}{1+3\bar{\Gamma}^2}
  * @f}
- * Since the library assumes $[0,1]$ as reference interval, we will map
- * these values on the proper reference interval in the implementation.
+ * Since the library assumes $[0,1]$ as reference interval, we will map these
+ * values on the proper reference interval in the implementation.
  *
- * This variable change can be used to integrate singular integrals.
- * One example is $f(x)/|x-x_0|$ on the reference interval $[0,1]$,
- * where $x_0$ is given at construction time, and is the location of the
- * singularity $x_0$, and $f(x)$ is a smooth non singular function.
+ * This variable change can be used to integrate singular integrals. One
+ * example is $f(x)/|x-x_0|$ on the reference interval $[0,1]$, where $x_0$ is
+ * given at construction time, and is the location of the singularity $x_0$,
+ * and $f(x)$ is a smooth non singular function.
  *
  * Singular quadrature formula are rather expensive, nevertheless Telles'
- * quadrature formula are much easier to compute with respect to other singular
- * integration techniques as Lachat-Watson.
+ * quadrature formula are much easier to compute with respect to other
+ * singular integration techniques as Lachat-Watson.
  *
  * We have implemented the case for $dim = 1$. When we deal the case $dim >1$
  * we have computed the quadrature formula has a tensorial product of one
- * dimensional Telles' quadrature formulas considering the different components
- * of the singularity.
+ * dimensional Telles' quadrature formulas considering the different
+ * components of the singularity.
  *
  * The weights and functions for Gauss Legendre formula have been tabulated up
  * to order 12.
@@ -504,17 +500,17 @@ class QTelles: public Quadrature<dim>
 {
 public:
   /**
-  * A constructor that takes a quadrature formula and a singular point as
-  * argument. The quadrature formula will be mapped using Telles' rule. Make
-  * sure that the order of the quadrature rule is appropriate for the
-  * singularity in question.
-  **/
+   * A constructor that takes a quadrature formula and a singular point as
+   * argument. The quadrature formula will be mapped using Telles' rule. Make
+   * sure that the order of the quadrature rule is appropriate for the
+   * singularity in question.
+   */
   QTelles (const Quadrature<1> &base_quad, const Point<dim> &singularity);
   /**
-  * A variant of above constructor that takes as parameters the order @p n
-  * and location of a singularity. A Gauss Legendre quadrature of order n
-  * will be used
-  **/
+   * A variant of above constructor that takes as parameters the order @p n
+   * and location of a singularity. A Gauss Legendre quadrature of order n
+   * will be used
+   */
   QTelles (const unsigned int n, const Point<dim> &singularity);
 
 };
@@ -522,20 +518,18 @@ public:
 /*@}*/
 
 /**
-* Gauss-Chebyshev quadrature rules integrate the weighted product
-* $\int_{-1}^1 f(x) w(x) dx$ with weight given by:
-* $w(x) = 1/\sqrt{1-x^2}$. The nodes and weights are known analytically,
-* and are exact for monomials up to the order $2n-1$, where $n$ is the number
-* of quadrature points.
-* Here we rescale the quadrature formula so that it is defined on
-* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
-* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
-* $w(x) = 1/sqrt{x(1-x)}$.
-* For details see:
-* M. Abramowitz & I.A. Stegun: Handbook of Mathematical Functions, par. 25.4.38
-*
-* @author Giuseppe Pitton, Luca Heltai 2015
-**/
+ * Gauss-Chebyshev quadrature rules integrate the weighted product
+ * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$.
+ * The nodes and weights are known analytically, and are exact for monomials
+ * up to the order $2n-1$, where $n$ is the number of quadrature points. Here
+ * we rescale the quadrature formula so that it is defined on the interval
+ * $[0,1]$ instead of $[-1,1]$. So the quadrature formulas integrate exactly
+ * the integral $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) =
+ * 1/sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
+ * Mathematical Functions, par. 25.4.38
+ *
+ * @author Giuseppe Pitton, Luca Heltai 2015
+ */
 template <int dim>
 class QGaussChebyshev : public Quadrature<dim>
 {
@@ -556,21 +550,21 @@ private:
 
 
 /**
-* Gauss-Radau-Chebyshev quadrature rules integrate the weighted product
-* $\int_{-1}^1 f(x) w(x) dx$ with weight given by:
-* $w(x) = 1/\sqrt{1-x^2}$ with the additional constraint that a quadrature point
-* lies at one of the two extrema of the interval.
-* The nodes and weights are known analytically,
-* and are exact for monomials up to the order $2n-2$, where $n$ is the number
-* of quadrature points. Here we rescale the quadrature formula so that it is defined on
-* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
-* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
-* $w(x) = 1/sqrt{x(1-x)}$. By default the quadrature is constructed with the
-* left endpoint as quadrature node, but the quadrature node can be imposed at the
-* right endpoint through the variable ep that can assume the values left or right.
-*
-* @author Giuseppe Pitton, Luca Heltai 2015
-**/
+ * Gauss-Radau-Chebyshev quadrature rules integrate the weighted product
+ * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$
+ * with the additional constraint that a quadrature point lies at one of the
+ * two extrema of the interval. The nodes and weights are known analytically,
+ * and are exact for monomials up to the order $2n-2$, where $n$ is the number
+ * of quadrature points. Here we rescale the quadrature formula so that it is
+ * defined on the interval $[0,1]$ instead of $[-1,1]$. So the quadrature
+ * formulas integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the
+ * weight: $w(x) = 1/sqrt{x(1-x)}$. By default the quadrature is constructed
+ * with the left endpoint as quadrature node, but the quadrature node can be
+ * imposed at the right endpoint through the variable ep that can assume the
+ * values left or right.
+ *
+ * @author Giuseppe Pitton, Luca Heltai 2015
+ */
 template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
 {
@@ -596,22 +590,20 @@ private:
 };
 
 /**
-* Gauss-Lobatto-Chebyshev quadrature rules integrate the weighted product
-* $\int_{-1}^1 f(x) w(x) dx$ with weight given by:
-* $w(x) = 1/\sqrt{1-x^2}$, with the additional constraint that two of the quadrature
-* points are located at the endpoints of the quadrature interval.
-* The nodes and weights are known analytically,
-* and are exact for monomials up to the order $2n-3$, where $n$ is the number
-* of quadrature points.
-* Here we rescale the quadrature formula so that it is defined on
-* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
-* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
-* $w(x) = 1/sqrt{x(1-x)}$.
-* For details see:
-* M. Abramowitz & I.A. Stegun: Handbook of Mathematical Functions, par. 25.4.40
-*
-* @author Giuseppe Pitton, Luca Heltai 2015
-**/
+ * Gauss-Lobatto-Chebyshev quadrature rules integrate the weighted product
+ * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$,
+ * with the additional constraint that two of the quadrature points are
+ * located at the endpoints of the quadrature interval. The nodes and weights
+ * are known analytically, and are exact for monomials up to the order $2n-3$,
+ * where $n$ is the number of quadrature points. Here we rescale the
+ * quadrature formula so that it is defined on the interval $[0,1]$ instead of
+ * $[-1,1]$. So the quadrature formulas integrate exactly the integral
+ * $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) = 1/sqrt{x(1-x)}$. For
+ * details see: M. Abramowitz & I.A. Stegun: Handbook of Mathematical
+ * Functions, par. 25.4.40
+ *
+ * @author Giuseppe Pitton, Luca Heltai 2015
+ */
 template <int dim>
 class QGaussLobattoChebyshev : public Quadrature<dim>
 {

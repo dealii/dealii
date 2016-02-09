@@ -53,8 +53,8 @@ template <int,int> class FiniteElement;
  *
  * <h3>Use of these flags flags</h3>
  *
- * More information on the use of this type both in user code as
- * well as internally can be found in the documentation modules on
+ * More information on the use of this type both in user code as well as
+ * internally can be found in the documentation modules on
  * @ref UpdateFlags "The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues"
  * and
  * @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
@@ -323,8 +323,8 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
  * when calling the method FEValues::reinit() (like derivatives, which do not
  * change if one cell is just a translation of the previous). Currently, this
  * variable does only recognize a translation and an inverted translation (if
- * dim<spacedim). However, this concept makes it easy to add additional
- * states to be detected in FEValues/FEFaceValues for making use of these
+ * dim<spacedim). However, this concept makes it easy to add additional states
+ * to be detected in FEValues/FEFaceValues for making use of these
  * similarities as well.
  */
 namespace CellSimilarity
@@ -346,12 +346,12 @@ namespace internal
     /**
      * A class that stores all of the mapping related data used in
      * dealii::FEValues, dealii::FEFaceValues, and dealii::FESubfaceValues
-     * objects. Objects of this kind will be given
-     * as <i>output</i> argument when dealii::FEValues::reinit()
-     * calls Mapping::fill_fe_values() for a given cell, face, or subface.
+     * objects. Objects of this kind will be given as <i>output</i> argument
+     * when dealii::FEValues::reinit() calls Mapping::fill_fe_values() for a
+     * given cell, face, or subface.
      *
-     * The data herein will then be provided as <i>input</i> argument in
-     * the following call to FiniteElement::fill_fe_values().
+     * The data herein will then be provided as <i>input</i> argument in the
+     * following call to FiniteElement::fill_fe_values().
      *
      * @ingroup feaccess
      */
@@ -366,23 +366,23 @@ namespace internal
                        const UpdateFlags  flags);
 
       /**
-       * Compute and return an estimate for the memory consumption (in
-       * bytes) of this object.
+       * Compute and return an estimate for the memory consumption (in bytes)
+       * of this object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Store an array of weights times the Jacobi determinant at the quadrature
-       * points. This function is reset each time reinit() is called. The Jacobi
-       * determinant is actually the reciprocal value of the Jacobi matrices
-       * stored in this class, see the general documentation of this class for
-       * more information.
+       * Store an array of weights times the Jacobi determinant at the
+       * quadrature points. This function is reset each time reinit() is
+       * called. The Jacobi determinant is actually the reciprocal value of
+       * the Jacobi matrices stored in this class, see the general
+       * documentation of this class for more information.
        *
        * However, if this object refers to an FEFaceValues or FESubfaceValues
        * object, then the JxW_values correspond to the Jacobian of the
-       * transformation of the face, not the cell, i.e. the dimensionality is that
-       * of a surface measure, not of a volume measure. In this case, it is
-       * computed from the boundary forms, rather than the Jacobian matrix.
+       * transformation of the face, not the cell, i.e. the dimensionality is
+       * that of a surface measure, not of a volume measure. In this case, it
+       * is computed from the boundary forms, rather than the Jacobian matrix.
        */
       std::vector<double>       JxW_values;
 
@@ -403,8 +403,8 @@ namespace internal
       std::vector<DerivativeForm<1,spacedim,dim> > inverse_jacobians;
 
       /**
-       * Array of the derivatives of the Jacobian matrices at the
-       * quadrature points, pushed forward to the real cell coordinates.
+       * Array of the derivatives of the Jacobian matrices at the quadrature
+       * points, pushed forward to the real cell coordinates.
        */
       std::vector<Tensor<3,spacedim> > jacobian_pushed_forward_grads;
 
@@ -429,14 +429,13 @@ namespace internal
       /**
        * Array of the  third derivatives of the Jacobian matrices at the
        * quadrature points, pushed forward to the real cell coordinates.
-
        */
       std::vector<Tensor<5,spacedim> > jacobian_pushed_forward_3rd_derivatives;
 
       /**
-       * Array of quadrature points. This array is set up upon calling reinit()
-       * and contains the quadrature points on the real element, rather than on
-       * the reference element.
+       * Array of quadrature points. This array is set up upon calling
+       * reinit() and contains the quadrature points on the real element,
+       * rather than on the reference element.
        */
       std::vector<Point<spacedim> >  quadrature_points;
 
@@ -455,9 +454,8 @@ namespace internal
     /**
      * A class that stores all of the shape function related data used in
      * dealii::FEValues, dealii::FEFaceValues, and dealii::FESubfaceValues
-     * objects. Objects of this kind will be given
-     * as <i>output</i> argument when dealii::FEValues::reinit()
-     * calls FiniteElement::fill_fe_values().
+     * objects. Objects of this kind will be given as <i>output</i> argument
+     * when dealii::FEValues::reinit() calls FiniteElement::fill_fe_values().
      *
      * @ingroup feaccess
      */
@@ -473,27 +471,28 @@ namespace internal
                        const UpdateFlags         flags);
 
       /**
-       * Compute and return an estimate for the memory consumption (in
-       * bytes) of this object.
+       * Compute and return an estimate for the memory consumption (in bytes)
+       * of this object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Storage type for shape values. Each row in the matrix denotes the values
-       * of a single shape function at the different points, columns are for a
-       * single point with the different shape functions.
+       * Storage type for shape values. Each row in the matrix denotes the
+       * values of a single shape function at the different points, columns
+       * are for a single point with the different shape functions.
        *
        * If a shape function has more than one non-zero component (in deal.II
        * diction: it is non-primitive), then we allocate one row per non-zero
-       * component, and shift subsequent rows backward.  Lookup of the correct row
-       * for a shape function is thus simple in case the entire finite element is
-       * primitive (i.e. all shape functions are primitive), since then the shape
-       * function number equals the row number. Otherwise, use the
-       * #shape_function_to_row_table array to get at the first row that belongs
-       * to this particular shape function, and navigate among all the rows for
-       * this shape function using the FiniteElement::get_nonzero_components()
-       * function which tells us which components are non-zero and thus have a row
-       * in the array presently under discussion.
+       * component, and shift subsequent rows backward.  Lookup of the correct
+       * row for a shape function is thus simple in case the entire finite
+       * element is primitive (i.e. all shape functions are primitive), since
+       * then the shape function number equals the row number. Otherwise, use
+       * the #shape_function_to_row_table array to get at the first row that
+       * belongs to this particular shape function, and navigate among all the
+       * rows for this shape function using the
+       * FiniteElement::get_nonzero_components() function which tells us which
+       * components are non-zero and thus have a row in the array presently
+       * under discussion.
        */
       typedef dealii::Table<2,double> ShapeVector;
 
@@ -514,57 +513,60 @@ namespace internal
       typedef dealii::Table<2,Tensor<3,spacedim> > ThirdDerivativeVector;
 
       /**
-       * Store the values of the shape functions at the quadrature points. See the
-       * description of the data type for the layout of the data in this field.
+       * Store the values of the shape functions at the quadrature points. See
+       * the description of the data type for the layout of the data in this
+       * field.
        */
       ShapeVector shape_values;
 
       /**
-       * Store the gradients of the shape functions at the quadrature points. See
-       * the description of the data type for the layout of the data in this
-       * field.
+       * Store the gradients of the shape functions at the quadrature points.
+       * See the description of the data type for the layout of the data in
+       * this field.
        */
       GradientVector shape_gradients;
 
       /**
        * Store the 2nd derivatives of the shape functions at the quadrature
-       * points.  See the description of the data type for the layout of the data
-       * in this field.
+       * points.  See the description of the data type for the layout of the
+       * data in this field.
        */
       HessianVector shape_hessians;
 
       /**
        * Store the 3nd derivatives of the shape functions at the quadrature
-       * points.  See the description of the data type for the layout of the data
-       * in this field.
+       * points.  See the description of the data type for the layout of the
+       * data in this field.
        */
       ThirdDerivativeVector shape_3rd_derivatives;
 
       /**
-       * When asked for the value (or gradient, or Hessian) of shape function i's
-       * c-th vector component, we need to look it up in the #shape_values,
-       * #shape_gradients and #shape_hessians arrays.  The question is where in
-       * this array does the data for shape function i, component c reside. This
-       * is what this table answers.
+       * When asked for the value (or gradient, or Hessian) of shape function
+       * i's c-th vector component, we need to look it up in the
+       * #shape_values, #shape_gradients and #shape_hessians arrays.  The
+       * question is where in this array does the data for shape function i,
+       * component c reside. This is what this table answers.
        *
        * The format of the table is as follows: - It has dofs_per_cell times
-       * n_components entries. - The entry that corresponds to shape function i,
-       * component c is <code>i * n_components + c</code>. - The value stored at
-       * this position indicates the row in #shape_values and the other tables
-       * where the corresponding datum is stored for all the quadrature points.
+       * n_components entries. - The entry that corresponds to shape function
+       * i, component c is <code>i * n_components + c</code>. - The value
+       * stored at this position indicates the row in #shape_values and the
+       * other tables where the corresponding datum is stored for all the
+       * quadrature points.
        *
-       * In the general, vector-valued context, the number of components is larger
-       * than one, but for a given shape function, not all vector components may
-       * be nonzero (e.g., if a shape function is primitive, then exactly one
-       * vector component is non-zero, while the others are all zero). For such
-       * zero components, #shape_values and friends do not have a row.
-       * Consequently, for vector components for which shape function i is zero,
-       * the entry in the current table is numbers::invalid_unsigned_int.
+       * In the general, vector-valued context, the number of components is
+       * larger than one, but for a given shape function, not all vector
+       * components may be nonzero (e.g., if a shape function is primitive,
+       * then exactly one vector component is non-zero, while the others are
+       * all zero). For such zero components, #shape_values and friends do not
+       * have a row. Consequently, for vector components for which shape
+       * function i is zero, the entry in the current table is
+       * numbers::invalid_unsigned_int.
        *
        * On the other hand, the table is guaranteed to have at least one valid
        * index for each shape function. In particular, for a primitive finite
-       * element, each shape function has exactly one nonzero component and so for
-       * each i, there is exactly one valid index within the range
+       * element, each shape function has exactly one nonzero component and so
+       * for each i, there is exactly one valid index within the range
        * <code>[i*n_components, (i+1)*n_components)</code>.
        */
       std::vector<unsigned int> shape_function_to_row_table;

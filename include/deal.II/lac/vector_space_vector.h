@@ -36,10 +36,11 @@ namespace LinearAlgebra
    */
 
   /**
-   * VectorSpaceVector is an abstract class that is used to define the interface
-   * that vector classes need to implement when they want to implement global
-   * operations. This class is complementary of ReadWriteVector which allows
-   * the access of individual elements but does not allow global operations.
+   * VectorSpaceVector is an abstract class that is used to define the
+   * interface that vector classes need to implement when they want to
+   * implement global operations. This class is complementary of
+   * ReadWriteVector which allows the access of individual elements but does
+   * not allow global operations.
    *
    * @author Bruno Turcksin, 2015.
    */
@@ -140,11 +141,11 @@ namespace LinearAlgebra
      * @endcode
      *
      * The reason this function exists is that this operation involves less
-     * memory transfer than calling the two functions separately. This
-     * method only needs to load three vectors, @p this, @p V, @p W, whereas
-     * calling separate methods means to load the calling vector @p this
-     * twice. Since most vector operations are memory transfer limited, this
-     * reduces the time by 25\% (or 50\% if @p W equals @p this).
+     * memory transfer than calling the two functions separately. This method
+     * only needs to load three vectors, @p this, @p V, @p W, whereas calling
+     * separate methods means to load the calling vector @p this twice. Since
+     * most vector operations are memory transfer limited, this reduces the
+     * time by 25\% (or 50\% if @p W equals @p this).
      */
     virtual Number add_and_dot(const Number a,
                                const VectorSpaceVector<Number> &V,
@@ -158,10 +159,11 @@ namespace LinearAlgebra
 
     /**
      * Return an index set that describes which elements of this vector are
-     * owned by the current processor. As a consequence, the index sets returned
-     * on different procesors if this is a distributed vector will form disjoint
-     * sets that add up to the complete index set. Obviously, if a vector is
-     * created on only one processor, then the result would satisfy
+     * owned by the current processor. As a consequence, the index sets
+     * returned on different procesors if this is a distributed vector will
+     * form disjoint sets that add up to the complete index set. Obviously, if
+     * a vector is created on only one processor, then the result would
+     * satisfy
      * @code
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode

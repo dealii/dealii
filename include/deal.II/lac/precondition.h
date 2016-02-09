@@ -206,8 +206,8 @@ public:
   };
 
   /**
-   * Constructor, sets the relaxation parameter, domain and range sizes
-   * to their default.
+   * Constructor, sets the relaxation parameter, domain and range sizes to
+   * their default.
    */
   PreconditionRichardson();
 
@@ -445,9 +445,10 @@ protected:
 
 
 /**
- * Jacobi preconditioner using matrix built-in function.  The <tt>MatrixType</tt>
- * class used is required to have a function <tt>precondition_Jacobi(VectorType&,
- * const VectorType&, double</tt>). This class satisfies the
+ * Jacobi preconditioner using matrix built-in function.  The
+ * <tt>MatrixType</tt> class used is required to have a function
+ * <tt>precondition_Jacobi(VectorType&, const VectorType&, double</tt>). This
+ * class satisfies the
  * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
@@ -579,9 +580,10 @@ public:
 
 
 /**
- * SSOR preconditioner using matrix built-in function.  The <tt>MatrixType</tt>
- * class used is required to have a function <tt>precondition_SSOR(VectorType&,
- * const VectorType&, double)</tt>. This class satisfies the
+ * SSOR preconditioner using matrix built-in function.  The
+ * <tt>MatrixType</tt> class used is required to have a function
+ * <tt>precondition_SSOR(VectorType&, const VectorType&, double)</tt>. This
+ * class satisfies the
  * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
@@ -664,9 +666,9 @@ private:
 
 /**
  * Permuted SOR preconditioner using matrix built-in function.  The
- * <tt>MatrixType</tt> class used is required to have functions <tt>PSOR(VectorType&,
- * const VectorType&, double)</tt> and <tt>TPSOR(VectorType&, const VectorType&,
- * double)</tt>.
+ * <tt>MatrixType</tt> class used is required to have functions
+ * <tt>PSOR(VectorType&, const VectorType&, double)</tt> and
+ * <tt>TPSOR(VectorType&, const VectorType&, double)</tt>.
  *
  * @code
  *     // Declare related objects
@@ -704,8 +706,8 @@ public:
   typedef typename MatrixType::size_type size_type;
 
   /**
-    * Parameters for PreconditionPSOR.
-    */
+   * Parameters for PreconditionPSOR.
+   */
   class AdditionalData
   {
   public:
@@ -797,9 +799,8 @@ private:
  * matrices. This preconditioner is similar to a Jacobi preconditioner if the
  * degree variable is set to one, otherwise some higher order polynomial
  * corrections are used. This preconditioner needs access to the diagonal of
- * the matrix it acts on and needs a respective <tt>vmult</tt>
- * implementation. However, it does not need to explicitly know the matrix
- * entries.
+ * the matrix it acts on and needs a respective <tt>vmult</tt> implementation.
+ * However, it does not need to explicitly know the matrix entries.
  *
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).

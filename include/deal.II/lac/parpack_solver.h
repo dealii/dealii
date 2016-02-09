@@ -70,20 +70,19 @@ extern "C" {
 
 /**
  * Interface for using PARPACK. PARPACK is a collection of Fortran77
- * subroutines designed to solve large scale eigenvalue problems.
- * Here we interface to the routines <code>pdneupd</code>,
- * <code>pdseupd</code>, <code>pdnaupd</code>, <code>pdsaupd</code> of
- * PARPACK.  The package is designed to compute a few eigenvalues and
- * corresponding eigenvectors of a general n by n matrix A. It is most
- * appropriate for large sparse matrices A.
+ * subroutines designed to solve large scale eigenvalue problems. Here we
+ * interface to the routines <code>pdneupd</code>, <code>pdseupd</code>,
+ * <code>pdnaupd</code>, <code>pdsaupd</code> of PARPACK.  The package is
+ * designed to compute a few eigenvalues and corresponding eigenvectors of a
+ * general n by n matrix A. It is most appropriate for large sparse matrices
+ * A.
  *
  * In this class we make use of the method applied to the generalized
- * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$
- * is a system matrix, $B$ is a mass matrix, and $\lambda, x$ are a
- * set of eigenvalues and eigenvectors respectively.
+ * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
+ * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * eigenvalues and eigenvectors respectively.
  *
- * The ArpackSolver can be used in application codes in the
- * following way:
+ * The ArpackSolver can be used in application codes in the following way:
  * @code
  *   SolverControl solver_control (1000, 1e-9);
  *   const unsigned int num_arnoldi_vectors = 2*size_of_spectrum + 2;
@@ -104,26 +103,26 @@ extern "C" {
  *                       x,
  *                       size_of_spectrum);
  * @endcode
- * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
- * variable <code>size_of_spectrum</code> tells PARPACK the number of
- * eigenvector/eigenvalue pairs to solve for. Here,
- * <code>lambda</code> is a vector that will contain the eigenvalues
- * computed, <code>x</code> a vector of objects of type <code>V</code>
- * that will contain the eigenvectors computed. <code>OP</code> is an
- * inverse operation for the matrix <code>A - sigma * B</code>, where
- * <code> sigma </code> is a shift value, set to zero by default.
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where the variable
+ * <code>size_of_spectrum</code> tells PARPACK the number of
+ * eigenvector/eigenvalue pairs to solve for. Here, <code>lambda</code> is a
+ * vector that will contain the eigenvalues computed, <code>x</code> a vector
+ * of objects of type <code>V</code> that will contain the eigenvectors
+ * computed. <code>OP</code> is an inverse operation for the matrix <code>A -
+ * sigma * B</code>, where <code> sigma </code> is a shift value, set to zero
+ * by default.
  *
- * Through the AdditionalData the user can specify some of the
- * parameters to be set.
+ * Through the AdditionalData the user can specify some of the parameters to
+ * be set.
  *
- * The class is intended to be used with MPI and can work on arbitrary
- * vector and matrix distributed classes.  Both symmetric and
- * non-symmetric <code>A</code> are supported.
+ * The class is intended to be used with MPI and can work on arbitrary vector
+ * and matrix distributed classes.  Both symmetric and non-symmetric
+ * <code>A</code> are supported.
  *
- * For further information on how the PARPACK routines
- * <code>pdneupd</code>, <code>pdseupd</code>, <code>pdnaupd</code>,
- * <code>pdsaupd</code> work and also how to set the parameters
- * appropriately please take a look into the PARPACK manual.
+ * For further information on how the PARPACK routines <code>pdneupd</code>,
+ * <code>pdseupd</code>, <code>pdnaupd</code>, <code>pdsaupd</code> work and
+ * also how to set the parameters appropriately please take a look into the
+ * PARPACK manual.
  *
  * @author Denis Davydov, 2015.
  */
@@ -137,11 +136,11 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * An enum that lists the possible choices for which eigenvalues to
-   * compute in the solve() function.
+   * An enum that lists the possible choices for which eigenvalues to compute
+   * in the solve() function.
    *
-   * A particular choice is limited based on symmetric or
-   * non-symmetric matrix <code>A</code> considered.
+   * A particular choice is limited based on symmetric or non-symmetric matrix
+   * <code>A</code> considered.
    */
   enum WhichEigenvalues
   {
@@ -203,8 +202,8 @@ public:
   };
 
   /**
-   * Standardized data struct to pipe additional data to the solver,
-   * should it be needed.
+   * Standardized data struct to pipe additional data to the solver, should it
+   * be needed.
    */
   struct AdditionalData
   {
@@ -240,9 +239,9 @@ public:
   void set_shift(const double s );
 
   /**
-   * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by
-   * calling the <code>pd(n/s)eupd</code> and <code>pd(n/s)aupd</code>
-   * functions of PARPACK.
+   * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
+   * the <code>pd(n/s)eupd</code> and <code>pd(n/s)aupd</code> functions of
+   * PARPACK.
    */
   template <typename MatrixType1,
             typename MatrixType2, typename INVERSE>
@@ -259,8 +258,8 @@ public:
 protected:
 
   /**
-   * Reference to the object that controls convergence of the
-   * iterative solver.
+   * Reference to the object that controls convergence of the iterative
+   * solver.
    */
   SolverControl &solver_control;
 
@@ -315,14 +314,14 @@ protected:
   int ldv;
 
   /**
-   * Double precision vector of size ldv by NCV.  Will contains the
-   * final set of Arnoldi basis vectors.
+   * Double precision vector of size ldv by NCV.  Will contains the final set
+   * of Arnoldi basis vectors.
    */
   std::vector<double> v;
 
   /**
-   * The initial residual vector, possibly from a previous run.  On
-   * output, it contains the final residual vector.
+   * The initial residual vector, possibly from a previous run.  On output, it
+   * contains the final residual vector.
    */
   std::vector<double> resid;
 
@@ -332,9 +331,9 @@ protected:
   int ldz;
 
   /**
-   * A vector of minimum size of nloc by NEV+1.  Z contains the
-   * B-orthonormal Ritz vectors of the eigensystem A*z = lambda*B*z
-   * corresponding to the Ritz value approximations.
+   * A vector of minimum size of nloc by NEV+1.  Z contains the B-orthonormal
+   * Ritz vectors of the eigensystem A*z = lambda*B*z corresponding to the
+   * Ritz value approximations.
    */
   std::vector<double> z;
 

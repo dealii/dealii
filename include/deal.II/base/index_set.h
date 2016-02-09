@@ -52,9 +52,9 @@ DEAL_II_NAMESPACE_OPEN
  * class are a subset.
  *
  * There are two ways to iterate over the IndexSets: First, begin() and end()
- * allow iteration over individual indices in the set. Second, begin_interval()
- * and end_interval() allow iteration over the half-open ranges as described
- * above.
+ * allow iteration over individual indices in the set. Second,
+ * begin_interval() and end_interval() allow iteration over the half-open
+ * ranges as described above.
  *
  * The data structures used in this class along with a rationale can be found
  * in the
@@ -154,11 +154,10 @@ public:
    * Add a whole set of indices described by dereferencing every element of
    * the iterator range <code>[begin,end)</code>.
    *
-   * @param[in] begin Iterator to the first element of range of indices
-   *   to be added
-   * @param[in] end The past-the-end iterator for the range of elements
-   *   to be added.
-   * @pre The condition <code>begin@<=end</code> needs to be satisfied.
+   * @param[in] begin Iterator to the first element of range of indices to be
+   * added
+   * @param[in] end The past-the-end iterator for the range of elements to be
+   * added. @pre The condition <code>begin@<=end</code> needs to be satisfied.
    */
   template <typename ForwardIterator>
   void add_indices (const ForwardIterator &begin,
@@ -224,7 +223,8 @@ public:
   unsigned int n_intervals () const;
 
   /**
-   * This function returns the local index of the beginning of the largest range.
+   * This function returns the local index of the beginning of the largest
+   * range.
    */
   unsigned int largest_range_starting_index() const;
 
@@ -428,8 +428,8 @@ public:
     ElementIterator end() const;
 
     /**
-    * Return the index of the last index in this interval.
-    */
+     * Return the index of the last index in this interval.
+     */
     size_type last() const;
 
   private:

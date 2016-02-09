@@ -131,14 +131,14 @@ namespace FiniteElementDomination
 /**
  * A class that declares a number of scalar constant variables that describe
  * basic properties of a finite element implementation. This includes, for
- * example, the number of degrees of freedom per vertex, line, or cell;
- * the number of vector components; etc.
+ * example, the number of degrees of freedom per vertex, line, or cell; the
+ * number of vector components; etc.
  *
- * The kind of information stored here is computed during initialization
- * of a finite element object and is passed down to this class via its
- * constructor. The data stored by this class is part of the public
- * interface of the FiniteElement class (which derives from the current
- * class). See there for more information.
+ * The kind of information stored here is computed during initialization of a
+ * finite element object and is passed down to this class via its constructor.
+ * The data stored by this class is part of the public interface of the
+ * FiniteElement class (which derives from the current class). See there for
+ * more information.
  *
  * @ingroup febase
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003,
@@ -314,39 +314,39 @@ public:
    * Constructor, computing all necessary values from the distribution of dofs
    * to geometrical objects.
    *
-   * @param[in] dofs_per_object A vector that describes the number of degrees of
-   *   freedom on geometrical objects for each dimension. This vector must
-   *   have size dim+1, and entry 0 describes the number of degrees of freedom
-   *   per vertex, entry 1 the number of degrees of freedom per line, etc.
-   *   As an example, for the common $Q_1$ Lagrange element in 2d, this
-   *   vector would have elements <code>(1,0,0)</code>. On the other hand,
-   *   for a $Q_3$ element in 3d, it would have entries <code>(1,2,4,8)</code>.
+   * @param[in] dofs_per_object A vector that describes the number of degrees
+   * of freedom on geometrical objects for each dimension. This vector must
+   * have size dim+1, and entry 0 describes the number of degrees of freedom
+   * per vertex, entry 1 the number of degrees of freedom per line, etc. As an
+   * example, for the common $Q_1$ Lagrange element in 2d, this vector would
+   * have elements <code>(1,0,0)</code>. On the other hand, for a $Q_3$
+   * element in 3d, it would have entries <code>(1,2,4,8)</code>.
    *
    * @param[in] n_components Number of vector components of the element.
    *
-   * @param[in] degree The maximal polynomial degree of any of the shape functions
-   *   of this element in any variable on the reference element. For example,
-   *   for the $Q_1$ element (in any space dimension), this would be one; this
-   *   is so despite the fact that the element has a shape function of the form
-   *   $\hat x\hat y$ (in 2d) and $\hat x\hat y\hat z$ (in 3d), which, although
-   *   quadratic and cubic polynomials, are still only linear in each reference
-   *   variable separately. The information provided by this variable is
-   *   typically used in determining what an appropriate quadrature formula is.
+   * @param[in] degree The maximal polynomial degree of any of the shape
+   * functions of this element in any variable on the reference element. For
+   * example, for the $Q_1$ element (in any space dimension), this would be
+   * one; this is so despite the fact that the element has a shape function of
+   * the form $\hat x\hat y$ (in 2d) and $\hat x\hat y\hat z$ (in 3d), which,
+   * although quadratic and cubic polynomials, are still only linear in each
+   * reference variable separately. The information provided by this variable
+   * is typically used in determining what an appropriate quadrature formula
+   * is.
    *
    * @param[in] conformity A variable describing which Sobolev space this
-   *   element conforms to. For example, the $Q_p$ Lagrange elements
-   *   (implemented by the FE_Q class) are $H^1$ conforming, whereas the
-   *   Raviart-Thomas element (implemented by the FE_RaviartThomas class) is
-   *   $H_\text{div}$ conforming; finally, completely discontinuous
-   *   elements (implemented by the FE_DGQ class) are only $L_2$
-   *   conforming.
+   * element conforms to. For example, the $Q_p$ Lagrange elements
+   * (implemented by the FE_Q class) are $H^1$ conforming, whereas the
+   * Raviart-Thomas element (implemented by the FE_RaviartThomas class) is
+   * $H_\text{div}$ conforming; finally, completely discontinuous elements
+   * (implemented by the FE_DGQ class) are only $L_2$ conforming.
    *
    * @param[in] block_indices An argument that describes how the base elements
-   *   of a finite element are grouped. The default value constructs a single
-   *   block that consists of all @p dofs_per_cell degrees of freedom. This
-   *   is appropriate for all "atomic" elements (including non-primitive ones)
-   *   and these can therefore omit this argument. On the other hand, composed
-   *   elements such as FESystem will want to pass a different value here.
+   * of a finite element are grouped. The default value constructs a single
+   * block that consists of all @p dofs_per_cell degrees of freedom. This is
+   * appropriate for all "atomic" elements (including non-primitive ones) and
+   * these can therefore omit this argument. On the other hand, composed
+   * elements such as FESystem will want to pass a different value here.
    */
   FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                      const unsigned int               n_components,

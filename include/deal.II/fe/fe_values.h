@@ -371,10 +371,10 @@ namespace FEValuesViews
      * on the selected scalar component.
      *
      * The data type stored by the output vector must be what you get when you
-     * multiply the third derivatives of shape functions
-     * (i.e., @p third_derivative_type) times the type used to store the values
-     * of the unknowns $U_j$ of your finite element vector $U$ (represented by
-     * the @p fe_function argument).
+     * multiply the third derivatives of shape functions (i.e., @p
+     * third_derivative_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented by the @p
+     * fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_third_derivatives}
      */
@@ -664,9 +664,9 @@ namespace FEValuesViews
              const unsigned int q_point) const;
 
     /**
-     * Return the tensor of rank 3 of all third derivatives of
-     * the vector components selected by this view, for the shape function and
-     * quadrature point selected by the arguments.
+     * Return the tensor of rank 3 of all third derivatives of the vector
+     * components selected by this view, for the shape function and quadrature
+     * point selected by the arguments.
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
@@ -845,10 +845,10 @@ namespace FEValuesViews
      * on the selected scalar component.
      *
      * The data type stored by the output vector must be what you get when you
-     * multiply the third derivatives of shape functions
-     * (i.e., @p third_derivative_type) times the type used to store the values
-     * of the unknowns $U_j$ of your finite element vector $U$ (represented by
-     * the @p fe_function argument).
+     * multiply the third derivatives of shape functions (i.e., @p
+     * third_derivative_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented by the @p
+     * fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_third_derivatives}
      */
@@ -1344,8 +1344,8 @@ namespace internal
  * of finite element and mapping, some values can be computed once on the unit
  * cell. Others must be computed on each cell, but maybe computation of
  * several values at the same time offers ways for optimization. Since this
- * interplay may be complex and depends on the actual finite element, it cannot
- * be left to the applications programmer.
+ * interplay may be complex and depends on the actual finite element, it
+ * cannot be left to the applications programmer.
  *
  * FEValues, FEFaceValues and FESubfaceValues provide only data handling:
  * computations are left to objects of type Mapping and FiniteElement. These
@@ -1428,7 +1428,8 @@ namespace internal
  * <h3>Internals about the implementation</h3>
  *
  * The mechanisms by which this class work are discussed on the page on
- * @ref UpdateFlags "Update flags" and about the
+ * @ref UpdateFlags "Update flags"
+ * and about the
  * @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
  *
  *
@@ -1553,8 +1554,8 @@ public:
    *
    * @param function_no Number of the shape function to be evaluated.
    *
-   * @param quadrature_point Number of the quadrature point at which function is to be
-   * evaluated.
+   * @param quadrature_point Number of the quadrature point at which function
+   * is to be evaluated.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -1588,8 +1589,8 @@ public:
    * <tt>point_no</tt>th quadrature point with respect to real cell
    * coordinates. If you want to get the derivatives in one of the coordinate
    * directions, use the appropriate function of the Tensor class to extract
-   * one component. Since only a reference to the hessian values is
-   * returned, there should be no major performance drawback.
+   * one component. Since only a reference to the hessian values is returned,
+   * there should be no major performance drawback.
    *
    * If the shape function is vector-valued, then this returns the only non-
    * zero component. If the shape function has more than one non-zero
@@ -1630,10 +1631,10 @@ public:
   /**
    * Third derivatives of the <tt>function_no</tt>th shape function at the
    * <tt>point_no</tt>th quadrature point with respect to real cell
-   * coordinates. If you want to get the 3rd derivatives in one of the coordinate
-   * directions, use the appropriate function of the Tensor class to extract
-   * one component. Since only a reference to the 3rd derivative values is
-   * returned, there should be no major performance drawback.
+   * coordinates. If you want to get the 3rd derivatives in one of the
+   * coordinate directions, use the appropriate function of the Tensor class
+   * to extract one component. Since only a reference to the 3rd derivative
+   * values is returned, there should be no major performance drawback.
    *
    * If the shape function is vector-valued, then this returns the only non-
    * zero component. If the shape function has more than one non-zero
@@ -1651,15 +1652,15 @@ public:
                         const unsigned int point_no) const;
 
   /**
-   * Return one vector component of the third derivative of a shape function at a
-   * quadrature point. If the finite element is scalar, then only component
-   * zero is allowed and the return value equals that of the shape_3rdderivative()
-   * function. If the finite element is vector valued but all shape functions
-   * are primitive (i.e. they are non-zero in only one component), then the
-   * value returned by shape_3rdderivative() equals that of this function for
-   * exactly one component. This function is therefore only of greater
-   * interest if the shape function is not primitive, but then it is necessary
-   * since the other function cannot be used.
+   * Return one vector component of the third derivative of a shape function
+   * at a quadrature point. If the finite element is scalar, then only
+   * component zero is allowed and the return value equals that of the
+   * shape_3rdderivative() function. If the finite element is vector valued
+   * but all shape functions are primitive (i.e. they are non-zero in only one
+   * component), then the value returned by shape_3rdderivative() equals that
+   * of this function for exactly one component. This function is therefore
+   * only of greater interest if the shape function is not primitive, but then
+   * it is necessary since the other function cannot be used.
    *
    * The same holds for the arguments of this function as for the
    * shape_value_component() function.
@@ -2141,11 +2142,11 @@ public:
    * store the values of the unknowns $U_j$ of your finite element vector $U$
    * (represented by the @p fe_function argument).
    *
-   * @post <code>third_derivatives[q]</code> will contain the third derivatives
-   * of the field described by fe_function at the $q$th quadrature point.
-   * <code>third_derivatives[q][i][j][k]</code> represents the $(i,j,k)$th
-   * component of the 3rd order tensor of third derivatives at quadrature
-   * point $q$.
+   * @post <code>third_derivatives[q]</code> will contain the third
+   * derivatives of the field described by fe_function at the $q$th quadrature
+   * point. <code>third_derivatives[q][i][j][k]</code> represents the
+   * $(i,j,k)$th component of the 3rd order tensor of third derivatives at
+   * quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
@@ -2163,20 +2164,20 @@ public:
                                   std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const;
 
   /**
-   * This function does the same as the other get_function_third_derivatives(),
-   * but applied to multi-component (vector-valued) elements. The meaning of
-   * the arguments is as explained there.
+   * This function does the same as the other
+   * get_function_third_derivatives(), but applied to multi-component (vector-
+   * valued) elements. The meaning of the arguments is as explained there.
    *
    * @post <code>third_derivatives[q]</code> is a vector of third derivatives
    * of the field described by fe_function at the $q$th quadrature point. The
    * size of the vector accessed by <code>third_derivatives[q]</code> equals
    * the number of components of the finite element, i.e.
    * <code>third_derivatives[q][c]</code> returns the third derivative of the
-   * $c$th vector component at the $q$th quadrature point.
-   * Consequently, <code>third_derivatives[q][c][i][j][k]</code> is
-   * the $(i,j,k)$th component of the tensor of third derivatives of the $c$th
-   * vector component of the vector field at quadrature point $q$ of the
-   * current cell.
+   * $c$th vector component at the $q$th quadrature point. Consequently,
+   * <code>third_derivatives[q][c][i][j][k]</code> is the $(i,j,k)$th
+   * component of the tensor of third derivatives of the $c$th vector
+   * component of the vector field at quadrature point $q$ of the current
+   * cell.
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
@@ -2302,9 +2303,9 @@ public:
   const std::vector<Tensor<3,spacedim> > &get_jacobian_pushed_forward_grads () const;
 
   /**
-   * Return the third derivative of the transformation from unit to real
-   * cell, i.e. the second derivative of the Jacobian, at the specified
-   * quadrature point, i.e. $G_{ijkl}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l}$.
+   * Return the third derivative of the transformation from unit to real cell,
+   * i.e. the second derivative of the Jacobian, at the specified quadrature
+   * point, i.e. $G_{ijkl}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l}$.
    *
    * @dealiiRequiresUpdateFlags{update_jacobian_2nd_derivatives}
    */
@@ -2319,10 +2320,11 @@ public:
   const std::vector<DerivativeForm<3,dim,spacedim> > &get_jacobian_2nd_derivatives () const;
 
   /**
-   * Return the third derivative of the transformation from unit to real
-   * cell, i.e. the second derivative of the Jacobian, at the specified
-   * quadrature point, pushed forward to the real cell coordinates, i.e.
-   * $G_{ijkl}=\frac{d^2J_{iJ}}{d\hat x_K d\hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1}(J_{lL})^{-1}$.
+   * Return the third derivative of the transformation from unit to real cell,
+   * i.e. the second derivative of the Jacobian, at the specified quadrature
+   * point, pushed forward to the real cell coordinates, i.e.
+   * $G_{ijkl}=\frac{d^2J_{iJ}}{d\hat x_K d\hat x_L} (J_{jJ})^{-1}
+   * (J_{kK})^{-1}(J_{lL})^{-1}$.
    *
    * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_2nd_derivatives}
    */
@@ -2339,7 +2341,8 @@ public:
   /**
    * Return the fourth derivative of the transformation from unit to real
    * cell, i.e. the third derivative of the Jacobian, at the specified
-   * quadrature point, i.e. $G_{ijklm}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l d\hat x_m}$.
+   * quadrature point, i.e. $G_{ijklm}=\frac{d^2J_{ij}}{d\hat x_k d\hat x_l
+   * d\hat x_m}$.
    *
    * @dealiiRequiresUpdateFlags{update_jacobian_3rd_derivatives}
    */
@@ -2357,7 +2360,8 @@ public:
    * Return the fourth derivative of the transformation from unit to real
    * cell, i.e. the third derivative of the Jacobian, at the specified
    * quadrature point, pushed forward to the real cell coordinates, i.e.
-   * $G_{ijklm}=\frac{d^3J_{iJ}}{d\hat x_K d\hat x_L d\hat x_M} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1} (J_{mM})^{-1}$.
+   * $G_{ijklm}=\frac{d^3J_{iJ}}{d\hat x_K d\hat x_L d\hat x_M} (J_{jJ})^{-1}
+   * (J_{kK})^{-1} (J_{lL})^{-1} (J_{mM})^{-1}$.
    *
    * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_3rd_derivatives}
    */
@@ -2391,10 +2395,10 @@ public:
    * For a face, return the outward normal vector to the cell at the
    * <tt>i</tt>th quadrature point.
    *
-   * For a cell of codimension one, return the normal vector. There
-   * are of course two normal directions to a manifold in that case,
-   * and this function returns the "up" direction as induced by the
-   * numbering of the vertices.
+   * For a cell of codimension one, return the normal vector. There are of
+   * course two normal directions to a manifold in that case, and this
+   * function returns the "up" direction as induced by the numbering of the
+   * vertices.
    *
    * The length of the vector is normalized to one.
    *
@@ -2409,21 +2413,21 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    *
-   * @note This function should really be named get_normal_vectors(),
-   *   but this function already exists with a different return type
-   *   that returns a vector of Point objects, rather than a vector of
-   *   Tensor objects. This is a historical accident, but can not
-   *   be fixed in a backward compatible style. That said, the
-   *   get_normal_vectors() function is now deprecated, will be removed
-   *   in the next version, and the current function will then be renamed.
+   * @note This function should really be named get_normal_vectors(), but this
+   * function already exists with a different return type that returns a
+   * vector of Point objects, rather than a vector of Tensor objects. This is
+   * a historical accident, but can not be fixed in a backward compatible
+   * style. That said, the get_normal_vectors() function is now deprecated,
+   * will be removed in the next version, and the current function will then
+   * be renamed.
    */
   const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const;
 
   /**
-   * Return the normal vectors at the quadrature points as a vector of
-   * Point objects. This function is deprecated because normal vectors
-   * are correctly represented by rank-1 Tensor objects, not Point objects.
-   * Use get_all_normal_vectors() instead.
+   * Return the normal vectors at the quadrature points as a vector of Point
+   * objects. This function is deprecated because normal vectors are correctly
+   * represented by rank-1 Tensor objects, not Point objects. Use
+   * get_all_normal_vectors() instead.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    *
@@ -2671,14 +2675,15 @@ protected:
   std_cxx11::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
 
   /**
-   * An object into which the Mapping::fill_fe_values() and similar
-   * functions place their output.
+   * An object into which the Mapping::fill_fe_values() and similar functions
+   * place their output.
    */
   dealii::internal::FEValues::MappingRelatedData<dim, spacedim> mapping_output;
 
 
   /**
-   * A pointer to the finite element object associated with this FEValues object.
+   * A pointer to the finite element object associated with this FEValues
+   * object.
    */
   const SmartPointer<const FiniteElement<dim,spacedim>,FEValuesBase<dim,spacedim> > fe;
 
@@ -2786,9 +2791,9 @@ public:
             const UpdateFlags                  update_flags);
 
   /**
-   * Constructor. This constructor is equivalent to the other one except
-   * that it makes the object use a $Q_1$ mapping (i.e., an object of
-   * type MappingQGeneric(1)) implicitly.
+   * Constructor. This constructor is equivalent to the other one except that
+   * it makes the object use a $Q_1$ mapping (i.e., an object of type
+   * MappingQGeneric(1)) implicitly.
    */
   FEValues (const FiniteElement<dim,spacedim> &fe,
             const Quadrature<dim>             &quadrature,
@@ -2812,8 +2817,8 @@ public:
    * this class if they need information about degrees of freedom. These
    * functions are, above all, the
    * <tt>get_function_value/gradients/hessians/laplacians/third_derivatives</tt>
-   * functions. If you want to call these functions, you have to call the
-   * @p reinit variants that take iterators into DoFHandler or other DoF handler
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
    * type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
@@ -2997,9 +3002,9 @@ public:
                 const UpdateFlags                  update_flags);
 
   /**
-   * Constructor. This constructor is equivalent to the other one except
-   * that it makes the object use a $Q_1$ mapping (i.e., an object of
-   * type MappingQGeneric(1)) implicitly.
+   * Constructor. This constructor is equivalent to the other one except that
+   * it makes the object use a $Q_1$ mapping (i.e., an object of type
+   * MappingQGeneric(1)) implicitly.
    */
   FEFaceValues (const FiniteElement<dim,spacedim> &fe,
                 const Quadrature<dim-1>           &quadrature,
@@ -3022,9 +3027,9 @@ public:
    * some functions of this class if they need information about degrees of
    * freedom. These functions are, above all, the
    * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
-   * functions. If you want to call these functions, you have to call the
-   * @p reinit variants that take iterators into DoFHandler or other
-   * DoF handler type objects.
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                const unsigned int                                         face_no);
@@ -3107,9 +3112,9 @@ public:
                    const UpdateFlags         update_flags);
 
   /**
-   * Constructor. This constructor is equivalent to the other one except
-   * that it makes the object use a $Q_1$ mapping (i.e., an object of
-   * type MappingQGeneric(1)) implicitly.
+   * Constructor. This constructor is equivalent to the other one except that
+   * it makes the object use a $Q_1$ mapping (i.e., an object of type
+   * MappingQGeneric(1)) implicitly.
    */
   FESubfaceValues (const FiniteElement<dim,spacedim> &fe,
                    const Quadrature<dim-1>  &face_quadrature,
@@ -3135,9 +3140,9 @@ public:
    * some functions of this class if they need information about degrees of
    * freedom. These functions are, above all, the
    * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
-   * functions. If you want to call these functions, you have to call the
-   * @p reinit variants that take iterators into DoFHandler or other
-   * DoF handler type objects.
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
    */
   void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                const unsigned int                    face_no,

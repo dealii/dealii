@@ -92,8 +92,8 @@ namespace SLEPcWrappers
     void set_matrix_mode(const STMatMode mode);
 
     /**
-     * Set solver to be used when solving a system of
-     * linear algebraic equations inside the eigensolver.
+     * Set solver to be used when solving a system of linear algebraic
+     * equations inside the eigensolver.
      */
     void
     set_solver(const PETScWrappers::SolverBase &solver);

@@ -32,22 +32,22 @@ DEAL_II_NAMESPACE_OPEN
  * Implementation of a scalar Lagrange finite element @p Q_p^+ that yields the
  * finite element space of continuous, piecewise polynomials of degree @p p in
  * each coordinate direction plus some bubble enrichment space spanned by
- * $(2x_j-1)^{p-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. Therefore the highest polynomial
- * degree is $p+1$.
- * This class is realized using tensor product polynomials based on equidistant
- * or given support points.
+ * $(2x_j-1)^{p-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. Therefore the highest
+ * polynomial degree is $p+1$. This class is realized using tensor product
+ * polynomials based on equidistant or given support points.
  *
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
- * the support points of the Lagrange interpolation in one coordinate direction.
+ * the support points of the Lagrange interpolation in one coordinate
+ * direction.
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
  *
- * Due to the fact that the enrichments are small almost everywhere
- * for large p, the condition number for the mass and stiffness matrix fastly
- * increaseses with increasing p.
- * Below you see a comparison with FE_Q(QGaussLobatto(p+1)) for dim=1.
+ * Due to the fact that the enrichments are small almost everywhere for large
+ * p, the condition number for the mass and stiffness matrix fastly
+ * increaseses with increasing p. Below you see a comparison with
+ * FE_Q(QGaussLobatto(p+1)) for dim=1.
  *
  * <p ALIGN="center">
  * @image html fe_q_bubbles_conditioning.png
@@ -58,13 +58,13 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object that includes the
- * tensor product of @p LagrangeEquidistant polynomials of degree @p p plus the
- * bubble enrichments. This @p TensorProductPolynomialsBubbles object
+ * tensor product of @p LagrangeEquidistant polynomials of degree @p p plus
+ * the bubble enrichments. This @p TensorProductPolynomialsBubbles object
  * provides all values and derivatives of the shape functions. In case a
  * quadrature rule is given, the constructor creates a
- * TensorProductPolynomialsBubbles object that includes the tensor product of @p
- * Lagrange polynomials with the support points from @p points and the bubble enrichments
- * as defined above.
+ * TensorProductPolynomialsBubbles object that includes the tensor product of
+ * @p Lagrange polynomials with the support points from @p points and the
+ * bubble enrichments as defined above.
  *
  * Furthermore the constructor fills the @p interface_constrains, the @p
  * prolongation (embedding) and the @p restriction matrices.
@@ -72,12 +72,11 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * The original ordering of the shape functions represented by the
- * TensorProductPolynomialsBubbles is a tensor product
- * numbering. However, the shape functions on a cell are renumbered
- * beginning with the shape functions whose support points are at the
- * vertices, then on the line, on the quads, and finally (for 3d) on
- * the hexes. Finally, there are support points for the bubble enrichments
- * in the middle of the cell.
+ * TensorProductPolynomialsBubbles is a tensor product numbering. However, the
+ * shape functions on a cell are renumbered beginning with the shape functions
+ * whose support points are at the vertices, then on the line, on the quads,
+ * and finally (for 3d) on the hexes. Finally, there are support points for
+ * the bubble enrichments in the middle of the cell.
  *
  */
 template <int dim, int spacedim=dim>
@@ -85,16 +84,17 @@ class FE_Q_Bubbles : public FE_Q_Base<TensorProductPolynomialsBubbles<dim>,dim,s
 {
 public:
   /**
-   * Constructor for tensor product polynomials of degree @p p plus bubble enrichments
+   * Constructor for tensor product polynomials of degree @p p plus bubble
+   * enrichments
    *
    */
   FE_Q_Bubbles (const unsigned int p);
 
   /**
    * Constructor for tensor product polynomials with support points @p points
-   * plus bubble enrichments based on a one-dimensional quadrature
-   * formula. The degree of the finite element is <tt>points.size()</tt>.
-   * Note that the first point has to be 0 and the last one 1.
+   * plus bubble enrichments based on a one-dimensional quadrature formula.
+   * The degree of the finite element is <tt>points.size()</tt>. Note that the
+   * first point has to be 0 and the last one 1.
    */
   FE_Q_Bubbles (const Quadrature<1> &points);
 
@@ -176,8 +176,8 @@ protected:
 private:
 
   /**
-   * Returns the restriction_is_additive flags.
-   * Only the last components for the bubble enrichments are true.
+   * Returns the restriction_is_additive flags. Only the last components for
+   * the bubble enrichments are true.
    */
   static std::vector<bool> get_riaf_vector(const unsigned int degree);
 

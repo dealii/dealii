@@ -95,8 +95,8 @@ namespace TrilinosWrappers
  * explicit Mapping argument and one that does not. The second one generally
  * calls the first with an implicit $Q_1$ argument (i.e., with an argument of
  * kind MappingQGeneric(1)). If your intend your code to use a different
- * mapping than a (bi-/tri-)linear one, then you need to call the
- * functions <b>with</b> mapping argument should be used.
+ * mapping than a (bi-/tri-)linear one, then you need to call the functions
+ * <b>with</b> mapping argument should be used.
  *
  * All functions take a sparse matrix object to hold the matrix to be created.
  * The functions assume that the matrix is initialized with a sparsity pattern
@@ -181,9 +181,9 @@ namespace TrilinosWrappers
  * char</tt>s as parameter @p boundary_functions containing the keys zero and
  * 2). The size of the matrix is equal to the number of degrees of freedom
  * that have support on the boundary, i.e. it is <em>not</em> a matrix on all
- * degrees of freedom, but only a subset. (The $\phi_i$ in the formula are
- * the subset of basis functions which have at least part of their support
- * on $\Gamma$.) In order to determine which shape functions are to be
+ * degrees of freedom, but only a subset. (The $\phi_i$ in the formula are the
+ * subset of basis functions which have at least part of their support on
+ * $\Gamma$.) In order to determine which shape functions are to be
  * considered, and in order to determine in which order, the function takes a
  * @p dof_to_boundary_mapping; this object maps global DoF numbers to a
  * numbering of the degrees of freedom located on the boundary, and can be

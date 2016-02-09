@@ -50,9 +50,9 @@ class Tensor<-1, dim, Number>
 
 
 /**
- * This class is a specialized version of the
- * <tt>Tensor<rank,dim,Number></tt> class. It handles tensors of rank zero,
- * i.e. scalars. The second template argument @p dim is ignored.
+ * This class is a specialized version of the <tt>Tensor<rank,dim,Number></tt>
+ * class. It handles tensors of rank zero, i.e. scalars. The second template
+ * argument @p dim is ignored.
  *
  * This class exists because in some cases we want to construct objects of
  * type Tensor@<spacedim-dim,dim,Number@>, which should expand to scalars,
@@ -163,8 +163,7 @@ public:
    * Return a reference to the encapsulated Number object. Since rank-0
    * tensors are scalars, this is a natural operation.
    *
-   * This is the const conversion operator that returns a read-only
-   * reference.
+   * This is the const conversion operator that returns a read-only reference.
    */
   operator const Number &() const;
 
@@ -174,8 +173,8 @@ public:
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
 
   /**
-   * Assignment from tensors with different underlying scalar type.
-   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Assignment from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    */
   template <typename OtherNumber>
@@ -237,16 +236,15 @@ public:
   void clear ();
 
   /**
-   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum
-   * of the absolute squares of all entries. For the present case of rank-1
-   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the
-   * vector.
+   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
+   * the absolute squares of all entries. For the present case of rank-1
+   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    */
   real_type norm () const;
 
   /**
-   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
-   * the absolute squares of all entries.
+   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
+   * absolute squares of all entries.
    */
   real_type norm_square () const;
 
@@ -258,8 +256,8 @@ public:
   void serialize(Archive &ar, const unsigned int version);
 
   /**
-   * Internal type declaration that is used to specialize the return type
-   * of operator[]() for Tensor<1,dim,Number>
+   * Internal type declaration that is used to specialize the return type of
+   * operator[]() for Tensor<1,dim,Number>
    */
   typedef Number tensor_type;
 
@@ -353,8 +351,8 @@ public:
 
   /**
    * Type of objects encapsulated by this container and returned by
-   * operator[](). This is a tensor of lower rank for a general tensor, and
-   * a scalar number type for Tensor<1,dim,Number>.
+   * operator[](). This is a tensor of lower rank for a general tensor, and a
+   * scalar number type for Tensor<1,dim,Number>.
    */
   typedef typename Tensor<rank_-1,dim,Number>::tensor_type value_type;
 
@@ -500,17 +498,16 @@ public:
   void clear ();
 
   /**
-   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum
-   * of the absolute squares of all entries. For the present case of rank-1
-   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the
-   * vector.
+   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
+   * the absolute squares of all entries. For the present case of rank-1
+   * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    */
 
   typename numbers::NumberTraits<Number>::real_type norm() const;
 
   /**
-   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
-   * the absolute squares of all entries.
+   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
+   * absolute squares of all entries.
    */
   typename numbers::NumberTraits<Number>::real_type norm_square() const;
 
@@ -553,8 +550,8 @@ public:
   void serialize(Archive &ar, const unsigned int version);
 
   /**
-   * Internal type declaration that is used to specialize the return type
-   * of operator[]() for Tensor<1,dim,Number>
+   * Internal type declaration that is used to specialize the return type of
+   * operator[]() for Tensor<1,dim,Number>
    */
   typedef Tensor<rank_, dim, Number> tensor_type;
 
@@ -1222,8 +1219,7 @@ struct ProductType<Tensor<rank,dim,T>,U>
 
 
 /**
- * Scalar multiplication of a tensor of rank 0 with an object from the
- * left.
+ * Scalar multiplication of a tensor of rank 0 with an object from the left.
  *
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
@@ -1241,8 +1237,7 @@ operator * (const Other                 object,
 
 
 /**
- * Scalar multiplication of a tensor of rank 0 with an object from the
- * right.
+ * Scalar multiplication of a tensor of rank 0 with an object from the right.
  *
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
@@ -1263,8 +1258,8 @@ operator * (const Tensor<0,dim,Number> &t,
  * Scalar multiplication of two tensors of rank 0.
  *
  * This function unwraps the underlying objects of type @p Number and @p
- * OtherNumber that are stored within the Tensor and multiplies them.
- * It returns an unwrapped number of product type.
+ * OtherNumber that are stored within the Tensor and multiplies them. It
+ * returns an unwrapped number of product type.
  *
  * @relates Tensor<0,dim,Number>
  */
@@ -1444,10 +1439,10 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
 
 
 /**
- * The dot product (single contraction) for tensors: Return a tensor of
- * rank $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of
- * the last index of a tensor @p src1 of rank @p rank_1 with the first
- * index of a tensor @p src2 of rank @p rank_2:
+ * The dot product (single contraction) for tensors: Return a tensor of rank
+ * $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of the last
+ * index of a tensor @p src1 of rank @p rank_1 with the first index of a
+ * tensor @p src2 of rank @p rank_2:
  * @f[
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \sum_{k}
@@ -1460,8 +1455,8 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @note In case the contraction yields a tensor of rank 0 the scalar
- * number is returned as an unwrapped number type.
+ * @note In case the contraction yields a tensor of rank 0 the scalar number
+ * is returned as an unwrapped number type.
  *
  * @relates Tensor
  * @author Matthias Maier, 2015
@@ -1484,10 +1479,10 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * Generic contraction of a pair of indices of two tensors of arbitrary
- * rank: Return a tensor of rank $(\text{rank}_1 + \text{rank}_2 - 2)$ that
- * is the contraction of index @p index_1 of a tensor @p src1 of rank
- * @p rank_1 with the index @p index_2 of a tensor @p src2 of rank @p rank_2:
+ * Generic contraction of a pair of indices of two tensors of arbitrary rank:
+ * Return a tensor of rank $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the
+ * contraction of index @p index_1 of a tensor @p src1 of rank @p rank_1 with
+ * the index @p index_2 of a tensor @p src2 of rank @p rank_2:
  * @f[
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \sum_{k}
@@ -1506,8 +1501,8 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index}_i<\text{range}_i$.
  *
- * @note In case the contraction yields a tensor of rank 0 the scalar
- * number is returned as an unwrapped number type.
+ * @note In case the contraction yields a tensor of rank 0 the scalar number
+ * is returned as an unwrapped number type.
  *
  * @relates Tensor
  * @author Matthias Maier, 2015
@@ -1544,12 +1539,11 @@ contract (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * Generic contraction of two pairs of indices of two tensors of
- * arbitrary rank: Return a tensor of rank
- * $(\text{rank}_1 + \text{rank}_2 - 4)$ that is the contraction of index
- * @p index_1 with index @p index_2, and index @p index_3 with index
- * @p index_4 of a tensor @p src1 of rank @p rank_1 and a tensor @p src2 of
- * rank @p rank_2:
+ * Generic contraction of two pairs of indices of two tensors of arbitrary
+ * rank: Return a tensor of rank $(\text{rank}_1 + \text{rank}_2 - 4)$ that is
+ * the contraction of index @p index_1 with index @p index_2, and index @p
+ * index_3 with index @p index_4 of a tensor @p src1 of rank @p rank_1 and a
+ * tensor @p src2 of rank @p rank_2:
  * @f[
  *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
  *   = \sum_{k, l}
@@ -1558,10 +1552,10 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * @f]
  *
  * If for example the first index (<code>index_1==0</code>) shall be
- * contracted with the third index (<code>index_2==2</code>), and the
- * second index (<code>index_3==1</code>) with the first index
- * (<code>index_4==0</code>) the invocation of this function is
- * this function is
+ * contracted with the third index (<code>index_2==2</code>), and the second
+ * index (<code>index_3==1</code>) with the first index
+ * (<code>index_4==0</code>) the invocation of this function is this function
+ * is
  * @code
  *   contract<0, 2, 1, 0>(t1, t2);
  * @endcode
@@ -1569,8 +1563,8 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index}_i<\text{range}_i$.
  *
- * @note In case the contraction yields a tensor of rank 0 the scalar
- * number is returned as an unwrapped number type.
+ * @note In case the contraction yields a tensor of rank 0 the scalar number
+ * is returned as an unwrapped number type.
  *
  * @relates Tensor
  * @author Matthias Maier, 2015
@@ -1627,9 +1621,9 @@ double_contract (const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * The scalar product, or (generalized) Frobenius inner product of two
- * tensors of equal rank: Return a scalar number that is the result of a
- * full contraction of a tensor @p left and @p right:
+ * The scalar product, or (generalized) Frobenius inner product of two tensors
+ * of equal rank: Return a scalar number that is the result of a full
+ * contraction of a tensor @p left and @p right:
  * @f[
  *   \sum_{i_1,..,i_r}
  *   \text{left}_{i_1,..,i_r}
@@ -1739,11 +1733,11 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
 
 
 /**
- * Returns the cross product of 2 vectors in 3d. This function is defined
- * for all space dimensions to allow for dimension independent programming
- * (e.g. within switches over the space dimension), but may only be called
- * if the actual dimension of the arguments is three (e.g. from the
- * <tt>dim==3</tt> case in the switch).
+ * Returns the cross product of 2 vectors in 3d. This function is defined for
+ * all space dimensions to allow for dimension independent programming (e.g.
+ * within switches over the space dimension), but may only be called if the
+ * actual dimension of the arguments is three (e.g. from the <tt>dim==3</tt>
+ * case in the switch).
  *
  * @relates Tensor
  * @author Guido Kanschat, 2001

@@ -287,8 +287,8 @@ public:
    * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
    * standard library containers.
    *
-   * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
-   * elements are left an unspecified state.
+   * If @p omit_zeroing_entries is false, the vector is filled by zeros.
+   * Otherwise, the elements are left an unspecified state.
    *
    * This function is virtual in order to allow for derived classes to handle
    * memory separately.

@@ -210,8 +210,8 @@ public:
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
-   * square, or the square of the norm. In case of a complex number type it
-   * is equivalent to the contraction of this point vector with a complex
+   * square, or the square of the norm. In case of a complex number type it is
+   * equivalent to the contraction of this point vector with a complex
    * conjugate of itself.
    *
    * @note This function is equivalent to

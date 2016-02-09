@@ -257,8 +257,8 @@ protected:
 
 /**
  * Implementation of transfer between the global vectors and the multigrid
- * levels for use in the derived class MGTransferPrebuilt and other
- * classes. This class is a specialization for the case of
+ * levels for use in the derived class MGTransferPrebuilt and other classes.
+ * This class is a specialization for the case of
  * parallel::distributed::Vector that requires a few different calling
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.

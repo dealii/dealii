@@ -36,8 +36,8 @@ namespace MeshWorker
    * Objects of this class contain one or more objects of type FEValues,
    * FEFaceValues or FESubfaceValues to be used in local integration. They are
    * stored in an array of pointers to the base classes FEValuesBase. The
-   * template parameter VectorType allows the use of different data types for the
-   * global system.
+   * template parameter VectorType allows the use of different data types for
+   * the global system.
    *
    * Additionally, this function contains space to store the values of finite
    * element functions stored in #global_data in the quadrature points. These

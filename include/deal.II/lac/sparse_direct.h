@@ -74,8 +74,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup Solvers Preconditioners
  *
- * @author Wolfgang Bangerth, 2004; extension for full compatibility
- * with LinearOperator class: Jean-Paul Pelteret, 2015
+ * @author Wolfgang Bangerth, 2004; extension for full compatibility with
+ * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class SparseDirectUMFPACK : public Subscriptor
 {

@@ -99,11 +99,10 @@ null_operator(const LinearOperator<Range, Domain> &);
  * const auto op = (op_a + k * op_b) * op_c;
  * @endcode
  *
- * @note This class makes heavy use of <code>std::function</code> objects
- * and lambda functions. This flexibility comes with a run-time penalty.
- * Only use this object to encapsulate matrix object of medium to large
- * size (as a rule of thumb, sparse matrices with a size $1000\times1000$,
- * or larger).
+ * @note This class makes heavy use of <code>std::function</code> objects and
+ * lambda functions. This flexibility comes with a run-time penalty. Only use
+ * this object to encapsulate matrix object of medium to large size (as a rule
+ * of thumb, sparse matrices with a size $1000\times1000$, or larger).
  *
  * @note This class is only available if deal.II was configured with C++11
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
@@ -170,8 +169,8 @@ public:
   LinearOperator (const LinearOperator<Range, Domain> &) = default;
 
   /**
-   * Templated copy constructor that creates a LinearOperator object from
-   * an object @p op for which the conversion function
+   * Templated copy constructor that creates a LinearOperator object from an
+   * object @p op for which the conversion function
    * <code>linear_operator</code> is defined.
    */
   template<typename Op,
@@ -586,8 +585,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 /**
  * @relates LinearOperator
  *
- * Returns the transpose linear operations of
- * @p op.
+ * Returns the transpose linear operations of @p op.
  *
  * @ingroup LAOperators
  */
@@ -692,9 +690,8 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
  *
  * Returns a LinearOperator that is the identity of the vector space @p Range.
  *
- * The function takes an <code>std::function</code> object
- * @p reinit_vector
- * as an argument to initialize the <code>reinit_range_vector</code> and
+ * The function takes an <code>std::function</code> object @p reinit_vector as
+ * an argument to initialize the <code>reinit_range_vector</code> and
  * <code>reinit_domain_vector</code> objects of the LinearOperator object.
  *
  * @ingroup LAOperators

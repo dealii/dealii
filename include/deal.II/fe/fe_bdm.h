@@ -34,8 +34,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Degrees of freedom</h3>
  *
- * @todo The 3D version exhibits some numerical instabilities, in
- * particular for higher order
+ * @todo The 3D version exhibits some numerical instabilities, in particular
+ * for higher order
  *
  * @todo Restriction matrices are missing.
  *
@@ -105,9 +105,9 @@ private:
    */
   void initialize_support_points (const unsigned int bdm_degree);
   /**
-   * The values in the face support points of the polynomials needed as
-   * test functions. The outer vector is indexed by quadrature points, the
-   * inner by the test function. The test function space is PolynomialsP<dim-1>.
+   * The values in the face support points of the polynomials needed as test
+   * functions. The outer vector is indexed by quadrature points, the inner by
+   * the test function. The test function space is PolynomialsP<dim-1>.
    */
   std::vector<std::vector<double> > test_values_face;
   /**

@@ -79,10 +79,10 @@ namespace hp
  *   }
  * @endcode
  *
- * In this
- * example, <tt>solution</tt> obtains the block structure needed to represent
- * a finite element function on the DoFHandler. Similarly, all levels of
- * <tt>mg_vector</tt> will have the block structure needed on that level.
+ * In this example, <tt>solution</tt> obtains the block structure needed to
+ * represent a finite element function on the DoFHandler. Similarly, all
+ * levels of <tt>mg_vector</tt> will have the block structure needed on that
+ * level.
  *
  * @todo Extend the functions local() and renumber() to the concept to
  * hpDoFHandler.

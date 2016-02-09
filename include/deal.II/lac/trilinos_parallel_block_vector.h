@@ -201,7 +201,8 @@ namespace TrilinosWrappers
        * Epetra_Maps given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+       * zeros.
        *
        * This function is deprecated.
        */
@@ -213,7 +214,8 @@ namespace TrilinosWrappers
        * index sets given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+       * zeros.
        */
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const MPI_Comm              &communicator = MPI_COMM_WORLD,

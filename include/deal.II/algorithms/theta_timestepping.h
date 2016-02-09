@@ -206,8 +206,8 @@ namespace Algorithms
      * #op_implicit.
      *
      * @param out in its first argument must contain a pointer to a VectorType
-     * instance, which contains the initial value when the operator is
-     * called. It contains the final value when the operator returns.
+     * instance, which contains the initial value when the operator is called.
+     * It contains the final value when the operator returns.
      */
     virtual void operator() (AnyData &out, const AnyData &in);
 

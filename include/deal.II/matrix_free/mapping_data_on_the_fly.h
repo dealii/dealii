@@ -70,8 +70,8 @@ namespace internal
 
       /**
        * Constructor. This constructor is equivalent to the other one except
-       * that it makes the object use a $Q_1$ mapping (i.e., an object of
-       * type MappingQGeneric(1)) implicitly.
+       * that it makes the object use a $Q_1$ mapping (i.e., an object of type
+       * MappingQGeneric(1)) implicitly.
        */
       MappingDataOnTheFly (const Quadrature<1> &quadrature,
                            const UpdateFlags update_flags);

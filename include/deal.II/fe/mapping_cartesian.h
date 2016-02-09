@@ -46,9 +46,8 @@ DEAL_II_NAMESPACE_OPEN
  * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 & 0 \\ 0 & h_y & 0
  * \\ 0 & 0 & h_z \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
  * @f}
- * in 3d,
- * where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$ are the
- * extents of the cell along the axes.
+ * in 3d, where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$
+ * are the extents of the cell along the axes.
  *
  * The class is intended for efficiency, and it does not do a whole lot of
  * error checking. If you apply this mapping to a cell that does not conform
@@ -153,12 +152,12 @@ private:
    * Storage for internal data of the mapping. See Mapping::InternalDataBase
    * for an extensive description.
    *
-   * This includes data that is computed once when the object is created
-   * (in get_data()) as well as data the class wants to store from between
-   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * This includes data that is computed once when the object is created (in
+   * get_data()) as well as data the class wants to store from between the
+   * call to fill_fe_values(), fill_fe_face_values(), or
    * fill_fe_subface_values() until possible later calls from the finite
-   * element to functions such as transform(). The latter class of
-   * member variables are marked as 'mutable'.
+   * element to functions such as transform(). The latter class of member
+   * variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim, spacedim>::InternalDataBase
   {

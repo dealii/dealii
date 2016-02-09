@@ -2049,8 +2049,8 @@ operator-(const SymmetricTensor<rank, dim, Number> &left,
 
 
 /**
- * Subtraction of a general Tensor with a SymmetricTensor of equal rank.
- * The result is a general Tensor.
+ * Subtraction of a general Tensor with a SymmetricTensor of equal rank. The
+ * result is a general Tensor.
  *
  * @relates SymmetricTensor
  */

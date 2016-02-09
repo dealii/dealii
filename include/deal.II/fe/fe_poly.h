@@ -55,8 +55,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class is not a fully implemented FiniteElement class. Instead there
  * are several pure virtual functions declared in the FiniteElement and
- * FiniteElement classes which cannot be implemented by this class but are left
- * for implementation in derived classes.
+ * FiniteElement classes which cannot be implemented by this class but are
+ * left for implementation in derived classes.
  *
  * @todo Since nearly all functions for spacedim != dim are specialized, this
  * class needs cleaning up.
@@ -167,9 +167,9 @@ public:
                                                    const unsigned int component) const;
 
   /**
-   * Return the tensor of third derivatives of the <tt>i</tt>th shape
-   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
-   * class for more information about the semantics of this function.
+   * Return the tensor of third derivatives of the <tt>i</tt>th shape function
+   * at point <tt>p</tt> on the unit cell. See the FiniteElement base class
+   * for more information about the semantics of this function.
    */
   virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
                                               const Point<dim>   &p) const;
@@ -395,7 +395,8 @@ protected:
      * point.
      *
      * We store the hessians in the quadrature points on the unit cell. We
-     * then only have to apply the transformation when visiting an actual cell.
+     * then only have to apply the transformation when visiting an actual
+     * cell.
      */
     Table<2,Tensor<2,dim> > shape_hessians;
 
@@ -412,22 +413,23 @@ protected:
   };
 
   /**
-   * Correct the shape third derivatives by subtracting the terms corresponding
-   * to the Jacobian pushed forward gradient and second derivative.
+   * Correct the shape third derivatives by subtracting the terms
+   * corresponding to the Jacobian pushed forward gradient and second
+   * derivative.
    *
    * Before the correction, the third derivatives would be given by
    * @f[
    * D_{ijkl} = \frac{d^3\phi_i}{d \hat x_J d \hat x_K d \hat x_L} (J_{jJ})^{-1} (J_{kK})^{-1} (J_{lL})^{-1},
    * @f]
-   * where $J_{iI}=\frac{d x_i}{d \hat x_I}$. After the correction, the correct
-   * third derivative would be given by
+   * where $J_{iI}=\frac{d x_i}{d \hat x_I}$. After the correction, the
+   * correct third derivative would be given by
    * @f[
    * \frac{d^3\phi_i}{d x_j d x_k d x_l} = D_{ijkl} - H_{mjl} \frac{d^2 \phi_i}{d x_k d x_m}
    * - H_{mkl} \frac{d^2 \phi_i}{d x_j d x_m} - H_{mjk} \frac{d^2 \phi_i}{d x_l d x_m}
    * - K_{mjkl} \frac{d \phi_i}{d x_m},
    * @f]
-   * where $H_{ijk}$ is the Jacobian pushed-forward derivative and $K_{ijkl}$ is
-   * the Jacobian pushed-forward second derivative.
+   * where $H_{ijk}$ is the Jacobian pushed-forward derivative and $K_{ijkl}$
+   * is the Jacobian pushed-forward second derivative.
    */
   void
   correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
@@ -436,7 +438,8 @@ protected:
                              const unsigned int                                                dof) const;
 
   /**
-   * The polynomial space. Its type is given by the template parameter PolynomialType.
+   * The polynomial space. Its type is given by the template parameter
+   * PolynomialType.
    */
   PolynomialType poly_space;
 };

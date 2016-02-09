@@ -34,16 +34,16 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that performs the operations
- * associated with the Schur complement. There are two additional
- * helper functions, condense_schur_rhs() and postprocess_schur_solution(), that are likely
- * necessary to be used in order to perform any useful tasks in linear
- * algebra with this operator.
+ * Returns a LinearOperator that performs the operations associated with the
+ * Schur complement. There are two additional helper functions,
+ * condense_schur_rhs() and postprocess_schur_solution(), that are likely
+ * necessary to be used in order to perform any useful tasks in linear algebra
+ * with this operator.
  *
  * We construct the definition of the Schur complement in the following way:
  *
- * Consider a general system of linear equations that can be
- * decomposed into two major sets of equations:
+ * Consider a general system of linear equations that can be decomposed into
+ * two major sets of equations:
  * @f{eqnarray*}{
  * \mathbf{K}\mathbf{d} = \mathbf{f}
  * \quad \Rightarrow\quad
@@ -58,9 +58,9 @@ DEAL_II_NAMESPACE_OPEN
  *    f \\ g
  * \end{array}\right),
  * @f}
- * where $ A,B,C,D $  represent general subblocks of the matrix
- * $ \mathbf{K} $ and, similarly, general subvectors of
- * $ \mathbf{d},\mathbf{f} $ are given by $ x,y,f,g $ .
+ * where $ A,B,C,D $  represent general subblocks of the matrix $ \mathbf{K} $
+ * and, similarly, general subvectors of $ \mathbf{d},\mathbf{f} $ are given
+ * by $ x,y,f,g $ .
  *
  * This is equivalent to the following two statements:
  * @f{eqnarray*}{
@@ -68,17 +68,17 @@ DEAL_II_NAMESPACE_OPEN
  *   (2) \quad Cx + Dy &=& g \quad .
  * @f}
  *
- * Assuming that $ A,D $ are both square and invertible, we could
- * then perform one of two possible substitutions,
+ * Assuming that $ A,D $ are both square and invertible, we could then perform
+ * one of two possible substitutions,
  * @f{eqnarray*}{
  *   (3) \quad x &=& A^{-1}(f - By) \quad \text{from} \quad (1) \\
  *   (4) \quad y &=& D^{-1}(g - Cx) \quad \text{from} \quad (2) ,
  * @f}
- * which amount to performing block Gaussian elimination on
- * this system of equations.
+ * which amount to performing block Gaussian elimination on this system of
+ * equations.
  *
- * For the purpose of the current implementation, we choose to
- * substitute (3) into (2)
+ * For the purpose of the current implementation, we choose to substitute (3)
+ * into (2)
  * @f{eqnarray*}{
  *   C \: A^{-1}(f - By) + Dy &=& g \\
  *   -C \: A^{-1} \: By + Dy &=& g - C \: A^{-1} \: f \quad .
@@ -88,36 +88,30 @@ DEAL_II_NAMESPACE_OPEN
  *   (5) \quad (D - C\: A^{-1} \:B)y  = g - C \: A^{-1} f
  *       \quad \Rightarrow \quad Sy = g'
  * @f]
- * with $ S = (D - C\: A^{-1} \:B) $ being the Schur complement
- * and the modified right-hand side vector $ g' = g - C \: A^{-1} f $ arising from
- * the condensation step.
- * Note that for this choice of $ S $, submatrix $ D $
- * need not be invertible and may thus be the null matrix.
- * Ideally $ A $ should be well-conditioned.
+ * with $ S = (D - C\: A^{-1} \:B) $ being the Schur complement and the
+ * modified right-hand side vector $ g' = g - C \: A^{-1} f $ arising from the
+ * condensation step. Note that for this choice of $ S $, submatrix $ D $ need
+ * not be invertible and may thus be the null matrix. Ideally $ A $ should be
+ * well-conditioned.
  *
- * So for any arbitrary vector $ a $, the Schur complement
- * performs the following operation:
+ * So for any arbitrary vector $ a $, the Schur complement performs the
+ * following operation:
  * @f[
  *   (6) \quad Sa = (D - C \: A^{-1} \: B)a
  * @f]
  *
- * A typical set of steps needed the solve a linear system (1),(2)
- * would be:
+ * A typical set of steps needed the solve a linear system (1),(2) would be:
  * 1. Define the inverse matrix @p A_inv (using inverse_operator()).
  * 2. Define the Schur complement $ S $ (using schur_complement()).
  * 3. Define iterative inverse matrix $ S^{-1} $ such that (6)
- *    holds.
- *    It is necessary to use a solver with a preconditioner
- *    to compute the approximate inverse operation of $ S $ since
- *    we never compute $ S $ directly, but rather the result of
- *    its operation.
- *    To achieve this, one may again use the inverse_operator() in
- *    conjunction with the Schur complement that we've just
- *    constructed.
- *    Observe that the both $ S $ and its preconditioner operate
- *    over the same space as $ D $.
+ * holds. It is necessary to use a solver with a preconditioner to compute the
+ * approximate inverse operation of $ S $ since we never compute $ S $
+ * directly, but rather the result of its operation. To achieve this, one may
+ * again use the inverse_operator() in conjunction with the Schur complement
+ * that we've just constructed. Observe that the both $ S $ and its
+ * preconditioner operate over the same space as $ D $.
  * 4. Perform pre-processing step on the RHS of (5) using
- *    condense_schur_rhs():
+ * condense_schur_rhs():
  *    @f[
  *      g' = g - C \: A^{-1} \: f
  *    @f]
@@ -126,7 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  *      y =  S^{-1} g'
  *    @f]
  * 6. Perform the post-processing step from (3) using
- *    postprocess_schur_solution():
+ * postprocess_schur_solution():
  *    @f[
  *      x =  A^{-1} (f - By)
  *    @f]
@@ -167,22 +161,20 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In the above example, the preconditioner for $ S $ was defined as the
  * preconditioner for $ D $, which is valid since they operate on the same
- * space.
- * However, if $ D $ and $ S $ are too dissimilar, then this may lead to
- * a large number of solver iterations as $ \text{prec}(D) $ is not a good
+ * space. However, if $ D $ and $ S $ are too dissimilar, then this may lead
+ * to a large number of solver iterations as $ \text{prec}(D) $ is not a good
  * approximation for $ S^{-1} $.
  *
  * A better preconditioner in such a case would be one that provides a more
- * representative approximation for $ S^{-1} $.
- * One approach is shown in step-22, where $ D $ is the null matrix and the
- * preconditioner for $ S^{-1} $ is derived from the mass matrix over this
- * space.
+ * representative approximation for $ S^{-1} $. One approach is shown in
+ * step-22, where $ D $ is the null matrix and the preconditioner for $ S^{-1}
+ * $ is derived from the mass matrix over this space.
  *
  * From another viewpoint, a similar result can be achieved by first
  * constructing an object that represents an approximation for $ S $ wherein
- * expensive operation, namely $ A^{-1} $, is approximated.
- * Thereafter we construct the approximate inverse operator $ \tilde{S}^{-1} $
- * which is then used as the preconditioner for computing $ S^{-1} $.
+ * expensive operation, namely $ A^{-1} $, is approximated. Thereafter we
+ * construct the approximate inverse operator $ \tilde{S}^{-1} $ which is then
+ * used as the preconditioner for computing $ S^{-1} $.
  * @code
  *    // Construction of approximate inverse of Schur complement
  *    const auto A_inv_approx = linear_operator(preconditioner_A);
@@ -199,34 +191,31 @@ DEAL_II_NAMESPACE_OPEN
  *    y = S_inv * rhs; // Solve for y
  *    x = postprocess_schur_solution (A_inv,B,y,f);
  * @endcode
- * Note that due to the construction of @c S_inv_approx and subsequently
- * @c S_inv, there are a pair of nested iterative solvers which could
- * collectively consume a lot of resources.
- * Therefore care should be taken in the choices leading to the construction
- * of the iterative inverse_operators.
+ * Note that due to the construction of @c S_inv_approx and subsequently @c
+ * S_inv, there are a pair of nested iterative solvers which could
+ * collectively consume a lot of resources. Therefore care should be taken in
+ * the choices leading to the construction of the iterative inverse_operators.
  * One might consider the use of a IterationNumberControl (or a similar
- * mechanism) to limit the number of inner solver iterations.
- * This controls the accuracy of the approximate inverse operation
- * $ \tilde{S}^{-1} $ which acts only as the preconditioner for
- * $ S^{-1} $.
- * Furthermore, the preconditioner to $ \tilde{S}^{-1} $, which in this example is
- * $ \text{prec}(D) $, should ideally be computationally inexpensive.
+ * mechanism) to limit the number of inner solver iterations. This controls
+ * the accuracy of the approximate inverse operation $ \tilde{S}^{-1} $ which
+ * acts only as the preconditioner for $ S^{-1} $. Furthermore, the
+ * preconditioner to $ \tilde{S}^{-1} $, which in this example is $
+ * \text{prec}(D) $, should ideally be computationally inexpensive.
  *
- * However, if an iterative solver based on IterationNumberControl is used as a
- * preconditioner then the preconditioning operation is not a linear operation.
- * Here a flexible solver like SolverFGMRES (flexible GMRES) is best employed as an
- * outer solver in order to deal with the variable behaviour of the preconditioner.
- * Otherwise the iterative solver can stagnate somewhere near the tolerance of the
- * preconditioner or generally behave erratically.
- * Alternatively, using a ReductionControl would ensure that the preconditioner
- * always solves to the same tolerance, thereby rendering its behaviour constant.
+ * However, if an iterative solver based on IterationNumberControl is used as
+ * a preconditioner then the preconditioning operation is not a linear
+ * operation. Here a flexible solver like SolverFGMRES (flexible GMRES) is
+ * best employed as an outer solver in order to deal with the variable
+ * behaviour of the preconditioner. Otherwise the iterative solver can
+ * stagnate somewhere near the tolerance of the preconditioner or generally
+ * behave erratically. Alternatively, using a ReductionControl would ensure
+ * that the preconditioner always solves to the same tolerance, thereby
+ * rendering its behaviour constant.
  *
- * Further examples of this functionality can be found in
- * the test-suite, such as
- * <code>tests/lac/schur_complement_01.cc</code> .
- * The solution of a multi-component problem (namely step-22) using the
- * schur_complement can be found in
- * <code>tests/lac/schur_complement_03.cc</code> .
+ * Further examples of this functionality can be found in the test-suite, such
+ * as <code>tests/lac/schur_complement_01.cc</code> . The solution of a multi-
+ * component problem (namely step-22) using the schur_complement can be found
+ * in <code>tests/lac/schur_complement_03.cc</code> .
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
@@ -354,17 +343,16 @@ schur_complement(const LinearOperator<Domain_1, Range_1> &A_inv,
  *
  * For the system of equations
  * @f{eqnarray*}{
-     Ax + By &=& f \\
-     Cx + Dy &=& g \quad ,
+ *   Ax + By &=& f \\
+ *   Cx + Dy &=& g \quad ,
  * @f}
- * this operation performs the pre-processing (condensation)
- * step on the RHS subvector @p g so that the Schur complement
- * can be used to solve this system of equations.
- * More specifically, it produces an object that represents the
- * condensed form of the subvector @p g, namely
+ * this operation performs the pre-processing (condensation) step on the RHS
+ * subvector @p g so that the Schur complement can be used to solve this
+ * system of equations. More specifically, it produces an object that
+ * represents the condensed form of the subvector @p g, namely
  * @f[
-     g' = g - C \: A^{-1} \: f
-   @f]
+ *   g' = g - C \: A^{-1} \: f
+ * @f]
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
@@ -437,15 +425,15 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1> &A_inv,
  *
  * For the system of equations
  * @f{eqnarray*}{
-     Ax + By &=& f \\
-     Cx + Dy &=& g \quad ,
+ *   Ax + By &=& f \\
+ *   Cx + Dy &=& g \quad ,
  * @f}
- * this operation performs the post-processing step of the
- * Schur complement to solve for the second subvector @p x once
- * subvector @p y is known, with the result that
+ * this operation performs the post-processing step of the Schur complement to
+ * solve for the second subvector @p x once subvector @p y is known, with the
+ * result that
  * @f[
-     x =  A^{-1}(f - By)
-   @f]
+ *   x =  A^{-1}(f - By)
+ * @f]
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"

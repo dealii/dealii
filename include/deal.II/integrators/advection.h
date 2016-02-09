@@ -124,8 +124,8 @@ namespace LocalIntegrators
      *
      * \f[ r_i = \int_Z  (\mathbf w \cdot \nabla)u\, v_i \, dx. \f]
      *
-     * \warning This is not the residual consistent with cell_matrix(),
-     * but with its transpose.
+     * \warning This is not the residual consistent with cell_matrix(), but
+     * with its transpose.
      */
     template <int dim>
     inline void
@@ -161,15 +161,15 @@ namespace LocalIntegrators
 
 
     /**
-      * Vector-valued advection residual operator in strong form
-      *
-      *
-      * \f[ r_i = \int_Z \bigl((\mathbf w \cdot \nabla) \mathbf u\bigr)
-      * \cdot\mathbf v_i \, dx. \f]
-      *
-      * \warning This is not the residual consistent with cell_matrix(),
-      * but with its transpose.
-      */
+     * Vector-valued advection residual operator in strong form
+     *
+     *
+     * \f[ r_i = \int_Z \bigl((\mathbf w \cdot \nabla) \mathbf u\bigr)
+     * \cdot\mathbf v_i \, dx. \f]
+     *
+     * \warning This is not the residual consistent with cell_matrix(), but
+     * with its transpose.
+     */
     template <int dim>
     inline void
     cell_residual  (
@@ -298,8 +298,8 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected by the same velocity.
@@ -352,9 +352,10 @@ namespace LocalIntegrators
 
 
     /**
-     * Scalar case: Residual for upwind flux at the boundary for weak advection operator. This is the
-     * value of the trial function at the outflow boundary and the value of the incoming boundary
-     * condition on the inflow boundary:
+     * Scalar case: Residual for upwind flux at the boundary for weak
+     * advection operator. This is the value of the trial function at the
+     * outflow boundary and the value of the incoming boundary condition on
+     * the inflow boundary:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
      * (\mathbf w\cdot\mathbf n)
@@ -362,14 +363,14 @@ namespace LocalIntegrators
      * @f]
      *
      * Here, the numerical flux $\widehat u$ is the upwind value at the face,
-     * namely the finite element function whose values are given in the argument
-     * `input` on the outflow boundary.
-     * On the inflow boundary, it is the inhomogenous boundary value in the argument `data`.
+     * namely the finite element function whose values are given in the
+     * argument `input` on the outflow boundary. On the inflow boundary, it is
+     * the inhomogenous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected by the same velocity.
@@ -419,9 +420,10 @@ namespace LocalIntegrators
 
 
     /**
-     * Vector-valued case: Residual for upwind flux at the boundary for weak advection operator. This is the
-     * value of the trial function at the outflow boundary and the value of the incoming boundary
-     * condition on the inflow boundary:
+     * Vector-valued case: Residual for upwind flux at the boundary for weak
+     * advection operator. This is the value of the trial function at the
+     * outflow boundary and the value of the incoming boundary condition on
+     * the inflow boundary:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
      * (\mathbf w\cdot\mathbf n)
@@ -429,14 +431,14 @@ namespace LocalIntegrators
      * @f]
      *
      * Here, the numerical flux $\widehat u$ is the upwind value at the face,
-     * namely the finite element function whose values are given in the argument
-     * `input` on the outflow boundary.
-     * On the inflow boundary, it is the inhomogenous boundary value in the argument `data`.
+     * namely the finite element function whose values are given in the
+     * argument `input` on the outflow boundary. On the inflow boundary, it is
+     * the inhomogenous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected by the same velocity.
@@ -503,8 +505,8 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected the same way.
@@ -568,9 +570,9 @@ namespace LocalIntegrators
 
 
     /**
-     * Scalar case: Upwind flux in the interior for weak advection operator. Matrix entries
-     * correspond to the upwind value of the trial function, multiplied by the
-     * jump of the test functions
+     * Scalar case: Upwind flux in the interior for weak advection operator.
+     * Matrix entries correspond to the upwind value of the trial function,
+     * multiplied by the jump of the test functions
      * @f[
      * a_{ij} = \int_F \left|\mathbf w
      * \cdot \mathbf n\right|
@@ -581,8 +583,8 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected the same way.
@@ -646,9 +648,9 @@ namespace LocalIntegrators
 
 
     /**
-     * Vector-valued case: Upwind flux in the interior for weak advection operator. Matrix entries
-     * correspond to the upwind value of the trial function, multiplied by the
-     * jump of the test functions
+     * Vector-valued case: Upwind flux in the interior for weak advection
+     * operator. Matrix entries correspond to the upwind value of the trial
+     * function, multiplied by the jump of the test functions
      * @f[
      * a_{ij} = \int_F \left|\mathbf w
      * \cdot \mathbf n\right|
@@ -659,8 +661,8 @@ namespace LocalIntegrators
      *
      * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
-     * either have only a single entry, if the advection velocity is
-     * constant, or have an entry for each quadrature point.
+     * either have only a single entry, if the advection velocity is constant,
+     * or have an entry for each quadrature point.
      *
      * The finite element can have several components, in which case each
      * component is advected the same way.

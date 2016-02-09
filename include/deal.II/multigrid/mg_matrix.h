@@ -86,11 +86,11 @@ namespace mg
 
 /**
  * Multilevel matrix selecting from block matrices. This class implements the
- * interface defined by MGMatrixBase.  The template parameter @p MatrixType should
- * be a block matrix class like BlockSparseMatrix or @p BlockSparseMatrixEZ.
- * Then, this class stores a pointer to a MGLevelObject of this matrix class.
- * In each @p vmult, the block selected on initialization will be multiplied
- * with the vector provided.
+ * interface defined by MGMatrixBase.  The template parameter @p MatrixType
+ * should be a block matrix class like BlockSparseMatrix or @p
+ * BlockSparseMatrixEZ. Then, this class stores a pointer to a MGLevelObject
+ * of this matrix class. In each @p vmult, the block selected on
+ * initialization will be multiplied with the vector provided.
  *
  * @author Guido Kanschat, 2002
  */

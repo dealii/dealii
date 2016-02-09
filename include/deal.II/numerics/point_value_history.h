@@ -282,8 +282,8 @@ public:
 
 
   /**
-   * Put another mnemonic string (and hence @p VectorType) into the class. This
-   * method adds storage space for variables equal to the number of true
+   * Put another mnemonic string (and hence @p VectorType) into the class.
+   * This method adds storage space for variables equal to the number of true
    * values in component_mask. This also adds extra entries for points that
    * are already in the class, so @p add_field_name and @p add_points can be
    * called in any order.
@@ -292,8 +292,8 @@ public:
                       const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Put another mnemonic string (and hence @p VectorType) into the class. This
-   * method adds storage space for n_components variables. This also adds
+   * Put another mnemonic string (and hence @p VectorType) into the class.
+   * This method adds storage space for n_components variables. This also adds
    * extra entries for points that are already in the class, so @p
    * add_field_name and @p add_points can be called in any order. This method
    * generates a std::vector 0, ..., n_components-1 and calls the previous
@@ -366,8 +366,8 @@ public:
 
 
   /**
-   * Extract values at the points actually requested from the VectorType supplied
-   * and add them to the new dataset in vector_name. Unlike the other
+   * Extract values at the points actually requested from the VectorType
+   * supplied and add them to the new dataset in vector_name. Unlike the other
    * evaluate_field methods this method does not care if the dof_handler has
    * been modified because it uses calls to @p VectorTools::point_value to
    * extract there data. Therefore, if only this method is used, the class is

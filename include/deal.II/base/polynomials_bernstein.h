@@ -9,9 +9,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class implements Bernstein basis polynomials of desire degree as described in
- * http://www.idav.ucdavis.edu/education/CAGDNotes/Bernstein-Polynomials.pdf
- * in the paragraph "Converting from the Bernstein Basis to the Power Basis".
+ * This class implements Bernstein basis polynomials of desire degree as
+ * described in http://www.idav.ucdavis.edu/education/CAGDNotes/Bernstein-
+ * Polynomials.pdf in the paragraph "Converting from the Bernstein Basis to
+ * the Power Basis".
  *
  * They are used to create the Bernstein finite element FE_Bernstein.
  *

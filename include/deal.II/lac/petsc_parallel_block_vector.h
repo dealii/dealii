@@ -174,7 +174,8 @@ namespace PETScWrappers
        * @p communicator argument denotes which MPI channel each of these
        * blocks shall communicate.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+       * zeros.
        */
       void reinit (const unsigned int  n_blocks,
                    const MPI_Comm     &communicator,
@@ -192,7 +193,8 @@ namespace PETScWrappers
        * called, all vectors remain the same and reinit() is called for each
        * vector.
        *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
+       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
+       * zeros.
        *
        * Note that you must call this (or the other reinit() functions)
        * function, rather than calling the reinit() functions of an individual

@@ -146,7 +146,8 @@ public:
                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th polynomial at unit point <tt>p</tt>.
+   * Computes the value of the <tt>i</tt>th polynomial at unit point
+   * <tt>p</tt>.
    *
    * Consider using compute() instead.
    */
@@ -166,8 +167,8 @@ public:
                                         const Point<dim> &p) const;
 
   /**
-   * Computes the gradient of the <tt>i</tt>th polynomial at
-   * unit point <tt>p</tt>.
+   * Computes the gradient of the <tt>i</tt>th polynomial at unit point
+   * <tt>p</tt>.
    *
    * Consider using compute() instead.
    */
@@ -203,8 +204,8 @@ public:
    * Static function used in the constructor to compute the number of
    * polynomials.
    *
-   * @warning The argument `n` is not the maximal degree, but the
-   * number of onedimensional polynomials, thus the degree plus one.
+   * @warning The argument `n` is not the maximal degree, but the number of
+   * onedimensional polynomials, thus the degree plus one.
    */
   static unsigned int compute_n_pols (const unsigned int n);
 

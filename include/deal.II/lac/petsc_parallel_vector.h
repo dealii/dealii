@@ -79,9 +79,9 @@ namespace PETScWrappers
      * the collective MPI functions and wait for all the other processes to
      * join in on this. Since the other processes don't call this function,
      * you will either get a time-out on the first process, or, worse, by the
-     * time the next a call to a PETSc function generates an MPI message on the
-     * other processes, you will get a cryptic message that only a subset of
-     * processes attempted a communication. These bugs can be very hard to
+     * time the next a call to a PETSc function generates an MPI message on
+     * the other processes, you will get a cryptic message that only a subset
+     * of processes attempted a communication. These bugs can be very hard to
      * figure out, unless you are well-acquainted with the communication model
      * of MPI, and know which functions may generate MPI messages.
      *
@@ -324,8 +324,8 @@ namespace PETScWrappers
        * @p communicator denotes the MPI communicator henceforth to be used
        * for this vector.
        *
-       * If @p omit_zeroing_entries is false, the vector is filled by zeros. Otherwise, the
-       * elements are left an unspecified state.
+       * If @p omit_zeroing_entries is false, the vector is filled by zeros.
+       * Otherwise, the elements are left an unspecified state.
        */
       void reinit (const MPI_Comm  &communicator,
                    const size_type  N,
@@ -338,7 +338,8 @@ namespace PETScWrappers
        * The same applies as for the other @p reinit function.
        *
        * The elements of @p v are not copied, i.e. this function is the same
-       * as calling <tt>reinit(v.size(), v.local_size(), omit_zeroing_entries)</tt>.
+       * as calling <tt>reinit(v.size(), v.local_size(),
+       * omit_zeroing_entries)</tt>.
        */
       void reinit (const Vector &v,
                    const bool    omit_zeroing_entries = false);

@@ -295,15 +295,15 @@ namespace SparsityPatternIterators
 
 
 /**
- * A class that can store which elements of a matrix are nonzero (or,
- * in fact, <i>may</i> be nonzero) and for which we have to allocate
- * memory to store their values. This class is an example of the
- * "static" type of sparsity patters (see
+ * A class that can store which elements of a matrix are nonzero (or, in fact,
+ * <i>may</i> be nonzero) and for which we have to allocate memory to store
+ * their values. This class is an example of the "static" type of sparsity
+ * patters (see
  * @ref Sparsity).
- * It uses the
- * <a href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed
- * row storage (CSR)</a> format to store data, and is used as the
- * basis for the SparseMatrix class.
+ * It uses the <a
+ * href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed row storage
+ * (CSR)</a> format to store data, and is used as the basis for the
+ * SparseMatrix class.
  *
  * The elements of a SparsityPattern, corresponding to the places where
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
@@ -418,8 +418,8 @@ public:
    *
    * @param[in] m The number of rows.
    * @param[in] n The number of columns.
-   * @param[in] row_lengths Possible number of nonzero entries for each row. This
-   * vector must have one entry for each row.
+   * @param[in] row_lengths Possible number of nonzero entries for each row.
+   * This vector must have one entry for each row.
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
@@ -440,8 +440,8 @@ public:
    * Initialize a quadratic pattern of size <tt>m x m</tt>.
    *
    * @param[in] m The number of rows and columns.
-   * @param[in] row_lengths Maximum number of nonzero entries for each row. This
-   * vector must have one entry for each row.
+   * @param[in] row_lengths Maximum number of nonzero entries for each row.
+   * This vector must have one entry for each row.
    */
   SparsityPattern (const size_type m,
                    const std::vector<unsigned int> &row_lengths);
@@ -935,10 +935,11 @@ public:
   void print_gnuplot (std::ostream &out) const;
 
   /**
-   * Prints the sparsity of the matrix in a .svg file which can be opened in a web browser.
-   * The .svg file contains squares which correspond to the entries in the matrix. An entry
-   * in the matrix which contains a non-zero value corresponds with a red square while a
-   * zero-valued entry in the matrix correspond with a white square.
+   * Prints the sparsity of the matrix in a .svg file which can be opened in a
+   * web browser. The .svg file contains squares which correspond to the
+   * entries in the matrix. An entry in the matrix which contains a non-zero
+   * value corresponds with a red square while a zero-valued entry in the
+   * matrix correspond with a white square.
    */
   void print_svg (std::ostream &out) const;
 

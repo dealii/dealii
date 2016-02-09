@@ -43,9 +43,9 @@ namespace LinearAlgebra
   /**
    * Numerical vector of data. This class derives from both
    * ::dealii::LinearAlgebra::ReadWriteVector and
-   * ::dealii::LinearAlgebra::VectorSpaceVector. As opposed to the array of the
-   * C++ standard library, this class implements an element of a vector space
-   * suitable for numerical computations.
+   * ::dealii::LinearAlgebra::VectorSpaceVector. As opposed to the array of
+   * the C++ standard library, this class implements an element of a vector
+   * space suitable for numerical computations.
    *
    * @author Bruno Turcksin, 2015.
    */
@@ -143,7 +143,8 @@ namespace LinearAlgebra
     virtual void add(const Number a, const VectorSpaceVector<Number> &V);
 
     /**
-     * Multiple addition of a multiple of a vector, i.e. <tt>*this += a*V+b*W</tt>.
+     * Multiple addition of a multiple of a vector, i.e. <tt>*this +=
+     * a*V+b*W</tt>.
      */
     virtual void add(const Number a, const VectorSpaceVector<Number> &V,
                      const Number b, const VectorSpaceVector<Number> &W);
@@ -180,8 +181,8 @@ namespace LinearAlgebra
     virtual typename VectorSpaceVector<Number>::real_type l2_norm();
 
     /**
-     * Return the maximum norm of the vector (i.e., the maximum absolute
-     * value among all entries and among all processors).
+     * Return the maximum norm of the vector (i.e., the maximum absolute value
+     * among all entries and among all processors).
      */
     virtual typename VectorSpaceVector<Number>::real_type linfty_norm();
 
@@ -199,17 +200,18 @@ namespace LinearAlgebra
                                const VectorSpaceVector<Number> &W);
 
     /**
-     * Return the global size of the vector, equal to the sum of the number
-     * of locally owned indices among all processors.
+     * Return the global size of the vector, equal to the sum of the number of
+     * locally owned indices among all processors.
      */
     size_type size() const;
 
     /**
      * Return an index set that describes which elements of this vector are
-     * owned by the current processor. As a consequence, the index sets returned
-     * on different procesors if this is a distributed vector will form disjoint
-     * sets that add up to the complete index set. Obviously, if a vector is
-     * created on only one processor, then the result would satisfy
+     * owned by the current processor. As a consequence, the index sets
+     * returned on different procesors if this is a distributed vector will
+     * form disjoint sets that add up to the complete index set. Obviously, if
+     * a vector is created on only one processor, then the result would
+     * satisfy
      * @code
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
@@ -224,9 +226,9 @@ namespace LinearAlgebra
                        const bool scientific=true,
                        const bool across=true) const;
     /**
-     * Write the vector en bloc to a file. This is done in a binary mode, so the
-     * output is neither readable by humans nor (probably) by other computers
-     * using a different operating system or number format.
+     * Write the vector en bloc to a file. This is done in a binary mode, so
+     * the output is neither readable by humans nor (probably) by other
+     * computers using a different operating system or number format.
      */
     void block_write (std::ostream &out) const;
 
@@ -237,9 +239,9 @@ namespace LinearAlgebra
      *
      * The vector is resized if necessary.
      *
-     * A primitive form of error checking is performed which will recognize the
-     * bluntest attempts to interpret some data as a vector stored bitwise to a
-     * file, but not more.
+     * A primitive form of error checking is performed which will recognize
+     * the bluntest attempts to interpret some data as a vector stored bitwise
+     * to a file, but not more.
      */
     void block_read (std::istream &in);
 
@@ -257,24 +259,26 @@ namespace LinearAlgebra
 
   private:
     /**
-     * Compute the L1 norm in a recursive way by dividing the vector on smaller
-     * and smaller intervals. This reduces the numerical error on large vector.
+     * Compute the L1 norm in a recursive way by dividing the vector on
+     * smaller and smaller intervals. This reduces the numerical error on
+     * large vector.
      */
     typename VectorSpaceVector<Number>::real_type l1_norm_recursive(unsigned int i,
         unsigned int j);
 
     /**
-     * Compute the squared L2 norm in a recursive way by dividing the vector on
-     * smaller and smaller intervals. This reduces the numerical error on large
-     * vector.
+     * Compute the squared L2 norm in a recursive way by dividing the vector
+     * on smaller and smaller intervals. This reduces the numerical error on
+     * large vector.
      */
     typename VectorSpaceVector<Number>::real_type l2_norm_squared_recursive(
       unsigned int i,
       unsigned int j);
 
     /**
-     * Serialize the data of this object using boost. This function is necessary
-     * to use boost::archive::text_iarchive and boost::archive::text_oarchive.
+     * Serialize the data of this object using boost. This function is
+     * necessary to use boost::archive::text_iarchive and
+     * boost::archive::text_oarchive.
      */
     template <typename Archive>
     void serialize(Archive &ar, const unsigned int version);

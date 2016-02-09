@@ -47,9 +47,8 @@ DEAL_II_NAMESPACE_OPEN
  * system. This point is a singular point of the coordinate transformation,
  * and there taking averages does not make any sense.
  *
- * This class is used in step-1 and step-2 to describe the boundaries
- * of circles. Its use is also discussed in the results section of
- * step-6.
+ * This class is used in step-1 and step-2 to describe the boundaries of
+ * circles. Its use is also discussed in the results section of step-6.
  *
  * @ingroup manifold
  *

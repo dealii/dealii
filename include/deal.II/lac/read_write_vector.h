@@ -63,9 +63,9 @@ namespace LinearAlgebra
    * which it stores all or a subset of elements. The latter case in important
    * in parallel computations, where $N$ may be so large that no processor can
    * actually all elements of a solution vector, but where this is also not
-   * necessary: one typically only has to store the values of degrees of freedom
-   * that live on cells that are locally owned plus potentially those degrees of
-   * freedom that live on ghost cells.
+   * necessary: one typically only has to store the values of degrees of
+   * freedom that live on cells that are locally owned plus potentially those
+   * degrees of freedom that live on ghost cells.
    *
    * This class allows to access individual elements to be read or written.
    * However, it does not allow global operations such as taking the norm.
@@ -73,24 +73,23 @@ namespace LinearAlgebra
    * from VectorSpaceVector such as TrilinosWrappers::MPI::Vector and
    * PETScWrappers::MPI::Vector.
    *
-   * <h3>Storing elements</h3>
-   * Most of the time, one will simply read from or write into a vector of the
-   * current class using the global numbers of these degrees of freedom. This is
-   * done using operator() or operator[] which call global_to_local() to transform
-   * the <i>global</i> index into a <i>local</i> one. In such cases, it is clear
-   * that one can only access elements of the vector that the current object
-   * indeed stores.
+   * <h3>Storing elements</h3> Most of the time, one will simply read from or
+   * write into a vector of the current class using the global numbers of
+   * these degrees of freedom. This is done using operator() or operator[]
+   * which call global_to_local() to transform the <i>global</i> index into a
+   * <i>local</i> one. In such cases, it is clear that one can only access
+   * elements of the vector that the current object indeed stores.
    *
-   * However, it is also possible to access elements in the order in which they
-   * are stored by the current object. In other words, one is not interested in
-   * accessing elements with their <i>global</i> indices, but instead using an
-   * enumeration that only takes into account the elements that are actually
-   * stored. This is facilitated by the local_element() function. To this end,
-   * it is necessary to know <i>in which order</i> the current class stores its
-   * element. The elements of all the consecutive ranges are stored in ascending
-   * order of the first index of each range. The function
-   * largest_range_starting_index() of IndexSet can be used to get the first
-   * index of the largest range.
+   * However, it is also possible to access elements in the order in which
+   * they are stored by the current object. In other words, one is not
+   * interested in accessing elements with their <i>global</i> indices, but
+   * instead using an enumeration that only takes into account the elements
+   * that are actually stored. This is facilitated by the local_element()
+   * function. To this end, it is necessary to know <i>in which order</i> the
+   * current class stores its element. The elements of all the consecutive
+   * ranges are stored in ascending order of the first index of each range.
+   * The function largest_range_starting_index() of IndexSet can be used to
+   * get the first index of the largest range.
    *
    * @author Bruno Turcksin, 2015.
    */
@@ -128,8 +127,8 @@ namespace LinearAlgebra
     ReadWriteVector (const ReadWriteVector<Number> &in_vector);
 
     /**
-     * Constructs a vector given the size, the stored elements have their index
-     * in [0,size).
+     * Constructs a vector given the size, the stored elements have their
+     * index in [0,size).
      */
     explicit ReadWriteVector (const size_type size);
 
@@ -148,9 +147,9 @@ namespace LinearAlgebra
      * Sets the global size of the vector to @p size. The stored elements have
      * their index in [0,size).
      *
-     * If the flag @p omit_zeroing_entries is set to false, the memory will be initialized
-     * with zero, otherwise the memory will be untouched (and the user must
-     * make sure to fill it with reasonable data before using it).
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
      */
     void reinit (const size_type size,
                  const bool      omit_zeroing_entries = false);
@@ -159,21 +158,21 @@ namespace LinearAlgebra
      * Uses the same IndexSet as the one of the input vector @p in_vector and
      * allocates memory for this vector.
      *
-     * If the flag @p omit_zeroing_entries is set to false, the memory will be initialized
-     * with zero, otherwise the memory will be untouched (and the user must
-     * make sure to fill it with reasonable data before using it).
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
      */
     template <typename Number2>
     void reinit(const ReadWriteVector<Number2> &in_vector,
                 const bool                      omit_zeroing_entries = false);
 
     /**
-     * Initializes the vector. The indices are specified by
-     * @p locally_stored_indices.
+     * Initializes the vector. The indices are specified by @p
+     * locally_stored_indices.
      *
-     * If the flag @p omit_zeroing_entries is set to false, the memory will be initialized
-     * with zero, otherwise the memory will be untouched (and the user must
-     * make sure to fill it with reasonable data before using it).
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
      * locally_stored_indices.
      */
     void reinit (const IndexSet &locally_stored_indices,
@@ -186,10 +185,10 @@ namespace LinearAlgebra
      * only swaps the pointers to the data of the two vectors and therefore
      * does not need to allocate temporary storage and move data around.
      *
-     * This function is analog to the the @p swap function of all C++
-     * standard containers. Also, there is a global function
-     * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
-     * analogy to standard functions.
+     * This function is analog to the the @p swap function of all C++ standard
+     * containers. Also, there is a global function <tt>swap(u,v)</tt> that
+     * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+     * functions.
      */
     void swap (ReadWriteVector<Number> &v);
 
@@ -208,8 +207,8 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
     /**
-     * Imports all the elements present in the vector's IndexSet from the input
-     * vector @p petsc_vec.
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p petsc_vec.
      */
     ReadWriteVector<Number> &
     operator= (const PETScWrappers::MPI::Vector &petsc_vec);
@@ -217,8 +216,8 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_TRILINOS
     /**
-     * Imports all the elements present in the vector's IndexSet from the input
-     * vector @p trilinos_vec.
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p trilinos_vec.
      */
     ReadWriteVector<Number> &
     operator= (const TrilinosWrappers::MPI::Vector &trilinos_vec);
@@ -231,12 +230,12 @@ namespace LinearAlgebra
     ReadWriteVector<Number> &operator = (const Number s);
 
     /**
-     * The value returned by this function denotes the dimension of the vector spaces
-     * that are modeled by objects of this kind. However, objects of the current
-     * class do not actually stores all elements of vectors of this space but
-     * may, in fact store only a subset. The number of elements stored is
-     * returned by n_elements() and is smaller or equal to the number returned
-     * by the current function.
+     * The value returned by this function denotes the dimension of the vector
+     * spaces that are modeled by objects of this kind. However, objects of
+     * the current class do not actually stores all elements of vectors of
+     * this space but may, in fact store only a subset. The number of elements
+     * stored is returned by n_elements() and is smaller or equal to the
+     * number returned by the current function.
      */
     size_type size() const;
 
@@ -253,9 +252,9 @@ namespace LinearAlgebra
     const IndexSet &get_stored_elements () const;
 
     /**
-     * Make the @p ReadWriteVector class a bit like the <tt>vector<></tt> class of
-     * the C++ standard library by returning iterators to the start and end
-     * of the <i>locally stored</i> elements of this vector.
+     * Make the @p ReadWriteVector class a bit like the <tt>vector<></tt>
+     * class of the C++ standard library by returning iterators to the start
+     * and end of the <i>locally stored</i> elements of this vector.
      */
     iterator begin ();
 
@@ -272,8 +271,8 @@ namespace LinearAlgebra
     iterator end ();
 
     /**
-     * Returns a constant iterator pointing to the element past the end of
-     * the array of the locally stored entries.
+     * Returns a constant iterator pointing to the element past the end of the
+     * array of the locally stored entries.
      */
     const_iterator end () const;
     //@}
@@ -286,22 +285,22 @@ namespace LinearAlgebra
 
     /**
      * Read access to the data in the position corresponding to @p
-     * global_index. An exception is thrown if @p global_index is not stored by
-     * the current object.
+     * global_index. An exception is thrown if @p global_index is not stored
+     * by the current object.
      */
     Number operator () (const size_type global_index) const;
 
     /**
      * Read and write access to the data in the position corresponding to @p
-     * global_index. An exception is thrown if @p global_index is not stored by
-     * the current object.
+     * global_index. An exception is thrown if @p global_index is not stored
+     * by the current object.
      */
     Number &operator () (const size_type global_index);
 
     /**
      * Read access to the data in the position corresponding to @p
-     * global_index. An exception is thrown if @p global_index is not stored by
-     * the current object.
+     * global_index. An exception is thrown if @p global_index is not stored
+     * by the current object.
      *
      * This function does the same thing as operator().
      */
@@ -309,8 +308,8 @@ namespace LinearAlgebra
 
     /**
      * Read and write access to the data in the position corresponding to @p
-     * global_index. An exception is thrown if @p global_index is not stored by
-     * the current object.
+     * global_index. An exception is thrown if @p global_index is not stored
+     * by the current object.
      *
      * This function does the same thing as operator().
      */
@@ -319,8 +318,8 @@ namespace LinearAlgebra
     /**
      * Instead of getting individual elements of a vector, this function
      * allows to get a whole set of elements at once. The indices of the
-     * elements to be read are stated in the first argument, the
-     * corresponding values are returned in the second.
+     * elements to be read are stated in the first argument, the corresponding
+     * values are returned in the second.
      */
     template <typename Number2>
     void extract_subvector_to (const std::vector<size_type> &indices,
@@ -348,12 +347,12 @@ namespace LinearAlgebra
     Number local_element (const size_type local_index) const;
 
     /**
-     * Read and write access to the data field specified by @p local_index. When
-     * you access elements in the order in which they are stored, it is necessary
-     * that you know in which they are stored. In other words, you need to
-     * know the map between the global indices of the elements this class
-     * stores, and the local indices into the contiguous array of these global
-     * elements. For this, see the general documentation of this class.
+     * Read and write access to the data field specified by @p local_index.
+     * When you access elements in the order in which they are stored, it is
+     * necessary that you know in which they are stored. In other words, you
+     * need to know the map between the global indices of the elements this
+     * class stores, and the local indices into the contiguous array of these
+     * global elements. For this, see the general documentation of this class.
      *
      * Performance: Direct array access (fast).
      */
@@ -367,16 +366,16 @@ namespace LinearAlgebra
     //@{
 
     /**
-     * This function adds a whole set of values stored in @p values to the vector
-     * components specified by @p indices.
+     * This function adds a whole set of values stored in @p values to the
+     * vector components specified by @p indices.
      */
     template <typename Number2>
     void add (const std::vector<size_type>  &indices,
               const std::vector<Number2>    &values);
 
     /**
-     * This function is similar to the previous one but takes a ReadWriteVector
-     * of values.
+     * This function is similar to the previous one but takes a
+     * ReadWriteVector of values.
      */
     template <typename Number2>
     void add (const std::vector<size_type>   &indices,

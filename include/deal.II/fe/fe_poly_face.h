@@ -211,7 +211,8 @@ protected:
   };
 
   /**
-   * The polynomial space. Its type is given by the template parameter PolynomialType.
+   * The polynomial space. Its type is given by the template parameter
+   * PolynomialType.
    */
   PolynomialType poly_space;
 };

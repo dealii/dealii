@@ -53,10 +53,10 @@ template <typename number> class SparseBlockVanka;
  * Objects of this class are constructed by passing a vector of indices of the
  * degrees of freedom of the Lagrange multiplier. In the actual
  * preconditioning method, these rows are traversed in the order in which the
- * appear in the matrix. Since this is a Gauß-Seidel like procedure,
- * remember to have a good ordering in advance (for transport dominated
- * problems, Cuthill-McKee algorithms are a good means for this, if points on
- * the inflow boundary are chosen as starting points for the renumbering).
+ * appear in the matrix. Since this is a Gauß-Seidel like procedure, remember
+ * to have a good ordering in advance (for transport dominated problems,
+ * Cuthill-McKee algorithms are a good means for this, if points on the inflow
+ * boundary are chosen as starting points for the renumbering).
  *
  * For each selected degree of freedom, a local system of equations is built
  * by the degree of freedom itself and all other values coupling immediately,
@@ -180,8 +180,8 @@ public:
   ~SparseVanka();
 
   /**
-    * Parameters for SparseVanka.
-    */
+   * Parameters for SparseVanka.
+   */
   class AdditionalData
   {
   public:
@@ -203,8 +203,8 @@ public:
     const bool conserve_mem;
 
     /**
-     * Number of threads to be used when building the inverses. Only relevant in
-     * multithreaded mode.
+     * Number of threads to be used when building the inverses. Only relevant
+     * in multithreaded mode.
      */
     const unsigned int n_threads;
   };
@@ -232,8 +232,8 @@ public:
               const Vector<number2> &src) const;
 
   /**
-   * Apply transpose preconditioner. This function takes the residual in
-   * @p src  and returns the resulting update vector in @p dst.
+   * Apply transpose preconditioner. This function takes the residual in @p
+   * src  and returns the resulting update vector in @p dst.
    */
   template<typename number2>
   void Tvmult (Vector<number2>       &dst,

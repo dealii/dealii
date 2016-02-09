@@ -32,30 +32,30 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * This function takes a ConstraintMatrix @p constraint_matrix and an
- * operator exemplar @p exemplar (this exemplar is usually a linear
- * operator that describes the system matrix - it is only used to create
- * domain and range vectors of appropriate sizes, its action <tt>vmult</tt>
- * is never used). A LinearOperator object associated with the "homogeneous
- * action" of the underlying ConstraintMatrix object is returned:
+ * This function takes a ConstraintMatrix @p constraint_matrix and an operator
+ * exemplar @p exemplar (this exemplar is usually a linear operator that
+ * describes the system matrix - it is only used to create domain and range
+ * vectors of appropriate sizes, its action <tt>vmult</tt> is never used). A
+ * LinearOperator object associated with the "homogeneous action" of the
+ * underlying ConstraintMatrix object is returned:
  *
- * Applying the LinearOperator object on a vector <code>u</code> results in
- * a vector <code>v</code> that stores the result of calling
+ * Applying the LinearOperator object on a vector <code>u</code> results in a
+ * vector <code>v</code> that stores the result of calling
  * ConstraintMatrix::distribute() on <code>u</code> - with one important
  * difference: inhomogeneities are not applied, but always treated as 0
  * instead.
  *
  * The LinearOperator object created by this function is primarily used
- * internally in constrained_linear_operator() to build up a modified
- * system of linear equations. How to solve a linear system of equations
- * with this approach is explained in detail in the
+ * internally in constrained_linear_operator() to build up a modified system
+ * of linear equations. How to solve a linear system of equations with this
+ * approach is explained in detail in the
  * @ref constraints
  * module.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
- *       structures.
+ * structures.
  *
  * @relates LinearOperator
  * @ingroup constraints
@@ -132,11 +132,10 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
 
 /**
- * Given a ConstraintMatrix @p constraint_matrix and an operator exemplar
- * @p exemplar, return a LinearOperator that is the projection to the
- * subspace of constrained degrees of freedom, i.e. all entries of the
- * result vector that correspond to unconstrained degrees of freedom are
- * set to zero.
+ * Given a ConstraintMatrix @p constraint_matrix and an operator exemplar @p
+ * exemplar, return a LinearOperator that is the projection to the subspace of
+ * constrained degrees of freedom, i.e. all entries of the result vector that
+ * correspond to unconstrained degrees of freedom are set to zero.
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
@@ -192,9 +191,9 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
 
 
 /**
- * Given a ConstraintMatrix object @p constraint_matrix and a
- * LinearOperator @p linop, this function creates a LinearOperator object
- * consisting of the composition of three operations and a regularization:
+ * Given a ConstraintMatrix object @p constraint_matrix and a LinearOperator
+ * @p linop, this function creates a LinearOperator object consisting of the
+ * composition of three operations and a regularization:
  * @code
  *   Ct * linop * C + Id_c;
  * @endcode
@@ -204,12 +203,12 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  *   Ct = transpose_operator(C);
  *   Id_c = project_to_constrained_linear_operator(constraint_matrix, linop);
  * @endcode
- * and <code>Id_c</code> is the projection to the subspace consisting of
- * all vector entries associated with constrained degrees of freedoms.
+ * and <code>Id_c</code> is the projection to the subspace consisting of all
+ * vector entries associated with constrained degrees of freedoms.
  *
  * This LinearOperator object is used together with
- * constrained_right_hand_side() to build up the following modified system
- * of linear equations:
+ * constrained_right_hand_side() to build up the following modified system of
+ * linear equations:
  * @f[
  *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
@@ -223,7 +222,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
- *       structures.
+ * structures.
  *
  * @relates LinearOperator
  * @ingroup constraints
@@ -243,9 +242,9 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
 
 
 /**
- * Given a ConstraintMatrix object @p constraint_matrix, a LinearOperator
- * @p linop and a right-hand side @p right_hand_side, this function creates
- * a PackagedOperation that stores the following computation:
+ * Given a ConstraintMatrix object @p constraint_matrix, a LinearOperator @p
+ * linop and a right-hand side @p right_hand_side, this function creates a
+ * PackagedOperation that stores the following computation:
  * @code
  *   Ct * (right_hand_side - linop * k)
  * @endcode
@@ -256,8 +255,8 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * @endcode
  *
  * This LinearOperator object is used together with
- * constrained_right_hand_side() to build up the following modified system
- * of linear equations:
+ * constrained_right_hand_side() to build up the following modified system of
+ * linear equations:
  * @f[
  *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
@@ -271,7 +270,7 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
- *       structures.
+ * structures.
  *
  * @relates LinearOperator
  * @ingroup constraints

@@ -67,9 +67,9 @@ DEAL_II_NAMESPACE_OPEN
  * on the first grid will point to cell 1 on the second grid.
  *
  * @tparam MeshType This class may be used with any class that satisfies the
- * @ref ConceptMeshType "MeshType concept". The extension to other classes
- * offering iterator functions and some minor additional requirements is
- * simple.
+ * @ref ConceptMeshType "MeshType concept".
+ * The extension to other classes offering iterator functions and some minor
+ * additional requirements is simple.
  *
  * Note that this class could in principle be based on the C++
  * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data

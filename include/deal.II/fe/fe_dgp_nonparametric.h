@@ -255,15 +255,16 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <h3> Implementation details </h3>
  *
- * This element does not have an InternalData class, unlike all other elements,
- * because the InternalData classes are used to store things that can be computed once
- * and reused multiple times (such as the values of shape functions
- * at quadrature points on the reference cell). However, because the
- * element is not mapped, this element has nothing that could be computed on the
- * reference cell -- everything needs to be computed on the real cell -- and
- * consequently there is nothing we'd like to store in such an object. We can thus
- * simply use the members already provided by FiniteElement::InternalDataBase without
- * adding anything in a derived class in this class.
+ * This element does not have an InternalData class, unlike all other
+ * elements, because the InternalData classes are used to store things that
+ * can be computed once and reused multiple times (such as the values of shape
+ * functions at quadrature points on the reference cell). However, because the
+ * element is not mapped, this element has nothing that could be computed on
+ * the reference cell -- everything needs to be computed on the real cell --
+ * and consequently there is nothing we'd like to store in such an object. We
+ * can thus simply use the members already provided by
+ * FiniteElement::InternalDataBase without adding anything in a derived class
+ * in this class.
  *
  * @author Guido Kanschat, 2002
  */
@@ -289,81 +290,81 @@ public:
   requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
-   * This function is intended to return the value of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the value of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_value(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_value(), this function throws an exception of
+   * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
 
   /**
-   * This function is intended to return the value of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the value of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_value_component(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_value_component(), this function throws an
+   * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim> &p,
                                         const unsigned int component) const;
 
   /**
-   * This function is intended to return the gradient of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the gradient of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_grad(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_grad(), this function throws an exception of
+   * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
 
   /**
-   * This function is intended to return the gradient of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the gradient of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_grad_component(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_grad_component(), this function throws an
+   * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim> &p,
                                               const unsigned int component) const;
 
   /**
-   * This function is intended to return the Hessian of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the Hessian of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_grad_grad(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_grad_grad(), this function throws an
+   * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim> &p) const;
 
   /**
-   * This function is intended to return the Hessian of a shape function
-   * at a point on the reference cell. However, since the current element
-   * does not implement shape functions by mapping from a reference cell,
-   * no shape functions exist on the reference cell.
+   * This function is intended to return the Hessian of a shape function at a
+   * point on the reference cell. However, since the current element does not
+   * implement shape functions by mapping from a reference cell, no shape
+   * functions exist on the reference cell.
    *
    * Consequently, as discussed in the corresponding function in the base
-   * class, FiniteElement::shape_grad_grad_component(), this function throws an exception
-   * of type FiniteElement::ExcUnitShapeValuesDoNotExist.
+   * class, FiniteElement::shape_grad_grad_component(), this function throws
+   * an exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,

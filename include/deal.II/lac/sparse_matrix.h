@@ -431,24 +431,22 @@ namespace SparseMatrixIterators
 //TODO: Add multithreading to the other vmult functions.
 
 /**
- * Sparse matrix. This class implements the functionality to store
- * matrix entry values in the locations denoted by a
- * SparsityPattern. See
+ * Sparse matrix. This class implements the functionality to store matrix
+ * entry values in the locations denoted by a SparsityPattern. See
  * @ref Sparsity
- * for a discussion about the
- * separation between sparsity patterns and matrices.
+ * for a discussion about the separation between sparsity patterns and
+ * matrices.
  *
  * The elements of a SparseMatrix are stored in the same order in which the
  * SparsityPattern class stores its entries. Within each row, elements are
  * generally stored left-to-right in increasing column index order; the
- * exception to this rule is that if the matrix is square (m() ==
- * n()), then the diagonal entry is stored as the first element in
- * each row to make operations like applying a Jacobi or SSOR preconditioner
- * faster. As a consequence, if you traverse the elements of a row of a
- * SparseMatrix with the help of iterators into this object (using
- * SparseMatrix::begin and SparseMatrix::end) you will find that the elements
- * are not sorted by column index within each row whenever the matrix is
- * square.
+ * exception to this rule is that if the matrix is square (m() == n()), then
+ * the diagonal entry is stored as the first element in each row to make
+ * operations like applying a Jacobi or SSOR preconditioner faster. As a
+ * consequence, if you traverse the elements of a row of a SparseMatrix with
+ * the help of iterators into this object (using SparseMatrix::begin and
+ * SparseMatrix::end) you will find that the elements are not sorted by column
+ * index within each row whenever the matrix is square.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -874,10 +872,10 @@ public:
    * Copying matrices is an expensive operation that we do not want to happen
    * by accident through compiler generated code for <code>operator=</code>.
    * (This would happen, for example, if one accidentally declared a function
-   * argument of the current type <i>by value</i> rather than <i>by reference</i>.)
-   * The functionality of copying matrices is implemented in this member function
-   * instead. All copy operations of objects of this type therefore require an
-   * explicit function call.
+   * argument of the current type <i>by value</i> rather than <i>by
+   * reference</i>.) The functionality of copying matrices is implemented in
+   * this member function instead. All copy operations of objects of this type
+   * therefore require an explicit function call.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.

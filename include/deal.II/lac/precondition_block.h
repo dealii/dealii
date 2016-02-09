@@ -172,8 +172,8 @@ public:
 protected:
   /**
    * Initialize matrix and block size for permuted preconditioning.
-   * Additionally to the parameters of the other initialize() function, we hand
-   * over two index vectors with the permutation and its inverse. For the
+   * Additionally to the parameters of the other initialize() function, we
+   * hand over two index vectors with the permutation and its inverse. For the
    * meaning of these vectors see PreconditionBlockSOR.
    *
    * In a second step, the inverses of the diagonal blocks may be computed.

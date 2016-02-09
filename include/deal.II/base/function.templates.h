@@ -788,11 +788,11 @@ void VectorFunctionFromTensorFunction<dim, Number>::vector_value (
 
 
 /**
- * Member function <tt>vector_value_list </tt> is the interface for giving
- * a list of points (<code>vector<Point<dim> ></code>) of which to evaluate
- * using the <tt>vector_value</tt> member function.  Again, this function
- * is written so as to not replicate the function definition but passes
- * each point on to <tt>vector_value</tt> to be evaluated.
+ * Member function <tt>vector_value_list </tt> is the interface for giving a
+ * list of points (<code>vector<Point<dim> ></code>) of which to evaluate
+ * using the <tt>vector_value</tt> member function.  Again, this function is
+ * written so as to not replicate the function definition but passes each
+ * point on to <tt>vector_value</tt> to be evaluated.
  */
 template <int dim, typename Number>
 void VectorFunctionFromTensorFunction<dim, Number>::vector_value_list (

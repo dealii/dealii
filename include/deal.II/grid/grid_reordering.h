@@ -471,10 +471,10 @@ DEAL_II_NAMESPACE_OPEN
  * do its work in linear time; if it is not orientable, then it aborts in
  * linear time as well.
  *
- * Both algorithms are described in the paper
- * "On orienting edges of unstructured two- and three-dimensional meshes",
- * R. Agelek, M. Anderson, W. Bangerth, W. L. Barth (submitted, 2015).
- * A preprint is available as <a href="http://arxiv.org/abs/1512.02137">arxiv
+ * Both algorithms are described in the paper "On orienting edges of
+ * unstructured two- and three-dimensional meshes", R. Agelek, M. Anderson, W.
+ * Bangerth, W. L. Barth (submitted, 2015). A preprint is available as <a
+ * href="http://arxiv.org/abs/1512.02137">arxiv
  * 1512.02137</a>.
  *
  *

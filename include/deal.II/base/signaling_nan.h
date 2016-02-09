@@ -32,29 +32,27 @@ namespace numbers
   namespace internal
   {
     /**
-     * A namespace for the implementation of functions that create
-     * signaling NaN objects. This is where the Utilities::signaling_nan()
-     * function calls into.
+     * A namespace for the implementation of functions that create signaling
+     * NaN objects. This is where the Utilities::signaling_nan() function
+     * calls into.
      */
     namespace SignalingNaN
     {
       /**
-       * A general template for classes that know how to initialize
-       * objects of type @p T with signaling NaNs to denote invalid
-       * values.
+       * A general template for classes that know how to initialize objects of
+       * type @p T with signaling NaNs to denote invalid values.
        *
        * The real implementation of this class happens in (partial)
-       * specializations for particular values of the template
-       * argument @p T.
+       * specializations for particular values of the template argument @p T.
        */
       template <typename T>
       struct NaNInitializer;
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a @p float value equal to
-       * the invalid signaling NaN.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a @p float value equal to the invalid signaling
+       * NaN.
        */
       template <>
       struct NaNInitializer<float>
@@ -67,9 +65,9 @@ namespace numbers
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a @p double value equal to
-       * the invalid signaling NaN.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a @p double value equal to the invalid
+       * signaling NaN.
        */
       template <>
       struct NaNInitializer<double>
@@ -82,9 +80,9 @@ namespace numbers
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a Tensor<1,dim> value whose
-       * components are invalid signaling NaN values.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a Tensor<1,dim> value whose components are
+       * invalid signaling NaN values.
        */
       template <int dim, typename T>
       struct NaNInitializer<Tensor<1,dim,T> >
@@ -103,9 +101,9 @@ namespace numbers
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a Tensor<rank,dim> value whose
-       * components are invalid signaling NaN values.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a Tensor<rank,dim> value whose components are
+       * invalid signaling NaN values.
        */
       template <int rank, int dim, typename T>
       struct NaNInitializer<Tensor<rank,dim,T> >
@@ -125,9 +123,9 @@ namespace numbers
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a SymmetricTensor<rank,dim>
-       * value whose components are invalid signaling NaN values.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a SymmetricTensor<rank,dim> value whose
+       * components are invalid signaling NaN values.
        */
       template <int rank, int dim, typename T>
       struct NaNInitializer<SymmetricTensor<rank,dim,T> >
@@ -146,10 +144,9 @@ namespace numbers
 
 
       /**
-       * A specialization of the general NaNInitializer class that
-       * provides a function that returns a
-       * DerivativeForm<order,dim,spacedim> value whose components are
-       * invalid signaling NaN values.
+       * A specialization of the general NaNInitializer class that provides a
+       * function that returns a DerivativeForm<order,dim,spacedim> value
+       * whose components are invalid signaling NaN values.
        */
       template <int order, int dim, int spacedim, typename T>
       struct NaNInitializer<DerivativeForm<order,dim,spacedim,T> >
@@ -172,29 +169,28 @@ namespace numbers
 
 
   /**
-   * Provide an object of type @p T filled with a signaling NaN that
-   * will cause an exception when used in a computation. The content
-   * of these objects is a "signaling NaN" ("NaN" stands for "not a
-   * number", and "signaling" implies that at least on platforms where
-   * this is supported, any arithmetic operation using them terminates
-   * the program). The purpose of such objects is to use them as
-   * markers for uninitialized objects and arrays that are required to
-   * be filled in other places, and to trigger an error when this
-   * later initialization does not happen before the first use.
+   * Provide an object of type @p T filled with a signaling NaN that will
+   * cause an exception when used in a computation. The content of these
+   * objects is a "signaling NaN" ("NaN" stands for "not a number", and
+   * "signaling" implies that at least on platforms where this is supported,
+   * any arithmetic operation using them terminates the program). The purpose
+   * of such objects is to use them as markers for uninitialized objects and
+   * arrays that are required to be filled in other places, and to trigger an
+   * error when this later initialization does not happen before the first
+   * use.
    *
    * @tparam T The type of the returned invalid object. This type can either
-   *   be a scalar, or of type Tensor, SymmetricTensor, or DerivativeForm.
-   *   Other types may be supported if there is a corresponding
-   *   specialization of the internal::SignalingNaN::NaNInitializer class
-   *   for this type.
+   * be a scalar, or of type Tensor, SymmetricTensor, or DerivativeForm. Other
+   * types may be supported if there is a corresponding specialization of the
+   * internal::SignalingNaN::NaNInitializer class for this type.
    *
    * @note Because the type @p T is not used as a function argument, the
-   *   compiler cannot deduce it from the type of arguments. Consequently,
-   *   you have to provide it explicitly. For example, the line
+   * compiler cannot deduce it from the type of arguments. Consequently, you
+   * have to provide it explicitly. For example, the line
    *   @code
    *     Tensor<1,dim> tensor = Utilities::signaling_nan<Tensor<1,dim> >();
    *   @endcode
-   *   initializes a tensor with invalid values.
+   * initializes a tensor with invalid values.
    */
   template <class T>
   T

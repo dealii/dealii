@@ -124,10 +124,9 @@ struct CellData
   };
 
   /**
-   * Manifold identifier of this object. This identifier should be used
-   * to identify the manifold to which this object belongs, and from which
-   * this object will collect information on how to add points upon
-   * refinement.
+   * Manifold identifier of this object. This identifier should be used to
+   * identify the manifold to which this object belongs, and from which this
+   * object will collect information on how to add points upon refinement.
    */
   types::manifold_id manifold_id;
 
@@ -162,13 +161,12 @@ struct CellData
  * list either the boundary indicator zero (if on the boundary) or
  * numbers::internal_face_boundary_id (if in the interior).
  *
- * You will get an error if you try to set the boundary indicator of
- * an interior edge or face, i.e., an edge or face that is not at the
- * boundary of the mesh. However, one may sometimes want to set the
- * manifold indicator to an interior object. In this case, set its
- * boundary indicator to numbers::internal_face_boundary_id, to
- * indicate that you understand that it is an interior object, but set
- * its manifold id to the value you want.
+ * You will get an error if you try to set the boundary indicator of an
+ * interior edge or face, i.e., an edge or face that is not at the boundary of
+ * the mesh. However, one may sometimes want to set the manifold indicator to
+ * an interior object. In this case, set its boundary indicator to
+ * numbers::internal_face_boundary_id, to indicate that you understand that it
+ * is an interior object, but set its manifold id to the value you want.
  *
  * @ingroup grid
  */
@@ -1711,10 +1709,10 @@ public:
   std::vector<types::manifold_id> get_manifold_ids() const;
 
   /**
-   * Copy @p old_tria to this triangulation. This operation is not cheap, so you
-   * should be careful with using this. We do not implement this function as a
-   * copy constructor, since it makes it easier to maintain collections of
-   * triangulations if you can assign them values later on.
+   * Copy @p old_tria to this triangulation. This operation is not cheap, so
+   * you should be careful with using this. We do not implement this function
+   * as a copy constructor, since it makes it easier to maintain collections
+   * of triangulations if you can assign them values later on.
    *
    * Keep in mind that this function also copies the pointer to the boundary
    * descriptor previously set by the @p set_boundary function and to the
@@ -1920,8 +1918,8 @@ public:
   enum CellStatus
   {
     /**
-     * The cell will not be refined or coarsened and might or might not
-     * move to a different processor.
+     * The cell will not be refined or coarsened and might or might not move
+     * to a different processor.
      */
     CELL_PERSIST,
     /**
@@ -1940,7 +1938,8 @@ public:
 
   /**
    * A structure used to accumulate the results of the cell_weights slot
-   * functions below. It takes an iterator range and returns the sum of values.
+   * functions below. It takes an iterator range and returns the sum of
+   * values.
    */
   template<typename T>
   struct CellWeightSum
@@ -1967,10 +1966,9 @@ public:
 
   /**
    * A structure that has boost::signal objects for a number of actions that a
-   * triangulation can do to itself. Please refer to the
-   * "Getting notice when a triangulation changes" section in the general
-   * documentation of the Triangulation class for more information
-   * and examples.
+   * triangulation can do to itself. Please refer to the "Getting notice when
+   * a triangulation changes" section in the general documentation of the
+   * Triangulation class for more information and examples.
    *
    * For documentation on signals, see
    * http://www.boost.org/doc/libs/release/libs/signals2 .
@@ -1979,17 +1977,19 @@ public:
   {
     /**
      * This signal is triggered whenever the
-     * Triangulation::create_triangulation or Triangulation::copy_triangulation()
-     * is called. This signal is also triggered when loading a triangulation from an
-     * archive via Triangulation::load().
+     * Triangulation::create_triangulation or
+     * Triangulation::copy_triangulation() is called. This signal is also
+     * triggered when loading a triangulation from an archive via
+     * Triangulation::load().
      */
     boost::signals2::signal<void ()> create;
 
     /**
-     * This signal is triggered at the beginning of execution of
-     * the Triangulation::execute_coarsening_and_refinement() function (which is
-     * itself called by other functions such as Triangulation::refine_global() ).
-     * At the time this signal is triggered, the triangulation is still unchanged.
+     * This signal is triggered at the beginning of execution of the
+     * Triangulation::execute_coarsening_and_refinement() function (which is
+     * itself called by other functions such as Triangulation::refine_global()
+     * ). At the time this signal is triggered, the triangulation is still
+     * unchanged.
      */
     boost::signals2::signal<void ()> pre_refinement;
 
@@ -2003,70 +2003,69 @@ public:
     /**
      * This signal is triggered for each cell that is going to be coarsened.
      *
-     * @note This signal is triggered with the immediate parent cell of a set of
-     * active cells as argument. The children of this parent cell will subsequently
-     * be coarsened away.
+     * @note This signal is triggered with the immediate parent cell of a set
+     * of active cells as argument. The children of this parent cell will
+     * subsequently be coarsened away.
      */
     boost::signals2::signal<void (const typename Triangulation<dim, spacedim>::cell_iterator &cell)> pre_coarsening_on_cell;
 
     /**
      * This signal is triggered for each cell that just has been refined.
      *
-     * @note The signal parameter @p cell corresponds to the immediate parent cell
-     * of a set of newly created active cells.
+     * @note The signal parameter @p cell corresponds to the immediate parent
+     * cell of a set of newly created active cells.
      */
     boost::signals2::signal<void (const typename Triangulation<dim, spacedim>::cell_iterator &cell)> post_refinement_on_cell;
 
     /**
      * This signal is triggered whenever the triangulation owning the signal
-     * is copied by another triangulation using Triangulation::copy_triangulation()
-     * (i.e. it is triggered on the <i>old</i> triangulation, but the new one is
-     * passed as an argument).
+     * is copied by another triangulation using
+     * Triangulation::copy_triangulation() (i.e. it is triggered on the
+     * <i>old</i> triangulation, but the new one is passed as an argument).
      */
     boost::signals2::signal<void (const Triangulation<dim, spacedim> &destination_tria)> copy;
 
     /**
-     * This signal is triggered whenever the Triangulation::clear()
-     * function is called. This signal is also triggered when loading a
-     * triangulation from an archive via Triangulation::load() as the previous
-     * content of the triangulation is first destroyed.
+     * This signal is triggered whenever the Triangulation::clear() function
+     * is called. This signal is also triggered when loading a triangulation
+     * from an archive via Triangulation::load() as the previous content of
+     * the triangulation is first destroyed.
      */
     boost::signals2::signal<void ()> clear;
 
     /**
      * This is a catch-all signal that is triggered whenever the create,
-     * post_refinement, or clear signals are triggered.
-     * In effect, it can be used to indicate to an object connected to
-     * the signal that the triangulation has been changed, whatever the
-     * exact cause of the change.
+     * post_refinement, or clear signals are triggered. In effect, it can be
+     * used to indicate to an object connected to the signal that the
+     * triangulation has been changed, whatever the exact cause of the change.
      *
-     * @note The cell-level signals @p pre_coarsening_on_cell and
-     * @p post_refinement_on_cell are not connected to this signal.
+     * @note The cell-level signals @p pre_coarsening_on_cell and @p
+     * post_refinement_on_cell are not connected to this signal.
      */
     boost::signals2::signal<void ()> any_change;
 
     /**
      * This signal is triggered for each cell during every automatic or manual
-     * repartitioning. This signal is
-     * somewhat special in that it is only triggered for distributed parallel
-     * calculations and only if functions are connected to it. It is intended to
-     * allow a weighted repartitioning of the domain to balance the computational
-     * load across processes in a different way than balancing the number of cells.
-     * Any connected function is expected to take an iterator to a cell, and a
-     * CellStatus argument that indicates whether this cell is going to be refined,
-     * coarsened or left untouched (see the documentation of the CellStatus enum
-     * for more information). The function is expected to return an unsigned
-     * integer, which is interpreted as the additional computational load of this
-     * cell. If this cell is going to be coarsened, the signal is called for the
-     * parent cell and you need to provide the weight of the future parent
-     * cell. If this cell is going to be refined the function should return a
-     * weight, which will be equally assigned to every future child
-     * cell of the current cell. As a reference a value of 1000 is added for
-     * every cell to the total weight. This means a signal return value of 1000
-     * (resulting in a weight of 2000) means that it is twice as expensive for
-     * a process to handle this particular cell. If several functions are
-     * connected to this signal, their return values will be summed to calculate
-     * the final weight.
+     * repartitioning. This signal is somewhat special in that it is only
+     * triggered for distributed parallel calculations and only if functions
+     * are connected to it. It is intended to allow a weighted repartitioning
+     * of the domain to balance the computational load across processes in a
+     * different way than balancing the number of cells. Any connected
+     * function is expected to take an iterator to a cell, and a CellStatus
+     * argument that indicates whether this cell is going to be refined,
+     * coarsened or left untouched (see the documentation of the CellStatus
+     * enum for more information). The function is expected to return an
+     * unsigned integer, which is interpreted as the additional computational
+     * load of this cell. If this cell is going to be coarsened, the signal is
+     * called for the parent cell and you need to provide the weight of the
+     * future parent cell. If this cell is going to be refined the function
+     * should return a weight, which will be equally assigned to every future
+     * child cell of the current cell. As a reference a value of 1000 is added
+     * for every cell to the total weight. This means a signal return value of
+     * 1000 (resulting in a weight of 2000) means that it is twice as
+     * expensive for a process to handle this particular cell. If several
+     * functions are connected to this signal, their return values will be
+     * summed to calculate the final weight.
      */
     boost::signals2::signal<unsigned int (const cell_iterator &,
                                           const CellStatus),
@@ -2566,8 +2565,8 @@ public:
    */
 
   /**
-   * Iterator to the first used vertex. This function can only be used if dim is
-   * not one.
+   * Iterator to the first used vertex. This function can only be used if dim
+   * is not one.
    */
   vertex_iterator        begin_vertex() const;
 
@@ -2580,8 +2579,8 @@ public:
 
   /**
    * Iterator past the end; this iterator serves for comparisons of iterators
-   * with past-the-end or before-the-beginning states. This function can only be
-   * used if dim is not one.
+   * with past-the-end or before-the-beginning states. This function can only
+   * be used if dim is not one.
    */
   vertex_iterator        end_vertex() const;
 
@@ -2815,19 +2814,18 @@ public:
   /**
    * Return a reference to the current object.
    *
-   * This doesn't seem to be very useful but allows to write code that
-   * can access the underlying triangulation for anything that satisfies
-   * the
+   * This doesn't seem to be very useful but allows to write code that can
+   * access the underlying triangulation for anything that satisfies the
    * @ref ConceptMeshType "MeshType concept"
-   * (which may not only be a
-   * triangulation, but also a DoFHandler, for example).
+   * (which may not only be a triangulation, but also a DoFHandler, for
+   * example).
    */
   Triangulation<dim,spacedim> &
   get_triangulation ();
 
   /**
-   * Return a reference to the current object. This is the const-version
-   * of the previous function.
+   * Return a reference to the current object. This is the const-version of
+   * the previous function.
    */
   const Triangulation<dim,spacedim> &
   get_triangulation () const;

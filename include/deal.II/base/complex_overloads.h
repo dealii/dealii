@@ -27,8 +27,8 @@ template <typename T, typename U> struct ProductType;
 
 #ifndef DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 /**
- * Provide an <tt>operator*</tt> that operates on mixed complex floating
- * point types. Annoyingly, the standard library does not provide such an
+ * Provide an <tt>operator*</tt> that operates on mixed complex floating point
+ * types. Annoyingly, the standard library does not provide such an
  * operator...
  *
  * @relates ProductType
@@ -45,8 +45,8 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
 
 /**
  * Provide an <tt>operator*</tt> for a scalar multiplication of a complex
- * floating point type with a different real floating point type.
- * Annoyingly, the standard library does not provide such an operator...
+ * floating point type with a different real floating point type. Annoyingly,
+ * the standard library does not provide such an operator...
  *
  * @relates EnableIfScalar
  * @relates ProductType
