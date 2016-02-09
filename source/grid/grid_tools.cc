@@ -3049,9 +3049,9 @@ next_cell:
 
 
 
-  template <class MeshType>
-  std::map< types::global_dof_index,std::vector<typename MeshType::active_cell_iterator> >
-  get_dof_to_support_patch_map(MeshType &dof_handler)
+  template <class DoFHandlerType>
+  std::map< types::global_dof_index,std::vector<typename DoFHandlerType::active_cell_iterator> >
+  get_dof_to_support_patch_map(DoFHandlerType &dof_handler)
   {
 
     // This is the map from global_dof_index to
@@ -3064,7 +3064,7 @@ next_cell:
     // constructed, we will copy to a map of vectors
     // since that is the prefered output for other
     // functions.
-    std::map< types::global_dof_index,std::set<typename MeshType::active_cell_iterator> > dof_to_set_of_cells_map;
+    std::map< types::global_dof_index,std::set<typename DoFHandlerType::active_cell_iterator> > dof_to_set_of_cells_map;
 
     std::vector<types::global_dof_index> local_dof_indices;
     std::vector<types::global_dof_index> local_face_dof_indices;
@@ -3077,17 +3077,17 @@ next_cell:
 
     // in 3d, we need pointers from active lines to the
     // active parent lines, so we construct it as needed.
-    std::map<typename MeshType::active_line_iterator, typename MeshType::line_iterator > lines_to_parent_lines_map;
-    if (MeshType::dimension == 3)
+    std::map<typename DoFHandlerType::active_line_iterator, typename DoFHandlerType::line_iterator > lines_to_parent_lines_map;
+    if (DoFHandlerType::dimension == 3)
       {
 
         // save user flags as they will be modified and then later restored
         dof_handler.get_triangulation().save_user_flags(user_flags);
-        const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
 
 
-        typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
-                                                endc = dof_handler.end();
+        typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+                                                      endc = dof_handler.end();
         for (; cell!=endc; ++cell)
           {
             // We only want lines that are locally_relevant
@@ -3096,7 +3096,7 @@ next_cell:
             // few and we don't have to use them.
             if (cell->is_artificial() == false)
               {
-                for (unsigned int l=0; l<GeometryInfo<MeshType::dimension>::lines_per_cell; ++l)
+                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
                   if (cell->line(l)->has_children())
                     for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
                       {
@@ -3116,8 +3116,8 @@ next_cell:
     // which it is a part, mainly the ones that must
     // be added on account of adaptivity hanging node
     // constraints.
-    typename MeshType::active_cell_iterator cell = dof_handler.begin_active(),
-                                            endc = dof_handler.end();
+    typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+                                                  endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         // Need to loop through all cells that could
@@ -3142,7 +3142,7 @@ next_cell:
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (unsigned int f=0; f<GeometryInfo<MeshType::dimension>::faces_per_cell; ++f)
+            for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
               {
                 if (cell->face(f)->has_children())
                   {
@@ -3225,9 +3225,9 @@ next_cell:
             // if cell's line has an active parent, then
             // distribute cell to dofs on parent line
             // and dofs on all children of parent line.
-            if (MeshType::dimension == 3)
+            if (DoFHandlerType::dimension == 3)
               {
-                for (unsigned int l=0; l<GeometryInfo<MeshType::dimension>::lines_per_cell; ++l)
+                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
                   {
                     if (cell->line(l)->has_children())
                       {
@@ -3252,7 +3252,7 @@ next_cell:
                     // children
                     else if (cell->line(l)->user_flag_set() == true)
                       {
-                        typename MeshType::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
+                        typename DoFHandlerType::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
                         Assert (parent_line->has_children(), ExcInternalError() );
 
                         // dofs_per_line returns number of dofs
@@ -3281,24 +3281,24 @@ next_cell:
 
                       }
                   } // for lines l
-              }// if MeshType::dimension == 3
+              }// if DoFHandlerType::dimension == 3
           }// if cell->is_locally_owned()
       }// for cells
 
 
-    if (MeshType::dimension == 3)
+    if (DoFHandlerType::dimension == 3)
       {
         // finally, restore user flags that were changed above
         // to when we constructed the pointers to parent of lines
         // Since dof_handler is const, we must leave it unchanged.
-        const_cast<dealii::Triangulation<MeshType::dimension,MeshType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
       }
 
     // Finally, we copy map of sets to
-    // map of vectors using assign()
-    std::map< types::global_dof_index, std::vector<typename MeshType::active_cell_iterator> > dof_to_cell_patches;
+    // map of vectors using the std::vector::assign() function
+    std::map< types::global_dof_index, std::vector<typename DoFHandlerType::active_cell_iterator> > dof_to_cell_patches;
 
-    typename std::map<types::global_dof_index, std::set< typename MeshType::active_cell_iterator> >::iterator
+    typename std::map<types::global_dof_index, std::set< typename DoFHandlerType::active_cell_iterator> >::iterator
     it = dof_to_set_of_cells_map.begin(),
     it_end = dof_to_set_of_cells_map.end();
     for ( ; it!=it_end; ++it)

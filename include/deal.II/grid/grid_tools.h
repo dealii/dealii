@@ -1081,44 +1081,43 @@ namespace GridTools
 
   /**
    * This function runs through the degrees of freedom defined by the
-   * Container and for each dof constructs a vector of active_cell_iterators
-   * representing the cells of support of the nodal basis element
-   * at that degree of freedom. This function was designed for the
+   * DoFHandlerType and for each dof constructs a vector of active_cell_iterators
+   * representing the cells of support of the associated basis element
+   * at that degree of freedom. This function was originally designed for the
    * implementation of local projections, for instance the Clement interpolant,
    * in conjunction with other local patch functions like
    * GridTools::build_triangulation_from_patch.
    *
-   * Containers built on top of Triangulation<dim> or
-   * parallel:distributed::Triangulation<dim> are supported and handled
+   * DoFHandlerType's built on top of Triangulation or
+   * parallel:distributed::Triangulation are supported and handled
    * appropriately.
    *
-   * It is necessary that the finite element underlying the MeshType used has
-   * degrees of freedom that are logically associated to a vertex, line, quad,
-   * or hex.  This includes both nodal degrees of freedom and other modal types
-   * of dofs that are associated to an edge, etc.  The result is the patch of
-   * cells representing the support of the basis element associated to the
-   * degree of freedom.  For instance using an FE_Q finite element, we obtain
-   * the standard patch of cells touching the degree of freedom and then others
-   * that take care of possible hanging node constraints.  Using a FE_DGQ finite
-   * element, the degrees of freedom are logically considered to be "interior" to
-   * the cells so the patch would be the cell on which the degree of freedom is
+   * The result is the patch of cells representing the support of the basis
+   * element associated to the degree of freedom.  For instance using an FE_Q
+   * finite element, we obtain the standard patch of cells touching the degree
+   * of freedom and then add other cells that take care of possible hanging node
+   * constraints.  Using a FE_DGQ finite element, the degrees of freedom are
+   * logically considered to be "interior" to the cells so the patch would
+   * consist exclusively of the single cell on which the degree of freedom is
    * located.
    *
-   * @tparam MeshType The MeshType should be a DoFHandler<dim> or hp::DoFHandler<dim>.
-   * @param[in] dof_handler The MeshType which could be built on a Triangulation<dim>
-   * or a parallel::distributed::Triangulation<dim> and should be using a finite
-   * element that has degrees of freedom that are logically associated to a vertex,
-   * line, quad, or hex.
-   * @param[out] dof_to_support_patch_map A map from the global_dof_index of DoFs
-   * on locally relevant cells to vectors containing MeshType::active_cell_iterators of
-   * cells in support of basis function at that degree of freedom.
+   * @tparam DoFHandlerType The DoFHandlerType should be a DoFHandler or
+   * hp::DoFHandler.
+   * @param[in] dof_handler The DoFHandlerType which could be built on a
+   * Triangulation or a parallel::distributed::Triangulation with a finite
+   * element that has degrees of freedom that are logically associated to a
+   * vertex, line, quad, or hex.
+   * @param[out] dof_to_support_patch_map A map from the global_dof_index of
+   * degrees of freedom on locally relevant cells to vectors containing
+   * DoFHandlerType::active_cell_iterators of cells in the support of the basis
+   * function at that degree of freedom.
    *
    *  @author Spencer Patty, 2016
    *
    */
-  template <class MeshType>
-  std::map< types::global_dof_index,std::vector<typename MeshType::active_cell_iterator> >
-  get_dof_to_support_patch_map(MeshType &dof_handler);
+  template <class DoFHandlerType>
+  std::map< types::global_dof_index,std::vector<typename DoFHandlerType::active_cell_iterator> >
+  get_dof_to_support_patch_map(DoFHandlerType &dof_handler);
 
 
   /*@}*/
