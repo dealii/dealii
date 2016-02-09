@@ -1390,8 +1390,8 @@ protected:
  * for applying a vector operation for several cells at once. This setting is
  * explained in the step-37 and step-48 tutorial programs. For vector-valued
  * problems, the deal.II test suite includes a few additional examples as
- * well, e.g. the Stokes operator found at https://github.com/dealii/dealii/bl
- * ob/master/tests/matrix_free/matrix_vector_stokes_noflux.cc
+ * well, e.g. the Stokes operator found at
+ * https://github.com/dealii/dealii/blob/master/tests/matrix_free/matrix_vector_stokes_noflux.cc
  *
  * For most operator evaluation tasks, this path provides the most efficient
  * solution by combining pre-computed data for the mapping (Jacobian
