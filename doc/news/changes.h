@@ -512,7 +512,14 @@ inconvenience this causes.
 
 
 
-<ol>
+<ol> 
+  <li> New: FunctionParser now supports <code>rand()</code> and
+  <code>rand_seed(number)</code>, which return a random value in the
+  range [0,1].
+  <br>
+  (Wolfgang Bangerth, Luca Heltai, Alberto Sartori, 2016/02/09)
+  </li>
+
   <li> Fixed: FullMatrix::TmTmult for matrix multiplication used to compute
   wrong results for larger matrix sizes where external BLAS is called. This
   has been fixed.

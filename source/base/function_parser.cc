@@ -16,15 +16,19 @@
 
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
 #include <cmath>
-
+#include <boost/random.hpp>
+#include <map>
 
 #ifdef DEAL_II_WITH_MUPARSER
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <muParser.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
+
+
 
 namespace fparser
 {
@@ -176,6 +180,36 @@ namespace internal
   {
     return erfc(value);
   }
+
+  // returns a random value in the range [0,1] initializing the generator
+  // with the given seed
+  double mu_rand_seed(double seed)
+  {
+    static Threads::Mutex rand_mutex;
+    Threads::Mutex::ScopedLock lock(rand_mutex);
+
+    static boost::random::uniform_real_distribution<> uniform_distribution(0,1);
+
+    // for each seed an unique random number generator is created,
+    // which is initialized with the seed itself
+    static std::map<double, boost::random::mt19937> rng_map;
+
+    if (rng_map.find(seed) == rng_map.end())
+      rng_map[seed] = boost::random::mt19937(static_cast<unsigned int>(seed));
+
+    return uniform_distribution(rng_map[seed]);
+  }
+
+  // returns a random value in the range [0,1]
+  double mu_rand()
+  {
+    static Threads::Mutex rand_mutex;
+    Threads::Mutex::ScopedLock lock(rand_mutex);
+    static boost::random::uniform_real_distribution<> uniform_distribution(0,1);
+    static boost::random::mt19937 rng(static_cast<unsigned long>(std::time(0)));
+    return uniform_distribution(rng);
+  }
+
 }
 
 
@@ -215,6 +249,8 @@ void FunctionParser<dim>:: init_muparser() const
       fp.get()[component].DefineFun("log", internal::mu_log, true);
       fp.get()[component].DefineFun("pow", internal::mu_pow, true);
       fp.get()[component].DefineFun("erfc", internal::mu_erfc, true);
+      fp.get()[component].DefineFun("rand_seed", internal::mu_rand_seed, true);
+      fp.get()[component].DefineFun("rand", internal::mu_rand, true);
 
       try
         {
@@ -265,7 +301,9 @@ void FunctionParser<dim>:: init_muparser() const
             "floor",
             "sec",
             "pow",
-            "erfc"
+            "erfc",
+            "rand",
+            "rand_seed"
           };
           for (unsigned int f=0; f<sizeof(function_names)/sizeof(function_names[0]); ++f)
             {
