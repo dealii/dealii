@@ -3048,6 +3048,267 @@ next_cell:
 
 
 
+
+  template <class DoFHandlerType>
+  std::map< types::global_dof_index,std::vector<typename DoFHandlerType::active_cell_iterator> >
+  get_dof_to_support_patch_map(DoFHandlerType &dof_handler)
+  {
+
+    // This is the map from global_dof_index to
+    // a set of cells on patch.  We first map into
+    // a set because it is very likely that we
+    // will attempt to add a cell more than once
+    // to a particular patch and we want to preserve
+    // uniqueness of cell iterators. std::set does this
+    // automatically for us.  Later after it is all
+    // constructed, we will copy to a map of vectors
+    // since that is the prefered output for other
+    // functions.
+    std::map< types::global_dof_index,std::set<typename DoFHandlerType::active_cell_iterator> > dof_to_set_of_cells_map;
+
+    std::vector<types::global_dof_index> local_dof_indices;
+    std::vector<types::global_dof_index> local_face_dof_indices;
+    std::vector<types::global_dof_index> local_line_dof_indices;
+
+    // a place to save the dof_handler user flags and restore them later
+    // to maintain const of dof_handler.
+    std::vector<bool> user_flags;
+
+
+    // in 3d, we need pointers from active lines to the
+    // active parent lines, so we construct it as needed.
+    std::map<typename DoFHandlerType::active_line_iterator, typename DoFHandlerType::line_iterator > lines_to_parent_lines_map;
+    if (DoFHandlerType::dimension == 3)
+      {
+
+        // save user flags as they will be modified and then later restored
+        dof_handler.get_triangulation().save_user_flags(user_flags);
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
+
+
+        typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+                                                      endc = dof_handler.end();
+        for (; cell!=endc; ++cell)
+          {
+            // We only want lines that are locally_relevant
+            // although it doesn't hurt to have lines that
+            // are children of ghost cells since there are
+            // few and we don't have to use them.
+            if (cell->is_artificial() == false)
+              {
+                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
+                  if (cell->line(l)->has_children())
+                    for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
+                      {
+                        lines_to_parent_lines_map[cell->line(l)->child(c)] = cell->line(l);
+                        // set flags to know that child
+                        // line has an active parent.
+                        cell->line(l)->child(c)->set_user_flag();
+                      }
+              }
+          }
+      }
+
+
+    // We loop through all cells and add cell to the
+    // map for the dofs that it immediately touches
+    // and then account for all the other dofs of
+    // which it is a part, mainly the ones that must
+    // be added on account of adaptivity hanging node
+    // constraints.
+    typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+                                                  endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      {
+        // Need to loop through all cells that could
+        // be in the patch of dofs on locally_owned
+        // cells including ghost cells
+        if (cell->is_artificial() == false)
+          {
+            const unsigned int n_dofs_per_cell = cell->get_fe().dofs_per_cell;
+            local_dof_indices.resize(n_dofs_per_cell);
+
+            // Take care of adding cell pointer to each
+            // dofs that exists on cell.
+            cell->get_dof_indices(local_dof_indices);
+            for (unsigned int i=0; i< n_dofs_per_cell; ++i )
+              dof_to_set_of_cells_map[local_dof_indices[i]].insert(cell);
+
+            // In the case of the adjacent cell (over
+            // faces or edges) being more refined, we
+            // want to add all of the children to the
+            // patch since the support function at that
+            // dof could be non-zero along that entire
+            // face (or line).
+
+            // Take care of dofs on neighbor faces
+            for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
+              {
+                if (cell->face(f)->has_children())
+                  {
+                    for (unsigned int c=0; c<cell->face(f)->n_children(); ++c)
+                      {
+                        //  Add cell to dofs of all subfaces
+                        //
+                        //   *-------------------*----------*---------*
+                        //   |                   | add cell |         |
+                        //   |                   |<- to dofs|         |
+                        //   |                   |of subface|         |
+                        //   |        cell       *----------*---------*
+                        //   |                   | add cell |         |
+                        //   |                   |<- to dofs|         |
+                        //   |                   |of subface|         |
+                        //   *-------------------*----------*---------*
+                        //
+                        Assert (cell->face(f)->child(c)->has_children() == false, ExcInternalError());
+
+                        const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                        local_face_dof_indices.resize(n_dofs_per_face);
+
+                        cell->face(f)->child(c)->get_dof_indices(local_face_dof_indices);
+                        for (unsigned int i=0; i< n_dofs_per_face; ++i )
+                          dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+                      }
+                  }
+                else if ((cell->face(f)->at_boundary() == false) && (cell->neighbor_is_coarser(f)))
+                  {
+
+                    // Add cell to dofs of parent face and all
+                    // child faces of parent face
+                    //
+                    //   *-------------------*----------*---------*
+                    //   |                   |          |         |
+                    //   |                   |   cell   |         |
+                    //   |      add cell     |          |         |
+                    //   |      to dofs   -> *----------*---------*
+                    //   |      of parent    | add cell |         |
+                    //   |       face        |<- to dofs|         |
+                    //   |                   |of subface|         |
+                    //   *-------------------*----------*---------*
+                    //
+
+                    // Add cell to all dofs of parent face
+                    std::pair<unsigned int, unsigned int> neighbor_face_no_subface_no = cell->neighbor_of_coarser_neighbor(f);
+                    unsigned int face_no = neighbor_face_no_subface_no.first;
+                    unsigned int subface = neighbor_face_no_subface_no.second;
+
+                    const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                    local_face_dof_indices.resize(n_dofs_per_face);
+
+                    cell->neighbor(f)->face(face_no)->get_dof_indices(local_face_dof_indices);
+                    for (unsigned int i=0; i< n_dofs_per_face; ++i )
+                      dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+
+                    // Add cell to all dofs of children of
+                    // parent face
+                    for (unsigned int c=0; c<cell->neighbor(f)->face(face_no)->n_children(); ++c)
+                      {
+                        if (c != subface) // don't repeat work on dofs of original cell
+                          {
+                            const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                            local_face_dof_indices.resize(n_dofs_per_face);
+
+                            Assert (cell->neighbor(f)->face(face_no)->child(c)->has_children() == false, ExcInternalError());
+                            cell->neighbor(f)->face(face_no)->child(c)->get_dof_indices(local_face_dof_indices);
+                            for (unsigned int i=0; i<n_dofs_per_face; ++i )
+                              dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+                          }
+                      }
+                  }
+              }
+
+
+            // If 3d, take care of dofs on lines in the
+            // same pattern as faces above. That is, if
+            // a cell's line has children, distribute
+            // cell to dofs of children of line,  and
+            // if cell's line has an active parent, then
+            // distribute cell to dofs on parent line
+            // and dofs on all children of parent line.
+            if (DoFHandlerType::dimension == 3)
+              {
+                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
+                  {
+                    if (cell->line(l)->has_children())
+                      {
+                        for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
+                          {
+                            Assert (cell->line(l)->child(c)->has_children() == false, ExcInternalError());
+
+                            // dofs_per_line returns number of dofs
+                            // on line not including the vertices of the line.
+                            const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
+                                                                 + cell->get_fe().dofs_per_line;
+                            local_line_dof_indices.resize(n_dofs_per_line);
+
+                            cell->line(l)->child(c)->get_dof_indices(local_line_dof_indices);
+                            for (unsigned int i=0; i<n_dofs_per_line; ++i )
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+                          }
+                      }
+                    // user flag was set above to denote that
+                    // an active parent line exists so add
+                    // cell to dofs of parent and all it's
+                    // children
+                    else if (cell->line(l)->user_flag_set() == true)
+                      {
+                        typename DoFHandlerType::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
+                        Assert (parent_line->has_children(), ExcInternalError() );
+
+                        // dofs_per_line returns number of dofs
+                        // on line not including the vertices of the line.
+                        const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
+                                                             + cell->get_fe().dofs_per_line;
+                        local_line_dof_indices.resize(n_dofs_per_line);
+
+                        parent_line->get_dof_indices(local_line_dof_indices);
+                        for (unsigned int i=0; i<n_dofs_per_line; ++i )
+                          dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+
+                        for (unsigned int c=0; c<parent_line->n_children(); ++c)
+                          {
+                            Assert (parent_line->child(c)->has_children() == false, ExcInternalError());
+
+                            const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
+                                                                 + cell->get_fe().dofs_per_line;
+                            local_line_dof_indices.resize(n_dofs_per_line);
+
+                            parent_line->child(c)->get_dof_indices(local_line_dof_indices);
+                            for (unsigned int i=0; i<n_dofs_per_line; ++i )
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+                          }
+
+
+                      }
+                  } // for lines l
+              }// if DoFHandlerType::dimension == 3
+          }// if cell->is_locally_owned()
+      }// for cells
+
+
+    if (DoFHandlerType::dimension == 3)
+      {
+        // finally, restore user flags that were changed above
+        // to when we constructed the pointers to parent of lines
+        // Since dof_handler is const, we must leave it unchanged.
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+      }
+
+    // Finally, we copy map of sets to
+    // map of vectors using the std::vector::assign() function
+    std::map< types::global_dof_index, std::vector<typename DoFHandlerType::active_cell_iterator> > dof_to_cell_patches;
+
+    typename std::map<types::global_dof_index, std::set< typename DoFHandlerType::active_cell_iterator> >::iterator
+    it = dof_to_set_of_cells_map.begin(),
+    it_end = dof_to_set_of_cells_map.end();
+    for ( ; it!=it_end; ++it)
+      dof_to_cell_patches[it->first].assign( it->second.begin(), it->second.end() );
+
+    return dof_to_cell_patches;
+  }
+
+
+
   /*
    * Internally used in orthogonal_equality
    *

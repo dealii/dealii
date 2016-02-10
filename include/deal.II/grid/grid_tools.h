@@ -1077,6 +1077,47 @@ namespace GridTools
     std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
     typename Container::active_cell_iterator> &patch_to_global_tria_map);
 
+  /**
+   * This function runs through the degrees of freedom defined by the
+   * DoFHandlerType and for each dof constructs a vector of active_cell_iterators
+   * representing the cells of support of the associated basis element
+   * at that degree of freedom. This function was originally designed for the
+   * implementation of local projections, for instance the Clement interpolant,
+   * in conjunction with other local patch functions like
+   * GridTools::build_triangulation_from_patch.
+   *
+   * DoFHandlerType's built on top of Triangulation or
+   * parallel:distributed::Triangulation are supported and handled
+   * appropriately.
+   *
+   * The result is the patch of cells representing the support of the basis
+   * element associated to the degree of freedom.  For instance using an FE_Q
+   * finite element, we obtain the standard patch of cells touching the degree
+   * of freedom and then add other cells that take care of possible hanging node
+   * constraints.  Using a FE_DGQ finite element, the degrees of freedom are
+   * logically considered to be "interior" to the cells so the patch would
+   * consist exclusively of the single cell on which the degree of freedom is
+   * located.
+   *
+   * @tparam DoFHandlerType The DoFHandlerType should be a DoFHandler or
+   * hp::DoFHandler.
+   * @param[in] dof_handler The DoFHandlerType which could be built on a
+   * Triangulation or a parallel::distributed::Triangulation with a finite
+   * element that has degrees of freedom that are logically associated to a
+   * vertex, line, quad, or hex.
+   * @param[out] dof_to_support_patch_map A map from the global_dof_index of
+   * degrees of freedom on locally relevant cells to vectors containing
+   * DoFHandlerType::active_cell_iterators of cells in the support of the basis
+   * function at that degree of freedom.
+   *
+   *  @author Spencer Patty, 2016
+   *
+   */
+  template <class DoFHandlerType>
+  std::map< types::global_dof_index,std::vector<typename DoFHandlerType::active_cell_iterator> >
+  get_dof_to_support_patch_map(DoFHandlerType &dof_handler);
+
+
   /*@}*/
   /**
    * @name Lower-dimensional meshes for parts of higher-dimensional meshes

@@ -1,0 +1,191 @@
+
+
+// ---------------------------------------------------------------------
+//
+// Copyright (C)  2015 - 2016  by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+// Test GridTools::map_dof_to_support_patch () using a quadratic FE_Q<dim>
+// space.  We output the barycenter of each cell in the patch around the dof
+// for a few dofs in the triangulation.  We have three layers of refinement in
+// the triangulation which represents the various patches that could arise in
+// practice.
+
+
+
+#include "../tests.h"
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/point.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+
+#include <fstream>
+#include <string>
+
+using namespace dealii;
+
+
+template<int dim>
+void test()
+{
+  using namespace dealii;
+
+  Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
+
+  GridGenerator::hyper_cube(triangulation,0,1);
+
+  triangulation.refine_global (2);
+  {
+
+    // choose barycenters of cells to refine or coarsen to end up with
+    // a three level triangulation.
+    std::vector<Point<dim> > refine_centers;
+    std::vector<Point<dim> > coarsen_centers;
+
+    if (dim==1)
+      {
+        refine_centers.push_back(Point<dim> (1./8.));
+
+        coarsen_centers.push_back(Point<dim> (5./8.));
+        coarsen_centers.push_back(Point<dim> (7./8.));
+      }
+    else if (dim==2)
+      {
+        refine_centers.push_back(Point<dim> (1./8., 7./8.));
+
+        coarsen_centers.push_back(Point<dim> (5./8., 5./8.));
+        coarsen_centers.push_back(Point<dim> (5./8., 7./8.));
+        coarsen_centers.push_back(Point<dim> (7./8., 5./8.));
+        coarsen_centers.push_back(Point<dim> (7./8., 7./8.));
+
+      }
+    else if (dim==3)
+      {
+        refine_centers.push_back(Point<dim> (1./8., 7./8., 1./8.));
+
+        coarsen_centers.push_back(Point<dim> (7./8., 7./8., 7./8.));
+        coarsen_centers.push_back(Point<dim> (5./8., 7./8., 7./8.));
+        coarsen_centers.push_back(Point<dim> (7./8., 5./8., 7./8.));
+        coarsen_centers.push_back(Point<dim> (5./8., 5./8., 7./8.));
+        coarsen_centers.push_back(Point<dim> (7./8., 7./8., 5./8.));
+        coarsen_centers.push_back(Point<dim> (5./8., 7./8., 5./8.));
+        coarsen_centers.push_back(Point<dim> (7./8., 5./8., 5./8.));
+        coarsen_centers.push_back(Point<dim> (5./8., 5./8., 5./8.));
+      }
+    else
+      Assert(false, ExcNotImplemented() );
+
+    unsigned int index = 0;
+    for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+         cell != triangulation.end(); ++cell, ++index)
+
+      {
+        Point<dim> cell_bary = cell->barycenter();
+
+        // refine cells
+        for (unsigned int i=0; i<refine_centers.size(); ++i)
+          {
+            double diff = 0;
+            for (unsigned int d=0; d<dim; ++d)
+              diff += pow(cell_bary[d] - refine_centers[i][d], 2.);
+            diff = std::sqrt(diff);
+
+            if (diff < 1e-14)
+              {
+                cell->set_refine_flag ();
+                break;
+              }
+          }
+        // coarsen cells
+        for (unsigned int i=0; i<coarsen_centers.size(); ++i)
+          {
+            double diff = 0;
+            for (unsigned int d=0; d<dim; ++d)
+              diff += pow(cell_bary[d] - coarsen_centers[i][d], 2.);
+            diff = std::sqrt(diff);
+
+            if (diff < 1e-14)
+              {
+                cell->set_coarsen_flag ();
+                break;
+              }
+          }
+      }
+    triangulation.execute_coarsening_and_refinement ();
+
+  }
+
+
+  DoFHandler<dim> dof_handler(triangulation);
+  unsigned int iFEDeg = 2;
+  FE_Q<dim> finite_element(iFEDeg);
+  dof_handler.distribute_dofs (finite_element);
+
+  std::map< types::global_dof_index, std::vector<typename dealii::DoFHandler<dim>::active_cell_iterator> >
+  dof_to_cell_map = GridTools::get_dof_to_support_patch_map(dof_handler);
+
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    {
+      // loop through and print out barycenter of cells in patch of certain dofs
+      // in system
+      if (i % (dim == 1 ? 1 : (dim == 2 ? 5 : 25 )) == 0)
+        {
+          deallog << "Patch around dof " << i << ": ";
+          typename std::vector<typename dealii::DoFHandler<dim>::active_cell_iterator>::iterator
+          patch_iter = dof_to_cell_map[i].begin(),
+          patch_iter_end = dof_to_cell_map[i].end();
+          for (; patch_iter != patch_iter_end ; ++patch_iter )
+            {
+              typename dealii::DoFHandler<dim>::active_cell_iterator patch_cell = *(patch_iter);
+              Point<dim> cell_bary = patch_cell->barycenter();
+              deallog << "(" ;
+              for (unsigned int d=0; d<dim-1; ++d)
+                deallog << cell_bary[d] << ", ";
+              deallog << cell_bary[dim-1] << ") ";
+            }
+          deallog << std::endl;
+        }
+
+    }
+
+
+  // clean up data
+  dof_handler.clear();
+}
+
+
+int main()
+{
+  using namespace dealii;
+
+  initlog();
+  deallog.threshold_double(1.e-10);
+
+  deallog.push("1d");
+  test<1>();
+  deallog.pop();
+
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
+
+  deallog.push("3d");
+  test<3>();
+  deallog.pop();
+}
