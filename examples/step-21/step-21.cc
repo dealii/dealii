@@ -1122,7 +1122,9 @@ namespace Step21
     data_out.build_patches (degree+1);
 
     std::ostringstream filename;
-    filename << "solution-" << timestep_number << ".vtk";
+    filename << "solution-"
+             << Utilities::int_to_string(timestep_number,4)
+             << ".vtk";
 
     std::ofstream output (filename.str().c_str());
     data_out.write_vtk (output);

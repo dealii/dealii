@@ -940,6 +940,8 @@ int main ()
       using namespace dealii;
       using namespace Step29;
 
+      deallog.depth_console(5);
+
       ParameterHandler  prm;
       ParameterReader   param(prm);
       param.read_parameters("step-29.prm");
