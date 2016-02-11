@@ -2,8 +2,8 @@
 
 
 The output of this program consist of the console output, a file 
-named ``convergence_table'' to record main results of mesh iteration, the eps
-files including the grids, and the solutions given in gnuplot format.
+named ``convergence_table'' to record main results of mesh iteration, 
+and the graphical output in vtu format.
 
 When we set Polynomial_Order to 2, we got following console output:
 @code

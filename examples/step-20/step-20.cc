@@ -849,59 +849,36 @@ namespace Step20
   // @sect4{MixedLaplace::output_results}
 
   // The last interesting function is the one in which we generate graphical
-  // output. Everything here looks obvious and familiar. Note how we construct
-  // unique names for all the solution variables at the beginning, like we did
-  // in step-8 and other programs later on. The only thing worth mentioning is
-  // that for higher order elements, in seems inappropriate to only show a
-  // single bilinear quadrilateral per cell in the graphical output. We
-  // therefore generate patches of size (degree+1)x(degree+1) to capture the
-  // full information content of the solution. See the step-7 tutorial program
-  // for more information on this.
-  //
-  // Note that we output the <code>dim+1</code> components of the solution
-  // vector as a collection of individual scalars here. Most visualization
-  // programs will then only offer to visualize them individually, rather than
-  // allowing us to plot the flow field as a vector field. However, as
-  // explained in the corresponding function of step-22 or the @ref VVOutput
-  // "Generating graphical output" section of the @ref vector_valued module,
-  // instructing the DataOut class to identify components of the FESystem
-  // object as elements of a <code>dim</code>-dimensional vector is not
-  // actually very difficult and will then allow us to show results as vector
-  // plots. We skip this here for simplicity and refer to the links above for
-  // more information.
+  // output. Note that all velocity components get the same solution name
+  // "u". Together with using
+  // DataComponentInterpretation::::component_is_part_of_vector this will
+  // cause DataOut<dim>::write_vtu() to generate a vector representation of
+  // the individual velocity components, see step-22 or the
+  // @ref VVOutput "Generating graphical output"
+  // section of the
+  // @ref vector_valued
+  // module for more information. Finally, it seems inappropriate for higher
+  // order elements to only show a single bilinear quadrilateral per cell in
+  // the graphical output. We therefore generate patches of size
+  // (degree+1)x(degree+1) to capture the full information content of the
+  // solution. See the step-7 tutorial program for more information on this.
   template <int dim>
   void MixedLaplaceProblem<dim>::output_results () const
   {
-    std::vector<std::string> solution_names;
-    switch (dim)
-      {
-      case 2:
-        solution_names.push_back ("u");
-        solution_names.push_back ("v");
-        solution_names.push_back ("p");
-        break;
-
-      case 3:
-        solution_names.push_back ("u");
-        solution_names.push_back ("v");
-        solution_names.push_back ("w");
-        solution_names.push_back ("p");
-        break;
-
-      default:
-        Assert (false, ExcNotImplemented());
-      }
-
+    std::vector<std::string> solution_names(dim, "u");
+    solution_names.push_back ("p");
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    interpretation (dim,
+                    DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back (DataComponentInterpretation::component_is_scalar);
 
     DataOut<dim> data_out;
-
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, solution_names);
+    data_out.add_data_vector (dof_handler, solution, solution_names, interpretation);
 
     data_out.build_patches (degree+1);
 
-    std::ofstream output ("solution.gmv");
-    data_out.write_gmv (output);
+    std::ofstream output ("solution.vtu");
+    data_out.write_vtu (output);
   }
 
 

@@ -27,14 +27,14 @@ subsection Output parameters
   set Output file   = solution
 
   # A name for the output format to be used
-  set Output format = gmv
+  set Output format = vtu
 end
 @endcode
 
 As can be seen, we set
 $d=0.3$, which amounts to a focus of the transducer lens
 at $x=0.5$, $y=0.3$. The coarse mesh is refined 5 times,
-resulting in 160x160 cells, and the output is written in gmv
+resulting in 160x160 cells, and the output is written in vtu
 format. The parameter reader understands many more parameters
 pertaining in particular to the generation of output, see the
 explanation in step-19, but we need none of these

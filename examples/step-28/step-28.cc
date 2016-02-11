@@ -1133,34 +1133,20 @@ namespace Step28
   void
   EnergyGroup<dim>::output_results (const unsigned int cycle) const
   {
-    {
-      const std::string filename = std::string("grid-") +
-                                   Utilities::int_to_string(group,1) +
-                                   "." +
-                                   Utilities::int_to_string(cycle,1) +
-                                   ".eps";
-      std::ofstream output (filename.c_str());
+    const std::string filename = std::string("solution-") +
+                                 Utilities::int_to_string(group, 2) +
+                                 "." +
+                                 Utilities::int_to_string(cycle, 2) +
+                                 ".vtu";
 
-      GridOut grid_out;
-      grid_out.write_eps (triangulation, output);
-    }
+    DataOut<dim> data_out;
 
-    {
-      const std::string filename = std::string("solution-") +
-                                   Utilities::int_to_string(group,1) +
-                                   "." +
-                                   Utilities::int_to_string(cycle,1) +
-                                   ".gmv";
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution, "solution");
+    data_out.build_patches ();
 
-      DataOut<dim> data_out;
-
-      data_out.attach_dof_handler (dof_handler);
-      data_out.add_data_vector (solution, "solution");
-      data_out.build_patches ();
-
-      std::ofstream output (filename.c_str());
-      data_out.write_gmv (output);
-    }
+    std::ofstream output (filename.c_str());
+    data_out.write_vtu (output);
   }
 
 
