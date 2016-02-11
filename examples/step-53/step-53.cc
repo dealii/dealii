@@ -35,16 +35,20 @@
 #include <deal.II/grid/grid_tools.h>
 
 // The remainder of the include files relate to reading the topography data.
-// As explained in the introduction, we will read it from a file and then
-// use the Functions::InterpolatedUniformGridData class that is declared in the
-// first of the following header files. Because the data is large, the file
-// we read from is stored as gzip compressed data and we make use of
-// some BOOST-provided functionality to read directly from gzipped data.
+// As explained in the introduction, we will read it from a file and then use
+// the Functions::InterpolatedUniformGridData class that is declared in the
+// first of the following header files. Because the data is large, the file we
+// read from is stored as gzip compressed data and we make use of some
+// BOOST-provided functionality to read directly from gzipped data. We wrap
+// the BOOST includes with a preprocessor macro that disables certain annoying
+// compiler warnings.
 #include <deal.II/base/function_lib.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <iostream>
 #include <fstream>
