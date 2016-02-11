@@ -1,0 +1,160 @@
+deal.II Authors
+===============
+
+   deal.II is a global project. It is administered by a group of principal
+   developers. Technical decisions are made by the principal developers
+   and a group of developers consisting of long-term contributors with a
+   global overview of the library. A large number of contributors have
+   provided substantial patches over the years. These three groups are
+   listed below.
+
+Principal developers
+--------------------
+
+     * Wolfgang Bangerth, Texas A&M University, TX, USA
+     * Timo Heister, Clemson University, SC, USA
+     * Guido Kanschat, Universität Heidelberg, Germany
+     * Matthias Maier, University of Minnesota, Minneapolis, MN, USA
+
+Developers
+----------
+
+     * Denis Davydov, University of Erlangen-Nuremberg, Germany
+     * Luca Heltai, SISSA, Trieste, Italy
+     * Martin Kronbichler, Technische Universität München, Germany
+     * Bruno Turcksin, Texas A&M University, TX, USA
+     * David Wells, Rensselaer Polytechnic Institute, NY, USA
+     * Toby D. Young, Polish Academy of Sciences, Poland
+
+Contributors
+------------
+
+   Many people have contributed to deal.II over the years, some of them
+   very substantial parts of the library. Their work is greatly
+   appreciated: no open source project can survice without a community.
+   The following people contributed major parts of the library (in
+   alphabetical order), with many more that have sent in fixes and small
+   enhancements:
+
+Mihai Alexe
+Moritz Allmaras
+Fahad Alrashed
+Michael Anderson
+Juan Carlos Araujo Cabarcas
+Nicola Cavallini
+Daniel Arndt
+Andrew Baker
+Mauro Bardelloni
+Alistair Bentley
+Andrea Bonito
+Marco Borelli
+Benjamin Brands
+Claire Bruna-Rosso
+Markus Bürg
+John Burnell
+Krysztof Bzowski
+Praveen C
+Brian Carnes
+Jordan Cazamias
+Conrad Clevenger
+Ivan Christov
+Chih-Che Chueh
+Minh Do-Quang
+Kevin Drzycimski
+Kevin Dugan
+Marco Engelhard
+Patrick Esser
+Anton Evgrafov
+Menno Fraters
+Jörg Frohne
+Thomas Geenen
+Rene Gassmoeller
+Martin Genet
+Arezou Ghesmati
+Nicola Giuliani
+Christian Goll
+Alexander Grayver
+Ryan Grove
+Felix Gruber
+Maien Hamed
+Ralf Hartmann
+Eric Heien
+Christoph Heiniger
+Michael F. Herbst
+Dakshina Ilangovan
+Bärbel Janssen
+Armin Ghajar Jazi
+Xing Jin
+Oliver Kayser-Herold
+Seungil Kim
+Benjamin Shelton Kirk
+Angela Klewinghaus
+Uwe Köcher
+Aslan Kosakian
+Adam Kosik
+Katharina Kormann
+Lukas Korous
+Giorgos Kourakos
+Oleh Krehel
+Ross Kynch
+Konstantin Ladutenko
+Damien Lebrun-Grandie
+Tobias Leicht
+Yan Li
+Manuel Quezada de Luna
+Vijay Mahadevan
+Cataldo Manigrasso
+Andre Massing
+Andrew McBride
+Craig Michoski
+Scott Miller
+Andrea Mola
+Helmut Müller
+Jose Javier Munoz Criollo
+Stefan Nauber
+David Neckels
+M. Sebastian Pauletti
+Jean-Paul Pelteret
+Jonathan Pitt
+Guiseppe Pitton
+Fernando Posada
+Adam Powell IV
+Florian Prill
+Andreas Putz
+Lei Qiao
+Daniel Castanon Quiroz
+Michael Rapson
+Thomas Richter
+Gennadiy Rishin
+Angel Rodriguez
+Ian Rose
+Shiva Rudraraju
+Mayank Sabharwal
+Abner Salgado-Gonzalez
+Alberto Sartori
+Anna Schneebeli
+Jan Schrage
+Ralf B. Schulz
+Daniel Shapero
+Jason Sheldon
+Florian Sonner
+Michael Stadler
+Jan Stebel
+Martin Steigemann
+Simon Sticko
+Franz-Theo Suttmeier
+Zhen Tao
+Marco Tezzele
+Habib Talavatifard
+Ben Thompson
+Christophe Trophime
+Heikki Virtanen
+Kainan Wang
+Yaqi Wang
+Sven Wetterauer
+Daniel Weygand
+Joshua White
+Michal Wichrowski
+Christian Wülker
+Yuhan Zhou
+Valentin Zingan
