@@ -19,8 +19,11 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
 #include <cmath>
-#include <boost/random.hpp>
 #include <map>
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/random.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #ifdef DEAL_II_WITH_MUPARSER
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
