@@ -1019,6 +1019,13 @@ namespace GridTools
    * identify the cells in the output Triangulation and corresponding cells in
    * the input list.
    *
+   * The function copies the location of vertices of cells from the cells of the
+   * source triangulation to the triangulation that is built from the list of
+   * patch cells.  This adds support for triangulations which have been
+   * perturbed or smoothed in some manner which makes the triangulation
+   * deviate from the standard deal.ii refinement strategy of placing new
+   * vertices at midpoints of faces or edges.
+   *
    * The operation implemented by this function is frequently used in the
    * definition of error estimators that need to solve "local" problems on
    * each cell and its neighbors. A similar construction is necessary in the
