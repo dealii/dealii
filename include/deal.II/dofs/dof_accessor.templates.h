@@ -2371,7 +2371,7 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::operator !=
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
 TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >
-DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsigned int i) const
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsigned int /*i*/) const
 {
   return TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >();
 }
