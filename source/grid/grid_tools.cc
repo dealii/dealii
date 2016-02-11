@@ -2932,9 +2932,9 @@ next_cell:
     for (uniform_cell=uniform_cells.begin(); uniform_cell!=uniform_cells.end(); ++uniform_cell)
       {
         bool repeat_vertex;
-        for (unsigned int j=0;  j< GeometryInfo<Container::dimension>::vertices_per_cell; ++j)
+        for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
           {
-            Point<Container::space_dimension> position=(*uniform_cell)->vertex (j);
+            Point<Container::space_dimension> position=(*uniform_cell)->vertex (v);
             repeat_vertex=false;
 
             for (unsigned int m=0; m<i; ++m)
@@ -2942,14 +2942,14 @@ next_cell:
                 if (position == vertices[m])
                   {
                     repeat_vertex=true;
-                    cells[k].vertices[j]=m;
+                    cells[k].vertices[v]=m;
                     break;
                   }
               }
             if (repeat_vertex==false)
               {
                 vertices.push_back(position);
-                cells[k].vertices[j]=i;
+                cells[k].vertices[v]=i;
                 i=i+1;
               }
 
@@ -2989,8 +2989,19 @@ next_cell:
               }
             else for (unsigned int i=0; i<patch.size(); ++i)
                 {
+                  // Even though vertices may not be exactly the same, the
+                  // appropriate cells will match since == for TriAccessors
+                  // checks only cell level and index.
                   if (patch_to_global_tria_map_tmp[active_tria_cell]==patch[i])
                     {
+                      // adjust the cell vertices of the local_triangulation to
+                      // match cell vertices of the global triangulation
+                      for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
+                        active_tria_cell->vertex(v) = patch[i]->vertex(v);
+
+                      Assert(active_tria_cell->center().distance(patch_to_global_tria_map_tmp[active_tria_cell]->center())
+                             <=1e-15*active_tria_cell->diameter(), ExcInternalError());
+
                       active_tria_cell->set_user_flag();
                       break;
                     }
@@ -3014,17 +3025,30 @@ next_cell:
                         // children may be added into the map, instead
 
                         // these children may not yet be in the map
-                        for (unsigned int c=0; c< cell ->n_children(); ++c)
+                        for (unsigned int c=0; c<cell->n_children(); ++c)
                           {
                             if (patch_to_global_tria_map_tmp.find(cell->child(c)) ==
                                 patch_to_global_tria_map_tmp.end())
                               {
-                                patch_to_global_tria_map_tmp.insert (std::make_pair(cell ->child(c),
+                                patch_to_global_tria_map_tmp.insert (std::make_pair(cell->child(c),
                                                                                     patch_to_global_tria_map_tmp[cell]->child(c)));
 
-                                Assert(cell->child(c)->center().distance( patch_to_global_tria_map_tmp[cell]->child(c)->center())
-                                       <=1e-15*cell->child(c)->diameter(),
-                                       ExcInternalError());
+                                // One might be tempted to assert that the cell
+                                // being added here has the same center as the
+                                // equivalent cell in the global triangulation,
+                                // but it may not be the case.  For triangulations
+                                // that have been perturbed or smoothed, the cell
+                                // indices and levels may be the same, but the
+                                // vertex locations may not.  We adjust
+                                // the vertices of the cells that have no
+                                // children (ie the active cells) to be
+                                // consistent with the global triangulation
+                                // later on and add assertions at that time
+                                // to guarantee the cells in the
+                                // local_triangulation are physically at the same
+                                // locations of the cells in the patch of the
+                                // global triangulation.
+
                               }
                           }
                         // The parent cell whose children were added
@@ -3037,6 +3061,22 @@ next_cell:
 
       }
     while (refinement_necessary);
+
+
+    // Last assertion check to make sure we have the right cells and centers
+    // in the map, and hence the correct vertices of the triangulation
+    for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator
+         cell = local_triangulation.begin();
+         cell != local_triangulation.end(); ++cell)
+      {
+        Assert(patch_to_global_tria_map_tmp.find(cell) != patch_to_global_tria_map_tmp.end(),
+               ExcInternalError() );
+
+        Assert(cell->center().distance( patch_to_global_tria_map_tmp[cell]->center())<=1e-15*cell->diameter(),
+               ExcInternalError());
+      }
+
+
     typename std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
              typename Container::cell_iterator>::iterator map_tmp_it =
                patch_to_global_tria_map_tmp.begin(),map_tmp_end = patch_to_global_tria_map_tmp.end();
