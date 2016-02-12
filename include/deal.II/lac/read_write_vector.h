@@ -30,6 +30,7 @@
 #include <iomanip>
 
 #ifdef DEAL_II_WITH_TRILINOS
+#include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #include "Epetra_MultiVector.h"
 #endif
 
@@ -249,7 +250,7 @@ namespace LinearAlgebra
                 const CommunicationPatternBase *communication_pattern = NULL);
 
     /**
-     * imports all the elements present in the vector's IndexSet from the input
+     * Imports all the elements present in the vector's IndexSet from the input
      * vector @p epetra_vec. VectorOperation::values @p operation is used to
      * decide if the elements in @p V should be added to the current vector or
      * replace the current elements. The last parameter can be used if the same
@@ -472,11 +473,15 @@ namespace LinearAlgebra
      */
     void resize_val (const size_type new_allocated_size);
 
+#ifdef DEAL_II_WITH_TRILINOS
     /**
-     *
+     * Return a EpetraWrappers::Communication pattern and store it for future
+     * use.
      */
-    void create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                    const MPI_Comm &mpi_comm);
+    EpetraWrappers::CommunicationPattern
+    create_epetra_comm_pattern(const IndexSet &source_index_set,
+                               const MPI_Comm &mpi_comm);
+#endif
 
     /**
      * Indices of the elements stored.
@@ -484,12 +489,13 @@ namespace LinearAlgebra
     IndexSet stored_elements;
 
     /**
-     * Indices of the elements stored on a VectorSpaceVector
+     * IndexSet of the elements of the last imported vector;
      */
-    std::shared_ptr<IndexSet> source_stored_elements;
+    IndexSet source_stored_elements;
 
     /**
-     *
+     * CommunicationPattern for the communication between the
+     * source_stored_elements IndexSet and the current vector.
      */
     std::shared_ptr<CommunicationPatternBase> comm_pattern;
 
@@ -511,7 +517,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
     :
-    source_stored_elements(nullptr),
     comm_pattern(nullptr),
     val(nullptr)
   {}
@@ -523,7 +528,6 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
     Subscriptor(),
-    source_stored_elements(nullptr),
     comm_pattern(nullptr),
     val(nullptr)
   {
@@ -536,7 +540,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
     :
-    source_stored_elements(nullptr),
     comm_pattern(nullptr),
     val(nullptr)
   {
@@ -549,7 +552,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
     :
-    source_stored_elements(nullptr),
     comm_pattern(nullptr),
     val(nullptr)
   {

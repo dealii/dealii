@@ -27,6 +27,7 @@
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_space_vector.h>
+#include <memory>
 #include "mpi.h"
 #include "Epetra_FEVector.h"
 
@@ -91,11 +92,17 @@ namespace LinearAlgebra
       Vector &operator= (const Vector &V);
 
       /**
-       * Copy function. Copy the elements from the ReadWriteVector @p V in the
-       * Vector. If elements if @p V are not locally owned, there is a
-       * communication.
+       * Imports all the elements present in the vector's IndexSet from the input
+       * vector @p V. VectorOperation::values @p operation is used to decide if
+       * the elements in @p V should be added to the current vector or replace the
+       * current elements. The last parameter can be used if the same
+       * communication pattern is used multiple times. This can be used to improve
+       * performance.
        */
-      Vector &operator= (const ::dealii::LinearAlgebra::ReadWriteVector<double> &V);
+      virtual void import(const ReadWriteVector<double>  &V,
+                          VectorOperation::values         operation,
+                          const CommunicationPatternBase *communication_pattern = NULL)
+      override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -273,9 +280,27 @@ namespace LinearAlgebra
 
     private:
       /**
+       * Create the CommunicationPattern for the communication between the
+       * IndexSet @param source_index_set and the current vector.
+       */
+      void create_epetra_comm_pattern(const IndexSet &source_index_set,
+                                      const MPI_Comm &mpi_comm);
+
+      /**
        * Pointer to the actual Epetra vector object.
        */
       std_cxx11::shared_ptr<Epetra_FEVector> vector;
+
+      /**
+       * IndexSet of the elements of the last imported vector.
+       */
+      ::dealii::IndexSet source_stored_elements;
+
+      /**
+       * CommunicationPattern for the communication between the
+       * source_stored_elements IndexSet and the current vector.
+       */
+      std_cxx11::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
     };
   }
 }

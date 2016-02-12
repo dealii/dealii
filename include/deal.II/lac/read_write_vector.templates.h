@@ -70,7 +70,7 @@ namespace LinearAlgebra
       this->operator = (Number());
 
     // reset the communication patter
-    source_stored_elements = nullptr;
+    source_stored_elements.clear();
     comm_pattern = nullptr;
   }
 
@@ -90,7 +90,7 @@ namespace LinearAlgebra
       this->operator= (Number());
 
     // reset the communication patter
-    source_stored_elements = nullptr;
+    source_stored_elements.clear();
     comm_pattern = nullptr;
   }
 
@@ -111,7 +111,7 @@ namespace LinearAlgebra
       this->operator= (Number());
 
     // reset the communication patter
-    source_stored_elements = nullptr;
+    source_stored_elements.clear();
     comm_pattern = nullptr;
   }
 
@@ -182,27 +182,31 @@ namespace LinearAlgebra
                                   const MPI_Comm                  &mpi_comm,
                                   const CommunicationPatternBase *communication_pattern)
   {
-    const EpetraWrappers::CommunicationPattern *epetra_comm_pattern = nullptr;
+    std_cxx11::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
 
+    // If no communication pattern is given, create one. Otherwise, use the one
+    // given.
     if (communication_pattern == nullptr)
       {
-        if (source_elements == *source_stored_elements)
+        // The first time import is called, we create a communication pattern.
+        // Check if the communication pattern already exists and if it can be
+        // reused.
+        if (source_elements == source_stored_elements)
           {
-            epetra_comm_pattern =
-              dynamic_cast<const EpetraWrappers::CommunicationPattern *> (comm_pattern.get());
+            epetra_comm_pattern.reset(
+              dynamic_cast<const EpetraWrappers::CommunicationPattern *> (comm_pattern.get()));
             if (epetra_comm_pattern == nullptr)
-              create_epetra_comm_pattern(source_elements, mpi_comm);
+              epetra_comm_pattern = std::make_shared<const EpetraWrappers::CommunicationPattern>(
+                                      create_epetra_comm_pattern(source_elements, mpi_comm));
           }
         else
-          create_epetra_comm_pattern(source_elements, mpi_comm);
-
-        epetra_comm_pattern =
-          dynamic_cast<const EpetraWrappers::CommunicationPattern *> (comm_pattern.get());
+          epetra_comm_pattern = std::make_shared<const EpetraWrappers::CommunicationPattern>(
+                                  create_epetra_comm_pattern(source_elements, mpi_comm));
       }
     else
       {
-        epetra_comm_pattern =
-          dynamic_cast<const EpetraWrappers::CommunicationPattern *> (communication_pattern);
+        epetra_comm_pattern.reset(
+          dynamic_cast<const EpetraWrappers::CommunicationPattern *> (communication_pattern));
         AssertThrow(epetra_comm_pattern != nullptr,
                     ExcMessage(std::string("The communication pattern is not of type ") +
                                "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
@@ -310,15 +314,21 @@ namespace LinearAlgebra
 
 
 
+#ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
-  void
+  EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(const IndexSet &source_index_set,
                                                       const MPI_Comm &mpi_comm)
   {
-    source_stored_elements = std::make_shared<IndexSet>(source_index_set);
-    comm_pattern.reset(new EpetraWrappers::CommunicationPattern(
-                         *source_stored_elements, stored_elements, mpi_comm));
+    source_stored_elements = source_index_set;
+    EpetraWrappers::CommunicationPattern epetra_comm_pattern(
+      source_stored_elements, stored_elements, mpi_comm);
+    comm_pattern = std::make_shared<EpetraWrappers::CommunicationPattern>(
+                     epetra_comm_pattern);
+
+    return epetra_comm_pattern;
   }
+#endif
 } // end of namespace LinearAlgebra
 
 

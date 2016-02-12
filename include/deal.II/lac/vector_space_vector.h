@@ -77,7 +77,7 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      */
-    virtual void Import(const ReadWriteVector<Number> &V,
+    virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
                         const CommunicationPatternBase *communication_pattern = NULL);
 

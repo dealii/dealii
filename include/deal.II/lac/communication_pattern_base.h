@@ -31,7 +31,10 @@ namespace LinearAlgebra
   /**
    * CommunicationPattern is an abstract class that is used to define a
    * communication plan that can be called repeatedly to efficiently obtain
-   * off-processor elements.
+   * off-processor elements. The idea is to decouple the communication pattern
+   * from the vectors. The goal is to reuse the same communication pattern for
+   * different vectors. This is similar to the way SparseMatrix and
+   * SparsityPattern works.
    *
    * @author Bruno Turcksin, 2015.
    */

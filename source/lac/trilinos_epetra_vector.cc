@@ -33,14 +33,16 @@ namespace LinearAlgebra
   {
     Vector::Vector()
       :
-      vector(new Epetra_FEVector(Epetra_Map(0,1,0,Epetra_MpiComm(MPI_COMM_SELF))))
+      vector(new Epetra_FEVector(Epetra_Map(0,1,0,Epetra_MpiComm(MPI_COMM_SELF)))),
+      epetra_comm_pattern(nullptr)
     {}
 
 
 
     Vector::Vector(const Vector &V)
       :
-      vector(new Epetra_FEVector(V.trilinos_vector()))
+      vector(new Epetra_FEVector(V.trilinos_vector())),
+      epetra_comm_pattern(nullptr)
     {}
 
 
@@ -48,7 +50,8 @@ namespace LinearAlgebra
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm &communicator)
       :
-      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false)))
+      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false))),
+      epetra_comm_pattern(nullptr)
     {}
 
 
@@ -96,91 +99,43 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator= (const ::dealii::LinearAlgebra::ReadWriteVector<double> &V)
+    void Vector::import(const ReadWriteVector<double>  &V,
+                        VectorOperation::values         operation,
+                        const CommunicationPatternBase *communication_pattern)
     {
-      IndexSet elements_to_write(V.get_stored_elements());
-      IndexSet locally_owned_elements(this->locally_owned_elements());
-      IndexSet off_proc_elements(elements_to_write);
-      off_proc_elements.subtract_set(locally_owned_elements);
-      IndexSet on_proc_elements(elements_to_write);
-      on_proc_elements.subtract_set(off_proc_elements);
-
-      // Write the elements that locally owned.
-      IndexSet::ElementIterator elem = on_proc_elements.begin(),
-                                elem_end = on_proc_elements.end();
-      for (; elem!=elem_end; ++elem)
+      // If no communication pattern is given, create one. Otherwsie, use the
+      // one given.
+      if (communication_pattern == nullptr)
         {
-          const TrilinosWrappers::types::int_type local_index =
-            vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(*elem));
-          (*vector)[0][local_index] = V[*elem];
-        }
-
-
-      // Write the elements off-processor. Cannot use Import function of Trilinos
-      // because V is not a Trilinos object. The most straightforward to send
-      // the off-processor to the other processors is to AllGather. This way
-      // every processor has access to all the off-processor elements. The
-      // problem with this method is that if every element in V is
-      // off-processor, it is possible that the buffers used to receive the data
-      // has twice the global size of the current Vector.
-      // TODO This won't scale past a few 10,000's of processors.
-
-      // Get recv_count and the size of the buffer needed to receive the data.
-      const Epetra_MpiComm *epetra_comm
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      MPI_Comm comm = epetra_comm->GetMpiComm();
-      int send_buffer_size(off_proc_elements.n_elements());
-      int n_procs(0);
-      MPI_Comm_size(comm, &n_procs);
-      std::vector<int> recv_count(n_procs);
-      MPI_Allgather(&send_buffer_size, 1, MPI_INT, &recv_count, 1,
-                    MPI_INT, comm);
-      std::vector<int> displacement(n_procs,0);
-      for (int i=1; i<n_procs; ++i)
-        displacement[i] = displacement[i-1] + recv_count[i-1];
-      const unsigned int recv_buffer_size = displacement[n_procs-1] +
-                                            recv_count[n_procs-1];
-
-      // Write the indices in the send buffer
-      std::vector<types::global_dof_index> send_index_buffer(send_buffer_size);
-      elem = off_proc_elements.begin();
-      for (int i=0; i<send_buffer_size; ++i)
-        {
-          send_index_buffer[i] = *elem;
-          ++elem;
-        }
-      // Send the index of the off-processor elements
-      std::vector<types::global_dof_index> recv_index_buffer(recv_buffer_size);
-      MPI_Allgatherv(&send_index_buffer[0], send_buffer_size, DEAL_II_DOF_INDEX_MPI_TYPE,
-                     &recv_index_buffer[0], &recv_count[0], &displacement[0],
-                     DEAL_II_DOF_INDEX_MPI_TYPE, comm);
-
-      // Write the values in the send buffer
-      std::vector<double> send_value_buffer(send_buffer_size);
-      elem = off_proc_elements.begin();
-      for (int i=0; i<send_buffer_size; ++i)
-        {
-          send_value_buffer[i] = V[*elem];
-          ++elem;
-        }
-      // Send the value of the off-processor elements
-      std::vector<double> recv_value_buffer(recv_buffer_size);
-      MPI_Allgatherv(&send_value_buffer[0], send_buffer_size, MPI_DOUBLE,
-                     &recv_value_buffer[0], &recv_count[0], &displacement[0], MPI_DOUBLE, comm);
-
-      // Write the data in the vector
-      for (unsigned int i=0; i<recv_buffer_size; ++i)
-        {
-          if (locally_owned_elements.is_element(recv_index_buffer[i]))
+          // The first time import is called, a communication pattern is created.
+          // Check if the communication pattern already exists and if it can be
+          // reused.
+          if (source_stored_elements == V.get_stored_elements())
             {
-              const TrilinosWrappers::types::int_type local_index =
-                vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(
-                                    recv_index_buffer[i]));
-              (*vector)[0][local_index] = recv_value_buffer[i];
+              create_epetra_comm_pattern(V.get_stored_elements(),
+                                         dynamic_cast<const Epetra_MpiComm &>(vector->Comm()).Comm());
             }
         }
+      else
+        {
+          epetra_comm_pattern.reset(
+            dynamic_cast<const CommunicationPattern *> (communication_pattern));
+          AssertThrow(epetra_comm_pattern != nullptr,
+                      ExcMessage(std::string("The communication pattern is not of type ") +
+                                 "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+        }
 
-      return *this;
+      Epetra_Import import(epetra_comm_pattern->get_epetra_import());
+
+      // The TargetMap and the SourceMap have their roles inverted.
+      Epetra_FEVector source_vector(import.TargetMap());
+      double *values = source_vector.Values();
+      std::copy(V.begin(), V.end(), values);
+
+      if (operation==VectorOperation::insert)
+        vector->Export(source_vector, import, Insert);
+      else
+        vector->Export(source_vector, import, Add);
     }
 
 
@@ -500,10 +455,10 @@ namespace LinearAlgebra
         out.setf(std::ios::fixed, std::ios::floatfield);
 
       if (across)
-        for (size_type i=0; i<vector->MyLength(); ++i)
+        for (int i=0; i<vector->MyLength(); ++i)
           out << val[i] << ' ';
       else
-        for (size_type i=0; i<vector->MyLength(); ++i)
+        for (int i=0; i<vector->MyLength(); ++i)
           out << val[i] << std::endl;
       out << std::endl;
 
@@ -519,6 +474,16 @@ namespace LinearAlgebra
       return sizeof(*this)
              + vector->MyLength()*(sizeof(double)+
                                    sizeof(TrilinosWrappers::types::int_type));
+    }
+
+
+
+    void Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
+                                            const MPI_Comm &mpi_comm)
+    {
+      source_stored_elements = source_index_set;
+      epetra_comm_pattern.reset(new CommunicationPattern(locally_owned_elements(),
+                                                         source_index_set, mpi_comm));
     }
   }
 }
