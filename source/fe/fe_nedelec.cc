@@ -40,6 +40,23 @@ DEAL_II_NAMESPACE_OPEN
 
 //#define DEBUG_NEDELEC
 
+namespace internal
+{
+  namespace
+  {
+    double
+    get_embedding_computation_tolerance(const unsigned int p)
+    {
+      // This heuristic was computed by monitoring the worst residual
+      // resulting from the least squares computation when computing
+      // the face embedding matrices in the FE_Nedelec constructor.
+      // The residual growth is exponential, but is bounded by this
+      // function up to degree 12.
+      return 1.e-15*std::exp(std::pow(p,1.075));
+    }
+  }
+}
+
 
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
@@ -86,7 +103,8 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
 
   FETools::compute_face_embedding_matrices<dim,double>
-  (*this, face_embeddings, 0, 0);
+  (*this, face_embeddings, 0, 0,
+   internal::get_embedding_computation_tolerance(p));
 
   switch (dim)
     {
@@ -3002,7 +3020,8 @@ FE_Nedelec<dim>
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices ();
       // Fill prolongation matrices with embedding operators
-      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
+      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true,
+                                           internal::get_embedding_computation_tolerance(this->degree));
 #ifdef DEBUG_NEDELEC
       deallog << "Restriction" << std::endl;
 #endif
@@ -3052,7 +3071,8 @@ FE_Nedelec<dim>
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices ();
       // Fill prolongation matrices with embedding operators
-      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
+      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true,
+                                           internal::get_embedding_computation_tolerance(this->degree));
 #ifdef DEBUG_NEDELEC
       deallog << "Restriction" << std::endl;
 #endif

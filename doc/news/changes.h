@@ -57,6 +57,12 @@ inconvenience this causes.
 
 
 <ol> 
+ <li> Fixed: FE_Nedelec elements up to polynomial order 12 can now be
+ constructed.
+ <br>
+ (Jean-Paul Pelteret, 2016/02/12)
+ </li>
+
  <li> Fixed: The GridTools::build_triangulation_from_patches() function now 
  also copies the locations of vertices from the cells of the source 
  triangulation to the triangulation that is built from the list of patch cells.
