@@ -2445,14 +2445,9 @@ namespace Functions
 
 
   template <int dim>
-  double
-  InterpolatedTensorProductGridData<dim>::value(const Point<dim> &p,
-                                                const unsigned int component) const
+  TableIndices<dim>
+  InterpolatedTensorProductGridData<dim>::table_index_of_point(const Point<dim> &p) const
   {
-    (void)component;
-    Assert (component == 0,
-            ExcMessage ("This is a scalar function object, the component can only be zero."));
-
     // find out where this data point lies, relative to the given
     // points. if we run all the way to the end of the range,
     // set the indices so that we will simply query the last of the
@@ -2462,9 +2457,11 @@ namespace Functions
       {
         // get the index of the first element of the coordinate arrays that is
         // larger than p[d]
-        ix[d] = (std::lower_bound (coordinate_values[d].begin(), coordinate_values[d].end(),
+        ix[d] = (std::lower_bound (coordinate_values[d].begin(),
+                                   coordinate_values[d].end(),
                                    p[d])
                  - coordinate_values[d].begin());
+
         // the one we want is the index of the coordinate to the left, however,
         // so decrease it by one (unless we have a point to the left of all, in which
         // case we stay where we are; the formulas below are made in a way that allow
@@ -2477,6 +2474,23 @@ namespace Functions
         else if (ix[d] > 0)
           --ix[d];
       }
+
+    return ix;
+  }
+
+
+
+  template <int dim>
+  double
+  InterpolatedTensorProductGridData<dim>::value(const Point<dim> &p,
+                                                const unsigned int component) const
+  {
+    (void)component;
+    Assert (component == 0,
+            ExcMessage ("This is a scalar function object, the component can only be zero."));
+
+    // find the index in the data table of the cell containing the input point
+    const TableIndices<dim> ix = table_index_of_point (p);
 
     // now compute the relative point within the interval/rectangle/box
     // defined by the point coordinates found above. truncate below and
@@ -2503,19 +2517,7 @@ namespace Functions
             ExcMessage ("This is a scalar function object, the component can only be zero."));
 
     // find out where this data point lies
-    TableIndices<dim> ix;
-    for (unsigned int d=0; d<dim; ++d)
-      {
-        ix[d] = (std::lower_bound (coordinate_values[d].begin(),
-                                   coordinate_values[d].end(),
-                                   p[d])
-                 - coordinate_values[d].begin());
-
-        if (ix[d] == coordinate_values[d].size())
-          ix[d] = coordinate_values[d].size()-2;
-        else if (ix[d] > 0)
-          --ix[d];
-      }
+    const TableIndices<dim> ix = table_index_of_point (p);
 
     Point<dim> dx;
     for (unsigned int d=0; d<dim; ++d)

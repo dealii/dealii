@@ -1170,7 +1170,12 @@ namespace Functions
     gradient (const Point<dim>    &p,
               const unsigned int component = 0) const;
 
-  private:
+  protected:
+    /**
+     * Find the index in the table of the rectangle containing an input point
+     */
+    TableIndices<dim> table_index_of_point (const Point<dim> &p) const;
+
     /**
      * The set of coordinate values in each of the coordinate directions.
      */
