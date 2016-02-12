@@ -1,0 +1,1309 @@
+
+DEAL:1d::patch_cells 1.1: 1.1 2.1 
+DEAL:1d::local_triangulation 1.1:    0.1 user flag check:   (+) 
+DEAL:1d::  vertices for cell  0.1 : 0.525000
+DEAL:1d::  vertices for cell  0.1 : 0.950000
+DEAL:1d::   1.0 user flag check:   (-) 
+DEAL:1d::  vertices for cell  1.0 : 0.0250000
+DEAL:1d::  vertices for cell  1.0 : 0.275000
+DEAL:1d::   1.1 user flag check:   (+) 
+DEAL:1d::  vertices for cell  1.1 : 0.275000
+DEAL:1d::  vertices for cell  1.1 : 0.525000
+DEAL:1d::patch_cells 2.0: 2.0 2.1 
+DEAL:1d::local_triangulation 2.0:    0.0 user flag check:   (+) 
+DEAL:1d::  vertices for cell  0.0 : 0.0250000
+DEAL:1d::  vertices for cell  0.0 : 0.275000
+DEAL:1d::   0.1 user flag check:   (+) 
+DEAL:1d::  vertices for cell  0.1 : 0.275000
+DEAL:1d::  vertices for cell  0.1 : 0.525000
+DEAL:1d::patch_cells 2.1: 2.1 2.0 1.1 
+DEAL:1d::local_triangulation 2.1:    0.1 user flag check:   (+) 
+DEAL:1d::  vertices for cell  0.1 : 0.525000
+DEAL:1d::  vertices for cell  0.1 : 0.950000
+DEAL:1d::   1.0 user flag check:   (+) 
+DEAL:1d::  vertices for cell  1.0 : 0.0250000
+DEAL:1d::  vertices for cell  1.0 : 0.275000
+DEAL:1d::   1.1 user flag check:   (+) 
+DEAL:1d::  vertices for cell  1.1 : 0.275000
+DEAL:1d::  vertices for cell  1.1 : 0.525000
+DEAL:2d::patch_cells 1.1: 1.1 2.1 2.3 1.3 
+DEAL:2d::local_triangulation 1.1:    0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  0.1 : 1.03856 0.0318322
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : 0.971032 0.459246
+DEAL:2d::   0.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.2 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.2 : 0.971032 0.459246
+DEAL:2d::  vertices for cell  0.2 : 0.504734 1.04978
+DEAL:2d::  vertices for cell  0.2 : 1.04145 0.972031
+DEAL:2d::   1.0 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  1.0 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.0 : -0.00424595 0.241995
+DEAL:2d::  vertices for cell  1.0 : 0.248775 0.274970
+DEAL:2d::   1.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.1 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  1.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.1 : 0.515570 0.248903
+DEAL:2d::   1.2 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.2 : -0.00424595 0.241995
+DEAL:2d::  vertices for cell  1.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  1.2 : 0.246056 0.510649
+DEAL:2d::   1.3 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.3 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.3 : 0.515570 0.248903
+DEAL:2d::  vertices for cell  1.3 : 0.246056 0.510649
+DEAL:2d::  vertices for cell  1.3 : 0.516942 0.518384
+DEAL:2d::patch_cells 1.2: 1.2 1.3 2.2 2.3 
+DEAL:2d::local_triangulation 1.2:    0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : -0.0311287 1.03913
+DEAL:2d::  vertices for cell  0.1 : 0.504734 1.04978
+DEAL:2d::   0.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.2 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.2 : 0.971032 0.459246
+DEAL:2d::  vertices for cell  0.2 : 0.504734 1.04978
+DEAL:2d::  vertices for cell  0.2 : 1.04145 0.972031
+DEAL:2d::   1.0 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  1.0 : 0.265268 -0.0197501
+DEAL:2d::  vertices for cell  1.0 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.0 : 0.248775 0.274970
+DEAL:2d::   1.1 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.1 : 0.265268 -0.0197501
+DEAL:2d::  vertices for cell  1.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  1.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.1 : 0.515570 0.248903
+DEAL:2d::   1.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.2 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  1.2 : 0.246056 0.510649
+DEAL:2d::   1.3 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.3 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.3 : 0.515570 0.248903
+DEAL:2d::  vertices for cell  1.3 : 0.246056 0.510649
+DEAL:2d::  vertices for cell  1.3 : 0.516942 0.518384
+DEAL:2d::patch_cells 1.3: 1.3 1.2 1.1 
+DEAL:2d::local_triangulation 1.3:    0.0 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.0 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  0.0 : 1.03856 0.0318322
+DEAL:2d::  vertices for cell  0.0 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.0 : 0.971032 0.459246
+DEAL:2d::   0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : -0.0311287 1.03913
+DEAL:2d::  vertices for cell  0.1 : 0.504734 1.04978
+DEAL:2d::   0.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.2 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.2 : 0.971032 0.459246
+DEAL:2d::  vertices for cell  0.2 : 0.504734 1.04978
+DEAL:2d::  vertices for cell  0.2 : 1.04145 0.972031
+DEAL:2d::patch_cells 2.0: 2.0 2.1 2.2 
+DEAL:2d::local_triangulation 2.0:    0.0 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  0.0 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  0.0 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  0.0 : 0.248775 0.274970
+DEAL:2d::   0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  0.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  0.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  0.1 : 0.515570 0.248903
+DEAL:2d::   0.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.2 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  0.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  0.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  0.2 : 0.246056 0.510649
+DEAL:2d::patch_cells 2.1: 2.1 2.0 1.1 2.3 
+DEAL:2d::local_triangulation 2.1:    0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  0.1 : 1.03856 0.0318322
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : 0.971032 0.459246
+DEAL:2d::   1.0 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  1.0 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.0 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.0 : 0.248775 0.274970
+DEAL:2d::   1.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.1 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  1.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.1 : 0.515570 0.248903
+DEAL:2d::   1.2 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.2 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  1.2 : 0.246056 0.510649
+DEAL:2d::   1.3 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.3 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.3 : 0.515570 0.248903
+DEAL:2d::  vertices for cell  1.3 : 0.246056 0.510649
+DEAL:2d::  vertices for cell  1.3 : 0.516942 0.518384
+DEAL:2d::patch_cells 2.2: 2.2 2.3 2.0 1.2 
+DEAL:2d::local_triangulation 2.2:    0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : -0.0311287 1.03913
+DEAL:2d::  vertices for cell  0.1 : 0.504734 1.04978
+DEAL:2d::   1.0 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  1.0 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.0 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.0 : 0.248775 0.274970
+DEAL:2d::   1.1 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.1 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  1.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.1 : 0.515570 0.248903
+DEAL:2d::   1.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.2 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  1.2 : 0.246056 0.510649
+DEAL:2d::   1.3 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.3 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.3 : 0.515570 0.248903
+DEAL:2d::  vertices for cell  1.3 : 0.246056 0.510649
+DEAL:2d::  vertices for cell  1.3 : 0.516942 0.518384
+DEAL:2d::patch_cells 2.3: 2.3 2.2 1.1 2.1 1.2 
+DEAL:2d::local_triangulation 2.3:    0.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  0.1 : 1.03856 0.0318322
+DEAL:2d::  vertices for cell  0.1 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.1 : 0.971032 0.459246
+DEAL:2d::   0.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  0.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  0.2 : 0.516942 0.518384
+DEAL:2d::  vertices for cell  0.2 : -0.0311287 1.03913
+DEAL:2d::  vertices for cell  0.2 : 0.504734 1.04978
+DEAL:2d::   1.0 user flag check:   (-) 
+DEAL:2d::  vertices for cell  1.0 : 0.0163378 -0.0189229
+DEAL:2d::  vertices for cell  1.0 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.0 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.0 : 0.248775 0.274970
+DEAL:2d::   1.1 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.1 : 0.267624 0.0177308
+DEAL:2d::  vertices for cell  1.1 : 0.514198 -0.0205773
+DEAL:2d::  vertices for cell  1.1 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.1 : 0.515570 0.248903
+DEAL:2d::   1.2 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.2 : -0.0208691 0.263765
+DEAL:2d::  vertices for cell  1.2 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.2 : -0.0248297 0.502913
+DEAL:2d::  vertices for cell  1.2 : 0.246056 0.510649
+DEAL:2d::   1.3 user flag check:   (+) 
+DEAL:2d::  vertices for cell  1.3 : 0.248775 0.274970
+DEAL:2d::  vertices for cell  1.3 : 0.515570 0.248903
+DEAL:2d::  vertices for cell  1.3 : 0.246056 0.510649
+DEAL:2d::  vertices for cell  1.3 : 0.516942 0.518384
+DEAL:3d::patch_cells 1.1: 1.1 2.1 2.3 2.5 2.7 1.3 1.5 
+DEAL:3d::local_triangulation 1.1:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.2 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.2 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.2 : 0.978606 0.955116 0.00526623
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.2 : 0.973886 1.03934 0.516440
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.3 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.3 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.3 : 1.02948 0.0273663 1.02970
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.973662 0.480959 1.03800
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : -0.000585435 0.242229 0.246938
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : -0.000585435 0.242229 0.246938
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : -0.000585435 0.242229 0.246938
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.6 : -0.000585435 0.242229 0.246938
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 1.2: 1.2 1.3 2.2 2.6 2.3 2.7 1.6 
+DEAL:3d::local_triangulation 1.2:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.1 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.1 : 0.521162 0.959288 0.480134
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.2 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.2 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.2 : 0.978606 0.955116 0.00526623
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.2 : 0.973886 1.03934 0.516440
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.0312834 1.03147 0.976960
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.0 : 0.256420 -0.00955660 0.248136
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.256420 -0.00955660 0.248136
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.4 : 0.256420 -0.00955660 0.248136
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.5 : 0.256420 -0.00955660 0.248136
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 1.3: 1.3 1.2 1.1 1.7 
+DEAL:3d::local_triangulation 1.3:    0.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.0 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.0 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.0 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.0 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.0 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.0 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.0 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.0 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.1 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.1 : 0.521162 0.959288 0.480134
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.2 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.2 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.2 : 0.978606 0.955116 0.00526623
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.2 : 0.973886 1.03934 0.516440
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.973886 1.03934 0.516440
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.973662 0.480959 1.03800
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::  vertices for cell  0.3 : 1.01591 1.03315 1.03389
+DEAL:3d::patch_cells 1.4: 1.4 1.5 1.6 2.4 2.5 2.6 2.7 
+DEAL:3d::local_triangulation 1.4:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.1 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.1 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.1 : 0.525270 0.543135 0.999098
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.2 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.2 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.2 : 1.02948 0.0273663 1.02970
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.2 : 0.973662 0.480959 1.03800
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.0312834 1.03147 0.976960
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.0 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.0 : 0.259414 0.243367 0.00611095
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.259414 0.243367 0.00611095
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.2 : 0.259414 0.243367 0.00611095
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.3 : 0.259414 0.243367 0.00611095
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 1.5: 1.5 1.4 1.7 1.1 
+DEAL:3d::local_triangulation 1.5:    0.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.0 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.0 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.0 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.0 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.0 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.0 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.0 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.0 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.1 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.1 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.1 : 0.525270 0.543135 0.999098
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.2 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.2 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.2 : 1.02948 0.0273663 1.02970
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.2 : 0.973662 0.480959 1.03800
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.973886 1.03934 0.516440
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.973662 0.480959 1.03800
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::  vertices for cell  0.3 : 1.01591 1.03315 1.03389
+DEAL:3d::patch_cells 1.6: 1.6 1.7 1.4 1.2 
+DEAL:3d::local_triangulation 1.6:    0.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.0 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.0 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.0 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.0 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.0 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.0 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.0 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.0 : 0.521162 0.959288 0.480134
+DEAL:3d::   0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.1 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.1 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.1 : 0.525270 0.543135 0.999098
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.2 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.2 : 0.0312834 1.03147 0.976960
+DEAL:3d::  vertices for cell  0.2 : 0.467627 0.967361 0.980337
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.973886 1.03934 0.516440
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.973662 0.480959 1.03800
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::  vertices for cell  0.3 : 1.01591 1.03315 1.03389
+DEAL:3d::patch_cells 1.7: 1.7 1.6 1.5 1.3 
+DEAL:3d::local_triangulation 1.7:    0.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.0 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.0 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.0 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.0 : 0.978606 0.955116 0.00526623
+DEAL:3d::  vertices for cell  0.0 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.0 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.0 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.0 : 0.973886 1.03934 0.516440
+DEAL:3d::   0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.1 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.1 : 1.02948 0.0273663 1.02970
+DEAL:3d::  vertices for cell  0.1 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.1 : 0.973662 0.480959 1.03800
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.2 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.2 : 0.0312834 1.03147 0.976960
+DEAL:3d::  vertices for cell  0.2 : 0.467627 0.967361 0.980337
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : 1.03673 0.524046 0.523931
+DEAL:3d::  vertices for cell  0.3 : 0.521162 0.959288 0.480134
+DEAL:3d::  vertices for cell  0.3 : 0.973886 1.03934 0.516440
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::  vertices for cell  0.3 : 0.973662 0.480959 1.03800
+DEAL:3d::  vertices for cell  0.3 : 0.467627 0.967361 0.980337
+DEAL:3d::  vertices for cell  0.3 : 1.01591 1.03315 1.03389
+DEAL:3d::patch_cells 2.0: 2.0 2.1 2.2 2.4 
+DEAL:3d::local_triangulation 2.0:    0.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  0.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  0.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  0.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  0.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  0.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  0.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  0.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  0.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  0.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  0.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  0.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  0.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  0.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  0.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  0.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  0.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  0.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  0.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  0.3 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  0.3 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  0.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  0.3 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.3 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  0.3 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  0.3 : 0.238646 0.247045 0.489899
+DEAL:3d::patch_cells 2.1: 2.1 2.0 1.1 2.3 2.5 
+DEAL:3d::local_triangulation 2.1:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::   1.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.2: 2.2 2.3 2.0 1.2 2.6 
+DEAL:3d::local_triangulation 2.2:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.1 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.1 : 0.521162 0.959288 0.480134
+DEAL:3d::   1.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.3: 2.3 2.2 1.1 2.1 1.2 2.7 
+DEAL:3d::local_triangulation 2.3:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.2 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.2 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.2 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.4: 2.4 2.5 2.6 2.0 1.4 
+DEAL:3d::local_triangulation 2.4:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.1 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.1 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.1 : 0.525270 0.543135 0.999098
+DEAL:3d::   1.0 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.5: 2.5 2.4 1.1 2.7 2.1 1.4 
+DEAL:3d::local_triangulation 2.5:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.2 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.2 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.2 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.0 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.1 : 0.230827 -0.00607004 -0.0148516
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.6: 2.6 2.7 2.4 1.2 2.2 1.4 
+DEAL:3d::local_triangulation 2.6:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.1 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.1 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.1 : 0.521162 0.959288 0.480134
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.2 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.2 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.2 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.2 : 0.525270 0.543135 0.999098
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.0 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.2 : 0.0110778 0.231276 0.0123163
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.4 : -0.0204462 -0.0138111 0.245974
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920
+DEAL:3d::patch_cells 2.7: 2.7 2.6 1.1 2.5 1.2 2.3 1.4 
+DEAL:3d::local_triangulation 2.7:    0.1 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  0.1 : 1.02440 -0.0271699 0.0341519
+DEAL:3d::  vertices for cell  0.1 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.1 : 0.966893 0.535516 0.0119399
+DEAL:3d::  vertices for cell  0.1 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.1 : 1.02203 0.0285341 0.534646
+DEAL:3d::  vertices for cell  0.1 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.1 : 1.03673 0.524046 0.523931
+DEAL:3d::   0.2 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  0.2 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  0.2 : 0.0400585 0.972967 0.0128264
+DEAL:3d::  vertices for cell  0.2 : 0.500545 1.02316 0.0443083
+DEAL:3d::  vertices for cell  0.2 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.2 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.2 : -0.0388696 0.988388 0.529229
+DEAL:3d::  vertices for cell  0.2 : 0.521162 0.959288 0.480134
+DEAL:3d::   0.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  0.3 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  0.3 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  0.3 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  0.3 : 0.476594 0.508225 0.496920
+DEAL:3d::  vertices for cell  0.3 : -0.0287527 -0.0404505 1.00609
+DEAL:3d::  vertices for cell  0.3 : 0.527115 -0.0153617 1.03910
+DEAL:3d::  vertices for cell  0.3 : 0.0350779 0.535440 0.996321
+DEAL:3d::  vertices for cell  0.3 : 0.525270 0.543135 0.999098
+DEAL:3d::   1.0 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.0 : 0.0124938 -0.0144708 0.0161090
+DEAL:3d::  vertices for cell  1.0 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.0 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.0 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.0 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.0 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.0 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.0 : 0.262727 0.232946 0.236878
+DEAL:3d::   1.1 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.1 : 0.265752 -0.0153472 0.00775045
+DEAL:3d::  vertices for cell  1.1 : 0.519011 -0.0162237 -0.000608147
+DEAL:3d::  vertices for cell  1.1 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.1 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.1 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.1 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.1 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.1 : 0.498645 0.248183 0.249071
+DEAL:3d::   1.2 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.2 : 0.0141873 0.250763 0.00264819
+DEAL:3d::  vertices for cell  1.2 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.2 : 0.0158807 0.515997 -0.0108127
+DEAL:3d::  vertices for cell  1.2 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.2 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.2 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.2 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.2 : 0.241639 0.499969 0.247874
+DEAL:3d::   1.3 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.3 : 0.263204 0.266882 -0.0128701
+DEAL:3d::  vertices for cell  1.3 : 0.504640 0.235972 0.00957370
+DEAL:3d::  vertices for cell  1.3 : 0.253075 0.502082 0.00447145
+DEAL:3d::  vertices for cell  1.3 : 0.490269 0.488167 0.0197556
+DEAL:3d::  vertices for cell  1.3 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.3 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.3 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.3 : 0.483431 0.498196 0.258338
+DEAL:3d::   1.4 user flag check:   (-) 
+DEAL:3d::  vertices for cell  1.4 : -0.00101856 -0.0172824 0.256467
+DEAL:3d::  vertices for cell  1.4 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.4 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.4 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.4 : -0.0145310 -0.0200941 0.496825
+DEAL:3d::  vertices for cell  1.4 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.4 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.4 : 0.238646 0.247045 0.489899
+DEAL:3d::   1.5 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.5 : 0.262124 -0.0108659 0.231028
+DEAL:3d::  vertices for cell  1.5 : 0.513859 -0.00183077 0.239804
+DEAL:3d::  vertices for cell  1.5 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.5 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.5 : 0.247088 -0.00376596 0.488521
+DEAL:3d::  vertices for cell  1.5 : 0.508707 0.0125622 0.480217
+DEAL:3d::  vertices for cell  1.5 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.5 : 0.492650 0.260394 0.488568
+DEAL:3d::   1.6 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.6 : 0.0147270 0.250273 0.270200
+DEAL:3d::  vertices for cell  1.6 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.6 : -0.000152307 0.501741 0.237410
+DEAL:3d::  vertices for cell  1.6 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.6 : -0.0153581 0.233696 0.491229
+DEAL:3d::  vertices for cell  1.6 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.6 : -0.0161853 0.487486 0.485632
+DEAL:3d::  vertices for cell  1.6 : 0.230204 0.497856 0.491276
+DEAL:3d::   1.7 user flag check:   (+) 
+DEAL:3d::  vertices for cell  1.7 : 0.262727 0.232946 0.236878
+DEAL:3d::  vertices for cell  1.7 : 0.498645 0.248183 0.249071
+DEAL:3d::  vertices for cell  1.7 : 0.241639 0.499969 0.247874
+DEAL:3d::  vertices for cell  1.7 : 0.483431 0.498196 0.258338
+DEAL:3d::  vertices for cell  1.7 : 0.238646 0.247045 0.489899
+DEAL:3d::  vertices for cell  1.7 : 0.492650 0.260394 0.488568
+DEAL:3d::  vertices for cell  1.7 : 0.230204 0.497856 0.491276
+DEAL:3d::  vertices for cell  1.7 : 0.476594 0.508225 0.496920

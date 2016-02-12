@@ -3070,13 +3070,13 @@ next_cell:
          cell != local_triangulation.end(); ++cell)
       {
         if (cell->user_flag_set() )
-        {
-          Assert(patch_to_global_tria_map_tmp.find(cell) != patch_to_global_tria_map_tmp.end(),
-                 ExcInternalError() );
+          {
+            Assert(patch_to_global_tria_map_tmp.find(cell) != patch_to_global_tria_map_tmp.end(),
+                   ExcInternalError() );
 
-          Assert(cell->center().distance( patch_to_global_tria_map_tmp[cell]->center())<=1e-15*cell->diameter(),
-                 ExcInternalError());
-        }
+            Assert(cell->center().distance( patch_to_global_tria_map_tmp[cell]->center())<=1e-15*cell->diameter(),
+                   ExcInternalError());
+          }
       }
 
 
