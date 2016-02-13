@@ -35,8 +35,15 @@ print "<dl>\n";
 foreach my $gallery (sort @ARGV)
 {
     my $gallery_underscore = $gallery;
+
+    open AUTHOR, "<$gallery_dir/$gallery/doc/author";
+    my $authors;
+    while (my $line = <AUTHOR>) {
+        $authors .= $line;
+    }
+
     $gallery_underscore    =~ s/-/_/;
-    print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$gallery\"</b></dt>\n";
+    print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$gallery\"</b> (by $authors)</dt>\n";
     print "    <dd>\n";
     open TOOLTIP, "<$gallery_dir/$gallery/doc/tooltip";
     while (my $line = <TOOLTIP>) {
