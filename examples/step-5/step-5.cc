@@ -179,12 +179,12 @@ double Coefficient<dim>::value (const Point<dim> &p,
 // Most people who have tried that soon realize that they introduce lots of
 // errors that would have easily been caught had they run the program in debug
 // mode while developing.) For those who want to try: The way to switch from
-// debug mode to optimized mode is to go edit the Makefile in this
-// directory. It should have a line <code>debug-mode = on</code>; simply
-// replace it by <code>debug-mode = off</code> and recompile your program. The
-// output of the <code>make</code> program should already indicate to you that
-// the program is now compiled in optimized mode, and it will later also be
-// linked to libraries that have been compiled for optimized mode.
+// debug mode to optimized mode is to recompile your program with the command
+// <code>make release</code>. The output of the <code>make</code> program should
+// now indicate to you that the program is now compiled in optimized mode, and
+// it will later also be linked to libraries that have been compiled for
+// optimized mode. In order to switch back to debug mode, simply recompile with
+// the command <code>make debug</code>.
 //
 // Here, as has been said above, we would like to make sure that the size of
 // the two arrays is equal, and if not throw an exception. Comparing the sizes
