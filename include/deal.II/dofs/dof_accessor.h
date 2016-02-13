@@ -176,6 +176,22 @@ namespace internal
  * There is a DoFCellAccessor class that provides the equivalent to the
  * CellAccessor class.
  *
+ * @tparam structdim The dimensionality of the objects the accessor
+ *   represents. For example, points have @p structdim equal to zero,
+ *   edges have @structdim equal to one, etc.
+ * @tparam DoFHandlerType The type of the DoF handler into which accessor
+ *   of this type point. This is either the DoFHandler or hp::DoFHandler
+ *   class. See also the @ref ConceptDoFHandlerType "DoFHandlerType concept".
+ * @tparam level_dof_access If @p false, then the accessor simply represents
+ *   a cell, face, or edge in a DoFHandler for which degrees of freedom only
+ *   exist on the finest level. Some operations are not allowed in this case,
+ *   such as asking for DoF indices on non-active cells. On the other hand,
+ *   if this template argument is @p true, then the accessor represents an
+ *   object in a multilevel hierarchy of degrees of freedom. In this case,
+ *   accessing DoF indices of <i>any</i> cell is possible, and will return
+ *   the <i>level</i> indices (which, for active cells, may be different
+ *   from the <i>global</i> indices).
+ *
  * @ingroup dofs
  * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998, 2006, 2008, Timo Heister, Guido Kanschat,
@@ -224,12 +240,25 @@ public:
   DoFAccessor ();
 
   /**
-   * Constructor
+   * Constructor that generates an access that points to a particular cell or
+   * face or edge in a DoFHandler or hp::DoFHandler.
+   *
+   * @param tria The triangulation into which this accessor points.
+   * @param level The level within the mesh hierarchy of the object pointed
+   *   to. For example, coarse mesh cells will have level zero, their children
+   *   level one, and so on. This argument is ignored for faces and edges
+   *   which do not have a level.
+   * @param index The index of the object pointed to within the specified
+   *   refinement level.
+   * @param dof_handler A pointer to the DoFHandler or hp::DoFHandler object
+   *   to which the accessor shall refer. This DoFHandler object must of
+   *   course be built on the same triangulation as the one specified in
+   *   the first argument.
    */
   DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria,
                const int             level,
                const int             index,
-               const DoFHandlerType *local_data);
+               const DoFHandlerType *dof_handler);
 
   /**
    * Conversion constructor. This constructor exists to make certain

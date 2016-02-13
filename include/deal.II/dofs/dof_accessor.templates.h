@@ -48,18 +48,22 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::DoFAccessor ()
 
 template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
-DoFAccessor<structdim,DoFHandlerType,level_dof_access>::DoFAccessor (
-  const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria,
-  const int             level,
-  const int             index,
-  const DoFHandlerType *dof_handler)
+DoFAccessor<structdim,DoFHandlerType,level_dof_access>::
+DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *tria,
+             const int             level,
+             const int             index,
+             const DoFHandlerType *dof_handler)
   :
   dealii::internal::DoFAccessor::Inheritance<structdim,DoFHandlerType::dimension,
   DoFHandlerType::space_dimension>::BaseClass (tria,
                                                level,
                                                index),
   dof_handler(const_cast<DoFHandlerType *>(dof_handler))
-{}
+{
+  Assert (&dof_handler->get_triangulation() == tria,
+          ExcMessage ("You can't create a DoF accessor in which the DoFHandler object "
+                      "uses a different triangulation than the one you pass as argument."));
+}
 
 
 
