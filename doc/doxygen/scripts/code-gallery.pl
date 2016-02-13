@@ -39,8 +39,13 @@ foreach my $gallery (sort @ARGV)
     open AUTHOR, "<$gallery_dir/$gallery/doc/author";
     my $authors;
     while (my $line = <AUTHOR>) {
-        $authors .= $line;
+        chop $line;
+        $authors .= $line . ", ";
     }
+
+    # remove trailing whitespaces, as well as the trailing comma
+    chop $authors;
+    $authors =~ s/,$//;
 
     $gallery_underscore    =~ s/-/_/;
     print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$gallery\"</b> (by $authors)</dt>\n";
