@@ -1,11 +1,11 @@
 <h1>Results</h1>
 
 
-Running the program takes a good while if one doesn't change the flags
-in the Makefile: in debug mode (the default) and on only a single
-machine, it takes about 3h45min on my Athlon XP 2GHz. Fortunately, but
-setting <code>debug-mode = off</code> in the Makefile, this can be
-reduced significantly, to about 23 minutes, a much more reasonable time.
+Running the program takes a good while if one uses debug mode; it takes about
+eleven minutes on my i7 desktop. Fortunately, the version compiled with
+optimizations is much faster; the program only takes about a minute and a half
+after recompiling with the command <tt>make release</tt> on the same machine, a
+much more reasonable time.
 
 
 
@@ -13,93 +13,117 @@ reduced significantly, to about 23 minutes, a much more reasonable time.
 If run, the program prints the following output, explaining what it is
 doing during all that time:
 @code
-examples/\step-18> time make run
-============================ Running \step-18
+$ time make run
+[ 66%] Built target step-18
+[100%] Run step-18 with Release configuration
 Timestep 1 at time 1
   Cycle 0:
     Number of active cells:       3712 (by partition: 3712)
     Number of degrees of freedom: 17226 (by partition: 17226)
-    Assembling system... norm of rhs is 2.34224e+10
-    Solver converged in 117 iterations.
+    Assembling system... norm of rhs is 2.35077e+10
+    Solver converged in 103 iterations.
     Updating quadrature point data...
   Cycle 1:
     Number of active cells:       12812 (by partition: 12812)
-    Number of degrees of freedom: 51726 (by partition: 51726)
-    Assembling system... norm of rhs is 2.34227e+10
-    Solver converged in 130 iterations.
+    Number of degrees of freedom: 51738 (by partition: 51738)
+    Assembling system... norm of rhs is 2.32681e+10
+    Solver converged in 121 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 2 at time 2
-    Assembling system... norm of rhs is 2.30852e+10
-    Solver converged in 131 iterations.
-    Updating quadrature point data...
-    Moving mesh...
-
-Timestep 3 at time 3
-    Assembling system... norm of rhs is 2.27792e+10
-    Solver converged in 126 iterations.
-    Updating quadrature point data...
-    Moving mesh...
-
-Timestep 4 at time 4
-    Assembling system... norm of rhs is 2.25107e+10
-    Solver converged in 124 iterations.
-    Updating quadrature point data...
-    Moving mesh...
-
-Timestep 5 at time 5
-    Assembling system... norm of rhs is 2.22883e+10
+    Assembling system... norm of rhs is 2.29614e+10
     Solver converged in 122 iterations.
     Updating quadrature point data...
     Moving mesh...
 
+Timestep 3 at time 3
+    Assembling system... norm of rhs is 2.26871e+10
+    Solver converged in 129 iterations.
+    Updating quadrature point data...
+    Moving mesh...
+
+Timestep 4 at time 4
+    Assembling system... norm of rhs is 2.24515e+10
+    Solver converged in 116 iterations.
+    Updating quadrature point data...
+    Moving mesh...
+
+Timestep 5 at time 5
+    Assembling system... norm of rhs is 2.22637e+10
+    Solver converged in 114 iterations.
+    Updating quadrature point data...
+    Moving mesh...
+
 Timestep 6 at time 6
-    Assembling system... norm of rhs is 2.21272e+10
-    Solver converged in 118 iterations.
+    Assembling system... norm of rhs is 2.21401e+10
+    Solver converged in 112 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 7 at time 7
-    Assembling system... norm of rhs is 2.20652e+10
-    Solver converged in 117 iterations.
+    Assembling system... norm of rhs is 2.2123e+10
+    Solver converged in 112 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 8 at time 8
-    Assembling system... norm of rhs is 2.22501e+10
-    Solver converged in 127 iterations.
+    Assembling system... norm of rhs is 2.23793e+10
+    Solver converged in 136 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 9 at time 9
-    Assembling system... norm of rhs is 2.32742e+10
-    Solver converged in 144 iterations.
+    Assembling system... norm of rhs is 2.35671e+10
+    Solver converged in 140 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 10 at time 10
-    Assembling system... norm of rhs is 2.55929e+10
-    Solver converged in 149 iterations.
+    Assembling system... norm of rhs is 2.59722e+10
+    Solver converged in 163 iterations.
     Updating quadrature point data...
     Moving mesh...
+
+[100%] Built target run
+make run  176.82s user 0.15s system 198% cpu 1:28.94 total
 @endcode
 In other words, it is computing on 12,000 cells and with some 52,000
 unknowns. Not a whole lot, but enough for a coupled three-dimensional
 problem to keep a computer busy for a while. At the end of the day,
 this is what we have for output:
 @code
-examples/\step-18> ls -l *.d2
--rw-r--r--  1 bangerth wheeler 8797414 May 25 09:10 solution-0001.0000.vtu
--rw-r--r--  1 bangerth wheeler 8788500 May 25 09:32 solution-0002.0000.vtu
--rw-r--r--  1 bangerth wheeler 8763718 May 25 09:55 solution-0003.0000.vtu
--rw-r--r--  1 bangerth wheeler 8738940 May 25 10:17 solution-0004.0000.vtu
--rw-r--r--  1 bangerth wheeler 8710104 May 25 10:39 solution-0005.0000.vtu
--rw-r--r--  1 bangerth wheeler 8685388 May 25 11:01 solution-0006.0000.vtu
--rw-r--r--  1 bangerth wheeler 8649088 May 25 11:23 solution-0007.0000.vtu
--rw-r--r--  1 bangerth wheeler 8585146 May 25 11:45 solution-0008.0000.vtu
--rw-r--r--  1 bangerth wheeler 8489764 May 25 12:07 solution-0009.0000.vtu
--rw-r--r--  1 bangerth wheeler 8405388 May 25 12:29 solution-0010.0000.vtu
+$ ls -l *vtu *visit
+-rw-r--r-- 1 drwells users 1706059 Feb 13 19:36 solution-0010.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:36 solution-0010.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:36 solution-0010.visit
+-rw-r--r-- 1 drwells users 1707907 Feb 13 19:36 solution-0009.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:36 solution-0009.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:36 solution-0009.visit
+-rw-r--r-- 1 drwells users 1703771 Feb 13 19:35 solution-0008.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0008.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0008.visit
+-rw-r--r-- 1 drwells users 1693671 Feb 13 19:35 solution-0007.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0007.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0007.visit
+-rw-r--r-- 1 drwells users 1681847 Feb 13 19:35 solution-0006.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0006.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0006.visit
+-rw-r--r-- 1 drwells users 1670115 Feb 13 19:35 solution-0005.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0005.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0005.visit
+-rw-r--r-- 1 drwells users 1658559 Feb 13 19:35 solution-0004.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0004.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0004.visit
+-rw-r--r-- 1 drwells users 1639983 Feb 13 19:35 solution-0003.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0003.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0003.visit
+-rw-r--r-- 1 drwells users 1625851 Feb 13 19:35 solution-0002.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:35 solution-0002.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:35 solution-0002.visit
+-rw-r--r-- 1 drwells users 1616035 Feb 13 19:34 solution-0001.000.vtu
+-rw-r--r-- 1 drwells users     761 Feb 13 19:34 solution-0001.pvtu
+-rw-r--r-- 1 drwells users      33 Feb 13 19:34 solution-0001.visit
 @endcode
 
 
@@ -165,71 +189,73 @@ original coarse mesh was symmetric.
 Whether the computation is fully converged is a different matter. In order to
 see whether it is, we ran the program again with one more global refinement at
 the beginning and with the time step halved. This would have taken a very long
-time on a single machine, so we used our cluster again and ran it on 16
-processors (8 dual-processor machines) in parallel. The beginning of the output
+time on a single machine, so we used a proper workstation and ran it on 16
+processors in parallel. The beginning of the output
 now looks like this:
 @code
 Timestep 1 at time 0.5
   Cycle 0:
-    Number of active cells:       29696 (by partition: 1862+1890+1866+1850+1864+1850+1858+1842+1911+1851+1911+1804+1854+1816+1839+1828)
-    Number of degrees of freedom: 113100 (by partition: 7089+7218+6978+6972+7110+6840+7119+7023+7542+7203+7068+6741+6921+6759+7464+7053)
-    Assembling system... norm of rhs is 1.05874e+10
-    Solver converged in 289 iterations.
+    Number of active cells:       29696 (by partition: 1906+1844+1827+1850+1875+1877+1818+1838+1867+1859+1900+1878+1862+1809+1825+1861)
+    Number of degrees of freedom: 113100 (by partition: 7354+6831+7193+6912+7035+7154+6894+7116+7007+7189+7346+6952+6944+7133+6889+7151)
+    Assembling system... norm of rhs is 1.04416e+10
+    Solver converged in 243 iterations.
     Updating quadrature point data...
   Cycle 1:
-    Number of active cells:       102097 (by partition: 6346+6478+6442+6570+6370+6483+6413+6376+6403+6195+6195+6195+6494+6571+6371+6195)
-    Number of degrees of freedom: 358875 (by partition: 22257+22161+22554+22482+21759+23361+23040+21609+22347+20937+21801+21678+24126+25149+21321+22293)
-    Assembling system... norm of rhs is 3.46364e+10
-    Solver converged in 249 iterations.
+    Number of active cells:       102076 (by partition: 6513+6193+6241+6305+6448+6503+6275+6557+6532+6383+6356+6235+6402+6525+6214+6394)
+    Number of degrees of freedom: 359484 (by partition: 22401+21521+21649+21928+24768+24759+21610+23987+22678+22167+22021+21667+22034+22831+21256+22207)
+    Assembling system... norm of rhs is 3.04821e+10
+    Solver converged in 257 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 2 at time 1
-    Assembling system... norm of rhs is 3.42269e+10
-    Solver converged in 248 iterations.
+    Assembling system... norm of rhs is 3.02616e+10
+    Solver converged in 256 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 3 at time 1.5
-    Assembling system... norm of rhs is 3.38229e+10
-    Solver converged in 247 iterations.
+    Assembling system... norm of rhs is 3.00497e+10
+    Solver converged in 254 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 4 at time 2
-    Assembling system... norm of rhs is 3.34247e+10
-    Solver converged in 247 iterations.
+    Assembling system... norm of rhs is 2.98467e+10
+    Solver converged in 252 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 [...]
 
 Timestep 20 at time 10
-    Assembling system... norm of rhs is 3.2449e+10
-    Solver converged in 493 iterations.
+    Assembling system... norm of rhs is 3.01912e+10
+    Solver converged in 479 iterations.
     Updating quadrature point data...
     Moving mesh...
 @endcode
 That's quite a good number of unknowns, given that we are in 3d. The output of
 this program are 16 files for each time step:
 @code
-examples/\step-18> ls -l solution-0001*
--rw-r--r--    1 bangerth mfw       4325219 Aug 11 09:44 solution-0001.000.d2
--rw-r--r--    1 bangerth mfw       4454460 Aug 11 09:44 solution-0001.001.d2
--rw-r--r--    1 bangerth mfw       4485242 Aug 11 09:43 solution-0001.002.d2
--rw-r--r--    1 bangerth mfw       4517364 Aug 11 09:43 solution-0001.003.d2
--rw-r--r--    1 bangerth mfw       4462829 Aug 11 09:43 solution-0001.004.d2
--rw-r--r--    1 bangerth mfw       4482487 Aug 11 09:43 solution-0001.005.d2
--rw-r--r--    1 bangerth mfw       4548619 Aug 11 09:43 solution-0001.006.d2
--rw-r--r--    1 bangerth mfw       4522421 Aug 11 09:43 solution-0001.007.d2
--rw-r--r--    1 bangerth mfw       4337529 Aug 11 09:43 solution-0001.008.d2
--rw-r--r--    1 bangerth mfw       4163047 Aug 11 09:43 solution-0001.009.d2
--rw-r--r--    1 bangerth mfw       4288247 Aug 11 09:43 solution-0001.010.d2
--rw-r--r--    1 bangerth mfw       4350410 Aug 11 09:43 solution-0001.011.d2
--rw-r--r--    1 bangerth mfw       4458427 Aug 11 09:43 solution-0001.012.d2
--rw-r--r--    1 bangerth mfw       4466037 Aug 11 09:43 solution-0001.013.d2
--rw-r--r--    1 bangerth mfw       4505679 Aug 11 09:44 solution-0001.014.d2
--rw-r--r--    1 bangerth mfw       4340488 Aug 11 09:44 solution-0001.015.d2
+$ ls -l solution-0001*
+-rw-r--r-- 1 wellsd2 user 761065 Feb 13 21:09 solution-0001.000.vtu
+-rw-r--r-- 1 wellsd2 user 759277 Feb 13 21:09 solution-0001.001.vtu
+-rw-r--r-- 1 wellsd2 user 761217 Feb 13 21:09 solution-0001.002.vtu
+-rw-r--r-- 1 wellsd2 user 761605 Feb 13 21:09 solution-0001.003.vtu
+-rw-r--r-- 1 wellsd2 user 756917 Feb 13 21:09 solution-0001.004.vtu
+-rw-r--r-- 1 wellsd2 user 752669 Feb 13 21:09 solution-0001.005.vtu
+-rw-r--r-- 1 wellsd2 user 735217 Feb 13 21:09 solution-0001.006.vtu
+-rw-r--r-- 1 wellsd2 user 750065 Feb 13 21:09 solution-0001.007.vtu
+-rw-r--r-- 1 wellsd2 user 760273 Feb 13 21:09 solution-0001.008.vtu
+-rw-r--r-- 1 wellsd2 user 777265 Feb 13 21:09 solution-0001.009.vtu
+-rw-r--r-- 1 wellsd2 user 772469 Feb 13 21:09 solution-0001.010.vtu
+-rw-r--r-- 1 wellsd2 user 760833 Feb 13 21:09 solution-0001.011.vtu
+-rw-r--r-- 1 wellsd2 user 782241 Feb 13 21:09 solution-0001.012.vtu
+-rw-r--r-- 1 wellsd2 user 748905 Feb 13 21:09 solution-0001.013.vtu
+-rw-r--r-- 1 wellsd2 user 738413 Feb 13 21:09 solution-0001.014.vtu
+-rw-r--r-- 1 wellsd2 user 762133 Feb 13 21:09 solution-0001.015.vtu
+-rw-r--r-- 1 wellsd2 user   1421 Feb 13 21:09 solution-0001.pvtu
+-rw-r--r-- 1 wellsd2 user    364 Feb 13 21:09 solution-0001.visit
 @endcode
 
 Here are first the mesh on which we compute as well as the partitioning
@@ -545,4 +571,3 @@ other cases this should be preventable by appropriate mesh refinement and/or a
 reduction of the time step size. The program does not do that, but a more
 sophisticated version definitely should employ some sort of heuristic defining
 what amount of deformation of cells is acceptable, and what isn't.
-
