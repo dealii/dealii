@@ -27,14 +27,12 @@ SET(_src
   constraint_matrix.cc
   full_matrix.cc
   lapack_full_matrix.cc
-  la_vector.cc
   matrix_lib.cc
   matrix_out.cc
   parallel_vector.cc
   precondition_block.cc
   precondition_block_ez.cc
   relaxation_block.cc
-  read_write_vector.cc
   solver.cc
   solver_control.cc
   sparse_decomposition.cc
@@ -61,11 +59,9 @@ SET(_inst
   constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
-  la_vector.inst.in
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
-  read_write_vector.inst.in
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
