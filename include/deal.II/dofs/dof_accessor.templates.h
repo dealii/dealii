@@ -60,7 +60,7 @@ DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space
                                                index),
   dof_handler(const_cast<DoFHandlerType *>(dof_handler))
 {
-  Assert (&dof_handler->get_triangulation() == tria,
+  Assert (tria == NULL || &dof_handler->get_triangulation() == tria,
           ExcMessage ("You can't create a DoF accessor in which the DoFHandler object "
                       "uses a different triangulation than the one you pass as argument."));
 }
