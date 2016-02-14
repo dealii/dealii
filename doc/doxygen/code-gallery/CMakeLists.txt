@@ -133,9 +133,17 @@ ELSE()
   MESSAGE(STATUS "Setting up code gallery documentation.")
   MESSAGE(STATUS "  Skipping as no code gallery exists in ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
 
-  FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/no-code-gallery.h
-       DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  FILE(RENAME ${CMAKE_CURRENT_BINARY_DIR}/no-code-gallery.h
-       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/no-code-gallery.h ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/no-code-gallery.h
+	)
+
+  # Make the custom command for code-gallery.h visible to the parent CMakeLists.txt by attaching to the code-gallery
+  # custom target:
+  ADD_CUSTOM_TARGET(build_code-gallery_h
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
+  ADD_DEPENDENCIES(code-gallery build_code-gallery_h)
+
 ENDIF()
 
