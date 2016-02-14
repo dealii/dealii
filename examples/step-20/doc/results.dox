@@ -9,18 +9,18 @@ freedom since we use piecewise constants, and 144 velocities because
 the Raviart-Thomas element defines one degree per freedom per face and
 there are 72 faces parallel to the $x$-axis and the same number
 parallel to the $y$-axis):
-@code
-examples/\step-20> make run
-============================ Remaking Makefile.dep
-==============debug========= \step-20.cc
-============================ Linking \step-20
-============================ Running \step-20
+@verbatim
+\$ make run
+[ 66%] Built target \step-20
+Scanning dependencies of target run
+[100%] Run \step-20 with Release configuration
 Number of active cells: 64
 Total number of cells: 85
 Number of degrees of freedom: 208 (144+64)
 15 CG Schur complement iterations to obtain convergence.
 Errors: ||e_p||_L2 = 0.178055,   ||e_u||_L2 = 0.0433435
-@endcode
+[100%] Built target run
+@endverbatim
 
 The fact that the number of iterations is so small, of course, is due to good
 (but expensive!) preconditioner we have developed. To get confidence in the
