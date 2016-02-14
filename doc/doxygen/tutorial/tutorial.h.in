@@ -49,9 +49,10 @@
  * one of the tutorial directories, you can configure the program by typing
  * <code>cmake .</code>, build it via <code>make</code> and run it using
  * <code>make run</code>. The latter command also compiles the program if
- * that has not already been done. The CMakefiles.txt files in the
- * different directories are based on the 
- * <a href="../../users/cmakelists.html" target="_top">small program Makefile template</a>.
+ * that has not already been done. The CMakeLists.txt files in the
+ * different directories are based on the
+ * <a href="../../users/cmakelists.html#cmakeauto" target="_top">autopilot
+ * style CMakeLists.txt example</a>.
  *
  * @note Some of the tutorial programs also jointly form
  *   the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
