@@ -1105,7 +1105,7 @@ namespace GridTools
    * Triangulation or a parallel::distributed::Triangulation with a finite
    * element that has degrees of freedom that are logically associated to a
    * vertex, line, quad, or hex.
-   * @param[out] dof_to_support_patch_map A map from the global_dof_index of
+   * @return A map from the global_dof_index of
    * degrees of freedom on locally relevant cells to vectors containing
    * DoFHandlerType::active_cell_iterators of cells in the support of the basis
    * function at that degree of freedom.
