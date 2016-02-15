@@ -180,7 +180,7 @@ namespace LinearAlgebra
                                   const IndexSet                  &source_elements,
                                   VectorOperation::values          operation,
                                   const MPI_Comm                  &mpi_comm,
-                                  const CommunicationPatternBase *communication_pattern)
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     std_cxx11::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
 
@@ -206,8 +206,8 @@ namespace LinearAlgebra
       }
     else
       {
-        epetra_comm_pattern.reset(
-          dynamic_cast<const EpetraWrappers::CommunicationPattern *> (communication_pattern));
+        epetra_comm_pattern = std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (
+                                communication_pattern);
         AssertThrow(epetra_comm_pattern != nullptr,
                     ExcMessage(std::string("The communication pattern is not of type ") +
                                "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
@@ -236,9 +236,9 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
-                                  VectorOperation::values              operation,
-                                  const CommunicationPatternBase      *communication_pattern)
+  ReadWriteVector<Number>::import(const TrilinosWrappers::MPI::Vector            &trilinos_vec,
+                                  VectorOperation::values                         operation,
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
            operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
@@ -248,9 +248,9 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(const LinearAlgebra::EpetraWrappers::Vector &trilinos_vec,
-                                  VectorOperation::values                      operation,
-                                  const CommunicationPatternBase     *communication_pattern)
+  ReadWriteVector<Number>::import(const LinearAlgebra::EpetraWrappers::Vector    &trilinos_vec,
+                                  VectorOperation::values                         operation,
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
            operation, trilinos_vec.get_mpi_communicator(), communication_pattern);

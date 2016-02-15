@@ -101,7 +101,7 @@ namespace LinearAlgebra
        */
       virtual void import(const ReadWriteVector<double>  &V,
                           VectorOperation::values         operation,
-                          const CommunicationPatternBase *communication_pattern = NULL)
+                          std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr)
       override;
 
       /**

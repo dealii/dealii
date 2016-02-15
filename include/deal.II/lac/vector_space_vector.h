@@ -79,7 +79,7 @@ namespace LinearAlgebra
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        const CommunicationPatternBase *communication_pattern = NULL) = 0;
+                        std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr) = 0;
 
     /**
      * Return the scalar product of two vectors.

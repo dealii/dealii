@@ -137,7 +137,7 @@ namespace LinearAlgebra
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        const CommunicationPatternBase *communication_pattern = NULL) override;
+                        std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
