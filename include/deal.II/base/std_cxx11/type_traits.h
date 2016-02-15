@@ -38,8 +38,16 @@ DEAL_II_NAMESPACE_CLOSE
 
 #else
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/type_traits.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION<105600
+#include <boost/utility/enable_if.hpp>
+#else
 #include <boost/core/enable_if.hpp>
+#endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
