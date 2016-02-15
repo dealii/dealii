@@ -30,10 +30,12 @@
 #endif
 
 #ifdef DEAL_II_WITH_METIS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 extern "C"
 {
 #include <metis.h>
 }
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
