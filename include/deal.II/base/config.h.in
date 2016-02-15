@@ -285,6 +285,7 @@ _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")         \
 _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")          \
 _Pragma("GCC diagnostic ignored \"-Wtype-limits\"")              \
 _Pragma("GCC diagnostic ignored \"-Wtautological-constant-out-of-range-compare\"") \
+_Pragma("GCC diagnostic ignored \"-Wmissing-field-initializers\"") \
 _Pragma("GCC diagnostic ignored \"-Winfinite-recursion\"")       \
 _Pragma("GCC diagnostic ignored \"-Wunused-but-set-parameter\"") \
 _Pragma("GCC diagnostic ignored \"-Wnested-anon-types\"")        \
