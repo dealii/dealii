@@ -202,6 +202,8 @@ namespace LinearAlgebra
        * calling separate methods means to load the calling vector @p this
        * twice. Since most vector operations are memory transfer limited, this
        * reduces the time by 25\% (or 50\% if @p W equals @p this).
+       *
+       * The vectors need to have the same layout.
        */
       virtual double add_and_dot(const double a,
                                  const VectorSpaceVector<double> &V,

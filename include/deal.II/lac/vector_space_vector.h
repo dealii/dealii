@@ -70,7 +70,7 @@ namespace LinearAlgebra
     virtual VectorSpaceVector<Number> &operator-= (const VectorSpaceVector<Number> &V) = 0;
 
     /**
-     * Imports all the elements present in the vector's IndexSet from the input
+     * Import all the elements present in the vector's IndexSet from the input
      * vector @p V. VectorOperation::values @p operation is used to decide if
      * the elements in @p V should be added to the current vector or replace the
      * current elements. The last parameter can be used if the same
@@ -79,7 +79,7 @@ namespace LinearAlgebra
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        const CommunicationPatternBase *communication_pattern = NULL);
+                        const CommunicationPatternBase *communication_pattern = NULL) = 0;
 
     /**
      * Return the scalar product of two vectors.

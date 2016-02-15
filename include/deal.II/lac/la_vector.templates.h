@@ -115,6 +115,16 @@ namespace LinearAlgebra
 
 
   template <typename Number>
+  void Vector<Number>::import(const ReadWriteVector<Number> &,
+                              VectorOperation::values        ,
+                              const CommunicationPatternBase *)
+  {
+    AssertThrow(false, ExcMessage("This function is not implemented."));
+  }
+
+
+
+  template <typename Number>
   void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.

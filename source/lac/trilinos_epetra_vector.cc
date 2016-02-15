@@ -33,7 +33,7 @@ namespace LinearAlgebra
   {
     Vector::Vector()
       :
-      vector(new Epetra_FEVector(Epetra_Map(0,1,0,Epetra_MpiComm(MPI_COMM_SELF)))),
+      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self()))),
       epetra_comm_pattern(nullptr)
     {}
 
@@ -110,7 +110,9 @@ namespace LinearAlgebra
           // The first time import is called, a communication pattern is created.
           // Check if the communication pattern already exists and if it can be
           // reused.
-          if (source_stored_elements == V.get_stored_elements())
+          if ((source_stored_elements.size() != V.get_stored_elements().size()) ||
+              ((source_stored_elements.size() == V.get_stored_elements().size()) &&
+               (source_stored_elements != V.get_stored_elements())))
             {
               create_epetra_comm_pattern(V.get_stored_elements(),
                                          dynamic_cast<const Epetra_MpiComm &>(vector->Comm()).Comm());
@@ -414,8 +416,30 @@ namespace LinearAlgebra
 
     ::dealii::IndexSet Vector::locally_owned_elements() const
     {
-      const Epetra_Map *map = dynamic_cast<const Epetra_Map *>(&(vector->Map()));
-      return IndexSet(*map);
+      IndexSet is (size());
+
+      // easy case: local range is contiguous
+      if (vector->Map().LinearMap())
+        {
+#ifndef DEAL_II_WITH_64BIT_INDICES
+          is.add_range(vector->Map().MinMyGID(), vector->Map().MaxMyGID()+1);
+#else
+          is.add_range(vector->Map().MinMyGID64(), vector->Map().MaxMyGID64()+1);
+#endif
+        }
+      else if (vector->Map().NumMyElements() > 0)
+        {
+          const size_type n_indices = vector->Map().NumMyElements();
+#ifndef DEAL_II_WITH_64BIT_INDICES
+          unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
+#else
+          size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
+#endif
+          is.add_indices(vector_indices, vector_indices+n_indices);
+        }
+      is.compress();
+
+      return is;
     }
 
 

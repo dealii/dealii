@@ -86,16 +86,18 @@ void test()
         }
     }
 
-  a = read_write_2;
-  b = read_write_1;
-  c = read_write_2;
+  a.import(read_write_2, VectorOperation::insert);
+  b.import(read_write_1, VectorOperation::insert);
+  c.import(read_write_2, VectorOperation::insert);
 
-  read_write_3 = a;
+  read_write_3.import(a, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
-        AssertThrow(read_write_2[i]==read_write_3[i],
-                    ExcMessage("Vector a has been modified."));
+        {
+          AssertThrow(read_write_2[i]==read_write_3[i],
+                      ExcMessage("Vector a has been modified."));
+        }
     }
   else
     {
@@ -104,7 +106,7 @@ void test()
                     ExcMessage("Vector a has been modified."));
     }
 
-  read_write_3 = b;
+  read_write_3.import(b, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -118,7 +120,7 @@ void test()
                     ExcMessage("Vector b has been modified."));
     }
 
-  read_write_3 = c;
+  read_write_3.import(c, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -134,7 +136,7 @@ void test()
 
 
   a *= 2;
-  read_write_3 = a;
+  read_write_3.import(a, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -149,7 +151,7 @@ void test()
     }
 
   c /= 2.;
-  read_write_3 = c;
+  read_write_3.import(c, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -164,7 +166,7 @@ void test()
     }
 
   b += a;
-  read_write_3 = b;
+  read_write_3.import(b, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -179,7 +181,7 @@ void test()
     }
 
   b -= c;
-  read_write_3 = b;
+  read_write_3.import(b, VectorOperation::insert);
   if (rank==0)
     {
       for (unsigned int i=0; i<5; ++i)
@@ -193,8 +195,8 @@ void test()
                     ExcMessage("Problem in operator -=."));
     }
 
-  b = read_write_1;
-  c = read_write_1;
+  b.import(read_write_1, VectorOperation::insert);
+  c.import(read_write_1, VectorOperation::insert);
   const double val = b*c;
   AssertThrow(val==285., ExcMessage("Problem in operator *."));
 }
@@ -208,6 +210,8 @@ int main(int argc, char **argv)
   deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
+
+  test();
 
   deallog << "OK" <<std::endl;
 

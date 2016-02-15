@@ -133,6 +133,13 @@ namespace LinearAlgebra
     virtual Number operator* (const VectorSpaceVector<Number> &V) const override;
 
     /**
+     * This function is not implemented and will throw an exception.
+     */
+    virtual void import(const ReadWriteVector<Number> &V,
+                        VectorOperation::values operation,
+                        const CommunicationPatternBase *communication_pattern = NULL) override;
+
+    /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
      */
     virtual void add(const Number a) override;

@@ -233,7 +233,7 @@ namespace LinearAlgebra
      */
     void import(const PETScWrappers::MPI::Vector &petsc_vec,
                 VectorOperation::values operation,
-                const CommunicationPatternBase *communication_pattern = NULL);
+                const CommunicationPatternBase *communication_pattern = nullptr);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -247,7 +247,7 @@ namespace LinearAlgebra
      */
     void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
                 VectorOperation::values operation,
-                const CommunicationPatternBase *communication_pattern = NULL);
+                const CommunicationPatternBase *communication_pattern = nullptr);
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -259,7 +259,7 @@ namespace LinearAlgebra
      */
     void import(const EpetraWrappers::Vector &epetra_vec,
                 VectorOperation::values operation,
-                const CommunicationPatternBase *communication_pattern = NULL);
+                const CommunicationPatternBase *communication_pattern = nullptr);
 #endif
 
     /**
@@ -446,7 +446,7 @@ namespace LinearAlgebra
   protected:
 #ifdef DEAL_II_WITH_TRILINOS
     /**
-     * Imports all the elements present in the vector's IndexSet from the input
+     * Import all the elements present in the vector's IndexSet from the input
      * vector @p multivector. This is an helper function and it should not be
      * used directly.
      */
