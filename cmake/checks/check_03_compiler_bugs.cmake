@@ -62,6 +62,17 @@ ENDIF()
 
 
 #
+# Newer gcc versions generate a large number of warnings inside boost if we
+# are compiling without cxx11 but with -pedantic and there is no way to
+# silence them.
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+   NOT DEAL_II_WITH_CXX11)
+  STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
+ENDIF()
+
+
+#
 # In some cases, we would like to name partial specializations
 # as friends. However, the standard forbids us to do so. But
 # then, we can declare the general template as a friend, and
