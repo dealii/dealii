@@ -12,10 +12,10 @@ much more reasonable time.
 
 If run, the program prints the following output, explaining what it is
 doing during all that time:
-@code
-$ time make run
-[ 66%] Built target step-18
-[100%] Run step-18 with Release configuration
+@verbatim
+\$ time make run
+[ 66%] Built target \step-18
+[100%] Run \step-18 with Release configuration
 Timestep 1 at time 1
   Cycle 0:
     Number of active cells:       3712 (by partition: 3712)
@@ -87,13 +87,13 @@ Timestep 10 at time 10
 
 [100%] Built target run
 make run  176.82s user 0.15s system 198% cpu 1:28.94 total
-@endcode
+@endverbatim
 In other words, it is computing on 12,000 cells and with some 52,000
 unknowns. Not a whole lot, but enough for a coupled three-dimensional
 problem to keep a computer busy for a while. At the end of the day,
 this is what we have for output:
-@code
-$ ls -l *vtu *visit
+@verbatim
+\$ ls -l *vtu *visit
 -rw-r--r-- 1 drwells users 1706059 Feb 13 19:36 solution-0010.000.vtu
 -rw-r--r-- 1 drwells users     761 Feb 13 19:36 solution-0010.pvtu
 -rw-r--r-- 1 drwells users      33 Feb 13 19:36 solution-0010.visit
@@ -124,7 +124,7 @@ $ ls -l *vtu *visit
 -rw-r--r-- 1 drwells users 1616035 Feb 13 19:34 solution-0001.000.vtu
 -rw-r--r-- 1 drwells users     761 Feb 13 19:34 solution-0001.pvtu
 -rw-r--r-- 1 drwells users      33 Feb 13 19:34 solution-0001.visit
-@endcode
+@endverbatim
 
 
 If we visualize these files with VisIt or Paraview, we get to see the full picture
@@ -192,7 +192,7 @@ the beginning and with the time step halved. This would have taken a very long
 time on a single machine, so we used a proper workstation and ran it on 16
 processors in parallel. The beginning of the output
 now looks like this:
-@code
+@verbatim
 Timestep 1 at time 0.5
   Cycle 0:
     Number of active cells:       29696 (by partition: 1906+1844+1827+1850+1875+1877+1818+1838+1867+1859+1900+1878+1862+1809+1825+1861)
@@ -233,11 +233,11 @@ Timestep 20 at time 10
     Solver converged in 479 iterations.
     Updating quadrature point data...
     Moving mesh...
-@endcode
+@endverbatim
 That's quite a good number of unknowns, given that we are in 3d. The output of
 this program are 16 files for each time step:
-@code
-$ ls -l solution-0001*
+@verbatim
+\$ ls -l solution-0001*
 -rw-r--r-- 1 wellsd2 user 761065 Feb 13 21:09 solution-0001.000.vtu
 -rw-r--r-- 1 wellsd2 user 759277 Feb 13 21:09 solution-0001.001.vtu
 -rw-r--r-- 1 wellsd2 user 761217 Feb 13 21:09 solution-0001.002.vtu
@@ -256,7 +256,7 @@ $ ls -l solution-0001*
 -rw-r--r-- 1 wellsd2 user 762133 Feb 13 21:09 solution-0001.015.vtu
 -rw-r--r-- 1 wellsd2 user   1421 Feb 13 21:09 solution-0001.pvtu
 -rw-r--r-- 1 wellsd2 user    364 Feb 13 21:09 solution-0001.visit
-@endcode
+@endverbatim
 
 Here are first the mesh on which we compute as well as the partitioning
 for the 16 processors:
