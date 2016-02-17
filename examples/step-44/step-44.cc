@@ -559,7 +559,7 @@ namespace Step44
                               const double J_tilde_in)
     {
       det_F = determinant(F);
-      b_bar = std::pow(det_F, -2.0 / 3.0) * symmetrize(F * transpose(F));
+      b_bar = std::pow(det_F, -2.0 / dim) * symmetrize(F * transpose(F));
       p_tilde = p_tilde_in;
       J_tilde = J_tilde_in;
 
@@ -677,9 +677,9 @@ namespace Step44
                         tau_iso);
       const SymmetricTensor<4, dim> c_bar = get_c_bar();
 
-      return (2.0 / 3.0) * trace(tau_bar)
+      return (2.0 / dim) * trace(tau_bar)
              * StandardTensors<dim>::dev_P
-             - (2.0 / 3.0) * (tau_iso_x_I + I_x_tau_iso)
+             - (2.0 / dim) * (tau_iso_x_I + I_x_tau_iso)
              + StandardTensors<dim>::dev_P * c_bar
              * StandardTensors<dim>::dev_P;
     }
@@ -1120,6 +1120,7 @@ namespace Step44
     n_q_points (qf_cell.size()),
     n_q_points_f (qf_face.size())
   {
+    Assert(dim==2 || dim==3, ExcMessage("This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
   }
 
@@ -1517,8 +1518,8 @@ namespace Step44
   void Solid<dim>::make_grid()
   {
     GridGenerator::hyper_rectangle(triangulation,
-                                   Point<dim>(0.0, 0.0, 0.0),
-                                   Point<dim>(1.0, 1.0, 1.0),
+                                   (dim==3 ? Point<dim>(0.0, 0.0, 0.0) : Point<dim>(0.0, 0.0)),
+                                   (dim==3 ? Point<dim>(1.0, 1.0, 1.0) : Point<dim>(1.0, 1.0)),
                                    true);
     GridTools::scale(parameters.scale, triangulation);
     triangulation.refine_global(std::max (1U, parameters.global_refinement));
@@ -1537,13 +1538,25 @@ namespace Step44
     for (; cell != endc; ++cell)
       for (unsigned int face = 0;
            face < GeometryInfo<dim>::faces_per_cell; ++face)
+      {
         if (cell->face(face)->at_boundary() == true
             &&
-            cell->face(face)->center()[2] == 1.0 * parameters.scale)
-          if (cell->face(face)->center()[0] < 0.5 * parameters.scale
-              &&
-              cell->face(face)->center()[1] < 0.5 * parameters.scale)
-            cell->face(face)->set_boundary_id(6);
+            cell->face(face)->center()[1] == 1.0 * parameters.scale)
+        {
+          if (dim==3)
+          {
+            if (cell->face(face)->center()[0] < 0.5 * parameters.scale
+                &&
+                cell->face(face)->center()[2] < 0.5 * parameters.scale)
+              cell->face(face)->set_boundary_id(6);
+          }
+          else
+          {
+            if (cell->face(face)->center()[0] < 0.5 * parameters.scale)
+              cell->face(face)->set_boundary_id(6);
+          }
+        }
+      }
   }
 
 
@@ -2448,11 +2461,11 @@ namespace Step44
 
     // The boundary conditions for the indentation problem are as follows: On
     // the -x, -y and -z faces (ID's 0,2,4) we set up a symmetry condition to
-    // allow only planar movement while the +x and +y faces (ID's 1,3) are
-    // traction free. In this contrived problem, part of the +z face (ID 5) is
-    // set to have no motion in the x- and y-component. Finally, as described
-    // earlier, the other part of the +z face has an the applied pressure but
-    // is also constrained in the x- and y-directions.
+    // allow only planar movement while the +x and +z faces (ID's 1,5) are
+    // traction free. In this contrived problem, part of the +y face (ID 3) is
+    // set to have no motion in the x- and z-component. Finally, as described
+    // earlier, the other part of the +y face has an the applied pressure but
+    // is also constrained in the x- and z-directions.
     //
     // In the following, we will have to tell the function interpolation
     // boundary values which components of the solution vector should be
@@ -2464,7 +2477,6 @@ namespace Step44
     // use it when generating the relevant component masks:
     const FEValuesExtractors::Scalar x_displacement(0);
     const FEValuesExtractors::Scalar y_displacement(1);
-    const FEValuesExtractors::Scalar z_displacement(2);
 
     {
       const int boundary_id = 0;
@@ -2498,61 +2510,103 @@ namespace Step44
                                                  constraints,
                                                  fe.component_mask(y_displacement));
     }
-    {
-      const int boundary_id = 4;
 
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 fe.component_mask(z_displacement));
-      else
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 fe.component_mask(z_displacement));
+    if (dim==3)
+    {
+      const FEValuesExtractors::Scalar z_displacement(2);
+
+      {
+        const int boundary_id = 3;
+
+        if (apply_dirichlet_bc == true)
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)
+                                                    |
+                                                    fe.component_mask(z_displacement)));
+        else
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)
+                                                    |
+                                                    fe.component_mask(z_displacement)));
+      }
+      {
+        const int boundary_id = 4;
+
+        if (apply_dirichlet_bc == true)
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   fe.component_mask(z_displacement));
+        else
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   fe.component_mask(z_displacement));
+      }
+
+      {
+        const int boundary_id = 6;
+
+        if (apply_dirichlet_bc == true)
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)
+                                                    |
+                                                    fe.component_mask(z_displacement)));
+        else
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)
+                                                    |
+                                                    fe.component_mask(z_displacement)));
+      }
     }
+    else
     {
-      const int boundary_id = 5;
+      {
+        const int boundary_id = 3;
 
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 (fe.component_mask(x_displacement)
-                                                  |
-                                                  fe.component_mask(y_displacement)));
-      else
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 (fe.component_mask(x_displacement)
-                                                  |
-                                                  fe.component_mask(y_displacement)));
-    }
-    {
-      const int boundary_id = 6;
+        if (apply_dirichlet_bc == true)
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)));
+        else
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)));
+      }
+      {
+        const int boundary_id = 6;
 
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 (fe.component_mask(x_displacement)
-                                                  |
-                                                  fe.component_mask(y_displacement)));
-      else
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                 boundary_id,
-                                                 ZeroFunction<dim>(n_components),
-                                                 constraints,
-                                                 (fe.component_mask(x_displacement)
-                                                  |
-                                                  fe.component_mask(y_displacement)));
+        if (apply_dirichlet_bc == true)
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)));
+        else
+          VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                   boundary_id,
+                                                   ZeroFunction<dim>(n_components),
+                                                   constraints,
+                                                   (fe.component_mask(x_displacement)));
+      }
     }
 
     constraints.close();
@@ -3155,7 +3209,7 @@ namespace Step44
     data_out.build_patches(q_mapping, degree);
 
     std::ostringstream filename;
-    filename << "solution-" << time.get_timestep() << ".vtk";
+    filename << "solution-" << dim << "d-" << time.get_timestep() << ".vtk";
 
     std::ofstream output(filename.str().c_str());
     data_out.write_vtk(output);
@@ -3174,8 +3228,9 @@ int main ()
 
   try
     {
-      Solid<3> solid_3d("parameters.prm");
-      solid_3d.run();
+      const unsigned int dim = 3;
+      Solid<dim> solid("parameters.prm");
+      solid.run();
     }
   catch (std::exception &exc)
     {
