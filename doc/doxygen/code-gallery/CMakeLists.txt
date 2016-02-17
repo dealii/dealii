@@ -49,7 +49,13 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     LIST(APPEND _code_gallery_names_sans_dir "${_step}")
   ENDFOREACH()
 
-  # Describe how to build code-gallery.h:
+  # Describe how to build code-gallery.h. Make sure we properly
+  # track dependencies on the input files, by assuming that the PERL
+  # script is going to read all of the files in the doc/ subdirectories
+  FILE(GLOB _code_gallery_h_deps
+       "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/*")
+  STRING(REPLACE "//" "/" _code_gallery_h_deps "${_code_gallery_h_deps}")
+
   ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
     COMMAND ${PERL_EXECUTABLE}
@@ -62,10 +68,12 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     DEPENDS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
       ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
-      ${_code_gallery_names}
+      ${_code_gallery_h_deps}
     )
   ADD_CUSTOM_TARGET(build_code-gallery_h
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h)
+    DEPENDS 
+      ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
+      ${_code_gallery_h_deps})
   ADD_DEPENDENCIES(code-gallery build_code-gallery_h)
 
 
