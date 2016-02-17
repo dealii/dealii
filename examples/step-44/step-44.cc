@@ -713,8 +713,6 @@ namespace Step44
       Jc(SymmetricTensor<4, dim>())
     {}
 
-    // That the material is stored in a smart pointer, we don't need to worry
-    // about its memory management
     virtual ~PointHistory()
     {}
 
@@ -2458,8 +2456,8 @@ namespace Step44
     const bool apply_dirichlet_bc = (it_nr == 0);
 
     // The boundary conditions for the indentation problem are as follows: On
-    // the -x, -y and -z faces (ID's 0,2,4) we set up a symmetry condition to
-    // allow only planar movement while the +x and +z faces (ID's 1,5) are
+    // the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry condition to
+    // allow only planar movement while the +x and +z faces (IDs 1,5) are
     // traction free. In this contrived problem, part of the +y face (ID 3) is
     // set to have no motion in the x- and z-component. Finally, as described
     // earlier, the other part of the +y face has an the applied pressure but
