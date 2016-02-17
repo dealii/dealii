@@ -706,7 +706,6 @@ namespace Step44
   public:
     PointHistory()
       :
-      material(NULL),
       F_inv(StandardTensors<dim>::I),
       tau(SymmetricTensor<2, dim>()),
       d2Psi_vol_dJ2(0.0),
@@ -714,11 +713,10 @@ namespace Step44
       Jc(SymmetricTensor<4, dim>())
     {}
 
+    // That the material is stored in a smart pointer, we don't need to worry
+    // about its memory management
     virtual ~PointHistory()
-    {
-      delete material;
-      material = NULL;
-    }
+    {}
 
     // The first function is used to create a material object and to
     // initialize all tensors correctly: The second one updates the stored
@@ -727,8 +725,8 @@ namespace Step44
     // dilation $\widetilde{J}$ field values.
     void setup_lqp (const Parameters::AllParameters &parameters)
     {
-      material = new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
-          parameters.nu);
+      material.reset(new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
+          parameters.nu));
       update_values(Tensor<2, dim>(), 0.0, 1.0);
     }
 
@@ -819,7 +817,7 @@ namespace Step44
     // materials are used in different regions of the domain, as well as the
     // inverse of the deformation gradient...
   private:
-    Material_Compressible_Neo_Hook_Three_Field<dim> *material;
+    std_cxx11::shared_ptr< Material_Compressible_Neo_Hook_Three_Field<dim> > material;
 
     Tensor<2, dim> F_inv;
 
