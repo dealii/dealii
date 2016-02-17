@@ -78,7 +78,9 @@ ADD_CUSTOM_COMMAND(
     ${_code_gallery_names}
   )
 ADD_CUSTOM_TARGET(build_tutorial_h
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h)
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
+    COMMENT
+      "Building tutorial.h")
 ADD_DEPENDENCIES(tutorial build_tutorial_h)
 
 
@@ -126,6 +128,8 @@ FOREACH(_step ${_deal_ii_steps})
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
+      COMMENT
+        "Building doxygen input file for tutorial program <${_step}>"
     )
   ADD_DEPENDENCIES(tutorial tutorial_${_step})
 ENDFOREACH()

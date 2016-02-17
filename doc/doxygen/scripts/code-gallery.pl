@@ -36,19 +36,28 @@ foreach my $gallery (sort @ARGV)
 {
     my $gallery_underscore = $gallery;
 
+    # Read the proper name of the program
+    open ENTRYNAME, "<$gallery_dir/$gallery/doc/entry-name";
+    my $entryname;
+    while (my $line = <ENTRYNAME>) {
+        chop $line;
+        $entryname .= $line . " ";
+    }
+    chop $entryname;
+
+    # Read the names of the authors, collate with commas, and at the
+    # end chop the last comma off
     open AUTHOR, "<$gallery_dir/$gallery/doc/author";
     my $authors;
     while (my $line = <AUTHOR>) {
         chop $line;
         $authors .= $line . ", ";
     }
-
-    # remove trailing whitespaces, as well as the trailing comma
     chop $authors;
     $authors =~ s/,$//;
 
     $gallery_underscore    =~ s/-/_/;
-    print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$gallery\"</b> (by $authors)</dt>\n";
+    print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$entryname\"</b> (by $authors)</dt>\n";
     print "    <dd>\n";
     open TOOLTIP, "<$gallery_dir/$gallery/doc/tooltip";
     while (my $line = <TOOLTIP>) {

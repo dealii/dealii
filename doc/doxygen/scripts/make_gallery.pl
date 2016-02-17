@@ -25,7 +25,6 @@ my $gallery_underscore = $gallery;
 $gallery_underscore    =~ s/-/_/;
 
 my $gallery_dir = shift(@ARGV);
-my $author_file = "$gallery_dir/doc/author";
 
 # next get the source files. sort all markdown files
 # first so that we get to show them first. this makes
@@ -38,15 +37,26 @@ push @src_files, sort(grep { !($_ =~ m/.*\.(md|markdown)/) }@ARGV);
 # read the names of authors; escape '<' and '>' as they
 # appear in the email address. also trim trailing space and
 # newlines
-open AUTHORS, "<$author_file";
+open AUTHORS, "<$gallery_dir/doc/author";
 my $authors = <AUTHORS>;
 $authors    =~ s/</&lt;/g; 
 $authors    =~ s/>/&gt;/g; 
 $authors    =~ s/\s*$//g;
 
+
+# Read the proper name of the program
+open ENTRYNAME, "<$gallery_dir/doc/entry-name";
+my $entryname;
+while (my $line = <ENTRYNAME>) {
+    chop $line;
+    $entryname .= $line . " ";
+}
+chop $entryname;
+
+
 print
 "/**
-  * \@page code_gallery_$gallery_underscore The $gallery code gallery program
+  * \@page code_gallery_$gallery_underscore The '$entryname' code gallery program
 \@htmlonly
 <p align=\"center\"> 
   This program was contributed by $authors.
