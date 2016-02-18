@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-Firstly, we present a comparison of a series of results with those
+Firstly, we present a comparison of a series of 3-d results with those
 in the literature (see Reese et al (2000)) to demonstrate that the program works as expected.
 
 We begin with a comparison of the convergence with mesh refinement for the $Q_1-DGPM_0-DGPM_0$ and
@@ -18,13 +18,13 @@ as it should.
      <td align="center">
         <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_convergence.png" alt="">
 	<p align="center">
-        Convergence of the $Q_1-DGPM_0-DGPM_0$ formulation.
+        Convergence of the $Q_1-DGPM_0-DGPM_0$ formulation in 3-d.
 	</p>
     </td>
     <td align="center">
         <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_convergence.png" alt="">
 	<p align="center">
-        Convergence of the $Q_2-DGPM_1-DGPM_1$ formulation.
+        Convergence of the $Q_2-DGPM_1-DGPM_1$ formulation in 3-d.
 	</p>
     </td>
   </tr>
@@ -140,7 +140,7 @@ and is opposite to the physically realistic interpretation of pressure.
     <td align="center">
         <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-displacement.png" alt="">
 	<p align="center">
-        Z-displacement solution.
+        Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
@@ -172,7 +172,7 @@ There is a clear distinction and transition between regions of compression and e
 and the linear approximation of the pressure field allows a refined visualisation
 of the pressure at the sub-element scale.
 It should however be noted that the pressure field remains discontinuous
- and could be smoothed on a continuous grid for the post-processing purposes.
+and could be smoothed on a continuous grid for the post-processing purposes.
 
 
 
@@ -182,7 +182,7 @@ It should however be noted that the pressure field remains discontinuous
     <td align="center">
         <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
 	<p align="center">
-        Z-displacement solution.
+        Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
@@ -213,7 +213,7 @@ than the $Q_1-DGPM_0-DGPM_0$ for a similar number of degrees-of-freedom
 This is shown in the graph below for a batch of tests run consecutively on a single 4-core (8-thread) machine.
 The increase in computational time for the higher-order method is likely due to
 the increased band-width required for the higher-order elements.
-As previously mentioned, the use of a better solver and precondtioner may mitigate the
+As previously mentioned, the use of a better solver and preconditioner may mitigate the
 expense of using a higher-order formulation.
 It was observed that for the given problem using the multithreaded Jacobi preconditioner can reduce the
 computational runtime by up to 72% (for the worst case being a higher-order formulation with a large number
@@ -228,6 +228,31 @@ some finite-strain problems involving alternative constitutive models.
         <img src="http://www.dealii.org/images/steps/developer/step-44.Normalised_runtime.png" alt="">
 	<p align="center">
         Runtime on a 4-core machine, normalised against the lowest grid resolution $Q_1-DGPM_0-DGPM_0$ solution that utilised a SSOR preconditioner.
+	</p>
+    </td>
+  </tr>
+</table>
+
+
+Lastly, results for the displacement solution for the 2-d problem are showcased below for
+two different levels of grid refinement.
+It is clear that due to the extra constraints imposed by simulating in 2-d that the resulting
+displacement field, although qualitatively similar, is different to that of the 3-d case.
+
+
+<table align="center" class="tutorial" cellspacing="3" cellpadding="3">
+
+  <tr>
+    <td align="center">
+        <img src="http://www.dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">
+	<p align="center">
+        Y-displacement solution in 2-d for 2 global grid refinement levels.
+	</p>
+    </td>
+    <td align="center">
+        <img src="http://www.dealii.org/images/steps/developer/step-44.2d-gr_5.png" alt="">
+	<p align="center">
+        Y-displacement solution in 2-d for 5 global grid refinement levels.
 	</p>
     </td>
   </tr>

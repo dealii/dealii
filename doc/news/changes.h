@@ -57,6 +57,12 @@ inconvenience this causes.
 
 
 <ol> 
+ <li> Updated: step-44 has been been expressed in a more dimension independent 
+ manner, and can be now run in both 2-d and 3-d.
+ <br>
+ (Jean-Paul Pelteret, 2016/02/17)
+ </li>
+
  <li> Fixed: FE_Nedelec elements up to polynomial order 12 can now be
  constructed.
  <br>
