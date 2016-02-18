@@ -724,7 +724,7 @@ namespace Step44
     void setup_lqp (const Parameters::AllParameters &parameters)
     {
       material.reset(new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
-          parameters.nu));
+                     parameters.nu));
       update_values(Tensor<2, dim>(), 0.0, 1.0);
     }
 
@@ -1534,25 +1534,25 @@ namespace Step44
     for (; cell != endc; ++cell)
       for (unsigned int face = 0;
            face < GeometryInfo<dim>::faces_per_cell; ++face)
-      {
-        if (cell->face(face)->at_boundary() == true
-            &&
-            cell->face(face)->center()[1] == 1.0 * parameters.scale)
         {
-          if (dim==3)
-          {
-            if (cell->face(face)->center()[0] < 0.5 * parameters.scale
-                &&
-                cell->face(face)->center()[2] < 0.5 * parameters.scale)
-              cell->face(face)->set_boundary_id(6);
-          }
-          else
-          {
-            if (cell->face(face)->center()[0] < 0.5 * parameters.scale)
-              cell->face(face)->set_boundary_id(6);
-          }
+          if (cell->face(face)->at_boundary() == true
+              &&
+              cell->face(face)->center()[1] == 1.0 * parameters.scale)
+            {
+              if (dim==3)
+                {
+                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale
+                      &&
+                      cell->face(face)->center()[2] < 0.5 * parameters.scale)
+                    cell->face(face)->set_boundary_id(6);
+                }
+              else
+                {
+                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale)
+                    cell->face(face)->set_boundary_id(6);
+                }
+            }
         }
-      }
   }
 
 
@@ -2508,102 +2508,102 @@ namespace Step44
     }
 
     if (dim==3)
-    {
-      const FEValuesExtractors::Scalar z_displacement(2);
-
       {
-        const int boundary_id = 3;
+        const FEValuesExtractors::Scalar z_displacement(2);
 
-        if (apply_dirichlet_bc == true)
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)
-                                                    |
-                                                    fe.component_mask(z_displacement)));
-        else
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)
-                                                    |
-                                                    fe.component_mask(z_displacement)));
+        {
+          const int boundary_id = 3;
+
+          if (apply_dirichlet_bc == true)
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)
+                                                      |
+                                                      fe.component_mask(z_displacement)));
+          else
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)
+                                                      |
+                                                      fe.component_mask(z_displacement)));
+        }
+        {
+          const int boundary_id = 4;
+
+          if (apply_dirichlet_bc == true)
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     fe.component_mask(z_displacement));
+          else
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     fe.component_mask(z_displacement));
+        }
+
+        {
+          const int boundary_id = 6;
+
+          if (apply_dirichlet_bc == true)
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)
+                                                      |
+                                                      fe.component_mask(z_displacement)));
+          else
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)
+                                                      |
+                                                      fe.component_mask(z_displacement)));
+        }
       }
-      {
-        const int boundary_id = 4;
-
-        if (apply_dirichlet_bc == true)
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   fe.component_mask(z_displacement));
-        else
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   fe.component_mask(z_displacement));
-      }
-
-      {
-        const int boundary_id = 6;
-
-        if (apply_dirichlet_bc == true)
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)
-                                                    |
-                                                    fe.component_mask(z_displacement)));
-        else
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)
-                                                    |
-                                                    fe.component_mask(z_displacement)));
-      }
-    }
     else
-    {
       {
-        const int boundary_id = 3;
+        {
+          const int boundary_id = 3;
 
-        if (apply_dirichlet_bc == true)
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)));
-        else
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)));
-      }
-      {
-        const int boundary_id = 6;
+          if (apply_dirichlet_bc == true)
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)));
+          else
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)));
+        }
+        {
+          const int boundary_id = 6;
 
-        if (apply_dirichlet_bc == true)
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)));
-        else
-          VectorTools::interpolate_boundary_values(dof_handler_ref,
-                                                   boundary_id,
-                                                   ZeroFunction<dim>(n_components),
-                                                   constraints,
-                                                   (fe.component_mask(x_displacement)));
+          if (apply_dirichlet_bc == true)
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)));
+          else
+            VectorTools::interpolate_boundary_values(dof_handler_ref,
+                                                     boundary_id,
+                                                     ZeroFunction<dim>(n_components),
+                                                     constraints,
+                                                     (fe.component_mask(x_displacement)));
+        }
       }
-    }
 
     constraints.close();
   }
