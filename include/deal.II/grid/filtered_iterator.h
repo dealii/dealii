@@ -299,6 +299,24 @@ namespace IteratorFilters
      */
     const bool only_locally_owned;
   };
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is on the boundary.
+   *
+   * @author Bruno Turcksin, 2016
+   *
+   * @ingroup Iterators
+   */
+  class AtBoundary
+  {
+  public:
+    /**
+     * Evaluate the iterator and return true if the object at the boundary.
+     */
+    template <class Iterator>
+    bool operator () (const Iterator &i) const;
+  };
 }
 
 
@@ -1215,6 +1233,17 @@ namespace IteratorFilters
            active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end();
   }
 
+
+
+// ---------------- IteratorFilters::AtBoundary ---------
+
+  template <class Iterator>
+  inline
+  bool
+  AtBoundary::operator () (const Iterator &i) const
+  {
+    return (i->at_boundary());
+  }
 }
 
 
