@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: tria.cc 32807 2014-04-22 15:01:57Z heister $
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,24 +16,12 @@
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/logstream.h>
-#include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/distributed/shared_tria.h>
-
-
-
-
-#include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <fstream>
 
 
 DEAL_II_NAMESPACE_OPEN
