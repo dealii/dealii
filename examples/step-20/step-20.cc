@@ -700,11 +700,11 @@ namespace Step20
   template <int dim>
   void MixedLaplaceProblem<dim>::solve ()
   {
+    ReductionControl inner_control(1000, 0., 1.e-13);
     PreconditionIdentity identity;
     IterativeInverse<Vector<double> > m_inverse;
     m_inverse.initialize(system_matrix.block(0,0), identity);
     m_inverse.solver.select("cg");
-    static ReductionControl inner_control(1000, 0., 1.e-13);
     m_inverse.solver.set_control(inner_control);
 
     Vector<double> tmp (solution.block(0).size());
