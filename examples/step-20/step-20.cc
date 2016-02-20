@@ -556,15 +556,62 @@ namespace Step20
   // therefore not discuss the rationale for these classes here any more, but
   // rather only comment on implementational aspects.
 
+  // @sect4{The <code>InverseMatrix</code> class template}
+
+  // There are a few places in this program where we will need either the
+  // action of the inverse of the mass matrix or the action of the inverse of
+  // the approximate Schur complement. Rather than explicitly calling
+  // SolverCG::solve every time that we need to solve such a system, we will
+  // wrap the action of either inverse in a simple class. The only things we
+  // would like to note are that this class is derived from
+  // <code>Subscriptor</code> and, as mentioned above, it stores a pointer to
+  // the underlying matrix with a <code>SmartPointer</code> object.
+  template <class MatrixType>
+  class InverseMatrix : public Subscriptor
+  {
+  public:
+    InverseMatrix(const MatrixType &m);
+
+    void vmult(Vector<double>       &dst,
+               const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const MatrixType> matrix;
+  };
+
+
+  template <class MatrixType>
+  InverseMatrix<MatrixType>::InverseMatrix (const MatrixType &m)
+    :
+    matrix (&m)
+  {}
+
+
+  template <class MatrixType>
+  void InverseMatrix<MatrixType>::vmult (Vector<double>       &dst,
+                                         const Vector<double> &src) const
+  {
+    // To make the control flow simpler, we recreate both the ReductionControl
+    // and SolverCG objects every time this is called. This is not the most
+    // efficient choice because SolverCG instances allocate memory whenever
+    // they are created; this is just a tutorial so such inefficiencies are
+    // acceptable for the sake of exposition.
+    SolverControl solver_control (std::max(src.size(), static_cast<std::size_t> (200)),
+                                  1e-8*src.l2_norm());
+    SolverCG<>    cg (solver_control);
+
+    dst = 0;
+
+    cg.solve (*matrix, dst, src, PreconditionIdentity());
+  }
+
 
   // @sect4{The <code>SchurComplement</code> class template}
 
   // The next class is the Schur complement class. Its rationale has also been
-  // discussed in length in the introduction. The only things we would like to
-  // note is that the class, too, is derived from the <code>Subscriptor</code>
-  // class and that as mentioned above it stores pointers to the entire block
-  // matrix and the inverse of the mass matrix block using
-  // <code>SmartPointer</code> objects.
+  // discussed in length in the introduction. Like <code>InverseMatrix</code>,
+  // this class is derived from Subscriptor and stores SmartPointer&nbsp;s
+  // pointing to the system matrix and <code>InverseMatrix</code> wrapper.
   //
   // The <code>vmult</code> function requires two temporary vectors that we do
   // not want to re-allocate and free every time we call this function. Since
@@ -583,25 +630,26 @@ namespace Step20
   class SchurComplement : public Subscriptor
   {
   public:
-    SchurComplement (const BlockSparseMatrix<double> &A,
-                     const IterativeInverse<Vector<double> > &Minv);
+    SchurComplement (const BlockSparseMatrix<double>            &A,
+                     const InverseMatrix<SparseMatrix<double> > &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
   };
 
 
-  SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
-                                    const IterativeInverse<Vector<double> > &Minv)
+  SchurComplement
+  ::SchurComplement (const BlockSparseMatrix<double>            &A,
+                     const InverseMatrix<SparseMatrix<double> > &Minv)
     :
     system_matrix (&A),
-    m_inverse (&Minv),
+    inverse_mass (&Minv),
     tmp1 (A.block(0,0).m()),
     tmp2 (A.block(0,0).m())
   {}
@@ -619,29 +667,9 @@ namespace Step20
   // @sect4{The <code>ApproximateSchurComplement</code> class template}
 
   // The third component of our solver and preconditioner system is the class
-  // that approximates the Schur complement so we can form a an InverseIterate
-  // object that approximates the inverse of the Schur complement. It follows
-  // the same pattern as the Schur complement class, with the only exception
-  // that we do not multiply with the inverse mass matrix in
-  // <code>vmult</code>, but rather just do a single Jacobi
-  // step. Consequently, the class also does not have to store a pointer to an
-  // inverse mass matrix object.
-  //
-  // We will later use this class as a template argument to the
-  // IterativeInverse class which will in turn want to use it as a
-  // template argument for the PointerMatrix class. The latter class
-  // has a function that requires us to also write a function that
-  // provides the product with the transpose of the matrix this object
-  // represents. As a consequence, in the code below, we also
-  // implement a <tt>Tvmult</tt> function here that represents the
-  // product of the transpose matrix with a vector. It is easy to see
-  // how this needs to be implemented here: since the matrix is
-  // symmetric, we can as well call <code>vmult</code> wherever the
-  // product with the transpose matrix is required. (Note, however,
-  // that even though we implement this function here, there will in
-  // fact not be any need for it as long as we use SolverCG as the
-  // solver since that solver does not ever call the function that
-  // provides this operation.)
+  // that approximates the Schur complement with the method described in the
+  // introduction. We will use this class to build a preconditioner for our
+  // system matrix.
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
@@ -649,8 +677,6 @@ namespace Step20
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
-    void Tvmult (Vector<double>       &dst,
-                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -659,30 +685,24 @@ namespace Step20
   };
 
 
-  ApproximateSchurComplement::ApproximateSchurComplement (const BlockSparseMatrix<double> &A)
-    :
+
+  ApproximateSchurComplement::ApproximateSchurComplement
+  (const BlockSparseMatrix<double> &A) :
     system_matrix (&A),
     tmp1 (A.block(0,0).m()),
     tmp2 (A.block(0,0).m())
   {}
 
 
-  void ApproximateSchurComplement::vmult (Vector<double>       &dst,
-                                          const Vector<double> &src) const
+  void
+  ApproximateSchurComplement::vmult
+  (Vector<double>       &dst,
+   const Vector<double> &src) const
   {
     system_matrix->block(0,1).vmult (tmp1, src);
     system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
     system_matrix->block(1,0).vmult (dst, tmp2);
   }
-
-
-  void ApproximateSchurComplement::Tvmult (Vector<double>       &dst,
-                                           const Vector<double> &src) const
-  {
-    vmult (dst, src);
-  }
-
-
 
   // @sect4{MixedLaplace::solve}
 
@@ -690,54 +710,33 @@ namespace Step20
   // actually solves the linear problem. We will go through the two parts it
   // has that each solve one of the two equations, the first one for the
   // pressure (component 1 of the solution), then the velocities (component 0
-  // of the solution). Both parts need an object representing the inverse mass
-  // matrix and an auxiliary vector, and we therefore declare these objects at
-  // the beginning of this function.
+  // of the solution).
   template <int dim>
   void MixedLaplaceProblem<dim>::solve ()
   {
-    ReductionControl inner_control(1000, 0., 1.e-13);
-    PreconditionIdentity identity;
-    IterativeInverse<Vector<double> > m_inverse;
-    m_inverse.initialize(system_matrix.block(0,0), identity);
-    m_inverse.solver.select("cg");
-    m_inverse.solver.set_control(inner_control);
-
+    InverseMatrix<SparseMatrix<double> > inverse_mass (system_matrix.block(0,0));
     Vector<double> tmp (solution.block(0).size());
 
     // Now on to the first equation. The right hand side of it is $B^TM^{-1}F-G$,
-    // which is what we compute in the first few lines. We then declare the
-    // objects representing the Schur complement, its approximation, and the
-    // inverse of the approximation. Finally, we declare a solver object and
-    // hand off all these matrices and vectors to it to compute block 1 (the
-    // pressure) of the solution:
+    // which is what we compute in the first few lines:
     {
+      SchurComplement schur_complement (system_matrix, inverse_mass);
       Vector<double> schur_rhs (solution.block(1).size());
-
-      m_inverse.vmult (tmp, system_rhs.block(0));
+      inverse_mass.vmult (tmp, system_rhs.block(0));
       system_matrix.block(1,0).vmult (schur_rhs, tmp);
       schur_rhs -= system_rhs.block(1);
 
-
-      SchurComplement
-      schur_complement (system_matrix, m_inverse);
-
-      ApproximateSchurComplement
-      approximate_schur_complement (system_matrix);
-
-      IterativeInverse<Vector<double> >
-      preconditioner;
-      preconditioner.initialize(approximate_schur_complement, identity);
-      preconditioner.solver.select("cg");
-      preconditioner.solver.set_control(inner_control);
-
-
+      // Now that we have the right hand side we can go ahead and solve for the
+      // pressure, using our approximation of the inverse as a preconditioner:
       SolverControl solver_control (solution.block(1).size(),
                                     1e-12*schur_rhs.l2_norm());
-      SolverCG<>    cg (solver_control);
+      SolverCG<> cg (solver_control);
 
+      ApproximateSchurComplement approximate_schur (system_matrix);
+      InverseMatrix<ApproximateSchurComplement> approximate_inverse
+      (approximate_schur);
       cg.solve (schur_complement, solution.block(1), schur_rhs,
-                preconditioner);
+                approximate_inverse);
 
       std::cout << solver_control.last_step()
                 << " CG Schur complement iterations to obtain convergence."
@@ -753,7 +752,7 @@ namespace Step20
       tmp *= -1;
       tmp += system_rhs.block(0);
 
-      m_inverse.vmult (solution.block(0), tmp);
+      inverse_mass.vmult (solution.block(0), tmp);
     }
   }
 
