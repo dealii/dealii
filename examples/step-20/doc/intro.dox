@@ -352,15 +352,15 @@ on the diagonal and none of the usual preconditioners (Jacobi, SSOR) will work
 as they require division by diagonal elements.
 
 For the matrix sizes we expect to run with this program, the by far simplest
-approach would be to just use a direct solver (in particular, the 
+approach would be to just use a direct solver (in particular, the
 SparseDirectUMFPACK class that is bundled with deal.II). step-29 goes this
 route and shows that solving <i>any</i> linear system can be done in just
-3 or 4 lines of code. 
+3 or 4 lines of code.
 
 But then, this is a tutorial: we teach how to do things. Consequently,
 in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
-large matrix and vectors, but we will want to decompose matrices 
+large matrix and vectors, but we will want to decompose matrices
 into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are much
 better ways, for example those explained in the results section of step-22 or
