@@ -515,12 +515,12 @@ namespace Step20
                               fe_values.JxW(q);
             }
 
-        for (unsigned int face_no=0;
-             face_no<GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (unsigned int face_n=0;
+             face_n<GeometryInfo<dim>::faces_per_cell;
+             ++face_n)
+          if (cell->at_boundary(face_n))
             {
-              fe_face_values.reinit (cell, face_no);
+              fe_face_values.reinit (cell, face_n);
 
               pressure_boundary_values
               .value_list (fe_face_values.get_quadrature_points(),
