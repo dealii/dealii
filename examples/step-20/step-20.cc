@@ -32,10 +32,6 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
-// For our Schur complement solver, we need two new objects. One is a matrix
-// object which acts as the inverse of a matrix by calling an iterative
-// solver.
-#include <deal.II/lac/iterative_inverse.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

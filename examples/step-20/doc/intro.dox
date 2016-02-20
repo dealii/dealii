@@ -37,7 +37,7 @@ for fluid flow in porous media. In particular, if flow is so slow that all
 dynamic effects such as the acceleration terms in the Navier-Stokes equation
 become irrelevant, and if the flow pattern is stationary, then the
 Laplace
-equation models the pressure that drives the flow reasonable well. (Because the
+equation models the pressure that drives the flow reasonably well. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
 name $u$ more commonly used for the solution of partial differential equations.)
 
