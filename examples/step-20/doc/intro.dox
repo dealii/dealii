@@ -37,7 +37,7 @@ for fluid flow in porous media. In particular, if flow is so slow that all
 dynamic effects such as the acceleration terms in the Navier-Stokes equation
 become irrelevant, and if the flow pattern is stationary, then the
 Laplace
-equation models the pressure that drives the flow reasonable well. (Because the
+equation models the pressure that drives the flow reasonably well. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
 name $u$ more commonly used for the solution of partial differential equations.)
 
@@ -352,15 +352,15 @@ on the diagonal and none of the usual preconditioners (Jacobi, SSOR) will work
 as they require division by diagonal elements.
 
 For the matrix sizes we expect to run with this program, the by far simplest
-approach would be to just use a direct solver (in particular, the 
+approach would be to just use a direct solver (in particular, the
 SparseDirectUMFPACK class that is bundled with deal.II). step-29 goes this
 route and shows that solving <i>any</i> linear system can be done in just
-3 or 4 lines of code. 
+3 or 4 lines of code.
 
 But then, this is a tutorial: we teach how to do things. Consequently,
 in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
-large matrix and vectors, but we will want to decompose matrices 
+large matrix and vectors, but we will want to decompose matrices
 into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are much
 better ways, for example those explained in the results section of step-22 or
@@ -434,26 +434,25 @@ function <code>vmult()</code> that is all that the SolverCG class
 requires from an object representing a matrix. We can make our life a
 bit easier by also introducing an object that represents $M^{-1}$ and
 that has its own <code>vmult()</code> function that, if called, solves
-the linear system with $M$; in fact, such a class already exists in
-deal.II: this is accomplished by using the class
-IterativeInverse. Using it, the class that implements the Schur
-only needs to offer the <code>vmult()</code>
+the linear system with $M$. Using this (which we will implement as the
+<code>InverseMatrix</code> class in the body of the program), the class
+that implements the Schur only needs to offer the <code>vmult()</code>
 function to perform a matrix-vector multiplication, using the algorithm
 above. Here are again the relevant parts of the code:
 
 @code
-class SchurComplement
+class SchurComplement : public Subscriptor
 {
   public:
-    SchurComplement (const BlockSparseMatrix<double> &A,
-                     const IterativeInverse<Vector<double> > &Minv);
+    SchurComplement (const BlockSparseMatrix<double>            &A,
+                     const InverseMatrix<SparseMatrix<double> > &inverse_mass);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > inverse_mass;
 
     mutable Vector<double> tmp1, tmp2;
 };
@@ -463,7 +462,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
                              const Vector<double> &src) const
 {
   system_matrix->block(0,1).vmult (tmp1, src); // multiply with the top right block: B
-  m_inverse->vmult (tmp2, tmp1);               // multiply with M^-1
+  inverse_mass->vmult (tmp2, tmp1);            // multiply with M^-1
   system_matrix->block(1,0).vmult (dst, tmp2); // multiply with the bottom left block: B^T
 }
 @endcode
@@ -490,37 +489,31 @@ matrix and the mass matrix, respectively:
 template <int dim>
 void MixedLaplaceProblem<dim>::solve ()
 {
-  PreconditionIdentity identity;
-  IterativeInverse<Vector<double> > m_inverse;
-  m_inverse.initialize(system_matrix.block(0,0), identity);
-  m_inverse.solver.select("cg");
-  static ReductionControl inner_control(1000, 0., 1.e-13);
-  m_inverse.solver.set_control(inner_control);
-
+  InverseMatrix<SparseMatrix<double> > inverse_mass (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
 
   {
+    SchurComplement schur_complement (system_matrix, inverse_mass);
     Vector<double> schur_rhs (solution.block(1).size());
-
-    m_inverse.vmult (tmp, system_rhs.block(0));
+    inverse_mass.vmult (tmp, system_rhs.block(0));
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
-    SolverControl solver_control (system_matrix.block(0,0).m(),
-                                  1e-6*schur_rhs.l2_norm());
-    SolverCG<>    cg (solver_control);
+    SolverControl solver_control (solution.block(1).size(),
+                                  1e-12*schur_rhs.l2_norm());
+    SolverCG<> cg (solver_control);
 
-    cg.solve (SchurComplement(system_matrix, m_inverse),
-              solution.block(1),
-              schur_rhs,
-              PreconditionIdentity());
+    PreconditionIdentity preconditioner;
+    cg.solve (schur_complement, solution.block(1), schur_rhs,
+              preconditioner);
   }
+
   {
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
 
-    m_inverse.vmult (solution.block(0), tmp);
+    inverse_mass.vmult (solution.block(0), tmp);
   }
 }
 @endcode
@@ -568,7 +561,7 @@ this looks almost as expensive as solving with $S$ right away. However, note
 that in the inner iteration, we do not have to calculate $M^{-1}$, but only
 the inverse of its diagonal, which is cheap.
 
-The next step is to define a class that represents the approximate Schur
+The next step is to define a class that represents this approximate Schur
 complement. This should look very much like the Schur complement class itself,
 except that it doesn't need the object representing $M^{-1}$ any more
 since we can compute the inverse of the diagonal of $M$ on the fly:
@@ -576,26 +569,28 @@ since we can compute the inverse of the diagonal of $M$ on the fly:
 @code
 class ApproximateSchurComplement : public Subscriptor
 {
-  public:
-    ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
+public:
+  ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
 
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+  void vmult (Vector<double>       &dst,
+              const Vector<double> &src) const;
 
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+private:
+  const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
 
-    mutable Vector<double> tmp1, tmp2;
+  mutable Vector<double> tmp1, tmp2;
 };
 
 
-void ApproximateSchurComplement::vmult (Vector<double>       &dst,
-                                        const Vector<double> &src) const
-{
-  system_matrix->block(0,1).vmult (tmp1, src);
-  system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
-  system_matrix->block(1,0).vmult (dst, tmp2);
-}
+void
+ApproximateSchurComplement::vmult
+  (Vector<double>       &dst,
+   const Vector<double> &src) const
+  {
+    system_matrix->block(0,1).vmult (tmp1, src);
+    system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
+    system_matrix->block(1,0).vmult (dst, tmp2);
+  }
 @endcode
 
 Note how the <code>vmult</code> function differs in simply doing one Jacobi sweep
@@ -606,18 +601,14 @@ the diagonal of $M$; in other words, the operation $({\textrm{diag}\
 }M)^{-1}x$ on a vector $x$ is exactly what the function
 SparseMatrix::precondition_Jacobi above does.)
 
-With all this, we already have the preconditioner: it should be the inverse of
-the approximate Schur complement, i.e. we need code like this:
+With all this, we nearly already have the preconditioner: it should be the
+inverse of the approximate Schur complement. We implement this with
+the <code>InverseMatrix</code> class:
 
 @code
-    ApproximateSchurComplement
-      approximate_schur_complement (system_matrix);
-
-    IterativeInverse<Vector<double> >
-      preconditioner;
-    preconditioner.initialize(approximate_schur_complement, identity);
-    preconditioner.solver.select("cg");
-    preconditioner.solver.set_control(inner_control);
+  ApproximateSchurComplement approximate_schur (system_matrix);
+  InverseMatrix<ApproximateSchurComplement> approximate_inverse
+  (approximate_schur);
 @endcode
 
 That's all!
@@ -626,30 +617,21 @@ Taken together, the first block of our <code>solve()</code> function will then
 look like this:
 
 @code
-    Vector<double> schur_rhs (solution.block(1).size());
+      SchurComplement schur_complement (system_matrix, inverse_mass);
+      Vector<double> schur_rhs (solution.block(1).size());
+      inverse_mass.vmult (tmp, system_rhs.block(0));
+      system_matrix.block(1,0).vmult (schur_rhs, tmp);
+      schur_rhs -= system_rhs.block(1);
 
-    m_inverse.vmult (tmp, system_rhs.block(0));
-    system_matrix.block(1,0).vmult (schur_rhs, tmp);
-    schur_rhs -= system_rhs.block(1);
+      SolverControl solver_control (solution.block(1).size(),
+                                    1e-12*schur_rhs.l2_norm());
+      SolverCG<> cg (solver_control);
 
-    SchurComplement
-      schur_complement (system_matrix, m_inverse);
-
-    ApproximateSchurComplement
-      approximate_schur_complement (system_matrix);
-
-    IterativeInverse<Vector<double> >
-      preconditioner;
-    preconditioner.initialize(approximate_schur_complement, identity);
-    preconditioner.solver.select("cg");
-    preconditioner.solver.set_control(inner_control);
-
-    SolverControl solver_control (solution.block(1).size(),
-                                  1e-12*schur_rhs.l2_norm());
-    SolverCG<> cg (solver_control);
-
-    cg.solve (schur_complement, solution.block(1), schur_rhs,
-              preconditioner);
+      ApproximateSchurComplement approximate_schur (system_matrix);
+      InverseMatrix<ApproximateSchurComplement> approximate_inverse
+      (approximate_schur);
+      cg.solve (schur_complement, solution.block(1), schur_rhs,
+                approximate_inverse);
 @endcode
 
 Note how we pass the so-defined preconditioner to the solver working on the
