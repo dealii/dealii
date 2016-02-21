@@ -565,7 +565,9 @@ namespace Step20
   // wrap the action of either inverse in a simple class. The only things we
   // would like to note are that this class is derived from
   // <code>Subscriptor</code> and, as mentioned above, it stores a pointer to
-  // the underlying matrix with a <code>SmartPointer</code> object.
+  // the underlying matrix with a <code>SmartPointer</code> object. This class
+  // also appears in step-21 and a more advanced version of it appears in
+  // step-22.
   template <class MatrixType>
   class InverseMatrix : public Subscriptor
   {
