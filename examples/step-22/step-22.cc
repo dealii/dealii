@@ -264,25 +264,26 @@ namespace Step22
   // <code>InverseMatrix</code> object is created. The member function
   // <code>vmult</code> is, as in step-20, a multiplication with a vector,
   // obtained by solving a linear system:
-  template <class Matrix, class Preconditioner>
+  template <class MatrixType, class Preconditioner>
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix (const Matrix         &m,
+    InverseMatrix (const MatrixType     &m,
                    const Preconditioner &preconditioner);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const Matrix> matrix;
+    const SmartPointer<const MatrixType> matrix;
     const SmartPointer<const Preconditioner> preconditioner;
   };
 
 
-  template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-                                                       const Preconditioner &preconditioner)
+  template <class MatrixType, class Preconditioner>
+  InverseMatrix<MatrixType,Preconditioner>::InverseMatrix
+  (const MatrixType     &m,
+   const Preconditioner &preconditioner)
     :
     matrix (&m),
     preconditioner (&preconditioner)
@@ -299,9 +300,9 @@ namespace Step22
   // inverse of the Laplace matrix &ndash; which is hence directly responsible
   // for the accuracy of the solution itself, so we can't choose a too large
   // tolerance, either.
-  template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-                                                    const Vector<double> &src) const
+  template <class MatrixType, class Preconditioner>
+  void InverseMatrix<MatrixType,Preconditioner>::vmult (Vector<double>       &dst,
+                                                        const Vector<double> &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
     SolverCG<>    cg (solver_control);
