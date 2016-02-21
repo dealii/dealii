@@ -606,7 +606,7 @@ namespace Step20
   }
 
 
-  // @sect4{The <code>SchurComplement</code> class template}
+  // @sect4{The <code>SchurComplement</code> class}
 
   // The next class is the Schur complement class. Its rationale has also been
   // discussed in length in the introduction. Like <code>InverseMatrix</code>,
@@ -664,7 +664,7 @@ namespace Step20
   }
 
 
-  // @sect4{The <code>ApproximateSchurComplement</code> class template}
+  // @sect4{The <code>ApproximateSchurComplement</code> class}
 
   // The third component of our solver and preconditioner system is the class
   // that approximates the Schur complement with the method described in the
