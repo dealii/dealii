@@ -461,31 +461,31 @@ namespace Step21
   // converges in at most <code>src.size()</code> steps.) As a consequence, we
   // set the maximum number of iterations equal to the maximum of the size of
   // the linear system and 200.
-  template <class Matrix>
+  template <class MatrixType>
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix (const Matrix &m);
+    InverseMatrix (const MatrixType &m);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const Matrix> matrix;
+    const SmartPointer<const MatrixType> matrix;
   };
 
 
-  template <class Matrix>
-  InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
+  template <class MatrixType>
+  InverseMatrix<MatrixType>::InverseMatrix (const MatrixType &m)
     :
     matrix (&m)
   {}
 
 
 
-  template <class Matrix>
-  void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
-                                     const Vector<double> &src) const
+  template <class MatrixType>
+  void InverseMatrix<MatrixType>::vmult (Vector<double>       &dst,
+                                         const Vector<double> &src) const
   {
     SolverControl solver_control (std::max(src.size(), static_cast<std::size_t> (200)),
                                   1e-8*src.l2_norm());

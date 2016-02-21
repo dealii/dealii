@@ -266,11 +266,11 @@ namespace Step31
     // run-time exception into an assertion that fails and triggers a call to
     // <code>abort()</code>, allowing us to trace back in a debugger how we
     // got to the current place.
-    template <class Matrix, class Preconditioner>
+    template <class MatrixType, class Preconditioner>
     class InverseMatrix : public Subscriptor
     {
     public:
-      InverseMatrix (const Matrix         &m,
+      InverseMatrix (const MatrixType     &m,
                      const Preconditioner &preconditioner);
 
 
@@ -279,14 +279,14 @@ namespace Step31
                   const VectorType &src) const;
 
     private:
-      const SmartPointer<const Matrix> matrix;
+      const SmartPointer<const MatrixType> matrix;
       const Preconditioner &preconditioner;
     };
 
 
-    template <class Matrix, class Preconditioner>
-    InverseMatrix<Matrix,Preconditioner>::
-    InverseMatrix (const Matrix &m,
+    template <class MatrixType, class Preconditioner>
+    InverseMatrix<MatrixType,Preconditioner>::
+    InverseMatrix (const MatrixType     &m,
                    const Preconditioner &preconditioner)
       :
       matrix (&m),
@@ -295,10 +295,10 @@ namespace Step31
 
 
 
-    template <class Matrix, class Preconditioner>
+    template <class MatrixType, class Preconditioner>
     template <typename VectorType>
     void
-    InverseMatrix<Matrix,Preconditioner>::
+    InverseMatrix<MatrixType,Preconditioner>::
     vmult (VectorType       &dst,
            const VectorType &src) const
     {

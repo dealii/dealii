@@ -361,11 +361,11 @@ namespace Step43
   // darcy_matrix to match our problem.
   namespace LinearSolvers
   {
-    template <class Matrix, class Preconditioner>
+    template <class MatrixType, class Preconditioner>
     class InverseMatrix : public Subscriptor
     {
     public:
-      InverseMatrix (const Matrix         &m,
+      InverseMatrix (const MatrixType     &m,
                      const Preconditioner &preconditioner);
 
 
@@ -374,14 +374,14 @@ namespace Step43
                   const VectorType &src) const;
 
     private:
-      const SmartPointer<const Matrix> matrix;
+      const SmartPointer<const MatrixType> matrix;
       const Preconditioner &preconditioner;
     };
 
 
-    template <class Matrix, class Preconditioner>
-    InverseMatrix<Matrix,Preconditioner>::
-    InverseMatrix (const Matrix &m,
+    template <class MatrixType, class Preconditioner>
+    InverseMatrix<MatrixType,Preconditioner>::
+    InverseMatrix (const MatrixType     &m,
                    const Preconditioner &preconditioner)
       :
       matrix (&m),
@@ -390,10 +390,10 @@ namespace Step43
 
 
 
-    template <class Matrix, class Preconditioner>
+    template <class MatrixType, class Preconditioner>
     template <typename VectorType>
     void
-    InverseMatrix<Matrix,Preconditioner>::
+    InverseMatrix<MatrixType,Preconditioner>::
     vmult (VectorType       &dst,
            const VectorType &src) const
     {

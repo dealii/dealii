@@ -182,11 +182,11 @@ namespace Step45
 
 
 
-  template <class Matrix, class Preconditioner>
+  template <class MatrixType, class Preconditioner>
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix (const Matrix         &m,
+    InverseMatrix (const MatrixType     &m,
                    const Preconditioner &preconditioner,
                    const IndexSet       &locally_owned,
                    const MPI_Comm       &mpi_communicator);
@@ -195,7 +195,7 @@ namespace Step45
                 const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const Matrix> matrix;
+    const SmartPointer<const MatrixType> matrix;
     const SmartPointer<const Preconditioner> preconditioner;
 
     const MPI_Comm *mpi_communicator;
@@ -204,9 +204,9 @@ namespace Step45
 
 
 
-  template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::InverseMatrix
-  (const Matrix         &m,
+  template <class MatrixType, class Preconditioner>
+  InverseMatrix<MatrixType,Preconditioner>::InverseMatrix
+  (const MatrixType     &m,
    const Preconditioner &preconditioner,
    const IndexSet       &locally_owned,
    const MPI_Comm       &mpi_communicator)
@@ -219,8 +219,8 @@ namespace Step45
 
 
 
-  template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult
+  template <class MatrixType, class Preconditioner>
+  void InverseMatrix<MatrixType,Preconditioner>::vmult
   (TrilinosWrappers::MPI::Vector       &dst,
    const TrilinosWrappers::MPI::Vector &src) const
   {
