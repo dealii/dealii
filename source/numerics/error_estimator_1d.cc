@@ -219,6 +219,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
           const types::subdomain_id                   subdomain_id_,
           const types::material_id                    material_id)
 {
+  typedef typename InputVector::value_type number;
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
       (&dof_handler.get_triangulation())
@@ -301,13 +302,13 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   //
   // for the neighbor gradient, we need several auxiliary fields, depending on
   // the way we get it (see below)
-  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > >
   gradients_here (n_solution_vectors,
-                  std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > >(2, std::vector<Tensor<1,spacedim,typename InputVector::value_type> >(n_components)));
-  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
+                  std::vector<std::vector<Tensor<1,spacedim,number> > >(2, std::vector<Tensor<1,spacedim,number> >(n_components)));
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > >
   gradients_neighbor (gradients_here);
-  std::vector<Vector<typename InputVector::value_type> >
-  grad_neighbor (n_solution_vectors, Vector<typename InputVector::value_type>(n_components));
+  std::vector<Vector<number> >
+  grad_neighbor (n_solution_vectors, Vector<number>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -434,12 +435,12 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                 if (component_mask[component] == true)
                   {
                     // get gradient here
-                    const double grad_here = gradients_here[s][n][component]
+                    const number grad_here = gradients_here[s][n][component]
                                              * normal;
 
-                    const double jump = ((grad_here - grad_neighbor[s](component)) *
+                    const number jump = ((grad_here - grad_neighbor[s](component)) *
                                          coefficient_values(component));
-                    (*errors[s])(cell->active_cell_index()) += jump*jump * cell->diameter();
+                    (*errors[s])(cell->active_cell_index()) += numbers::NumberTraits<number>::abs_square(jump) * cell->diameter();
                   }
           }
 

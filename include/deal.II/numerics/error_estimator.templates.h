@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -476,7 +477,7 @@ namespace internal
         for (unsigned int component=0; component<n_components; ++component)
           if (parallel_data.component_mask[component] == true)
             for (unsigned int p=0; p<n_q_points; ++p)
-              face_integral[n] += Utilities::fixed_power<2>(parallel_data.phi[n][p][component]) *
+              face_integral[n] += numbers::NumberTraits<number>::abs_square(parallel_data.phi[n][p][component]) *
                                   parallel_data.JxW_values[p];
 
       return face_integral;
