@@ -21,7 +21,7 @@ for (deal_II_dimension : DIMENSIONS)
 }
 
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+for (VEC : REAL_SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 
@@ -30,7 +30,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 }
 
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+for (VEC : REAL_SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field_at_requested_location 
@@ -38,7 +38,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
    const VEC &);
 }
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+for (VEC : REAL_SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 
@@ -48,7 +48,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
    const Quadrature<deal_II_dimension> &);
 }
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+for (VEC : REAL_SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 

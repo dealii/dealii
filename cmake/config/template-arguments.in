@@ -37,6 +37,33 @@ SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
+REAL_SERIAL_VECTORS := { Vector<double>;
+                    Vector<float> ;
+                    Vector<long double>;
+
+                    BlockVector<double>;
+                    BlockVector<float>;
+                    BlockVector<long double>;
+
+                    parallel::distributed::Vector<double>;
+                    parallel::distributed::Vector<float> ;
+                    parallel::distributed::Vector<long double>;
+
+                    parallel::distributed::BlockVector<double>;
+                    parallel::distributed::BlockVector<float> ;
+                    parallel::distributed::BlockVector<long double>;
+
+                    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+                    @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                    @DEAL_II_EXPAND_PETSC_VECTOR_REAL@;
+                    @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;                    
+
+                    @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
+                    @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
+                    @DEAL_II_EXPAND_PETSC_BLOCKVECTOR_REAL@;
+                    @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL@;
+                  }
+
 EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                                  @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                                  @DEAL_II_EXPAND_PETSC_VECTOR@;
