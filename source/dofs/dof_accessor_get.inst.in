@@ -15,12 +15,12 @@
 
 
 
-for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS; lda : BOOL)
+for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template
       void
       DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #if deal_II_dimension != 3
@@ -28,7 +28,7 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
     template
       void
       DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #endif
@@ -38,7 +38,7 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
     template
       void
       DoFCellAccessor<DoFHandler<1,3>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #endif
@@ -46,12 +46,12 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
   }
 
 
-for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS; lda : BOOL)
+for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template
       void
       DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #if deal_II_dimension != 3
@@ -59,7 +59,7 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
     template
       void
       DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #endif
@@ -69,7 +69,7 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
     template
       void
       DoFCellAccessor<hp::DoFHandler<1,3>, lda>::get_interpolated_dof_values
-      (const VEC&, Vector<SCALAR>&,
+      (const VEC&, Vector<VEC::value_type>&,
        const unsigned int fe_index) const;
 
 #endif
