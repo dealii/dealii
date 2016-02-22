@@ -162,7 +162,7 @@ namespace Functions
   template <int dim,
             typename DoFHandlerType=DoFHandler<dim>,
             typename VectorType=Vector<double> >
-  class FEFieldFunction :  public Function<dim>
+  class FEFieldFunction :  public Function<dim, typename VectorType::value_type>
   {
   public:
     /**
@@ -200,7 +200,7 @@ namespace Functions
      * information.
      */
     virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const;
+                               Vector<typename VectorType::value_type>   &values) const;
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -219,8 +219,8 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual double value (const Point< dim > &p,
-                          const unsigned int  component = 0)    const;
+    virtual typename VectorType::value_type value (const Point< dim > &p,
+                                                   const unsigned int  component = 0)    const;
 
     /**
      * Set @p values to the point values of the specified component of the
@@ -238,7 +238,7 @@ namespace Functions
      * information.
      */
     virtual void value_list (const std::vector<Point< dim > >     &points,
-                             std::vector< double > &values,
+                             std::vector<typename VectorType::value_type > &values,
                              const unsigned int  component = 0)    const;
 
 
@@ -258,7 +258,7 @@ namespace Functions
      * information.
      */
     virtual void vector_value_list (const std::vector<Point< dim > >     &points,
-                                    std::vector< Vector<double> > &values) const;
+                                    std::vector<Vector<typename VectorType::value_type> > &values) const;
 
     /**
      * Return the gradient of all components of the function at the given
@@ -277,7 +277,7 @@ namespace Functions
      */
     virtual void
     vector_gradient (const Point< dim > &p,
-                     std::vector< Tensor< 1, dim > > &gradients) const;
+                     std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients) const;
 
     /**
      * Return the gradient of the specified component of the function at the
@@ -294,8 +294,8 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual Tensor<1,dim> gradient(const Point< dim > &p,
-                                   const unsigned int component = 0)const;
+    virtual Tensor<1,dim,typename VectorType::value_type> gradient(const Point< dim > &p,
+        const unsigned int component = 0)const;
 
     /**
      * Return the gradient of all components of the function at all the given
@@ -313,7 +313,7 @@ namespace Functions
     virtual void
     vector_gradient_list (const std::vector< Point< dim > > &p,
                           std::vector<
-                          std::vector< Tensor< 1, dim > > > &gradients) const;
+                          std::vector< Tensor< 1, dim,typename VectorType::value_type > > > &gradients) const;
 
     /**
      * Return the gradient of the specified component of the function at all
@@ -330,7 +330,7 @@ namespace Functions
      */
     virtual void
     gradient_list (const std::vector< Point< dim > > &p,
-                   std::vector< Tensor< 1, dim > > &gradients,
+                   std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients,
                    const unsigned int component=0) const;
 
 
@@ -345,7 +345,7 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual double
+    virtual typename VectorType::value_type
     laplacian (const Point<dim>   &p,
                const unsigned int  component = 0) const;
 
@@ -363,7 +363,7 @@ namespace Functions
      */
     virtual void
     vector_laplacian (const Point<dim>   &p,
-                      Vector<double>     &values) const;
+                      Vector<typename VectorType::value_type>     &values) const;
 
     /**
      * Compute the Laplacian of one component at a set of points.
@@ -378,7 +378,7 @@ namespace Functions
      */
     virtual void
     laplacian_list (const std::vector<Point<dim> > &points,
-                    std::vector<double>            &values,
+                    std::vector<typename VectorType::value_type>            &values,
                     const unsigned int              component = 0) const;
 
     /**
@@ -394,7 +394,7 @@ namespace Functions
      */
     virtual void
     vector_laplacian_list (const std::vector<Point<dim> > &points,
-                           std::vector<Vector<double> >   &values) const;
+                           std::vector<Vector<typename VectorType::value_type> >   &values) const;
 
     /**
      * Create quadrature rules. This function groups the points into blocks
