@@ -1222,17 +1222,18 @@ ConstraintMatrix::resolve_indices (std::vector<types::global_dof_index> &indices
                                                         VectorType       &condensed) const;\
   template void ConstraintMatrix::condense<VectorType >(VectorType &vec) const;\
   template void ConstraintMatrix:: \
-  distribute_local_to_global<VectorType > (const Vector<double>            &, \
+  distribute_local_to_global<VectorType > (const Vector<VectorType::value_type>            &, \
                                            const std::vector<ConstraintMatrix::size_type>  &, \
                                            VectorType                      &, \
-                                           const FullMatrix<double>        &) const
+                                           const FullMatrix<VectorType::value_type>        &) const
+
 
 #define PARALLEL_VECTOR_FUNCTIONS(VectorType) \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<VectorType > (const Vector<double>            &, \
+  distribute_local_to_global<VectorType > (const Vector<VectorType::value_type>            &, \
                                            const std::vector<ConstraintMatrix::size_type>  &, \
                                            VectorType                      &, \
-                                           const FullMatrix<double>        &) const
+                                           const FullMatrix<VectorType::value_type>        &) const
 
 
 #ifdef DEAL_II_WITH_PETSC
