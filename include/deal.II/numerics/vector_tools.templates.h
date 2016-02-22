@@ -77,9 +77,10 @@ namespace VectorTools
             template <int, int> class DoFHandlerType>
   void interpolate (const Mapping<dim,spacedim>        &mapping,
                     const DoFHandlerType<dim,spacedim> &dof,
-                    const Function<spacedim>           &function,
+                    const Function<spacedim, typename VectorType::value_type>           &function,
                     VectorType                         &vec)
   {
+    typedef typename VectorType::value_type number;
     Assert (vec.size() == dof.n_dofs(),
             ExcDimensionMismatch (vec.size(), dof.n_dofs()));
     Assert (dof.get_fe().n_components() == function.n_components,
@@ -187,8 +188,8 @@ namespace VectorTools
     // have two versions, one for system fe
     // and one for scalar ones, to take the
     // more efficient one respectively
-    std::vector<std::vector<double> >         function_values_scalar(fe.size());
-    std::vector<std::vector<Vector<double> > > function_values_system(fe.size());
+    std::vector<std::vector<number> >         function_values_scalar(fe.size());
+    std::vector<std::vector<Vector<number> > > function_values_system(fe.size());
 
     // Make a quadrature rule from support points
     // to feed it into FEValues
@@ -234,7 +235,7 @@ namespace VectorTools
                   // all components
                   function_values_system[fe_index]
                   .resize (n_rep_points[fe_index],
-                           Vector<double> (fe[fe_index].n_components()));
+                           Vector<number> (fe[fe_index].n_components()));
                   function.vector_value_list (rep_points,
                                               function_values_system[fe_index]);
                   // distribute the function
@@ -273,7 +274,7 @@ namespace VectorTools
 
   template <typename VectorType, typename DoFHandlerType>
   void interpolate (const DoFHandlerType                            &dof,
-                    const Function<DoFHandlerType::space_dimension> &function,
+                    const Function<DoFHandlerType::space_dimension,typename VectorType::value_type> &function,
                     VectorType                                      &vec)
   {
     interpolate(StaticMappingQ1<DoFHandlerType::dimension,
@@ -294,8 +295,9 @@ namespace VectorTools
                const InVector                  &data_1,
                OutVector                       &data_2)
   {
-    Vector<double> cell_data_1(dof_1.get_fe().dofs_per_cell);
-    Vector<double> cell_data_2(dof_2.get_fe().dofs_per_cell);
+    typedef typename OutVector::value_type number;
+    Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
+    Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
     std::vector<short unsigned int> touch_count (dof_2.n_dofs(), 0); //TODO: check on datatype... kinda strange (UK)
     std::vector<types::global_dof_index>       local_dof_indices (dof_2.get_fe().dofs_per_cell);
@@ -6102,6 +6104,25 @@ namespace VectorTools
                                    std::vector<Tensor<1,spacedim> >(n_components));
     }
 
+    namespace
+    {
+      template<typename number>
+      double mean_to_double(const number &mean_value)
+      {
+        return mean_value;
+      }
+
+      template<typename number>
+      double mean_to_double(const std::complex<number> &mean_value)
+      {
+        // we need to return double as a norm, but mean value is a complex
+        // number. Panick and return real-part while warning the user that
+        // he shall never do that.
+        Assert ( false, ExcMessage("Mean value norm is not implemented for complex-valued vectors") );
+        return mean_value.real();
+      }
+    }
+
 
     // avoid compiling inner function for many vector types when we always
     // really do the same thing by putting the main work into this helper
@@ -6219,6 +6240,7 @@ namespace VectorTools
         }
 
       double diff = 0;
+      Number diff_mean = 0;
 
       // First work on function values:
       switch (norm)
@@ -6227,10 +6249,10 @@ namespace VectorTools
           // Compute values in quadrature points and integrate
           for (unsigned int q=0; q<n_q_points; ++q)
             {
-              double sum = 0;
+              Number sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
                 sum += data.psi_values[q](k) * data.weight_vectors[q](k);
-              diff += sum * fe_values.JxW(q);
+              diff_mean += sum * fe_values.JxW(q);
             }
           break;
 
@@ -6243,7 +6265,7 @@ namespace VectorTools
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
                 sum += std::pow(
-                         static_cast<double>(data.psi_values[q](k)*data.psi_values[q](k)),
+                         static_cast<double>(numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k))),
                          exponent/2.) * data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
@@ -6260,7 +6282,7 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += data.psi_values[q](k) * data.psi_values[q](k) *
+                sum += numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k)) *
                        data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
@@ -6299,7 +6321,7 @@ namespace VectorTools
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
                 sum += std::pow(
-                         static_cast<double>(data.psi_grads[q][k]*data.psi_grads[q][k]),
+                         data.psi_grads[q][k].norm_square(),
                          exponent/2.) * data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
@@ -6312,7 +6334,7 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += (data.psi_grads[q][k] * data.psi_grads[q][k]) *
+                sum += data.psi_grads[q][k].norm_square() *
                        data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
@@ -6326,11 +6348,11 @@ namespace VectorTools
                       ExcMessage ("You can only ask for the Hdiv norm for a finite element "
                                   "with at least 'dim' components. In that case, this function "
                                   "will take the divergence of the first 'dim' components."));
-              double sum = 0;
+              Number sum = 0;
               // take the trace of the derivatives scaled by the weight and square it
               for (unsigned int k=0; k<dim; ++k)
                 sum += data.psi_grads[q][k][k] * std::sqrt(data.weight_vectors[q](k));
-              diff += sum * sum * fe_values.JxW(q);
+              diff += numbers::NumberTraits<Number>::abs_square(sum) * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
           break;
@@ -6353,6 +6375,9 @@ namespace VectorTools
         default:
           break;
         }
+
+      if (norm == mean)
+        diff = mean_to_double(diff_mean);
 
       // append result of this cell to the end of the vector
       AssertIsFinite(diff);
@@ -6554,8 +6579,8 @@ namespace VectorTools
   void
   point_difference (const DoFHandler<dim,spacedim> &dof,
                     const VectorType               &fe_function,
-                    const Function<spacedim>       &exact_function,
-                    Vector<double>                 &difference,
+                    const Function<spacedim, typename VectorType::value_type>       &exact_function,
+                    Vector<typename VectorType::value_type>                 &difference,
                     const Point<spacedim>          &point)
   {
     point_difference(StaticMappingQ1<dim>::mapping,
@@ -6572,8 +6597,8 @@ namespace VectorTools
   point_difference (const Mapping<dim, spacedim>   &mapping,
                     const DoFHandler<dim,spacedim> &dof,
                     const VectorType               &fe_function,
-                    const Function<spacedim>       &exact_function,
-                    Vector<double>                 &difference,
+                    const Function<spacedim, typename VectorType::value_type>       &exact_function,
+                    Vector<typename VectorType::value_type>                 &difference,
                     const Point<spacedim>          &point)
   {
     typedef typename VectorType::value_type Number;
@@ -6618,7 +6643,7 @@ namespace VectorTools
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point,
-               Vector<double>                 &value)
+               Vector<typename VectorType::value_type>                 &value)
   {
 
     point_value (StaticMappingQ1<dim,spacedim>::mapping,
@@ -6634,7 +6659,7 @@ namespace VectorTools
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
                const Point<spacedim>              &point,
-               Vector<double>                     &value)
+               Vector<typename VectorType::value_type>                     &value)
   {
     point_value(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                 dof,
@@ -6645,7 +6670,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point)
@@ -6658,7 +6683,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
                const Point<spacedim>              &point)
@@ -6676,7 +6701,7 @@ namespace VectorTools
                const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point,
-               Vector<double>                 &value)
+               Vector<typename VectorType::value_type>                 &value)
   {
     typedef typename VectorType::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
@@ -6717,7 +6742,7 @@ namespace VectorTools
                const hp::DoFHandler<dim,spacedim>         &dof,
                const VectorType                           &fe_function,
                const Point<spacedim>                      &point,
-               Vector<double>                             &value)
+               Vector<typename VectorType::value_type>                             &value)
   {
     typedef typename VectorType::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
@@ -6752,7 +6777,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const Mapping<dim, spacedim>   &mapping,
                const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -6761,7 +6786,7 @@ namespace VectorTools
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    Vector<double> value(1);
+    Vector<typename VectorType::value_type> value(1);
     point_value(mapping, dof, fe_function, point, value);
 
     return value(0);
@@ -6769,7 +6794,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const hp::MappingCollection<dim, spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>         &dof,
                const VectorType                           &fe_function,
@@ -6778,7 +6803,7 @@ namespace VectorTools
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    Vector<double> value(1);
+    Vector<typename VectorType::value_type> value(1);
     point_value(mapping, dof, fe_function, point, value);
 
     return value(0);
@@ -6992,7 +7017,8 @@ namespace VectorTools
         for (unsigned int i=0; i<n; ++i)
           if (p_select[i])
             {
-              s += v(i);
+              typename VectorType::value_type vi = v(i);
+              s += vi;
               ++counter;
             }
         // Error out if we have not constrained anything. Note that in this
@@ -7030,7 +7056,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   compute_mean_value (const Mapping<dim, spacedim>   &mapping,
                       const DoFHandler<dim,spacedim> &dof,
                       const Quadrature<dim>          &quadrature,
@@ -7097,7 +7123,7 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   compute_mean_value (const DoFHandler<dim,spacedim> &dof,
                       const Quadrature<dim>          &quadrature,
                       const VectorType               &v,

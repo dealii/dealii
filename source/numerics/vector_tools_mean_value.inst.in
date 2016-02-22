@@ -20,7 +20,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
     namespace VectorTools \{
 
       template
-        double compute_mean_value<deal_II_dimension>
+        VEC::value_type compute_mean_value<deal_II_dimension>
         (const Mapping<deal_II_dimension,deal_II_space_dimension>&,
          const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const Quadrature<deal_II_dimension>&,
@@ -28,7 +28,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
          const unsigned int);
 
       template
-        double compute_mean_value<deal_II_dimension>
+        VEC::value_type compute_mean_value<deal_II_dimension>
         (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const Quadrature<deal_II_dimension>&,
          const VEC&,
