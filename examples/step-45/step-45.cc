@@ -182,21 +182,21 @@ namespace Step45
 
 
 
-  template <class MatrixType, class Preconditioner>
+  template <class MatrixType, class PreconditionerType>
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix (const MatrixType     &m,
-                   const Preconditioner &preconditioner,
-                   const IndexSet       &locally_owned,
-                   const MPI_Comm       &mpi_communicator);
+    InverseMatrix (const MatrixType         &m,
+                   const PreconditionerType &preconditioner,
+                   const IndexSet           &locally_owned,
+                   const MPI_Comm           &mpi_communicator);
 
     void vmult (TrilinosWrappers::MPI::Vector       &dst,
                 const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
     const SmartPointer<const MatrixType> matrix;
-    const SmartPointer<const Preconditioner> preconditioner;
+    const SmartPointer<const PreconditionerType> preconditioner;
 
     const MPI_Comm *mpi_communicator;
     mutable TrilinosWrappers::MPI::Vector tmp;
@@ -204,12 +204,12 @@ namespace Step45
 
 
 
-  template <class MatrixType, class Preconditioner>
-  InverseMatrix<MatrixType,Preconditioner>::InverseMatrix
-  (const MatrixType     &m,
-   const Preconditioner &preconditioner,
-   const IndexSet       &locally_owned,
-   const MPI_Comm       &mpi_communicator)
+  template <class MatrixType, class PreconditionerType>
+  InverseMatrix<MatrixType,PreconditionerType>::InverseMatrix
+  (const MatrixType         &m,
+   const PreconditionerType &preconditioner,
+   const IndexSet           &locally_owned,
+   const MPI_Comm           &mpi_communicator)
     :
     matrix (&m),
     preconditioner (&preconditioner),
@@ -219,8 +219,8 @@ namespace Step45
 
 
 
-  template <class MatrixType, class Preconditioner>
-  void InverseMatrix<MatrixType,Preconditioner>::vmult
+  template <class MatrixType, class PreconditionerType>
+  void InverseMatrix<MatrixType,PreconditionerType>::vmult
   (TrilinosWrappers::MPI::Vector       &dst,
    const TrilinosWrappers::MPI::Vector &src) const
   {
@@ -235,15 +235,15 @@ namespace Step45
 
 
 
-  template <class Preconditioner>
+  template <class PreconditionerType>
   class SchurComplement : public TrilinosWrappers::SparseMatrix
   {
   public:
-    SchurComplement ( const TrilinosWrappers::BlockSparseMatrix &system_matrix,
-                      const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                      Preconditioner> &A_inverse,
-                      const IndexSet &owned_pres,
-                      const MPI_Comm &mpi_communicator);
+    SchurComplement (const TrilinosWrappers::BlockSparseMatrix &system_matrix,
+                     const InverseMatrix<TrilinosWrappers::SparseMatrix,
+                     PreconditionerType>                       &A_inverse,
+                     const IndexSet                            &owned_pres,
+                     const MPI_Comm                            &mpi_communicator);
 
     void vmult (TrilinosWrappers::MPI::Vector       &dst,
                 const TrilinosWrappers::MPI::Vector &src) const;
@@ -251,19 +251,19 @@ namespace Step45
   private:
     const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> system_matrix;
     const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-          Preconditioner> > A_inverse;
+          PreconditionerType> > A_inverse;
     mutable TrilinosWrappers::MPI::Vector tmp1, tmp2;
   };
 
 
 
-  template <class Preconditioner>
-  SchurComplement<Preconditioner>::
+  template <class PreconditionerType>
+  SchurComplement<PreconditionerType>::
   SchurComplement (const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                    const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                   Preconditioner> &A_inverse,
-                   const IndexSet &owned_vel,
-                   const MPI_Comm &mpi_communicator)
+                   PreconditionerType>                       &A_inverse,
+                   const IndexSet                            &owned_vel,
+                   const MPI_Comm                            &mpi_communicator)
     :
     system_matrix (&system_matrix),
     A_inverse (&A_inverse),
@@ -273,8 +273,8 @@ namespace Step45
 
 
 
-  template <class Preconditioner>
-  void SchurComplement<Preconditioner>::vmult
+  template <class PreconditionerType>
+  void SchurComplement<PreconditionerType>::vmult
   (TrilinosWrappers::MPI::Vector       &dst,
    const TrilinosWrappers::MPI::Vector &src) const
   {
