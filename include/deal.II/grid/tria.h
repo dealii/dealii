@@ -39,7 +39,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <vector>
 #include <list>
 #include <map>
-#include <algorithm>
+#include <numeric>
 
 
 DEAL_II_NAMESPACE_OPEN
