@@ -39,6 +39,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <vector>
 #include <list>
 #include <map>
+#include <algorithm>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1949,18 +1950,7 @@ public:
     template<typename InputIterator>
     T operator()(InputIterator first, InputIterator last) const
     {
-      // If there are no slots to call, just return the
-      // default-constructed value
-      if (first == last)
-        return T();
-
-      T sum = *first++;
-      while (first != last)
-        {
-          sum += *first++;
-        }
-
-      return sum;
+      return std::accumulate (first, last, T());
     }
   };
 
