@@ -222,7 +222,7 @@ namespace FETools
     for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
-          Assert(touch_count(i) != typename OutVector::value_type(),
+          Assert(static_cast<typename OutVector::value_type>(touch_count(i)) != typename OutVector::value_type(0),
                  ExcInternalError());
           u2(i) /= touch_count(i);
         }
@@ -714,8 +714,8 @@ namespace FETools
     const unsigned int n1 = dof1.get_fe().dofs_per_cell;
     const unsigned int n2 = dof2.get_fe().dofs_per_cell;
 
-    Vector<double> u1_local(n1);
-    Vector<double> u2_local(n2);
+    Vector<typename OutVector::value_type> u1_local(n1);
+    Vector<typename OutVector::value_type> u2_local(n2);
     std::vector<types::global_dof_index> dofs(n2);
 
     FullMatrix<double> matrix(n2,n1);
