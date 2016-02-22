@@ -361,12 +361,12 @@ namespace Step43
   // darcy_matrix to match our problem.
   namespace LinearSolvers
   {
-    template <class MatrixType, class Preconditioner>
+    template <class MatrixType, class PreconditionerType>
     class InverseMatrix : public Subscriptor
     {
     public:
-      InverseMatrix (const MatrixType     &m,
-                     const Preconditioner &preconditioner);
+      InverseMatrix (const MatrixType         &m,
+                     const PreconditionerType &preconditioner);
 
 
       template <typename VectorType>
@@ -375,14 +375,14 @@ namespace Step43
 
     private:
       const SmartPointer<const MatrixType> matrix;
-      const Preconditioner &preconditioner;
+      const PreconditionerType &preconditioner;
     };
 
 
-    template <class MatrixType, class Preconditioner>
-    InverseMatrix<MatrixType,Preconditioner>::
-    InverseMatrix (const MatrixType     &m,
-                   const Preconditioner &preconditioner)
+    template <class MatrixType, class PreconditionerType>
+    InverseMatrix<MatrixType,PreconditionerType>::InverseMatrix
+    (const MatrixType         &m,
+     const PreconditionerType &preconditioner)
       :
       matrix (&m),
       preconditioner (preconditioner)
@@ -390,12 +390,12 @@ namespace Step43
 
 
 
-    template <class MatrixType, class Preconditioner>
+    template <class MatrixType, class PreconditionerType>
     template <typename VectorType>
     void
-    InverseMatrix<MatrixType,Preconditioner>::
-    vmult (VectorType       &dst,
-           const VectorType &src) const
+    InverseMatrix<MatrixType,PreconditionerType>::vmult
+    (VectorType       &dst,
+     const VectorType &src) const
     {
       SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
       SolverCG<VectorType> cg (solver_control);
@@ -412,15 +412,15 @@ namespace Step43
         }
     }
 
-    template <class PreconditionerA, class PreconditionerMp>
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
     class BlockSchurPreconditioner : public Subscriptor
     {
     public:
       BlockSchurPreconditioner (
-        const TrilinosWrappers::BlockSparseMatrix     &S,
+        const TrilinosWrappers::BlockSparseMatrix &S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
-        PreconditionerMp>         &Mpinv,
-        const PreconditionerA                         &Apreconditioner);
+        PreconditionerTypeMp>                     &Mpinv,
+        const PreconditionerTypeA                 &Apreconditioner);
 
       void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
                   const TrilinosWrappers::MPI::BlockVector &src) const;
@@ -428,20 +428,20 @@ namespace Step43
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> darcy_matrix;
       const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-            PreconditionerMp > > m_inverse;
-      const PreconditionerA &a_preconditioner;
+            PreconditionerTypeMp > > m_inverse;
+      const PreconditionerTypeA &a_preconditioner;
 
       mutable TrilinosWrappers::MPI::Vector tmp;
     };
 
 
 
-    template <class PreconditionerA, class PreconditionerMp>
-    BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
+    BlockSchurPreconditioner<PreconditionerTypeA, PreconditionerTypeMp>::
+    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
                              const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                             PreconditionerMp>      &Mpinv,
-                             const PreconditionerA                      &Apreconditioner)
+                             PreconditionerTypeMp>                     &Mpinv,
+                             const PreconditionerTypeA                 &Apreconditioner)
       :
       darcy_matrix            (&S),
       m_inverse               (&Mpinv),
@@ -450,8 +450,8 @@ namespace Step43
     {}
 
 
-    template <class PreconditionerA, class PreconditionerMp>
-    void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
+    void BlockSchurPreconditioner<PreconditionerTypeA, PreconditionerTypeMp>::vmult (
       TrilinosWrappers::MPI::BlockVector       &dst,
       const TrilinosWrappers::MPI::BlockVector &src) const
     {

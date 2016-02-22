@@ -237,7 +237,7 @@ namespace Step31
     // way as the corresponding class in step-22: when the product of an
     // object of this class is requested, we solve a linear equation system
     // with that matrix using the CG method, accelerated by a preconditioner
-    // of (templated) class <code>Preconditioner</code>.
+    // of (templated) class <code>PreconditionerType</code>.
     //
     // In a minor deviation from the implementation of the same class in
     // step-22 (and step-20), we make the <code>vmult</code> function take any
@@ -266,12 +266,12 @@ namespace Step31
     // run-time exception into an assertion that fails and triggers a call to
     // <code>abort()</code>, allowing us to trace back in a debugger how we
     // got to the current place.
-    template <class MatrixType, class Preconditioner>
+    template <class MatrixType, class PreconditionerType>
     class InverseMatrix : public Subscriptor
     {
     public:
       InverseMatrix (const MatrixType     &m,
-                     const Preconditioner &preconditioner);
+                     const PreconditionerType &preconditioner);
 
 
       template <typename VectorType>
@@ -280,14 +280,14 @@ namespace Step31
 
     private:
       const SmartPointer<const MatrixType> matrix;
-      const Preconditioner &preconditioner;
+      const PreconditionerType &preconditioner;
     };
 
 
-    template <class MatrixType, class Preconditioner>
-    InverseMatrix<MatrixType,Preconditioner>::
-    InverseMatrix (const MatrixType     &m,
-                   const Preconditioner &preconditioner)
+    template <class MatrixType, class PreconditionerType>
+    InverseMatrix<MatrixType,PreconditionerType>::InverseMatrix
+    (const MatrixType         &m,
+     const PreconditionerType &preconditioner)
       :
       matrix (&m),
       preconditioner (preconditioner)
@@ -295,12 +295,12 @@ namespace Step31
 
 
 
-    template <class MatrixType, class Preconditioner>
+    template <class MatrixType, class PreconditionerType>
     template <typename VectorType>
     void
-    InverseMatrix<MatrixType,Preconditioner>::
-    vmult (VectorType       &dst,
-           const VectorType &src) const
+    InverseMatrix<MatrixType,PreconditionerType>::vmult
+    (VectorType       &dst,
+     const VectorType &src) const
     {
       SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
       SolverCG<VectorType> cg (solver_control);
@@ -369,15 +369,15 @@ namespace Step31
     // Schur complement in step-20, with the difference that we need some more
     // preconditioners in the constructor and that the matrices we use here
     // are built upon Trilinos:
-    template <class PreconditionerA, class PreconditionerMp>
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
     class BlockSchurPreconditioner : public Subscriptor
     {
     public:
       BlockSchurPreconditioner (
         const TrilinosWrappers::BlockSparseMatrix     &S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
-        PreconditionerMp>         &Mpinv,
-        const PreconditionerA                         &Apreconditioner);
+        PreconditionerTypeMp>     &Mpinv,
+        const PreconditionerTypeA &Apreconditioner);
 
       void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
                   const TrilinosWrappers::MPI::BlockVector &src) const;
@@ -385,8 +385,8 @@ namespace Step31
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
       const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-            PreconditionerMp > > m_inverse;
-      const PreconditionerA &a_preconditioner;
+            PreconditionerTypeMp > > m_inverse;
+      const PreconditionerTypeA &a_preconditioner;
 
       mutable TrilinosWrappers::MPI::Vector tmp;
     };
@@ -402,12 +402,12 @@ namespace Step31
     // an IndexSet where every valid index is part of the set. Note that this
     // program can only be run sequentially and will throw an exception if used
     // in parallel.
-    template <class PreconditionerA, class PreconditionerMp>
-    BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
+    BlockSchurPreconditioner<PreconditionerTypeA, PreconditionerTypeMp>::
+    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
                              const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                             PreconditionerMp>      &Mpinv,
-                             const PreconditionerA                      &Apreconditioner)
+                             PreconditionerTypeMp>                     &Mpinv,
+                             const PreconditionerTypeA                 &Apreconditioner)
       :
       stokes_matrix           (&S),
       m_inverse               (&Mpinv),
@@ -431,11 +431,11 @@ namespace Step31
     // vector and finally multiply by the inverse pressure mass matrix to get
     // the final pressure vector, completing our work on the Stokes
     // preconditioner:
-    template <class PreconditionerA, class PreconditionerMp>
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
     void
-    BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    vmult (TrilinosWrappers::MPI::BlockVector       &dst,
-           const TrilinosWrappers::MPI::BlockVector &src) const
+    BlockSchurPreconditioner<PreconditionerTypeA, PreconditionerTypeMp>::vmult
+    (TrilinosWrappers::MPI::BlockVector       &dst,
+     const TrilinosWrappers::MPI::BlockVector &src) const
     {
       a_preconditioner.vmult (dst.block(0), src.block(0));
       stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));

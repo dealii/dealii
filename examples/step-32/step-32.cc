@@ -232,15 +232,15 @@ namespace Step32
   // discussion of composing solvers in step-20.
   namespace LinearSolvers
   {
-    template <class PreconditionerA, class PreconditionerMp>
+    template <class PreconditionerTypeA, class PreconditionerTypeMp>
     class BlockSchurPreconditioner : public Subscriptor
     {
     public:
-      BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix  &S,
-                                const TrilinosWrappers::BlockSparseMatrix  &Spre,
-                                const PreconditionerMp                     &Mppreconditioner,
-                                const PreconditionerA                      &Apreconditioner,
-                                const bool                                  do_solve_A)
+      BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix &S,
+                                const TrilinosWrappers::BlockSparseMatrix &Spre,
+                                const PreconditionerTypeMp                &Mppreconditioner,
+                                const PreconditionerTypeA                 &Apreconditioner,
+                                const bool                                 do_solve_A)
         :
         stokes_matrix     (&S),
         stokes_preconditioner_matrix     (&Spre),
@@ -286,8 +286,8 @@ namespace Step32
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
-      const PreconditionerMp &mp_preconditioner;
-      const PreconditionerA  &a_preconditioner;
+      const PreconditionerTypeMp &mp_preconditioner;
+      const PreconditionerTypeA  &a_preconditioner;
       const bool do_solve_A;
     };
   }

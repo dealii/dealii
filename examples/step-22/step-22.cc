@@ -264,26 +264,26 @@ namespace Step22
   // <code>InverseMatrix</code> object is created. The member function
   // <code>vmult</code> is, as in step-20, a multiplication with a vector,
   // obtained by solving a linear system:
-  template <class MatrixType, class Preconditioner>
+  template <class MatrixType, class PreconditionerType>
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix (const MatrixType     &m,
-                   const Preconditioner &preconditioner);
+    InverseMatrix (const MatrixType         &m,
+                   const PreconditionerType &preconditioner);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const MatrixType> matrix;
-    const SmartPointer<const Preconditioner> preconditioner;
+    const SmartPointer<const PreconditionerType> preconditioner;
   };
 
 
-  template <class MatrixType, class Preconditioner>
-  InverseMatrix<MatrixType,Preconditioner>::InverseMatrix
-  (const MatrixType     &m,
-   const Preconditioner &preconditioner)
+  template <class MatrixType, class PreconditionerType>
+  InverseMatrix<MatrixType,PreconditionerType>::InverseMatrix
+  (const MatrixType         &m,
+   const PreconditionerType &preconditioner)
     :
     matrix (&m),
     preconditioner (&preconditioner)
@@ -300,9 +300,10 @@ namespace Step22
   // inverse of the Laplace matrix &ndash; which is hence directly responsible
   // for the accuracy of the solution itself, so we can't choose a too large
   // tolerance, either.
-  template <class MatrixType, class Preconditioner>
-  void InverseMatrix<MatrixType,Preconditioner>::vmult (Vector<double>       &dst,
-                                                        const Vector<double> &src) const
+  template <class MatrixType, class PreconditionerType>
+  void InverseMatrix<MatrixType,PreconditionerType>::vmult
+  (Vector<double>       &dst,
+   const Vector<double> &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
     SolverCG<>    cg (solver_control);
@@ -317,35 +318,35 @@ namespace Step22
 
   // This class implements the Schur complement discussed in the introduction.
   // It is in analogy to step-20.  Though, we now call it with a template
-  // parameter <code>Preconditioner</code> in order to access that when
+  // parameter <code>PreconditionerType</code> in order to access that when
   // specifying the respective type of the inverse matrix class. As a
   // consequence of the definition above, the declaration
   // <code>InverseMatrix</code> now contains the second template parameter for
   // a preconditioner class as above, which affects the
   // <code>SmartPointer</code> object <code>m_inverse</code> as well.
-  template <class Preconditioner>
+  template <class PreconditionerType>
   class SchurComplement : public Subscriptor
   {
   public:
     SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-                     const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse);
+                     const InverseMatrix<SparseMatrix<double>, PreconditionerType> &A_inverse);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>, Preconditioner> > A_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>, PreconditionerType> > A_inverse;
 
     mutable Vector<double> tmp1, tmp2;
   };
 
 
 
-  template <class Preconditioner>
-  SchurComplement<Preconditioner>::
-  SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-                   const InverseMatrix<SparseMatrix<double>,Preconditioner> &A_inverse)
+  template <class PreconditionerType>
+  SchurComplement<PreconditionerType>::SchurComplement
+  (const BlockSparseMatrix<double>                              &system_matrix,
+   const InverseMatrix<SparseMatrix<double>,PreconditionerType> &A_inverse)
     :
     system_matrix (&system_matrix),
     A_inverse (&A_inverse),
@@ -354,9 +355,9 @@ namespace Step22
   {}
 
 
-  template <class Preconditioner>
-  void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
-                                               const Vector<double> &src) const
+  template <class PreconditionerType>
+  void SchurComplement<PreconditionerType>::vmult (Vector<double>       &dst,
+                                                   const Vector<double> &src) const
   {
     system_matrix->block(0,1).vmult (tmp1, src);
     A_inverse->vmult (tmp2, tmp1);
