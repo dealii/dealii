@@ -37,7 +37,7 @@ namespace Functions
    const VectorType     &myv,
    const Mapping<dim>   &mymapping)
     :
-    Function<dim>(mydh.get_fe().n_components()),
+    Function<dim,typename VectorType::value_type>(mydh.get_fe().n_components()),
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),
@@ -60,7 +60,7 @@ namespace Functions
 
   template <int dim, typename DoFHandlerType, typename VectorType>
   void FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_value (const Point<dim> &p,
-      Vector<double>   &values) const
+      Vector<typename VectorType::value_type>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
@@ -97,11 +97,11 @@ namespace Functions
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  double
+  typename VectorType::value_type
   FEFieldFunction<dim, DoFHandlerType, VectorType>::value (const Point<dim>   &p,
                                                            const unsigned int comp) const
   {
-    Vector<double> values(n_components);
+    Vector<typename VectorType::value_type> values(n_components);
     vector_value(p, values);
     return values(comp);
   }
@@ -112,7 +112,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_gradient (const Point<dim>            &p,
-                   std::vector<Tensor<1,dim> > &gradients) const
+                   std::vector<Tensor<1,dim,typename VectorType::value_type> > &gradients) const
   {
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
@@ -140,25 +140,18 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
-
-    // FIXME: we need a temp argument because get_function_values wants to put
-    // its data into an object storing the correct scalar type, but this
-    // function wants to return everything in a vector<double>
-    std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > > vgrads
-    (1,  std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components) );
-    fe_v.get_function_gradients(data_vector, vgrads);
-    gradients = std::vector<Tensor<1,dim> >(vgrads[0].begin(), vgrads[0].end());
+    fe_v.get_function_gradients(data_vector, gradients);
   }
 
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  Tensor<1,dim>
+  Tensor<1,dim,typename VectorType::value_type>
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   gradient (const Point<dim>   &p,
             const unsigned int comp) const
   {
-    std::vector<Tensor<1,dim> > grads(n_components);
+    std::vector<Tensor<1,dim,typename VectorType::value_type> > grads(n_components);
     vector_gradient(p, grads);
     return grads[comp];
   }
@@ -169,7 +162,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_laplacian (const Point<dim> &p,
-                    Vector<double>   &values) const
+                    Vector<typename VectorType::value_type>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
@@ -206,11 +199,11 @@ namespace Functions
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  double FEFieldFunction<dim, DoFHandlerType, VectorType>::laplacian
+  typename VectorType::value_type FEFieldFunction<dim, DoFHandlerType, VectorType>::laplacian
   (const Point<dim>   &p,
    const unsigned int  comp) const
   {
-    Vector<double> lap(n_components);
+    Vector<typename VectorType::value_type> lap(n_components);
     vector_laplacian(p, lap);
     return lap[comp];
   }
@@ -223,7 +216,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_value_list (const std::vector<Point< dim > > &points,
-                     std::vector< Vector<double> >    &values) const
+                     std::vector< Vector<typename VectorType::value_type> >    &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -267,12 +260,12 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   value_list (const std::vector<Point< dim > > &points,
-              std::vector< double >            &values,
+              std::vector< typename VectorType::value_type >            &values,
               const unsigned int                component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
-    std::vector< Vector<double> > vvalues(points.size(), Vector<double>(n_components));
+    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(n_components));
     vector_value_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q](component);
@@ -284,7 +277,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_gradient_list (const std::vector<Point< dim > >           &points,
-                        std::vector<std::vector< Tensor<1,dim> > > &values) const
+                        std::vector<std::vector< Tensor<1,dim, typename VectorType::value_type> > > &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -332,13 +325,13 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   gradient_list (const std::vector<Point< dim > > &points,
-                 std::vector< Tensor<1,dim> >     &values,
+                 std::vector< Tensor<1,dim, typename VectorType::value_type> >     &values,
                  const unsigned int                component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
-    std::vector< std::vector<Tensor<1,dim> > >
-    vvalues(points.size(), std::vector<Tensor<1,dim> >(n_components));
+    std::vector< std::vector<Tensor<1,dim, typename VectorType::value_type> > >
+    vvalues(points.size(), std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components));
     vector_gradient_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q][component];
@@ -349,7 +342,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   vector_laplacian_list (const std::vector<Point< dim > > &points,
-                         std::vector< Vector<double> >    &values) const
+                         std::vector< Vector<typename VectorType::value_type> >    &values) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
@@ -391,12 +384,12 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::
   laplacian_list (const std::vector<Point<dim> > &points,
-                  std::vector<double>            &values,
+                  std::vector<typename VectorType::value_type>            &values,
                   const unsigned int              component) const
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
-    std::vector< Vector<double> > vvalues(points.size(), Vector<double>(n_components));
+    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(n_components));
     vector_laplacian_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q](component);
