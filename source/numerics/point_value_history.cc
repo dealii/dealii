@@ -817,6 +817,7 @@ void PointValueHistory<dim>
 ::evaluate_field_at_requested_location (const std::string &vector_name,
                                         const VectorType  &solution)
 {
+  typedef typename VectorType::value_type number;
   // must be closed to add data to internal
   // members.
   Assert (closed, ExcInvalidState ());
@@ -841,7 +842,7 @@ void PointValueHistory<dim>
   unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe ().n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  Vector <double> value (dof_handler->get_fe().n_components());
+  Vector <number> value (dof_handler->get_fe().n_components());
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
     {
       // Make a Vector <double> for the value
