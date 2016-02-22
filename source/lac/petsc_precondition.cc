@@ -479,6 +479,7 @@ namespace PETScWrappers
   void
   PreconditionBoomerAMG::initialize ()
   {
+#ifndef PETSC_USE_COMPLEX
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -517,6 +518,9 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+#else
+    Assert(false, ExcMessage("Complex-valued PETSc does not support BoomerAMG preconditioner."));
+#endif
   }
 
   void
