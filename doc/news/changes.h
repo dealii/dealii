@@ -38,8 +38,9 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: ConstraintMatrix::distribute_local_to_global() now requires
-  matching data types. This is done to correctly handle complex-valued case.
+  <li> Changed: ConstraintMatrix::distribute_local_to_global() and numerous
+  functions in VectorTools namespace now require matching data types.
+  This is done to correctly handle complex-valued case.
   <br>
   (Denis Davydov, 2016/02/22)
   </li>

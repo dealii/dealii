@@ -403,7 +403,7 @@ namespace VectorTools
   template <typename VectorType, int dim, int spacedim, template <int, int> class DoFHandlerType>
   void interpolate (const Mapping<dim,spacedim>        &mapping,
                     const DoFHandlerType<dim,spacedim> &dof,
-                    const Function<spacedim,double>    &function,
+                    const Function<spacedim,typename VectorType::value_type>    &function,
                     VectorType                         &vec);
 
   /**
@@ -412,7 +412,7 @@ namespace VectorTools
    */
   template <typename VectorType, typename DoFHandlerType>
   void interpolate (const DoFHandlerType                                   &dof,
-                    const Function<DoFHandlerType::space_dimension,double> &function,
+                    const Function<DoFHandlerType::space_dimension,typename VectorType::value_type> &function,
                     VectorType                                             &vec);
 
   /**
@@ -489,7 +489,7 @@ namespace VectorTools
   interpolate_based_on_material_id
   (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
    const DoFHandlerType                                                  &dof_handler,
-   const std::map<types::material_id, const Function<DoFHandlerType::space_dimension, double> *> &function_map,
+   const std::map<types::material_id, const Function<DoFHandlerType::space_dimension, typename VectorType::value_type> *> &function_map,
    VectorType                                                            &dst,
    const ComponentMask                                                   &component_mask = ComponentMask());
 
@@ -592,7 +592,7 @@ namespace VectorTools
                 const DoFHandler<dim,spacedim>  &dof,
                 const ConstraintMatrix          &constraints,
                 const Quadrature<dim>           &quadrature,
-                const Function<spacedim,double> &function,
+                const Function<spacedim,typename VectorType::value_type> &function,
                 VectorType                      &vec,
                 const bool                      enforce_zero_boundary = false,
                 const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
@@ -608,7 +608,7 @@ namespace VectorTools
   void project (const DoFHandler<dim,spacedim>  &dof,
                 const ConstraintMatrix          &constraints,
                 const Quadrature<dim>           &quadrature,
-                const Function<spacedim,double> &function,
+                const Function<spacedim,typename VectorType::value_type> &function,
                 VectorType                      &vec,
                 const bool                      enforce_zero_boundary = false,
                 const Quadrature<dim-1>         &q_boundary = (dim > 1 ?
@@ -625,7 +625,7 @@ namespace VectorTools
                 const hp::DoFHandler<dim,spacedim>         &dof,
                 const ConstraintMatrix                     &constraints,
                 const hp::QCollection<dim>                 &quadrature,
-                const Function<spacedim,double>            &function,
+                const Function<spacedim,typename VectorType::value_type>            &function,
                 VectorType                                 &vec,
                 const bool                                 enforce_zero_boundary = false,
                 const hp::QCollection<dim-1> &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
@@ -641,7 +641,7 @@ namespace VectorTools
   void project (const hp::DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix             &constraints,
                 const hp::QCollection<dim>         &quadrature,
-                const Function<spacedim,double>    &function,
+                const Function<spacedim,typename VectorType::value_type>    &function,
                 VectorType                         &vec,
                 const bool                         enforce_zero_boundary = false,
                 const hp::QCollection<dim-1>       &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
@@ -1989,8 +1989,8 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   void point_difference (const DoFHandler<dim,spacedim>  &dof,
                          const VectorType                &fe_function,
-                         const Function<spacedim,double> &exact_solution,
-                         Vector<double>                  &difference,
+                         const Function<spacedim,typename VectorType::value_type> &exact_solution,
+                         Vector<typename VectorType::value_type>                  &difference,
                          const Point<spacedim>           &point);
 
   /**
@@ -2009,8 +2009,8 @@ namespace VectorTools
   void point_difference (const Mapping<dim, spacedim>    &mapping,
                          const DoFHandler<dim,spacedim>  &dof,
                          const VectorType                &fe_function,
-                         const Function<spacedim,double> &exact_solution,
-                         Vector<double>                  &difference,
+                         const Function<spacedim,typename VectorType::value_type> &exact_solution,
+                         Vector<typename VectorType::value_type>                  &difference,
                          const Point<spacedim>           &point);
 
   /**
@@ -2029,7 +2029,7 @@ namespace VectorTools
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point,
-               Vector<double>                 &value);
+               Vector<typename VectorType::value_type>                 &value);
 
   /**
    * Same as above for hp.
@@ -2042,7 +2042,7 @@ namespace VectorTools
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
                const Point<spacedim>              &point,
-               Vector<double>                     &value);
+               Vector<typename VectorType::value_type>                     &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2060,7 +2060,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point);
@@ -2072,7 +2072,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const hp::DoFHandler<dim,spacedim> &dof,
                const VectorType                   &fe_function,
                const Point<spacedim>              &point);
@@ -2094,7 +2094,7 @@ namespace VectorTools
                const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
                const Point<spacedim>          &point,
-               Vector<double>                 &value);
+               Vector<typename VectorType::value_type>                 &value);
 
   /**
    * Same as above for hp.
@@ -2108,7 +2108,7 @@ namespace VectorTools
                const hp::DoFHandler<dim,spacedim>         &dof,
                const VectorType                           &fe_function,
                const Point<spacedim>                      &point,
-               Vector<double>                             &value);
+               Vector<typename VectorType::value_type>                             &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2122,7 +2122,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const Mapping<dim,spacedim>    &mapping,
                const DoFHandler<dim,spacedim> &dof,
                const VectorType               &fe_function,
@@ -2135,7 +2135,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  double
+  typename VectorType::value_type
   point_value (const hp::MappingCollection<dim,spacedim> &mapping,
                const hp::DoFHandler<dim,spacedim>        &dof,
                const VectorType                          &fe_function,
@@ -2346,21 +2346,23 @@ namespace VectorTools
    * mean value and subtract it right inside the evaluation routine.
    */
   template <int dim, typename VectorType, int spacedim>
-  double compute_mean_value (const Mapping<dim, spacedim>   &mapping,
-                             const DoFHandler<dim,spacedim> &dof,
-                             const Quadrature<dim>          &quadrature,
-                             const VectorType               &v,
-                             const unsigned int             component);
+  typename VectorType::value_type
+  compute_mean_value (const Mapping<dim, spacedim>   &mapping,
+                      const DoFHandler<dim,spacedim> &dof,
+                      const Quadrature<dim>          &quadrature,
+                      const VectorType               &v,
+                      const unsigned int             component);
 
   /**
    * Calls the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
-  double compute_mean_value (const DoFHandler<dim,spacedim> &dof,
-                             const Quadrature<dim>          &quadrature,
-                             const VectorType               &v,
-                             const unsigned int             component);
+  typename VectorType::value_type
+  compute_mean_value (const DoFHandler<dim,spacedim> &dof,
+                      const Quadrature<dim>          &quadrature,
+                      const VectorType               &v,
+                      const unsigned int             component);
   //@}
   /**
    * Geometrical interpolation
