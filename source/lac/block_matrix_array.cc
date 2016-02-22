@@ -323,7 +323,7 @@ BlockTrianglePrecondition<number,BlockVectorType>::do_row
             m->matrix->Tvmult(aux, dst.block(j));
           else
             m->matrix->vmult(aux, dst.block(j));
-          dst.block(i).add (-1 * m->prefix, aux);
+          dst.block(i).add (-1.0 * m->prefix, aux);
         }
     }
   Assert (diagonals.size() != 0, ExcNoDiagonal(row_num));
@@ -438,10 +438,17 @@ template class BlockTrianglePrecondition<double, TrilinosWrappers::MPI::BlockVec
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
+#ifdef PETSC_USE_COMPLEX
+template class BlockMatrixArray<std::complex<float>, PETScWrappers::MPI::BlockVector>;
+template class BlockMatrixArray<std::complex<double>, PETScWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<std::complex<float>, PETScWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<std::complex<double>, PETScWrappers::MPI::BlockVector>;
+#else
 template class BlockMatrixArray<float, PETScWrappers::MPI::BlockVector>;
 template class BlockMatrixArray<double, PETScWrappers::MPI::BlockVector>;
 template class BlockTrianglePrecondition<float, PETScWrappers::MPI::BlockVector>;
 template class BlockTrianglePrecondition<double, PETScWrappers::MPI::BlockVector>;
+#endif
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

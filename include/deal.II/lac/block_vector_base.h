@@ -1686,10 +1686,11 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::mean_value () const
 {
   value_type sum = 0.;
+  // need to do static_cast as otherwise it won't work with value_type=complex<T>
   for (size_type i=0; i<n_blocks(); ++i)
-    sum += components[i].mean_value() * components[i].size();
+    sum += components[i].mean_value() * static_cast<double>(components[i].size());
 
-  return sum/size();
+  return sum/static_cast<double>(size());
 }
 
 
