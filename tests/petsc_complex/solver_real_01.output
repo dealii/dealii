@@ -1,0 +1,18 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: N6dealii13PETScWrappers16SolverRichardsonE
+DEAL::Starting value 7.750
+DEAL::Failure step 100 value 4.004
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_solver.cc> in function
+    void dealii::PETScWrappers::SolverBase::solve(const dealii::PETScWrappers::MatrixBase&, dealii::PETScWrappers::VectorBase&, const dealii::PETScWrappers::VectorBase&, const dealii::PETScWrappers::PreconditionerBase&)
+The violated condition was: 
+    false
+The name and call sequence of the exception was:
+    SolverControl::NoConvergence (solver_control.last_step(), solver_control.last_value())
+Additional Information: 
+Iterative method reported convergence failure in step 100 with residual 4.00437
+--------------------------------------------------------
+
+DEAL::Solver stopped after 100 iterations

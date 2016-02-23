@@ -1,0 +1,8 @@
+
+Initializing SLEPc (PETSc): ok
+Using PetscScalar:
+   pi+1i:           (3.14159,1.00000)
+   two:             (2.00000,0.00000)
+   two times pi+1i: (6.28319,2.00000)
+Finalizing SLEPc (PETSc): ok
+
