@@ -651,7 +651,7 @@ namespace Step20
                      const InverseMatrix<SparseMatrix<double> > &Minv)
     :
     system_matrix (&A),
-    inverse_mass (&Minv),
+    m_inverse (&Minv),
     tmp1 (A.block(0,0).m()),
     tmp2 (A.block(0,0).m())
   {}
