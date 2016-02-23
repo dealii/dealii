@@ -1004,12 +1004,13 @@ types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_ids) const
+template <typename number>
+types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::map<types::boundary_id, const Function<1,number>*> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_ids.begin();
+  for (typename std::map<types::boundary_id, const Function<1,number>*>::const_iterator i=boundary_ids.begin();
        i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
@@ -1043,12 +1044,13 @@ types::global_dof_index DoFHandler<1,2>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_ids) const
+template <typename number>
+types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::map<types::boundary_id, const Function<2,number>*> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_ids.begin();
+  for (typename std::map<types::boundary_id, const Function<2,number>*>::const_iterator i=boundary_ids.begin();
        i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
@@ -1113,8 +1115,9 @@ types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 
 
 template<int dim, int spacedim>
+template<typename number>
 types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_ids) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
 {
   Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());

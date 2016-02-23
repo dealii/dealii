@@ -681,17 +681,17 @@ namespace DoFTools
    * This function could have been written by passing a @p set of boundary_id
    * numbers. However, most of the functions throughout deal.II dealing with
    * boundary indicators take a mapping of boundary indicators and the
-   * corresponding boundary function, i.e., a FunctionMap argument.
+   * corresponding boundary function, i.e., a std::map<types::boundary_id, const Function<spacedim,number>*> argument.
    * Correspondingly, this function does the same, though the actual boundary
    * function is ignored here. (Consequently, if you don't have any such
    * boundary functions, just create a map with the boundary indicators you
    * want and set the function pointers to null pointers).
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType, typename SparsityPatternType, typename number>
   void
   make_boundary_sparsity_pattern
   (const DoFHandlerType                                              &dof,
-   const typename FunctionMap<DoFHandlerType::space_dimension>::type &boundary_ids,
+   const std::map<types::boundary_id, const Function<DoFHandlerType::space_dimension,number>*> &boundary_ids,
    const std::vector<types::global_dof_index>                        &dof_to_boundary_mapping,
    SparsityPatternType                                               &sparsity);
 

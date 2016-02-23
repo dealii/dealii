@@ -14,6 +14,15 @@
 // ---------------------------------------------------------------------
 
 
+for (scalar: REAL_SCALARS; deal_II_dimension : DIMENSIONS)
+  {
+    template types::global_dof_index DoFHandler<deal_II_dimension>::n_boundary_dofs<scalar> (const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids) const;
+    
+#if deal_II_dimension < 3
+    template types::global_dof_index DoFHandler<deal_II_dimension,deal_II_dimension+1>::n_boundary_dofs<scalar> (const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids) const;
+#endif
+    
+  }
 
 for (deal_II_dimension : DIMENSIONS)
   {
