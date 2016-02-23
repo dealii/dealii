@@ -114,6 +114,7 @@ namespace Functions
   vector_gradient (const Point<dim>            &p,
                    std::vector<Tensor<1,dim,typename VectorType::value_type> > &gradients) const
   {
+    typedef typename VectorType::value_type number;
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
@@ -140,7 +141,25 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
-    fe_v.get_function_gradients(data_vector, gradients);
+
+    if (n_components == 1)
+      {
+        // the size of the @p gradients coincidentally coincides
+        // with the number of quadrature points we evaluate the function at.
+        fe_v.get_function_gradients(data_vector, gradients);
+      }
+    else
+      {
+        // Unfortunately we still need a temporary argument as we want to
+        // evaluate a gradient of a (generally) multicomponent function at
+        // a single quadrature point. Note that the first std::vector<> is related
+        // to the number of quadrature points (always one here), whereas the second
+        // to the number of components.
+        std::vector< std::vector<Tensor<1,dim,number> > > vgrads
+        (1,  std::vector<Tensor<1,dim,number> >(n_components) );
+        fe_v.get_function_gradients(data_vector, vgrads);
+        gradients = vgrads[0];
+      }
   }
 
 
