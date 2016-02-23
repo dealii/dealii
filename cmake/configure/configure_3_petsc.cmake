@@ -103,6 +103,17 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
   SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
+  #
+  # FIXME:
+  # temporary variable until deal.II fully support complex-valued PETSc
+  IF( NOT PETSC_WITH_COMPLEX )
+    SET(DEAL_II_EXPAND_PETSC_VECTOR_REAL "PETScWrappers::Vector")
+    SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR_REAL "PETScWrappers::BlockVector")
+    SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL "PETScWrappers::MPI::Vector")
+    SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL "PETScWrappers::MPI::BlockVector")
+  ELSE()
+    MESSAGE(STATUS "Compiling with complex-valued algebra")
+  ENDIF()
 ENDMACRO()
 
 

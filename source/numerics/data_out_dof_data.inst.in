@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
+for (VEC : REAL_SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 {
 // codim=0
 
