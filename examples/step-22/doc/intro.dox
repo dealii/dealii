@@ -40,6 +40,45 @@ valid; taking into account inertia effects then leads to the
 nonlinear Navier-Stokes equations. However, in this tutorial program,
 we will focus on the simpler Stokes system.
 
+Note that when deriving the more general compressible Navier-Stokes equations,
+the diffusion is modeled as the divergence of the stress tensor
+@f{eqnarray*}
+  \tau = - \mu (2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I),
+@f}
+where $\mu$ is the viscosity of the fluid. With the assumption of $\mu=1$
+(assume constant viscosity and non-dimensionalize the equation by dividing out
+$\mu$) and assuming incompressibility ($\textrm{div}\; \textbf{u}=0$), we
+arrive at the formulation from above:
+@f{eqnarray*}
+  \textrm{div}\; \tau = -2\textrm{div}\;\varepsilon(\textbf{u}).
+@f}
+A different formulation uses the Laplace operator ($-\triangle \textbf{u}$)
+instead of the symmetrized gradient. A big difference here is that the
+different components of the velocity do not couple. If you assume additional
+regularity of the solution $\textbf{u}$ (second partial derivatives exist and
+are continuous), the formulations are equivalent:
+@f{eqnarray*}
+  \textrm{div}\; \tau
+  = -2\textrm{div}\;\varepsilon(\textbf{u})
+  = -\triangle \textbf{u} + \nabla \cdot (\nabla\textbf{u})^T
+  = -\triangle \textbf{u}.
+@f}
+This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given by:
+@f{eqnarray*}
+[\nabla \cdot (\nabla\textbf{u})^T]_i
+= \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})^T]_{i,j}
+= \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})]_{j,i}
+= \sum_j \frac{\partial}{\partial x_j} \frac{\partial}{\partial x_i} \textbf{u}_j
+= \sum_j \frac{\partial}{\partial x_i} \frac{\partial}{\partial x_j} \textbf{u}_j
+= \frac{\partial}{\partial x_i} \textrm{div}\; \textbf{u}
+= 0.
+@f}
+If you can not assume the above mentioned regularity, or if your viscosity is
+not a constant, the equivalence no longer holds. Therefore, we decided to
+stick with the more physically accurate symmetric tensor formulation in this
+tutorial.
+
+
 To be well-posed, we will have to add boundary conditions to the
 equations. What boundary conditions are readily possible here will
 become clear once we discuss the weak form of the equations.
@@ -66,7 +105,7 @@ form as
   \end{pmatrix},
 @f}
 forming the dot product from the left with a vector-valued test
-function $\phi = \begin{pmatrix}\textbf v \\ q\end{pmatrix}$ and integrating
+function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$ and integrating
 over the domain $\Omega$, yielding the following set of equations:
 @f{eqnarray*}
   (\mathrm v,
@@ -76,13 +115,13 @@ over the domain $\Omega$, yielding the following set of equations:
   =
   (\textbf{v}, \textbf{f})_\Omega,
 @f}
-which has to hold for all test functions $\phi = \begin{pmatrix}\textbf v
+which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 \\ q\end{pmatrix}$.
 
 In practice, one wants to impose as little regularity on the pressure
 variable as possible; consequently, we integrate by parts the second term:
 @f{eqnarray*}
-  (\mathrm v, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
+  (\textbf{v}, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -92,9 +131,9 @@ variable as possible; consequently, we integrate by parts the second term:
 @f}
 Likewise, we integrate by parts the first term to obtain
 @f{eqnarray*}
-  (\nabla \mathrm v, 2\; \varepsilon(\textbf{u}))_{\Omega}
+  (\nabla \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
-  (\textbf{n} \otimes \mathrm v, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
+  (\textbf{n} \otimes \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -105,20 +144,20 @@ Likewise, we integrate by parts the first term to obtain
 where the scalar product between two tensor-valued quantities is here
 defined as
 @f{eqnarray*}
-  (\nabla \mathrm v, 2\; \varepsilon(\textbf{u}))_{\Omega}
+  (\nabla \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\Omega}
   =
   2 \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
   \varepsilon(\textbf{u})_{ij} \ dx.
 @f}
 Because the scalar product between a general tensor like
-$\nabla\mathrm v$ and a symmetric tensor like
+$\nabla\textbf{v}$ and a symmetric tensor like
 $\varepsilon(\textbf{u})$ equals the scalar product between the
 symmetrized forms of the two, we can also write the bilinear form
 above as follows:
 @f{eqnarray*}
-  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
-  (\textbf{n} \otimes \mathrm v, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
+  (\textbf{n} \otimes \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
   -
@@ -129,7 +168,7 @@ above as follows:
 We will deal with the boundary terms in the next section, but it is already
 clear from the domain terms
 @f{eqnarray*}
-  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -153,8 +192,8 @@ possibilities for imposing boundary conditions:
     @f{eqnarray*}
         \textbf u = \textbf g_D \qquad\qquad \textrm{on}\ \Gamma_D.
     @f}
-    Because test functions $\textbf v$ come from the tangent space of
-    the solution variable, we have that $\textbf v=0$ on $\Gamma_D$
+    Because test functions $\textbf{v}$ come from the tangent space of
+    the solution variable, we have that $\textbf{v}=0$ on $\Gamma_D$
     and consequently that
     @f{eqnarray*}
       -(\textbf{n} \otimes \mathrm
@@ -198,11 +237,11 @@ possibilities for imposing boundary conditions:
       (n_i v_j,p \delta_{ij} - 2\; \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
       \\
       &=&
-      (\textbf{n} \otimes \mathrm v,
+      (\textbf{n} \otimes \textbf{v},
       p \textbf{1} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
       \\
       &=&
-      (\mathrm v,
+      (\textbf{v},
        \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
     @f}
     In other words, on the Neumann part of the boundary we can
@@ -215,7 +254,7 @@ possibilities for imposing boundary conditions:
     If the boundary is subdivided into Dirichlet and Neumann parts
     $\Gamma_D,\Gamma_N$, this then leads to the following weak form:
     @f{eqnarray*}
-      (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
+      (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
       (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -235,7 +274,7 @@ possibilities for imposing boundary conditions:
     @f}
     with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
     @f{eqnarray*}
-      (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
+      (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
       (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -299,7 +338,7 @@ boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
 $\textbf u\in \textbf V_g = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=\textbf
 g_D\}, p\in Q=L^2(\Omega)$ so that
 @f{eqnarray*}
-  (\varepsilon(\mathrm v), 2\; \varepsilon(\textbf{u}))_{\Omega}
+  (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
@@ -309,7 +348,7 @@ g_D\}, p\in Q=L^2(\Omega)$ so that
   (\textbf{v}, \textbf g_N)_{\Gamma_N}
 @f}
 for all test functions
-$\textbf v\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
+$\textbf{v}\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
 Q$.
 
 These equations represent a symmetric saddle point problem. It is well known
@@ -331,7 +370,7 @@ pressures.
 This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
 that
 @f{eqnarray*}
-  (\varepsilon(\mathrm v_h), 2\; \varepsilon(\textbf u_h))_{\Omega}
+  (\varepsilon(\textbf{v}_h), 2\; \varepsilon(\textbf u_h))_{\Omega}
   - (\textrm{div}\; \textbf{v}_h, p_h)_{\Omega}
   -
   (q_h,\textrm{div}\; \textbf{u}_h)_{\Omega}
@@ -340,7 +379,7 @@ that
   -
   (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
 @f}
-for all test functions $\textbf v_h, q_h$. Assembling the linear system
+for all test functions $\textbf{v}_h, q_h$. Assembling the linear system
 associated with this problem follows the same lines used in @ref step_20
 "step-20", step-21, and explained in detail in the @ref
 vector_valued module.
