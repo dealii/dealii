@@ -344,10 +344,11 @@ namespace VectorTools
   interpolate_based_on_material_id
   (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
    const DoFHandlerType                                                      &dof,
-   const std::map<types::material_id, const Function<DoFHandlerType::space_dimension> *> &function_map,
+   const std::map<types::material_id, const Function<DoFHandlerType::space_dimension, typename VectorType::value_type> *> &function_map,
    VectorType                                                                &dst,
    const ComponentMask                                                       &component_mask)
   {
+    typedef typename VectorType::value_type number;
     const unsigned int dim = DoFHandlerType::dimension;
 
     Assert( component_mask.represents_n_components(dof.get_fe().n_components()),
@@ -362,7 +363,7 @@ namespace VectorTools
             ExcMessage("You cannot specify the invalid material indicator "
                        "in your function map."));
 
-    for (typename std::map<types::material_id, const Function<DoFHandlerType::space_dimension>* >
+    for (typename std::map<types::material_id, const Function<DoFHandlerType::space_dimension, number>* >
          ::const_iterator
          iter  = function_map.begin();
          iter != function_map.end();
@@ -425,8 +426,8 @@ namespace VectorTools
     std::vector< types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
     std::vector< Point<DoFHandlerType::space_dimension> > rep_points(max_rep_points);
 
-    std::vector< std::vector<double> >           function_values_scalar(fe.size());
-    std::vector< std::vector< Vector<double> > > function_values_system(fe.size());
+    std::vector< std::vector<number> >           function_values_scalar(fe.size());
+    std::vector< std::vector< Vector<number> > > function_values_system(fe.size());
 
     hp::QCollection<dim> support_quadrature;
     for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
@@ -459,7 +460,7 @@ namespace VectorTools
             if (fe_is_system)
               {
                 function_values_system[fe_index].resize( n_rep_points[fe_index],
-                                                         Vector<double>(fe[fe_index].n_components()) );
+                                                         Vector<number>(fe[fe_index].n_components()) );
 
                 function_map.find(cell->material_id())->second->vector_value_list(rep_points,
                     function_values_system[fe_index]);
