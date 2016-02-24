@@ -63,6 +63,12 @@ inconvenience this causes.
 
 
 <ol> 
+ <li> Fixed: The function IndexSet::make_trilinos_map() now works if some 
+ processors have a contiguous range of indices and others do not.
+ <br>
+ (Bruno Turcksin, 2016/02/17)
+ </li>
+
  <li> Updated: step-44 has been been expressed in a more dimension independent 
  manner, and can be now run in both 2-d and 3-d.
  <br>
