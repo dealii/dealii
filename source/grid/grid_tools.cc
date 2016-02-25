@@ -1714,8 +1714,8 @@ next_cell:
     // processors and shifting the indices accordingly
     const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
     std::vector<types::global_vertex_index> indices(n_cpu);
-    MPI_Allgather(&next_index, 1, MPI_UNSIGNED_LONG_LONG, &indices[0],
-                  indices.size(), MPI_UNSIGNED_LONG_LONG, triangulation.get_communicator());
+    MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
+                  indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
     const types::global_vertex_index shift = std::accumulate(&indices[0],
                                                              &indices[0]+triangulation.locally_owned_subdomain(),0);
 
