@@ -434,3 +434,11 @@ IF(DEAL_II_WITH_CXX11)
   RESET_CMAKE_REQUIRED()
 ENDIF()
 
+#
+# Intel 16.0.1 produces wrong code that creates a race condition in
+# tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
+# version. Also see github.com/dealii/dealii/issues/2203
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "16.0.1" )
+  MESSAGE(FATAL_ERROR "Intel compiler version 16.0.1 is not supported, please update to 16.0.2 or newer!")
+ENDIF()
