@@ -2244,6 +2244,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
+      Triangulation<dim, spacedim>::update_periodic_face_map();
     }
 
 
@@ -2582,8 +2583,6 @@ namespace parallel
       coarse_cell_to_p4est_tree_permutation.resize (0);
       p4est_tree_to_coarse_cell_permutation.resize (0);
 
-      periodic_face_pairs_level_0.clear();
-
       dealii::Triangulation<dim,spacedim>::clear ();
 
       this->update_number_cache ();
@@ -2774,6 +2773,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
+      Triangulation<dim, spacedim>::update_periodic_face_map();
     }
 
 
@@ -3207,7 +3207,7 @@ namespace parallel
       template <int dim, int spacedim>
       bool enforce_mesh_balance_over_periodic_boundaries
       (Triangulation<dim,spacedim> &tria,
-       const std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > periodic_face_pairs_level_0)
+       const std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > &periodic_face_pairs_level_0)
       {
         if (periodic_face_pairs_level_0.empty())
           return false;
@@ -3361,7 +3361,7 @@ namespace parallel
           if (this->smooth_grid &
               dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
             mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this,
-                           periodic_face_pairs_level_0);
+                           this->periodic_face_pairs_level_0);
         }
       while (mesh_changed);
 
@@ -3894,8 +3894,8 @@ namespace parallel
 
 
       refinement_in_progress = false;
-
       this->update_number_cache ();
+      Triangulation<dim, spacedim>::update_periodic_face_map();
     }
 
     template <int dim, int spacedim>
@@ -3965,6 +3965,7 @@ namespace parallel
 
       // update how many cells, edges, etc, we store locally
       this->update_number_cache ();
+      Triangulation<dim, spacedim>::update_periodic_face_map();
     }
 
 
@@ -4693,8 +4694,8 @@ namespace parallel
               vertices_with_ghost_neighbors[cell->vertex_index(v)]
               .insert (cell->level_subdomain_id());
 
-      for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
-        set_periodic_ghost_neighbors_recursively(periodic_face_pairs_level_0[i],
+      for (unsigned int i=0; i<this->periodic_face_pairs_level_0.size(); ++i)
+        set_periodic_ghost_neighbors_recursively(this->periodic_face_pairs_level_0[i],
                                                  level, vertices_with_ghost_neighbors);
     }
 
@@ -4715,8 +4716,8 @@ namespace parallel
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
             marked_vertices[cell->vertex_index(v)] = true;
 
-      for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
-        mark_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
+      for (unsigned int i=0; i<this->periodic_face_pairs_level_0.size(); ++i)
+        mark_periodic_vertices_recursively(this->periodic_face_pairs_level_0[i],
                                            level, marked_vertices);
 
       return marked_vertices;
@@ -4862,7 +4863,7 @@ namespace parallel
         }
 
       //finally call the base class for storing the periodicity information
-      Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
+      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 #else
       Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
 #endif
@@ -4964,6 +4965,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
+      Triangulation<dim, spacedim>::update_periodic_face_map();
     }
 
 

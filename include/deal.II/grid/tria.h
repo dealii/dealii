@@ -46,6 +46,11 @@ template <int dim, int spacedim> class Boundary;
 template <int dim, int spacedim> class StraightBoundary;
 template <int dim, int spacedim> class Manifold;
 
+namespace GridTools
+{
+  template<typename CellIterator>  struct PeriodicFacePair;
+}
+
 template <int, int, int> class TriaAccessor;
 template <int spacedim> class TriaAccessor<0,1,spacedim>;
 template <int, int, int> class TriaAccessorBase;
@@ -1468,15 +1473,15 @@ public:
   /**
    * If add_periodicity() is called, this variable stores the given
    * periodic face pairs on level 0 for later access during the
-   * identification of ghost cells for the multigrid hierarchy.
+   * identification of ghost cells for the multigrid hierarchy and for
+   * setting up the periodic_face_map.
    */
   std::vector<GridTools::PeriodicFacePair<cell_iterator> > periodic_face_pairs_level_0;
 
   /**
    * If add_periodicity() is called, this variable stores the active periodic face pairs.
-   * The variable is updated on refinement.
    */
-  std::map<GridTools::PeriodicFacePair<cell_iterator>, GridTools::PeriodicFacePair<cell_iterator> > periodic_face_map;
+  std::map<std::pair<cell_iterator, unsigned int>, std::pair<cell_iterator, unsigned int> > periodic_face_map;
 
   /**
    * Make the dimension available in function templates.
@@ -2978,7 +2983,7 @@ public:
     * Declare the (coarse) face pairs given in the argument of this function
     * as periodic. This way it it possible to obtain neighbors across periodic
     * boundaries.
-    * This function initializes ActivePeriodicFacePairs and on refinement this
+    * This function initializes periodic_face_map that stores the active periodic faces.
     *
     * The vector can be filled by the function
     * GridTools::collect_periodic_faces.
@@ -3099,6 +3104,13 @@ protected:
                                 std::vector<bool>       &v,
                                 const unsigned int       magic_number2,
                                 std::istream            &in);
+
+  /**
+   * Recreate information about periodic neighbors from periodic_face_pairs_level_0.
+   * Only faces that belong to locally owned or ghosted cells are stored.
+   */
+  void update_periodic_face_map ();
+
 
 private:
   /**
