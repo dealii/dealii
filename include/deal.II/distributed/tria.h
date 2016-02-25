@@ -757,7 +757,8 @@ namespace parallel
       get_coarse_cell_to_p4est_tree_permutation() const;
 
       /**
-       * Join faces in the p4est forest for periodic boundary conditions. As a
+       * In addition to the action in the base class Triangulation, this function
+       * joins faces in the p4est forest for periodic boundary conditions. As a
        * result, each pair of faces will differ by at most one refinement
        * level and ghost neighbors will be available across these faces.
        *
@@ -773,7 +774,7 @@ namespace parallel
        * once is possible, but not recommended: The function destroys and
        * rebuilds the p4est forest each time it is called.
        */
-      void
+      virtual void
       add_periodicity
       (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &);
 

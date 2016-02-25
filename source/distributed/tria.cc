@@ -4861,10 +4861,8 @@ namespace parallel
           AssertThrow (false, ExcInternalError());
         }
 
-      periodic_face_pairs_level_0.insert(periodic_face_pairs_level_0.end(),
-                                         periodicity_vector.begin(),
-                                         periodicity_vector.end());
-
+      //finally call the base class for storing the periodicity information
+      Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 #else
       Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
 #endif

@@ -11587,6 +11587,14 @@ Triangulation<dim,spacedim>::get_triangulation () const
 }
 
 
+template <int dim, int spacedim>
+virtual void
+Triangulation<dim, spacedim>::add_periodicity()
+{
+  periodic_face_pairs_level_0.insert(periodic_face_pairs_level_0.end(),
+                                     periodicity_vector.begin(),
+                                     periodicity_vector.end());
+}
 
 template <int dim, int spacedim>
 void
