@@ -31,8 +31,6 @@
 
 #  include <cmath>
 
-#  define TrilinosScalar double
-
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations

@@ -33,8 +33,6 @@
 #  include <cmath>
 #  include <memory>
 
-#  define TrilinosScalar double
-
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsMatrix.h>
 #  include <Epetra_Map.h>

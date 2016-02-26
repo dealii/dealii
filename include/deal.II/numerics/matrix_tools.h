@@ -70,9 +70,6 @@ namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
-// TODO: move this to a stand-alone header and include from there?
-#  define TrilinosScalar double
-
 namespace TrilinosWrappers
 {
   class SparseMatrix;
