@@ -51,33 +51,161 @@ namespace Manifolds
 
 
 /**
- * This class is used to represent a manifold to a triangulation. When a
- * triangulation creates a new vertex on this manifold, it determines the new
- * vertex' coordinates through the following function:
+ * Manifolds are used to describe the geometry of boundaries of domains as
+ * well as the geometry of the interior. Manifold objects are therefore
+ * associated with cells, faces, and/or edges, either by direct user action
+ * or, if a user program does not do this explicitly, a default manifold
+ * object is used.
  *
+ * Manifolds are best understood by using the language of differential
+ * geometry, but their common uses can be easily described simply through
+ * examples.
+ *
+ *
+ * <h3>Common use case: Creating a new vertex</h3>
+ *
+ * In the most essential use of manifolds, manifold descriptions are used
+ * to create a "point between other points. For example, when a triangulation
+ * creates a new vertex on a cell, face, or edge , it determines the new
+ * vertex' coordinates through the following function call:
  *   @code
  *     ...
  *     Point<spacedim> new_vertex = manifold.get_new_point (quadrature);
  *     ...
  *   @endcode
- * @p quadrature is a Quadrature<spacedim> object, which contains a collection
- * of points in @p spacedim dimension, and a collection of weights (Note that
- * unlike almost all other cases in the library, we here interpret the points
- * in the quadrature object to be in real space, not on the reference cell.)
+ * Here, @p quadrature is a Quadrature<spacedim> object, which contains a collection
+ * of points in @p spacedim dimension, and a collection of weights. The points
+ * in this context will then be the vertices of the cell, face, or edge, and
+ * the weights are typically one over the number of points when a new midpoint
+ * of the cell, face, or edge is needed. Derived classes then will implement the
+ * Manifold::get_new_point() function in a way that computes the location of this
+ * new point. In the simplest case, for example in the FlatManifold class, the
+ * function simply computes the arithmetic average (with given weights) of
+ * the given points. However, other classes do something differently; for example,
+ * the SphericalManifold class used to describe domains that form (part of) the
+ * sphere, will ensure that if it is given the two vertices of an edge at
+ * the boundary, the new point returned will lie on the grand circle that connects
+ * the two points, rather than choosing a point that is half-way between the
+ * two points in ${\mathbb R}^d$.
  *
- * Internally, the get_new_point() function calls the project_to_manifold()
+ *
+ * @note Unlike almost all other cases in the library, we here interpret the points
+ * in the quadrature object to be in real space, not on the reference cell.
+ *
+ * Manifold::get_new_point() has a default implementation that can simplify
+ * this process somewhat:
+ * Internally, the function calls the Manifold::project_to_manifold()
  * function after computing the weighted average of the quadrature points.
- * This allows end users to only overload project_to_manifold() for simple
- * situations.
+ * This allows derived classes to only overload Manifold::project_to_manifold()
+ * for simple situations. This is often useful when describing manifolds that
+ * are embedded in higher dimensional space, e.g., the surface of a sphere.
+ * In those cases, the desired new point is simply the (weighted) average
+ * of the provided point, projected back out onto the sphere.
  *
- * Should a finer control be necessary, then get_new_point() can be
- * overloaded.
  *
- * FlatManifold is the specialization from which StraightBoundary is derived,
- * where the project_to_manifold() function is the identity.
+ * <h3>Common use case: Computing tangent vectors</h3>
+ *
+ * The second use of this class is in computing directions on domains and
+ * boundaries. For example, we may need to compute the normal vector to a
+ * face in order to impose the no-flow boundary condition
+ * $\mathbf u \cdot \mathbf n = 0$ (see the
+ * VectorTools::compute_no_normal_flux_constraints() as an example). Similarly,
+ * we may need normal vectors in the computation of the normal component of
+ * the gradient of the numerical solution in order to compute the jump in the
+ * gradient of the solution in error estimators (see, for example, the
+ * KellyErrorEstimator class).
+ *
+ * To make this possible, the Manifold class provides a member function
+ * (to be implemented by derived classes) that computes a "vector tangent
+ * to the manifold at one point, in direction of another point" via the
+ * Manifold::get_tangent_vector() function. For example, in 2d, one would
+ * use this function with the two vertices of an edge at the boundary
+ * to compute a "tangential" vector along the edge, and then get the normal
+ * vector by rotation by 90 degrees. In 3d, one would compute the two
+ * vectors "tangential" to the two edges of a boundary face adjacent to a
+ * boundary vertex, and then take the cross product of these two to
+ * obtain a vector normal to the boundary.
+ *
+ * For reasons that are more
+ * difficult to understand, these direction vectors are normalized in a very
+ * specific way, rather than to have unit norm. See the documentation of
+ * Manifold::get_tangent_vector(), as well as below, for more information.
+ *
+ * In the simplest case (namely, the FlatManifold class), these direction
+ * vectors are just the difference vector between the two given points.
+ * However, in more complicated (and more interesting) cases, the direction may
+ * be different. For example, for the SphericalManifold case, if the two given
+ * points lie on a common grand circle around the origin, then the direction
+ * vector will be tangential to the grand circle, rather than pointing straight
+ * from one point to the other.
+ *
+ *
+ * <h3>A unified description</h3>
+ *
+ * The "real" way to understand what this class does is to see it in the
+ * framework of differential geometry. More specifically, differential geometry
+ * is fundamentally based on the assumption that two sufficiently close points
+ * are connected via a line of "shortest distance". This line is called a
+ * "geodesic", and it is selected from all other lines that connect the two
+ * points by the property that it is shortest if distances are measured in
+ * terms of the "metric" that describes a manifold. To give examples, recall
+ * that the geodesics of a flat manifold (implemented in the FlatManifold
+ * class) are simply the straight lines connecting two points, whereas for
+ * spherical manifolds (see the SphericalManifold class) geodesics between
+ * two points of same distance are the grand circles, and are in general
+ * curved lines when connecting two lines of different distance from the
+ * origin.
+ *
+ * In the following discussion, and for the purposes of implementing the
+ * current class, the concept of "metrics" that is so fundamental to
+ * differential geometry is no longer of great importance to us. Rather,
+ * everything can simply be described by postulating the existence of
+ * geodesics connecting points on a manifold.
+ *
+ * Given geodesics, the operations discussed in the previous two sections
+ * can be described in a more formal way. In essence, they rely on the
+ * fact that we can assume that a geodesic is parameterized by a "time"
+ * like variable $t$ so that $\mathbf s(t)$ describes the curve and so
+ * that $\mathbf s(0)$ is the location of the first and $\mathbf s(1)$
+ * the location of the second point. Furthermore, $\mathbf s(t)$ traces
+ * out the geodesic at constant speed, covering equal distance in equal
+ * time (as measured by the metric). Note that this parameterization
+ * uses time, not arc length to denote progress along the geodesic.
+ *
+ * In this picture, computing a mid-point between points $\mathbf x_1$
+ * and $\mathbf x_2$ with weights $w_1$ and $w_2=1-w_1$ then simply
+ * requires computing the point $\mathbf s(w_1)$. Computing a new
+ * point as a weighted average of more than two points can be done
+ * by considering pairwise geodetics, finding suitable points on
+ * the geodetic between the first two points, then on the geodetic
+ * between this new point and the third given point, etc.
+ *
+ * Likewise, the "tangential" vector described above is simply the
+ * velocity vector, $\mathbf s'(t)$, evaluated at one of the end
+ * points of a geodesic (i.e., at $t=0$ or $t=1$). In the case of a flat
+ * manifold, the geodesic is simply the straight line connecting two points,
+ * and the velocity vector is just the connecting vector in that
+ * case. On the other hand, for two points on a spherical manifold,
+ * the geodesic is a grand circle, and the velocity vector is
+ * tangent to the spherical surface.
+ *
+ * Note that if we wanted to, we could use this to compute the length
+ * of the geodesic that connects two points $\mathbf x_1$
+ * and $\mathbf x_2$ by computing $\int_0^1 \|\mathbf s'(t)\| dt$
+ * along the geodesic that connects them, but this operation will
+ * not be of use to us in practice. One could also conceive
+ * computing the direction vector using the "new point" operation
+ * above, using the formula $\mathbf s'(0)=\lim_{w\rightarrow 0}
+ * \frac{\mathbf s(w)-\mathbf s(0)}{w}$ where all we need to do
+ * is compute the new point $\mathbf s(w)$ with weights $w$ and
+ * $1-w$ along the geodesic connecting $\mathbf x_1$ and $\mathbf x_2$.
+ * In practice, however, it is almost always possible to explicitly
+ * compute the direction vector, i.e., without the need to numerically
+ * approximate the limit process.
+ *
  *
  * @ingroup manifold
- * @author Luca Heltai, 2014
+ * @author Luca Heltai, Wolfgang Bangerth, 2014, 2016
  */
 template <int dim, int spacedim=dim>
 class Manifold : public Subscriptor
@@ -86,10 +214,15 @@ public:
 
 
   /**
-   * Destructor. Does nothing here, but needs to be declared to make it
-   * virtual.
+   * Destructor. Does nothing here, but needs to be declared virtual to make
+   * class hierarchies derived from this class possible.
    */
   virtual ~Manifold ();
+
+  /**
+   * @name Computing the location of points.
+   */
+  /// @{
 
   /**
    * Return the point which shall become the new vertex surrounded by the
@@ -201,6 +334,8 @@ public:
    */
   Point<spacedim>
   get_new_point_on_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+  /// @}
 };
 
 
