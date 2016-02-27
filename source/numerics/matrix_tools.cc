@@ -2399,7 +2399,7 @@ namespace MatrixTools
             // figure out which rows of the matrix we
             // have to eliminate on this processor
             std::vector<types::global_dof_index> constrained_rows;
-            for (std::map<types::global_dof_index,double>::const_iterator
+            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
                  dof  = boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
@@ -2422,7 +2422,7 @@ namespace MatrixTools
 
             std::vector<types::global_dof_index> indices;
             std::vector<PetscScalar>  solution_values;
-            for (std::map<types::global_dof_index,double>::const_iterator
+            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
                  dof  = boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
@@ -2522,7 +2522,7 @@ namespace MatrixTools
               block++;
             }
           const types::global_dof_index index = dof->first - offset;
-          block_boundary_values[block].insert(std::pair<types::global_dof_index, double> (index,dof->second));
+          block_boundary_values[block].insert(std::pair<types::global_dof_index, PetscScalar> (index,dof->second));
         }
     }
 
