@@ -1964,7 +1964,7 @@ namespace MatrixTools
     // there is no such thing
     number first_nonzero_diagonal_entry = 1;
     for (unsigned int i=0; i<n_dofs; ++i)
-      if (matrix.diag_element(i) != 0)
+      if (matrix.diag_element(i) != number())
         {
           first_nonzero_diagonal_entry = matrix.diag_element(i);
           break;
@@ -2002,7 +2002,7 @@ namespace MatrixTools
         // store the new rhs entry to make
         // the gauss step more efficient
         number new_rhs;
-        if (matrix.diag_element(dof_number) != 0.0)
+        if (matrix.diag_element(dof_number) != number())
           {
             new_rhs = dof->second * matrix.diag_element(dof_number);
             right_hand_side(dof_number) = new_rhs;
@@ -2076,7 +2076,7 @@ namespace MatrixTools
                                    "function, see the documentation."));
 
                 // correct right hand side
-                right_hand_side(row) -= p->value() /
+                right_hand_side(row) -= static_cast<number>(p->value()) /
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
