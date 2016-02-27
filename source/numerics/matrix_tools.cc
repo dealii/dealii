@@ -306,12 +306,12 @@ namespace MatrixCreator
                     {
                       if (data.coefficient->n_components==1)
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += (phi_i[point] * phi_j[point] * JxW[point] *
-                                       data.coefficient_values[point]);
+                          add_data += (data.coefficient_values[point] *
+                                       phi_i[point] * phi_j[point] * JxW[point]);
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += (phi_i[point] * phi_j[point] * JxW[point] *
-                                       data.coefficient_vector_values[point](component_i));
+                          add_data += (data.coefficient_vector_values[point](component_i) *
+                                       phi_i[point] * phi_j[point] * JxW[point]);
                     }
                   else
                     for (unsigned int point=0; point<n_q_points; ++point)
@@ -328,12 +328,12 @@ namespace MatrixCreator
                 add_data = 0;
                 if (data.rhs_function->n_components==1)
                   for (unsigned int point=0; point<n_q_points; ++point)
-                    add_data += phi_i[point] * JxW[point] *
-                                data.rhs_values[point];
+                    add_data += data.rhs_values[point] *
+                                phi_i[point] * JxW[point];
                 else
                   for (unsigned int point=0; point<n_q_points; ++point)
-                    add_data += phi_i[point] * JxW[point] *
-                                data.rhs_vector_values[point](component_i);
+                    add_data += data.rhs_vector_values[point](component_i) *
+                                phi_i[point] * JxW[point];
                 copy_data.cell_rhs(i) = add_data;
               }
           }
@@ -352,16 +352,16 @@ namespace MatrixCreator
                         {
                           if (data.coefficient->n_components==1)
                             for (unsigned int point=0; point<n_q_points; ++point)
-                              add_data += (fe_values.shape_value_component(i,point,comp_i) *
+                              add_data += (data.coefficient_values[point] *
+                                           fe_values.shape_value_component(i,point,comp_i) *
                                            fe_values.shape_value_component(j,point,comp_i) *
-                                           JxW[point] *
-                                           data.coefficient_values[point]);
+                                           JxW[point]);
                           else
                             for (unsigned int point=0; point<n_q_points; ++point)
-                              add_data += (fe_values.shape_value_component(i,point,comp_i) *
+                              add_data += (data.coefficient_vector_values[point](comp_i) *
+                                           fe_values.shape_value_component(i,point,comp_i) *
                                            fe_values.shape_value_component(j,point,comp_i) *
-                                           JxW[point] *
-                                           data.coefficient_vector_values[point](comp_i));
+                                           JxW[point]);
                         }
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
@@ -381,12 +381,14 @@ namespace MatrixCreator
                     {
                       if (data.rhs_function->n_components==1)
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += fe_values.shape_value_component(i,point,comp_i) *
-                                      JxW[point] * data.rhs_values[point];
+                          add_data += data.rhs_values[point] *
+                                      fe_values.shape_value_component(i,point,comp_i) *
+                                      JxW[point];
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += fe_values.shape_value_component(i,point,comp_i) *
-                                      JxW[point] * data.rhs_vector_values[point](comp_i);
+                          add_data += data.rhs_vector_values[point](comp_i) *
+                                      fe_values.shape_value_component(i,point,comp_i) *
+                                      JxW[point];
                     }
                 copy_data.cell_rhs(i) = add_data;
               }
