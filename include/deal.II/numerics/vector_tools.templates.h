@@ -752,6 +752,32 @@ namespace VectorTools
       return true;
     }
 
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
+                            const Vector<number> &tmp,
+                            Vector<number> &vec)
+    {
+      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+      // steps may not be sufficient, since roundoff errors may accumulate for
+      // badly conditioned matrices
+      ReductionControl      control(5*tmp.size(), 0., 1e-12, false, false);
+      GrowingVectorMemory<Vector<number> > memory;
+      SolverCG<Vector<number> >            cg(control,memory);
+
+      PreconditionSSOR<SparseMatrix<number> > prec;
+      prec.initialize(mass_matrix, 1.2);
+
+      cg.solve (mass_matrix, vec, tmp, prec);
+    }
+
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &mass_matrix,
+                            const Vector<std::complex<number> > &tmp,
+                            Vector<std::complex<number> > &vec)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
 
     /**
      * Generic implementation of the project() function
@@ -825,18 +851,7 @@ namespace VectorTools
           constraints.condense(mass_matrix, tmp);
         }
 
-      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
-      // steps may not be sufficient, since roundoff errors may accumulate for
-      // badly conditioned matrices
-      ReductionControl      control(5*tmp.size(), 0., 1e-12, false, false);
-      GrowingVectorMemory<Vector<number> > memory;
-      SolverCG<Vector<number> >            cg(control,memory);
-
-      PreconditionSSOR<SparseMatrix<number> > prec;
-      prec.initialize(mass_matrix, 1.2);
-
-      cg.solve (mass_matrix, vec, tmp, prec);
-
+      invert_mass_matrix(mass_matrix,tmp,vec);
       constraints.distribute (vec);
 
       // copy vec into vec_result. we can't use vec_result itself above, since
