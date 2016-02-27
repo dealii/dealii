@@ -2928,54 +2928,5 @@ namespace MatrixTools
 // explicit instantiations
 #include "matrix_tools.inst"
 
-namespace MatrixTools
-{
-  template
-  void
-  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 SparseMatrix<double>  &matrix,
-                                 Vector<double>   &solution,
-                                 Vector<double>   &right_hand_side,
-                                 const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<long double> (const std::map<types::global_dof_index,long double> &boundary_values,
-                                      SparseMatrix<long double>  &matrix,
-                                      Vector<long double>   &solution,
-                                      Vector<long double>   &right_hand_side,
-                                      const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<float> (const std::map<types::global_dof_index,float> &boundary_values,
-                                SparseMatrix<float>  &matrix,
-                                Vector<float>   &solution,
-                                Vector<float>   &right_hand_side,
-                                const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<long double> (const std::map<types::global_dof_index,long double> &boundary_values,
-                                      BlockSparseMatrix<long double>  &matrix,
-                                      BlockVector<long double>   &solution,
-                                      BlockVector<long double>   &right_hand_side,
-                                      const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 BlockSparseMatrix<double>  &matrix,
-                                 BlockVector<double>   &solution,
-                                 BlockVector<double>   &right_hand_side,
-                                 const bool        eliminate_columns);
-  template
-  void
-  apply_boundary_values<float> (const std::map<types::global_dof_index,float> &boundary_values,
-                                BlockSparseMatrix<float>  &matrix,
-                                BlockVector<float>   &solution,
-                                BlockVector<float>   &right_hand_side,
-                                const bool        eliminate_columns);
-}
 
 DEAL_II_NAMESPACE_CLOSE
