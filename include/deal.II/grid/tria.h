@@ -873,7 +873,7 @@ namespace internal
  * been called.
  *
  *
- * <h3>Boundary approximation</h3>
+ * <h3>%Boundary approximation</h3>
  *
  * You can specify a boundary function for each boundary component. If a new
  * vertex is created on a side or face at the boundary, this function is used
@@ -1070,7 +1070,7 @@ namespace internal
  *
  * <h3>Technical details</h3>
  *
- * <h4>Algorithms for mesh regularization and smoothing upon refinement</h4>
+ * <h4>%Algorithms for mesh regularization and smoothing upon refinement</h4>
  *
  * We chose an inductive point of view: since upon creation of the
  * triangulation all cells are on the same level, all regularity assumptions
