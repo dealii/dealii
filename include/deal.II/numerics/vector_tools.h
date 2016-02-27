@@ -1325,7 +1325,9 @@ namespace VectorTools
   /**
    * This function computes the constraints that correspond to boundary
    * conditions of the form $\vec u \cdot \vec n=\vec u_\Gamma \cdot \vec n$,
-   * i.e. normal flux constraints if $\vec u$ is a vector-valued quantity.
+   * i.e., normal flux constraints where $\vec u$ is a vector-valued solution
+   * variable and $\vec u_\Gamma$ is a prescribed vector field whose normal
+   * component we want to be equal to the normal component of the solution.
    * These conditions have exactly the form handled by the ConstraintMatrix
    * class, so instead of creating a map between boundary degrees of freedom
    * and corresponding value, we here create a list of constraints that are
@@ -1539,7 +1541,8 @@ namespace VectorTools
    const Mapping<dim, spacedim>         &mapping = StaticMappingQ1<dim>::mapping);
 
   /**
-   * Same as above for homogeneous normal-flux constraints.
+   * Same as above for homogeneous normal-flux constraints, i.e., for
+   * imposing the condition $\vec u \cdot \vec n= 0$.
    *
    * @ingroup constraints
    *
@@ -1557,12 +1560,14 @@ namespace VectorTools
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
-   * form $\vec u \times \vec n=\vec u_\Gamma \times \vec n$, i.e. tangential
-   * flow constraints if $\vec u$ is a vector-valued quantity. This function
-   * constrains exactly those vector-valued components that are left
-   * unconstrained by compute_no_normal_flux_constraints, and leaves the one
-   * component unconstrained that is constrained by
-   * compute_no_normal_flux_constraints.
+   * form $\vec u \times \vec n=\vec u_\Gamma \times \vec n$, i.e., tangential
+   * flow constraints where $\vec u$ is a vector-valued solution
+   * variable and $\vec u_\Gamma$ is prescribed vector field whose tangential
+   * component(s) we want to be equal to the tangential component(s) of the
+   * solution. This function constrains exactly those dim-1 vector-valued
+   * components that are left unconstrained by
+   * VectorTools::compute_no_normal_flux_constraints(), and leaves the one
+   * component unconstrained that is constrained by that function.
    *
    * @ingroup constraints
    *
