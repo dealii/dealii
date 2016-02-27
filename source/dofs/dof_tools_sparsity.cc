@@ -338,7 +338,7 @@ namespace DoFTools
       {
         // there are only 2 boundary indicators in 1d, so it is no
         // performance problem to call the other function
-        typename DoFHandlerType::FunctionMap boundary_ids;
+        std::map<types::boundary_id, const Function<DoFHandlerType::space_dimension,double>*> boundary_ids;
         boundary_ids[0] = 0;
         boundary_ids[1] = 0;
         make_boundary_sparsity_pattern<DoFHandlerType, SparsityPatternType>
@@ -397,10 +397,10 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType, typename SparsityPatternType, typename number>
   void make_boundary_sparsity_pattern
   (const DoFHandlerType                                              &dof,
-   const typename FunctionMap<DoFHandlerType::space_dimension>::type &boundary_ids,
+   const std::map<types::boundary_id, const Function<DoFHandlerType::space_dimension,number>*> &boundary_ids,
    const std::vector<types::global_dof_index>                        &dof_to_boundary_mapping,
    SparsityPatternType                                               &sparsity)
   {

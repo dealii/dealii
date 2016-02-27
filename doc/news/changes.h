@@ -38,6 +38,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: Many functions in VectorTools and MatrixTools now require
+  matching data types between vectors, matrices, and Function arguments.
+  <br>
+  (Denis Davydov, 2016/02/27)
+  </li>
+
   <li> Changed: ConstraintMatrix::distribute_local_to_global() and numerous
   functions in VectorTools namespace now require matching data types.
   This is done to correctly handle complex-valued case.

@@ -1832,14 +1832,15 @@ namespace hp
 
 
   template <>
-  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_ids) const
+  template <typename number>
+  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::map<types::boundary_id, const Function<1,number>*> &boundary_ids) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
     // check that only boundary
     // indicators 0 and 1 are allowed
     // in 1d
-    for (FunctionMap::const_iterator i=boundary_ids.begin();
+    for (typename std::map<types::boundary_id, const Function<1,number>*>::const_iterator i=boundary_ids.begin();
          i!=boundary_ids.end(); ++i)
       Assert ((i->first == 0) || (i->first == 1),
               ExcInvalidBoundaryIndicator());
@@ -1916,7 +1917,8 @@ namespace hp
   }
 
   template <>
-  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &) const
+  template <typename number>
+  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::map<types::boundary_id, const Function<2,number>*> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1939,7 +1941,8 @@ namespace hp
   }
 
   template <>
-  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const FunctionMap &) const
+  template <typename number>
+  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const std::map<types::boundary_id, const Function<3,number>*> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1992,8 +1995,9 @@ namespace hp
 
 
   template<int dim, int spacedim>
+  template<typename number>
   types::global_dof_index
-  DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_ids) const
+  DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
     Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
@@ -2073,7 +2077,8 @@ namespace hp
 
 
   template <>
-  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const FunctionMap &) const
+  template <typename number>
+  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const std::map<types::boundary_id, const Function<3,number>*> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;

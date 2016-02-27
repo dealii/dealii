@@ -130,6 +130,12 @@ namespace types
   typedef unsigned char material_id;
 }
 
+/**
+ * Declare type used in Epetra.
+ */
+typedef double TrilinosScalar;
+
+
 namespace TrilinosWrappers
 {
   namespace types

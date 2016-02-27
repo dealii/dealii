@@ -1283,6 +1283,7 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
       bool                             , \
       internal::bool2type<true>) const
 
+MATRIX_FUNCTIONS(SparseMatrix<long double>);
 MATRIX_FUNCTIONS(SparseMatrix<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>);
 MATRIX_FUNCTIONS(FullMatrix<double>);

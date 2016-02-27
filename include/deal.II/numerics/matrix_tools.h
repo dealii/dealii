@@ -53,6 +53,8 @@ namespace hp
 
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <petscsys.h>
+
 namespace PETScWrappers
 {
   class SparseMatrix;
@@ -175,8 +177,8 @@ namespace TrilinosWrappers
  *
  * The create_boundary_mass_matrix() creates the matrix with entries $m_{ij} =
  * \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union of boundary
- * parts with indicators contained in a FunctionMap passed to the function
- * (i.e. if you want to set up the mass matrix for the parts of the boundary
+ * parts with indicators contained in a std::map<types::boundary_id, const Function<spacedim,number>*>
+ *  passed to the function (i.e. if you want to set up the mass matrix for the parts of the boundary
  * with indicators zero and 2, you pass the function a map of <tt>unsigned
  * char</tt>s as parameter @p boundary_functions containing the keys zero and
  * 2). The size of the matrix is equal to the number of degrees of freedom
@@ -232,23 +234,23 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Calls the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -267,73 +269,73 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const Mapping<dim, spacedim>   &mapping,
                            const DoFHandler<dim,spacedim> &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> &rhs,
+                           const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Calls the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const DoFHandler<dim,spacedim> &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> &rhs,
+                           const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
                            const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> &rhs,
+                           const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, typename number, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> &rhs,
+                           const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim> *const a = 0,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
 
@@ -359,15 +361,15 @@ namespace MatrixCreator
    * @todo This function does not work for finite elements with cell-dependent
    * shape functions.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                                     const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
-                                    SparseMatrix<double>     &matrix,
-                                    const typename FunctionMap<spacedim>::type &boundary_functions,
-                                    Vector<double>           &rhs_vector,
+                                    SparseMatrix<number>     &matrix,
+                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
+                                    Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim> *const weight = 0,
+                                    const Function<spacedim,number> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 
@@ -375,41 +377,41 @@ namespace MatrixCreator
    * Calls the create_boundary_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
-                                    SparseMatrix<double>     &matrix,
-                                    const typename FunctionMap<spacedim>::type        &boundary_functions,
-                                    Vector<double>           &rhs_vector,
+                                    SparseMatrix<number>     &matrix,
+                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
+                                    Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim> *const a = 0,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                                     const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<double>     &matrix,
-                                    const typename FunctionMap<spacedim>::type &boundary_functions,
-                                    Vector<double>           &rhs_vector,
+                                    SparseMatrix<number>     &matrix,
+                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
+                                    Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim> *const a = 0,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Same function as above, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<double>     &matrix,
-                                    const typename FunctionMap<spacedim>::type        &boundary_functions,
-                                    Vector<double>           &rhs_vector,
+                                    SparseMatrix<number>     &matrix,
+                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
+                                    Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim> *const a = 0,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -757,7 +759,7 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
                          SparseMatrix<number>  &matrix,
                          Vector<number>        &solution,
                          Vector<number>        &right_hand_side,
@@ -770,7 +772,7 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
                          BlockSparseMatrix<number>           &matrix,
                          BlockVector<number>                 &solution,
                          BlockVector<number>                 &right_hand_side,
@@ -797,7 +799,7 @@ namespace MatrixTools
    * This function is used in step-17 and step-18.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
                          PETScWrappers::SparseMatrix  &matrix,
                          PETScWrappers::Vector  &solution,
                          PETScWrappers::Vector  &right_hand_side,
@@ -823,7 +825,7 @@ namespace MatrixTools
    * rows.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
                          PETScWrappers::MPI::Vector  &solution,
                          PETScWrappers::MPI::Vector  &right_hand_side,
@@ -833,7 +835,7 @@ namespace MatrixTools
    * Same function, but for parallel PETSc matrices and a non-parallel vector.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
                          PETScWrappers::Vector       &solution,
                          PETScWrappers::MPI::Vector  &right_hand_side,
@@ -843,7 +845,7 @@ namespace MatrixTools
    * Same as above but for BlockSparseMatrix.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double>  &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar>  &boundary_values,
                          PETScWrappers::MPI::BlockSparseMatrix &matrix,
                          PETScWrappers::MPI::BlockVector        &solution,
                          PETScWrappers::MPI::BlockVector        &right_hand_side,
@@ -870,7 +872,7 @@ namespace MatrixTools
    * name in this namespace.)
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::Vector        &solution,
                          TrilinosWrappers::Vector        &right_hand_side,
@@ -881,7 +883,7 @@ namespace MatrixTools
    * structures.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::BlockVector        &solution,
                          TrilinosWrappers::BlockVector        &right_hand_side,
@@ -907,7 +909,7 @@ namespace MatrixTools
    * rows.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::MPI::Vector   &solution,
                          TrilinosWrappers::MPI::Vector   &right_hand_side,
@@ -918,7 +920,7 @@ namespace MatrixTools
    * structures.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::MPI::BlockVector   &solution,
                          TrilinosWrappers::MPI::BlockVector   &right_hand_side,
@@ -943,11 +945,12 @@ namespace MatrixTools
    *
    * @dealiiVideoLecture{21.6,21.65}
    */
+  template <typename number>
   void
-  local_apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+  local_apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
                                const std::vector<types::global_dof_index> &local_dof_indices,
-                               FullMatrix<double> &local_matrix,
-                               Vector<double>     &local_rhs,
+                               FullMatrix<number> &local_matrix,
+                               Vector<number>     &local_rhs,
                                const bool          eliminate_columns);
 
   /**

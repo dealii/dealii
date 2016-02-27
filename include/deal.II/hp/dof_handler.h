@@ -203,11 +203,6 @@ namespace hp
     typedef typename LevelSelector::face_iterator         level_face_iterator;
 
     /**
-     * Alias the @p FunctionMap type declared elsewhere.
-     */
-    typedef typename FunctionMap<spacedim>::type FunctionMap;
-
-    /**
      * Make the dimension available in function templates.
      */
     static const unsigned int dimension = dim;
@@ -526,9 +521,12 @@ namespace hp
      * reason that a @p map rather than a @p set is used is the same as
      * described in the section on the @p make_boundary_sparsity_pattern
      * function.
+     *
+     * The type of @p boundary_ids equals typename FunctionMap<spacedim,number>::type.
      */
+    template <typename number>
     types::global_dof_index
-    n_boundary_dofs (const FunctionMap &boundary_ids) const;
+    n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const;
 
     /**
      * Same function, but with different data type of the argument, which is
