@@ -134,6 +134,8 @@ namespace types
  * Declare type used in Epetra.
  */
 typedef double TrilinosScalar;
+
+
 namespace TrilinosWrappers
 {
   namespace types

@@ -53,7 +53,7 @@ namespace hp
 
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <petscvec.h>
+#  include <petscsys.h>
 
 namespace PETScWrappers
 {
