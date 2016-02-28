@@ -501,6 +501,7 @@ public:
   /**
    * import functions from private base class
    */
+  using typename PreconditionBlock<MatrixType,inverse_type>::AdditionalData;
   using PreconditionBlock<MatrixType, inverse_type>::initialize;
   using PreconditionBlock<MatrixType, inverse_type>::clear;
   using PreconditionBlock<MatrixType, inverse_type>::empty;
