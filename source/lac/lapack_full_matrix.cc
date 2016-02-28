@@ -22,8 +22,6 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
-#include <boost/math/special_functions/round.hpp>
-
 #include <iostream>
 #include <iomanip>
 
@@ -504,8 +502,9 @@ LAPACKFullMatrix<number>::compute_svd()
         &wr[0], mu, &mm, mvt, &nn,
         &work[0], &lwork, &ipiv[0], &info);
   AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
-  // Now resize work array and
-  lwork = boost::math::iround(work[0]);
+  // Resize the work array. Add one to the size computed by LAPACK to be on
+  // the safe side.
+  lwork = static_cast<int>(work[0] + 1);
 
   work.resize(lwork);
   // Do the actual SVD.
@@ -656,8 +655,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   // geev returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according to suggestion.
-  lwork = boost::math::iround(work[0]);
+  // Allocate working array according to suggestion (same strategy as was
+  // noted in compute_svd).
+  lwork = static_cast<int>(work[0] + 1);
 
   // resize workspace array
   work.resize((size_type ) lwork);
@@ -728,8 +728,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
   // syevx returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according to suggestion.
-  lwork = boost::math::iround(work[0]);
+  // Allocate working array according to suggestion (same strategy as was noted in
+  // compute_svd).
+  lwork = static_cast<int>(work[0] + 1);
   work.resize(static_cast<size_type> (lwork));
 
   // Finally compute the eigenvalues.
@@ -818,8 +819,9 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // sygvx returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according to suggestion.
-  lwork = boost::math::iround(work[0]);
+  // Allocate working array according to suggestion (same strategy as was
+  // noted in compute_svd).
+  lwork = static_cast<int>(work[0] + 1);
 
   // resize workspace arrays
   work.resize(static_cast<size_type> (lwork));
@@ -899,8 +901,9 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   // sygv returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according to suggestion.
-  lwork = boost::math::iround(work[0]);
+  // Allocate working array according to suggestion (same strategy as was
+  // noted in compute_svd).
+  lwork = static_cast<int>(work[0] + 1);
 
   // resize workspace array
   work.resize((size_type) lwork);
