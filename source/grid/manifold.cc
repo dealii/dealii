@@ -214,11 +214,21 @@ get_new_point_on_hex (const Triangulation<3, 3>::hex_iterator &hex) const
 
 template <int dim, int spacedim>
 Tensor<1,spacedim>
-Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &,
-                                           const Point<spacedim> &) const
+Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &x1,
+                                           const Point<spacedim> &x2) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Tensor<1,spacedim>();
+  const double epsilon = 1e-8;
+
+  std::vector<Point<spacedim> > q;
+  q.push_back(x1);
+  q.push_back(x2);
+
+  std::vector<double> w;
+  w.push_back(epsilon);
+  w.push_back(1.0-epsilon);
+
+  const Tensor<1,spacedim> neighbor_point = get_new_point (Quadrature<spacedim>(q, w));
+  return (neighbor_point-x1)/epsilon;
 }
 
 /* -------------------------- FlatManifold --------------------- */

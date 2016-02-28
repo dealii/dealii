@@ -199,9 +199,11 @@ namespace Manifolds
  * \frac{\mathbf s(w)-\mathbf s(0)}{w}$ where all we need to do
  * is compute the new point $\mathbf s(w)$ with weights $w$ and
  * $1-w$ along the geodesic connecting $\mathbf x_1$ and $\mathbf x_2$.
+ * The default implementation of the function does this, by evaluating
+ * the quotient for a small but finite weight $w$.
  * In practice, however, it is almost always possible to explicitly
  * compute the direction vector, i.e., without the need to numerically
- * approximate the limit process.
+ * approximate the limit process, and derived classes should do so.
  *
  *
  * @ingroup manifold
@@ -365,12 +367,11 @@ public:
    * $\mathbf s(t)$ must move "faster" if the two points it connects between
    * arguments $t=0$ and $t=1$ are farther apart.
    *
-   * This function is used, among other cases, in computing normal vectors to
-   * faces or, more generally, surfaces such as the boundary. Since not all
-   * programs need this functionality, this function has a default
-   * implementation that just throws an exception. Consequently, derived
-   * classes only have to implement this function if the program that uses
-   * them does in fact call it directly or indirectly.
+   * The default implementation of this function approximates
+   * $\mathbf s'(0) \approx \frac{$\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
+   * for a small value of $\epsilon$, and the evaluation of $\mathbf s(\epsilon)$
+   * is done by calling get_new_point(). If possible, derived classes should
+   * override this function by an implement of the exact derivative.
    *
    * @param x1 The first point that describes the geodesic, and the one
    *   at which the "direction" is to be evaluated.
